@@ -3,12 +3,23 @@ ChangeLog for herdstat
 2005-03-07 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version.
+	* bashcomp: Added completion.
+	* doc/herdstat.1.in: Added a non-option args section to explain them.
+	Also added the info relevant to the all target.
 	* src/herdstat.cc: Added herds.xml filesize check as it seems wget
 	will write a 0 byte file if fetching fails, rather than return an
 	exit code.
 	* src/action_pkg_handler.cc: Display a small message at the beginning
 	of operator() to give the user a hint as to why it might be taking a
-	while.
+	while.  Also, added check early on to make sure herd exists before
+	going through the trouble of getting the list of metadatas.
+	* src/action_dev_handler.cc: Added support for the 'all' target.
+	* src/action_herd_handler.cc: Fixed to respect --quiet when 'all'
+	target is specified.
+	* src/herds.cc: Only display name,desc, and email members of herd_T if
+	they're not empty.
+	* src/util.cc, src/util.hh: Moved the ECHANGELOG_USER check here in
+	current_user().
 
 2005-03-06 Aaron Walker <ka0ttic@gentoo.org>
 

@@ -1,0 +1,50 @@
+# $Id$
+# bash command-line completion for herdstat
+# Author: Aaron Walker <ka0ttic@gentoo.org>
+
+_herdstat() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-h --help -V --version -p --package -d --dev -H --herdsxml
+	-v --verbose -q --quiet -D --debug -t --timer all"
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+	return 0
+    elif [[ ${COMP_CWORD} -eq 1 ]] ; then
+	COMPREPLY=( $(compgen -W "$(herdstat -q all) ${opts}" -- ${cur}) )
+	return 0
+    fi
+
+    case "${prev}" in
+	-H|--herdsxml)
+	    COMPREPLY=( $(compgen -f -- ${cur}) )
+	    ;;
+	-p|--package)
+	    COMPREPLY=( $(compgen -W "$(herdstat -q all) ${opts}" -- ${cur}) )
+	    ;;
+	-d|--dev)
+	    COMPREPLY=( $(compgen -W "$(herdstat -dq all) ${opts}" -- ${cur}) )
+	    ;;
+	*)
+	    local x dev
+	    for x in ${COMP_WORDS[@]} ; do
+		if [[ ${x} == "-d" || ${x} == "--dev" ]] ; then
+		    dev=1
+		    break
+		fi
+	    done
+
+	    if [[ ${dev} -eq 1 ]] ; then
+		COMPREPLY=( $(compgen -W "$(herdstat -dq all) ${opts})" -- ${cur}) )
+	    else
+		COMPREPLY=( $(compgen -W "$(herdstat -q all) ${opts})" -- ${cur}) )
+	    fi
+	    ;;
+    esac
+}
+complete -o filenames -F _herdstat herdstat
+
+# vim: set ft=sh tw=80 sw=4 et :
