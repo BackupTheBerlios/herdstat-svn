@@ -294,10 +294,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     if (options.timer())
     {
-        float avg = timer.elapsed() / static_cast<long>(metadatas.size());
+        float avg = static_cast<float>(timer.elapsed()) /
+            static_cast<float>(metadatas.size());
         std::cout << std::endl << "Took " << timer.elapsed() << "ms to parse "
             << metadatas.size() << " metadata.xml's for an avg of "
-            << util::sprintf("%.2f", avg) << " ms/metadata.xml." << std::endl;
+            << util::sprintf("%.4f", avg) << " ms/metadata.xml." << std::endl;
     }
     else if (options.verbose())
     {
