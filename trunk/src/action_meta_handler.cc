@@ -182,8 +182,8 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         /* is there more than one package with that name? */
         if (possibles.size() > 1)
         {
-            std::cerr << *i << " is ambiguous." << std::endl << std::endl
-                << "Possible matches: " << std::endl;
+            std::cerr << *i << " is ambiguous.  Possibles matches:"
+                << std::endl << std::endl;
 
             std::vector<std::string>::iterator p;
             for (p = possibles.begin() ; p != possibles.end() ; ++p)
@@ -207,6 +207,9 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         if (possibles.front().find("/") == std::string::npos)
             cat = true;
         
+        if (n != 1)
+            output.endl();
+
         output(cat ? "Category" : "Package", possibles.front());
 
         if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
@@ -231,9 +234,6 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                     << e.error() << std::endl;
                 return EXIT_FAILURE;
             }
-
-            if (n != 1)
-                output.endl();
 
             /* herds */
             if (not cat and (herds.empty() or (herds.front() == "no-herd")))
