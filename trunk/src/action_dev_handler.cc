@@ -52,7 +52,12 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     
     /* set format attributes */
     formatter_T output;
-    output.set_maxlabel(12);
+
+    if (devs[0] == "all")
+        output.set_maxlabel(16);
+    else
+        output.set_maxlabel(12);
+
     output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
     output.set_attrs();
 
