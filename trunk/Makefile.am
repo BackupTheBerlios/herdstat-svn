@@ -16,7 +16,6 @@ EXTRA_DIST = autogen.sh .todo bashcomp
 TODO: .todo
 	@test -x $(prefix)/bin/devtodo && devtodo all --TODO
 
-all: TODO
 dist-hook: TODO
 
 dist-sign: dist
