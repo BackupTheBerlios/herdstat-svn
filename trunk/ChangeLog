@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-04-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util.cc, lib/util.hh, lib/vars.cc, lib/vars.hh: added vars_T and
+	removed get_*_var().
+
 2005-04-03 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_misc.cc, lib/portage_misc.hh: Added

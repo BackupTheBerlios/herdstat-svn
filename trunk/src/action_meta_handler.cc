@@ -212,8 +212,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         }
             
         /* if no '/' exists, assume it's a category */
-        if (possibles.front().find("/") == std::string::npos)
-            cat = true;
+        cat = (possibles.front().find('/') == std::string::npos);
         
         if (n != 1 and quiet)
             *stream << std::endl;
@@ -227,6 +226,8 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
         if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
         {
+            util::vars_T ebuild_vars;
+
             /* parse it */
             try
             {
@@ -302,19 +303,23 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             if (not cat)
             {
-                /* HOMEPAGE */
-                std::string homepage = util::get_ebuild_var(portdir,
-                    possibles.front(), "HOMEPAGE");
+                std::string ebuild(util::ebuild_which(portdir, possibles.front()));
+                ebuild_vars.read(ebuild);
 
                 if (quiet)
                 {
-                    if (homepage.empty())
-                        homepage = "none";
+                    if (ebuild_vars["HOMEPAGE"].empty())
+                        ebuild_vars["HOMEPAGE"] = "none";
                         
-                    *stream << homepage << std::endl;
+                    *stream << util::parse_homepage(ebuild_vars["HOMEPAGE"],
+                        ebuild_vars) << std::endl;
                 }
-                else if (not homepage.empty())
-                    output("Homepage", homepage);
+                else if (not ebuild_vars["HOMEPAGE"].empty())
+                {
+                    output("Homepage",
+                        util::parse_homepage(ebuild_vars["HOMEPAGE"],
+                            ebuild_vars));
+                }
             }
 
             /* long description */
@@ -322,19 +327,15 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not cat)
                 {
-                    /* ebuild's DESCRIPTION */
-                    longdesc = util::get_ebuild_var(portdir, possibles.front(),
-                        "DESCRIPTION");
-
                     if (quiet)
                     {
-                        if (longdesc.empty())
-                            longdesc = "none";
+                        if (ebuild_vars["DESCRIPTION"].empty())
+                            ebuild_vars["DESCRIPTION"] = "none";
 
-                        *stream << longdesc << std::endl;
+                        *stream << ebuild_vars["DESCRIPTION"] << std::endl;
                     }
-                    else if (not longdesc.empty());
-                        output("Description", longdesc);
+                    else if (not ebuild_vars["DESCRIPTION"].empty());
+                        output("Description", ebuild_vars["DESCRIPTION"]);
                 }
                 else
                     *stream << "none" << std::endl;
@@ -356,31 +357,32 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
-                std::string homepage = util::get_ebuild_var(portdir,
-                    possibles.front(), "HOMEPAGE");
+                util::vars_T ebuild_vars(util::ebuild_which(portdir,
+                    possibles.front()));
                 
                 if (quiet)
                 {
-                    if (homepage.empty())
-                        homepage = "none";
-
-                    *stream << homepage << std::endl;
+                    if (ebuild_vars["HOMEPAGE"].empty())
+                        ebuild_vars["HOMEPAGE"] = "none";
+                        
+                    *stream << util::parse_homepage(ebuild_vars["HOMEPAGE"],
+                        ebuild_vars) << std::endl;
                 }
-                else if (not homepage.empty())
-                    output("Homepage", homepage);
-
-                longdesc = util::get_ebuild_var(portdir, possibles.front(),
-                    "DESCRIPTION");
+                else if (not ebuild_vars["HOMEPAGE"].empty())
+                {
+                    output("Homepage", util::parse_homepage(ebuild_vars["HOMEPAGE"],
+                        ebuild_vars));
+                }
 
                 if (quiet)
                 {
-                    if (longdesc.empty())
-                        longdesc = "none";
+                    if (ebuild_vars["DESCRIPTION"].empty())
+                        ebuild_vars["DESCRIPTION"] = "none";
 
-                    *stream << longdesc << std::endl;
+                    *stream << ebuild_vars["DESCRIPTION"] << std::endl;
                 }
-                else if (not longdesc.empty())
-                    output("Description", longdesc);
+                else if (not ebuild_vars["DESCRIPTION"].empty())
+                    output("Description", ebuild_vars["DESCRIPTION"]);
             }
         }
     }

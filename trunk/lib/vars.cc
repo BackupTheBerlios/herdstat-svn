@@ -29,6 +29,7 @@
 #include "vars.hh"
 #include "util_exceptions.hh"
 
+void
 util::vars_T::read()
 {
     std::auto_ptr<std::ifstream> f(new std::ifstream(_file.c_str()));
@@ -38,6 +39,25 @@ util::vars_T::read()
     this->read(*f);
 }
 
+void
+util::vars_T::read(const char *path)
+{
+    _file.assign(path);
+
+    std::auto_ptr<std::ifstream> f(new std::ifstream(path));
+    if (not (*f))
+        throw util::bad_fileobject_E(path);
+
+    this->read(*f);
+}
+
+void
+util::vars_T::read(const std::string &path)
+{
+    return this->read(path.c_str());
+}
+
+void
 util::vars_T::read(std::ifstream &stream)
 {
     std::string line;
@@ -76,7 +96,7 @@ util::vars_T::read(std::ifstream &stream)
                     val.erase(pos, pos + 1);
             }
  
-            keys[key] = val;
+            _keys[key] = val;
         }
     }
 }

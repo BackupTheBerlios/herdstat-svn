@@ -36,7 +36,7 @@ namespace util
     class vars_T
     {
         protected:
-            const std::string _file;
+            std::string _file;
             std::map<std::string, std::string> _keys;
 
         public:
@@ -44,11 +44,16 @@ namespace util
             typedef std::map<std::string, std::string>::iterator iterator;
 
             vars_T() { }
+            vars_T(const char *path) : _file(path) { this->read(); }
             vars_T(const std::string &path) : _file(path) { this->read(); }
             vars_T(std::ifstream &stream) { this->read(stream); }
             
             void read();
+            void read(const char *);
+            void read(const std::string &);
             void read(std::ifstream &);
+
+            const std::string &filename() const { return _file; }
             
             /* provide a small subset of map methods */
             size_type size() const { return _keys.size(); }

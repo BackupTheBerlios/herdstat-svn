@@ -65,11 +65,6 @@ namespace util
 {
     bool md5check(const std::string &, const std::string &);
     std::string getcwd();
-    const char *get_ebuild_var(const std::string &, const std::string &,
-	const std::string &);
-    const char *get_var(const std::string &, const std::string &);
-    std::map<std::string, std::string> get_vars(const std::string &,
-	const std::vector<std::string> &);
     std::string get_user_from_email(const std::string &);
     void copy_file(const std::string &, const std::string &);
     void move_file(const std::string &, const std::string &);

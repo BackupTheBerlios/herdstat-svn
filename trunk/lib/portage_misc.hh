@@ -33,6 +33,8 @@ namespace util
 {
     bool in_pkg_dir();
     const char *ebuild_which(const std::string &, const std::string &);
+    std::vector<std::string> get_version_components(const std::string &);
+    std::map<std::string, std::string> get_version_map(const std::string &);
     std::string parse_homepage(const std::string &, vars_T &);
 }
 

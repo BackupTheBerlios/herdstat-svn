@@ -29,15 +29,18 @@
 
 #include "vars.hh"
 
-class portage_config_T : public vars_T
+namespace util
 {
-    public:
-        portage_config_T()
-        {
-            this->read("/etc/make.globals");
-            this->read("/etc/make.conf");
-        }
-};
+    class portage_config_T : public util::vars_T
+    {
+        public:
+            portage_config_T()
+            {
+                this->read("/etc/make.globals");
+                this->read("/etc/make.conf");
+            }
+    };
+}
 
 #endif
 

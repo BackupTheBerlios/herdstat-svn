@@ -3,6 +3,7 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     util.hh util.cc \
 		     string.hh string.cc \
 		     timer.hh \
+		     vars.hh vars.cc \
 		     portage_misc.hh portage_misc.cc \
 		     portage_config.hh
 

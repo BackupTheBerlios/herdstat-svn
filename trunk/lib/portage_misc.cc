@@ -144,9 +144,26 @@ util::get_version_components(const std::string &path)
 
     std::copy(parts.begin(), parts.end(), std::back_inserter(components));
 
-    std::assert(components.size() != 3);
+    assert(components.size() == 3);
 
     return components;
+}
+
+std::map<std::string, std::string>
+util::get_version_map(const std::string &path)
+{
+    std::map<std::string, std::string> version;
+    std::vector<std::string> components = util::get_version_components(path);
+
+    version["PN"] = components[0];
+    version["PV"] = components[1];
+    version["PR"] = components[2];
+
+    version["P"]  = version["PN"] + "-" + version["PV"];
+    version["PVR"] = version["PV"] + "-" + version["PR"];
+    version["PF"] = version["PN"] + "-" + version["PVR"];
+
+    return version;
 }
 
 /*
@@ -181,17 +198,28 @@ util::parse_homepage(const std::string &homepage, vars_T &vars)
 
         for (i = v.begin() ; i != v.end() ; ++i)
         {
-            std::string s("${" + (*i) + "}");
-            std::string::size_type pos = h.find(s);
+            std::string subst;
+            std::string var("${"+(*i)+"}");
+
+            std::string::size_type pos = h.find(var);
             if (pos == std::string::npos)
                 continue;
 
             vars_T::iterator x = vars.find(*i);
-            if (x != vars.end() and not x->second.empty())
-                h.replace(pos, s.length(), x->second, 0, x->second.length());
+            if (x != vars.end())
+                subst = x->second;
             else
             {
+                /* TODO: make a version class that does this */
+                std::map<std::string, std::string> version =
+                    util::get_version_map(vars.filename());
+                std::map<std::string, std::string>::iterator y = version.find(*i);
+                if (y != version.end())
+                    subst = y->second;
             }
+
+            if (not subst.empty())
+                h.replace(pos, var.length(), subst, 0, subst.length());
         }
     }
 
