@@ -6,6 +6,9 @@ ChangeLog for herdstat
 	* src/herdstat.cc: Added herds.xml filesize check as it seems wget
 	will write a 0 byte file if fetching fails, rather than return an
 	exit code.
+	* src/action_pkg_handler.cc: Display a small message at the beginning
+	of operator() to give the user a hint as to why it might be taking a
+	while.
 
 2005-03-06 Aaron Walker <ka0ttic@gentoo.org>
 

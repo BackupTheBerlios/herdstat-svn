@@ -142,6 +142,10 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     output.set_labelcolor(color[green]);
     output.set_attrs();
 
+    if (not options.quiet())
+        std::cout << "Parsing metadata.xml's (this may take a while)..."
+            << std::endl;
+
     /* get a list of every metadata.xml */
     std::vector<std::string> metadatas;
     try
@@ -250,6 +254,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
         if (not options.quiet())
         {
+            output.endl();
             output.append("Herd", *herd);
             if (not herds_xml[*herd]->mail.empty())
                 output.append("Email", herds_xml[*herd]->mail);
@@ -289,8 +294,15 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     if (options.timer())
     {
-        std::cout << std::endl << "Took " << timer.elapsed()
-            << "ms to parse every metadata.xml in the tree." << std::endl;
+        float avg = timer.elapsed() / static_cast<long>(metadatas.size());
+        std::cout << std::endl << "Took " << timer.elapsed() << "ms to parse "
+            << metadatas.size() << " metadata.xml's for an avg of "
+            << util::sprintf("%.2f", avg) << " ms/metadata.xml." << std::endl;
+    }
+    else if (options.verbose())
+    {
+        std::cout << std::endl
+            << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
 
     return EXIT_SUCCESS;
