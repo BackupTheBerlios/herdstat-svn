@@ -2,6 +2,10 @@ ChangeLog for herdstat
 
 2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
 
+	* src/exceptions.hh: va_start doesn't necessarily need a const char *.
+	Thanks to azarah for helping me with this.  This fix gets rid of the
+	only remaining gcc-4 warnings.
+
 	* configure.ac: Update version (release-0.5).
 	* NEWS: Update for 0.5 (and forgot to update for 0.4).
 	* src/formatter.hh: Added peek() member function for peeking at the
