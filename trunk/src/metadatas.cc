@@ -76,6 +76,8 @@ metadatas_T::cache_is_valid()
         {
             if (util::md5check(path, LASTSYNC))
                 valid = true;
+            else
+                util::copy_file(path, LASTSYNC);
         }
         /* no timestamp, so no rsync, just expire after 24hrs */
         else if (lastsync)
