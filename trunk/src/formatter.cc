@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "util.hh"
+#include "common.hh"
 #include "formatter.hh"
 #include "exceptions.hh"
 
@@ -175,10 +175,10 @@ formatter_T::append(const std::string &label, const std::string &data)
 
     if (not data.empty())
     {
-        util::debug_msg("data = '%s'", data.c_str());
+        debug_msg("data = '%s'", data.c_str());
 
         if (quiet())
-            append(label, util::splitstr(data));
+            append(label, util::split(data));
         else
         {
             size_type maxlen =
@@ -187,17 +187,17 @@ formatter_T::append(const std::string &label, const std::string &data)
 
             if ((cur.length() + data.length()) < maxlen)
             {
-                cur += highlight(util::splitstr(data));
-                util::debug_msg("it all fits on one line");
+                cur += highlight(util::split(data));
+                debug_msg("it all fits on one line");
             }
             else
             {
                 /* line's full, so find a location where we can truncate */
                 std::string::size_type pos = data.rfind(" ", attr.maxdata);
-                cur += highlight(util::splitstr(
+                cur += highlight(util::split(
                     (pos == std::string::npos ? data : data.substr(0, pos))));
 
-                util::debug_msg("pushing back '%s'", cur.c_str());
+                debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
                 cur.clear();
 
@@ -208,10 +208,10 @@ formatter_T::append(const std::string &label, const std::string &data)
                 while (cur.length() < attr.maxlabel)
                     cur.append(" ");
 
-                util::debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
+                debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
-                std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
+                std::vector<std::string> leftovers = util::split(data.substr(pos));
 
                 std::vector<std::string>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
@@ -242,7 +242,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                         curlen = cur.length() - attr.highlight_color.length() -
                             attr.no_color.length();
 
-                        util::debug_msg("found color in cur; setting curlen to %d",
+                        debug_msg("found color in cur; setting curlen to %d",
                             curlen);
                     }
 
@@ -252,7 +252,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                         curlen = cur.length() + attr.highlight_color.length() +
                             attr.no_color.length();
 
-                        util::debug_msg("highlighted '%s'; setting curlen to %d",
+                        debug_msg("highlighted '%s'; setting curlen to %d",
                             (*i).c_str(), curlen);
                     }
 
@@ -260,13 +260,13 @@ formatter_T::append(const std::string &label, const std::string &data)
                     else
                     {
                         curlen = cur.length();
-                        util::debug_msg("no highlight; setting curlen to %d", curlen);
+                        debug_msg("no highlight; setting curlen to %d", curlen);
                     }
 
                     /* does it fit on the current line? */
                     if ((curlen + (*i).length()) > attr.maxtotal)
                     {
-                        util::debug_msg("pushing back '%s'", cur.c_str());
+                        debug_msg("pushing back '%s'", cur.c_str());
                         buffer.push_back(cur);
                         cur.clear();
 
@@ -291,7 +291,7 @@ formatter_T::append(const std::string &label, const std::string &data)
 
     if (cur.length() > 0)
     {
-        util::debug_msg("pushing back '%s'", cur.c_str());
+        debug_msg("pushing back '%s'", cur.c_str());
         buffer.push_back(cur);
     }
 }

@@ -34,7 +34,8 @@
 #include <cstdarg>
 #include <cerrno>
 #include <cstring>
-#include "util.hh"
+
+#include "common.hh"
 
 /* base exceptions */
 class herdstat_base_E                   : public std::exception { };
@@ -127,21 +128,6 @@ class bad_fileobject_E                  : public errno_error_E
 };
 
 class bad_herdsXML_E                    : public herdstat_base_E { };
-
-class XMLParser_E                       : public herdstat_base_E
-{
-    protected:
-        std::string _file;
-        std::string _error;
-
-    public:
-        XMLParser_E() { }
-        XMLParser_E(const std::string &f, const std::string &e)
-            : _file(f), _error(e) { }
-        virtual ~XMLParser_E() throw() { }
-        virtual const std::string &file() const { return _file; }
-        virtual const std::string &error() const { return _error; }
-};
 
 class timer_E                           : public herdstat_base_E { };
 

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/categories.hh
+ * herdstat -- lib/timer.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,39 +20,42 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_CATEGORIES_HH
-#define HAVE_CATEGORIES_HH 1
+#ifndef HAVE_TIMER_HH
+#define HAVE_TIMER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include <cstdlib>
+#include <sys/time.h>
 
-#include "cache.hh"
-
-#define CATEGORIES "/profiles/categories"
-
-/*
- * categories_T represents a list of portage categories.
- */
-
-class categories_T : public cache_T<std::string>
+namespace util
 {
-    public:
-        categories_T()
-            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
+    class timer_T
+    {
+        private:
+	    struct timeval _begin, _end;
+	    long ms;
 
-        categories_T(const std::string &portdir)
-            : cache_T<std::string>(portdir + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
-};
+        public:
+            void start()
+	    {
+	        ms = 0;
+	        gettimeofday(&_begin, NULL);
+	    }
+
+	    void stop()
+	    {
+	        gettimeofday(&_end, NULL);
+	        ms = _end.tv_sec - _begin.tv_sec;
+	        ms *= 1000;
+	        ms += (_end.tv_usec - _begin.tv_usec) / 1000;
+	    }
+
+            long elapsed() const { return ms; }
+    };
+}
 
 #endif
 

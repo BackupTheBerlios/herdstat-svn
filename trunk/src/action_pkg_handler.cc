@@ -34,11 +34,10 @@
 #include <string>
 #include <cstdlib>
 
+#include "common.hh"
 #include "metadatas.hh"
 #include "metadata_xml_handler.hh"
 #include "herds_xml_handler.hh"
-#include "options.hh"
-#include "util.hh"
 #include "formatter.hh"
 #include "exceptions.hh"
 #include "action_pkg_handler.hh"
@@ -262,7 +261,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     if (pos != std::string::npos)
                         cat_and_pkg = cat_and_pkg.substr(0, pos);
 
-                    util::debug_msg("Match found in %s.", (*m).c_str());
+                    debug_msg("Match found in %s.", (*m).c_str());
 
                     pkgs[cat_and_pkg] = handler->longdesc;
                 }
@@ -339,7 +338,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     output("", p->first);
 
                 output("", longdesc);
-                util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
+                debug_msg("longdesc(%s): '%s'", p->first.c_str(),
                     longdesc.c_str());
 
                 if (pn != pkgs.size())

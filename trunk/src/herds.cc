@@ -31,9 +31,8 @@
 #include <algorithm>
 #include <cstdlib>
 
+#include "common.hh"
 #include "devs.hh"
-#include "util.hh"
-#include "options.hh"
 #include "formatter.hh"
 #include "herds.hh"
 
@@ -75,7 +74,7 @@ herd_T::display(std::ostream &stream)
         if (not desc.empty())
         {
             out("Description", desc);
-            util::debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
+            debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
         }
 
         if (optget("verbose", bool))

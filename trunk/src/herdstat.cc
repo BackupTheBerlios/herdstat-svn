@@ -44,11 +44,10 @@
 # include <getopt.h>
 #endif
 
+#include "common.hh"
 #include "herds.hh"
 #include "formatter.hh"
 #include "xmlparser.hh"
-#include "options.hh"
-#include "util.hh"
 #include "exceptions.hh"
 #include "herds_xml_handler.hh"
 #include "action_herd_handler.hh"
@@ -561,6 +560,11 @@ main(int argc, char **argv)
 
 	if (optget("timer", bool))
 	    throw timer_E();
+    }
+    catch (const util::errno_E &e)
+    {
+	std::cerr << e.what() << std::endl;
+	return EXIT_FAILURE;
     }
     catch (const errno_error_E &e)
     {

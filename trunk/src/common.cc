@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/categories.hh
+ * herdstat -- src/common.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,40 +20,31 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_CATEGORIES_HH
-#define HAVE_CATEGORIES_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include "common.hh"
 
-#include "cache.hh"
-
-#define CATEGORIES "/profiles/categories"
-
-/*
- * categories_T represents a list of portage categories.
- */
-
-class categories_T : public cache_T<std::string>
+void
+debug_msg(const char *msg, ...)
 {
-    public:
-        categories_T()
-            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
+    if (not optget("debug", bool))
+	return;
+    
+    va_list v;
+    va_start(v, msg);
+    
+    std::string s = util::sprintf(msg, v);
 
-        categories_T(const std::string &portdir)
-            : cache_T<std::string>(portdir + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
-};
+    /* make ASCII colors visible - TODO: anyway to escape them?
+     * simply inserting a '\' before it doesnt work... */
+    std::string::size_type pos = s.find("\033");
+    if (pos != std::string::npos)
+	s.erase(pos, 1);
 
-#endif
+    *(optget("outstream", std::ostream *)) << "!!! " << s << std::endl;
+    va_end(v);
+}
 
 /* vim: set tw=80 sw=4 et : */

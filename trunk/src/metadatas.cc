@@ -32,8 +32,7 @@
 #include <unistd.h>
 #include <dirent.h>
 
-#include "util.hh"
-#include "options.hh"
+#include "common.hh"
 #include "exceptions.hh"
 #include "categories.hh"
 #include "metadatas.hh"
@@ -122,7 +121,7 @@ metadatas_T::fill()
         if (status)
             ++progress;
 
-        util::debug_msg("searching %s", path.c_str());
+        debug_msg("searching %s", path.c_str());
 
         struct dirent *d = NULL;
         while ((d = readdir(dir)))
@@ -143,7 +142,7 @@ metadatas_T::fill()
     if (timer)
     {
         t.stop();
-        util::debug_msg("Took %ldms to get %d metadata.xml's.",
+        debug_msg("Took %ldms to get %d metadata.xml's.",
             t.elapsed(), this->size());
     }
 

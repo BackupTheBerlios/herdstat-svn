@@ -46,6 +46,25 @@ class XMLHandler_T : public xml::event_parser
 };
 
 /*
+ * parser exception class
+ */
+
+class XMLParser_E : public herdstat_base_E
+{
+    protected:
+        std::string _file;
+        std::string _error;
+
+    public:
+        XMLParser_E() { }
+        XMLParser_E(const std::string &f, const std::string &e)
+            : _file(f), _error(e) { }
+        virtual ~XMLParser_E() throw() { }
+        virtual const std::string &file() const { return _file; }
+        virtual const std::string &error() const { return _error; }
+};
+
+/*
  * XML Parser - takes a pointer to a XMLHandler_T object
  */
 

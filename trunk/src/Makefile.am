@@ -2,9 +2,9 @@
 
 bin_PROGRAMS = herdstat
 
-herdstat_SOURCES = exceptions.hh \
+herdstat_SOURCES = common.hh common.cc \
+		   exceptions.hh \
 		   options.hh options.cc \
-		   util.hh util.cc \
 		   devs.hh \
 		   herds.hh herds.cc \
 		   xmlparser.hh \
@@ -22,7 +22,15 @@ herdstat_SOURCES = exceptions.hh \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   herdstat.cc
 
+herdstat_LDADD = ../lib/libutil.la
+
+INCLUDES = -I../lib
 LIBS = @LIBS@ @XMLWRAPP_LIBS@
 AM_CXXFLAGS = @XMLWRAPP_CFLAGS@ -pedantic -ansi -Wall
 
 MAINTAINERCLEANFILES = Makefile.in *~
+
+srchtml:
+	for x in $(herdstat_SOURCES) ; do \
+		gvim +TOhtml "+w! $${x}.html" +q! +q! +q $${x} ; \
+	done

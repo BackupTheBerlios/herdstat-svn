@@ -31,7 +31,6 @@
 #include <utility>
 #include <sys/types.h>
 
-#include "util.hh"
 #include "options.hh"
 
 options_T::option_map_T options_T::optmap;

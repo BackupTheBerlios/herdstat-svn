@@ -2,6 +2,13 @@ ChangeLog for herdstat
 
 2005-04-03 Aaron Walker <ka0ttic@gentoo.org>
 
+	* lib/portage_misc.cc, lib/portage_misc.hh: Added
+	get_version_components().
+	* src/util.cc, src/util.hh, lib/util.cc, lib/util.hh, lib/string.cc,
+	lib/string.hh, lib/vars.cc, lib/vars.hh, lib/timer.hh,
+	lib/util_exceptions.hh, lib/portage_misc.cc, lib/portage_misc.hh,
+	lib/portage_config.hh: broke up util.{cc,hh} into it's own convenience
+	lib.
 	* src/cache.hh: Added new cache_T class, broken out from the caching
 	code in metadatas.cc.
 	* src/metadatas.cc: Use cache_T.

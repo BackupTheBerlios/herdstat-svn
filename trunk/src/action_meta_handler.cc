@@ -36,11 +36,10 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#include "common.hh"
 #include "categories.hh"
 #include "herds.hh"
 #include "formatter.hh"
-#include "options.hh"
-#include "util.hh"
 #include "exceptions.hh"
 #include "xmlparser.hh"
 #include "metadata_xml_handler.hh"
@@ -131,7 +130,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         unsigned short depth = 0;
 
         /* are we in a package's directory? */
-        if (util::in_pkgdir())
+        if (util::in_pkg_dir())
             depth = 2;
         /* not in pkgdir and metdata exists,
          * so assume we're in a category */
@@ -167,8 +166,8 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         portdir = path;
         opts.push_back(leftover);
         
-        util::debug_msg("set portdir to '%s'", portdir.c_str());
-        util::debug_msg("added '%s' to opts.", leftover.c_str());
+        debug_msg("set portdir to '%s'", portdir.c_str());
+        debug_msg("added '%s' to opts.", leftover.c_str());
     }
 
     /* for each specified package/category... */

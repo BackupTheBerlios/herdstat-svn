@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/devs.hh
+ * herdstat -- lib/portage_config.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,51 +20,23 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_TYPES_HH
-#define HAVE_TYPES_HH 1
+#ifndef HAVE_PORTAGE_CONFIG_HH
+#define HAVE_PORTAGE_CONFIG_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <ostream>
-#include <vector>
-#include <string>
+#include "vars.hh"
 
-
-#include "options.hh"
-#include "util.hh"
-#include "formatter.hh"
-
-/*
- * Display developer attributes (name, role, etc).
- */
-
-class dev_attrs_T : public std::vector<std::string>
+class portage_config_T : public vars_T
 {
     public:
-        void display(std::ostream &stream)
+        portage_config_T()
         {
-            formatter_T out;
-
-            if (optget("all", bool) and not name.empty())
-                out("", name);
-            else if (not optget("all", bool))
-            {
-                if (not name.empty())
-                    out("", name);
-                if (not role.empty())
-                    out("", util::tidy_whitespace(role));
-
-                for (iterator i = this->begin() ; i != this->end() ; ++i)
-                    out("", *i);
-            }
-
-            out.endl();
+            this->read("/etc/make.globals");
+            this->read("/etc/make.conf");
         }
-
-        std::string role;
-        std::string name;
 };
 
 #endif

@@ -1,6 +1,6 @@
 # $Id$
 
-SUBDIRS = . src doc
+SUBDIRS = . doc lib src
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
@@ -12,6 +12,19 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       *~
 
 EXTRA_DIST = autogen.sh .todo bashcomp
+
+srchtml:
+	if test -d ${PWD}/html ; then \
+		rm -fr ${PWD}/html/* ; \
+	else \
+		mkdir ${PWD}/html ; \
+	fi
+	for x in lib src ; do \
+		cd ${PWD}/$${x} && $(MAKE) $@ ; \
+		sleep 4 ; \
+		test -d ${PWD}/html/$${x} || mkdir ${PWD}/html/$${x} ; \
+		mv ${PWD}/$${x}/*.html ${PWD}/html/$${x} ; \
+	done
 
 TODO: .todo
 	@test -x $(prefix)/bin/devtodo && devtodo all --TODO

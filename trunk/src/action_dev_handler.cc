@@ -29,11 +29,10 @@
 #include <vector>
 #include <memory>
 
+#include "common.hh"
 #include "herds.hh"
 #include "xmlparser.hh"
 #include "herds_xml_handler.hh"
-#include "util.hh"
-#include "options.hh"
 #include "exceptions.hh"
 #include "formatter.hh"
 #include "action_dev_handler.hh"

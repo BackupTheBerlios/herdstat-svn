@@ -34,10 +34,9 @@
 #include <cerrno>
 #include <unistd.h>
 
+#include "common.hh"
 #include "herds.hh"
 #include "formatter.hh"
-#include "util.hh"
-#include "options.hh"
 #include "exceptions.hh"
 #include "action_herd_handler.hh"
 
@@ -50,7 +49,6 @@ int
 action_herd_handler_T::operator() (herds_T &herds_xml,
                                    std::vector<std::string> &herds)
 {
-    util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
 
     /* set format attributes */

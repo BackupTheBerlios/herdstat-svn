@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/devs.hh
+ * herdstat -- lib/string.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,52 +20,23 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_TYPES_HH
-#define HAVE_TYPES_HH 1
+#ifndef HAVE_STRING_HH
+#define HAVE_STRING_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <ostream>
-#include <vector>
 #include <string>
 
-
-#include "options.hh"
-#include "util.hh"
-#include "formatter.hh"
-
-/*
- * Display developer attributes (name, role, etc).
- */
-
-class dev_attrs_T : public std::vector<std::string>
+namespace util
 {
-    public:
-        void display(std::ostream &stream)
-        {
-            formatter_T out;
-
-            if (optget("all", bool) and not name.empty())
-                out("", name);
-            else if (not optget("all", bool))
-            {
-                if (not name.empty())
-                    out("", name);
-                if (not role.empty())
-                    out("", util::tidy_whitespace(role));
-
-                for (iterator i = this->begin() ; i != this->end() ; ++i)
-                    out("", *i);
-            }
-
-            out.endl();
-        }
-
-        std::string role;
-        std::string name;
-};
+    std::string lowercase(const std::string &);
+    std::string tidy_whitespace(const std::string &);
+    std::string sprintf(const char *, ...);
+    std::string sprintf(const char *, va_list);
+    std::vector<std::string> split(const std::string &, const char d = ' ');
+}
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/categories.hh
+ * herdstat -- src/common.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,39 +20,20 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_CATEGORIES_HH
-#define HAVE_CATEGORIES_HH 1
+#include <string>
+#include <cstdarg>
+#include "options.hh"
+#include "util.hh"
+#include "exceptions.hh"
+
+#ifndef HAVE_COMMON_HH
+#define HAVE_COMMON_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-
-#include "cache.hh"
-
-#define CATEGORIES "/profiles/categories"
-
-/*
- * categories_T represents a list of portage categories.
- */
-
-class categories_T : public cache_T<std::string>
-{
-    public:
-        categories_T()
-            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
-
-        categories_T(const std::string &portdir)
-            : cache_T<std::string>(portdir + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
-};
+void debug_msg(const char *, ...);
 
 #endif
 

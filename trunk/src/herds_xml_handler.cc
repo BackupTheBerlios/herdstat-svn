@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "util.hh"
+#include "common.hh"
 #include "herds_xml_handler.hh"
 
 bool

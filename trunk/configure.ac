@@ -1,10 +1,10 @@
 # Process this file with autoconf to produce a configure script.
 # $Id$
 
-AC_INIT([herdstat], [1.0.2], [ka0ttic@gentoo.org])
+AC_PREREQ(2.59)
+AC_INIT([herdstat], [1.0.3], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
-AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.8 foreign dist-bzip2 no-dist-gzip])
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
@@ -23,16 +23,21 @@ AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
+AC_PROG_LIBTOOL
 AC_PROG_INSTALL
+AC_PROG_MAKE_SET
 
 dnl Required headers
 AC_HEADER_STDC
+AC_HEADER_TIME(,
+    [AC_MSG_ERROR([sys/time.h is required])])
 AC_HEADER_DIRENT(,
     [AC_MSG_ERROR([dirent.h is required])])
-AC_CHECK_HEADERS(sys/time.h,,
-    [AC_MSG_ERROR([sys/time.h is required])])
 
 dnl Required funcs
+AC_FUNC_CLOSEDIR_VOID
+AC_FUNC_STAT(,
+    [AC_MSG_ERROR([stat is required])])
 AC_CHECK_FUNCS(asprintf,,
     [AC_CHECK_FUNCS(snprintf,,
     [AC_MSG_ERROR([either asprintf or snprintf is required])])])
@@ -40,6 +45,17 @@ AC_CHECK_FUNCS(vasprintf,,
     [AC_CHECK_FUNCS(vsnprintf,,
     [AC_CHECK_FUNCS(vsprintf,,
     [AC_MSG_ERROR([either vasprintf, vsnprintf, or vsprintf is required])])])])
+AC_CHECK_FUNCS(getcwd,,
+    [AC_MSG_ERROR([getcwd is required])])
+AC_CHECK_FUNCS(gettimeofday,,
+    [AC_MSG_ERROR([gettimeofday is required])])
+AC_CHECK_FUNCS(strerror,,
+    [AC_MSG_ERROR([strerror is required])])
+AC_CHECK_FUNCS(strrchr,,
+    [AC_MSG_ERROR([strrchr is required])])
+
+AC_C_CONST
+AC_TYPE_SIZE_T
 
 dnl Optional headers
 AC_CHECK_HEADERS(getopt.h)
@@ -61,5 +77,6 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
-	  src/Makefile
-	  doc/Makefile)
+	  doc/Makefile
+	  lib/Makefile
+	  src/Makefile)

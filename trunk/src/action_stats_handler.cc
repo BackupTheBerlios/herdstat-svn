@@ -24,13 +24,11 @@
 # include "config.h"
 #endif
 
-#include <ostream>
 #include <vector>
 #include <algorithm>
 
+#include "common.hh"
 #include "formatter.hh"
-#include "util.hh"
-#include "options.hh"
 #include "action_stats_handler.hh"
 
 /*
@@ -41,7 +39,6 @@ int
 action_stats_handler_T::operator() (herds_T &herds_xml,
     std::vector<std::string> &null)
 {
-    util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
 
     /* set format attributes */

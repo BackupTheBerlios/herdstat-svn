@@ -24,9 +24,8 @@
 # include "config.h"
 #endif
 
-#include "util.hh"
+#include "common.hh"
 #include "devs.hh"
-#include "options.hh"
 #include "metadata_xml_handler.hh"
 
 bool
