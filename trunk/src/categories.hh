@@ -51,7 +51,9 @@ class categories_T : public std::vector<std::string>
 
             std::string line;
             while (std::getline(*f, line))
-                push_back(line);
+                /* a nasty hack for a nasty hack */
+                if (line != "virtual")
+                    push_back(line);
         }
 
     public:
