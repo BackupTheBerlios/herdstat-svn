@@ -1,9 +1,21 @@
 ChangeLog for herdstat
 
+2005-03-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (release).
+	* doc/herdstat.1.in: Added a few more examples.
+	* src/util.cc, src/util.hh: Added copy_file(), move_file(), and
+	get_user_from_email().
+	* src/herdstat.cc: Use cached copy of herds.xml if it exists and we
+	are unable to fetch it.
+	* src/herds.cc: Highlight current user's nick *after* sorting,
+	otherwise the highlighted nick will always be at the beginning of the
+	vector.
+
 2005-03-07 Aaron Walker <ka0ttic@gentoo.org>
 
-	* configure.ac: Update version.
-	* bashcomp: Added completion.
+	* bashcomp: Now that the 'all' target is completed, we can now use it
+	to generate our completions!
 	* doc/herdstat.1.in: Added a non-option args section to explain them.
 	Also added the info relevant to the all target.
 	* src/herdstat.cc: Added herds.xml filesize check as it seems wget
@@ -46,7 +58,7 @@ ChangeLog for herdstat
 	* src/util.cc, src/util.hh: Added rcfile_T class originally written by
 	Ciaran McCreesh for annodir.  Slightly modified to support quotes.
 	Also added a portdir() function that tries to read
-	make.conf/make.globals to determine PORTDIR.  Faster than calling
+	make.conf/make.globals to determine PORTDIR. A *lot* faster than calling
 	portageq.
 	* src/herdstat.cc: Call util::portdir() to set the portdir.
 	* src/action_pkg_handler.cc: Removed portageq popen.

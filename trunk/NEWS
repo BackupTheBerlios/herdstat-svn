@@ -1,0 +1,19 @@
+This file contains a summary of changes in released versions.  Please read the
+ChangeLog file for a more detailed listing of changes/bug fixes.
+
+0.2:
+    New features:
+     - Herd output now show's herd's email address (if available).
+     - Both --dev and the default action now support an 'all' target (for
+     example 'herdstat all').
+     - Bash command-line completion is now included.
+
+    Bug fixes:
+     - Fixed several fetching-related bugs. Now uses the cached copy of
+       herds.xml (if it exists) if for some reason fetching fails. Also
+       fixed a bug where (since we tell wget to clobber the old file) if
+       wget fails, it writes a 0 byte file (and thus all queries fail).
+     - PORTDIR determination code fixed/quicker.
+     - Fixed bug where highlighting of the user's nick was done prior to
+       sorting, thus causing the user's nick to always appear first in
+       output.
