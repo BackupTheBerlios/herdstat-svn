@@ -163,7 +163,10 @@ get_metadatas(const std::string &portdir)
     if (d)
         util::debug_msg("cached %d metadata.xml's", metadatas.size());
     else if (not d and not q)
-        *(optget("outstream", std::ostream *)) << std::endl;
+    {
+        *(optget("outstream", std::ostream *)) << " (total "
+            << metadatas.size()<< ")" << std::endl;
+    }
     
     return metadatas;
 }
@@ -190,9 +193,21 @@ int
 action_pkg_handler_T::operator() (herds_T &herds_xml,
                                   std::vector<std::string> &opts)
 {
+    typedef std::map<std::string, std::string> pmap_T;
+    typedef std::map<std::string, pmap_T * > pkgmap_T;
+    typedef std::map<std::string, dev_attrs_T > attr_map_T;
+    pkgmap_T pkgs;
+    pkgmap_T::iterator p;
+    attr_map_T attrs;
+    attr_map_T::iterator a;
+
+    std::vector<std::string>::iterator i;
+    std::map<std::string, std::string>::size_type size = 0;
     util::color_map_T color;
     util::timer_T timer;
+    util::status_T status;
     std::ostream *stream = optget("outstream", std::ostream *);
+    bool quiet = optget("quiet", bool), debug = optget("debug", bool);
 
     /* set format attributes */
     formatter_T output;
@@ -207,24 +222,25 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         return EXIT_FAILURE;
     }
 
-    /* before trying to get a list of metadatas,
-     * see if the herd/dev even exists */
-    if (opts.size() == 1 and optget("dev", bool))
+    /* Check if specified herds exist */
+    if (not optget("dev", bool))
     {
-        if (not dev_exists(herds_xml, opts[0]))
+        for (i = opts.begin() ; i != opts.end() ; ++i)
         {
-            std::cerr << "Developer '" << opts[0]
-                << "' doesn't seem to belong to any herds." << std::endl;
-            throw dev_E();
-        }
-    }
-    else if (opts.size() == 1)
-    {
-        if (not herds_xml.exists(opts[0]))
-        {
-            std::cerr << "Herd '" << opts[0] << "' doesn't seem to exist."
-                << std::endl;
-            throw herd_E();
+            if (not herds_xml.exists(*i))
+            {
+                std::cerr << "Herd '" << *i << "' doesn't seem to exist."
+                    << std::endl;
+
+                /* we want to die if they only specified
+                 * one and it doesnt exist */
+                if (opts.size() == 1)
+                    throw herd_E();
+            }
+            else
+            {
+                pkgs[*i] = new pmap_T();
+            }
         }
     }
 
@@ -252,135 +268,114 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             timer.elapsed());
     }
 
-    if (not optget("quiet", bool))
+    if (not quiet)
         output.endl();
     
-    /* total pkgs */
-    std::map<std::string, std::string>::size_type size = 0;
-
-    util::status_T status;
-    if (not optget("quiet", bool) and not (optget("debug", bool)))
+    if (not quiet and not debug)
     {
         *stream << "Parsing metadata.xml's: ";
-        status.start(opts.size());
+        status.start(metadatas.size());
     }
 
-    /* for each specified herd/dev... */
-    std::vector<std::string>::iterator i;
-    std::vector<std::string>::size_type n = 1;
-    for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
+    if (optget("timer", bool))
+        timer.start();
+
+    /* for each metadata.xml... */
+    std::vector<std::string>::iterator m;
+    for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
     {
-        dev_attrs_T attr;
-        std::map<std::string, std::string> pkgs;
-
-        if (optget("dev", bool))
+        try
         {
-            if (not dev_exists(herds_xml, *i))
-            {
-                if (not optget("quiet", bool))
-                    std::cerr << std::endl << "Developer '" << *i
-                        << "' doesn't seem to belong to any herds." << std::endl;
+            std::auto_ptr<MetadataXMLHandler_T>
+                handler(new MetadataXMLHandler_T());
+            XMLParser_T parser(&(*handler));
 
-                continue;
-            }
-        }
-        else
-        {
-            if (not herds_xml.exists(*i))
-            {
-                if (not optget("quiet", bool))
-                    std::cerr << std::endl << "Herd '" << *i
-                        << "' doesn't seem to exist in herds.xml." << std::endl;
+            /* parse metadata.xml */
+            parser.parse(*m);
 
-                continue;
-            }
-        }
-
-        if (optget("timer", bool))
-            timer.start();
-
-        /* for each metadata.xml... */
-        std::vector<std::string>::iterator m;
-        for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
-        {
-            try
+            for (i = opts.begin() ; i != opts.end() ; ++i)
             {
                 bool found = false;
 
-                std::auto_ptr<MetadataXMLHandler_T> handler(new
-                    MetadataXMLHandler_T());
-                XMLParser_T parser(&(*handler));
-
-                /* parse metadata.xml */
-                parser.parse(*m);
-
                 if (optget("dev", bool))
                 {
-                    herd_T::iterator d = handler->devs.find(*i + "@gentoo.org");
+                    herd_T::iterator d;
+
+                    if (i->find('@') != std::string::npos)
+                        d = handler->devs.find(*i);
+                    else
+                        d = handler->devs.find(*i + "@gentoo.org");
+
                     if (d == handler->devs.end())
                         continue;
                     else
                     {
                         found = true;
-                        std::copy(d->second->begin(), d->second->end(), attr.begin());
-                        attr.name = d->second->name;
-                        attr.role = d->second->role;
+                        std::copy(d->second->begin(), d->second->end(), attrs[*i].begin());
+                        attrs[*i].name = d->second->name;
+                        attrs[*i].role = d->second->role;
                     }
                 }
                 else
                 {
-                    /* search the metadata for our herd */
                     if (std::find(handler->herds.begin(),
-                        handler->herds.end(), *i) != handler->herds.end())
-                        found = true;
-                    else
+                        handler->herds.end(), *i) == handler->herds.end())
                         continue;
+                    else
+                        found = true;
                 }
 
+                /* save it */
                 if (found)
                 {
-                    /* get category/package from absolute path */
-                    std::string cat_and_pkg =
-                        (*m).substr(optget("portdir", std::string).size() + 1);
-                    std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
-                    if (pos != std::string::npos)
-                        cat_and_pkg = cat_and_pkg.substr(0, pos);
-
                     util::debug_msg("Match found in %s.", (*m).c_str());
 
-                    pkgs[cat_and_pkg] = handler->longdesc;
+                    std::string pkg = m->substr(optget("portdir", std::string).size() + 1);
+                    std::string::size_type pos = pkg.find("/metadata.xml");
+                    if (pos != std::string::npos)
+                        pkg = pkg.substr(0, pos);
+
+                    if ((p = pkgs.find(*i)) != pkgs.end())
+                        pkgs[*i]->insert(std::make_pair(pkg, handler->longdesc));
                 }
             }
-            catch (const XMLParser_E &e)
-            {
-                std::cerr << "Error parsing '" << e.file()
-                    << "': " << e.error() << std::endl;
-                return EXIT_FAILURE;
-            }
         }
-        
-        size += pkgs.size();
+        catch (const XMLParser_E &e)
+        {
+            std::cerr << "Error parsing '" << e.file() << "': " << e.error()
+                << std::endl;
+            return EXIT_FAILURE;
+        }
 
-        if (optget("timer", bool))
-            timer.stop();
+        if (not quiet and not debug)
+            ++status;
+    }
+    
+    if (optget("timer", bool))
+        timer.stop();
 
-        if ((n == 1) and (not optget("quiet", bool) and
-                          not optget("debug", bool)))
+    std::vector<std::string>::size_type n = 1;
+    for (i = opts.begin() ; i != opts.end() ; ++i)
+    {
+        if ((p = pkgs.find(*i)) != pkgs.end())
+            size += pkgs[*i]->size();
+
+        if ((n == 1) and (not quiet and not debug))
             output.endl();
 
-        if (not optget("quiet", bool))
+        if (not quiet)
         {
-            if (optget("dev", bool))
+            if (optget("dev", bool) and (a = attrs.find(*i)) != attrs.end())
             {
-                if (attr.name.empty())
+                if (attrs[*i].name.empty())
                     output("Developer", *i);
                 else
                     output("Developer",
-                        attr.name + " (" + (*i) + ")");
+                        attrs[*i].name + " (" + (*i) + ")");
 
                 output("Email", *i + "@gentoo.org");
             }
-            else
+            else if (herds_xml.exists(*i))
             {
                 output("Herd", *i);
                 if (not herds_xml[*i]->mail.empty())
@@ -389,58 +384,59 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     output("Description", util::tidy_whitespace(herds_xml[*i]->desc));
             }
 
-            output(util::sprintf("Packages(%d)", pkgs.size()), "");
+            if ((p = pkgs.find(*i)) != pkgs.end())
+                output(util::sprintf("Packages(%d)", pkgs[*i]->size()), "");
         }
 
-        /* display the category/package */
-        std::map<std::string, std::string>::iterator p;
-        std::map<std::string, std::string>::size_type pn = 1;
-        for (p = pkgs.begin() ; p != pkgs.end() ; ++p, ++pn)
+        if ((p = pkgs.find(*i)) != pkgs.end())
         {
-            std::string longdesc;
+            /* display the category/package */
+            pmap_T::iterator p;
+            pmap_T::size_type pn = 1;
+            for (p = pkgs[*i]->begin() ; p != pkgs[*i]->end() ; ++p, ++pn)
+            {
+                std::string longdesc;
             
-            if (not p->second.empty())
-                longdesc = util::tidy_whitespace(p->second);
+                if (not p->second.empty())
+                    longdesc = util::tidy_whitespace(p->second);
 
-            if ((optget("verbose", bool) and not optget("quiet", bool))
-                and not longdesc.empty())
-            {
-                if (output.size() > 1 and output.peek() != "")
-                    output.endl();
+                if ((optget("verbose", bool) and not quiet)
+                    and not longdesc.empty())
+                {
+                    if (output.size() > 1 and output.peek() != "")
+                        output.endl();
 
-                if (optget("color", bool))
-                    output("", color[blue] + p->first + color[none]);
-                else
+                    if (optget("color", bool))
+                        output("", color[blue] + p->first + color[none]);
+                    else
+                        output("", p->first);
+
+                    output("", longdesc);
+                    util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
+                        longdesc.c_str());
+
+                    if (pn != pkgs.size())
+                        output.endl();
+                }
+                else if (optget("verbose", bool) and not quiet)
+                {
+                    if (optget("color", bool))
+                        output("", color[blue] + p->first + color[none]);
+                    else
+                        output("", p->first);
+                }
+                else if (not optget("count", bool))
                     output("", p->first);
-
-                output("", longdesc);
-                util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
-                    longdesc.c_str());
-
-                if (pn != pkgs.size())
-                    output.endl();
             }
-            else if (optget("verbose", bool) and not optget("quiet", bool))
-            {
-                if (optget("color", bool))
-                    output("", color[blue] + p->first + color[none]);
-                else
-                    output("", p->first);
-            }
-            else if (not optget("count", bool))
-                output("", p->first);
         }
 
         /* only skip a line if we're not on the last one */
         if (not optget("count", bool) and n != opts.size())
         {
-            if ((not optget("quiet", bool)) or
-                (optget("quiet", bool) and pkgs.size() > 0))
+            if (not quiet or (quiet and ((p = pkgs.find(*i)) != pkgs.end()) and
+                (pkgs[*i]->size() > 0)))
                     output.endl();
         }
-
-        if (not optget("quiet", bool) and not (optget("debug", bool)))
-            ++status;
     }
 
     if (optget("count", bool))
@@ -456,10 +452,16 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             << (static_cast<float>(timer.elapsed()) / metadatas.size())
             << " ms/metadata.xml)." << std::endl;
     }
-    else if (optget("verbose", bool) and not optget("quiet", bool))
+    else if (optget("verbose", bool) and not quiet)
     {
         *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
+    }
+
+    for (i = opts.begin() ; i != opts.end() ; ++i)
+    {
+        pkgs[*i]->clear();
+        delete pkgs[*i];
     }
 
     return EXIT_SUCCESS;
