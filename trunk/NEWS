@@ -1,6 +1,23 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+0.5:
+    New features:
+     - When herdstat is run with no arguments, display a summary of statistics.
+
+    Bug fixes:
+     - Fixed borked --package output.
+     - Remove backed-up copy of fetched herds.xml if it's unneeded.
+
+0.4:
+    New features:
+     - Added --fetch for telling herdstat to forcibly fetch herds.xml.
+
+    Bug fixes:
+     - All funky looking output caused by extra whitespace within XML elements
+       is now cleaned before being displayed.
+     - '@gentoo.org' is now appended to any invalid email addresses that lack it.
+
 0.3:
     New features:
      - Added --outfile command-line option that allows the user to easily send

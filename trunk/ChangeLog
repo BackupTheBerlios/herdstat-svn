@@ -1,5 +1,22 @@
 ChangeLog for herdstat
 
+2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (release-0.5).
+	* NEWS: Update for 0.5 (and forgot to update for 0.4).
+	* src/formatter.hh: Added peek() member function for peeking at the
+	last element of formatter_T's internal buffer.
+	* src/action_pkg_handler.cc: Fixed borked --package output (extra
+	newlines should only be included in --verbose output where package
+	<longdesciption>'s are displayed.
+	* src/action_stats_handler.cc, src/action_stats_handler.hh: Added new
+	action handler which shows a nice summary of statistics.  This handler
+	is called if no arguments are specified on the command-line.
+	* src/options.hh: Added action_stats to options_action_T enum.
+	* src/herdstat.cc: Added action_stats_handler_T to the handler list.
+	Also fixed bug where backup copy of fetched herds.xml wasn't removed.
+	* src/Makefile.am: Added action_stats_handler.{cc,hh} to source list.
+
 2005-03-14 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (release-0.4).
