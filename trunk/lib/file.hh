@@ -138,7 +138,7 @@ namespace util
             size_type bufsize() const { return _contents.size(); }
             void push_back(const std::string &s) { _contents.push_back(s); }
 
-            virtual void open();
+            virtual void open() { this->open(_name.c_str(), DEFAULT_MODE); }
             virtual void open(const char *n,
                 std::ios_base::openmode mode = DEFAULT_MODE);
             virtual void open(std::ios_base::openmode mode)
@@ -146,10 +146,15 @@ namespace util
 
             virtual void close();
 
-            virtual void read();
+            virtual void read() { this->read(&_contents); }
             virtual void read(std::vector<std::string> *);
+
             virtual void write() { this->display(*stream); }
-            virtual void write(const std::vector<std::string> &);
+            virtual void write(const std::vector<std::string> &v)
+            {
+                _contents = v; this->write();
+            }
+
             virtual void display(std::ostream &);
     };
 
@@ -159,7 +164,6 @@ namespace util
     {
         protected:
             DIR *dirp;
-            struct dirent *d;
             std::vector<fileobject_T * > _contents;
 
         public:
@@ -168,14 +172,14 @@ namespace util
             typedef std::vector<fileobject_T * >::size_type size_type;
 
             dir_T(const char *n, bool recurse = false)
-                : fileobject_T(n, FTYPE_DIR), dirp(NULL), d(NULL)
+                : fileobject_T(n, FTYPE_DIR), dirp(NULL)
             {
                 this->open();
                 this->read(recurse);
             }
             
             dir_T(const std::string &n, bool recurse = false)
-                : fileobject_T(n, FTYPE_DIR), dirp(NULL), d(NULL)
+                : fileobject_T(n, FTYPE_DIR), dirp(NULL)
             {
                 this->open();
                 this->read(recurse);

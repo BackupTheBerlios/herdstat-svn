@@ -36,12 +36,6 @@
  **************************/
 
 void
-util::file_T::open()
-{
-    this->open(_name.c_str(), DEFAULT_MODE);
-}
-
-void
 util::file_T::open(const char *n, std::ios_base::openmode mode)
 {
     if (_name.empty())
@@ -62,12 +56,6 @@ util::file_T::open(const char *n, std::ios_base::openmode mode)
 }
 
 void
-util::file_T::read()
-{
-    this->read(&_contents);
-}
-
-void
 util::file_T::read(std::vector<std::string> *v)
 {
     assert(stream);
@@ -76,13 +64,6 @@ util::file_T::read(std::vector<std::string> *v)
     std::string line;
     while (std::getline(*stream, line))
         v->push_back(line);
-}
-
-void
-util::file_T::write(const std::vector<std::string> &v)
-{
-    _contents = v;
-    this->write();
 }
 
 void
@@ -106,6 +87,7 @@ util::file_T::close()
 void
 util::dir_T::open()
 {
+    assert(not _name.empty());
     dirp = opendir(_name.c_str());
     if (not dirp)
         throw util::bad_fileobject_E(_name);
@@ -114,6 +96,7 @@ util::dir_T::open()
 void
 util::dir_T::read(bool recurse)
 {
+    struct dirent *d = NULL;
     while ((d = readdir(dirp)))
     {
         /* skip . and .. for obvious reasons */
@@ -144,8 +127,12 @@ util::dir_T::read(bool recurse)
 void
 util::dir_T::close()
 {
+#ifdef CLOSEDIR_VOID
+    closedir(dirp);
+#else /* CLOSEDIR_VOID */
     if (closedir(dirp) != 0)
         throw util::errno_E("closedir: " + _name);
+#endif /* CLOSEDIR_VOID */
 }
 
 void
