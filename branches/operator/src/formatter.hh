@@ -30,88 +30,110 @@
 #include <ostream>
 #include <string>
 #include <vector>
-#include <map>
+#include <utility>
 
 #include "util.hh"
-
-/* format attributes */
-class format_attrs_T
-{
-    public:
-        format_attrs_T();
-
-        bool colors;
-        bool quiet;
-
-        std::string label_color;
-        std::string data_color;
-        std::string highlight_color;
-
-        std::string::size_type maxtotal;
-        std::string::size_type maxlabel;
-        std::string::size_type maxdata;
-            
-        std::string::size_type maxctotal;
-        std::string::size_type maxclabel;
-        std::string::size_type maxcdata;
-
-        std::vector<std::string> highlights;
-};
 
 class formatter_T
 {
     private:
-        static std::vector<std::string> buffer;
-        static format_attrs_T attr;
+        /* format attributes */
+        class attrs_T
+        {
+            public:
+                attrs_T();
+
+                std::ostream *stream;
+
+                bool colors;
+                bool quiet;
+
+                std::string label_color;
+                std::string data_color;
+                std::string highlight_color;
+
+                std::string::size_type maxtotal;
+                std::string::size_type maxlabel;
+                std::string::size_type maxdata;
+            
+                std::string::size_type maxctotal;
+                std::string::size_type maxclabel;
+                std::string::size_type maxcdata;
+
+                std::vector<std::string> highlights;
+        };
+
+        class buf_T
+            : public std::vector<std::pair<std::string, std::string> >
+        {
+            public:
+                void operator() (std::string l, std::string d)
+                {
+                    push_back(std::make_pair(l, d));
+                }
+
+                void operator() (std::string l, std::vector<std::string> d)
+                {
+                    std::string s;
+                    std::vector<std::string>::iterator i;
+                    for (i = d.begin() ; i != d.end() ; ++i)
+                        s.append(*i + " ");
+                    s.erase(s.length() - 1);
+                    push_back(std::make_pair(l, s));
+                }
+        };
+
+        std::string highlight(std::vector<std::string>);
+
+        static attrs_T attrs;
+        static buf_T buf;
         util::color_map_T color;
 
     public:
-        typedef size_t size_type;
+        typedef std::size_t size_type;
 
-        formatter_T() { }
+        formatter_T(std::ostream *s) : stream(s) { }
+        ~formatter_T() { flush(); }
 
-        void endl() { buffer.push_back(""); }
-        void append(const std::string &, const std::string &);
-        void append(const std::string &, std::vector<std::string>);
-        void flush(std::ostream &);
-        const std::string &peek() const { return buffer.back(); }
-        std::vector<std::string>::size_type size() const { return buffer.size(); }
-        std::string highlight(std::vector<std::string>);
+        void operator() (std::string l, std::string d) { return buf(l, d); }
+        void operator() (std::string l, std::vector<std::string> d)
+            { return buf(l, d); }
 
+        void flush();
+        void endl() { buf("" ,"\n"); }
+        const std::string &peek() const { return buf.back().second; }
+        const buf_T::size_type size() const { return buf.size(); }
         void set_attrs();
 
         /* attribute member functions */
-        void set_maxtotal(size_type s) { attr.maxtotal = s; }
-        size_type maxtotal() { return attr.maxtotal; }
-        void set_maxctotal(size_type s) { attr.maxctotal = s; }
-        size_type maxctotal() { return attr.maxctotal; }
+        void set_ostream(std::ostream *s) { attrs.stream = s; }
+        std::ostream *ostream() { return attrs.stream; }
+
+        void set_maxtotal(size_type s) { attrs.maxtotal = s; }
+        size_type maxtotal() { return attrs.maxtotal; }
             
-        void set_maxlabel(size_type s) { attr.maxlabel = s; }
-        size_type maxlabel() { return attr.maxlabel; }
-        void set_maxclabel(size_type s) { attr.maxclabel = s; }
-        size_type maxclabel() { return attr.maxclabel; }
+        void set_maxlabel(size_type s) { attrs.maxlabel = s; }
+        size_type maxlabel() { return attrs.maxlabel; }
 
-        void set_maxdata(size_type s) { attr.maxdata = s; }
-        size_type maxdata() { return attr.maxdata; }
-        void set_maxcdata(size_type s) { attr.maxcdata = s; }
-        size_type maxcdata()  { return attr.maxcdata;  }
+        void set_maxdata(size_type s) { attrs.maxdata = s; }
+        size_type maxdata() { return attrs.maxdata; }
 
-        void set_colors(bool value) { attr.colors = value; }
-        bool colors() { return attr.colors; }
+        void set_colors(bool value) { attrs.colors = value; }
+        bool colors() { return attrs.colors; }
 
-        void set_quiet(bool value) { attr.quiet = value; }
-        bool quiet() { return attr.quiet; }
+        void set_quiet(bool value) { attrs.quiet = value; }
+        bool quiet() { return attrs.quiet; }
 
-        void set_labelcolor(std::string &s) { attr.label_color = s; }
-        std::string &labelcolor() { return attr.label_color; }
+        void set_labelcolor(std::string &s) { attrs.label_color = s; }
+        std::string &labelcolor() { return attrs.label_color; }
 
-        void set_datacolor(std::string &s) { attr.data_color = s; }
-        std::string &datacolor() { return attr.data_color; }
+        void set_datacolor(std::string &s) { attrs.data_color = s; }
+        std::string &datacolor() { return attrs.data_color; }
 
-        void set_highlightcolor(std::string &s) { attr.highlight_color = s; }
-        std::string &highlightcolor() { return attr.highlight_color; }
+        void set_highlightcolor(std::string &s) { attrs.highlight_color = s; }
+        std::string &highlightcolor() { return attrs.highlight_color; }
 
-        void add_highlight(std::string s) { attr.highlights.push_back(s); }
+        void add_highlight(std::string s) { attrs.highlights.push_back(s); }
 };
 
 #endif

@@ -25,23 +25,21 @@
 #endif
 
 #include <string>
-#include <vector>
-#include <algorithm>
-#include <iterator>
+#include <utility>
 
 #include "util.hh"
 #include "formatter.hh"
 #include "exceptions.hh"
 
-format_attrs_T formatter_T::attr;
-std::vector<std::string> formatter_T::buffer;
+formatter_T::buf_T formatter_T::buf;
+formatter_T::attrs_T formatter_T::attrs;
 
 /*
  * Default constructor
  * Set sane default attributes
  */
 
-format_attrs_T::format_attrs_T()
+formatter_T::attrs_T::attrs_T()
 {
     colors = false;
     quiet = false;
@@ -60,31 +58,31 @@ void
 formatter_T::set_attrs()
 {
     if (quiet())
-        attr.colors = false;
+        attrs.colors = false;
     else
         /* +1 for ':' */
-        attr.maxlabel++;
+        attrs.maxlabel++;
 
     /* -2 just for padding */
-    attr.maxdata -= 2;
-    attr.maxtotal = attr.maxlabel + attr.maxdata;
+    attrs.maxdata -= 2;
+    attrs.maxtotal = attrs.maxlabel + attrs.maxdata;
 
     /* if we're using colors, we need to compensate
      * for the increase in string length.           */
-    if (attr.colors)
+    if (attrs.colors)
     {
-        attr.maxclabel = attr.maxlabel
-                       + attr.label_color.length()
+        attrs.maxclabel = attrs.maxlabel
+                       + attrs.label_color.length()
                        + color[none].length();
-        attr.maxcdata  = attr.maxdata;
-        attr.maxctotal = attr.maxclabel + attr.maxcdata;
+        attrs.maxcdata  = attrs.maxdata;
+        attrs.maxctotal = attrs.maxclabel + attrs.maxcdata;
     }
     else
     {
-        attr.label_color = attr.data_color = "";
-        attr.maxclabel = attr.maxlabel;
-        attr.maxcdata  = attr.maxdata;
-        attr.maxctotal = attr.maxtotal;
+        attrs.label_color = attrs.data_color = "";
+        attrs.maxclabel = attrs.maxlabel;
+        attrs.maxcdata  = attrs.maxdata;
+        attrs.maxctotal = attrs.maxtotal;
     }
 }
 
@@ -102,9 +100,9 @@ formatter_T::highlight(std::vector<std::string> data)
 
     for (i = data.begin() ; i != data.end() ; ++i)
     {
-        if (std::find(attr.highlights.begin(),
-            attr.highlights.end(), *i) != attr.highlights.end())
-            s += attr.highlight_color + (*i) + color[none] + " ";
+        if (std::find(attrs.highlights.begin(),
+            attrs.highlights.end(), *i) != attrs.highlights.end())
+            s += attrs.highlight_color + (*i) + color[none] + " ";
         else
             s += *i + " ";
     }
@@ -116,155 +114,154 @@ formatter_T::highlight(std::vector<std::string> data)
  * Overloaded append() that takes a vector
  */
 
-void
-formatter_T::append(const std::string &label, std::vector<std::string> data)
-{
-    std::vector<std::string>::iterator i;
+//void
+//formatter_T::append(const std::string &label, std::vector<std::string> data)
+//{
+//    std::vector<std::string>::iterator i;
 
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
-    if (quiet())
-        std::copy(data.begin(), data.end(), std::back_inserter(buffer));
+//    if (quiet())
+//        std::copy(data.begin(), data.end(), std::back_inserter(buffer));
 
     /* otherwise, produce a data string and call the real append() */
-    else
-    {
-        std::string s;
-        for (i = data.begin() ; i != data.end() ; ++i)
-            s += *i + " ";
-    
-        if (s[s.length() - 1] == ' ')
-            s.erase(s.length() - 1);
+//    else
+//    {
+//        std::string s;
+//        for (i = data.begin() ; i != data.end() ; ++i)
+//            s += *i + " ";
+//    
+//        if (s[s.length() - 1] == ' ')
+//            s.erase(s.length() - 1);
 
-        append(label, s);
-    }
-}
+//        append(label, s);
+//    }
+//}
 
 /*
- * Append text to the output buffer.  Smartly handle lines that are bigger
- * than maxcol (new line and indent), and make sure it all aligns nicely.
+ * Flush buffer, formatting it on its way out.
  */
 
 void
-formatter_T::append(const std::string &label, const std::string &data)
+formatter_T::flush()
 {
-    std::string cur;
-
-    /* don't display the label (or indent) if the quiet attr is set */
-    if (not quiet())
+    buf_T::iterator b;
+    for (b = buf.begin() ; b != buf.end() ; ++b)
     {
-        if (label.length() > attr.maxlabel)
-            throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
-                label.c_str(), attr.maxlabel);
+        std::string label(b->first);
+        std::string data(b->second);
+        std::string cur;
 
-        cur = color[green] + label + color[none] +
-            (label.empty() ? "" : ":");
-
-        while (cur.length() < attr.maxclabel)
-            cur.append(" ");
-    }
-
-    if (not data.empty())
-    {
-        if (quiet())
-            append(label, util::splitstr(data));
-        else
+        /* don't display the label (or indent) if the quiet attr is set */
+        if (not quiet())
         {
-            if ((cur.length() + data.length()) < attr.maxctotal)
-                cur += highlight(util::splitstr(data));
+            if (label.length() > attrs.maxlabel)
+                throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
+                    label.c_str(), attrs.maxlabel);
+
+            /* TODO: fix me. */
+            cur = color[green] + label + color[none] +
+                (label.empty() ? "" : ":");
+
+            while (cur.length() < attrs.maxclabel)
+                cur.append(" ");
+        }
+
+        if (not data.empty())
+        {
+            /* FIXME!!!! */
+            if (quiet())
+                ;
+//                append(label, util::splitstr(data));
             else
             {
-                /* line's full, so find a location where we can truncate */
-                std::string::size_type pos = data.rfind(" ", attr.maxdata);
-                cur += highlight(util::splitstr(
-                    (pos == std::string::npos ? data : data.substr(0, pos))));
-                buffer.push_back(cur);
-                cur.clear();
-
-                /* indent */
-                while (cur.length() < attr.maxlabel)
-                    cur.append(" ");
-
-                /* handle leftovers */
-                std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
-
-                std::vector<std::string>::iterator i;
-                for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
+                if ((cur.length() + data.length()) < attrs.maxctotal)
+                    cur += highlight(util::splitstr(data));
+                else
                 {
-                    std::string::size_type oldlen;
-                    bool highlight_found = false;
+                    /* line's full, so find a location where we can truncate */
+                    std::string::size_type pos = data.rfind(" ", attrs.maxdata);
+                    cur += highlight(util::splitstr(
+                        (pos == std::string::npos ? data : data.substr(0, pos))));
 
-                    /* should the current word be highlighted? */
-                    if (std::find(attr.highlights.begin(),
-                        attr.highlights.end(), *i) != attr.highlights.end())
+                    *stream << cur << std::endl;
+                    cur.clear();
+
+                    /* indent */
+                    while (cur.length() < attrs.maxlabel)
+                        cur.append(" ");
+
+                    /* handle leftovers */
+                    std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
+
+                    std::vector<std::string>::iterator i;
+                    for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
                     {
-                        highlight_found = true;
+                        std::string::size_type oldlen = 0;
+                        bool highlight_found = false;
 
-                        /* adjust maxtotal appropriately */
-                        oldlen = attr.maxtotal;
-                        attr.maxtotal = oldlen + attr.highlight_color.length() +
-                            color[none].length();
-                    }
+                        /* should the current word be highlighted? */
+                        if (std::find(attrs.highlights.begin(),
+                            attrs.highlights.end(), *i) != attrs.highlights.end())
+                        {
+                            highlight_found = true;
 
-                    std::string::size_type curlen;
+                            /* adjust maxtotal appropriately */
+                            oldlen = attrs.maxtotal;
+                            attrs.maxtotal = oldlen + attrs.highlight_color.length() +
+                                color[none].length();
+                        }
 
-                    /*
-                     * Does cur contain a previously highlighted word? If so,
-                     * we need to compensate for the color lengths.
-                     */
-                    if ((cur.find("\033") != std::string::npos))
-                        curlen = cur.length() - attr.highlight_color.length() -
-                            color[none].length();
+                        std::string::size_type curlen;
 
-                    /* compensate for current highlight? */
-                    else if (highlight_found)
-                        curlen = cur.length() + attr.highlight_color.length() +
-                            color[none].length();
+                        /*
+                         * Does cur contain a previously highlighted word? If so,
+                         * we need to compensate for the color lengths.
+                         */
+                        if ((cur.find("\033") != std::string::npos))
+                            curlen = cur.length() - attrs.highlight_color.length() -
+                                color[none].length();
 
-                    /* don't compensate */
-                    else
-                        curlen = cur.length();
+                        /* compensate for current highlight? */
+                        else if (highlight_found)
+                            curlen = cur.length() + attrs.highlight_color.length() +
+                                color[none].length();
 
-                    /* does it fit on the current line? */
-                    if ((curlen + (*i).length()) > attr.maxtotal)
-                    {
-                        buffer.push_back(cur);
-                        cur.clear();
+                        /* don't compensate */
+                        else
+                            curlen = cur.length();
 
-                        /* indent */
-                        while (cur.length() < attr.maxlabel)
-                            cur.append(" ");
-                    }
+                        /* does it fit on the current line? */
+                        if ((curlen + (*i).length()) > attrs.maxtotal)
+                        {
+                            *stream << cur << std::endl;
+                            cur.clear();
+
+                            /* indent */
+                            while (cur.length() < attrs.maxlabel)
+                                cur.append(" ");
+                        }
             
-                    if (highlight_found)
-                    {
-                        cur += attr.highlight_color + (*i) + color[none] + " ";
+                        if (highlight_found)
+                        {
+                            cur += attrs.highlight_color + (*i) + color[none] + " ";
 
-                        /* restore saved maxtotal */
-                        attr.maxtotal = oldlen;
-                    }   
-                    else
-                        cur += *i + " ";
+                            /* restore saved maxtotal */
+                            attrs.maxtotal = oldlen;
+                        }   
+                        else
+                            cur += *i + " ";
+                    }
                 }
             }
         }
+
+        if (cur.size() > 0)
+            *stream << cur << std::endl;
     }
 
-    if (cur.length() > 0)
-        buffer.push_back(cur);
-}
 
-/*
- * Flush our buffer's contents to the specified stream,
- * removing each element in the buffer as we do so.
- */
-
-void
-formatter_T::flush(std::ostream &stream)
-{
-    std::remove_copy(buffer.begin(), buffer.end(),
-        std::ostream_iterator<std::string>(stream, "\n"),
-        "supercalifragilisticexpialidocious"); // :)
+    buf.clear();
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -289,7 +289,6 @@ int
 main(int argc, char **argv)
 {
     options_T options;
-    formatter_T output;
     util::timer_T timer;
     std::string fetched_location = util::sprintf("%s/%s/herds.xml",
 	LOCALSTATEDIR, PACKAGE);
@@ -470,7 +469,7 @@ main(int argc, char **argv)
 
 	/* set common format attributes */
 	util::color_map_T color;
-	formatter_T output;
+	formatter_T output(outstream);
 	output.set_colors(true);
 	output.set_quiet(optget("quiet", bool));
 	output.set_labelcolor(color[green]);

@@ -54,7 +54,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
     std::ostream *stream = optget("outstream", std::ostream *);
 
     /* set format attributes */
-    formatter_T output;
+    formatter_T output(stream);
     output.set_maxlabel(15);
     output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
     output.set_attrs();
@@ -62,10 +62,10 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
     /* was the all target specified? */
     if (herds[0] == "all")
     {
-        herds_xml.display(*stream);
+        herds_xml.display(stream);
         
         if (optget("count", bool))
-            output.append("", util::sprintf("%d", herds_xml.size()));
+            output("", util::sprintf("%d", herds_xml.size()));
     }
 
     /* nope, so only display stats for specified herds */
@@ -96,7 +96,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
                     throw herd_E();
             }
 
-            herds_xml[*herd]->display(*stream);
+            herds_xml[*herd]->display(stream);
             size += herds_xml[*herd]->size();
 
             /* only skip a line if we're not displaying the last one */
@@ -105,10 +105,8 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
         }
 
         if (optget("count", bool))
-            output.append("", util::sprintf("%d", size));
+            output("", util::sprintf("%d", size));
     }
-
-    output.flush(*stream);
 
     if (optget("timer", bool))
         *stream << std::endl;

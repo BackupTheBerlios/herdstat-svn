@@ -42,7 +42,7 @@ class herd_T  : public std::map<std::string, dev_attrs_T * >
         herd_T(const std::string &n) : name(n) { }
 
         std::vector<std::string> keys();
-        void display(std::ostream &);
+        void display(std::ostream *);
 
         std::string name;
         std::string desc;
@@ -56,7 +56,7 @@ class herd_T  : public std::map<std::string, dev_attrs_T * >
 class herds_T : public std::map<std::string, herd_T * >
 {
     public:
-        void display(std::ostream &);
+        void display(std::ostream *);
         bool exists(const std::string &s)
         {
             return (this->find(s) != this->end());

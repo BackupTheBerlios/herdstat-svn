@@ -40,21 +40,21 @@
 class dev_attrs_T : public std::vector<std::string>
 {
     public:
-        void display(std::ostream &stream)
+        void display(std::ostream *stream)
         {
-            formatter_T out;
+            formatter_T out(stream);
 
             if (optget("all", bool) and not name.empty())
-                out.append("", name);
+                out("", name);
             else if (not optget("all", bool))
             {
                 if (not name.empty())
-                    out.append("", name);
+                    out("", name);
                 if (not role.empty())
-                    out.append("", role);
+                    out("", role);
 
-                for (iterator i = this->begin() ; i != this->end() ; ++i)
-                    out.append("", *i);
+                for (iterator i = begin() ; i != end() ; ++i)
+                    out("", *i);
             }
 
             out.endl();
