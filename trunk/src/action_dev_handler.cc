@@ -36,6 +36,16 @@
 #include "formatter.hh"
 #include "action_dev_handler.hh"
 
+void
+show_all_devs(herds_T &herds)
+{
+    herds_T::iterator h;
+    for (h = herds.begin() ; h != herds.end() ; ++h)
+    {
+
+    }
+}
+
 /*
  * Given a list of developers, display all herds that
  * each developer belongs to.
@@ -55,6 +65,10 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     output.set_colors(true);
     output.set_labelcolor(color[green]);
     output.set_attrs();
+
+    /* all target? */
+    if (devs[0] == "all")
+        show_all_devs(herds_xml);
 
     /* for each specified dev... */
     std::vector<std::string>::iterator dev;

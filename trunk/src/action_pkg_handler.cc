@@ -25,6 +25,7 @@
 #endif
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <algorithm>
 #include <map>
@@ -294,11 +295,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     if (options.timer())
     {
-        float avg = static_cast<float>(timer.elapsed()) /
-            static_cast<float>(metadatas.size());
         std::cout << std::endl << "Took " << timer.elapsed() << "ms to parse "
-            << metadatas.size() << " metadata.xml's for an avg of "
-            << util::sprintf("%.4f", avg) << " ms/metadata.xml." << std::endl;
+            << metadatas.size() << " metadata.xml's ("
+            << std::setprecision(4)
+            << (static_cast<float>(timer.elapsed()) / metadatas.size())
+            << " ms/metadata.xml)." << std::endl;
     }
     else if (options.verbose())
     {
