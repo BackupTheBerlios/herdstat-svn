@@ -124,15 +124,14 @@ int
 action_pkg_handler_T::operator() (herds_T &herds_xml,
                                   std::vector<std::string> &herds)
 {
-    options_T options;
     util::color_map_T color;
     util::timer_T timer;
-    std::ostream *stream = options.outstream();
+    std::ostream *stream = optget("outstream", std::ostream *);
 
     /* set format attributes */
     formatter_T output;
     output.set_maxlabel(16);
-    output.set_maxdata(options.maxcol() - output.maxlabel());
+    output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
     output.set_attrs();
 
     /* before trying to get a list of metadatas, see if the herd even exists */
@@ -142,7 +141,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         throw herd_E();
     }
 
-    if (not options.quiet())
+    if (not optget("quiet", bool))
         *stream << "Parsing metadata.xml's (this may take a while)..."
             << std::endl;
 
@@ -151,23 +150,23 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     try
     {
 	/* PORTDIR */
-	options.set_portdir(util::portdir());
+	optset("portdir", std::string, util::portdir());
         char *result = getenv("PORTDIR");
 	if (result)
-	    options.set_portdir(result);
+	    optset("portdir", std::string, result);
 
         /* make sure it exists */
-	if (not util::is_dir(options.portdir()))
+	if (not util::is_dir(optget("portdir", std::string)))
 	    throw bad_fileobject_E("PORTDIR '%s' does not exist.",
-		options.portdir().c_str());
+		optget("portdir", std::string).c_str());
 
-        if (options.timer())
+        if (optget("timer", bool))
             timer.start();
 
         /* get a list of all metadata.xml's */
-        metadatas = get_metadatas(options.portdir());
+        metadatas = get_metadatas(optget("portdir", std::string));
 
-        if (options.timer())
+        if (optget("timer", bool))
         {
             timer.stop();
             util::debug_msg("Took %ldms to get a list of every metadata.xml in the tree.",
@@ -204,7 +203,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 throw herd_E();
         }
 
-        if (options.timer())
+        if (optget("timer", bool))
             timer.start();
 
         /* for each metadata.xml... */
@@ -227,7 +226,8 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 else
                 {
                     /* get category/package from absolute path */
-                    std::string cat_and_pkg = (*m).substr(options.portdir().size() + 1);
+                    std::string cat_and_pkg =
+                        (*m).substr(optget("portdir", std::string).size() + 1);
                     std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
                     if (pos != std::string::npos)
                         cat_and_pkg = cat_and_pkg.substr(0, pos);
@@ -245,12 +245,12 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             }
         }
 
-        if (options.timer())
+        if (optget("timer", bool))
             timer.stop();
 
         /* we now have the list of packages that correspond to the herd */
 
-        if (not options.quiet())
+        if (not optget("quiet", bool))
         {
             output.endl();
             output.append("Herd", *herd);
@@ -268,12 +268,16 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             /* TODO: the below code works, but until we figure out a way
              * to cleanup all the whitespace, the output looks like shit */
 
-//          if (options.verbose() and not p->second.empty())
-//          {
-//              output.append("", color[blue] + p->first + color[none]);
-//              output.append("", p->second);
-//          }
-//          else
+            if (optget("verbose", bool) and not p->second.empty())
+            {
+                output.append("", color[blue] + p->first + color[none]);
+                output.append("", p->second);
+                util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
+                    p->second.c_str());
+            }
+            else if (optget("verbose", bool))
+                output.append("", color[blue] + p->first + color[none]);
+            else
                 output.append("", p->first);
         }
 
@@ -284,7 +288,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     output.flush(*stream);
 
-    if (options.timer())
+    if (optget("timer", bool))
     {
         *stream << std::endl << "Took " << timer.elapsed() << "ms to parse "
             << metadatas.size() << " metadata.xml's ("
@@ -292,7 +296,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             << (static_cast<float>(timer.elapsed()) / metadatas.size())
             << " ms/metadata.xml)." << std::endl;
     }
-    else if (options.verbose())
+    else if (optget("verbose", bool))
     {
         *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;

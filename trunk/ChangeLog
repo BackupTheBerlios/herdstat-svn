@@ -1,5 +1,17 @@
 ChangeLog for herdstat
 
+2005-03-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/options.cc, src/options.hh: Added generic container for holding
+	options (option_type_T). options_T now holds an internal static map of
+	strings (option names) and their corresponding data in whatever type
+	it is.
+	* src/exceptions.hh: Added base herdstat class for bad_casts and added
+	bad_option_cast_E and invalid_option_E exceptions.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc, src/herds.cc, src/devs.hh, src/herdstat.cc:
+	Updated to use new options interface.
+
 2005-03-13 Aaron Walker <ka0ttic@gentoo.org>
 
 	* doc/herdstat.1.in, bashcomp: Updated for --fetch.

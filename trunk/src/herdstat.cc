@@ -165,8 +165,7 @@ help()
 }
 
 int
-handle_opts(int argc, char **argv, options_T *opts,
-    std::vector<std::string> *args)
+handle_opts(int argc, char **argv, std::vector<std::string> *args)
 {
     int key, opt_index = 0;
 
@@ -185,52 +184,52 @@ handle_opts(int argc, char **argv, options_T *opts,
 	{
 	    /* --dev */
 	    case 'd':
-		if (opts->action() != action_unspecified)
+		if (optget("action", options_action_T) != action_unspecified)
 		    throw args_one_action_only_E();
-		opts->set_action(action_dev);
+		optset("action", options_action_T, action_dev);
 		break;
 	    /* --outfile */
 	    case 'o':
 		if (strcmp(optarg, "stdout") != 0)
 		{
 		    if (strcmp(optarg, "stderr") == 0)
-			opts->set_outstream(&std::cerr);
-		    opts->set_outfile(optarg);
-		    opts->set_quiet(true);
-		    opts->set_timer(false);
+			optset("outstream", std::ostream *, &std::cerr);
+		    optset("outfile", std::string, optarg);
+		    optset("quiet", bool, true);
+		    optset("timer", bool, false);
 		}
 		break;
 	    /* --fetch */
 	    case 'f':
-		opts->set_fetch(true);
+		optset("fetch", bool, true);
 		break;
 	    /* --verbose */
 	    case 'v':
-		opts->set_verbose(true);
+		optset("verbose", bool, true);
 		break;
 	    /* --quiet */
 	    case 'q':
-		opts->set_quiet(true);
+		optset("quiet", bool, true);
 		break;
 	    /* --herdsxml */
 	    case 'H':
-		opts->set_herds_xml(optarg);
+		optset("herds.xml", std::string, optarg);
 		break;
 	    /* --debug */
 	    case 'D':
-		opts->set_timer(true);
-		opts->set_debug(true);
+		optset("timer", bool, true);
+		optset("debug", bool, true);
 		break;
 	    /* --timer */
 	    case 't':
-		if (opts->outfile() == "stdout")
-		    opts->set_timer(true);
+		if (optget("outfile", std::string) == "stdout")
+		    optset("timer", bool, true);
 		break;
 	    /* --package */
 	    case 'p':
-		if (opts->action() != action_unspecified)
+		if (optget("action", options_action_T) != action_unspecified)
 		    throw args_one_action_only_E();
-		opts->set_action(action_pkg);
+		optset("action", options_action_T, action_pkg);
 		break;
 	    /* --version */
 	    case 'V':
@@ -255,7 +254,7 @@ handle_opts(int argc, char **argv, options_T *opts,
 	    args->push_back(argv[optind++]);
     }
     /* --fetch is the only option that allows ZERO non-option args */
-    else if (not opts->fetch())
+    else if (not optget("fetch", bool))
 	throw args_usage_E();
 
     return 0;
@@ -274,12 +273,12 @@ main(int argc, char **argv)
 	LOCALSTATEDIR, PACKAGE);
 
     /* try to determine current columns, otherwise use default */
-    options.set_maxcol(util::getcols());
+    optset("maxcol", size_t, util::getcols());
 
     /* HERDS */
     char *result = getenv("HERDS");
     if (result)
-	options.set_herds_xml(result);
+	optset("herds.xml", std::string, result);
     else
     {
 	/* if a fetched copy exists and is newer than 24hrs, use it.
@@ -288,7 +287,7 @@ main(int argc, char **argv)
 	struct stat s;
 	if ((stat(fetched_location.c_str(), &s) == 0) and
 	    ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
-	    options.set_herds_xml(fetched_location);
+	    optset("herds.xml", std::string, fetched_location);
     }
 
     try
@@ -296,7 +295,7 @@ main(int argc, char **argv)
 	std::vector<std::string> nonopt_args;
 
 	/* handle command line options */
-	if (handle_opts(argc, argv, &options, &nonopt_args) != 0)
+	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw args_E();
 
 	/* remove duplicates; also has the nice side advantage
@@ -317,29 +316,32 @@ main(int argc, char **argv)
 	    if (pos != nonopt_args.end())
 		nonopt_args.erase(pos);
 
-	    options.set_all(true);
+	    optset("all", bool, true);
 	}
 
-	if (not options.quiet() and options.fetch() and nonopt_args.empty())
-	    options.set_verbose(true);
+	if (optget("debug", bool))
+	    options.dump(*optget("outstream", std::ostream *));
+
+	if (not optget("quiet", bool) and optget("fetch", bool) and nonopt_args.empty())
+	    optset("verbose", bool, true);
 
 	/* every action handler needs to parse herds.xml for one reason
 	 * or another, so let's get it over with. */
 	struct stat s;
 	try
 	{
-	    if (options.fetch() and
-		(options.herds_xml().find("://") == std::string::npos))
-		options.set_herds_xml(default_herdsxml);
+	    if (optget("fetch", bool) and
+		(optget("herds.xml", std::string).find("://") == std::string::npos))
+		optset("herds.xml", std::string, default_herdsxml);
 
-	    if (options.herds_xml().find("://") != std::string::npos)
+	    if (optget("herds.xml", std::string).find("://") != std::string::npos)
 	    {
 		/* NOTE: ideally we'd love to only fetch it when the timestamp
 		 * and size are different, however, because the default
 		 * location to download herds.xml is from ViewCVS, there is no
 		 * Last-Modified header, meaning wget can't do timestamps :( */
 
-		if (not options.quiet())
+		if (not optget("quiet", bool))
 		{
 		    std::cout
 			<< "Fetching herds.xml..."
@@ -352,22 +354,22 @@ main(int argc, char **argv)
 		    util::copy_file(fetched_location, fetched_location + ".bak");
 
 		/* fetch it */
-		if (util::fetch(options.herds_xml(), fetched_location,
-		    options.verbose()) != 0)
+		if (util::fetch(optget("herds.xml", std::string), fetched_location,
+		    optget("verbose", bool)) != 0)
 		    throw fetch_E();
 
 		/* because we tell wget to clobber the file, if fetching fails for
 		 * some reason, it'll truncate the old one - make sure the file
 		 * is greater than 0 bytes */
 		if ((stat(fetched_location.c_str(), &s) == 0) and (s.st_size > 0))
-		    options.set_herds_xml(fetched_location);
+		    optset("herds.xml", std::string, fetched_location);
 		else
 		    throw fetch_E();
 	    }
 	}
 	catch (const fetch_E &e)
 	{
-	    std::cerr << "Error fetching " << options.herds_xml()
+	    std::cerr << "Error fetching " << optget("herds.xml", std::string)
 		<< std::endl << std::endl;
 
 	    /* if we can't fetch it but have an old cached copy, use it */
@@ -375,7 +377,7 @@ main(int argc, char **argv)
 	    {
 		std::cerr << "Using cached copy... ";
 		util::move_file(fetched_location + ".bak", fetched_location);
-		options.set_herds_xml(fetched_location);
+		optset("herds.xml", std::string, fetched_location);
 	    }
 		
 	    std::cerr
@@ -395,25 +397,25 @@ main(int argc, char **argv)
 	}
 
 	/* make sure herds.xml exists */
-	if (not util::is_file(options.herds_xml()))
-	    throw bad_fileobject_E("%s: %s", options.herds_xml().c_str(),
+	if (not util::is_file(optget("herds.xml", std::string)))
+	    throw bad_fileobject_E("%s: %s", optget("herds.xml", std::string).c_str(),
 		strerror(errno));
 
 	/* if there's no nonoption args, we're done */
-	if (options.fetch() and nonopt_args.empty())
+	if (optget("fetch", bool) and nonopt_args.empty())
 	    return EXIT_SUCCESS;
 
 	std::auto_ptr<HerdsXMLHandler_T> handler(new HerdsXMLHandler_T());
 	try
 	{
-	    if (options.timer())
+	    if (optget("timer", bool))
 		timer.start();
 
 	    /* parse herds.xml */
 	    XMLParser_T parser(&(*handler));
-	    parser.parse(options.herds_xml());
+	    parser.parse(optget("herds.xml", std::string));
 
-	    if (options.timer())
+	    if (optget("timer", bool))
 		timer.stop();
 	}
 	catch (const XMLParser_E &e)
@@ -425,32 +427,34 @@ main(int argc, char **argv)
 
 	/* setup outfile */
 	std::ostream *outstream = NULL;
-	if (options.outfile() != "stdout" and options.outfile() != "stderr")
+	if (optget("outfile", std::string) != "stdout" and
+	    optget("outfile", std::string) != "stderr")
 	{
-	    outstream = new std::ofstream(options.outfile().c_str());
+	    outstream = new std::ofstream(optget("outfile", std::string).c_str());
 	    if (not *outstream)
-		throw bad_fileobject_E("%s: %s", options.outfile().c_str(),
+		throw bad_fileobject_E("%s: %s", optget("outfile", std::string).c_str(),
 		    strerror(errno));
-	    options.set_outstream(outstream);
+	    optset("outstream", std::ostream *, outstream);
 	}
 
 	/* set common format attributes */
 	util::color_map_T color;
 	formatter_T output;
 	output.set_colors(true);
-	output.set_quiet(options.quiet());
+	output.set_quiet(optget("quiet", bool));
 	output.set_labelcolor(color[green]);
 
 	/* set default action */
-	if (options.action() == action_unspecified)
-	    options.set_action(action_herd);
+	if (optget("action", options_action_T) == action_unspecified)
+	    optset("action", options_action_T, action_herd);
 
 	std::map<options_action_T, action_handler_T * > handlers;
 	handlers[action_herd] = new action_herd_handler_T();
 	handlers[action_dev]  = new action_dev_handler_T();
 	handlers[action_pkg]  = new action_pkg_handler_T();
 
-	action_handler_T *action_handler = handlers[options.action()];
+	action_handler_T *action_handler =
+	    handlers[optget("action", options_action_T)];
 	if (action_handler)
 	{
 	    try
@@ -469,7 +473,7 @@ main(int argc, char **argv)
 	if (outstream)
 	    delete outstream;
 
-	if (options.timer())
+	if (optget("timer", bool))
 	    throw timer_E();
     }
     catch (const bad_fileobject_E &e)

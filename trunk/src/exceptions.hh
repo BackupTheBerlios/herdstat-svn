@@ -29,11 +29,13 @@
 
 #include <exception>
 #include <string>
+#include <sstream>
 #include <cstdarg>
 #include "util.hh"
 
-/* base exception */
+/* base exceptions */
 class herdstat_base_E                   : public std::exception { };
+class herdstat_base_bad_cast_E          : public std::bad_cast  { };
 
 class herdstat_msg_base_E               : public herdstat_base_E
 {
@@ -85,6 +87,20 @@ class args_help_E                       : public args_E { };
 class args_version_E                    : public args_E { };
 class args_unimplemented_E              : public args_E { };
 
+class bad_option_cast_E                 : public herdstat_base_bad_cast_E { };
+
+class invalid_option_E                  : public herdstat_msg_base_E
+{
+    public:
+        invalid_option_E(std::string const &msg) : herdstat_msg_base_E(msg) {}
+        virtual const char *what() const throw()
+        {
+            std::ostringstream out;
+            out << "Invalid option '" << str << "' ";
+            return out.str().c_str();
+        }
+};
+
 class bad_fileobject_E                  : public herdstat_va_base_E
 {
     public:
@@ -111,7 +127,6 @@ class bad_fileobject_E                  : public herdstat_va_base_E
 
 class bad_herdsXML_E                    : public herdstat_base_E { };
 
-/* parser exceptions */
 class XMLParser_E                       : public herdstat_base_E
 {
     protected:

@@ -385,13 +385,13 @@ util::splitstr(const std::string &str, const char delim)
 void
 util::debug_msg(const char *msg, ...)
 {
-    options_T opts;
-    if (not opts.debug())
+    if (not optget("debug", bool))
 	return;
     
     va_list v;
     va_start(v, msg);
-    *(opts.outstream()) << util::sprintf(msg, v) << std::endl;
+    *(optget("outstream", std::ostream *)) << "!!! " << util::sprintf(msg, v)
+	<< std::endl;
     va_end(v);
 }
 

@@ -57,7 +57,6 @@ herd_T::keys()
 void
 herd_T::display(std::ostream &stream)
 {
-    options_T options;
     formatter_T out;
     util::color_map_T color;
     std::string user = util::current_user();
@@ -66,7 +65,7 @@ herd_T::display(std::ostream &stream)
     std::vector<std::string>::iterator i;
 
     /* display header */
-    if (not options.quiet())
+    if (not optget("quiet", bool))
     {
         if (not name.empty())
             out.append("Herd", name);
@@ -75,15 +74,18 @@ herd_T::display(std::ostream &stream)
             out.append("Email", mail);
 
         if (not desc.empty())
+        {
             out.append("Description", desc);
+            util::debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
+        }
 
-        if (options.verbose())
+        if (optget("verbose", bool))
             out.append(util::sprintf("Developers(%d)", this->size()), "");
     }
     
     for (i = devs.begin() ; i != devs.end() ; ++i)
     {
-        if (options.verbose())
+        if (optget("verbose", bool))
         {
             /* highlight email if current user is in the herd */
             if (*i == user)
@@ -103,7 +105,7 @@ herd_T::display(std::ostream &stream)
             /* if the current user is in the herd, we highlight the nick
              * and adjust maxctotal appropriately */
 
-            if (not options.quiet() and (user == (*i + "@gentoo.org")))
+            if (not optget("quiet", bool) and (user == (*i + "@gentoo.org")))
             {
                 *i = color[yellow] + (*i) + color[none];
 
@@ -114,7 +116,7 @@ herd_T::display(std::ostream &stream)
         }
     }
 
-    if (not options.verbose())
+    if (not optget("verbose", bool))
         out.append(util::sprintf("Developers(%d)", devs.size()), devs);
 
     if (oldlen != 0)
@@ -128,7 +130,6 @@ herd_T::display(std::ostream &stream)
 void
 herds_T::display(std::ostream &stream)
 {
-    options_T options;
     util::color_map_T color;
     formatter_T out;
 
@@ -148,14 +149,14 @@ herds_T::display(std::ostream &stream)
         }
     }
 
-    if (options.verbose() and not options.quiet())
+    if (optget("verbose", bool) and not optget("quiet", bool))
         out.append(util::sprintf("Herds(%d)", this->size()), "");
 
     /* for each herd in herds.xml... */
     size_type n = 0;
     for (h = this->begin() ; h != this->end() ; ++h)
     {
-        if (options.verbose())
+        if (optget("verbose", bool))
         {
             /* herd name */
             out.append("", color[blue] + h->first + color[none]);
@@ -176,9 +177,9 @@ herds_T::display(std::ostream &stream)
     if (hvec.size() > 0)
         out.append(util::sprintf("Herds(%d)", this->size()), hvec);
     
-    if (not options.quiet())
+    if (not optget("quiet", bool))
     {
-        if (options.verbose())
+        if (optget("verbose", bool))
             out.endl();
         out.append("Avg devs/herd", util::sprintf("%.2f", ndev / this->size()));
         out.append(util::sprintf("Most devs(%d)", biggest_herd), biggest_herdstr);

@@ -42,10 +42,9 @@ class dev_attrs_T : public std::vector<std::string>
     public:
         void display(std::ostream &stream)
         {
-            options_T options;
             formatter_T out;
 
-            if (this->size() > 1 and options.all())
+            if (this->size() > 1 and optget("all", bool))
                 out.append("", this->front());
             else
             {

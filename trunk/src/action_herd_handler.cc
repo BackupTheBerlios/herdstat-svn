@@ -50,14 +50,13 @@ int
 action_herd_handler_T::operator() (herds_T &herds_xml,
                                    std::vector<std::string> &herds)
 {
-    options_T options;
     util::color_map_T color;
-    std::ostream *stream = options.outstream();
+    std::ostream *stream = optget("outstream", std::ostream *);
 
     /* set format attributes */
     formatter_T output;
     output.set_maxlabel(15);
-    output.set_maxdata(options.maxcol() - output.maxlabel());
+    output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
     output.set_attrs();
 
     /* was the all target specified? */
@@ -103,7 +102,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
         
     output.flush(*stream);
 
-    if (options.timer())
+    if (optget("timer", bool))
         *stream << std::endl;
 
     return EXIT_SUCCESS;

@@ -25,20 +25,42 @@
 #endif
 
 #include <iostream>
+#include <string>
+#include <map>
+#include <utility>
+#include <sys/types.h>
 #include "options.hh"
 
-bool options_T::_debug = false;
-bool options_T::_timer = false;
-bool options_T::_verbose = false;
-bool options_T::_quiet = false;
-bool options_T::_all = false;
-bool options_T::_fetch = false;
-std::string::size_type options_T::_maxcol = 78;
-options_action_T options_T::_action = action_unspecified;
-std::string options_T::_herds_xml = 
-    "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
-std::string options_T::_portdir = "/usr/portage";
-std::string options_T::_outfile = "stdout";
-std::ostream *options_T::_outstream = &std::cout;
+options_T::option_map_T options_T::optmap;
+
+#define insert_opt(k,v) insert(std::make_pair(k, new option_type_T(v)))
+
+/*
+ * Set default options here.
+ * This is the only place where new options need to be added.
+ */
+
+void
+options_T::option_map_T::set_defaults()
+{
+    insert_opt("verbose", false);
+    insert_opt("quiet", false);
+    insert_opt("debug", false);
+    insert_opt("timer", false);
+    insert_opt("all", false);
+    insert_opt("fetch", false);
+
+    insert_opt("maxcol", static_cast<size_t>(78));
+
+    insert_opt("portdir", std::string("/usr/portage"));
+    insert_opt("outfile", std::string("stdout"));
+    insert_opt("herds.xml",
+        std::string("http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"));
+    
+    insert_opt("outstream", &std::cout);
+
+    insert_opt("action",
+        static_cast<options_action_T>(action_unspecified));
+}
 
 /* vim: set tw=80 sw=4 et : */

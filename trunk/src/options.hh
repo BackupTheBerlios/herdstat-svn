@@ -27,7 +27,14 @@
 # include "config.h"
 #endif
 
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <algorithm>
+#include <typeinfo>
+#include <map>
+#include <cstdlib>
+#include "exceptions.hh"
 
 enum options_action_T
 {
@@ -37,58 +44,161 @@ enum options_action_T
     action_pkg
 };
 
+/*
+ * Generic type container for storing option values internally as their
+ * actual type (bool, string, etc).
+ */
+
+class option_type_T
+{
+    public:
+	option_type_T() : value(NULL) { }
+	template<typename T> 
+	option_type_T(const T &v) : value(new option_type_holder<T>(v)) { }
+	option_type_T(const option_type_T &ot)
+	    : value(ot.value ? ot.value->clone() : 0) { }
+	~option_type_T() { delete value; }
+
+	template<typename T>
+	option_type_T &operator=(const T &t)
+	{
+	    option_type_T(t).swap(*this);
+	    return *this;
+	}
+
+	option_type_T &operator=(const option_type_T &ot)
+	{
+	    option_type_T(ot).swap(*this);
+	    return *this;
+	}
+
+	option_type_T &swap(option_type_T &ot)
+	{
+	    std::swap(value, ot.value);
+	    return *this;
+	}
+
+	void dump(std::ostream &stream) const { value->dump(stream); }
+
+	bool empty() const { return (not value); }
+
+	const std::type_info &type() const 
+	    { return value ? value->type() : typeid(void); }
+
+	/* abstract base for option_type_holder */
+	class option_type_holder_base
+	{
+	    public:
+		virtual ~option_type_holder_base() { }
+		virtual const std::type_info &type() const = 0;
+		virtual option_type_holder_base *clone() const = 0;
+		virtual void dump(std::ostream &stream) const = 0;
+	};
+
+	template<typename T>
+	class option_type_holder : public option_type_holder_base
+	{
+	    public:
+		option_type_holder(const T &val) : v(val) { }
+		virtual const std::type_info &type() const
+		    { return typeid(T); }
+		virtual option_type_holder_base *clone() const
+		    { return new option_type_holder(v); }
+		virtual void dump(std::ostream &stream) const
+		    { stream << v; }
+		T v;
+	};
+
+	option_type_holder_base *value;
+};
+
+template<typename T>
+T *option_cast(option_type_T *opt)
+{
+    return opt && opt->type() == typeid(T) ?
+	&static_cast<option_type_T::option_type_holder<T> *>(opt->value)->v : 0;
+}
+
+template<typename T>
+const T *option_cast(const option_type_T *opt)
+{
+    return option_cast<T>(const_cast<option_type_T * >(opt));
+}
+
+template<typename T>
+T option_cast(const option_type_T &opt)
+{
+    const T *result = option_cast<T>(&opt);
+    if (not result)
+	throw bad_option_cast_E();
+    return *result;
+}
+
 class options_T
 {
-    protected:
-        static std::string _herds_xml;
-        static std::string _portdir;
-        static std::string _outfile;
-        static bool _debug;
-        static bool _timer;
-        static bool _verbose;
-        static bool _quiet;
-        static bool _all;
-        static bool _fetch;
-        static std::string::size_type _maxcol;
-        static options_action_T _action;
-        static std::ostream *_outstream;
+    private:
+	class option_map_T : public std::map<std::string, option_type_T * >
+	{
+	    public:
+		option_map_T() { set_defaults(); }
+		~option_map_T()
+		{
+		    for (iterator i = begin() ; i != end() ; ++i)
+			delete i->second;
+		}
+
+		/* set_defaults() is defined in the source file ; that way the only
+		 * thing we have to do when adding a new option, is set it there. */
+		void set_defaults();
+	};
+
+	static option_map_T optmap;
 
     public:
-        void set_debug(bool value) { _debug = value; }
-        bool debug() const { return _debug; }
+	/* get option with specified name */
+	template<typename T>
+	static const T get(std::string const &id)
+	{
+	    if (not optmap[id])
+		throw invalid_option_E(id);
+	    return option_cast<T>(*optmap[id]);
+	}
 
-        void set_timer(bool value) { _timer = value; }
-        bool timer() const { return _timer; }
+	/* set specified option name to specified value */
+	template<typename T>
+	static void set(std::string const &id, const T &t)
+	{
+	    option_map_T::iterator i = optmap.find(id);
+	    if (i != optmap.end())
+	    {
+		delete i->second;
+		optmap.erase(i);
+	    }
+            optmap[id] = new option_type_T(t);
+	}
 
-        void set_verbose(bool value) { _verbose = value; }
-        bool verbose() const { return _verbose; }
+	/* dump all the options to the specified stream */
+	static void dump(std::ostream &stream)
+	{
+	    stream << "******************** options ********************" << std::endl;
+	    option_map_T::iterator i;
+	    for (i = optmap.begin() ; i != optmap.end() ; ++i)
+	    {
+		std::string s(i->first);
+		while(s.size() < 20)
+		    s.append(" ");
+		stream << s;
+		(i->second)->dump(stream);
+		stream << std::endl;
+	    }
+	    stream << "*************************************************" << std::endl;
+            stream << std::endl;
+	}
 
-        void set_quiet(bool value) { _quiet = value; }
-        bool quiet() const { return _quiet; }
+	/* real public interface */
+#	define optset(key,type,value) options_T::set<type>(key, value)
+#	define optget(key,type)   options_T::get<type>(key)
 
-        void set_all(bool value) { _all = value; }
-        bool all() const { return _all; }
-
-        void set_fetch(bool value) { _fetch = value; }
-        bool fetch() const { return _fetch; }
-
-        void set_maxcol(std::string::size_type value) { _maxcol = value - 2; }
-        std::string::size_type maxcol() const { return _maxcol; }
-
-        void set_action(options_action_T value) { _action = value; }
-        options_action_T action() const { return _action; }
-
-        void set_herds_xml(const std::string &value) { _herds_xml = value; }
-        const std::string &herds_xml() const { return _herds_xml; }
-
-        void set_portdir(const std::string &value) { _portdir = value; }
-        const std::string &portdir() const { return _portdir; }
-
-        void set_outfile(const std::string &value) { _outfile = value; }
-        const std::string &outfile() const { return _outfile; }
-
-        void set_outstream(std::ostream *stream) { _outstream = stream; }
-        std::ostream *outstream() const { return _outstream; }
 };
 
 #endif
