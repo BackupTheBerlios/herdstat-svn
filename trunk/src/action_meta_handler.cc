@@ -94,13 +94,6 @@ get_possibles(const std::string &portdir, const std::string &pkg)
     return pkgs;
 }
 
-
-void
-display_quietly(std::string s)
-{
-    *(optget("outstream", std::ostream *)) << s << " ";
-}
-
 int
 action_meta_handler_T::operator() (herds_T &herds_xml,
                                     std::vector<std::string> &opts)
@@ -268,7 +261,6 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             {
                 if (quiet)
                 {
-//                    std::for_each(herds.begin(), herds.end(), display_quietly);
                     std::copy(herds.begin(), herds.end(),
                         std::ostream_iterator<std::string>(*stream, " "));
                     *stream << std::endl;
@@ -283,7 +275,6 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                 if (devs.size() > 1)
                 {
                     std::vector<std::string> dev_keys(devs.keys());
-//                    std::for_each(dev_keys.begin(), dev_keys.end(), display_quietly);
                     std::copy(dev_keys.begin(), dev_keys.end(),
                         std::ostream_iterator<std::string>(*stream, " "));
                     *stream << std::endl;
