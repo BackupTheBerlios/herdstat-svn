@@ -137,8 +137,15 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     /* set format attributes */
     formatter_T output;
     output.set_maxlabel(16);
-    output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
+    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
+
+    if (optget("all", bool))
+    {
+        std::cerr << "Package action handler does not support the 'all' target."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
 
     /* before trying to get a list of metadatas,
      * see if the herd/dev even exists */
@@ -201,6 +208,9 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         return EXIT_FAILURE;
     }
 
+    if (not optget("quiet", bool))
+        output.endl();
+
     std::map<std::string, std::string>::size_type size = 0;
 
     /* for each specified herd/dev... */
@@ -216,14 +226,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             if (not dev_exists(herds_xml, *i))
             {
                 if (not optget("quiet", bool))
-                    std::cerr << "Developer '" << *i
+                    std::cerr << std::endl << "Developer '" << *i
                         << "' doesn't seem to exist in herds.xml." << std::endl;
 
                 if (opts.size() > 1)
-                {
-                    std::cerr << std::endl;
                     continue;
-                }
                 else
                     throw dev_E();
             }
@@ -233,14 +240,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             if (not herds_xml.exists(*i))
             {
                 if (not optget("quiet", bool))
-                    std::cerr << "Herd '" << *i
-                        << "' doesn't seem to exist." << std::endl;
+                    std::cerr << std::endl << "Herd '" << *i
+                        << "' doesn't seem to exist in herds.xml." << std::endl;
 
                 if (opts.size() > 1)
-                {
-                    std::cerr << std::endl;
                     continue;
-                }
                 else
                     throw herd_E();
             }
@@ -316,8 +320,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
         if (not optget("quiet", bool))
         {
-            output.endl();
-
             if (optget("dev", bool))
             {
                 if (attr.name.empty())

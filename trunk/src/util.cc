@@ -343,9 +343,9 @@ const char *
 util::dirname(const char *path)
 {
     std::string s = path;
-    size_t path_len = strlen(path);
-    size_t base_len = strlen(util::basename(path));
-    size_t len = (path[path_len - 1] == '/' ? 2 : 1);
+   std::size_t path_len = strlen(path);
+   std::size_t base_len = strlen(util::basename(path));
+   std::size_t len = (path[path_len - 1] == '/' ? 2 : 1);
     len = path_len - base_len - (path_len - base_len - len == 0 ? len - 1 : len);
 
     return s.substr(0, len).c_str();

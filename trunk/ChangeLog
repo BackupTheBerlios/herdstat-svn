@@ -1,5 +1,17 @@
 ChangeLog for herdstat
 
+2005-03-23 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc: Add formatter_T::set_highlightcolor() and
+	formatter_T::add_highlight() calls.  Removed unnecessary remove_if()
+	call.
+	* src/herds.cc: Remove highlighting stuff since we do it in main()
+	now.
+	* src/action_stats_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc, src/action_dev_handler.cc, src/util.cc:
+	s/size_t/std::size_t/.
+	* src/action_pkg_handler.cc: Fix small formatting issue (errant \n).
+
 2005-03-22 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.0_rc1-release).

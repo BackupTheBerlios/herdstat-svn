@@ -56,7 +56,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
     /* set format attributes */
     formatter_T output;
     output.set_maxlabel(15);
-    output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
+    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
 
     /* was the all target specified? */

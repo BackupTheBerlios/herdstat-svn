@@ -288,9 +288,6 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
     return 0;
 }
 
-/* unary predicate for the remove_if() call below */
-bool isNotAll(std::string &s) { return (s != "all"); }
-
 int
 main(int argc, char **argv)
 {
@@ -301,7 +298,7 @@ main(int argc, char **argv)
 	LOCALSTATEDIR, PACKAGE);
 
     /* try to determine current columns, otherwise use default */
-    optset("maxcol", size_t, util::getcols());
+    optset("maxcol", std::size_t, util::getcols());
 
     /* HERDS */
     char *result = getenv("HERDS");
@@ -344,13 +341,9 @@ main(int argc, char **argv)
 	pos = std::find(nonopt_args.begin(), nonopt_args.end(), "all");
 	if (pos != nonopt_args.end())
 	{
-	    /* yep, so remove everything but it */
-	    pos = std::remove_if(nonopt_args.begin(), nonopt_args.end(),
-		isNotAll);
-	    if (pos != nonopt_args.end())
-		nonopt_args.erase(pos);
-
 	    optset("all", bool, true);
+	    nonopt_args.clear();
+	    nonopt_args.push_back("all");
 	}
 
 	if (optget("debug", bool))
@@ -485,6 +478,9 @@ main(int argc, char **argv)
 	output.set_colors(optget("color", bool));
 	output.set_quiet(optget("quiet", bool));
 	output.set_labelcolor(color[green]);
+	output.set_highlightcolor(color[yellow]);
+	output.add_highlight(util::current_user());
+	output.add_highlight(util::get_user_from_email(util::current_user()));
 
 	/* set default action */
 	if (optget("action", options_action_T) == action_unspecified)

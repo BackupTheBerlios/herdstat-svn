@@ -58,7 +58,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     else
         output.set_maxlabel(12);
 
-    output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
+    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
 
     herds_T::iterator h;

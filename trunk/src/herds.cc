@@ -63,11 +63,6 @@ herd_T::display(std::ostream &stream)
     std::vector<std::string> devs = this->keys();
     std::vector<std::string>::iterator i;
 
-    /* highlight current user if it appears in the output */
-    out.set_highlightcolor(color[yellow]);
-    out.add_highlight(user);
-    out.add_highlight(util::get_user_from_email(user));
-
     /* display header */
     if (not optget("quiet", bool))
     {
@@ -146,7 +141,8 @@ herds_T::display(std::ostream &stream)
             /* description */
             iterator x;
             if ((x = this->find(h->first)) != this->end())
-                out("", x->second->desc);
+                if (not x->second->desc.empty())
+                    out("", x->second->desc);
 
             if (not optget("count", bool) and n != this->size())
                 out.endl();

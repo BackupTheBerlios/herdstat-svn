@@ -179,6 +179,7 @@ formatter_T::append(const std::string &label, const std::string &data)
             append(label, util::splitstr(data));
         else
         {
+            /* does it all fit on one line? */
             if ((cur.length() + data.length()) < attr.maxctotal)
                 cur += highlight(util::splitstr(data));
             else
@@ -187,6 +188,8 @@ formatter_T::append(const std::string &label, const std::string &data)
                 std::string::size_type pos = data.rfind(" ", attr.maxdata);
                 cur += highlight(util::splitstr(
                     (pos == std::string::npos ? data : data.substr(0, pos))));
+
+                util::debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
                 cur.clear();
 
@@ -222,21 +225,35 @@ formatter_T::append(const std::string &label, const std::string &data)
                      * we need to compensate for the color lengths.
                      */
                     if ((cur.find("\033") != std::string::npos))
+                    {
                         curlen = cur.length() - attr.highlight_color.length() -
                             attr.no_color.length();
 
+                        util::debug_msg("found color in cur; setting curlen to %d",
+                            curlen);
+                    }
+
                     /* compensate for current highlight? */
                     else if (highlight_found)
+                    {
                         curlen = cur.length() + attr.highlight_color.length() +
                             attr.no_color.length();
 
+                        util::debug_msg("highlighted '%s'; setting curlen to %d",
+                            (*i).c_str(), curlen);
+                    }
+
                     /* don't compensate */
                     else
+                    {
                         curlen = cur.length();
+                        util::debug_msg("no highlight; setting curlen to %d", curlen);
+                    }
 
                     /* does it fit on the current line? */
                     if ((curlen + (*i).length()) > attr.maxtotal)
                     {
+                        util::debug_msg("pushing back '%s'", cur.c_str());
                         buffer.push_back(cur);
                         cur.clear();
 
@@ -260,7 +277,10 @@ formatter_T::append(const std::string &label, const std::string &data)
     }
 
     if (cur.length() > 0)
+    {
+        util::debug_msg("pushing back '%s'", cur.c_str());
         buffer.push_back(cur);
+    }
 }
 
 /*
