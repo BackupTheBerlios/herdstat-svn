@@ -1,0 +1,106 @@
+This file contains a summary of changes in released versions.  Please read the
+ChangeLog file for a more detailed listing of changes/bug fixes.
+
+1.0.1:
+    New features:
+     - New --metadata option that displays metadata information for the
+       specified package(s)/category(s).  Blame Obz for this.
+     - New --no-herd option that when specified with --package --dev only
+       shows packages belong to herd "no-herd".
+
+    Bug fixes:
+     - package handler quirks fixed wrt to stuff that doesnt exist.
+
+1.0:
+    New features:
+     - Added progress thinggy for metadata caching, since that's the biggest
+       bottleneck.
+
+    Bug fixes:
+     - Use C++ version of isspace and tolower so that locale is considered.
+
+1.0_rc2:
+    New features:
+     - Cache the metadata.xml list for 24hrs to reduce package lookup times.
+
+    Bug fixes:
+     - Fixed pretty big formatting bug that caused long lines to not be wrapped
+       and indented properly.
+     - Instead of cleaning whitespace of long strings (such as herd/package
+       descriptions) in the XML handler for EVERY single element, only clean
+       the stuff that will be displayed.  Reduces the number of calls to
+       util::tidy_whitespace() from ~2700 calls to 133.  Makes a pretty big
+       difference since it calls several STL algorithms.
+
+1.0_rc1:
+    New features:
+     - Added --nocolor.
+
+    Bug fixes:
+     - Reverted gcc-4 warning fixes since they cause havoc with gcc-3.3.x.
+     - Fixed exception if '-d all' is specified.
+
+0.6:
+    New features:
+     - You are now able to specify both --dev and --package at the same time
+       in order to query the packages maintained by a specific developer.
+     - Added --count option.  Using this option would produce the same result
+       as running 'herdstat ... | grep -v '^$' | wc -l'.
+
+    Bug fixes:
+     - Ignore --quiet if herdstat is invoked with no non-option arguments.
+     - Fixed completion bug where stderr wasn't redirected, this causing 
+       weird completion funkyness if an error occurred.
+     - Ignore case when it comes to developer usernames, otherwise we get
+       duplicates (ex: pyrania/pYrania).
+     - Fixed bug where a newline would get displayed after a herd, even if
+       the number of pkgs in that herd == 0.
+
+0.5:
+    New features:
+     - When herdstat is run with no arguments, display a summary of statistics.
+
+    Bug fixes:
+     - Fixed borked --package output.
+     - Remove backed-up copy of fetched herds.xml if it's unneeded.
+
+0.4:
+    New features:
+     - Added --fetch for telling herdstat to forcibly fetch herds.xml.
+
+    Bug fixes:
+     - All funky looking output caused by extra whitespace within XML elements
+       is now cleaned before being displayed.
+     - '@gentoo.org' is now appended to any invalid email addresses that lack it.
+
+0.3:
+    New features:
+     - Added --outfile command-line option that allows the user to easily send
+       the output to the specified file instead of stdout.
+
+    Bug fixes:
+     - Fixed the errant parentheses in bash command-line completion.
+     - Fixed user highlighting in --verbose output.
+     - Fixed bug where output was explicitly being sent to stdout instead of
+       the specified stream when --quiet was specified.
+     - Fixed bug where 'herdstat -dv all' would display developer roles (which
+       of course should only happen in herd output).
+
+0.2:
+    New features:
+     - Herd output now show's herd's email address (if available).
+     - Both --dev and the default action now support an 'all' target (for
+       example 'herdstat all').
+     - Bash command-line completion is now included.
+
+    Bug fixes:
+     - Fixed several fetching-related bugs. Now uses the cached copy of
+       herds.xml (if it exists) if for some reason fetching fails. Also
+       fixed a bug where (since we tell wget to clobber the old file) if
+       wget fails, it writes a 0 byte file (and thus all queries fail).
+     - PORTDIR determination code fixed/quicker.
+     - Fixed bug where highlighting of the user's nick was done prior to
+       sorting, thus causing the user's nick to always appear first in
+       output.
+
+vim: set ft=txt :
