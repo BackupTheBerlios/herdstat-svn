@@ -25,6 +25,7 @@
 #endif
 
 #include <iostream>
+#include <locale>
 #include <string>
 #include <map>
 #include <utility>
@@ -51,6 +52,7 @@ options_T::option_map_T::set_defaults()
     insert_opt("fetch", false);
     insert_opt("dev", false);
     insert_opt("count", false);
+    insert_opt("color", true);
 
     insert_opt("maxcol", static_cast<size_t>(78));
 
@@ -63,6 +65,8 @@ options_T::option_map_T::set_defaults()
 
     insert_opt("action",
         static_cast<options_action_T>(action_unspecified));
+
+    insert_opt("locale", std::locale("").name());
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -25,6 +25,7 @@
 #endif
 
 #include <iostream>
+#include <locale>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -466,7 +467,12 @@ main(int argc, char **argv)
 		throw bad_fileobject_E("%s: %s", optget("outfile", std::string).c_str(),
 		    strerror(errno));
 	    optset("outstream", std::ostream *, outstream);
+	    optset("locale", std::string, std::locale::classic().name());
 	}
+	
+	/* set locale */
+	optget("outstream", std::ostream *)->imbue
+	    (std::locale(optget("locale", std::string).c_str()));
 
 	/* set common format attributes */
 	util::color_map_T color;

@@ -66,7 +66,7 @@ class formatter_T
         util::color_map_T color;
 
     public:
-        typedef int size_type;
+        typedef std::size_t size_type;
 
         formatter_T() { }
 
@@ -83,18 +83,12 @@ class formatter_T
         /* attribute member functions */
         void set_maxtotal(size_type s) { attr.maxtotal = s; }
         size_type maxtotal() { return attr.maxtotal; }
-        void set_maxctotal(size_type s) { attr.maxctotal = s; }
-        size_type maxctotal() { return attr.maxctotal; }
             
         void set_maxlabel(size_type s) { attr.maxlabel = s; }
         size_type maxlabel() { return attr.maxlabel; }
-        void set_maxclabel(size_type s) { attr.maxclabel = s; }
-        size_type maxclabel() { return attr.maxclabel; }
 
         void set_maxdata(size_type s) { attr.maxdata = s; }
         size_type maxdata() { return attr.maxdata; }
-        void set_maxcdata(size_type s) { attr.maxcdata = s; }
-        size_type maxcdata()  { return attr.maxcdata;  }
 
         void set_colors(bool value) { attr.colors = value; }
         bool colors() { return attr.colors; }
