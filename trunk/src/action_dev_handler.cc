@@ -29,21 +29,57 @@
 #include <vector>
 #include <memory>
 
+#include "herds.hh"
 #include "xmlparser.hh"
 #include "herds_xml_handler.hh"
+#include "util.hh"
 #include "options.hh"
 #include "exceptions.hh"
 #include "formatter.hh"
 #include "action_dev_handler.hh"
 
+/*
+ * Called when the 'all' target is specified.  Displays
+ * every single developer present in herds.xml.
+ */
+
 void
 show_all_devs(herds_T &herds)
 {
+    formatter_T out;
+    util::color_map_T color;
+    
+    herd_T devs;
+    herd_T::iterator d;
+
+    /* for each herd in herds.xml... */
     herds_T::iterator h;
     for (h = herds.begin() ; h != herds.end() ; ++h)
     {
-
+        /* for each developer in that herd... */
+        for (d = h->second->begin() ; d != h->second->end() ; ++d)
+        {
+            /* if the developer is not already in our list, add it */
+            if (devs.find(d->first) == devs.end())
+                devs[d->first] = d->second;
+        }
     }
+
+    /* get a sorted vector */
+    std::vector<std::string> sorted_devs;
+    for (d = devs.begin() ; d != devs.end() ; ++d)
+        sorted_devs.push_back(d->first);
+    std::sort(sorted_devs.begin(), sorted_devs.end());
+
+    if (options.verbose())
+    {
+        out.append(util::sprintf("Developers(%d)", devs.size()), "");
+
+        std::vector<std::string>::iterator i;
+        for (i = sorted_devs.begin() ; i != sorted_devs.end() ; ++i)
+        {
+            out.append("", *i);
+        }
 }
 
 /*
