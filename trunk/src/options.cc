@@ -49,6 +49,8 @@ options_T::option_map_T::set_defaults()
     insert_opt("timer", false);
     insert_opt("all", false);
     insert_opt("fetch", false);
+    insert_opt("dev", false);
+    insert_opt("count", false);
 
     insert_opt("maxcol", static_cast<size_t>(78));
 

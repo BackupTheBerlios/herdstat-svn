@@ -14,7 +14,7 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 EXTRA_DIST = autogen.sh .todo bashcomp
 
 TODO: .todo
-	test -x $(prefix)/bin/devtodo && devtodo all --TODO
+	@test -x $(prefix)/bin/devtodo && devtodo all --TODO
 
 all: TODO
 dist-hook: TODO

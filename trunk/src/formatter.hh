@@ -74,7 +74,8 @@ class formatter_T
         void append(const std::string &, const std::string &);
         void append(const std::string &, std::vector<std::string>);
         void flush(std::ostream &);
-        const std::string &peek() { return buffer.back(); }
+        const std::string &peek() const { return buffer.back(); }
+        std::vector<std::string>::size_type size() const { return buffer.size(); }
         std::string highlight(std::vector<std::string>);
 
         void set_attrs();

@@ -61,11 +61,18 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
 
     /* was the all target specified? */
     if (herds[0] == "all")
+    {
         herds_xml.display(*stream);
+        
+        if (optget("count", bool))
+            output.append("", util::sprintf("%d", herds_xml.size()));
+    }
 
     /* nope, so only display stats for specified herds */
     else
     {
+        herd_T::size_type size = 0;
+
         /* for each specified herd... */
         std::vector<std::string>::iterator herd;
         std::vector<std::string>::size_type n = 1;
@@ -74,32 +81,33 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
             /* does the herd exist? */
             if (not herds_xml.exists(*herd))
             {
+                std::cerr << "Herd '" << *herd << "' doesn't seem to exist."
+                    << std::endl;
+
                 /* if the user specified more than one herd, then just print
                  * the error and keep going; otherwise, we want to exit with
                  * an error code */
                 if (herds.size() > 1)
                 {
-                    std::cerr << color[red] << "Herd '" << *herd
-                        << "' doesn't seem to exist." << color[none] << std::endl;
                     std::cerr << std::endl;
                     continue;
                 }
                 else
-                {
-                    std::cerr << "Herd '" << *herd << "' doesn't seem to exist."
-                        << std::endl;
                     throw herd_E();
-                }
             }
 
             herds_xml[*herd]->display(*stream);
+            size += herds_xml[*herd]->size();
 
             /* only skip a line if we're not displaying the last one */
-            if (n != herds.size())
+            if (not optget("count", bool) and n != herds.size())
                 output.endl();
         }
+
+        if (optget("count", bool))
+            output.append("", util::sprintf("%d", size));
     }
-        
+
     output.flush(*stream);
 
     if (optget("timer", bool))

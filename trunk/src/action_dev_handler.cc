@@ -52,7 +52,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     
     /* set format attributes */
     formatter_T output;
-    output.set_maxlabel(16);
+    output.set_maxlabel(12);
     output.set_maxdata(optget("maxcol", size_t) - output.maxlabel());
     output.set_attrs();
 
@@ -79,9 +79,14 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
         }
 
         all_devs.display(*stream);
+
+        if (optget("count", bool))
+            output.append("", util::sprintf("%d", all_devs.size()));
     }
     else
     {
+        std::vector<std::string>::size_type size = 0;
+
         /* for each specified dev... */
         std::vector<std::string>::iterator dev;
         std::vector<std::string>::size_type n = 1;
@@ -103,25 +108,16 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                     if (not d->second->name.empty())
                         name = d->second->name;
                 }
-                else
-                {
-                    /* there have been cases where the dev put just their
-                     * nick instead of their full email address             */
-                    d = herds_xml[herd]->find(*dev);
-                    if (d != herds_xml[herd]->end())
-                    {
-                        herds.push_back(herd);
-                        if (not d->second->name.empty())
-                            name = d->second->name;
-                    }
-                }
             }
+
+            size += herds.size();
 
             /* was the dev in any of the herds? */
             if (herds.empty())
             {
-                std::cerr << color[red] << "'" << *dev << "' doesn't seem to "
-                    << "belong to any herds." << color[none] << std::endl;
+                if (not optget("quiet", bool))
+                    std::cerr << "Developer '" << *dev << "' doesn't seem to "
+                        << "belong to any herds." << std::endl;
 
                 if (devs.size() == 1)
                     throw dev_E();
@@ -130,15 +126,15 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not optget("quiet", bool))
                 {
-                    if (not name.empty())
-                        output.append("Developer", name + " (" + (*dev) + ")");
-                    else
+                    if (name.empty())
                         output.append("Developer", *dev);
+                    else
+                        output.append("Developer", name + " (" + (*dev) + ")");
 
                     output.append("Email", *dev + "@gentoo.org");
                 }
 
-                if (optget("verbose", bool))
+                if (optget("verbose", bool) and not optget("quiet", bool))
                 {
                     output.append(util::sprintf("Herds(%d)", herds.size()), "");
 
@@ -159,14 +155,17 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                             output.endl();
                     }
                 }
-                else
+                else if (not optget("count", bool))
                     output.append(util::sprintf("Herds(%d)", herds.size()), herds);
             }
 
             /* skip a line if we're not displaying the last one */
-            if (n != devs.size())
+            if (not optget("count", bool) and n != devs.size())
                 output.endl();
         }
+
+        if (optget("count", bool))
+            output.append("", util::sprintf("%d", size));
     }
 
     output.flush(*stream);

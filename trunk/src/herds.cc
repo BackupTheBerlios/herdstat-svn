@@ -83,14 +83,13 @@ herd_T::display(std::ostream &stream)
             util::debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
         }
 
-        if (optget("verbose", bool) and not optget("quiet", bool))
+        if (optget("verbose", bool))
             out.append(util::sprintf("Developers(%d)", this->size()), "");
     }
     
     /* for each developer in this herd... */
     for (i = devs.begin() ; i != devs.end() ; ++i)
     {
-        
         if (not optget("verbose", bool))
             /* just show the username not the entire email address */
             *i = util::get_user_from_email(*i);
@@ -111,8 +110,9 @@ herd_T::display(std::ostream &stream)
         }
     }
 
-    if (not optget("verbose", bool) or
-        (optget("verbose", bool) and optget("quiet", bool)))
+    if ((not optget("verbose", bool) and not optget("count", bool)) or
+        (optget("verbose", bool) and optget("quiet", bool) and
+         not optget("count", bool)))
         out.append(util::sprintf("Developers(%d)", devs.size()), devs);
 }
 
@@ -132,10 +132,10 @@ herds_T::display(std::ostream &stream)
         out.append(util::sprintf("Herds(%d)", this->size()), "");
 
     /* for each herd in herds.xml... */
-    size_type n = 0;
-    for (iterator h = this->begin() ; h != this->end() ; ++h)
+    size_type n = 1;
+    for (iterator h = this->begin() ; h != this->end() ; ++h, ++n)
     {
-        if (optget("verbose", bool))
+        if (optget("verbose", bool) and not optget("quiet", bool))
         {
             /* herd name */
             out.append("", color[blue] + h->first + color[none]);
@@ -145,11 +145,11 @@ herds_T::display(std::ostream &stream)
             if ((x = this->find(h->first)) != this->end())
                 out.append("", x->second->desc);
 
-            if (++n != this->size())
+            if (not optget("count", bool) and n != this->size())
                 out.endl();
         }
         /* otherwise, store it for processing after the loop */
-        else
+        else if (not optget("count", bool))
             hvec.push_back(h->first);
     }
 

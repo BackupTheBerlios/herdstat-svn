@@ -9,7 +9,7 @@ _herdstat() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -V --version -p --package -d --dev -H --herdsxml
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
-        -f --fetch"
+        -f --fetch -c --count"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -23,25 +23,26 @@ _herdstat() {
 	-H|--herdsxml|-o|--outfile)
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
 	    ;;
-	-p|--package)
-	    COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts}" -- ${cur}) )
-	    ;;
 	-d|--dev)
 	    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    ;;
 	*)
-	    local x dev
+	    local x dev pkg
 	    for x in ${COMP_WORDS[@]} ; do
 		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
 		    dev=1
 		    break
+                elif [[ ${x} == -*p* ]] ; then
+                    pkg=1
 		fi
 	    done
 
-	    if [[ ${dev} -eq 1 ]] ; then
-		    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
+	    if [[ ${dev} -eq 1 && ${pkg} -eq 0 ]] ; then
+		COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts}" -- ${cur}) )
+            elif [[ ${dev} -eq 1 ]] ; then
+		COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    else
-		    COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" -- ${cur}) )
+		COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    fi
 	    ;;
     esac

@@ -1,5 +1,25 @@
 ChangeLog for herdstat
 
+2005-03-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (0.6 release).
+	* doc/herdstat.1.in: Added --count and a couple examples.
+	* bashcomp: Updated to allow --dev and --package to be specified at
+	the same time. Also added --count.
+	* src/options.cc: Added dev and count option.
+	* src/herdstat.cc: Allow both --dev and --package to be specified at
+	the same time in order to allow us to look up packages belonging to a
+	certain developer. Added --count option.
+	* src/action_pkg_handler.cc: Added developer support so that
+	specifying --dev and --package will work.  Also added --count support.
+	* src/action_dev_handler.cc: Removed check for dev w/o email address
+	since metadata_xml_handler_T now handles that. Also added --count
+	support.
+	* src/action_herd_handler.cc: Added --count support.
+	* src/herds.cc: Added --count support.
+	* src/formatter.hh: Added size() method for returning the current
+	buffer size.
+
 2005-03-17 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/formatter.cc, src/formatter.hh: Added highlighting

@@ -49,6 +49,10 @@ Display debugging messages.
 .B "\-t, \-\-timer"
 Display elapsed time of XML parsing.  Automatically enabled if --debug
 is specified.
+.TP
+.B "\-c, \-\-count"
+Display the number of items instead of the items themselves.
+.TP
 .SH "NON-OPTION ARGUMENTS"
 Unless you specify --version or --help, at least one non-option argument is
 required.  The non-option arguments depend on the action:
@@ -64,7 +68,7 @@ all developers will be displayed.
 .B "\-p, \-\-package" "\fI[ herd(s) ]\fR"
 Display package information for the specified herd(s).
 .TP
-If no options (non-option or not) are specified, @PACKAGE@ will display a summary of herds.xml statistics.
+If no options (non-option or not) are specified, @PACKAGE@ will display a summary of herds.xml statistics.  If --dev and --package are both specified, @PACKAGE@ will display all packages maintained by the specified developer.
 .SH EXAMPLES
 .IP "\fB$ @PACKAGE@ netmon x11\fR"
 Display all developers in the netmon and x11 herds.
@@ -72,6 +76,12 @@ Display all developers in the netmon and x11 herds.
 Display all packages in the netmon herd.
 .IP "\fB$ @PACKAGE@ -d ka0ttic\fR"
 Display all herds that the developer ka0ttic is in.
+.IP "\fB$ @PACKAGE@ -dp ka0ttic\fR"
+Display all packages ka0ttic maintains.
+.IP "\fB$ @PACKAGE@ -pc base-system\fR"
+Display the number of packages in the base-system herd.
+.IP "\fB$ @PACKAGE@ -dpc ka0ttic\fR"
+Display the number of packages maintained by ka0ttic.
 .IP "\fB$ @PACKAGE@ -o ~/x11-devs.txt x11\fR"
 Send the output of '@PACKAGE@ x11' to ~/x11-devs.txt.
 .IP "\fB$ @PACKAGE@ all\fR"

@@ -34,9 +34,9 @@ MetadataXMLHandler_T::start_element(const std::string &name, const attrs_type &)
         in_herd = true;
     else if (name == "maintainer")
         in_maintainer = true;
-    else if (name == "email")
+    else if (name == "email" and in_maintainer)
         in_email = true;
-    else if (name == "name")
+    else if (name == "name" and in_maintainer)
         in_name = true;
     else if (name == "description")
         in_desc = true;
@@ -53,9 +53,9 @@ MetadataXMLHandler_T::end_element(const std::string &name)
         in_herd = false;
     else if (name == "maintainer")
         in_maintainer = false;
-    else if (name == "email")
+    else if (name == "email" and in_maintainer)
         in_email = false;
-    else if (name == "name")
+    else if (name == "name" and in_maintainer)
         in_name = false;
     else if (name == "description")
         in_desc = false;
@@ -85,7 +85,7 @@ MetadataXMLHandler_T::text(const std::string &str)
 
     /* <maintainer><description> */
     else if (in_desc)
-        devs[cur_dev]->push_back(util::tidy_whitespace(str));
+        devs[cur_dev]->role = util::tidy_whitespace(str);
 
     /* <longdescription> */
     else if (in_longdesc)

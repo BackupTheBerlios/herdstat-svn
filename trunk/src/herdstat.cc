@@ -58,7 +58,7 @@
 static const std::string default_herdsxml =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
-static const char *short_opts = "H:o:hVvDdtpqf";
+static const char *short_opts = "H:o:hVvDdtpqfc";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -68,6 +68,7 @@ static struct option long_opts[] =
     {"verbose",	    no_argument,	0,  'v'},
     {"quiet",	    no_argument,	0,  'q'},
     {"debug",	    no_argument,	0,  'D'},
+    {"count",	    no_argument,	0,  'c'},
     /* force a fetch of herds.xml */
     {"fetch",	    no_argument,	0,  'f'},
     /* time how long it takes for XML parsing */
@@ -122,6 +123,8 @@ help()
 	<< std::endl
 	<< " -D, --debug           Display debugging messages." << std::endl
 	<< " -t, --timer           Display elapsed time of XML parsing." << std::endl
+	<< " -c, --count           Instead of displaying data items, display the" << std::endl
+	<< "                       number of items." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action        1 or more herds." << std::endl
@@ -149,6 +152,8 @@ help()
 	<< std::endl
 	<< " -D              Display debugging messages." << std::endl
 	<< " -t              Display elapsed time of XML parsing." << std::endl
+	<< " -c              Instead of displaying data items, display the" << std::endl
+	<< "                 number of items." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action  1 or more herds." << std::endl
@@ -185,9 +190,22 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	{
 	    /* --dev */
 	    case 'd':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (optget("action", options_action_T) != action_unspecified and
+		    optget("action", options_action_T) != action_pkg)
 		    throw args_one_action_only_E();
-		optset("action", options_action_T, action_dev);
+		if (optget("action", options_action_T) == action_pkg)
+		    optset("dev", bool, true);
+		else
+		    optset("action", options_action_T, action_dev);
+		break;
+	    /* --package */
+	    case 'p':
+		if (optget("action", options_action_T) != action_unspecified and
+		    optget("action", options_action_T) != action_dev)
+		    throw args_one_action_only_E();
+		if (optget("action", options_action_T) == action_dev)
+		    optset("dev", bool, true);
+		optset("action", options_action_T, action_pkg);
 		break;
 	    /* --outfile */
 	    case 'o':
@@ -212,6 +230,11 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	    case 'q':
 		optset("quiet", bool, true);
 		break;
+	    /* --count */
+	    case 'c':
+		optset("count", bool, true);
+		optset("quiet", bool, true);
+		break;
 	    /* --herdsxml */
 	    case 'H':
 		optset("herds.xml", std::string, optarg);
@@ -225,12 +248,6 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	    case 't':
 		if (optget("outfile", std::string) == "stdout")
 		    optset("timer", bool, true);
-		break;
-	    /* --package */
-	    case 'p':
-		if (optget("action", options_action_T) != action_unspecified)
-		    throw args_one_action_only_E();
-		optset("action", options_action_T, action_pkg);
 		break;
 	    /* --version */
 	    case 'V':
