@@ -373,8 +373,7 @@ main(int argc, char **argv)
 		    throw fetch_E();
 
 		/* remove back up copy */
-		if (util::is_file(fetched_location + ".bak"))
-		    unlink((fetched_location + ".bak").c_str());
+		unlink((fetched_location + ".bak").c_str());
 	    }
 	}
 	catch (const fetch_E &e)
