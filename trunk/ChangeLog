@@ -1,8 +1,27 @@
 ChangeLog for herdstat
 
+2005-03-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (release-0.3).
+	* bashcomp: Fixed the two errant ')' causing 'all' completion to
+	complete to 'all\)'.  Also, moving out of distribution and into the
+	portage tree for easier access.
+	* doc/herdstat.1.in: Updated for --outfile.
+	* src/herdstat.cc: Added new command-line option --outfile.
+	* src/herds.cc: Fix bug where yellow user highlighting doesn't occur
+	in verbose output. Also fixed another bug where output was being sent
+	to stdout instead of the stream arg if options.quiet().
+	* src/devs.hh: Fix dev_attrs_T::display() to only display all
+	developer attributes if option all is not set.
+	* src/options.cc, src/options.hh: Added options all, outfile, and
+	outstream.
+	* src/action_herd_handler.cc, src/action_dev_handler.cc,
+	src/action_pkg_handler.cc: Updated to use options_T::outstream()
+	instead of std::cout.
+
 2005-03-08 Aaron Walker <ka0ttic@gentoo.org>
 
-	* configure.ac: Update version (release).
+	* configure.ac: Update version (release-0.2).
 	* doc/herdstat.1.in: Added a few more examples.
 	* src/util.cc, src/util.hh: Added copy_file(), move_file(), and
 	get_user_from_email().
@@ -65,7 +84,7 @@ ChangeLog for herdstat
 
 2005-03-04 Aaron Walker <ka0ttic@gentoo.org>
 
-	* src/configure.ac: Change version to 0.1 (release).
+	* src/configure.ac: Update version (release-0.1).
 	* doc/herdstat.1.in: Added example thanks to dragonheart.  Added
 	PORTDIR and ECHANGELOG_USER to the Environment section.
 	* src/herdstat.cc, src/action_dev_handler.cc,

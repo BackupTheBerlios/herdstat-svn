@@ -1,11 +1,24 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+0.3:
+    New features:
+     - Added --outfile command-line option that allows the user to easily send
+       the output to the specified file instead of stdout.
+
+    Bug fixes:
+     - Fixed the errant parentheses in bash command-line completion.
+     - Fixed user highlighting in --verbose output.
+     - Fixed bug where output was explicitly being sent to stdout instead of
+       the specified stream when --quiet was specified.
+     - Fixed bug where 'herdstat -dv all' would display developer roles (which
+       of course should only happen in herd output).
+
 0.2:
     New features:
      - Herd output now show's herd's email address (if available).
      - Both --dev and the default action now support an 'all' target (for
-     example 'herdstat all').
+       example 'herdstat all').
      - Bash command-line completion is now included.
 
     Bug fixes:
@@ -17,3 +30,5 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
      - Fixed bug where highlighting of the user's nick was done prior to
        sorting, thus causing the user's nick to always appear first in
        output.
+
+vim: set ft=txt :
