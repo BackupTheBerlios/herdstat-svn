@@ -115,6 +115,8 @@ help()
 	<< " default action        1 or more herds." << std::endl
 	<< " -p, --package         1 or more herds." << std::endl
 	<< " -d, --dev             1 or more developers." << std::endl
+	<< "Both the default action and the --dev action support an 'all' target"
+	<< std::endl << "that show all of the devs or herds." << std::endl
 
 #else
 
@@ -137,6 +139,8 @@ help()
 	<< " default action  1 or more herds." << std::endl
 	<< " -p              1 or more herds." << std::endl
 	<< " -d              1 or more developers." << std::endl
+	<< "Both the default action and the -d action support an 'all' target"
+	<< std::endl << "that show all of the devs or herds." << std::endl
 
 #endif /* HAVE_GETOPT_LONG */
 
