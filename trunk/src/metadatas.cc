@@ -80,6 +80,7 @@ metadatas_T::valid() const
             valid = (s.st_size > 0);            
     }
     
+    debug_msg("cache is valid? %d", valid);
     return valid;
 }
 
@@ -111,32 +112,23 @@ metadatas_T::fill()
     categories_T::iterator cat;
     for (cat = categories.begin() ; cat != categories.end() ; ++cat)
     {
-        const std::string path = portdir + "/" + (*cat);
-
-        /* open category */
-        DIR *dir = opendir(path.c_str());
-        if (not dir)
-            continue;
+        const std::string path(portdir + "/" + (*cat));
+        debug_msg("searching %s", path.c_str());
 
         if (status)
             ++progress;
 
-        debug_msg("searching %s", path.c_str());
+        util::dir_T category(path);
+        util::dir_T::iterator d;
 
-        struct dirent *d = NULL;
-        while ((d = readdir(dir)))
+        /* for each directory in this category */
+        for (d = category.begin() ; d != category.end() ; ++d)
         {
-            /* skip anything starting with a '.' */
-            if (std::strncmp(d->d_name, ".", 1) == 0)
-                continue;
-
             /* instead of walking each directory, comparing d->d_name to
              * "metadata.xml", just stat the dir/metadata.xml */
-            if (util::is_file(path + "/" + d->d_name + "/metadata.xml"))
-                _cache.push_back(path + "/" + d->d_name + "/metadata.xml");
+            if (util::is_file((*d)->name() + "/metadata.xml"))
+                _cache.push_back((*d)->name() + "/metadata.xml");
         }
-
-        closedir(dir);
     }
 
     if (timer)

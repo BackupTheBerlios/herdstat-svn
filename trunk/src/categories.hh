@@ -27,8 +27,9 @@
 # include "config.h"
 #endif
 
-
-#include "cache.hh"
+#include <algorithm>
+#include "util.hh"
+#include "exceptions.hh"
 
 #define CATEGORIES "/profiles/categories"
 
@@ -36,22 +37,25 @@
  * categories_T represents a list of portage categories.
  */
 
-class categories_T : public cache_T<std::string>
+class categories_T : public util::file_T
 {
     public:
-        categories_T()
-            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES)
+        categories_T() : file_T(std::string(util::portdir()) + CATEGORIES)
+        { init(); }        
+        categories_T(const std::string &p) : file_T(p + CATEGORIES) { init(); }
+
+        void init()
         {
-            this->clear();
+            this->open();
             this->read();
+
+            /* remove 'virtual' -- a hack for a hack */
+            _contents.erase(
+                std::remove(_contents.begin(), _contents.end(), "virtual"),
+                _contents.end());
         }
 
-        categories_T(const std::string &portdir)
-            : cache_T<std::string>(portdir + CATEGORIES)
-        {
-            this->clear();
-            this->read();
-        }
+        size_type size() const { return _contents.size(); }
 };
 
 #endif

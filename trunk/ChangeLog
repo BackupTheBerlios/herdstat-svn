@@ -1,5 +1,11 @@
 ChangeLog for herdstat
 
+2005-04-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.cc, lib/file.hh: Finished up file_T methods.
+	* src/categories.hh, src/cache.hh, src/action_meta_handler.cc,
+	src/metadatas.cc, src/metadatas.hh: Updated to use file_T/dir_T.
+
 2005-04-05 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/file.cc, lib/file.hh: Added file/dir objects and moved

@@ -32,26 +32,40 @@
 #include <string>
 #include <iterator>
 #include <algorithm>
+
+#include "util.hh"
 #include "exceptions.hh"
 
 /*
  * Represents a cache of objects of type T.
  */
 
-template <typename T>
 class cache_T
 {
     protected:
         const std::string _file;
-        std::vector<T> _cache;
+        std::vector<std::string> _cache;
 
     public:
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::size_type size_type;
+        typedef std::vector<std::string>::iterator iterator;
+        typedef std::vector<std::string>::size_type size_type;
 
         cache_T(const std::string &f, size_type reserve = 0) : _file(f)
         {
-            _cache.reserve(reserve);
+            if (reserve != 0)
+                _cache.reserve(reserve);
+        }
+
+        virtual ~cache_T() { }
+
+        /* vector subset */
+        iterator begin() { return _cache.begin(); }
+        iterator end() { return _cache.end(); }
+        size_type size() const { return _cache.size(); }
+        void clear() { _cache.clear(); }
+
+        virtual void init()
+        {
             if (this->valid())
                 this->read();
             else
@@ -61,35 +75,25 @@ class cache_T
             }
         }
 
-        virtual ~cache_T() { }
-
-        iterator begin() { return _cache.begin(); }
-        iterator end() { return _cache.end(); }
-        size_type size() const { return _cache.size(); }
-        void clear() { _cache.clear(); }
-
+        /* read cache from disk */
         void read()
         {
-            std::auto_ptr<std::ifstream> f(new std::ifstream(_file.c_str()));
-            if (not (*f))
-                throw bad_fileobject_E(_file);
-
-            std::copy(std::istream_iterator<T>(*f),
-                std::istream_iterator<T>(), std::back_inserter(_cache));
+            util::file_T f(_file);
+            f.open();
+            f.read(&_cache);
         }
 
+        /* write cache to disk */
         void write() const
         {
-            std::auto_ptr<std::ofstream> f(new std::ofstream(_file.c_str()));
-            if (not (*f))
-                throw bad_fileobject_E(_file);
- 
-            std::copy(_cache.begin(), _cache.end(),
-                std::ostream_iterator<T>(*f, "\n"));
+            util::file_T f(_file);
+            f.open(std::ios::out);
+            f.write(_cache);
         }
 
-        virtual bool valid() const { return true; }
-        virtual void fill() { }
+        /* pure virtuals */
+        virtual bool valid() const = 0;
+        virtual void fill() = 0;
 };
 
 #endif

@@ -9,22 +9,19 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       config/* \
 		       config.h.in \
 		       stamp-h.in \
-		       html/* \
 		       *~
 
 EXTRA_DIST = autogen.sh .todo bashcomp
 
 srchtml:
-	if test -d ${PWD}/html ; then \
-		rm -fr ${PWD}/html/* ; \
-	else \
-		mkdir ${PWD}/html ; \
-	fi
+	test -d ${PWD}/html || mkdir ${PWD}/html ; \
 	for x in lib src ; do \
+		if test -d ${PWD}/html/$${x} ; then \
+			rm -fr ${PWD}/html/$${x}/* ; \
+		else \
+			mkdir ${PWD}/html/$${x} ; \
+		fi ; \
 		cd ${PWD}/$${x} && $(MAKE) $@ ; \
-		sleep 4 ; \
-		test -d ${PWD}/html/$${x} || mkdir ${PWD}/html/$${x} ; \
-		mv ${PWD}/$${x}/*.html ${PWD}/html/$${x} ; \
 	done
 
 TODO: .todo

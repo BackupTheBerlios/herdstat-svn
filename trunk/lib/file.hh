@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <ios>
 #include <fstream>
 #include <ostream>
 #include <string>
@@ -37,9 +38,23 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#define DEFAULT_MODE std::ios::in
+
 namespace util
 {
-    enum type_T { dir, file };
+    /* general purpose file-related functions */
+    bool is_dir(const char *);
+    bool is_dir(const std::string &);
+    bool is_dir(const struct stat &);
+    bool is_file(const char *);
+    bool is_file(const std::string &);
+    bool is_file(const struct stat &);
+    const char *basename(const char *);
+    const char *basename(std::string const &);
+    const char *dirname(const char *);
+    const char *dirname(std::string const &);
+
+    enum type_T { FTYPE_FILE, FTYPE_DIR };
 
     /* generic file object */
     class fileobject_T
@@ -48,6 +63,7 @@ namespace util
             std::string _name;   /* file object's name */
             struct stat _sbuf;   /* stat structure */
             type_T _type;
+            bool _exists;
 
         public:
             typedef off_t size_type;
@@ -60,8 +76,11 @@ namespace util
             typedef blksize_t blksize_type;
             typedef blkcnt_t blkcnt_type;
 
-            fileobject_T(const char *, type_T);
-            fileobject_T(const std::string &, type_T);
+            fileobject_T(type_T t) : _type(t) { }
+            fileobject_T(const char *n, type_T t) : _name(n), _type(t)
+            { this->stat(); }
+            fileobject_T(const std::string &n, type_T t) : _name(n), _type(t)
+            { this->stat(); }
             virtual ~fileobject_T() { }
 
             size_type size() const { return _sbuf.st_size; }
@@ -80,44 +99,67 @@ namespace util
             std::string basename() const { return util::basename(_name); }
             std::string dirname() const { return util::dirname(_name); }
             type_T type() const { return _type; }
+            bool exists() const { return _exists; }
+
+            void stat()
+            {
+                _exists = ( ::stat(_name.c_str(), &_sbuf) == 0 ? true : false );
+            }
 
             virtual void display(std::ostream &) { }
-            virtual void open() = 0;
-            virtual void open(const char *) = 0;
-            virtual void read() = 0;
+            virtual void open() { }
+            virtual void read() { }
+            virtual void close() { }
     };
 
     /* represents a regular file */
-    template <class C>
     class file_T : public fileobject_T
     {
         protected:
-            C *stream;
+            std::fstream *stream;
+            std::vector<std::string> _contents;
 
         public:
+            typedef std::vector<std::string>::iterator iterator;
+            typedef std::vector<std::string>::size_type size_type;
+
             file_T(const std::string &n)
-                : fileobject_T(n, file), stream(NULL) { }
+                : fileobject_T(n, FTYPE_FILE), stream(NULL) { }
             file_T(const char *n)
-                : fileobject_T(n, file), stream(NULL) { }
-            file_T(const std::string &n, C *s)
-                : fileobject_T(n, file), stream(s) { }
-            file_T(const char *n, C *s)
-                : fileobject_T(n, file), stream(s) { }
+                : fileobject_T(n, FTYPE_FILE), stream(NULL) { }
+            file_T(const std::string &n, std::fstream *s)
+                : fileobject_T(n, FTYPE_FILE), stream(s) { }
+            file_T(const char *n, std::fstream *s)
+                : fileobject_T(n, FTYPE_FILE), stream(s) { }
             virtual ~file_T() { if (stream) delete stream; }
 
-            virtual void open();
-            virtual void open(const char *);
-            virtual void read();
-    };
+            iterator begin() { return _contents.begin(); }
+            iterator end() { return _contents.end(); }
+            size_type bufsize() const { return _contents.size(); }
+            void push_back(const std::string &s) { _contents.push_back(s); }
 
-    typedef file_T<std::ofstream> ofile_T;
-    typedef file_T<std::ifstream> ifile_T;
+            virtual void open();
+            virtual void open(const char *n,
+                std::ios_base::openmode mode = DEFAULT_MODE);
+            virtual void open(std::ios_base::openmode mode)
+            { this->open(_name.c_str(), mode); }
+
+            virtual void close();
+
+            virtual void read();
+            virtual void read(std::vector<std::string> *);
+            virtual void write() { this->display(*stream); }
+            virtual void write(const std::vector<std::string> &);
+            virtual void display(std::ostream &);
+    };
 
     /* represents a fileobject_T container (aka a directory).
      * of course, directories are file objects themselves... */
     class dir_T : public fileobject_T
     {
         protected:
+            DIR *dirp;
+            struct dirent *d;
             std::vector<fileobject_T * > _contents;
 
         public:
@@ -125,35 +167,41 @@ namespace util
             typedef std::vector<fileobject_T * >::const_iterator const_iterator;
             typedef std::vector<fileobject_T * >::size_type size_type;
 
-            dir_T(const char *n, bool recurse = true)
-                : fileobject_T(n, dir) { read(recurse); }
-            dir_T(const std::string &n, bool recurse = true)
-                : fileobject_T(n, dir) { read(recurse); }
+            dir_T(const char *n, bool recurse = false)
+                : fileobject_T(n, FTYPE_DIR), dirp(NULL), d(NULL)
+            {
+                this->open();
+                this->read(recurse);
+            }
+            
+            dir_T(const std::string &n, bool recurse = false)
+                : fileobject_T(n, FTYPE_DIR), dirp(NULL), d(NULL)
+            {
+                this->open();
+                this->read(recurse);
+            }
+
             virtual ~dir_T();
 
-            virtual void open() { }
-            virtual void open(const char *) { }
-            virtual void read() { return false; }
+            virtual void open();
+            
+            virtual void open(const char *n)
+            {
+                _name = n;
+                this->stat();
+                this->open();
+            }
+
+            virtual void close();
+            virtual void read() { }
             virtual void read(bool recurse);
             virtual void display(std::ostream &);
 
             /* small subset of vector methods */
             iterator begin() { return _contents.begin(); }
             iterator end() { return _contents.end(); }
-            size_type size() const { return _contents.size(); }
+            size_type bufsize() const { return _contents.size(); }
     };
-
-    /* general purpose file-related functions */
-    bool is_dir(const char *);
-    bool is_dir(const std::string &);
-    bool is_dir(const struct stat &);
-    bool is_file(const char *);
-    bool is_file(const std::string &);
-    bool is_file(const struct stat &);
-    const char *basename(const char *);
-    const char *basename(std::string const &);
-    const char *dirname(const char *);
-    const char *dirname(std::string const &);
 }
 
 #endif

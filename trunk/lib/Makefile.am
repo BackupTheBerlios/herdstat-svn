@@ -14,5 +14,6 @@ MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 
 srchtml:
 	for x in $(libutil_la_SOURCES) ; do \
-		gvim +TOhtml "+w! $${x}.html" +q! +q! +q $${x} ; \
+		source-highlight -c ../src.css -s cpp -f html -t4 -n -i $${x} \
+			-o ../html/lib/$${x}.html ; \
 	done

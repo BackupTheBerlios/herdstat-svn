@@ -32,5 +32,6 @@ MAINTAINERCLEANFILES = Makefile.in *~
 
 srchtml:
 	for x in $(herdstat_SOURCES) ; do \
-		gvim +TOhtml "+w! $${x}.html" +q! +q! +q $${x} ; \
+		source-highlight -c ../src.css -s cpp -f html -t4 -n -i $${x} \
+			-o ../html/src/$${x}.html ; \
 	done

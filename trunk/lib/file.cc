@@ -24,27 +24,12 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
+#include <iterator>
 #include <cstring>
 #include <cassert>
 
 #include "util.hh"
-
-/**************************
- * fileobject_T           *
- **************************/
-
-util::fileobject_T::fileobject_T(const char *n, util::type_T t) : _name(n), _type(t)
-{
-    if (stat(_name.c_str(), &_sbuf) != 0)
-        throw util::errno_E("stat: " + _name);
-}
-
-util::fileobject_T::fileobject_T(const std::string &n, util::type_T t)
-    : _name(n), _type(t)
-{
-    if (stat(_name.c_str(), &_sbuf) != 0)
-        throw util::errno_E("stat: " + _name);
-}
 
 /**************************
  * file_T                 *
@@ -53,27 +38,65 @@ util::fileobject_T::fileobject_T(const std::string &n, util::type_T t)
 void
 util::file_T::open()
 {
+    this->open(_name.c_str(), DEFAULT_MODE);
+}
+
+void
+util::file_T::open(const char *n, std::ios_base::openmode mode)
+{
+    if (_name.empty())
+    {
+        _name = n;
+        this->stat();
+    }
+
     if (stream)
     {
         if (stream->is_open())
             return;
 
-        stream->open(_name.c_str());
+        stream->open(n, mode);
     }
     else
-        stream = new C(_name.c_str());
-}
-
-void
-util::file_T::open(const char *n)
-{
-
+        stream = new std::fstream(n, mode);
 }
 
 void
 util::file_T::read()
 {
+    this->read(&_contents);
+}
 
+void
+util::file_T::read(std::vector<std::string> *v)
+{
+    assert(stream);
+    assert(stream->is_open());
+
+    std::string line;
+    while (std::getline(*stream, line))
+        v->push_back(line);
+}
+
+void
+util::file_T::write(const std::vector<std::string> &v)
+{
+    _contents = v;
+    this->write();
+}
+
+void
+util::file_T::display(std::ostream &stream)
+{
+    std::copy(_contents.begin(), _contents.end(),
+        std::ostream_iterator<std::string>(stream, "\n"));
+}
+
+void
+util::file_T::close()
+{
+    assert(stream);
+    stream->close();
 }
 
 /**************************
@@ -81,15 +104,16 @@ util::file_T::read()
  **************************/
 
 void
-util::dir_T::read(bool recurse)
+util::dir_T::open()
 {
-    DIR *dirp = NULL;
-    struct dirent *d = NULL;
-
     dirp = opendir(_name.c_str());
     if (not dirp)
         throw util::bad_fileobject_E(_name);
+}
 
+void
+util::dir_T::read(bool recurse)
+{
     while ((d = readdir(dirp)))
     {
         /* skip . and .. for obvious reasons */
@@ -98,23 +122,28 @@ util::dir_T::read(bool recurse)
             continue;
 
         fileobject_T *f = NULL;
+        std::string path(_name + "/" + d->d_name);
 
-        if (util::is_dir(d->d_name))
+        if (util::is_dir(path))
         {
             if (recurse)
-                f = new dir_T(_name + "/" + d->d_name, recurse);
+                f = new dir_T(path, recurse);
             else
-                f = new fileobject_T(_name + "/" + d->d_name, dir);
+                f = new fileobject_T(path, FTYPE_DIR);
         }
-        else if (util::is_file(d->d_name))
-            f = new file_T(_name + "/" + d->d_name);
+        else if (util::is_file(path))
+            f = new file_T(path);
         else
-            f = new fileobject_T(_name + "/" + d->d_name, file);
+            f = new fileobject_T(path, FTYPE_FILE);
 
         assert(f);
         _contents.push_back(f);
     }
+}
 
+void
+util::dir_T::close()
+{
     if (closedir(dirp) != 0)
         throw util::errno_E("closedir: " + _name);
 }
@@ -126,7 +155,7 @@ util::dir_T::display(std::ostream &stream)
     {
         stream << (*i)->name() << ": " << (*i)->size() << "b" << std::endl;
 
-        if ((*i)->type() == dir)
+        if ((*i)->type() == FTYPE_DIR)
             (*i)->display(stream);
     }
 }

@@ -77,17 +77,15 @@ get_possibles(const std::string &portdir, const std::string &pkg)
             break;
         }
 
-        /* open category */
-        DIR *dir = opendir(path.c_str());
-        if (not dir)
-            continue;
+        util::dir_T category(path);
+        util::dir_T::iterator d;
 
-        struct dirent *d = NULL;
-        while ((d = readdir(dir)))
-            if (pkg == d->d_name)
-                pkgs.push_back(*c + "/" + d->d_name);
-
-        closedir(dir);
+        /* for each package in the category */
+        for (d = category.begin() ; d != category.end() ; ++d)
+        {
+            if (pkg == (*d)->name())
+                pkgs.push_back(*c + "/" + pkg);
+        }
     }
 
     return pkgs;
