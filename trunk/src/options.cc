@@ -24,16 +24,20 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include "options.hh"
 
 bool options_T::_debug = false;
 bool options_T::_timer = false;
 bool options_T::_verbose = false;
 bool options_T::_quiet = false;
+bool options_T::_all = false;
 std::string::size_type options_T::_maxcol = 78;
 options_action_T options_T::_action = action_unspecified;
 std::string options_T::_herds_xml = 
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 std::string options_T::_portdir = "/usr/portage";
+std::string options_T::_outfile = "stdout";
+std::ostream *options_T::_outstream = &std::cout;
 
 /* vim: set tw=80 sw=4 et : */
