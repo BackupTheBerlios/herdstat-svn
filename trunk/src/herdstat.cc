@@ -309,7 +309,8 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	while (optind < argc)
 	    args->push_back(argv[optind++]);
     }
-    else if (optget("action", options_action_T) != action_unspecified)
+    else if ((optget("action", options_action_T) != action_unspecified) and
+	    (optget("action", options_action_T) != action_meta))
 	throw args_usage_E();
 
     return 0;
@@ -350,7 +351,8 @@ main(int argc, char **argv)
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw args_E();
 
-	if (nonopt_args.empty())
+	if (nonopt_args.empty() and
+	    optget("action", options_action_T) != action_meta)
 	{
 	    optset("action", options_action_T, action_stats);
 	    optset("quiet", bool, false);
@@ -560,7 +562,7 @@ main(int argc, char **argv)
 	if (optget("timer", bool))
 	    throw timer_E();
     }
-    catch (const bad_fileobject_E &e)
+    catch (const errno_error_E &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;

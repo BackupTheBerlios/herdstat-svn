@@ -9,6 +9,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
      - Added --with-herd, a generalization of --no-herd (which is now
        shorthand for --with-herd=no-herd) for only displaying developer's
        packages that belong in the specified herd.
+     - User can now run 'herdstat -m' with no non-option args if inside a
+       package directory or category.
 
     Bug fixes:
      - Fixed bug where a std::runtime_error exception was thrown (and not

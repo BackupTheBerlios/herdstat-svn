@@ -1,5 +1,17 @@
 ChangeLog for herdstat
 
+2005-03-31 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/categories.hh: Added new categories_T class.
+	* src/metadatas.cc: Modified to use new categories_T.
+	* src/action_meta_handler.cc: Display ebuild's DESCRIPTION and
+	HOMEPAGE even if no metadata.xml exists.  Allow user to run 'herdstat
+	-m' with no non-opt args *IF* in a package directory or category.
+	* src/exceptions.hh: Added errno_error_E and modified bad_fileobject_E
+	to derive from it.
+	* src/util.cc, src/util.hh: Added getcwd(). Moved get_categories() to
+	it's own categories_T class.
+
 2005-03-30 Aaron Walker <ka0ttic@gentoo.org>
 
 	* doc/herdstat.1.in, bashcomp: Added --with-herd.
