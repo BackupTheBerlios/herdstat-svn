@@ -31,6 +31,7 @@
 #include <map>
 #include <vector>
 #include <cstdarg>
+#include <cstdio>
 #include <sys/time.h>
 
 #ifndef PATH_MAX
@@ -133,7 +134,7 @@ namespace util
 		    max  = m;
 		    cur  = 0;
 		    step = 100.0 / m;
-		    printf("  0%%");
+		    std::printf("  0%%");
 		}
 	    }
 
@@ -142,13 +143,13 @@ namespace util
 		max  = m;
 		cur  = 0;
 		step = 100.0 / m;
-		printf("  0%%");
+		std::printf("  0%%");
 	    }
 
 	    void operator++ ()
 	    {
-		printf("\b\b\b\b%.3i%%", (int) (cur += step));
-		fflush(stdout);
+		std::printf("\b\b\b\b%.3i%%", (int) (cur += step));
+		std::fflush(stdout);
 	    }
     };
 }
