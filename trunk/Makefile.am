@@ -10,4 +10,4 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       stamp-h.in \
 		       *~
 
-EXTRA_DIST = autogen.sh bashcomp
+EXTRA_DIST = autogen.sh
