@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-03-26 Aaron Walker <ka0ttic@gentoo.org>
+	
+	* src/util.hh: Added status_T class for showing percent of task
+	completion.
+	* src/action_pkg_handler.cc: Use util::status_T for metadata caching
+	and parsing.
+
 2005-03-25 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/util.cc: Use C++ version of std::isspace and std::tolower with

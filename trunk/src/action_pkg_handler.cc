@@ -122,7 +122,7 @@ get_metadatas(const std::string &portdir)
     {
         *(optget("outstream", std::ostream *))
             << "Caching list of metadata.xml's: ";
-        status.start(categories.size())
+        status.start(categories.size());
     }
 
     std::vector<std::string>::iterator c;
@@ -162,6 +162,8 @@ get_metadatas(const std::string &portdir)
 
     if (d)
         util::debug_msg("cached %d metadata.xml's", metadatas.size());
+    else if (not d and not q)
+        *(optget("outstream", std::ostream *)) << std::endl;
     
     return metadatas;
 }
@@ -226,10 +228,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         }
     }
 
-    if (not optget("quiet", bool))
-        *stream << "Parsing metadata.xml's (this may take a while)..."
-            << std::endl;
-
     /* PORTDIR */
     optset("portdir", std::string, util::portdir());
     char *result = getenv("PORTDIR");
@@ -259,6 +257,13 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     
     /* total pkgs */
     std::map<std::string, std::string>::size_type size = 0;
+
+    util::status_T status;
+    if (not optget("quiet", bool) and not (optget("debug", bool)))
+    {
+        *stream << "Parsing metadata.xml's: ";
+        status.start(opts.size());
+    }
 
     /* for each specified herd/dev... */
     std::vector<std::string>::iterator i;
@@ -359,6 +364,10 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         if (optget("timer", bool))
             timer.stop();
 
+        if ((n == 1) and (not optget("quiet", bool) and
+                          not optget("debug", bool)))
+            output.endl();
+
         if (not optget("quiet", bool))
         {
             if (optget("dev", bool))
@@ -429,6 +438,9 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 (optget("quiet", bool) and pkgs.size() > 0))
                     output.endl();
         }
+
+        if (not optget("quiet", bool) and not (optget("debug", bool)))
+            ++status;
     }
 
     if (optget("count", bool))
