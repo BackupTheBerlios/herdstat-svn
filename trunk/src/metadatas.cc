@@ -37,6 +37,7 @@
 #include "util.hh"
 #include "options.hh"
 #include "exceptions.hh"
+#include "categories.hh"
 #include "metadatas.hh"
 
 metadatas_T::metadatas_T(const std::string &p, const std::string &c)
@@ -114,9 +115,9 @@ metadatas_T::write_cache()
 void
 metadatas_T::get_metadatas()
 {
+    categories_T categories;
     util::progress_T progress;
     util::timer_T t;
-    std::vector<std::string> categories = util::get_categories(portdir);
     bool status = not optget("quiet", bool) and not optget("debug", bool);
     bool timer  = optget("timer", bool);
 
@@ -131,7 +132,7 @@ metadatas_T::get_metadatas()
         t.start();
 
     /* for each category */
-    std::vector<std::string>::iterator cat;
+    categories_T::iterator cat;
     for (cat = categories.begin() ; cat != categories.end() ; ++cat)
     {
         std::string path = portdir + "/" + (*cat);
