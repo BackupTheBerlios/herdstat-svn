@@ -30,6 +30,7 @@
 #include <memory>
 #include <iterator>
 #include <algorithm>
+#include <locale>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -46,15 +47,21 @@
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
 
+/*
+ * Given a string, convert all characters to lowercase
+ */
+
 std::string
-util::lowercase(const std::string &str)
+util::lowercase(const std::string &s)
 {
-    std::string s(str);
-    std::string::iterator i;
-    for (i = s.begin() ; i != s.end() ; ++i)
-	*i = tolower(*i);
+    if (s.empty())
+	return "";
+
+    std::string result(s);
+    for (std::string::iterator i = result.begin() ; i != result.end() ; ++i)
+	*i = std::tolower(*i, std::locale(optget("locale", std::string).c_str()));
     
-    return s;
+    return result;
 }
 
 /*
@@ -64,7 +71,8 @@ util::lowercase(const std::string &str)
 bool
 bothspaces(char c1, char c2)
 {
-    return std::isspace(c1) and std::isspace(c2);
+    std::locale loc = std::locale(optget("locale", std::string).c_str());
+    return std::isspace(c1, loc) and std::isspace(c2, loc);
 }
 
 std::string
@@ -189,16 +197,23 @@ std::string::size_type
 util::getcols()
 {
     std::string output;
-    FILE *p = popen("stty size 2>/dev/null | cut -d' ' -f2", "r");
+    FILE *p = popen("stty size 2>/dev/null", "r");
     if (p)
     {
-	char line[5];
+	char line[10];
 	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
 	    output = line;
 	pclose(p);
     }
 
-    return (output.empty() ? 78 : atoi(output.c_str()));
+    if (not output.empty())
+    {
+	std::string::size_type pos;
+	if ((pos = output.find(" ")) != std::string::npos)
+	    return std::atoi(output.substr(pos).c_str());
+    }
+
+    return 78;
 }
 
 /*
