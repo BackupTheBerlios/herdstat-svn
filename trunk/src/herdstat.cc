@@ -54,7 +54,7 @@
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
 
-static const char *short_opts = "H:hVvDdtpq";
+static const char *short_opts = "H:o:hVvDdtpq";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -72,6 +72,8 @@ static struct option long_opts[] =
     {"herdsxml",    required_argument,	0,  'H'},
     /* show package stats for the specified herds */
     {"package",	    no_argument,	0,  'p'},
+    /* specify a file to write the output to */
+    {"outfile",	    required_argument,	0,  'o'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -104,6 +106,8 @@ help()
 	<< " -p, --package         Look up packages by herd." << std::endl
 	<< " -d, --dev             Look up herds by developer." << std::endl
 	<< " -H, --herdsxml <file> Specify location of herds.xml." << std::endl
+	<< " -o, --outfile  <file> Send output to the specified file" << std::endl
+	<< "                       instead of stdout." << std::endl
 	<< " -v, --verbose         Display verbose output." << std::endl
 	<< " -q, --quiet           Don't display labels and fancy colors. Use this"
 	<< std::endl
@@ -128,6 +132,8 @@ help()
 	<< " -p              Look up packages by herd." << std::endl
 	<< " -d              Look up herds by developer." << std::endl
 	<< " -H <file>       Specify location of herds.xml." << std::endl
+	<< " -o <file>       Send output to the specified file" << std::endl
+	<< "                 instead of stdout." << std::endl
 	<< " -v              Display verbose output." << std::endl
 	<< " -q              Don't display labels and fancy colors. Use this"
 	<< std::endl
@@ -176,6 +182,17 @@ handle_opts(int argc, char **argv, options_T *opts,
 		    throw args_one_action_only_E();
 		opts->set_action(action_dev);
 		break;
+	    /* --outfile */
+	    case 'o':
+		if (strcmp(optarg, "stdout") != 0)
+		{
+		    if (strcmp(optarg, "stderr") == 0)
+			opts->set_outstream(&std::cerr);
+		    opts->set_outfile(optarg);
+		    opts->set_quiet(true);
+		    opts->set_timer(false);
+		}
+		break;
 	    /* --verbose */
 	    case 'v':
 		opts->set_verbose(true);
@@ -195,7 +212,8 @@ handle_opts(int argc, char **argv, options_T *opts,
 		break;
 	    /* --timer */
 	    case 't':
-		opts->set_timer(true);
+		if (opts->outfile() == "stdout")
+		    opts->set_timer(true);
 		break;
 	    /* --package */
 	    case 'p':
@@ -286,6 +304,8 @@ main(int argc, char **argv)
 		isNotAll);
 	    if (pos != nonopt_args.end())
 		nonopt_args.erase(pos);
+
+	    options.set_all(true);
 	}
 
 	/* every action handler needs to parse herds.xml for one reason
@@ -377,6 +397,17 @@ main(int argc, char **argv)
 	    return EXIT_FAILURE;
 	}
 
+	/* setup outfile */
+	std::ostream *outstream = NULL;
+	if (options.outfile() != "stdout" and options.outfile() != "stderr")
+	{
+	    outstream = new std::ofstream(options.outfile().c_str());
+	    if (not *outstream)
+		throw bad_fileobject_E("%s: %s", options.outfile().c_str(),
+		    strerror(errno));
+	    options.set_outstream(outstream);
+	}
+
 	/* set default action */
 	if (options.action() == action_unspecified)
 	    options.set_action(action_herd);
@@ -402,12 +433,15 @@ main(int argc, char **argv)
 	else
 	    throw args_unimplemented_E();
 
+	if (outstream)
+	    delete outstream;
+
 	if (options.timer())
 	    throw timer_E();
     }
     catch (const bad_fileobject_E &e)
     {
-	std::cout << e.what() << std::endl;
+	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const timer_E)
