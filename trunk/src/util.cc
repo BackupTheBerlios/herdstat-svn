@@ -48,6 +48,50 @@
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
 
+/*
+ * Try to determine if the current directory is
+ * a valid package directory.
+ */
+
+bool
+util::in_pkgdir()
+{
+    const char *pwd = util::getcwd().c_str();
+    DIR *dir = NULL;
+    struct dirent *d = NULL;
+    bool ebuild = false, filesdir = false;
+
+    if (not (dir = opendir(pwd)))
+	throw bad_fileobject_E(pwd);
+
+    while ((d = readdir(dir)))
+    {
+	char *s = NULL;
+	if ((s = std::strrchr(d->d_name, '.')))
+	{
+	    if (std::strcmp(++s, "ebuild") == 0)
+		ebuild = true;
+	}   
+	else if (std::strcmp(d->d_name, "files") == 0)
+	    filesdir = true;
+    }
+
+    closedir(dir);
+    return ebuild and filesdir;
+}
+
+std::string
+util::getcwd()
+{
+    char *pwd = ::getcwd(NULL, 0);
+    if (not pwd)
+	throw errno_error_E("getcwd");
+
+    std::string s(pwd);
+    std::free(pwd);
+    return s;
+}
+
 /* 
  * Given the portdir, a package, and a variable name,
  * try to retrieve the value of the specified variable
@@ -59,7 +103,8 @@ util::get_ebuild_var(const std::string &portdir,
 		     const std::string &pkg,
 		     const std::string &var)
 {
-    return get_var(ebuild_which(portdir, pkg), var);
+    std::string ebuild = ebuild_which(portdir, pkg);
+    return get_var(ebuild, var);
 }
 
 /*
@@ -73,6 +118,8 @@ util::get_var(const std::string &path, const std::string &var)
 {
     if (path.empty() or var.empty())
 	return "";
+
+    util::debug_msg("get_var: opening '%s'", path.c_str());
 
     std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
     if (not (*f))
@@ -127,28 +174,9 @@ util::ebuild_which(const std::string &portdir, const std::string &pkg)
 	return "";
 
     std::sort(ebuilds.begin(), ebuilds.end());
+    util::debug_msg("ebuild_which(%s) == '%s'", pkg.c_str(),
+	ebuilds.back().c_str());
     return ebuilds.back().c_str();
-}
-
-/*
- * Return a list of categories retrieved from PORTDIR/profiles/categories
- */
-
-std::vector<std::string>
-util::get_categories(const std::string &portdir)
-{
-    std::string catfile = portdir + "/profiles/categories";
-    std::vector<std::string> categories;
-
-    std::auto_ptr<std::ifstream> f(new std::ifstream(catfile.c_str()));
-    if (not (*f))
-        throw bad_fileobject_E(catfile);
-
-    std::string line;
-    while (std::getline(*f, line))
-        categories.push_back(line);
-
-    return categories;
 }
 
 /*

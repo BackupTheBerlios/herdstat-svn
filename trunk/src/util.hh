@@ -56,11 +56,12 @@ enum color_name_T
 
 namespace util
 {
+    bool in_pkgdir();
+    std::string getcwd();
     const char *get_ebuild_var(const std::string &, const std::string &,
 	const std::string &);
     const char *ebuild_which(const std::string &, const std::string &);
     const char *get_var(const std::string &, const std::string &);
-    std::vector<std::string> get_categories(const std::string &);
     std::string lowercase(const std::string &);
     std::string tidy_whitespace(const std::string &);
     std::string get_user_from_email(const std::string &);
