@@ -1,0 +1,51 @@
+This file contains a summary of changes in released versions.  Please read the
+ChangeLog file for a more detailed listing of changes/bug fixes.
+
+0.5:
+    New features:
+     - When herdstat is run with no arguments, display a summary of statistics.
+
+    Bug fixes:
+     - Fixed borked --package output.
+     - Remove backed-up copy of fetched herds.xml if it's unneeded.
+
+0.4:
+    New features:
+     - Added --fetch for telling herdstat to forcibly fetch herds.xml.
+
+    Bug fixes:
+     - All funky looking output caused by extra whitespace within XML elements
+       is now cleaned before being displayed.
+     - '@gentoo.org' is now appended to any invalid email addresses that lack it.
+
+0.3:
+    New features:
+     - Added --outfile command-line option that allows the user to easily send
+       the output to the specified file instead of stdout.
+
+    Bug fixes:
+     - Fixed the errant parentheses in bash command-line completion.
+     - Fixed user highlighting in --verbose output.
+     - Fixed bug where output was explicitly being sent to stdout instead of
+       the specified stream when --quiet was specified.
+     - Fixed bug where 'herdstat -dv all' would display developer roles (which
+       of course should only happen in herd output).
+
+0.2:
+    New features:
+     - Herd output now show's herd's email address (if available).
+     - Both --dev and the default action now support an 'all' target (for
+       example 'herdstat all').
+     - Bash command-line completion is now included.
+
+    Bug fixes:
+     - Fixed several fetching-related bugs. Now uses the cached copy of
+       herds.xml (if it exists) if for some reason fetching fails. Also
+       fixed a bug where (since we tell wget to clobber the old file) if
+       wget fails, it writes a 0 byte file (and thus all queries fail).
+     - PORTDIR determination code fixed/quicker.
+     - Fixed bug where highlighting of the user's nick was done prior to
+       sorting, thus causing the user's nick to always appear first in
+       output.
+
+vim: set ft=txt :
