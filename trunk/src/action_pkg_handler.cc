@@ -84,7 +84,6 @@ get_categories(const std::string &portdir)
 std::vector<std::string>
 get_metadatas(const std::string &portdir)
 {
-    bool new_only = false;
     std::vector<std::string> metadatas;
     metadatas.reserve(METADATA_RESERVE);
 
@@ -115,7 +114,17 @@ get_metadatas(const std::string &portdir)
     if (not (*cache))
         throw bad_fileobject_E(cache_location);
 
+    bool q = optget("quiet", bool), d = optget("debug", bool);
+    util::status_T status;
     std::vector<std::string> categories = get_categories(portdir);
+
+    if (not q and not d)
+    {
+        *(optget("outstream", std::ostream *))
+            << "Caching list of metadata.xml's: ";
+        status.start(categories.size())
+    }
+
     std::vector<std::string>::iterator c;
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
@@ -125,6 +134,9 @@ get_metadatas(const std::string &portdir)
         DIR *dir = opendir(path.c_str());
         if (not dir)
             continue;
+
+        if (not q and not d)
+            ++status;
         
         util::debug_msg("opened directory %s", path.c_str());
 
@@ -148,7 +160,7 @@ get_metadatas(const std::string &portdir)
         closedir(dir);
     }
 
-    if (optget("debug", bool))
+    if (d)
         util::debug_msg("cached %d metadata.xml's", metadatas.size());
     
     return metadatas;

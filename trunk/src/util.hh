@@ -118,6 +118,39 @@ namespace util
 	    rcfile_T(std::ifstream &);
 	    rcfile_keys_T keys;
     };
+
+    class status_T
+    {
+	private:
+	    unsigned max;
+	    float cur, step;
+
+	public:
+	    status_T(unsigned m = 0)
+	    {
+		if(m != 0)
+		{
+		    max  = m;
+		    cur  = 0;
+		    step = 100.0 / m;
+		    printf("  0%%");
+		}
+	    }
+
+	    void start(unsigned m)
+	    {
+		max  = m;
+		cur  = 0;
+		step = 100.0 / m;
+		printf("  0%%");
+	    }
+
+	    void operator++ ()
+	    {
+		printf("\b\b\b\b%.3i%%", (int) (cur += step));
+		fflush(stdout);
+	    }
+    };
 }
 
 #endif
