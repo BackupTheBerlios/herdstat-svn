@@ -15,7 +15,7 @@ _herdstat() {
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 	    return 0
     elif [[ ${COMP_CWORD} -eq 1 ]] ; then
-	    COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts}" -- ${cur}) )
+	    COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    return 0
     fi
 
