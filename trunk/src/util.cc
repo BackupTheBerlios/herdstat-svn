@@ -46,6 +46,17 @@
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
 
+std::string
+util::lowercase(const std::string &str)
+{
+    std::string s(str);
+    std::string::iterator i;
+    for (i = s.begin() ; i != s.end() ; ++i)
+	*i = tolower(*i);
+    
+    return s;
+}
+
 /*
  * Given a string, collapse all whitespace.
  */

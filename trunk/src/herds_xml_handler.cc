@@ -96,8 +96,11 @@ HerdsXMLHandler_T::text(const std::string &str)
     /* <maintainer><email> */
     else if (in_maintainer_email)
     {
+        cur_dev = util::lowercase(str);
+
         /* append @gentoo.org if needed */
-        cur_dev = (str.find('@') == std::string::npos ? str + "@gentoo.org" : str);
+        if (str.find('@') == std::string::npos)
+            cur_dev.append("@gentoo.org");
         herds[cur_herd]->insert(std::make_pair(cur_dev, new dev_attrs_T()));
     }
 

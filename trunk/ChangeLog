@@ -5,6 +5,10 @@ ChangeLog for herdstat
 	* src/herdstat.cc: Ignore --quiet if invoked with no other arguments.
 	* bashcomp: Added 2>/dev/null to any herdstat invocations so that no
 	errors (failed to fetch fex) show up in the completions.
+	* src/util.cc, src/util.hh: Added lowercase().
+	* src/herds_xml_handler.cc: Run developer username through
+	util::lowercase() before saving it.  Should get rid of another
+	duplicate or so.
 
 2005-03-15 Aaron Walker <ka0ttic@gentoo.org>
 
