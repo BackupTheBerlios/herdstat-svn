@@ -176,7 +176,7 @@ handle_opts(int argc, char **argv, options_T *opts,
 	key = getopt_long(argc, argv, short_opts, long_opts, &opt_index);
 #else
 	key = getopt(argc, argv, short_opts);
-#endif /* HAVE_GETOPT_LONG */
+#endif /* HAVE_GETOPT_LON)G */
 
 	if (key == -1)
 	    break;
@@ -320,6 +320,9 @@ main(int argc, char **argv)
 	    options.set_all(true);
 	}
 
+	if (not options.quiet() and options.fetch() and nonopt_args.empty())
+	    options.set_verbose(true);
+
 	/* every action handler needs to parse herds.xml for one reason
 	 * or another, so let's get it over with. */
 	struct stat s;
@@ -349,7 +352,8 @@ main(int argc, char **argv)
 		    util::copy_file(fetched_location, fetched_location + ".bak");
 
 		/* fetch it */
-		if (util::fetch(options.herds_xml(), fetched_location) != 0)
+		if (util::fetch(options.herds_xml(), fetched_location,
+		    options.verbose()) != 0)
 		    throw fetch_E();
 
 		/* because we tell wget to clobber the file, if fetching fails for

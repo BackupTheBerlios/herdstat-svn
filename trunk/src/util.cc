@@ -194,17 +194,17 @@ util::portdir()
  */
 
 int
-util::fetch(const std::string &url, const std::string &dir)
+util::fetch(const std::string &url, const std::string &dir, bool verbose)
 {
-    return util::fetch(url.c_str(), dir.c_str());
+    return util::fetch(url.c_str(), dir.c_str(), verbose);
 }
 
 int
-util::fetch(const char *url, const char *file)
+util::fetch(const char *url, const char *file, bool verbose)
 {
     const char *dir = util::dirname(file);
 
-    /* we have permission to write */
+    /* we have permission to write? */
     if (access(dir, W_OK) != 0)
     {
 	std::cerr << "You don't have proper permissions to write to "
@@ -214,7 +214,12 @@ util::fetch(const char *url, const char *file)
 	throw bad_fileobject_E("%s: %s", dir, strerror(errno));
     }
 
-    std::string cmd = util::sprintf("%s -rq -T5 -O %s '%s'", WGET, file, url);
+    std::string cmd;
+    
+    if (verbose)
+	cmd = util::sprintf("%s -r -T5 -O %s '%s'", WGET, file, url);
+    else
+	cmd = util::sprintf("%s -rq -T5 -O %s '%s'", WGET, file, url);
 
     util::debug_msg("Executing '%s'", cmd.c_str());
 

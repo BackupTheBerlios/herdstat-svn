@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-03-11 Aaron Walker <ka0ttic@gentoo.org>
 
+	* src/util.cc, src/util.hh: Don't use wget -q if --verbose.
 	* src/herdstat.cc: Set the common format attrs here. Also added new
 	option --fetch.
 	* src/options.cc, src/options.hh: Added option fetch.

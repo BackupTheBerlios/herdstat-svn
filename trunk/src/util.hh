@@ -61,8 +61,8 @@ namespace util
     std::string current_user();
     std::string::size_type getcols();
     const char *portdir();
-    int fetch(const std::string &, const std::string &);
-    int fetch(const char *, const char *);
+    int fetch(const std::string &, const std::string &, bool);
+    int fetch(const char *, const char *, bool);
     bool is_dir(const char *);
     bool is_dir(const std::string &);
     bool is_file(const char *);
