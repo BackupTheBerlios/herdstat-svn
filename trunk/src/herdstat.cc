@@ -299,7 +299,10 @@ main(int argc, char **argv)
 	    throw args_E();
 
 	if (nonopt_args.empty())
+	{
 	    optset("action", options_action_T, action_stats);
+	    optset("quiet", bool, false);
+	}
 
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output				*/
