@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>~/code/herdstat/branches/ka0ttic/src/util.cc.html</title>
+<meta name="Generator" content="Vim/7.0"/>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<style type="text/css">
+<!--
+.Type { color: #ff8bff; }
+.Statement { color: #808bed; }
+.Number { color: #506dbd; }
+.Special { color: #c080d0; }
+pre { color: #cfbfad; background-color: #1e1e27; }
+body { color: #cfbfad; background-color: #1e1e27; }
+.lnr { color: #8b8bcd; background-color: #1e1e27; }
+.Comment { color: #cd8b00; }
+.PreProc { color: #409090; }
+.Constant { color: #ffcd8b; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="Comment">/*</span>
+<span class="lnr">  2 </span><span class="Comment"> * herdstat -- src/util.cc</span>
+<span class="lnr">  3 </span><span class="Comment"> * $Id: util.cc 87 2005-03-06 03:28:48Z ka0ttic $</span>
+<span class="lnr">  4 </span><span class="Comment"> * Copyright (c) 2005 Aaron Walker &lt;ka0ttic at gentoo.org&gt;</span>
+<span class="lnr">  5 </span><span class="Comment"> *</span>
+<span class="lnr">  6 </span><span class="Comment"> * This file is part of herdstat.</span>
+<span class="lnr">  7 </span><span class="Comment"> *</span>
+<span class="lnr">  8 </span><span class="Comment"> * herdstat is free software; you can redistribute it and/or modify it under the</span>
+<span class="lnr">  9 </span><span class="Comment"> * terms of the GNU General Public License as published by the Free Software</span>
+<span class="lnr"> 10 </span><span class="Comment"> * Foundation; either version 2 of the License, or (at your option) any later</span>
+<span class="lnr"> 11 </span><span class="Comment"> * version.</span>
+<span class="lnr"> 12 </span><span class="Comment"> *</span>
+<span class="lnr"> 13 </span><span class="Comment"> * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="lnr"> 14 </span><span class="Comment"> * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="lnr"> 15 </span><span class="Comment"> * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more</span>
+<span class="lnr"> 16 </span><span class="Comment"> * details.</span>
+<span class="lnr"> 17 </span><span class="Comment"> *</span>
+<span class="lnr"> 18 </span><span class="Comment"> * You should have received a copy of the GNU General Public License along with</span>
+<span class="lnr"> 19 </span><span class="Comment"> * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple</span>
+<span class="lnr"> 20 </span><span class="Comment"> * Place, Suite 325, Boston, MA  02111-1257  USA</span>
+<span class="lnr"> 21 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 22 </span>
+<span class="lnr"> 23 </span><span class="PreProc">#ifdef HAVE_CONFIG_H</span>
+<span class="lnr"> 24 </span><span class="PreProc"># include </span><span class="Constant">&quot;config.h&quot;</span>
+<span class="lnr"> 25 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 26 </span>
+<span class="lnr"> 27 </span><span class="PreProc">#include </span><span class="Constant">&lt;iostream&gt;</span>
+<span class="lnr"> 28 </span><span class="PreProc">#include </span><span class="Constant">&lt;string&gt;</span>
+<span class="lnr"> 29 </span><span class="PreProc">#include </span><span class="Constant">&lt;map&gt;</span>
+<span class="lnr"> 30 </span><span class="PreProc">#include </span><span class="Constant">&lt;utility&gt;</span>
+<span class="lnr"> 31 </span><span class="PreProc">#include </span><span class="Constant">&lt;memory&gt;</span>
+<span class="lnr"> 32 </span><span class="PreProc">#include </span><span class="Constant">&lt;cstdio&gt;</span>
+<span class="lnr"> 33 </span><span class="PreProc">#include </span><span class="Constant">&lt;cstdlib&gt;</span>
+<span class="lnr"> 34 </span><span class="PreProc">#include </span><span class="Constant">&lt;cstring&gt;</span>
+<span class="lnr"> 35 </span><span class="PreProc">#include </span><span class="Constant">&lt;cstdarg&gt;</span>
+<span class="lnr"> 36 </span><span class="PreProc">#include </span><span class="Constant">&lt;cerrno&gt;</span>
+<span class="lnr"> 37 </span><span class="PreProc">#include </span><span class="Constant">&lt;sys/types.h&gt;</span>
+<span class="lnr"> 38 </span><span class="PreProc">#include </span><span class="Constant">&lt;sys/stat.h&gt;</span>
+<span class="lnr"> 39 </span><span class="PreProc">#include </span><span class="Constant">&lt;unistd.h&gt;</span>
+<span class="lnr"> 40 </span>
+<span class="lnr"> 41 </span><span class="PreProc">#include </span><span class="Constant">&quot;options.hh&quot;</span>
+<span class="lnr"> 42 </span><span class="PreProc">#include </span><span class="Constant">&quot;exceptions.hh&quot;</span>
+<span class="lnr"> 43 </span><span class="PreProc">#include </span><span class="Constant">&quot;util.hh&quot;</span>
+<span class="lnr"> 44 </span>
+<span class="lnr"> 45 </span>std::map&lt;color_name_T, std::string&gt; util::color_map_T::cmap;
+<span class="lnr"> 46 </span>
+<span class="lnr"> 47 </span><span class="Comment">/*</span>
+<span class="lnr"> 48 </span><span class="Comment"> * Return the output of the specified command</span>
+<span class="lnr"> 49 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 50 </span>
+<span class="lnr"> 51 </span>std::string
+<span class="lnr"> 52 </span>util::get_output_of(<span class="Type">const</span> <span class="Type">char</span> *cmd)
+<span class="lnr"> 53 </span>{
+<span class="lnr"> 54 </span>    std::string output;
+<span class="lnr"> 55 </span>    <span class="Type">FILE</span> *p = popen(cmd, <span class="Constant">&quot;r&quot;</span>);
+<span class="lnr"> 56 </span>    <span class="Statement">if</span> (p)
+<span class="lnr"> 57 </span>    {
+<span class="lnr"> 58 </span>        <span class="Type">char</span> line[PATH_MAX+<span class="Number">1</span>];
+<span class="lnr"> 59 </span>        <span class="Statement">if</span> (std::fgets(line, <span class="Statement">sizeof</span>(line) - <span class="Number">1</span>, p) != <span class="Constant">NULL</span>)
+<span class="lnr"> 60 </span>            output = line;
+<span class="lnr"> 61 </span>        pclose(p);
+<span class="lnr"> 62 </span>    }
+<span class="lnr"> 63 </span>
+<span class="lnr"> 64 </span>    <span class="Statement">return</span> output;
+<span class="lnr"> 65 </span>}
+<span class="lnr"> 66 </span>
+<span class="lnr"> 67 </span><span class="Comment">/*</span>
+<span class="lnr"> 68 </span><span class="Comment"> * Determine PORTDIR</span>
+<span class="lnr"> 69 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 70 </span>
+<span class="lnr"> 71 </span><span class="Type">const</span> <span class="Type">char</span> *
+<span class="lnr"> 72 </span>util::portdir()
+<span class="lnr"> 73 </span>{
+<span class="lnr"> 74 </span>    <span class="Type">const</span> <span class="Type">char</span> *make_conf = <span class="Constant">&quot;/etc/make.conf&quot;</span>;
+<span class="lnr"> 75 </span>    <span class="Type">const</span> <span class="Type">char</span> *make_glob = <span class="Constant">&quot;/etc/make.globals&quot;</span>;
+<span class="lnr"> 76 </span>
+<span class="lnr"> 77 </span>    std::string portdir;
+<span class="lnr"> 78 </span>
+<span class="lnr"> 79 </span>    <span class="Statement">if</span> (util::is_file(make_conf))
+<span class="lnr"> 80 </span>    {
+<span class="lnr"> 81 </span>        std::auto_ptr&lt;std::ifstream&gt; f(<span class="Statement">new</span> std::ifstream(make_conf));
+<span class="lnr"> 82 </span>        <span class="Statement">if</span> (<span class="Statement">not</span> (*f))
+<span class="lnr"> 83 </span>            <span class="Statement">throw</span> bad_fileobject_E(<span class="Constant">&quot;</span><span class="Special">%s</span><span class="Constant">: </span><span class="Special">%s</span><span class="Constant">&quot;</span>, make_conf, strerror(errno));
+<span class="lnr"> 84 </span>
+<span class="lnr"> 85 </span>        util::rcfile_T rc(*f);
+<span class="lnr"> 86 </span>        util::rcfile_keys_T::iterator pos = rc.keys.find(<span class="Constant">&quot;PORTDIR&quot;</span>);
+<span class="lnr"> 87 </span>        <span class="Statement">if</span> (pos != rc.keys.end())
+<span class="lnr"> 88 </span>            portdir = pos-&gt;second;
+<span class="lnr"> 89 </span>    }
+<span class="lnr"> 90 </span>
+<span class="lnr"> 91 </span>    <span class="Statement">if</span> (portdir.empty() <span class="Statement">and</span> util::is_file(make_glob))
+<span class="lnr"> 92 </span>    {
+<span class="lnr"> 93 </span>        std::auto_ptr&lt;std::ifstream&gt; f(<span class="Statement">new</span> std::ifstream(make_glob));
+<span class="lnr"> 94 </span>        <span class="Statement">if</span> (<span class="Statement">not</span> (*f))
+<span class="lnr"> 95 </span>            <span class="Statement">throw</span> bad_fileobject_E(<span class="Constant">&quot;</span><span class="Special">%s</span><span class="Constant">: </span><span class="Special">%s</span><span class="Constant">&quot;</span>, make_glob, strerror(errno));
+<span class="lnr"> 96 </span>
+<span class="lnr"> 97 </span>        util::rcfile_T rc(*f);
+<span class="lnr"> 98 </span>        util::rcfile_keys_T::iterator pos = rc.keys.find(<span class="Constant">&quot;PORTDIR&quot;</span>);
+<span class="lnr"> 99 </span>        <span class="Statement">if</span> (pos != rc.keys.end())
+<span class="lnr">100 </span>            portdir = pos-&gt;second;
+<span class="lnr">101 </span>    }
+<span class="lnr">102 </span>
+<span class="lnr">103 </span>    <span class="Statement">return</span> (portdir.empty() ? <span class="Constant">&quot;/usr/portage&quot;</span> : portdir.c_str());
+<span class="lnr">104 </span>}
+<span class="lnr">105 </span>
+<span class="lnr">106 </span><span class="Comment">/*</span>
+<span class="lnr">107 </span><span class="Comment"> * Download the specified file to the specified directory</span>
+<span class="lnr">108 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">109 </span>
+<span class="lnr">110 </span><span class="Type">int</span>
+<span class="lnr">111 </span>util::fetch(<span class="Type">const</span> std::string &amp;url, <span class="Type">const</span> std::string &amp;dir)
+<span class="lnr">112 </span>{
+<span class="lnr">113 </span>    <span class="Statement">return</span> util::fetch(url.c_str(), dir.c_str());
+<span class="lnr">114 </span>}
+<span class="lnr">115 </span>
+<span class="lnr">116 </span><span class="Type">int</span>
+<span class="lnr">117 </span>util::fetch(<span class="Type">const</span> <span class="Type">char</span> *url, <span class="Type">const</span> <span class="Type">char</span> *file)
+<span class="lnr">118 </span>{
+<span class="lnr">119 </span>    <span class="Type">const</span> <span class="Type">char</span> *dir = util::dirname(file);
+<span class="lnr">120 </span>
+<span class="lnr">121 </span>    <span class="Comment">/*</span><span class="Comment"> we have permission to write </span><span class="Comment">*/</span>
+<span class="lnr">122 </span>    <span class="Statement">if</span> (access(dir, W_OK) != <span class="Number">0</span>)
+<span class="lnr">123 </span>        <span class="Statement">throw</span> bad_fileobject_E(<span class="Constant">&quot;</span><span class="Special">%s</span><span class="Constant">: </span><span class="Special">%s</span><span class="Constant">&quot;</span>, dir, strerror(errno));
+<span class="lnr">124 </span>
+<span class="lnr">125 </span>    std::string cmd = util::sprintf(<span class="Constant">&quot;</span><span class="Special">%s</span><span class="Constant"> -rq -t3 -T5 -O </span><span class="Special">%s</span><span class="Constant"> '</span><span class="Special">%s</span><span class="Constant">'&quot;</span>, WGET, file, url);
+<span class="lnr">126 </span>
+<span class="lnr">127 </span>    util::debug_msg(<span class="Constant">&quot;Executing '</span><span class="Special">%s</span><span class="Constant">'&quot;</span>, cmd.c_str());
+<span class="lnr">128 </span>
+<span class="lnr">129 </span>    <span class="Statement">return</span> std::system(cmd.c_str());
+<span class="lnr">130 </span>}
+<span class="lnr">131 </span>
+<span class="lnr">132 </span>
+<span class="lnr">133 </span><span class="Comment">/*</span>
+<span class="lnr">134 </span><span class="Comment"> * Is the specified path a directory?</span>
+<span class="lnr">135 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">136 </span><span class="Type">bool</span>
+<span class="lnr">137 </span>util::is_dir(<span class="Type">const</span> <span class="Type">char</span> *path)
+<span class="lnr">138 </span>{
+<span class="lnr">139 </span>    <span class="Type">struct</span> stat s;
+<span class="lnr">140 </span>    <span class="Statement">if</span> (stat(path, &amp;s) != <span class="Number">0</span>)
+<span class="lnr">141 </span>        <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr">142 </span>    <span class="Statement">return</span> S_ISDIR(s.st_mode);
+<span class="lnr">143 </span>}
+<span class="lnr">144 </span>
+<span class="lnr">145 </span><span class="Comment">/*</span>
+<span class="lnr">146 </span><span class="Comment"> * Overloaded is_dir that takes a std::string</span>
+<span class="lnr">147 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">148 </span>
+<span class="lnr">149 </span><span class="Type">bool</span>
+<span class="lnr">150 </span>util::is_dir(<span class="Type">const</span> std::string &amp;path)
+<span class="lnr">151 </span>{
+<span class="lnr">152 </span>    <span class="Statement">return</span> is_dir(path.c_str());
+<span class="lnr">153 </span>}
+<span class="lnr">154 </span>
+<span class="lnr">155 </span><span class="Comment">/*</span>
+<span class="lnr">156 </span><span class="Comment"> * Is the specified path a regular file?</span>
+<span class="lnr">157 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">158 </span>
+<span class="lnr">159 </span><span class="Type">bool</span>
+<span class="lnr">160 </span>util::is_file(<span class="Type">const</span> <span class="Type">char</span> *path)
+<span class="lnr">161 </span>{
+<span class="lnr">162 </span>    <span class="Type">struct</span> stat s;
+<span class="lnr">163 </span>    <span class="Statement">if</span> (stat(path, &amp;s) != <span class="Number">0</span>)
+<span class="lnr">164 </span>        <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr">165 </span>    <span class="Statement">return</span> S_ISREG(s.st_mode);
+<span class="lnr">166 </span>}
+<span class="lnr">167 </span>
+<span class="lnr">168 </span><span class="Comment">/*</span>
+<span class="lnr">169 </span><span class="Comment"> * Overloaded is_file that takes a std::string</span>
+<span class="lnr">170 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">171 </span>
+<span class="lnr">172 </span><span class="Type">bool</span>
+<span class="lnr">173 </span>util::is_file(<span class="Type">const</span> std::string &amp;path)
+<span class="lnr">174 </span>{
+<span class="lnr">175 </span>    <span class="Statement">return</span> is_file(path.c_str());
+<span class="lnr">176 </span>}
+<span class="lnr">177 </span>
+<span class="lnr">178 </span><span class="Type">const</span> <span class="Type">char</span> *
+<span class="lnr">179 </span>util::basename(<span class="Type">const</span> <span class="Type">char</span> *path)
+<span class="lnr">180 </span>{
+<span class="lnr">181 </span>    std::string s = path;
+<span class="lnr">182 </span>
+<span class="lnr">183 </span>    <span class="Comment">/*</span><span class="Comment"> chop any trailing /'s </span><span class="Comment">*/</span>
+<span class="lnr">184 </span>    <span class="Statement">while</span> (s[s.length() - <span class="Number">1</span>] == <span class="Constant">'/'</span> <span class="Statement">and</span> s.length() &gt; <span class="Number">1</span>)
+<span class="lnr">185 </span>        s.erase(s.length() - <span class="Number">1</span>);
+<span class="lnr">186 </span>
+<span class="lnr">187 </span>    <span class="Type">char</span> *p = std::strrchr(s.c_str(), <span class="Constant">'/'</span>);
+<span class="lnr">188 </span>    <span class="Statement">return</span> (p ? (*(p + <span class="Number">1</span>) != <span class="Special">'\0'</span> ? p + <span class="Number">1</span> : p) : path);
+<span class="lnr">189 </span>}
+<span class="lnr">190 </span>
+<span class="lnr">191 </span><span class="Type">const</span> <span class="Type">char</span> *
+<span class="lnr">192 </span>util::basename(std::string <span class="Type">const</span> &amp;path)
+<span class="lnr">193 </span>{
+<span class="lnr">194 </span>    <span class="Statement">return</span> util::basename(path.c_str());
+<span class="lnr">195 </span>}
+<span class="lnr">196 </span>
+<span class="lnr">197 </span><span class="Type">const</span> <span class="Type">char</span> *
+<span class="lnr">198 </span>util::dirname(<span class="Type">const</span> <span class="Type">char</span> *path)
+<span class="lnr">199 </span>{
+<span class="lnr">200 </span>    std::string s = path;
+<span class="lnr">201 </span>    <span class="Type">size_t</span> path_len = strlen(path);
+<span class="lnr">202 </span>    <span class="Type">size_t</span> base_len = strlen(util::basename(path));
+<span class="lnr">203 </span>    <span class="Type">size_t</span> len = (path[path_len - <span class="Number">1</span>] == <span class="Constant">'/'</span> ? <span class="Number">2</span> : <span class="Number">1</span>);
+<span class="lnr">204 </span>    len = path_len - base_len - (path_len - base_len - len == <span class="Number">0</span> ? len - <span class="Number">1</span> : len);
+<span class="lnr">205 </span>
+<span class="lnr">206 </span>    <span class="Statement">return</span> s.substr(<span class="Number">0</span>, len).c_str();
+<span class="lnr">207 </span>}
+<span class="lnr">208 </span>
+<span class="lnr">209 </span><span class="Type">const</span> <span class="Type">char</span> *
+<span class="lnr">210 </span>util::dirname(std::string <span class="Type">const</span> &amp;path)
+<span class="lnr">211 </span>{
+<span class="lnr">212 </span>    <span class="Statement">return</span> util::dirname(path.c_str());
+<span class="lnr">213 </span>}
+<span class="lnr">214 </span>
+<span class="lnr">215 </span><span class="Comment">/*</span>
+<span class="lnr">216 </span><span class="Comment"> * Return a string formatted with printf-like format specifier</span>
+<span class="lnr">217 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">218 </span>std::string
+<span class="lnr">219 </span>util::sprintf(<span class="Type">const</span> <span class="Type">char</span> *str, ...)
+<span class="lnr">220 </span>{
+<span class="lnr">221 </span>    <span class="Type">va_list</span> v;
+<span class="lnr">222 </span>    va_start(v, str);
+<span class="lnr">223 </span>    std::string s(util::sprintf(str, v));
+<span class="lnr">224 </span>    va_end(v);
+<span class="lnr">225 </span>    <span class="Statement">return</span> s;
+<span class="lnr">226 </span>}
+<span class="lnr">227 </span>
+<span class="lnr">228 </span><span class="Comment">/*</span>
+<span class="lnr">229 </span><span class="Comment"> * Overloaded sprintf that takes a string and va_list</span>
+<span class="lnr">230 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">231 </span>std::string
+<span class="lnr">232 </span>util::sprintf(<span class="Type">const</span> <span class="Type">char</span> *str, <span class="Type">va_list</span> v)
+<span class="lnr">233 </span>{
+<span class="lnr">234 </span><span class="PreProc">#ifdef HAVE_VASPRINTF</span>
+<span class="lnr">235 </span>    <span class="Type">char</span> *buf;
+<span class="lnr">236 </span>    vasprintf(&amp;buf, str, v);
+<span class="lnr">237 </span><span class="PreProc">#else</span>
+<span class="lnr">238 </span>    <span class="Type">char</span> buf[<span class="Number">4096</span>] = { <span class="Number">0</span> };
+<span class="lnr">239 </span><span class="PreProc"># ifdef HAVE_VSNPRINTF</span>
+<span class="lnr">240 </span>    vsnprintf(buf, <span class="Statement">sizeof</span>(buf), str, v);
+<span class="lnr">241 </span><span class="PreProc"># else</span>
+<span class="lnr">242 </span>    vsprintf(buf, str, v);
+<span class="lnr">243 </span><span class="PreProc"># endif</span>
+<span class="lnr">244 </span><span class="PreProc">#endif</span>
+<span class="lnr">245 </span>
+<span class="lnr">246 </span>    std::string s(buf);
+<span class="lnr">247 </span>
+<span class="lnr">248 </span><span class="PreProc">#ifdef HAVE_VASPRINTF</span>
+<span class="lnr">249 </span>    free(buf);
+<span class="lnr">250 </span><span class="PreProc">#endif</span>
+<span class="lnr">251 </span>
+<span class="lnr">252 </span>    <span class="Statement">return</span> s;
+<span class="lnr">253 </span>}
+<span class="lnr">254 </span>
+<span class="lnr">255 </span><span class="Comment">/*</span>
+<span class="lnr">256 </span><span class="Comment"> * Given a string and a delimiter, split the string,</span>
+<span class="lnr">257 </span><span class="Comment"> * returning all the substrings in a vector</span>
+<span class="lnr">258 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">259 </span>std::vector&lt;std::string&gt;
+<span class="lnr">260 </span>util::splitstr(<span class="Type">const</span> std::string &amp;str, <span class="Type">const</span> <span class="Type">char</span> delim)
+<span class="lnr">261 </span>{
+<span class="lnr">262 </span>    std::vector&lt;std::string&gt; vec;
+<span class="lnr">263 </span>    std::string::size_type pos, lpos = <span class="Number">0</span>;
+<span class="lnr">264 </span>
+<span class="lnr">265 </span>    <span class="Statement">while</span> (<span class="Constant">true</span>)
+<span class="lnr">266 </span>    {
+<span class="lnr">267 </span>        pos = str.find(delim, lpos);
+<span class="lnr">268 </span>        <span class="Statement">if</span> (pos == std::string::npos)
+<span class="lnr">269 </span>        {
+<span class="lnr">270 </span>            vec.push_back(str.substr(lpos));
+<span class="lnr">271 </span>            <span class="Statement">break</span>;
+<span class="lnr">272 </span>        }
+<span class="lnr">273 </span>
+<span class="lnr">274 </span>        <span class="Comment">/*</span><span class="Comment"> don't append empty strings (two</span>
+<span class="lnr">275 </span><span class="Comment">         * delimiters in a row were encountered) </span><span class="Comment">*/</span>
+<span class="lnr">276 </span>        <span class="Statement">if</span> (str.substr(lpos, pos - lpos).length() &gt; <span class="Number">0</span>)
+<span class="lnr">277 </span>            vec.push_back(str.substr(lpos, pos - lpos));
+<span class="lnr">278 </span>
+<span class="lnr">279 </span>        lpos = ++pos;
+<span class="lnr">280 </span>    }
+<span class="lnr">281 </span>    <span class="Statement">return</span> vec;
+<span class="lnr">282 </span>}
+<span class="lnr">283 </span>
+<span class="lnr">284 </span><span class="Comment">/*</span>
+<span class="lnr">285 </span><span class="Comment"> * I hate to bring in options_T just for this, but it's either here</span>
+<span class="lnr">286 </span><span class="Comment"> * or make the caller declare an options_T instance and pass a bool value</span>
+<span class="lnr">287 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">288 </span><span class="Type">void</span>
+<span class="lnr">289 </span>util::debug_msg(<span class="Type">const</span> <span class="Type">char</span> *msg, ...)
+<span class="lnr">290 </span>{
+<span class="lnr">291 </span>    options_T opts;
+<span class="lnr">292 </span>    <span class="Statement">if</span> (<span class="Statement">not</span> opts.debug())
+<span class="lnr">293 </span>        <span class="Statement">return</span>;
+<span class="lnr">294 </span>
+<span class="lnr">295 </span>    <span class="Type">va_list</span> v;
+<span class="lnr">296 </span>    va_start(v, msg);
+<span class="lnr">297 </span>    std::cout &lt;&lt; util::sprintf(msg, v) &lt;&lt; std::endl;
+<span class="lnr">298 </span>    va_end(v);
+<span class="lnr">299 </span>}
+<span class="lnr">300 </span>
+<span class="lnr">301 </span>util::color_map_T::color_map_T()
+<span class="lnr">302 </span>{
+<span class="lnr">303 </span>    cmap.insert(std::make_pair(red,    <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[0;31m&quot;</span>));
+<span class="lnr">304 </span>    cmap.insert(std::make_pair(green,  <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[0;32m&quot;</span>));
+<span class="lnr">305 </span>    cmap.insert(std::make_pair(blue,   <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[1;34m&quot;</span>));
+<span class="lnr">306 </span>    cmap.insert(std::make_pair(yellow, <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[1;33m&quot;</span>));
+<span class="lnr">307 </span>    cmap.insert(std::make_pair(orange, <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[0;33m&quot;</span>));
+<span class="lnr">308 </span>    cmap.insert(std::make_pair(magenta,<span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[1;35m&quot;</span>));
+<span class="lnr">309 </span>    cmap.insert(std::make_pair(cyan,   <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[1;36m&quot;</span>));
+<span class="lnr">310 </span>    cmap.insert(std::make_pair(black,  <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[0;30m&quot;</span>));
+<span class="lnr">311 </span>    cmap.insert(std::make_pair(white,  <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[0;1m&quot;</span>));
+<span class="lnr">312 </span>    cmap.insert(std::make_pair(none,   <span class="Constant">&quot;</span><span class="Special">\033</span><span class="Constant">[00m&quot;</span>));
+<span class="lnr">313 </span>}
+<span class="lnr">314 </span>
+<span class="lnr">315 </span>util::rcfile_T::rcfile_T(std::ifstream &amp;stream)
+<span class="lnr">316 </span>{
+<span class="lnr">317 </span>    std::string line;
+<span class="lnr">318 </span>    std::string::size_type pos;
+<span class="lnr">319 </span>
+<span class="lnr">320 </span>    <span class="Statement">while</span> (std::getline(stream, line))
+<span class="lnr">321 </span>    {
+<span class="lnr">322 </span>        pos = line.find_first_not_of(<span class="Constant">&quot; </span><span class="Special">\t</span><span class="Constant">&quot;</span>);
+<span class="lnr">323 </span>        <span class="Statement">if</span> (pos != std::string::npos)
+<span class="lnr">324 </span>            line.erase(<span class="Number">0</span>, pos);
+<span class="lnr">325 </span>
+<span class="lnr">326 </span>        <span class="Statement">if</span> (line.length() &lt; <span class="Number">1</span> <span class="Statement">or</span> line[<span class="Number">0</span>] == <span class="Constant">'#'</span>)
+<span class="lnr">327 </span>            <span class="Statement">continue</span>;
+<span class="lnr">328 </span>
+<span class="lnr">329 </span>        pos = line.find(<span class="Constant">'='</span>);
+<span class="lnr">330 </span>        <span class="Statement">if</span> (pos != std::string::npos)
+<span class="lnr">331 </span>        {
+<span class="lnr">332 </span>            std::string key = line.substr(<span class="Number">0</span>, pos);
+<span class="lnr">333 </span>            std::string val = line.substr(pos + <span class="Number">1</span>);
+<span class="lnr">334 </span>
+<span class="lnr">335 </span>            <span class="Statement">if</span> (std::string::npos != (pos = key.find_first_not_of(<span class="Constant">&quot; </span><span class="Special">\t</span><span class="Constant">&quot;</span>)))
+<span class="lnr">336 </span>                key.erase(<span class="Number">0</span>, pos);
+<span class="lnr">337 </span>            <span class="Statement">if</span> (std::string::npos != (pos = val.find_first_not_of(<span class="Constant">&quot; </span><span class="Special">\t</span><span class="Constant">&quot;</span>)))
+<span class="lnr">338 </span>                val.erase(<span class="Number">0</span>, pos);
+<span class="lnr">339 </span>            <span class="Statement">if</span> (std::string::npos != (pos = key.find_last_not_of(<span class="Constant">&quot; </span><span class="Special">\t</span><span class="Constant">&quot;</span>)))
+<span class="lnr">340 </span>                key.erase(++pos);
+<span class="lnr">341 </span>            <span class="Statement">if</span> (std::string::npos != (pos = val.find_last_not_of(<span class="Constant">&quot; </span><span class="Special">\t</span><span class="Constant">&quot;</span>)))
+<span class="lnr">342 </span>                val.erase(++pos);
+<span class="lnr">343 </span>
+<span class="lnr">344 </span>            <span class="Statement">if</span> (std::string::npos != (pos = val.find_first_of(<span class="Constant">&quot;'</span><span class="Special">\&quot;</span><span class="Constant">&quot;</span>)))
+<span class="lnr">345 </span>            {
+<span class="lnr">346 </span>                val.erase(pos, pos + <span class="Number">1</span>);
+<span class="lnr">347 </span>                <span class="Statement">if</span> (std::string::npos != (pos = val.find_last_of(<span class="Constant">&quot;'</span><span class="Special">\&quot;</span><span class="Constant">&quot;</span>)))
+<span class="lnr">348 </span>                    val.erase(pos, pos + <span class="Number">1</span>);
+<span class="lnr">349 </span>            }
+<span class="lnr">350 </span>
+<span class="lnr">351 </span>            keys[key] = val;
+<span class="lnr">352 </span>        }
+<span class="lnr">353 </span>    }
+<span class="lnr">354 </span>}
+</pre>
+</body>
+</html>

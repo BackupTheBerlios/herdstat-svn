@@ -1,0 +1,179 @@
+/*
+ * herdstat -- src/formatter.cc
+ * $Id$
+ * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
+ *
+ * This file is part of herdstat.
+ *
+ * herdstat is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 325, Boston, MA  02111-1257  USA
+ */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <utility>
+#include <algorithm>
+
+#include "util.hh"
+#include "formatter.hh"
+#include "exceptions.hh"
+
+/*
+ * Default constructor
+ * Set sane default attributes
+ */
+fm::format_attrs_T::format_attrs_T()
+{
+    colors = false;
+    maxtotal = 78;
+    maxlabel = 20;
+    maxdata  = 58;
+}
+
+/*
+ * Finalize the attributes ; calculate increase in string length
+ * because of the colors, etc. This is called once by the caller
+ * after the attrs have been set.
+ */
+
+void
+fm::formatter_T::set_attrs()
+{
+    attr.maxlabel++;
+    attr.maxtotal = attr.maxlabel + attr.maxdata;
+
+    /* if we're using colors, we need to compensate
+     * for the increase in string length.           */
+    if (attr.colors)
+    {
+        attr.maxclabel = attr.maxlabel
+                       + attr.label_color.length()
+                       + attr.color(none).length();
+        attr.maxcdata  = attr.maxdata
+                       + attr.data_color.length()
+                       + attr.color(none).length();
+        attr.maxctotal = attr.maxclabel + attr.maxcdata;
+    }
+    else
+    {
+        attr.label_color = attr.data_color = "";
+        attr.maxclabel = attr.maxlabel;
+        attr.maxcdata  = attr.maxdata;
+        attr.maxctotal = attr.maxtotal;
+    }
+}
+
+/*
+ * Overloaded append() that takes a vector, converts it to a string,
+ * and calls the real append()
+ */
+void
+fm::formatter_T::append(const std::string &label, std::vector<std::string> &data)
+{
+    std::string s;
+    std::vector<std::string>::iterator i;
+    for (i = data.begin() ; i != data.end() ; ++i)
+        s += *i + " ";
+    
+    if (s[s.length() - 1] == ' ')
+        s.erase(s.length() - 1);
+
+    append(label, s);
+}
+
+/*
+ * append text to the output buffer
+ */
+void
+fm::formatter_T::append(const std::string &label, const std::string &data)
+{
+    std::string cur;
+
+    if (label.length() > attr.maxlabel)
+        throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
+            label.c_str(), attr.maxlabel);
+
+    cur = attr.color(green) + label + attr.color(none) +
+        (label.empty() ? "" : ":");
+
+    while (cur.length() < attr.maxclabel)
+        cur.append(" ");
+
+    cur.append(attr.data_color);
+
+    if (not data.empty())
+    {
+        /* will it all fit on one line? */
+        if ((cur.length() + data.length() +
+            attr.color(none).length()) < attr.maxctotal)
+            cur.append(data);
+        else
+        {
+            /* line's full, so find a location where we can truncate */
+            std::string::size_type pos = data.rfind(" ", attr.maxdata);
+            cur.append(pos == std::string::npos ? data : data.substr(0, pos));
+            buffer.push_back(cur);
+            cur.clear();
+            
+            /* indent */
+            while (cur.length() < attr.maxlabel)
+                cur.append(" ");
+
+            /* handle leftovers */
+            std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
+
+            std::vector<std::string>::iterator i;
+            for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
+            {
+                /* does it fit on the current line? */
+                if ((cur.length() + (*i).length()) < attr.maxtotal)
+                    cur += *i + " ";
+                else
+                {
+                    buffer.push_back(cur);
+                    cur.clear();
+
+                    /* indent */
+                    while (cur.length() < attr.maxlabel)
+                        cur.append(" ");
+
+                    cur += *i + " ";
+                }
+            }
+        }
+    }
+
+    if (cur.length() > 0)
+        buffer.push_back(cur);
+}
+
+/*
+ * flush everything in the buffer to the specified stream
+ */
+void
+fm::formatter_T::flush(std::ostream &stream)
+{
+    std::vector<std::string>::iterator i;
+    for (i = buffer.begin() ; i != buffer.end() ; ++i)
+        stream << *i << std::endl;
+
+    buffer.clear();
+}
+
+/* vim: set tw=80 sw=4 et : */

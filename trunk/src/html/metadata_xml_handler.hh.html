@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>~/code/herdstat/branches/ka0ttic/src/metadata_xml_handler.hh.html</title>
+<meta name="Generator" content="Vim/7.0"/>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<style type="text/css">
+<!--
+.Statement { color: #808bed; }
+pre { color: #cfbfad; background-color: #1e1e27; }
+body { color: #cfbfad; background-color: #1e1e27; }
+.lnr { color: #8b8bcd; background-color: #1e1e27; }
+.Comment { color: #cd8b00; }
+.PreProc { color: #409090; }
+.Number { color: #506dbd; }
+.Constant { color: #ffcd8b; }
+.Type { color: #ff8bff; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span><span class="Comment">/*</span>
+<span class="lnr"> 2 </span><span class="Comment"> * herdstat -- src/metadata_xml_handler.hh</span>
+<span class="lnr"> 3 </span><span class="Comment"> * $Id: metadata_xml_handler.hh 101 2005-03-06 18:14:14Z ka0ttic $</span>
+<span class="lnr"> 4 </span><span class="Comment"> * Copyright (c) 2005 Aaron Walker &lt;ka0ttic@gentoo.org&gt;</span>
+<span class="lnr"> 5 </span><span class="Comment"> *</span>
+<span class="lnr"> 6 </span><span class="Comment"> * This file is part of herdstat.</span>
+<span class="lnr"> 7 </span><span class="Comment"> *</span>
+<span class="lnr"> 8 </span><span class="Comment"> * herdstat is free software; you can redistribute it and/or modify it under the</span>
+<span class="lnr"> 9 </span><span class="Comment"> * terms of the GNU General Public License as published by the Free Software</span>
+<span class="lnr">10 </span><span class="Comment"> * Foundation; either version 2 of the License, or (at your option) any later</span>
+<span class="lnr">11 </span><span class="Comment"> * version.</span>
+<span class="lnr">12 </span><span class="Comment"> *</span>
+<span class="lnr">13 </span><span class="Comment"> * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="lnr">14 </span><span class="Comment"> * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="lnr">15 </span><span class="Comment"> * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more</span>
+<span class="lnr">16 </span><span class="Comment"> * details.</span>
+<span class="lnr">17 </span><span class="Comment"> *</span>
+<span class="lnr">18 </span><span class="Comment"> * You should have received a copy of the GNU General Public License along with</span>
+<span class="lnr">19 </span><span class="Comment"> * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple</span>
+<span class="lnr">20 </span><span class="Comment"> * Place, Suite 325, Boston, MA  02111-1257  USA</span>
+<span class="lnr">21 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">22 </span>
+<span class="lnr">23 </span><span class="PreProc">#ifndef HAVE_METADATA_XML_HANDLER_HH</span>
+<span class="lnr">24 </span><span class="PreProc">#define HAVE_METADATA_XML_HANDLER_HH </span><span class="Number">1</span>
+<span class="lnr">25 </span>
+<span class="lnr">26 </span><span class="PreProc">#ifdef HAVE_CONFIG_H</span>
+<span class="lnr">27 </span><span class="PreProc"># include </span><span class="Constant">&quot;config.h&quot;</span>
+<span class="lnr">28 </span><span class="PreProc">#endif</span>
+<span class="lnr">29 </span>
+<span class="lnr">30 </span><span class="PreProc">#include </span><span class="Constant">&quot;herds.hh&quot;</span>
+<span class="lnr">31 </span><span class="PreProc">#include </span><span class="Constant">&quot;xmlparser.hh&quot;</span>
+<span class="lnr">32 </span>
+<span class="lnr">33 </span><span class="Comment">/*</span>
+<span class="lnr">34 </span><span class="Comment"> * Content Handler for metadata.xml</span>
+<span class="lnr">35 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">36 </span>
+<span class="lnr">37 </span><span class="Type">class</span> MetadataXMLHandler_T : <span class="Statement">public</span> XMLHandler_T
+<span class="lnr">38 </span>{
+<span class="lnr">39 </span>    <span class="Statement">private</span>:
+<span class="lnr">40 </span>        <span class="Comment">/*</span><span class="Comment"> internal state variables </span><span class="Comment">*/</span>
+<span class="lnr">41 </span>        <span class="Type">bool</span> in_herd;
+<span class="lnr">42 </span>        <span class="Type">bool</span> in_maintainer;
+<span class="lnr">43 </span>        <span class="Type">bool</span> in_email;
+<span class="lnr">44 </span>        <span class="Type">bool</span> in_name;
+<span class="lnr">45 </span>        <span class="Type">bool</span> in_desc;
+<span class="lnr">46 </span>        <span class="Type">bool</span> in_longdesc;
+<span class="lnr">47 </span>
+<span class="lnr">48 </span>        std::string cur_dev;
+<span class="lnr">49 </span>
+<span class="lnr">50 </span>    <span class="Statement">protected</span>:
+<span class="lnr">51 </span>        <span class="Comment">/*</span><span class="Comment"> callbacks </span><span class="Comment">*/</span>
+<span class="lnr">52 </span>        <span class="Type">virtual</span> <span class="Type">bool</span> start_element(<span class="Type">const</span> std::string &amp;, <span class="Type">const</span> attrs_type &amp;);
+<span class="lnr">53 </span>        <span class="Type">virtual</span> <span class="Type">bool</span> end_element(<span class="Type">const</span> std::string &amp;);
+<span class="lnr">54 </span>        <span class="Type">virtual</span> <span class="Type">bool</span> text(<span class="Type">const</span> std::string &amp;);
+<span class="lnr">55 </span>
+<span class="lnr">56 </span>    <span class="Statement">public</span>:
+<span class="lnr">57 </span>        MetadataXMLHandler_T()
+<span class="lnr">58 </span>        {
+<span class="lnr">59 </span>            in_herd =
+<span class="lnr">60 </span>            in_maintainer =
+<span class="lnr">61 </span>            in_email =
+<span class="lnr">62 </span>            in_name =
+<span class="lnr">63 </span>            in_desc =
+<span class="lnr">64 </span>            in_longdesc = <span class="Constant">false</span>;
+<span class="lnr">65 </span>        }
+<span class="lnr">66 </span>        <span class="Type">virtual</span> ~MetadataXMLHandler_T();
+<span class="lnr">67 </span>
+<span class="lnr">68 </span>        std::vector&lt;std::string&gt; herds;
+<span class="lnr">69 </span>        herd_T devs;
+<span class="lnr">70 </span>        std::string longdesc;
+<span class="lnr">71 </span>};
+<span class="lnr">72 </span>
+<span class="lnr">73 </span><span class="PreProc">#endif</span>
+<span class="lnr">74 </span>
+<span class="lnr">75 </span><span class="Comment">/*</span><span class="Comment"> vim: set tw=80 sw=4 et : </span><span class="Comment">*/</span>
+</pre>
+</body>
+</html>

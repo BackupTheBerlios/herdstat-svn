@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>~/code/herdstat/branches/ka0ttic/src/herds_xml_handler.cc.html</title>
+<meta name="Generator" content="Vim/7.0"/>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<style type="text/css">
+<!--
+.Statement { color: #808bed; }
+pre { color: #cfbfad; background-color: #1e1e27; }
+body { color: #cfbfad; background-color: #1e1e27; }
+.lnr { color: #8b8bcd; background-color: #1e1e27; }
+.Comment { color: #cd8b00; }
+.PreProc { color: #409090; }
+.Constant { color: #ffcd8b; }
+.Type { color: #ff8bff; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="Comment">/*</span>
+<span class="lnr">  2 </span><span class="Comment"> * herdstat -- src/herds_xml_handler.cc</span>
+<span class="lnr">  3 </span><span class="Comment"> * $Id: herds_xml_handler.cc 101 2005-03-06 18:14:14Z ka0ttic $</span>
+<span class="lnr">  4 </span><span class="Comment"> * Copyright (c) 2005 Aaron Walker &lt;ka0ttic@gentoo.org&gt;</span>
+<span class="lnr">  5 </span><span class="Comment"> *</span>
+<span class="lnr">  6 </span><span class="Comment"> * This file is part of herdstat.</span>
+<span class="lnr">  7 </span><span class="Comment"> *</span>
+<span class="lnr">  8 </span><span class="Comment"> * herdstat is free software; you can redistribute it and/or modify it under the</span>
+<span class="lnr">  9 </span><span class="Comment"> * terms of the GNU General Public License as published by the Free Software</span>
+<span class="lnr"> 10 </span><span class="Comment"> * Foundation; either version 2 of the License, or (at your option) any later</span>
+<span class="lnr"> 11 </span><span class="Comment"> * version.</span>
+<span class="lnr"> 12 </span><span class="Comment"> *</span>
+<span class="lnr"> 13 </span><span class="Comment"> * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="lnr"> 14 </span><span class="Comment"> * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="lnr"> 15 </span><span class="Comment"> * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more</span>
+<span class="lnr"> 16 </span><span class="Comment"> * details.</span>
+<span class="lnr"> 17 </span><span class="Comment"> *</span>
+<span class="lnr"> 18 </span><span class="Comment"> * You should have received a copy of the GNU General Public License along with</span>
+<span class="lnr"> 19 </span><span class="Comment"> * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple</span>
+<span class="lnr"> 20 </span><span class="Comment"> * Place, Suite 325, Boston, MA  02111-1257  USA</span>
+<span class="lnr"> 21 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 22 </span>
+<span class="lnr"> 23 </span><span class="PreProc">#ifdef HAVE_CONFIG_H</span>
+<span class="lnr"> 24 </span><span class="PreProc"># include </span><span class="Constant">&quot;config.h&quot;</span>
+<span class="lnr"> 25 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 26 </span>
+<span class="lnr"> 27 </span><span class="PreProc">#include </span><span class="Constant">&quot;herds_xml_handler.hh&quot;</span>
+<span class="lnr"> 28 </span>
+<span class="lnr"> 29 </span><span class="Type">bool</span>
+<span class="lnr"> 30 </span>HerdsXMLHandler_T::start_element(<span class="Type">const</span> std::string &amp;name, <span class="Type">const</span> attrs_type &amp;)
+<span class="lnr"> 31 </span>{
+<span class="lnr"> 32 </span>    <span class="Statement">if</span> (name == <span class="Constant">&quot;herd&quot;</span>)
+<span class="lnr"> 33 </span>        in_herd = <span class="Constant">true</span>;
+<span class="lnr"> 34 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;name&quot;</span> <span class="Statement">and</span> <span class="Statement">not</span> in_maintainer)
+<span class="lnr"> 35 </span>        in_herd_name = <span class="Constant">true</span>;
+<span class="lnr"> 36 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;email&quot;</span> <span class="Statement">and</span> <span class="Statement">not</span> in_maintainer)
+<span class="lnr"> 37 </span>        in_herd_email = <span class="Constant">true</span>;
+<span class="lnr"> 38 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;description&quot;</span> <span class="Statement">and</span> <span class="Statement">not</span> in_maintainer)
+<span class="lnr"> 39 </span>        in_herd_desc = <span class="Constant">true</span>;
+<span class="lnr"> 40 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;maintainer&quot;</span>)
+<span class="lnr"> 41 </span>        in_maintainer = <span class="Constant">true</span>;
+<span class="lnr"> 42 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;email&quot;</span> <span class="Statement">and</span> in_maintainer)
+<span class="lnr"> 43 </span>        in_maintainer_email = <span class="Constant">true</span>;
+<span class="lnr"> 44 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;name&quot;</span> <span class="Statement">and</span> in_maintainer)
+<span class="lnr"> 45 </span>        in_maintainer_name = <span class="Constant">true</span>;
+<span class="lnr"> 46 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;role&quot;</span>)
+<span class="lnr"> 47 </span>        in_maintainer_role = <span class="Constant">true</span>;
+<span class="lnr"> 48 </span>    <span class="Statement">return</span> <span class="Constant">true</span>;
+<span class="lnr"> 49 </span>}
+<span class="lnr"> 50 </span>
+<span class="lnr"> 51 </span><span class="Type">bool</span>
+<span class="lnr"> 52 </span>HerdsXMLHandler_T::end_element(<span class="Type">const</span> std::string &amp;name)
+<span class="lnr"> 53 </span>{
+<span class="lnr"> 54 </span>    <span class="Statement">if</span> (name == <span class="Constant">&quot;herd&quot;</span>)
+<span class="lnr"> 55 </span>        in_herd = <span class="Constant">false</span>;
+<span class="lnr"> 56 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;name&quot;</span> <span class="Statement">and</span> <span class="Statement">not</span> in_maintainer)
+<span class="lnr"> 57 </span>        in_herd_name = <span class="Constant">false</span>;
+<span class="lnr"> 58 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;email&quot;</span> <span class="Statement">and</span> <span class="Statement">not</span> in_maintainer)
+<span class="lnr"> 59 </span>        in_herd_email = <span class="Constant">false</span>;
+<span class="lnr"> 60 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;description&quot;</span> <span class="Statement">and</span> <span class="Statement">not</span> in_maintainer)
+<span class="lnr"> 61 </span>        in_herd_desc = <span class="Constant">false</span>;
+<span class="lnr"> 62 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;maintainer&quot;</span>)
+<span class="lnr"> 63 </span>        in_maintainer = <span class="Constant">false</span>;
+<span class="lnr"> 64 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;email&quot;</span> <span class="Statement">and</span> in_maintainer)
+<span class="lnr"> 65 </span>        in_maintainer_email = <span class="Constant">false</span>;
+<span class="lnr"> 66 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;name&quot;</span> <span class="Statement">and</span> in_maintainer)
+<span class="lnr"> 67 </span>        in_maintainer_name = <span class="Constant">false</span>;
+<span class="lnr"> 68 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (name == <span class="Constant">&quot;role&quot;</span>)
+<span class="lnr"> 69 </span>        in_maintainer_role = <span class="Constant">false</span>;
+<span class="lnr"> 70 </span>    <span class="Statement">return</span> <span class="Constant">true</span>;
+<span class="lnr"> 71 </span>}
+<span class="lnr"> 72 </span>
+<span class="lnr"> 73 </span><span class="Type">bool</span>
+<span class="lnr"> 74 </span>HerdsXMLHandler_T::text(<span class="Type">const</span> std::string &amp;str)
+<span class="lnr"> 75 </span>{
+<span class="lnr"> 76 </span>    <span class="Statement">if</span> (in_herd_name)
+<span class="lnr"> 77 </span>    {
+<span class="lnr"> 78 </span>        cur_herd = str;
+<span class="lnr"> 79 </span>        herds.insert(std::make_pair(str, <span class="Statement">new</span> herd_T(str)));
+<span class="lnr"> 80 </span>    }
+<span class="lnr"> 81 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (in_herd_desc)
+<span class="lnr"> 82 </span>        herds[cur_herd]-&gt;desc = str;
+<span class="lnr"> 83 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (in_maintainer_email)
+<span class="lnr"> 84 </span>    {
+<span class="lnr"> 85 </span>        cur_dev = str;
+<span class="lnr"> 86 </span>        herds[cur_herd]-&gt;insert(std::make_pair(str, <span class="Statement">new</span> dev_attrs_T()));
+<span class="lnr"> 87 </span>    }
+<span class="lnr"> 88 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (in_maintainer_name)
+<span class="lnr"> 89 </span>    {
+<span class="lnr"> 90 </span>        herd_T::iterator i = herds[cur_herd]-&gt;find(cur_dev);
+<span class="lnr"> 91 </span>        <span class="Statement">if</span> (i == herds[cur_herd]-&gt;end())
+<span class="lnr"> 92 </span>            <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr"> 93 </span>        i-&gt;second-&gt;push_back(str);
+<span class="lnr"> 94 </span>    }
+<span class="lnr"> 95 </span>    <span class="Statement">else</span> <span class="Statement">if</span> (in_maintainer_role)
+<span class="lnr"> 96 </span>    {
+<span class="lnr"> 97 </span>        herd_T::iterator i = herds[cur_herd]-&gt;find(cur_dev);
+<span class="lnr"> 98 </span>        <span class="Statement">if</span> (i == herds[cur_herd]-&gt;end())
+<span class="lnr"> 99 </span>            <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr">100 </span>        i-&gt;second-&gt;push_back(str);
+<span class="lnr">101 </span>    }
+<span class="lnr">102 </span>
+<span class="lnr">103 </span>    <span class="Statement">return</span> <span class="Constant">true</span>;
+<span class="lnr">104 </span>}
+<span class="lnr">105 </span>
+<span class="lnr">106 </span>HerdsXMLHandler_T::~HerdsXMLHandler_T()
+<span class="lnr">107 </span>{
+<span class="lnr">108 </span>    <span class="Statement">for</span> (herds_T::iterator i = herds.begin() ; i != herds.end() ; ++i)
+<span class="lnr">109 </span>    {
+<span class="lnr">110 </span>        herd_T::iterator h;
+<span class="lnr">111 </span>        <span class="Statement">for</span> (h = i-&gt;second-&gt;begin() ; h != i-&gt;second-&gt;end() ; ++h)
+<span class="lnr">112 </span>            <span class="Statement">delete</span> h-&gt;second;
+<span class="lnr">113 </span>        <span class="Statement">delete</span> i-&gt;second;
+<span class="lnr">114 </span>    }
+<span class="lnr">115 </span>}
+<span class="lnr">116 </span>
+<span class="lnr">117 </span><span class="Comment">/*</span><span class="Comment"> vim: set tw=80 sw=4 et : </span><span class="Comment">*/</span>
+</pre>
+</body>
+</html>

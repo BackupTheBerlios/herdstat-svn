@@ -1,0 +1,12 @@
+
+Todo list for herdstat
+
+- Figure out a more reliable way of determining PORTDIR.
+  (added 03/04/05, 09:10, incomplete, priority veryhigh)
+
+- Add an 'all' target that prints out some stats for all herds.
+  (added 03/02/05, 23:52, incomplete, priority medium)
+
+- Figure out a way to trip excess whitespace inside elements.
+  (added 03/04/05, 09:09, incomplete, priority low)
+

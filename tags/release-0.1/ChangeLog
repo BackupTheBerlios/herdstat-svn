@@ -1,0 +1,87 @@
+ChangeLog for herdstat
+
+2005-03-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in: Added example thanks to dragonheart.  Added
+	PORTDIR and ECHANGELOG_USER to the Environment section.
+	* src/herdstat.cc, src/action_dev_handler.cc,
+	src/action_dev_handler.hh, src/action_pkg_handler.cc,
+	src/action_pkg_handler.hh, src/action_herd_handler.cc,
+	src/action_herd_handler.hh, src/action_handler.hh: Since all action
+	handlers need to parse herds.xml for one reason or another, do it
+	before calling the handler and then pass the data to the handler.
+	* src/formatter.cc, src/formatter.hh: Added member functions for
+	setting/getting attributes rather than having the caller set the
+	attributes manually.
+
+2005-03-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* README: Now has more content than "TODO".
+	* doc/Makefile.am, doc/herdstat.1.in: Added.
+	* src/exceptions.hh: Added timer_E.
+	* src/action_dev_handler.cc: Finished; now works.
+	* src/action_herd_handler.cc: Added some code to highlight the user's
+	nick if it occurs in the output (uses ECHANGELOG_USER). Also colorize
+	the email address, if verbose.
+	* src/action_pkg_handler.cc: removed the second level opendir() stuff
+	as it's totally unnecessary and overkill.  get_metadatas() is much
+	faster now as a result.
+	* src/xmlparser.hh: Added overloaded parse() that takes a stream.
+	* src/util.cc, src/util.hh: Added is_dir() and is_file().
+
+2005-03-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_dev_handler.cc, src/action_dev_handler.hh: Added template
+	for new action handler for doing reverse lookups (by dev instead of
+	herd).
+	* src/herdstat.cc: Fix unique() call.
+	* src/action_herd_handler.cc, src/action_pkg_handler.cc: Update to use
+	new handlers and directly use XMLParser_T.
+	* src/metadata.cc, src/metadata.hh: Move MetadataXMLParser_T to
+	MetadataXMLHandler_T.
+	* src/herds.cc, src/herds.hh: Move HerdsXMLParser_T to
+	HerdsXMLHandler_T.
+	* src/xmlparser.hh: XMLParser_T no longer inherits from
+	xml::event_parser; added XMLHandler_T as an abstract handler type.
+	* src/exceptions.hh: XMLParser_E now accepts two args, file and error
+	string.
+	* src/types.hh, src/herds.hh: Use typedef instead of classes for types
+	devs_T, dev_attrs_T, and herds_T.
+	* configure.ac: Use pkg-config for the xmlwrapp check.
+
+2005-03-01 Aaron Walker <ka0ttic@gentoo.org>
+	
+	* src/exceptions.hh: Added base msg and va exception classes.
+	* src/util.cc, src/util.hh: Added color_map_T class.
+	* src/formatter.cc, src/formatter.hh: Removed color_map_T.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Added these
+	for package stats.
+	* src/herds.cc, src/herds.hh: Moved herds.xml content handler here.
+	* src/metadata.cc, src/metadata.hh: Added metadata.xml content
+	handler.
+	* src/types.h: Moved container classes that are common between herds
+	and metadata content handlers here.
+	* src/herdstat.cc: Fixed catch clause when running action handler.
+
+2005-02-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/formatter.cc, src/formatter.hh: Added formatter_T class.
+	* src/output.cc, src/output.hh: obsoleted by formatter_T.
+	* src/util.cc, src/util.hh: Added splitstr() function and timer class.
+	* src/Makefile.am: Added formatter.{cc,hh} and removed
+	output.{cc,hh}.
+	* src/action_herd_handler.cc: Updated to use formatter_T.
+
+2005-02-23 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/options.cc, src/options.hh: Added verbose and maxcol options.
+	* src/output.cc, src/output.hh: New files for output-related functions.
+	* src/action_herd_handler.cc: Finished herd loop.
+	* src/herdstat.cc: Use a vector to save all non-option arguments.
+	* src/herds.hh: New file containing derived-types for dev/herd
+	containers.
+	* src/xmlparser.cc: Finished text callback.
+
+2005-02-22 Aaron Walker <ka0ttic@gentoo.org>
+
+	* ChangeLog: Start keeping a GNU-style ChangeLog.

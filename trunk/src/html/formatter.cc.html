@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>~/code/herdstat/branches/ka0ttic/src/formatter.cc.html</title>
+<meta name="Generator" content="Vim/7.0"/>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<style type="text/css">
+<!--
+.Number { color: #506dbd; }
+.Type { color: #ff8bff; }
+.Statement { color: #808bed; }
+.Special { color: #c080d0; }
+pre { color: #cfbfad; background-color: #1e1e27; }
+body { color: #cfbfad; background-color: #1e1e27; }
+.lnr { color: #8b8bcd; background-color: #1e1e27; }
+.Comment { color: #cd8b00; }
+.PreProc { color: #409090; }
+.Constant { color: #ffcd8b; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="Comment">/*</span>
+<span class="lnr">  2 </span><span class="Comment"> * herdstat -- src/formatter.cc</span>
+<span class="lnr">  3 </span><span class="Comment"> * $Id: formatter.cc 102 2005-03-06 19:14:27Z ka0ttic $</span>
+<span class="lnr">  4 </span><span class="Comment"> * Copyright (c) 2005 Aaron Walker &lt;ka0ttic@gentoo.org&gt;</span>
+<span class="lnr">  5 </span><span class="Comment"> *</span>
+<span class="lnr">  6 </span><span class="Comment"> * This file is part of herdstat.</span>
+<span class="lnr">  7 </span><span class="Comment"> *</span>
+<span class="lnr">  8 </span><span class="Comment"> * herdstat is free software; you can redistribute it and/or modify it under the</span>
+<span class="lnr">  9 </span><span class="Comment"> * terms of the GNU General Public License as published by the Free Software</span>
+<span class="lnr"> 10 </span><span class="Comment"> * Foundation; either version 2 of the License, or (at your option) any later</span>
+<span class="lnr"> 11 </span><span class="Comment"> * version.</span>
+<span class="lnr"> 12 </span><span class="Comment"> *</span>
+<span class="lnr"> 13 </span><span class="Comment"> * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="lnr"> 14 </span><span class="Comment"> * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="lnr"> 15 </span><span class="Comment"> * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more</span>
+<span class="lnr"> 16 </span><span class="Comment"> * details.</span>
+<span class="lnr"> 17 </span><span class="Comment"> *</span>
+<span class="lnr"> 18 </span><span class="Comment"> * You should have received a copy of the GNU General Public License along with</span>
+<span class="lnr"> 19 </span><span class="Comment"> * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple</span>
+<span class="lnr"> 20 </span><span class="Comment"> * Place, Suite 325, Boston, MA  02111-1257  USA</span>
+<span class="lnr"> 21 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 22 </span>
+<span class="lnr"> 23 </span><span class="PreProc">#ifdef HAVE_CONFIG_H</span>
+<span class="lnr"> 24 </span><span class="PreProc"># include </span><span class="Constant">&quot;config.h&quot;</span>
+<span class="lnr"> 25 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 26 </span>
+<span class="lnr"> 27 </span><span class="PreProc">#include </span><span class="Constant">&lt;iostream&gt;</span>
+<span class="lnr"> 28 </span><span class="PreProc">#include </span><span class="Constant">&lt;string&gt;</span>
+<span class="lnr"> 29 </span><span class="PreProc">#include </span><span class="Constant">&lt;vector&gt;</span>
+<span class="lnr"> 30 </span><span class="PreProc">#include </span><span class="Constant">&lt;utility&gt;</span>
+<span class="lnr"> 31 </span><span class="PreProc">#include </span><span class="Constant">&lt;algorithm&gt;</span>
+<span class="lnr"> 32 </span>
+<span class="lnr"> 33 </span><span class="PreProc">#include </span><span class="Constant">&quot;util.hh&quot;</span>
+<span class="lnr"> 34 </span><span class="PreProc">#include </span><span class="Constant">&quot;formatter.hh&quot;</span>
+<span class="lnr"> 35 </span><span class="PreProc">#include </span><span class="Constant">&quot;exceptions.hh&quot;</span>
+<span class="lnr"> 36 </span>
+<span class="lnr"> 37 </span>format_attrs_T formatter_T::attr;
+<span class="lnr"> 38 </span>std::vector&lt;std::string&gt; formatter_T::buffer;
+<span class="lnr"> 39 </span>
+<span class="lnr"> 40 </span><span class="Comment">/*</span>
+<span class="lnr"> 41 </span><span class="Comment"> * Default constructor</span>
+<span class="lnr"> 42 </span><span class="Comment"> * Set sane default attributes</span>
+<span class="lnr"> 43 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 44 </span>
+<span class="lnr"> 45 </span>format_attrs_T::format_attrs_T()
+<span class="lnr"> 46 </span>{
+<span class="lnr"> 47 </span>    colors = <span class="Constant">false</span>;
+<span class="lnr"> 48 </span>    maxtotal = <span class="Number">78</span>;
+<span class="lnr"> 49 </span>    maxlabel = <span class="Number">20</span>;
+<span class="lnr"> 50 </span>    maxdata  = <span class="Number">58</span>;
+<span class="lnr"> 51 </span>}
+<span class="lnr"> 52 </span>
+<span class="lnr"> 53 </span><span class="Comment">/*</span>
+<span class="lnr"> 54 </span><span class="Comment"> * Finalize the attributes ; calculate increase in string length</span>
+<span class="lnr"> 55 </span><span class="Comment"> * because of the colors, etc. This is called once by the caller</span>
+<span class="lnr"> 56 </span><span class="Comment"> * after the attrs have been set.</span>
+<span class="lnr"> 57 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 58 </span>
+<span class="lnr"> 59 </span><span class="Type">void</span>
+<span class="lnr"> 60 </span>formatter_T::set_attrs()
+<span class="lnr"> 61 </span>{
+<span class="lnr"> 62 </span>    util::color_map_T color;
+<span class="lnr"> 63 </span>    attr.maxlabel++;
+<span class="lnr"> 64 </span>    attr.maxtotal = attr.maxlabel + attr.maxdata;
+<span class="lnr"> 65 </span>
+<span class="lnr"> 66 </span>    <span class="Comment">/*</span><span class="Comment"> if we're using colors, we need to compensate</span>
+<span class="lnr"> 67 </span><span class="Comment">     * for the increase in string length.           </span><span class="Comment">*/</span>
+<span class="lnr"> 68 </span>    <span class="Statement">if</span> (attr.colors)
+<span class="lnr"> 69 </span>    {
+<span class="lnr"> 70 </span>        attr.maxclabel = attr.maxlabel
+<span class="lnr"> 71 </span>                       + attr.label_color.length()
+<span class="lnr"> 72 </span>                       + color[none].length();
+<span class="lnr"> 73 </span>        attr.maxcdata  = attr.maxdata
+<span class="lnr"> 74 </span>                       + attr.data_color.length()
+<span class="lnr"> 75 </span>                       + color[none].length();
+<span class="lnr"> 76 </span>        attr.maxctotal = attr.maxclabel + attr.maxcdata;
+<span class="lnr"> 77 </span>    }
+<span class="lnr"> 78 </span>    <span class="Statement">else</span>
+<span class="lnr"> 79 </span>    {
+<span class="lnr"> 80 </span>        attr.label_color = attr.data_color = <span class="Constant">&quot;&quot;</span>;
+<span class="lnr"> 81 </span>        attr.maxclabel = attr.maxlabel;
+<span class="lnr"> 82 </span>        attr.maxcdata  = attr.maxdata;
+<span class="lnr"> 83 </span>        attr.maxctotal = attr.maxtotal;
+<span class="lnr"> 84 </span>    }
+<span class="lnr"> 85 </span>}
+<span class="lnr"> 86 </span>
+<span class="lnr"> 87 </span><span class="Comment">/*</span>
+<span class="lnr"> 88 </span><span class="Comment"> * Overloaded append() that takes a vector, converts it to a string,</span>
+<span class="lnr"> 89 </span><span class="Comment"> * and calls the real append()</span>
+<span class="lnr"> 90 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 91 </span>
+<span class="lnr"> 92 </span><span class="Type">void</span>
+<span class="lnr"> 93 </span>formatter_T::append(<span class="Type">const</span> std::string &amp;label, std::vector&lt;std::string&gt; &amp;data)
+<span class="lnr"> 94 </span>{
+<span class="lnr"> 95 </span>    std::string s;
+<span class="lnr"> 96 </span>    std::vector&lt;std::string&gt;::iterator i;
+<span class="lnr"> 97 </span>    <span class="Statement">for</span> (i = data.begin() ; i != data.end() ; ++i)
+<span class="lnr"> 98 </span>        s += *i + <span class="Constant">&quot; &quot;</span>;
+<span class="lnr"> 99 </span>
+<span class="lnr">100 </span>    <span class="Statement">if</span> (s[s.length() - <span class="Number">1</span>] == <span class="Constant">' '</span>)
+<span class="lnr">101 </span>        s.erase(s.length() - <span class="Number">1</span>);
+<span class="lnr">102 </span>
+<span class="lnr">103 </span>    append(label, s);
+<span class="lnr">104 </span>}
+<span class="lnr">105 </span>
+<span class="lnr">106 </span><span class="Comment">/*</span>
+<span class="lnr">107 </span><span class="Comment"> * Append text to the output buffer.  Smartly handle lines that are bigger</span>
+<span class="lnr">108 </span><span class="Comment"> * than maxcol (new line and indent), and make sure it all aligns nicely.</span>
+<span class="lnr">109 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">110 </span>
+<span class="lnr">111 </span><span class="Type">void</span>
+<span class="lnr">112 </span>formatter_T::append(<span class="Type">const</span> std::string &amp;label, <span class="Type">const</span> std::string &amp;data)
+<span class="lnr">113 </span>{
+<span class="lnr">114 </span>    util::color_map_T color;
+<span class="lnr">115 </span>    std::string cur;
+<span class="lnr">116 </span>
+<span class="lnr">117 </span>    <span class="Statement">if</span> (label.length() &gt; attr.maxlabel)
+<span class="lnr">118 </span>        <span class="Statement">throw</span> format_E(<span class="Constant">&quot;Label '</span><span class="Special">%s</span><span class="Constant">' is greater than maxlabel attribute (</span><span class="Special">%d</span><span class="Constant">)&quot;</span>,
+<span class="lnr">119 </span>            label.c_str(), attr.maxlabel);
+<span class="lnr">120 </span>
+<span class="lnr">121 </span>    cur = color[green] + label + color[none] +
+<span class="lnr">122 </span>        (label.empty() ? <span class="Constant">&quot;&quot;</span> : <span class="Constant">&quot;:&quot;</span>);
+<span class="lnr">123 </span>
+<span class="lnr">124 </span>    <span class="Statement">while</span> (cur.length() &lt; attr.maxclabel)
+<span class="lnr">125 </span>        cur.append(<span class="Constant">&quot; &quot;</span>);
+<span class="lnr">126 </span>
+<span class="lnr">127 </span>    cur.append(attr.data_color);
+<span class="lnr">128 </span>
+<span class="lnr">129 </span>    <span class="Statement">if</span> (<span class="Statement">not</span> data.empty())
+<span class="lnr">130 </span>    {
+<span class="lnr">131 </span>        <span class="Comment">/*</span><span class="Comment"> will it all fit on one line? </span><span class="Comment">*/</span>
+<span class="lnr">132 </span>        <span class="Statement">if</span> ((cur.length() + data.length() +
+<span class="lnr">133 </span>            color[none].length()) &lt; attr.maxctotal)
+<span class="lnr">134 </span>            cur.append(data);
+<span class="lnr">135 </span>        <span class="Statement">else</span>
+<span class="lnr">136 </span>        {
+<span class="lnr">137 </span>            <span class="Comment">/*</span><span class="Comment"> line's full, so find a location where we can truncate </span><span class="Comment">*/</span>
+<span class="lnr">138 </span>            std::string::size_type pos = data.rfind(<span class="Constant">&quot; &quot;</span>, attr.maxdata);
+<span class="lnr">139 </span>            cur.append(pos == std::string::npos ? data : data.substr(<span class="Number">0</span>, pos));
+<span class="lnr">140 </span>            buffer.push_back(cur);
+<span class="lnr">141 </span>            cur.clear();
+<span class="lnr">142 </span>
+<span class="lnr">143 </span>            <span class="Comment">/*</span><span class="Comment"> indent </span><span class="Comment">*/</span>
+<span class="lnr">144 </span>            <span class="Statement">while</span> (cur.length() &lt; attr.maxlabel)
+<span class="lnr">145 </span>                cur.append(<span class="Constant">&quot; &quot;</span>);
+<span class="lnr">146 </span>
+<span class="lnr">147 </span>            <span class="Comment">/*</span><span class="Comment"> handle leftovers </span><span class="Comment">*/</span>
+<span class="lnr">148 </span>            std::vector&lt;std::string&gt; leftovers = util::splitstr(data.substr(pos));
+<span class="lnr">149 </span>
+<span class="lnr">150 </span>            std::vector&lt;std::string&gt;::iterator i;
+<span class="lnr">151 </span>            <span class="Statement">for</span> (i = leftovers.begin() ; i != leftovers.end() ; ++i)
+<span class="lnr">152 </span>            {
+<span class="lnr">153 </span>                <span class="Comment">/*</span><span class="Comment"> does it fit on the current line? </span><span class="Comment">*/</span>
+<span class="lnr">154 </span>                <span class="Statement">if</span> ((cur.length() + (*i).length()) &gt; attr.maxtotal)
+<span class="lnr">155 </span>                {
+<span class="lnr">156 </span>                    buffer.push_back(cur);
+<span class="lnr">157 </span>                    cur.clear();
+<span class="lnr">158 </span>
+<span class="lnr">159 </span>                    <span class="Comment">/*</span><span class="Comment"> indent </span><span class="Comment">*/</span>
+<span class="lnr">160 </span>                    <span class="Statement">while</span> (cur.length() &lt; attr.maxlabel)
+<span class="lnr">161 </span>                        cur.append(<span class="Constant">&quot; &quot;</span>);
+<span class="lnr">162 </span>                }
+<span class="lnr">163 </span>
+<span class="lnr">164 </span>                cur += *i + <span class="Constant">&quot; &quot;</span>;
+<span class="lnr">165 </span>            }
+<span class="lnr">166 </span>        }
+<span class="lnr">167 </span>    }
+<span class="lnr">168 </span>
+<span class="lnr">169 </span>    <span class="Statement">if</span> (cur.length() &gt; <span class="Number">0</span>)
+<span class="lnr">170 </span>        buffer.push_back(cur);
+<span class="lnr">171 </span>}
+<span class="lnr">172 </span>
+<span class="lnr">173 </span><span class="Comment">/*</span>
+<span class="lnr">174 </span><span class="Comment"> * flush everything in the buffer to the specified stream</span>
+<span class="lnr">175 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr">176 </span>
+<span class="lnr">177 </span><span class="Type">void</span>
+<span class="lnr">178 </span>formatter_T::flush(std::ostream &amp;stream)
+<span class="lnr">179 </span>{
+<span class="lnr">180 </span>    std::vector&lt;std::string&gt;::iterator i;
+<span class="lnr">181 </span>    <span class="Statement">for</span> (i = buffer.begin() ; i != buffer.end() ; ++i)
+<span class="lnr">182 </span>        stream &lt;&lt; *i &lt;&lt; std::endl;
+<span class="lnr">183 </span>
+<span class="lnr">184 </span>    buffer.clear();
+<span class="lnr">185 </span>}
+<span class="lnr">186 </span>
+<span class="lnr">187 </span><span class="Comment">/*</span><span class="Comment"> vim: set tw=80 sw=4 et : </span><span class="Comment">*/</span>
+</pre>
+</body>
+</html>

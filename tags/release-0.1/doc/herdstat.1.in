@@ -1,0 +1,68 @@
+.\" $Id$
+.TH "@PACKAGE@" 1 "Mar 2005" "@VERSION@"
+.SH NAME
+\fB@PACKAGE@\fR \- Display package/developer statistics for Gentoo herds.
+.SH SYNOPSIS
+.B "@PACKAGE@ "
+[ \fIoptions\fR ] [ \fI args \fR ]
+.SH DESCRIPTION
+\fB@PACKAGE@\fR is a utility that parses Gentoo's herds.xml and displays developer
+and/or package statistics.
+.SH OPTIONS
+.TP
+.B "\-h, \-\-help"
+Display usage information.
+.TP
+.B "\-V, \-\-version"
+Display version information.
+.TP
+.B "\-p, \-\-package"
+Display package statistics for the specified herd(s).
+.TP
+.B "\-d, \-\-dev"
+Display herd statistics for the specified developer(s).
+.TP
+.B "\-H, \-\-herdsxml <file>"
+Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
+for an alternative way of setting the herds.xml location.
+.TP
+.B "\-v, \-\-verbose"
+Display verbose output.
+.TP
+.B "\-q, \-\-quiet"
+Don't display labels and fancy colors.  Use this option to pipe @PACKAGE@
+output to other programs.
+.TP
+.B "\-D, \-\-debug"
+Display debugging messages.
+.TP
+.B "\-t, \-\-timer"
+Display elapsed time of XML parsing.  Automatically enabled if --debug
+is specified.
+.SH EXAMPLES
+.IP "\fB$ herdstat netmon x11\fR"
+Display all developers in the netmon and x11 herds.
+.IP "\fB$ herdstat -p netmon\fR"
+Display all packages in the netmon herd.
+.IP "\fB$ herdstat -d ka0ttic\fR"
+Display all herds that the developer ka0ttic is in.
+.IP "\fB$ for x in $(herdstat -pq cron); do ... ; done\fR" 
+Perform an action on every package in the cron herd.
+.IP "\fB$ herdstat -pq $(herdstat -dq ka0ttic)\fR"
+Display every package that belongs to a herd that ka0ttic is a member of.
+.SH ENVIRONMENT
+.TP
+.B HERDS
+Location of herds.xml.
+.TP
+.B PORTDIR
+Location of your portage tree.
+.TP
+.B ECHANGELOG_USER
+If set (correctly), your developer nick will be highlighted if it occurs
+in any of the output.
+.SH AUTHORS
+Aaron Walker <ka0ttic@gentoo.org>
+.SH "REPORTING BUGS"
+Please report bugs via http://bugs.gentoo.org/
+.\" vim: set ft=nroff :
