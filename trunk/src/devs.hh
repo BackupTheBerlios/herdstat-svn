@@ -31,15 +31,28 @@
 #include <vector>
 #include <string>
 #include "formatter.hh"
+#include "options.hh"
+
+/*
+ * Display developer attributes (name, role, etc).
+ */
 
 class dev_attrs_T : public std::vector<std::string>
 {
     public:
         void display(std::ostream &stream)
         {
+            options_T options;
             formatter_T out;
-            for (iterator i = this->begin() ; i != this->end() ; ++i)
-                out.append("", *i);
+
+            if (this->size() > 1 and options.all())
+                out.append("", this->front());
+            else
+            {
+                for (iterator i = this->begin() ; i != this->end() ; ++i)
+                    out.append("", *i);
+            }
+
             out.endl();
         }
 };
