@@ -169,10 +169,8 @@ formatter_T::flush()
 
         if (not data.empty())
         {
-            /* FIXME!!!! */
             if (quiet())
-                ;
-//                append(label, util::splitstr(data));
+                buf(label, util::splitstr(data));
             else
             {
                 if ((cur.length() + data.length()) < attrs.maxctotal)
@@ -184,7 +182,7 @@ formatter_T::flush()
                     cur += highlight(util::splitstr(
                         (pos == std::string::npos ? data : data.substr(0, pos))));
 
-                    *stream << cur << std::endl;
+                    *(attrs.stream) << cur << std::endl;
                     cur.clear();
 
                     /* indent */
@@ -234,7 +232,7 @@ formatter_T::flush()
                         /* does it fit on the current line? */
                         if ((curlen + (*i).length()) > attrs.maxtotal)
                         {
-                            *stream << cur << std::endl;
+                            *(attrs.stream) << cur << std::endl;
                             cur.clear();
 
                             /* indent */
@@ -257,7 +255,7 @@ formatter_T::flush()
         }
 
         if (cur.size() > 0)
-            *stream << cur << std::endl;
+            *(attrs.stream) << cur << std::endl;
     }
 
 

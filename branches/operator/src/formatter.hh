@@ -92,12 +92,21 @@ class formatter_T
     public:
         typedef std::size_t size_type;
 
-        formatter_T(std::ostream *s) : stream(s) { }
+        formatter_T(std::ostream *s) { attrs.stream = s; }
         ~formatter_T() { flush(); }
 
         void operator() (std::string l, std::string d) { return buf(l, d); }
         void operator() (std::string l, std::vector<std::string> d)
-            { return buf(l, d); }
+        {
+            if (quiet())
+            {
+                std::vector<std::string>::iterator i;
+                for (i = d.begin() ; i != d.end() ; ++i)
+                    buf("", *i);
+            }
+            else
+                buf(l, d);
+        }
 
         void flush();
         void endl() { buf("" ,"\n"); }

@@ -51,7 +51,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     std::ostream *stream = optget("outstream", std::ostream *);
     
     /* set format attributes */
-    formatter_T output(stream);
+    formatter_T output;
 
     if (devs[0] == "all")
         output.set_maxlabel(16);
@@ -83,7 +83,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             }
         }
 
-        all_devs.display(stream);
+        all_devs.display(*stream);
 
         if (optget("count", bool))
             output("", util::sprintf("%d", all_devs.size()));
@@ -131,11 +131,8 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not optget("quiet", bool))
                 {
-                    if (name.empty())
-                        output("Developer", *dev);
-                    else
-                        output("Developer", name + " (" + (*dev) + ")");
-
+                    output("Developer",
+                        (name.empty() ? *dev : name + " (" + (*dev) + ")"));
                     output("Email", *dev + "@gentoo.org");
                 }
 
@@ -148,7 +145,10 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                     for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
                     {
                         /* display herd */
-                        output("", color[blue] + (*i) + color[none]);
+                        if (optget("color", bool))
+                            output("", color[blue] + (*i) + color[none]);
+                        else
+                            output("", *i);
                         
                         /* display herd info */
                         if (not herds_xml[*i]->mail.empty())
@@ -172,6 +172,8 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
         if (optget("count", bool))
             output("", util::sprintf("%d", size));
     }
+
+    output.flush(*stream);
 
     if (optget("timer", bool))
         *stream << std::endl;
