@@ -74,6 +74,8 @@ herd_T::display(std::ostream &stream)
                     else
                         dev = dev.substr(0, pos);
                 }
+                else
+                    continue;
             }
             sorted_devs.push_back(dev);
         }
