@@ -92,7 +92,8 @@ get_metadatas(const std::string &portdir)
 
     /* does cache exist? */
     struct stat s;
-    if (stat(cache_location.c_str(), &s) == 0)
+    if ((stat(cache_location.c_str(), &s) == 0) and
+        ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
     {
         std::auto_ptr<std::istream> f(new std::ifstream(cache_location.c_str()));
         if (not (*f))
@@ -105,30 +106,17 @@ get_metadatas(const std::string &portdir)
         util::debug_msg("read a total of %d metadata.xml's from the cache.",
             metadatas.size());
 
-        /* has cache expired? */
-        if (((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
-        {
-            /* no so use it as is */
-            util::debug_msg("cache exists and is newer than 24hrs... using it.");
-            return metadatas;
-        }
-
-        /* expired, so only look for ones not in the list */
-        else if (s.st_size > 0)
-        {
-            util::debug_msg("cache exists but is expired... looking for new ones.");
-            new_only = true;
-        }
+        return metadatas;
     }
+    else if (s.st_size > 0)
+        util::debug_msg("cache exists but is expired");
 
-    std::auto_ptr<std::ofstream> cache(new std::ofstream(cache_location.c_str(),
-                                        std::ios::out|std::ios::app));
-    if (not (*fcache))
+    std::auto_ptr<std::ofstream> cache(new std::ofstream(cache_location.c_str()));
+    if (not (*cache))
         throw bad_fileobject_E(cache_location);
 
     std::vector<std::string> categories = get_categories(portdir);
     std::vector<std::string>::iterator c;
-    std::vector<std::string>::size_type orig = metadatas.size();
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         std::string path = portdir + "/" + (*c);
@@ -150,23 +138,18 @@ get_metadatas(const std::string &portdir)
             /* instead of walking each directory, just stat dir/metadata.xml */
             std::string metadata = path + "/" + d->d_name + "/metadata.xml";
 
-            /* does it exist in the old cache */
-            if (new_only and (std::find(metadatas.begin(), metadatas.end(),
-                                        metadata) != metadatas.end()))
-                continue;
-
             /* make sure it exists */
             if (util::is_file(metadata))
             {
                 metadatas.push_back(metadata);
-                *fcache << metadata << std::endl;
+                *cache << metadata << std::endl;
             }
         }
         closedir(dir);
     }
 
     if (optget("debug", bool))
-        util::debug_msg("cached %d metadata.xml's", metadatas.size() - orig);
+        util::debug_msg("cached %d metadata.xml's", metadatas.size());
     
     return metadatas;
 }
