@@ -30,16 +30,15 @@
 #include "cache.hh"
 
 /* metadata cache location */
-#define CACHE  LOCALSTATEDIR"/metadatas"
+#define CACHE               LOCALSTATEDIR"/metadatas"
 /* copy of PORTDIR/metadata/timestamp (if portdir was rsync'd) */
-#define LASTSYNC LOCALSTATEDIR"/lastsync"
+#define LASTSYNC            LOCALSTATEDIR"/lastsync"
 
-/*
- * rough number of metadata.xml's in the tree, updated from time to
+/* rough number of metadata.xml's in the tree, updated from time to
  * time as it grows. Used for initial vector size so that a ton of
- * re-allocations can be prevented
- */
+ * re-allocations can be prevented */
 #define METADATA_RESERVE    8240
+#define DEFAULT_EXPIRE      86400
 
 /*
  * An instance of metadatas_T represents a list of every metadata.xml
@@ -53,7 +52,8 @@ class metadatas_T : public cache_T<std::string>
         const std::string portdir;
 
     public:
-        metadatas_T(const std::string &portdir);
+        metadatas_T(const std::string &p)
+            : cache_T<std::string>(CACHE, METADATA_RESERVE), portdir(p) { }
 
         virtual bool valid() const;
         virtual void fill();

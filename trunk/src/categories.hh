@@ -42,12 +42,14 @@ class categories_T : public cache_T<std::string>
         categories_T()
             : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES)
         {
+            this->clear();
             this->read();
         }
 
         categories_T(const std::string &portdir)
             : cache_T<std::string>(portdir + CATEGORIES)
         {
+            this->clear();
             this->read();
         }
 };

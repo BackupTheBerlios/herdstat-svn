@@ -24,10 +24,6 @@
 # include "config.h"
 #endif
 
-#include <fstream>
-#include <algorithm>
-#include <memory>
-#include <iterator>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -42,31 +38,8 @@
 #include "categories.hh"
 #include "metadatas.hh"
 
-metadatas_T::metadatas_T(const std::string &p)
-    : cache_T<std::string>(CACHE), portdir(p)
-{
-    /* check cache
-     *  - exists and not expired? - read it
-     *  - otherwise get metadata list and cache it
-     */
-    
-    _cache.reserve(METADATA_RESERVE);
-    
-    if (this->valid())
-    {
-        this->read();
-        util::debug_msg("read %d metadata.xml's from the cache.", this->size());
-    }
-    else
-    {
-        this->fill();
-        this->write();
-        util::debug_msg("cached %d metadata.xml's.", this->size());
-    }
-}
-
 /*
- * Determine whether the metadata cache is valid.
+ * Determine whether the metadata.xml cache is valid.
  */
 
 bool
@@ -86,19 +59,22 @@ metadatas_T::valid() const
 
         if (timestamp and lastsync)
         {
-            if (util::md5check(path, LASTSYNC))
-                valid = true;
-            else
+            valid = util::md5check(path, LASTSYNC);
+
+            /* md5's don't match, meaning the user has sync'd since last run */
+            if (not valid)
                 util::copy_file(path, LASTSYNC);
         }
         /* no timestamp, so no rsync, just expire after 24hrs */
         else if (lastsync)
         {
             unlink(LASTSYNC);
-            valid = ((time(NULL) - s.st_mtime) < 86400);
+            valid = ((time(NULL) - s.st_mtime) < DEFAULT_EXPIRE);
         }
         else if (timestamp)
             util::copy_file(path, LASTSYNC); 
+        else
+            valid = ((time(NULL) - s.st_mtime) < DEFAULT_EXPIRE);
 
         /* only valid if size > 0 */
         if (valid)

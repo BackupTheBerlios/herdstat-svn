@@ -49,12 +49,24 @@ class cache_T
         typedef typename std::vector<T>::iterator iterator;
         typedef typename std::vector<T>::size_type size_type;
 
-        cache_T(const std::string &f) : _file(f) { }
+        cache_T(const std::string &f, size_type reserve = 0) : _file(f)
+        {
+            _cache.reserve(reserve);
+            if (this->valid())
+                this->read();
+            else
+            {
+                this->fill();
+                this->write();
+            }
+        }
+
         virtual ~cache_T() { }
 
         iterator begin() { return _cache.begin(); }
         iterator end() { return _cache.end(); }
         size_type size() const { return _cache.size(); }
+        void clear() { _cache.clear(); }
 
         void read()
         {
