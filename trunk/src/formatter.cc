@@ -179,9 +179,15 @@ formatter_T::append(const std::string &label, const std::string &data)
             append(label, util::splitstr(data));
         else
         {
-            /* does it all fit on one line? */
-            if ((cur.length() + data.length()) < attr.maxctotal)
+            size_type maxlen =
+                (cur.find("\033") == std::string::npos ?
+                attr.maxtotal : attr.maxctotal);
+
+            if ((cur.length() + data.length()) < maxlen)
+            {
                 cur += highlight(util::splitstr(data));
+                util::debug_msg("it all fits on one line");
+            }
             else
             {
                 /* line's full, so find a location where we can truncate */
@@ -193,9 +199,14 @@ formatter_T::append(const std::string &label, const std::string &data)
                 buffer.push_back(cur);
                 cur.clear();
 
+                if (pos == std::string::npos)
+                    return;
+
                 /* indent */
                 while (cur.length() < attr.maxlabel)
                     cur.append(" ");
+
+                util::debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
                 std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
