@@ -212,7 +212,7 @@ util::parse_homepage(const std::string &homepage, vars_T &vars)
             {
                 /* TODO: make a version class that does this */
                 std::map<std::string, std::string> version =
-                    util::get_version_map(vars.filename());
+                    util::get_version_map(vars.name());
                 std::map<std::string, std::string>::iterator y = version.find(*i);
                 if (y != version.end())
                     subst = y->second;

@@ -123,6 +123,7 @@ namespace util
             typedef std::vector<std::string>::iterator iterator;
             typedef std::vector<std::string>::size_type size_type;
 
+            file_T() : fileobject_T(FTYPE_FILE) { }
             file_T(const std::string &n)
                 : fileobject_T(n, FTYPE_FILE), stream(NULL) { }
             file_T(const char *n)

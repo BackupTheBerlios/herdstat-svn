@@ -30,13 +30,13 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include "file.hh"
 
 namespace util
 {
-    class vars_T
+    class vars_T : public file_T
     {
-        protected:
-            std::string _file;
+        private:
             std::map<std::string, std::string> _keys;
 
         public:
@@ -44,19 +44,20 @@ namespace util
             typedef std::map<std::string, std::string>::iterator iterator;
 
             vars_T() { }
-            vars_T(const char *path) : _file(path) { this->read(); }
-            vars_T(const std::string &path) : _file(path) { this->read(); }
-            vars_T(std::ifstream &stream) { this->read(stream); }
-            
-            void read();
-            void read(const char *);
-            void read(const std::string &);
-            void read(std::ifstream &);
 
-            const std::string &filename() const { return _file; }
-            
-            /* provide a small subset of map methods */
-            size_type size() const { return _keys.size(); }
+            vars_T(const char *path) : file_T(path)
+            {
+                this->open();
+                this->read();
+            }
+
+            vars_T(const std::string &path) : file_T(path)
+            {
+                this->open();
+                this->read();
+            }
+
+            /* map subset */
             size_type count(const std::string &s) { return _keys.count(s); }
             iterator begin() { return _keys.begin(); }
             iterator end() { return _keys.end(); }
@@ -64,6 +65,10 @@ namespace util
             void clear() { _keys.clear(); }
             bool empty() const { return (this->size() == 0); }
             std::string &operator[] (const std::string &s) { return _keys[s]; }
+
+            virtual void read();
+            virtual void read(const char *);
+            virtual void read(const std::string &);
     };
 }
 

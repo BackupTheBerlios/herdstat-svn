@@ -24,46 +24,36 @@
 # include "config.h"
 #endif
 
-#include <memory>
+#include <cassert>
 
 #include "vars.hh"
 #include "util_exceptions.hh"
 
 void
-util::vars_T::read()
-{
-    std::auto_ptr<std::ifstream> f(new std::ifstream(_file.c_str()));
-    if (not (*f))
-        throw util::bad_fileobject_E(_file);
-
-    this->read(*f);
-}
-
-void
 util::vars_T::read(const char *path)
 {
-    _file.assign(path);
-
-    std::auto_ptr<std::ifstream> f(new std::ifstream(path));
-    if (not (*f))
-        throw util::bad_fileobject_E(path);
-
-    this->read(*f);
+    _name.assign(path);
+    this->open(path);
+    assert(stream);
+    this->read();
 }
 
 void
 util::vars_T::read(const std::string &path)
 {
-    return this->read(path.c_str());
+    _name.assign(path);
+    this->open(path.c_str());
+    assert(stream);
+    this->read();
 }
 
 void
-util::vars_T::read(std::ifstream &stream)
+util::vars_T::read()
 {
     std::string line;
     std::string::size_type pos;
 
-    while (std::getline(stream, line))
+    while (std::getline(*stream, line))
     {
         pos = line.find_first_not_of(" \t");
         if (pos != std::string::npos)
