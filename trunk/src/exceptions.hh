@@ -71,7 +71,7 @@ class herdstat_va_base_E                : public herdstat_msg_base_E
 
         herdstat_va_base_E(const std::string &msg, ...)
         {
-            va_start(v, msg);
+            va_start(v, msg.c_str());
             str = util::sprintf(msg.c_str(), v).c_str();
             va_end(v);
         }
@@ -119,7 +119,7 @@ class bad_fileobject_E                  : public herdstat_va_base_E
 
         bad_fileobject_E(const std::string &msg, ...)
         {
-            va_start(v, msg);
+            va_start(v, msg.c_str());
             str = util::sprintf(msg.c_str(), v).c_str();
             va_end(v);
         }
