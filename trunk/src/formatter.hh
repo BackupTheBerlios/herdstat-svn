@@ -38,28 +38,27 @@ class formatter_T
 {
     private:
         /* format attributes */
-        class attrs_T
+        struct attrs_T
         {
-            public:
-                attrs_T();
+            attrs_T();
 
-                bool colors;
-                bool quiet;
+            bool colors;
+            bool quiet;
 
-                std::string label_color;
-                std::string data_color;
-                std::string highlight_color;
-                std::string no_color;
+            std::string label_color;
+            std::string data_color;
+            std::string highlight_color;
+            std::string no_color;
 
-                std::string::size_type maxtotal;
-                std::string::size_type maxlabel;
-                std::string::size_type maxdata;
+            std::string::size_type maxtotal;
+            std::string::size_type maxlabel;
+            std::string::size_type maxdata;
             
-                std::string::size_type maxctotal;
-                std::string::size_type maxclabel;
-                std::string::size_type maxcdata;
+            std::string::size_type maxctotal;
+            std::string::size_type maxclabel;
+            std::string::size_type maxcdata;
 
-                std::vector<std::string> highlights;
+            std::vector<std::string> highlights;
         };
 
         std::string highlight(std::vector<std::string>);
