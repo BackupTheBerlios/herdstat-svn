@@ -1,5 +1,11 @@
 ChangeLog for herdstat
 
+2005-04-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/cache.hh: Added new cache_T class, broken out from the caching
+	code in metadatas.cc.
+	* src/metadatas.cc: Use cache_T.
+
 2005-04-02 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/metadatas.cc: Fixed bug where new timestamp isnt copied when

@@ -30,6 +30,8 @@
 #include <string>
 #include <vector>
 
+#include "cache.hh"
+
 /* metadata cache location */
 #define CACHE  LOCALSTATEDIR"/metadatas"
 /* copy of PORTDIR/metadata/timestamp (if portdir was rsync'd) */
@@ -45,17 +47,16 @@
 /*
  * An instance of metadatas_T represents a list of every metadata.xml
  * in the portage tree that belongs to a package (so category metadata.xml's
- * are excluded
+ * are excluded).
  */
 
 class metadatas_T
 {
     private:
         bool cache_is_valid();
-        void read_cache();
-        void write_cache();
         void get();
 
+        cache_T cache;
         const std::string portdir;
         std::vector<std::string> _m;
 

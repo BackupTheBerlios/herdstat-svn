@@ -44,7 +44,7 @@ class categories_T : public std::vector<std::string>
     private:
         void get_categories(const std::string &portdir)
         {
-            std::string path = portdir + "/profiles/categories";
+            const std::string path = portdir + "/profiles/categories";
             std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
             if (not (*f))
                 throw bad_fileobject_E(path);

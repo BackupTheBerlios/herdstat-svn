@@ -12,6 +12,7 @@ herdstat_SOURCES = exceptions.hh \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
 		   formatter.hh formatter.cc \
 		   categories.hh \
+		   cache.hh \
 		   metadatas.hh metadatas.cc \
 		   action_handler.hh \
 		   action_herd_handler.hh action_herd_handler.cc \

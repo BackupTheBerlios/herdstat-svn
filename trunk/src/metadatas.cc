@@ -42,23 +42,30 @@
 #include "categories.hh"
 #include "metadatas.hh"
 
-metadatas_T::metadatas_T(const std::string &p) : portdir(p)
+metadatas_T::metadatas_T(const std::string &p) : cache(CACHE), portdir(p)
 {
     /* check cache
      *  - exists and not expired? - read it
      *  - otherwise get metadata list and cache it
      */
-
+    
     _m.reserve(METADATA_RESERVE);
     
     if (cache_is_valid())
-        read_cache();
+    {
+        _m = cache.read();
+        util::debug_msg("read %d metadata.xml's from the cache.", _m.size());
+    }
     else
     {
         get();
-        write_cache();
+        cache.write(_m);
     }
 }
+
+/*
+ * Determine whether the metadata cache is valid.
+ */
 
 bool
 metadatas_T::cache_is_valid()
@@ -97,41 +104,7 @@ metadatas_T::cache_is_valid()
 }
 
 /*
- * Fill vector with cached metadata.xml list
- */
-
-void
-metadatas_T::read_cache()
-{
-    std::auto_ptr<std::ifstream> cache(new std::ifstream(CACHE));
-    if (not (*cache))
-        throw bad_fileobject_E(CACHE);
-
-    std::string line;
-    while (std::getline(*cache, line))
-        _m.push_back(line);
-
-    util::debug_msg("read a total of %d metadata.xml's from the cache",
-        _m.size());
-}
-
-/*
- * Write cache with our current metadata.xml list
- */
-
-void
-metadatas_T::write_cache()
-{
-    std::auto_ptr<std::ofstream> cache(new std::ofstream(CACHE));
-    if (not (*cache))
-        throw bad_fileobject_E(CACHE);
-
-    std::copy(_m.begin(), _m.end(),
-        std::ostream_iterator<std::string>(*cache, "\n"));
-}
-
-/*
- * Walk each category in the portage tree, searching for metadata.xml's
+ * Walk each category in the portage tree, searching for package metadata.xml's
  */
 
 void
@@ -146,7 +119,7 @@ metadatas_T::get()
     if (status)
     {
         *(optget("outstream", std::ostream *))
-            << "Generating list of metadata.xml's: ";
+            << "Generating metadata.xml cache: ";
         progress.start(categories.size());
     }
 
