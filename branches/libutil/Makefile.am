@@ -1,6 +1,6 @@
 # $Id$
 
-SUBDIRS = . src doc
+SUBDIRS = . lib src doc
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
