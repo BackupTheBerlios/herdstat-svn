@@ -63,6 +63,8 @@ all developers will be displayed.
 .TP
 .B "\-p, \-\-package" "\fI[ herd(s) ]\fR"
 Display package information for the specified herd(s).
+.TP
+If no options (non-option or not) are specified, @PACKAGE@ will display a summary of herds.xml statistics.
 .SH EXAMPLES
 .IP "\fB$ @PACKAGE@ netmon x11\fR"
 Display all developers in the netmon and x11 herds.
