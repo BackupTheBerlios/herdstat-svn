@@ -49,7 +49,6 @@ herd_T::display(std::ostream &stream)
     util::color_map_T color;
 
     std::string user = util::current_user();
-    std::string::size_type oldlen = 0;
 
     /* sort devs */
     std::vector<std::string> sorted_devs;
@@ -59,21 +58,13 @@ herd_T::display(std::ostream &stream)
             std::string dev = i->first;
             if (not options.verbose())
             {
-                /* strip domain names from email addr */
+                /* strip domain names from email addy */
                 std::string::size_type pos = dev.find('@');
                 if (pos != std::string::npos)
-                {
-                    /* is the current user this user? */
-                    if (dev == user and not options.quiet())
-                    {
-                        /* if so, highlight it ; we need to save maxctotal
-                         * in order to modify it to compensate for color length */
-                        oldlen = out.maxctotal();
-                        dev = color[yellow] + dev.substr(0, pos) + color[none];
-                    }
-                    else
-                        dev = dev.substr(0, pos);
-                }
+                    dev = dev.substr(0, pos);
+                /* skip any invalid email addy's; for example, if dev 'joe'
+                 * uses 'joe' in one place and then 'joe@gentoo.org' in
+                 * another, it'll cause duplicates                          */
                 else
                     continue;
             }
@@ -87,7 +78,13 @@ herd_T::display(std::ostream &stream)
         if (not name.empty())
             out.append("Herd", name);
         if (not mail.empty())
+        {
+            /* add @gentoo.org if its not there already */
+            std::string::size_type pos = mail.find('@');
+            if (pos == std::string::npos)
+                mail += "@gentoo.org";
             out.append("Email", mail);
+        }
         if (not desc.empty())
             out.append("Description", desc);
     }
@@ -122,11 +119,20 @@ herd_T::display(std::ostream &stream)
         }
         else
         {
-            /* if the current user is in the herd, we highlighted the nick
-             * so adjust maxctotal appropriately                            */
-            if (oldlen != 0)
+            std::string::size_type oldlen = 0;
+
+            /* if the current user is in the herd, we highlight the nick
+             * and adjust maxctotal appropriately                       */
+            std::vector<std::string>::iterator pos =
+                std::find(sorted_devs.begin(), sorted_devs.end(), user);
+            if (pos != sorted_devs.end())
+            {
+                *pos = color[yellow] + user + color[none];
+    
+                oldlen = out.maxctotal();
                 out.set_maxctotal(oldlen + color[yellow].length() +
                     color[none].length());
+            }
 
             out.append(util::sprintf("Developers(%d)", sorted_devs.size()), sorted_devs);
 
@@ -150,28 +156,35 @@ herds_T::display(std::ostream &stream)
 
     std::vector<std::string> hvec;
     float ndev = 0;
+    std::string biggest_herdstr;
+    herd_T::size_type biggest_herd = 0;
 
     iterator h;
-    size_type n = 0;
     for (h = this->begin() ; h != this->end() ; ++h)
-        ndev += h->second->size();
-
-    if (options.verbose() and not options.quiet())
     {
-        out.append("Avg devs/herd", util::sprintf("%.2f",
-            ndev / this->size()));
-        out.append(util::sprintf("Herds(%d)", this->size()), "");
+        ndev += h->second->size();
+        if (h->second->size() > biggest_herd)
+        {
+            biggest_herd = h->second->size();
+            biggest_herdstr = h->first;
+        }
     }
 
+    if (options.verbose() and not options.quiet())
+        out.append(util::sprintf("Herds(%d)", this->size()), "");
+
     /* for each herd in herds.xml... */
+    size_type n = 0;
     for (h = this->begin() ; h != this->end() ; ++h)
     {
         if (options.quiet())
             stream << h->first << std::endl;
         else if (options.verbose())
         {
+            /* herd name */
             out.append("", color[blue] + h->first + color[none]);
 
+            /* description */
             iterator x;
             if ((x = this->find(h->first)) != this->end())
                 out.append("", x->second->desc);
@@ -179,14 +192,20 @@ herds_T::display(std::ostream &stream)
             if (++n != this->size())
                 out.endl();
         }
+        /* otherwise, store it for processing after the loop */
         else
             hvec.push_back(h->first);
     }
 
-    if (not options.verbose() and not options.quiet())
-    {
+    if (hvec.size() > 0)
         out.append(util::sprintf("Herds(%d)", this->size()), hvec);
+    
+    if (not options.quiet())
+    {
+        if (options.verbose())
+            out.endl();
         out.append("Avg devs/herd", util::sprintf("%.2f", ndev / this->size()));
+        out.append(util::sprintf("Most devs(%d)", biggest_herd), biggest_herdstr);
     }
 }
 
