@@ -34,16 +34,18 @@
 #include <cstdarg>
 #include <cstdio>
 
-#include "vars.hh"
-#include "string.hh"
-#include "timer.hh"
-#include "util_exceptions.hh"
-#include "portage_misc.hh"
-#include "portage_config.hh"
-
 #ifndef PATH_MAX
 # define PATH_MAX   4096
 #endif
+
+#include "file.hh"
+#include "vars.hh"
+#include "string.hh"
+#include "timer.hh"
+#include "progress.hh"
+#include "util_exceptions.hh"
+#include "portage_misc.hh"
+#include "portage_config.hh"
 
 enum color_name_T
 {
@@ -73,14 +75,6 @@ namespace util
     const char *portdir();
     int fetch(const std::string &, const std::string &, bool);
     int fetch(const char *, const char *, bool);
-    bool is_dir(const char *);
-    bool is_dir(const std::string &);
-    bool is_file(const char *);
-    bool is_file(const std::string &);
-    const char *basename(const char *);
-    const char *basename(std::string const &);
-    const char *dirname(const char *);
-    const char *dirname(std::string const &);
 
     class color_map_T
     {
@@ -107,41 +101,6 @@ namespace util
 
         public:
 	    std::string &operator[](color_name_T c) { return cm[c]; }
-    };
-
-    class rcfile_T
-    {
-	public:
-	    typedef std::map<std::string, std::string> rcfile_keys_T;
-	    rcfile_T(std::ifstream &);
-	    void dump(std::ostream &);
-	    rcfile_keys_T keys;
-    };
-
-    class progress_T
-    {
-	private:
-	    float cur, step;
-
-	public:
-	    progress_T() : cur(0) { }
-	    void start(unsigned m)
-	    {
-		step = 100.0 / m;
-		std::printf("  0%%");
-	    }
-
-	    void operator++ ()
-	    {
-		int inc = static_cast<int>(cur += step);
-		if (inc < 10)
-		    std::printf("\b\b%.1d%%", inc);
-		else if (inc < 100)
-		    std::printf("\b\b\b%.2d%%", inc);
-		else
-		    std::printf("\b\b\b\b%.3d%%", inc);
-		std::fflush(stdout);
-	    }
     };
 }
 

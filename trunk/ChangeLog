@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-04-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.cc, lib/file.hh: Added file/dir objects and moved
+	file-related util functions here.
+	* lib/progress.hh: Moved progress_T to it's own header.
+	* lib/util.cc, lib/util.hh: Tidy! moved a lot of the file-related util
+	functions to file.{cc,hh}.
+
 2005-04-04 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/util.cc, lib/util.hh, lib/vars.cc, lib/vars.hh: added vars_T and
