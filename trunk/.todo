@@ -3,4 +3,7 @@
     <title>
         Todo list for herdstat
     </title>
+    <note priority="verylow" time="1112186406">
+        IDEA: maybe make it possible for the user to specify 'herdstat -m' with no arguments IF currently inside a package's directory.
+    </note>
 </todo>
