@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <map>
 #include <vector>
-#include <utility>
 #include <memory>
 #include <string>
 #include <cstdlib>
@@ -39,7 +38,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <xmlwrapp/init.h>
 
 #include "metadata_xml_handler.hh"
 #include "herds_xml_handler.hh"
@@ -60,15 +58,13 @@ get_categories(const std::string &portdir)
     std::vector<std::string> categories;
 
     std::auto_ptr<std::istream> f(new std::ifstream(catfile.c_str()));
-    if ((*f))
-    {
-        std::string s;
-        while (std::getline(*f, s))
-            categories.push_back(s);
-    }
-    else
+    if (not (*f))
         throw bad_fileobject_E("Failed to open '%s': %s", catfile.c_str(),
             strerror(errno));
+
+    std::string s;
+    while (std::getline(*f, s))
+        categories.push_back(s);
 
     return categories;
 }
@@ -106,10 +102,8 @@ get_metadatas(const std::string &portdir)
             if (util::is_file(metadata))
                 metadatas.push_back(metadata);
         }
-
         closedir(dir);
     }
-
     return metadatas;
 }
 
@@ -271,18 +265,21 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
             if (optget("verbose", bool) and not p->second.empty())
             {
+                if(output.peek() != "")
+                    output.endl();
+
                 output.append("", color[blue] + p->first + color[none]);
                 output.append("", p->second);
                 util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
                     p->second.c_str());
+
+                if (++pn != pkgs.size())
+                    output.endl();
             }
             else if (optget("verbose", bool))
                 output.append("", color[blue] + p->first + color[none]);
             else
                 output.append("", p->first);
-
-            if (++pn != pkgs.size())
-                output.endl();
         }
 
         /* only skip a line if we're not on the last one */
