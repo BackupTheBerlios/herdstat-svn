@@ -43,8 +43,8 @@ _herdstat() {
                 words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
                        $(builtin cd ${p} ; compgen -G "*-*")"
             else
-                words="$(builtin cd ${p} ; compgen -S '/' -G "${cur}*") \
-                        $(builtin cd ${p} ; compgen -G "${cur}*")"
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur) \
+                        $(builtin cd ${p} ; compgen -G "*-*" -- $cur)"
             fi
 
             COMPREPLY=($(for x in ${words} ; do \
@@ -94,15 +94,15 @@ _herdstat() {
             
                 [[ -d ${p} ]] || return 0
 
-                if [[ ${cur} == */* ]] ; then
-                    words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
-                elif [[ ${cur} == "" ]] ; then
-                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
+            if [[ ${cur} == */* ]] ; then
+                words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+            elif [[ ${cur} == "" ]] ; then
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
                        $(builtin cd ${p} ; compgen -G "*-*")"
-                else
-                    words="$(builtin cd ${p} ; compgen -S '/' -G "${cur}*") \
-                        $(builtin cd ${p} ; compgen -G "${cur}*")"
-                fi
+            else
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur) \
+                        $(builtin cd ${p} ; compgen -G "*-*" -- $cur)"
+            fi
 
                 COMPREPLY=($(for x in ${words} ; do \
                             [[ ${x} == ${cur}* ]] && echo ${x} ; \
