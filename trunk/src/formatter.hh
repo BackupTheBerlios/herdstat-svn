@@ -97,7 +97,7 @@ class formatter_T
         void set_colors(bool value) { attr.colors = value; }
         bool colors() { return attr.colors; }
 
-        void set_quiet(bool value) { attr.value = value; }
+        void set_quiet(bool value) { attr.quiet = value; }
         bool quiet() { return attr.quiet; }
 
         void set_labelcolor(std::string &s) { attr.label_color = s; }
