@@ -2,6 +2,7 @@
 
 SUBDIRS = . src doc
 
+CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
 		       configure \
 		       Makefile.in \
@@ -10,4 +11,12 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       stamp-h.in \
 		       *~
 
-EXTRA_DIST = autogen.sh
+EXTRA_DIST = autogen.sh .todo
+
+TODO: .todo
+	@if test -x /usr/bin/devtodo ; then \
+		devtodo all --TODO  ; \
+	fi
+
+all: TODO
+dist-hook: TODO
