@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-03-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* Makefile.am: Added TODO target for automatically generating the TODO
+	file with devtodo.
+	* src/herds_xml_handler.cc: append '@gentoo.org' to email addresses
+	that lack it.
+	* src/util.cc: Make current_user() return the whole email address.
+	* src/herds.cc, src/herds.hh: Added herd_T::keys(); cleaned up
+	herd_T::display() a little.
+	* src/xmlparser.hh: Added a few comments.
+
 2005-03-09 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (release-0.3).
