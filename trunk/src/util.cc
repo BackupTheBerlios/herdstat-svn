@@ -388,7 +388,7 @@ util::debug_msg(const char *msg, ...)
     
     va_list v;
     va_start(v, msg);
-    std::cout << util::sprintf(msg, v) << std::endl;
+    *(opts.outstream()) << util::sprintf(msg, v) << std::endl;
     va_end(v);
 }
 
