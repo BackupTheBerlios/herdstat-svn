@@ -26,6 +26,12 @@ _herdstat() {
 	-d|--dev)
 	    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    ;;
+        -m|--metadata)
+            _pkgname -A $cur
+
+            local p=$(_portdir)
+            COMPREPLY=( ${COMPREPLY[@]} $(< ${portdir}/categories) )
+            ;;
 	*)
 	    local x dev=0 pkg=0 meta=0
 	    for x in ${COMP_WORDS[@]} ; do
