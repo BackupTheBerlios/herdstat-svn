@@ -60,9 +60,13 @@ herd_T::display(std::ostream &stream)
     formatter_T out;
     util::color_map_T color;
     std::string user = util::current_user();
-    std::string::size_type oldlen = 0;
     std::vector<std::string> devs = this->keys();
     std::vector<std::string>::iterator i;
+
+    /* highlight current user if it appears in the output */
+    out.set_highlightcolor(color[yellow]);
+    out.add_highlight(user);
+    out.add_highlight(util::get_user_from_email(user));
 
     /* display header */
     if (not optget("quiet", bool))
@@ -85,11 +89,13 @@ herd_T::display(std::ostream &stream)
     
     for (i = devs.begin() ; i != devs.end() ; ++i)
     {
-        if (optget("verbose", bool))
+        if (not optget("verbose", bool))
+            *i = util::get_user_from_email(*i);
+        else
         {
             /* highlight email if current user is in the herd */
             if (*i == user)
-                out.append("", color[yellow] + (*i) + color[none]);
+                out.append("", *i);
             else
                 out.append("", color[blue] + (*i) + color[none]);
 
@@ -98,29 +104,10 @@ herd_T::display(std::ostream &stream)
             if ((x = this->find(*i)) != this->end())
                 x->second->display(stream);
         }
-        else
-        {
-            *i = util::get_user_from_email(*i);
-
-            /* if the current user is in the herd, we highlight the nick
-             * and adjust maxctotal appropriately */
-
-            if (not optget("quiet", bool) and (user == (*i + "@gentoo.org")))
-            {
-                *i = color[yellow] + (*i) + color[none];
-
-                oldlen = out.maxctotal();
-                out.set_maxctotal(oldlen + color[yellow].length() +
-                    color[none].length());
-            }
-        }
     }
 
     if (not optget("verbose", bool))
         out.append(util::sprintf("Developers(%d)", devs.size()), devs);
-
-    if (oldlen != 0)
-        out.set_maxctotal(oldlen);
 }
 
 /*
