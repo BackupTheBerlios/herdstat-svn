@@ -321,23 +321,23 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             if (optget("dev", bool))
             {
                 if (attr.name.empty())
-                    output.append("Developer", *i);
+                    output("Developer", *i);
                 else
-                    output.append("Developer",
+                    output("Developer",
                         attr.name + " (" + (*i) + ")");
 
-                output.append("Email", *i + "@gentoo.org");
+                output("Email", *i + "@gentoo.org");
             }
             else
             {
-                output.append("Herd", *i);
+                output("Herd", *i);
                 if (not herds_xml[*i]->mail.empty())
-                    output.append("Email", herds_xml[*i]->mail);
+                    output("Email", herds_xml[*i]->mail);
                 if (not herds_xml[*i]->desc.empty())
-                    output.append("Description", herds_xml[*i]->desc);
+                    output("Description", herds_xml[*i]->desc);
             }
 
-            output.append(util::sprintf("Packages(%d)", pkgs.size()), "");
+            output(util::sprintf("Packages(%d)", pkgs.size()), "");
         }
 
         /* display the category/package */
@@ -351,8 +351,12 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 if (output.size() > 1 and output.peek() != "")
                     output.endl();
 
-                output.append("", color[blue] + p->first + color[none]);
-                output.append("", p->second);
+                if (optget("color", bool))
+                    output("", color[blue] + p->first + color[none]);
+                else
+                    output("", p->first);
+
+                output("", p->second);
                 util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
                     p->second.c_str());
 
@@ -360,9 +364,14 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     output.endl();
             }
             else if (optget("verbose", bool) and not optget("quiet", bool))
-                output.append("", color[blue] + p->first + color[none]);
+            {
+                if (optget("color", bool))
+                    output("", color[blue] + p->first + color[none]);
+                else
+                    output("", p->first);
+            }
             else if (not optget("count", bool))
-                output.append("", p->first);
+                output("", p->first);
         }
 
         /* only skip a line if we're not on the last one */
@@ -375,7 +384,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     }
 
     if (optget("count", bool))
-        output.append("", util::sprintf("%d", size));
+        output("", util::sprintf("%d", size));
 
     output.flush(*stream);
 

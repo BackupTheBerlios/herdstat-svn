@@ -72,19 +72,19 @@ herd_T::display(std::ostream &stream)
     if (not optget("quiet", bool))
     {
         if (not name.empty())
-            out.append("Herd", name);
+            out("Herd", name);
 
         if (not mail.empty())
-            out.append("Email", mail);
+            out("Email", mail);
 
         if (not desc.empty())
         {
-            out.append("Description", desc);
+            out("Description", desc);
             util::debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
         }
 
         if (optget("verbose", bool))
-            out.append(util::sprintf("Developers(%d)", this->size()), "");
+            out(util::sprintf("Developers(%d)", this->size()), "");
     }
     
     /* for each developer in this herd... */
@@ -98,10 +98,10 @@ herd_T::display(std::ostream &stream)
         {
             /* formatter_T can handle highlighting,
              * so dont do anything special */
-            if (*i == user)
-                out.append("", *i);
+            if (*i == user or not optget("color", bool))
+                out("", *i);
             else
-                out.append("", color[blue] + (*i) + color[none]);
+                out("", color[blue] + (*i) + color[none]);
 
             /* display developer attributes (name, role, etc) */
             iterator x;
@@ -113,7 +113,7 @@ herd_T::display(std::ostream &stream)
     if ((not optget("verbose", bool) and not optget("count", bool)) or
         (optget("verbose", bool) and optget("quiet", bool) and
          not optget("count", bool)))
-        out.append(util::sprintf("Developers(%d)", devs.size()), devs);
+        out(util::sprintf("Developers(%d)", devs.size()), devs);
 }
 
 /*
@@ -129,7 +129,7 @@ herds_T::display(std::ostream &stream)
     std::vector<std::string> hvec;
 
     if (optget("verbose", bool) and not optget("quiet", bool))
-        out.append(util::sprintf("Herds(%d)", this->size()), "");
+        out(util::sprintf("Herds(%d)", this->size()), "");
 
     /* for each herd in herds.xml... */
     size_type n = 1;
@@ -138,12 +138,15 @@ herds_T::display(std::ostream &stream)
         if (optget("verbose", bool) and not optget("quiet", bool))
         {
             /* herd name */
-            out.append("", color[blue] + h->first + color[none]);
+            if (optget("color", bool))
+                out("", color[blue] + h->first + color[none]);
+            else
+                out("", h->first);
 
             /* description */
             iterator x;
             if ((x = this->find(h->first)) != this->end())
-                out.append("", x->second->desc);
+                out("", x->second->desc);
 
             if (not optget("count", bool) and n != this->size())
                 out.endl();
@@ -154,7 +157,7 @@ herds_T::display(std::ostream &stream)
     }
 
     if (hvec.size() > 0)
-        out.append(util::sprintf("Herds(%d)", this->size()), hvec);
+        out(util::sprintf("Herds(%d)", this->size()), hvec);
 }
 
 /* vim: set tw=80 sw=4 et : */

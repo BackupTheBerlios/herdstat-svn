@@ -33,7 +33,7 @@
 #include "formatter.hh"
 #include "exceptions.hh"
 
-format_attrs_T formatter_T::attr;
+formatter_T::attrs_T formatter_T::attr;
 std::vector<std::string> formatter_T::buffer;
 
 /*
@@ -41,7 +41,7 @@ std::vector<std::string> formatter_T::buffer;
  * Set sane default attributes
  */
 
-format_attrs_T::format_attrs_T()
+formatter_T::attrs_T::attrs_T()
 {
     colors = false;
     quiet = false;
@@ -73,15 +73,18 @@ formatter_T::set_attrs()
      * for the increase in string length.           */
     if (attr.colors)
     {
+        attr.no_color = color[none];
         attr.maxclabel = attr.maxlabel
                        + attr.label_color.length()
-                       + color[none].length();
+                       + attr.no_color.length();
         attr.maxcdata  = attr.maxdata;
         attr.maxctotal = attr.maxclabel + attr.maxcdata;
     }
     else
     {
-        attr.label_color = attr.data_color = "";
+        attr.label_color.clear();
+        attr.data_color.clear();
+        attr.highlight_color.clear();
         attr.maxclabel = attr.maxlabel;
         attr.maxcdata  = attr.maxdata;
         attr.maxctotal = attr.maxtotal;
@@ -100,11 +103,14 @@ formatter_T::highlight(std::vector<std::string> data)
     std::string s;
     std::vector<std::string>::iterator i;
 
+    if (not colors())
+        attr.highlight_color.clear();
+
     for (i = data.begin() ; i != data.end() ; ++i)
     {
         if (std::find(attr.highlights.begin(),
             attr.highlights.end(), *i) != attr.highlights.end())
-            s += attr.highlight_color + (*i) + color[none] + " ";
+            s += attr.highlight_color + (*i) + attr.no_color + " ";
         else
             s += *i + " ";
     }
@@ -119,8 +125,6 @@ formatter_T::highlight(std::vector<std::string> data)
 void
 formatter_T::append(const std::string &label, std::vector<std::string> data)
 {
-    std::vector<std::string>::iterator i;
-
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
     if (quiet())
@@ -130,12 +134,12 @@ formatter_T::append(const std::string &label, std::vector<std::string> data)
     else
     {
         std::string s;
+
+        std::vector<std::string>::iterator i;
         for (i = data.begin() ; i != data.end() ; ++i)
             s += *i + " ";
     
-        if (s[s.length() - 1] == ' ')
-            s.erase(s.length() - 1);
-
+        s.erase(s.length() - 1);
         append(label, s);
     }
 }
@@ -157,11 +161,16 @@ formatter_T::append(const std::string &label, const std::string &data)
             throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
                 label.c_str(), attr.maxlabel);
 
-        cur = color[green] + label + color[none] +
-            (label.empty() ? "" : ":");
+        if (not label.empty())
+        {
+            cur = attr.label_color + label + attr.no_color + ":";
 
-        while (cur.length() < attr.maxclabel)
-            cur.append(" ");
+            while (cur.length() < attr.maxclabel)
+                cur.append(" ");
+        }
+        else
+            while (cur.length() < attr.maxlabel)
+                cur.append(" ");
     }
 
     if (not data.empty())
@@ -191,7 +200,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                 std::vector<std::string>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
                 {
-                    std::string::size_type oldlen;
+                    std::string::size_type oldlen = 0;
                     bool highlight_found = false;
 
                     /* should the current word be highlighted? */
@@ -203,7 +212,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                         /* adjust maxtotal appropriately */
                         oldlen = attr.maxtotal;
                         attr.maxtotal = oldlen + attr.highlight_color.length() +
-                            color[none].length();
+                            attr.no_color.length();
                     }
 
                     std::string::size_type curlen;
@@ -214,12 +223,12 @@ formatter_T::append(const std::string &label, const std::string &data)
                      */
                     if ((cur.find("\033") != std::string::npos))
                         curlen = cur.length() - attr.highlight_color.length() -
-                            color[none].length();
+                            attr.no_color.length();
 
                     /* compensate for current highlight? */
                     else if (highlight_found)
                         curlen = cur.length() + attr.highlight_color.length() +
-                            color[none].length();
+                            attr.no_color.length();
 
                     /* don't compensate */
                     else
@@ -238,7 +247,7 @@ formatter_T::append(const std::string &label, const std::string &data)
             
                     if (highlight_found)
                     {
-                        cur += attr.highlight_color + (*i) + color[none] + " ";
+                        cur += attr.highlight_color + (*i) + attr.no_color + " ";
 
                         /* restore saved maxtotal */
                         attr.maxtotal = oldlen;

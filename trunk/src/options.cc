@@ -54,7 +54,7 @@ options_T::option_map_T::set_defaults()
     insert_opt("count", false);
     insert_opt("color", true);
 
-    insert_opt("maxcol", static_cast<size_t>(78));
+    insert_opt("maxcol", static_cast<std::size_t>(78));
 
     insert_opt("portdir", std::string("/usr/portage"));
     insert_opt("outfile", std::string("stdout"));

@@ -34,35 +34,40 @@
 
 #include "util.hh"
 
-/* format attributes */
-class format_attrs_T
-{
-    public:
-        format_attrs_T();
-
-        bool colors;
-        bool quiet;
-
-        std::string label_color;
-        std::string data_color;
-        std::string highlight_color;
-
-        std::string::size_type maxtotal;
-        std::string::size_type maxlabel;
-        std::string::size_type maxdata;
-            
-        std::string::size_type maxctotal;
-        std::string::size_type maxclabel;
-        std::string::size_type maxcdata;
-
-        std::vector<std::string> highlights;
-};
-
 class formatter_T
 {
     private:
+        /* format attributes */
+        class attrs_T
+        {
+            public:
+                attrs_T();
+
+                bool colors;
+                bool quiet;
+
+                std::string label_color;
+                std::string data_color;
+                std::string highlight_color;
+                std::string no_color;
+
+                std::string::size_type maxtotal;
+                std::string::size_type maxlabel;
+                std::string::size_type maxdata;
+            
+                std::string::size_type maxctotal;
+                std::string::size_type maxclabel;
+                std::string::size_type maxcdata;
+
+                std::vector<std::string> highlights;
+        };
+
+        std::string highlight(std::vector<std::string>);
+        void append(const std::string &, const std::string &);
+        void append(const std::string &, std::vector<std::string>);
+
         static std::vector<std::string> buffer;
-        static format_attrs_T attr;
+        static attrs_T attr;
         util::color_map_T color;
 
     public:
@@ -70,13 +75,20 @@ class formatter_T
 
         formatter_T() { }
 
+        void operator() (const std::string &l, const std::string &d)
+        {
+            append(l, d);
+        }
+
+        void operator() (const std::string &l, std::vector<std::string> d)
+        {
+            append(l, d);
+        }
+
         void endl() { buffer.push_back(""); }
-        void append(const std::string &, const std::string &);
-        void append(const std::string &, std::vector<std::string>);
         void flush(std::ostream &);
         const std::string &peek() const { return buffer.back(); }
         std::vector<std::string>::size_type size() const { return buffer.size(); }
-        std::string highlight(std::vector<std::string>);
 
         void set_attrs();
 

@@ -9,7 +9,7 @@ _herdstat() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -V --version -p --package -d --dev -H --herdsxml
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
-        -f --fetch -c --count"
+        -f --fetch -c --count -n --nocolor"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )

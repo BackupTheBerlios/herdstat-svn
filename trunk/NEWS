@@ -1,6 +1,14 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+0.6.1:
+    New features:
+     - Added --nocolor.
+
+    Bug fixes:
+     - Reverted gcc-4 warning fixes since they cause havoc with gcc-3.3.x.
+     - Fixed exception if '-d all' is specified.
+
 0.6:
     New features:
      - You are now able to specify both --dev and --package at the same time

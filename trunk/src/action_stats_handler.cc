@@ -108,19 +108,19 @@ action_stats_handler_T::operator() (herds_T &herds_xml,
             least_herds.push_back(util::get_user_from_email(i->first));
     }
 
-    output.append("Total herds", util::sprintf("%d", herds_xml.size()));
-    output.append("Total devs", util::sprintf("%d", herds_per_dev.size()));
-    output.append("Avg devs/herd", util::sprintf("%.2f",
+    output("Total herds", util::sprintf("%d", herds_xml.size()));
+    output("Total devs", util::sprintf("%d", herds_per_dev.size()));
+    output("Avg devs/herd", util::sprintf("%.2f",
         ndevs / herds_xml.size()));
-    output.append("Avg herds/dev", util::sprintf("%.2f",
+    output("Avg herds/dev", util::sprintf("%.2f",
         nherds / herds_per_dev.size()));
-    output.append(util::sprintf("Herd(s) with most devs(%d)", biggest_herd),
+    output(util::sprintf("Herd(s) with most devs(%d)", biggest_herd),
         most_devs);
-    output.append(util::sprintf("Herd(s) with least devs(%d)", smallest_herd),
+    output(util::sprintf("Herd(s) with least devs(%d)", smallest_herd),
         least_devs);
-    output.append(util::sprintf("Dev(s) belonging to most herds(%d)", biggest_dev),
+    output(util::sprintf("Dev(s) belonging to most herds(%d)", biggest_dev),
         most_herds);
-    output.append(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
+    output(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
         least_herds);
 
     output.flush(*stream);

@@ -1,5 +1,19 @@
 ChangeLog for herdstat
 
+2005-03-22 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.0_rc1-release).
+	* bashcomp, doc/herdstat.1.in, src/herdstat.cc, src/options.cc:
+	Added --nocolor.
+	* src/formatter.cc: Fixed a few bugs to allow --nocolor to work as
+	expected.  Moved append() to private, and added operator() as an
+	interface. Also moved format_attrs_T and highlight() private.
+
+2005-03-21 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/exceptions.hh: Revert gcc-4 fixes since gcc-3.3.x has a broken
+	va_start macro, causing numerous warnings.
+
 2005-03-19 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/action_dev_handler.cc: Fixed too low maxlabel value causing an
@@ -7,7 +21,7 @@ ChangeLog for herdstat
 
 2005-03-18 Aaron Walker <ka0ttic@gentoo.org>
 
-	* configure.ac: Updated version (0.6 release).
+	* configure.ac: Updated version (release-0.6).
 	* doc/herdstat.1.in: Added --count and a couple examples.
 	* bashcomp: Updated to allow --dev and --package to be specified at
 	the same time. Also added --count.

@@ -59,7 +59,7 @@
 static const std::string default_herdsxml =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
-static const char *short_opts = "H:o:hVvDdtpqfc";
+static const char *short_opts = "H:o:hVvDdtpqfcn";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -70,6 +70,7 @@ static struct option long_opts[] =
     {"quiet",	    no_argument,	0,  'q'},
     {"debug",	    no_argument,	0,  'D'},
     {"count",	    no_argument,	0,  'c'},
+    {"nocolor",	    no_argument,	0,  'n'},
     /* force a fetch of herds.xml */
     {"fetch",	    no_argument,	0,  'f'},
     /* time how long it takes for XML parsing */
@@ -124,10 +125,9 @@ help()
 	<< std::endl
 	<< " -D, --debug           Display debugging messages." << std::endl
 	<< " -t, --timer           Display elapsed time of XML parsing." << std::endl
-	<< " -c, --count           Instead of displaying data items, display the" << std::endl
-	<< "                       number of items." << std::endl
 	<< " -c, --count           Display the number of items instead of the" << std::endl
 	<< "                       items themself." << std::endl
+	<< " -n, --nocolor         Don't display colored output." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action        1 or more herds." << std::endl
@@ -158,6 +158,7 @@ help()
 	<< " -t              Display elapsed time of XML parsing." << std::endl
 	<< " -c              Display the number of items instead of the" << std::endl
 	<< "                 items themself." << std::endl
+	<< " -n              Don't display colored output." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action  1 or more herds." << std::endl
@@ -240,6 +241,10 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	    case 'c':
 		optset("count", bool, true);
 		optset("quiet", bool, true);
+		break;
+	    /* --nocolor */
+	    case 'n':
+		optset("color", bool, false);
 		break;
 	    /* --herdsxml */
 	    case 'H':
@@ -477,7 +482,7 @@ main(int argc, char **argv)
 	/* set common format attributes */
 	util::color_map_T color;
 	formatter_T output;
-	output.set_colors(true);
+	output.set_colors(optget("color", bool));
 	output.set_quiet(optget("quiet", bool));
 	output.set_labelcolor(color[green]);
 

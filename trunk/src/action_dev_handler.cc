@@ -86,7 +86,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
         all_devs.display(*stream);
 
         if (optget("count", bool))
-            output.append("", util::sprintf("%d", all_devs.size()));
+            output("", util::sprintf("%d", all_devs.size()));
     }
     else
     {
@@ -131,37 +131,37 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not optget("quiet", bool))
                 {
-                    if (name.empty())
-                        output.append("Developer", *dev);
-                    else
-                        output.append("Developer", name + " (" + (*dev) + ")");
-
-                    output.append("Email", *dev + "@gentoo.org");
+                    output("Developer",
+                        (name.empty() ? *dev : name + " (" + (*dev) + ")"));
+                    output("Email", *dev + "@gentoo.org");
                 }
 
                 if (optget("verbose", bool) and not optget("quiet", bool))
                 {
-                    output.append(util::sprintf("Herds(%d)", herds.size()), "");
+                    output(util::sprintf("Herds(%d)", herds.size()), "");
 
                     std::vector<std::string>::iterator i;
                     herds_T::size_type nh = 1;
                     for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
                     {
                         /* display herd */
-                        output.append("", color[blue] + (*i) + color[none]);
+                        if (optget("color", bool))
+                            output("", color[blue] + (*i) + color[none]);
+                        else
+                            output("", *i);
                         
                         /* display herd info */
                         if (not herds_xml[*i]->mail.empty())
-                            output.append("", herds_xml[*i]->mail);
+                            output("", herds_xml[*i]->mail);
                         if (not herds_xml[*i]->desc.empty())
-                            output.append("", herds_xml[*i]->desc);
+                            output("", herds_xml[*i]->desc);
 
                         if (nh != herds.size())
                             output.endl();
                     }
                 }
                 else if (not optget("count", bool))
-                    output.append(util::sprintf("Herds(%d)", herds.size()), herds);
+                    output(util::sprintf("Herds(%d)", herds.size()), herds);
             }
 
             /* skip a line if we're not displaying the last one */
@@ -170,7 +170,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
         }
 
         if (optget("count", bool))
-            output.append("", util::sprintf("%d", size));
+            output("", util::sprintf("%d", size));
     }
 
     output.flush(*stream);

@@ -65,7 +65,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
         herds_xml.display(*stream);
         
         if (optget("count", bool))
-            output.append("", util::sprintf("%d", herds_xml.size()));
+            output("", util::sprintf("%d", herds_xml.size()));
     }
 
     /* nope, so only display stats for specified herds */
@@ -105,7 +105,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
         }
 
         if (optget("count", bool))
-            output.append("", util::sprintf("%d", size));
+            output("", util::sprintf("%d", size));
     }
 
     output.flush(*stream);
