@@ -1,6 +1,19 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.0.2:
+    New features:
+     - --metadata now shows the package's HOMEPAGE (if it exists in the
+       ebuild).  Also shows the ebuild's DESCRIPTION if a longdesc is
+       unavailable in metadata.xml.
+     - Added --with-herd, a generalization of --no-herd (which is now
+       shorthand for --with-herd=no-herd) for only displaying developer's
+       packages that belong in the specified herd.
+
+    Bug fixes:
+     - Fixed bug where a std::runtime_error exception was thrown (and not
+       caught) if the LC_ALL env variable is set to an invalid locale.
+
 1.0.1:
     New features:
      - New --metadata option that displays metadata information for the

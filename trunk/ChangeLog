@@ -1,9 +1,26 @@
 ChangeLog for herdstat
 
+2005-03-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, bashcomp: Added --with-herd.
+	* src/util.cc, src/util.hh: Added a generic get_var() for retrieving
+	variables from files using rcfile_T. Modified portdir() to use it.
+	Added ebuild_which() which haphazardly tries to determine the latest
+	ebuild of a package (does a crappy job).  I'll write a real version
+	parser if 100% accuracy is needed.  Added get_ebuild_var() which uses
+	get_var() to retrieve a variable value from an ebuild.
+	* src/action_meta_handler.cc: Modified to show ebuild DESCRIPTION if
+	metadata longdesc is non-existent. Also show HOMEPAGE if non-empty.
+	* src/herdstat.cc: Catch std::runtime_error when trying to set a non-C
+	locale, print an error, and exit.
+	* src/options.cc, src/herdstat.cc, src/action_pkg_handler.cc: Added a
+	--with-herd option, a generalization of --no-herd.  --no-herd will be
+	kept around and will be considered shorthand for --with-herd=no-herd.
+
 2005-03-27 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.0.1-release).
-	* doc/herdstat.1.in: Updated for --metadata and --no-herd.
+	* doc/herdstat.1.in, bashcomp: Updated for --metadata and --no-herd.
 	* src/action_pkg_handler.cc, src/options.cc: Added --no-herd option
 	for only displaying packages in herd "no-herd".
 	* src/action_meta_handler.cc, src/action_meta_handler.hh: Added

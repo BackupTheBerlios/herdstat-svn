@@ -40,12 +40,95 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include "options.hh"
 #include "exceptions.hh"
 #include "util.hh"
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
+
+/* 
+ * Given the portdir, a package, and a variable name,
+ * try to retrieve the value of the specified variable
+ * from the ebuild.
+ */
+
+const char *
+util::get_ebuild_var(const std::string &portdir,
+		     const std::string &pkg,
+		     const std::string &var)
+{
+    return get_var(ebuild_which(portdir, pkg), var);
+}
+
+/*
+ * Given a file, return the value of the specified variable
+ * (if it exists). Variable will only be found if it's in
+ * the form of VAR=value or VAR="value".
+ */
+
+const char *
+util::get_var(const std::string &path, const std::string &var)
+{
+    if (path.empty() or var.empty())
+	return "";
+
+    std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
+    if (not (*f))
+	throw bad_fileobject_E(path);
+
+    std::string result;
+    rcfile_T rc(*f);
+    rcfile_T::rcfile_keys_T::iterator pos = rc.keys.find(var);
+    if (pos != rc.keys.end())
+	result = pos->second;
+
+    util::debug_msg("Retrieved %s from %s: '%s'", var.c_str(),
+	path.c_str(), result.c_str());
+
+    return result.c_str();
+}
+
+/*
+ * Do our best to guess the latest ebuild of the specified
+ * package. TODO: write an actual version parsing class since
+ * this often produces incorrect results.
+ */
+
+const char *
+util::ebuild_which(const std::string &portdir, const std::string &pkg)
+{
+    DIR *dir = NULL;
+    struct dirent *d = NULL;
+    const std::string path = portdir + "/" + pkg;
+    std::vector<std::string> ebuilds;
+    std::vector<std::string>::iterator e;
+
+    /* open package directory */
+    if (not (dir = opendir(path.c_str())))
+    {
+	std::cerr << "failed to open dir '" << path << "'." << std::endl;
+	return "";
+    }
+
+    /* read package directory looking for ebuilds */
+    while ((d = readdir(dir)))
+    {
+	char *s = NULL;
+	if ((s = std::strrchr(d->d_name, '.')))
+	    if (std::strcmp(++s, "ebuild") == 0)
+		ebuilds.push_back(path + "/" + d->d_name);
+    }
+
+    closedir(dir);
+
+    if (ebuilds.empty())
+	return "";
+
+    std::sort(ebuilds.begin(), ebuilds.end());
+    return ebuilds.back().c_str();
+}
 
 /*
  * Return a list of categories retrieved from PORTDIR/profiles/categories
@@ -247,28 +330,10 @@ util::portdir()
     std::string portdir;
 
     if (util::is_file(make_conf))
-    {
-	std::auto_ptr<std::ifstream> f(new std::ifstream(make_conf));
-	if (not (*f))
-	    throw bad_fileobject_E(make_conf);
-
-	util::rcfile_T rc(*f);
-	util::rcfile_keys_T::iterator pos = rc.keys.find("PORTDIR");
-	if (pos != rc.keys.end())
-	    portdir = pos->second;
-    }
+	portdir = get_var(make_conf, "PORTDIR");
 
     if (portdir.empty() and util::is_file(make_glob))
-    {
-	std::auto_ptr<std::ifstream> f(new std::ifstream(make_glob));
-	if (not (*f))
-	    throw bad_fileobject_E(make_glob);
-
-	util::rcfile_T rc(*f);
-	util::rcfile_keys_T::iterator pos = rc.keys.find("PORTDIR");
-	if (pos != rc.keys.end())
-	    portdir = pos->second;
-    }
+	portdir = get_var(make_glob, "PORTDIR");
 
     /* environment overrides all */
     char *result = getenv("PORTDIR");
@@ -545,4 +610,16 @@ util::rcfile_T::rcfile_T(std::ifstream &stream)
             keys[key] = val;
         }
     }
+
+//    if (optget("debug", bool))
+//        dump(std::cout);
+}
+
+void
+util::rcfile_T::dump(std::ostream &stream)
+{
+    rcfile_keys_T::iterator k;
+    for (k = keys.begin() ; k != keys.end() ; ++k)
+	stream << "Key: '" << k->first << "', Value: '" << k->second << "'."
+	    << std::endl;
 }

@@ -215,18 +215,30 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     herd_T::iterator d = handler->devs.find(*i + "@gentoo.org");
                     if (d == handler->devs.end())
                         continue;
-                    else if (optget("no-herd", bool))
-                    {
-                        if (not handler->herds.empty() and
-                                handler->herds.front() == "no-herd")
-                            found = true;
-                    }
                     else
                     {
-                        found = true;
-                        std::copy(d->second->begin(), d->second->end(), attr.begin());
-                        attr.name = dev_name(herds_xml, *i);
-                        attr.role = d->second->role;
+                        bool copy = false;
+                        if (not optget("with-herd", std::string).empty())
+                        {
+                            if (std::find(handler->herds.begin(),
+                                handler->herds.end(),
+                                optget("with-herd", std::string)) !=
+                                handler->herds.end())
+                            {
+                                copy = true;
+                            }
+                        }
+                        else
+                            copy = true;
+
+                        if (copy)
+                        {
+                            found = true;
+                            std::copy(d->second->begin(), d->second->end(),
+                                attr.begin());
+                            attr.name = dev_name(herds_xml, *i);
+                            attr.role = d->second->role;
+                        }
                     }
                 }
                 else
@@ -271,8 +283,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
         if (not quiet)
         {
-            output.endl();
-
             if (dev)
             {
                 if (attr.name.empty())
@@ -292,13 +302,21 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     output("Description", util::tidy_whitespace(herds_xml[*i]->desc));
             }
 
-            output(util::sprintf("Packages(%d)", pkgs.size()), "");
+            if (pkgs.empty())
+                output("Packages(0)", "none");
+            else
+                /* display first package on same line */
+                output(util::sprintf("Packages(%d)", pkgs.size()),
+                    pkgs.begin()->first);
         }
+        else if (not pkgs.empty())
+            output("", pkgs.begin()->first);
 
         /* display the category/package */
-        std::map<std::string, std::string>::iterator p;
+        std::map<std::string, std::string>::iterator p =
+            ( pkgs.empty() ? pkgs.begin() : ++(pkgs.begin()) );
         std::map<std::string, std::string>::size_type pn = 1;
-        for (p = pkgs.begin() ; p != pkgs.end() ; ++p, ++pn)
+        for ( ; p != pkgs.end() ; ++p, ++pn)
         {
             std::string longdesc;
             

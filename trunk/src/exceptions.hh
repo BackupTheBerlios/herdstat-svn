@@ -28,6 +28,7 @@
 #endif
 
 #include <exception>
+#include <stdexcept>
 #include <string>
 #include <cstdlib>
 #include <cstdarg>
@@ -37,7 +38,8 @@
 
 /* base exceptions */
 class herdstat_base_E                   : public std::exception { };
-class herdstat_base_bad_cast_E          : public std::bad_cast  { };
+class herdstat_base_bad_cast_E          : public std::bad_cast,
+                                                 herdstat_base_E  { };
 
 class herdstat_msg_base_E               : public herdstat_base_E
 {
@@ -155,8 +157,7 @@ class format_E                          : public herdstat_va_base_E
             str = util::sprintf(msg, v).c_str();
             va_end(v);
         }
-//        virtual const char *what() const throw() { return str; }
-    };
+};
 
 #endif
 

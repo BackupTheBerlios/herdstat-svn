@@ -56,6 +56,10 @@ enum color_name_T
 
 namespace util
 {
+    const char *get_ebuild_var(const std::string &, const std::string &,
+	const std::string &);
+    const char *ebuild_which(const std::string &, const std::string &);
+    const char *get_var(const std::string &, const std::string &);
     std::vector<std::string> get_categories(const std::string &);
     std::string lowercase(const std::string &);
     std::string tidy_whitespace(const std::string &);
@@ -113,11 +117,12 @@ namespace util
 	    std::string &operator[](color_name_T c) { return cmap[c]; }
     };
 
-    typedef std::map<std::string, std::string> rcfile_keys_T;
     class rcfile_T
     {
 	public:
+	    typedef std::map<std::string, std::string> rcfile_keys_T;
 	    rcfile_T(std::ifstream &);
+	    void dump(std::ostream &);
 	    rcfile_keys_T keys;
     };
 

@@ -54,13 +54,12 @@ get_possibles(const std::string &pkg)
 
     /* if category was specified, just check for existence */
     std::string::size_type pos = pkg.find('/');
-    if (pos != std::string::npos and util::is_dir(portdir + "/" + pkg))
+    if (pos != std::string::npos)
     {
-        pkgs.push_back(pkg);
+        if (util::is_dir(portdir + "/" + pkg))
+            pkgs.push_back(pkg);
         return pkgs;
     }
-    else if (pos != std::string::npos)
-        return pkgs;
 
     std::vector<std::string> categories = util::get_categories(portdir);
     std::vector<std::string>::iterator c;
@@ -107,7 +106,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
     if (optget("all", bool))
     {
-        std::cerr << "Package action handler does not support the 'all' target."
+        std::cerr << "Metadata action handler does not support the 'all' target."
             << std::endl;
         return EXIT_FAILURE;
     }
@@ -118,7 +117,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
     if (not util::is_dir(portdir))
         throw bad_fileobject_E(portdir);
 
-    /* for each specified package... */
+    /* for each specified package/category... */
     std::vector<std::string>::iterator i;
     std::vector<std::string>::size_type n = 1;
     for (i = pkgs.begin() ; i != pkgs.end() ; ++i, ++n)
@@ -179,6 +178,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             if (n != 1)
                 output.endl();
 
+            /* if no '/' exists, assume it's a category */
             if (possibles.front().find("/") == std::string::npos)
                 cat = true;
 
@@ -208,9 +208,28 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             else if (not cat and devs.empty())
                 output("Maintainers(0)", "none");
 
+            if (not cat)
+            {
+                /* HOMEPAGE */
+                std::string homepage = util::get_ebuild_var(portdir,
+                    possibles.front(), "HOMEPAGE");
+                if (not homepage.empty())
+                    output("Homepage", homepage);
+            }
+
             /* long description */
             if (longdesc.empty())
-                output("Description", "none");
+            {
+                if (not cat)
+                {
+                    /* ebuild's DESCRIPTION */
+                    longdesc = util::get_ebuild_var(portdir, possibles.front(),
+                        "DESCRIPTION");
+
+                    if (not longdesc.empty())
+                        output("Description", longdesc);
+                }
+            }
             else
                 output("Description", util::tidy_whitespace(longdesc));
         }

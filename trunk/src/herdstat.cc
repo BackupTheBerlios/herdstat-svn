@@ -73,6 +73,7 @@ static struct option long_opts[] =
     {"count",	    no_argument,	0,  'c'},
     {"nocolor",	    no_argument,	0,  'n'},
     {"no-herd",	    no_argument,	0,  '\n'},
+    {"with-herd",   required_argument,	0,  '\v'},
     /* force a fetch of herds.xml */
     {"fetch",	    no_argument,	0,  'f'},
     /* time how long it takes for XML parsing */
@@ -112,35 +113,36 @@ help()
 	<< "usage: " << PACKAGE << " [options] [args]" << std::endl
 
 #ifdef HAVE_GETOPT_LONG
-	<< " -h, --help            Display this help message." << std::endl
-	<< " -V, --version         Display version information." << std::endl
+	<< " -h, --help             Display this help message." << std::endl
+	<< " -V, --version          Display version information." << std::endl
 	<< std::endl
 	<< "Where [options] can be any of the following:" << std::endl
-	<< " -p, --package         Look up packages by herd." << std::endl
-	<< " -d, --dev             Look up herds by developer." << std::endl
-	<< " -m, --metadata        Look up metadata by package/category." << std::endl
-	<< " -H, --herdsxml <file> Specify location of herds.xml." << std::endl
-	<< " -o, --outfile  <file> Send output to the specified file" << std::endl
-	<< "                       instead of stdout." << std::endl
-	<< " -f, --fetch           Force a fetch of herds.xml." << std::endl
-	<< " -v, --verbose         Display verbose output." << std::endl
-	<< " -q, --quiet           Don't display labels and fancy colors. Use this"
+	<< " -p, --package          Look up packages by herd." << std::endl
+	<< " -d, --dev              Look up herds by developer." << std::endl
+	<< " -m, --metadata         Look up metadata by package/category." << std::endl
+	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
+	<< "                        display all packages that belong to the specified herd." << std::endl
+	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
+	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
+	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
+	<< "                        instead of stdout." << std::endl
+	<< " -f, --fetch            Force a fetch of herds.xml." << std::endl
+	<< " -v, --verbose          Display verbose output." << std::endl
+	<< " -q, --quiet            Don't display labels and fancy colors. Use this"
 	<< std::endl
-	<< "                       option to pipe herdstat output to other programs"
+	<< "                        option to pipe herdstat output to other programs"
 	<< std::endl
-	<< " -D, --debug           Display debugging messages." << std::endl
-	<< " -t, --timer           Display elapsed time of XML parsing." << std::endl
-	<< " -c, --count           Display the number of items instead of the" << std::endl
-	<< "                       items themself." << std::endl
-	<< " -n, --nocolor         Don't display colored output." << std::endl
-	<< "     --noherd          When used in conjunction with --package and --dev," << std::endl
-	<< "                       display all packages that have a herd of \"no-herd\"." << std::endl
+	<< " -D, --debug            Display debugging messages." << std::endl
+	<< " -t, --timer            Display elapsed time of XML parsing." << std::endl
+	<< " -c, --count            Display the number of items instead of the" << std::endl
+	<< "                        items themself." << std::endl
+	<< " -n, --nocolor          Don't display colored output." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
-	<< " default action        1 or more herds." << std::endl
-	<< " -p, --package         1 or more herds." << std::endl
-	<< " -d, --dev             1 or more developers." << std::endl
-	<< " -m, --metadata        1 or more categories/packages." << std::endl
+	<< " default action         1 or more herds." << std::endl
+	<< " -p, --package          1 or more herds." << std::endl
+	<< " -d, --dev              1 or more developers." << std::endl
+	<< " -m, --metadata         1 or more categories/packages." << std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl
 	<< "specified, " << PACKAGE << " will display all packages maintained by" << std::endl
@@ -244,7 +246,11 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		break;
 	    /* --no-herd */
 	    case '\n':
-		optset("no-herd", bool, true);
+		optset("with-herd", std::string, "no-herd");
+		break;
+	    /* --with-herd */
+	    case '\v':
+		optset("with-herd", std::string, optarg);
 		break;
 	    /* --fetch */
 	    case 'f':
@@ -488,7 +494,22 @@ main(int argc, char **argv)
 	    if (not *outstream)
 		throw bad_fileobject_E(optget("outfile", std::string));
 	    optset("outstream", std::ostream *, outstream);
-	    optset("locale", std::string, std::locale::classic().name());
+	}
+	else
+	{
+	    try
+	    {
+		optset("locale", std::string, std::locale("").name());
+	    }
+	    catch (const std::runtime_error)
+	    {
+		std::string error("Invalid locale");
+		result = getenv("LC_ALL");
+		if (result)
+		    error += " '" + std::string(result) + "'.";
+		std::cerr << error << std::endl;
+		return EXIT_FAILURE;
+	    }
 	}
 	
 	/* set locale */
