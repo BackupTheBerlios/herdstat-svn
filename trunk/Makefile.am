@@ -9,6 +9,7 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       config/* \
 		       config.h.in \
 		       stamp-h.in \
+		       html
 		       *~
 
 EXTRA_DIST = autogen.sh .todo bashcomp
