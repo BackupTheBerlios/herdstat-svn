@@ -1,7 +1,6 @@
 /*
  * herdstat -- src/util.hh
  * $Id$
-
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.

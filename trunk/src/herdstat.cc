@@ -54,7 +54,10 @@
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
 
-static const char *short_opts = "H:o:hVvDdtpq";
+static const std::string default_herdsxml =
+    "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
+
+static const char *short_opts = "H:o:hVvDdtpqf";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -64,6 +67,8 @@ static struct option long_opts[] =
     {"verbose",	    no_argument,	0,  'v'},
     {"quiet",	    no_argument,	0,  'q'},
     {"debug",	    no_argument,	0,  'D'},
+    /* force a fetch of herds.xml */
+    {"fetch",	    no_argument,	0,  'f'},
     /* time how long it takes for XML parsing */
     {"timer",	    no_argument,	0,  't'},
     /* instead of displaying devs for a herd, display herds for a dev */
@@ -108,6 +113,7 @@ help()
 	<< " -H, --herdsxml <file> Specify location of herds.xml." << std::endl
 	<< " -o, --outfile  <file> Send output to the specified file" << std::endl
 	<< "                       instead of stdout." << std::endl
+	<< " -f, --fetch           Force a fetch of herds.xml." << std::endl
 	<< " -v, --verbose         Display verbose output." << std::endl
 	<< " -q, --quiet           Don't display labels and fancy colors. Use this"
 	<< std::endl
@@ -134,6 +140,7 @@ help()
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
+	<< " -f              Force a fetch of herds.xml." << std::endl
 	<< " -v              Display verbose output." << std::endl
 	<< " -q              Don't display labels and fancy colors. Use this"
 	<< std::endl
@@ -193,6 +200,10 @@ handle_opts(int argc, char **argv, options_T *opts,
 		    opts->set_timer(false);
 		}
 		break;
+	    /* --fetch */
+	    case 'f':
+		opts->set_fetch(true);
+		break;
 	    /* --verbose */
 	    case 'v':
 		opts->set_verbose(true);
@@ -243,7 +254,8 @@ handle_opts(int argc, char **argv, options_T *opts,
 	while (optind < argc)
 	    args->push_back(argv[optind++]);
     }
-    else
+    /* --fetch is the only option that allows ZERO non-option args */
+    else if (not opts->fetch())
 	throw args_usage_E();
 
     return 0;
@@ -313,6 +325,10 @@ main(int argc, char **argv)
 	struct stat s;
 	try
 	{
+	    if (options.fetch() and
+		(options.herds_xml().find("://") == std::string::npos))
+		options.set_herds_xml(default_herdsxml);
+
 	    if (options.herds_xml().find("://") != std::string::npos)
 	    {
 		/* NOTE: ideally we'd love to only fetch it when the timestamp
@@ -327,7 +343,7 @@ main(int argc, char **argv)
 			<< std::endl << std::endl;
 		}
 
-		/* backup cached copy if it exists so we can possibly use it
+		/* backup cached copy if it exists so we can use it
 		 * if fetching fails */
 		if (util::is_file(fetched_location))
 		    util::copy_file(fetched_location, fetched_location + ".bak");
@@ -336,8 +352,9 @@ main(int argc, char **argv)
 		if (util::fetch(options.herds_xml(), fetched_location) != 0)
 		    throw fetch_E();
 
-		/* instead of wget failing if it can't fetch it, it'll write a
-		 * 0-byte file... make sure the file is greater than 0 bytes */
+		/* because we tell wget to clobber the file, if fetching fails for
+		 * some reason, it'll truncate the old one - make sure the file
+		 * is greater than 0 bytes */
 		if ((stat(fetched_location.c_str(), &s) == 0) and (s.st_size > 0))
 		    options.set_herds_xml(fetched_location);
 		else
@@ -373,9 +390,14 @@ main(int argc, char **argv)
 		std::cerr << std::endl;
 	}
 
+	/* make sure herds.xml exists */
 	if (not util::is_file(options.herds_xml()))
 	    throw bad_fileobject_E("%s: %s", options.herds_xml().c_str(),
 		strerror(errno));
+
+	/* if there's no nonoption args, we're done */
+	if (options.fetch() and nonopt_args.empty())
+	    return EXIT_SUCCESS;
 
 	std::auto_ptr<HerdsXMLHandler_T> handler(new HerdsXMLHandler_T());
 	try
@@ -407,6 +429,13 @@ main(int argc, char **argv)
 		    strerror(errno));
 	    options.set_outstream(outstream);
 	}
+
+	/* set common format attributes */
+	util::color_map_T color;
+	formatter_T output;
+	output.set_colors(true);
+	output.set_quiet(options.quiet());
+	output.set_labelcolor(color[green]);
 
 	/* set default action */
 	if (options.action() == action_unspecified)
