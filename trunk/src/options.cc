@@ -32,6 +32,7 @@ bool options_T::_timer = false;
 bool options_T::_verbose = false;
 bool options_T::_quiet = false;
 bool options_T::_all = false;
+bool options_T::_fetch = false;
 std::string::size_type options_T::_maxcol = 78;
 options_action_T options_T::_action = action_unspecified;
 std::string options_T::_herds_xml = 

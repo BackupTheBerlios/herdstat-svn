@@ -48,43 +48,47 @@ class options_T
         static bool _verbose;
         static bool _quiet;
         static bool _all;
+        static bool _fetch;
         static std::string::size_type _maxcol;
         static options_action_T _action;
         static std::ostream *_outstream;
 
     public:
-        void set_debug(bool value) { options_T::_debug = value; }
-        bool debug() const { return options_T::_debug; }
+        void set_debug(bool value) { _debug = value; }
+        bool debug() const { return _debug; }
 
-        void set_timer(bool value) { options_T::_timer = value; }
-        bool timer() const { return options_T::_timer; }
+        void set_timer(bool value) { _timer = value; }
+        bool timer() const { return _timer; }
 
-        void set_verbose(bool value) { options_T::_verbose = value; }
-        bool verbose() const { return options_T::_verbose; }
+        void set_verbose(bool value) { _verbose = value; }
+        bool verbose() const { return _verbose; }
 
-        void set_quiet(bool value) { options_T::_quiet = value; }
-        bool quiet() const { return options_T::_quiet; }
+        void set_quiet(bool value) { _quiet = value; }
+        bool quiet() const { return _quiet; }
 
-        void set_all(bool value) { options_T::_all = value; }
-        bool all() const { return options_T::_all; }
+        void set_all(bool value) { _all = value; }
+        bool all() const { return _all; }
 
-        void set_maxcol(std::string::size_type value) { options_T::_maxcol = value - 2; }
-        std::string::size_type maxcol() const { return options_T::_maxcol; }
+        void set_fetch(bool value) { _fetch = value; }
+        bool fetch() const { return _fetch; }
 
-        void set_action(options_action_T value) { options_T::_action = value; }
-        options_action_T action() const { return options_T::_action; }
+        void set_maxcol(std::string::size_type value) { _maxcol = value - 2; }
+        std::string::size_type maxcol() const { return _maxcol; }
 
-        void set_herds_xml(const std::string &value) { options_T::_herds_xml = value; }
-        const std::string &herds_xml() const { return options_T::_herds_xml; }
+        void set_action(options_action_T value) { _action = value; }
+        options_action_T action() const { return _action; }
 
-        void set_portdir(const std::string &value) { options_T::_portdir = value; }
-        const std::string &portdir() const { return options_T::_portdir; }
+        void set_herds_xml(const std::string &value) { _herds_xml = value; }
+        const std::string &herds_xml() const { return _herds_xml; }
 
-        void set_outfile(const std::string &value) { options_T::_outfile = value; }
-        const std::string &outfile() const { return options_T::_outfile; }
+        void set_portdir(const std::string &value) { _portdir = value; }
+        const std::string &portdir() const { return _portdir; }
 
-        void set_outstream(std::ostream *stream) { options_T::_outstream = stream; }
-        std::ostream *outstream() const { return options_T::_outstream; }
+        void set_outfile(const std::string &value) { _outfile = value; }
+        const std::string &outfile() const { return _outfile; }
+
+        void set_outstream(std::ostream *stream) { _outstream = stream; }
+        std::ostream *outstream() const { return _outstream; }
 };
 
 #endif
