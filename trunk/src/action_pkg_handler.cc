@@ -189,14 +189,14 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         metadatas_T::iterator m;
         for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
         {
+            if (status)
+                ++progress;
+
             /* unfortunately, we still have to do a sanity check in the event
              * that the user has sync'd, a metadata.xml has been removed, and
              * the cache not yet updated ; otherwise we'll get a parser error */
             if (not util::is_file(*m))
                 continue;
-
-            if (status)
-                ++progress;
 
             try
             {
@@ -215,6 +215,12 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     herd_T::iterator d = handler->devs.find(*i + "@gentoo.org");
                     if (d == handler->devs.end())
                         continue;
+                    else if (optget("no-herd", bool))
+                    {
+                        if (not handler->herds.empty() and
+                                handler->herds.front() == "no-herd")
+                            found = true;
+                    }
                     else
                     {
                         found = true;

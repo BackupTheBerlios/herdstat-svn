@@ -2,8 +2,11 @@ ChangeLog for herdstat
 
 2005-03-27 Aaron Walker <ka0ttic@gentoo.org>
 
+	* doc/herdstat.1.in: Updated for --metadata and --no-herd.
+	* src/action_pkg_handler.cc, src/options.cc: Added --no-herd option
+	for only displaying packages in herd "no-herd".
 	* src/action_meta_handler.cc, src/action_meta_handler.hh: Added
-	metadata handler for looking up package metadata.
+	metadata handler for looking up package/category metadata (--metadata).
 	* src/options.cc: Added 'parse herds.xml' option since
 	action_meta_handler will not need to parse herds.xml. Also added
 	action_meta to action_options_T.

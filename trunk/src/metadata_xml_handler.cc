@@ -24,11 +24,14 @@
 # include "config.h"
 #endif
 
+#include "util.hh"
 #include "devs.hh"
+#include "options.hh"
 #include "metadata_xml_handler.hh"
 
 bool
-MetadataXMLHandler_T::start_element(const std::string &name, const attrs_type &)
+MetadataXMLHandler_T::start_element(const std::string &name,
+                                    const attrs_type &attrs)
 {
     if (name == "herd")
         in_herd = true;
@@ -41,7 +44,19 @@ MetadataXMLHandler_T::start_element(const std::string &name, const attrs_type &)
     else if (name == "description")
         in_desc = true;
     else if (name == "longdescription")
-        in_longdesc = true;
+    {
+        std::string locale = optget("locale", std::string);
+        attrs_type::const_iterator pos = attrs.find("lang");
+        if (pos != attrs.end())
+        {
+            if (pos->second == locale.substr(0,2))
+                in_longdesc = true;
+            else if (locale == "C" and pos->second == "en")
+                in_longdesc = true;
+        }
+        else
+            in_longdesc = true;
+    }
 
     return true;
 }

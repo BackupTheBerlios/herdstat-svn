@@ -72,6 +72,7 @@ static struct option long_opts[] =
     {"debug",	    no_argument,	0,  'D'},
     {"count",	    no_argument,	0,  'c'},
     {"nocolor",	    no_argument,	0,  'n'},
+    {"no-herd",	    no_argument,	0,  '\n'},
     /* force a fetch of herds.xml */
     {"fetch",	    no_argument,	0,  'f'},
     /* time how long it takes for XML parsing */
@@ -132,11 +133,14 @@ help()
 	<< " -c, --count           Display the number of items instead of the" << std::endl
 	<< "                       items themself." << std::endl
 	<< " -n, --nocolor         Don't display colored output." << std::endl
+	<< "     --noherd          When used in conjunction with --package and --dev," << std::endl
+	<< "                       display all packages that have a herd of \"no-herd\"." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action        1 or more herds." << std::endl
 	<< " -p, --package         1 or more herds." << std::endl
 	<< " -d, --dev             1 or more developers." << std::endl
+	<< " -m, --metadata        1 or more categories/packages." << std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl
 	<< "specified, " << PACKAGE << " will display all packages maintained by" << std::endl
@@ -169,6 +173,7 @@ help()
 	<< " default action  1 or more herds." << std::endl
 	<< " -p              1 or more herds." << std::endl
 	<< " -d              1 or more developers." << std::endl
+	<< " -m              1 or more categories/packages." << std::endl
 	<< "Both the default action and the -d action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both -d and -p are specified," << std::endl
 	<< PACKAGE << " will display all packages maintained by the specified" << std::endl
@@ -236,6 +241,10 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		    optset("quiet", bool, true);
 		    optset("timer", bool, false);
 		}
+		break;
+	    /* --no-herd */
+	    case '\n':
+		optset("no-herd", bool, true);
 		break;
 	    /* --fetch */
 	    case 'f':

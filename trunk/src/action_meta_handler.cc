@@ -52,9 +52,6 @@ get_possibles(const std::string &pkg)
     std::vector<std::string> pkgs;
     std::string portdir = optget("portdir", std::string);
 
-    std::vector<std::string>::iterator c;
-    std::vector<std::string> categories = util::get_categories(portdir);
-    
     /* if category was specified, just check for existence */
     std::string::size_type pos = pkg.find('/');
     if (pos != std::string::npos and util::is_dir(portdir + "/" + pkg))
@@ -62,10 +59,20 @@ get_possibles(const std::string &pkg)
         pkgs.push_back(pkg);
         return pkgs;
     }
+    else if (pos != std::string::npos)
+        return pkgs;
 
+    std::vector<std::string> categories = util::get_categories(portdir);
+    std::vector<std::string>::iterator c;
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         std::string path = portdir + "/" + (*c);
+
+        if (*c == pkg)
+        {
+            pkgs.push_back(*c);
+            return pkgs;
+        }
 
         /* open category */
         DIR *dir = opendir(path.c_str());
@@ -88,16 +95,15 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                                     std::vector<std::string> &pkgs)
 {
     util::color_map_T color;
-
-    std::ostream *stream = optget("outstream", std::ostream *);
-
     formatter_T output;
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_quiet(false);
     output.set_attrs();
 
-    std::string portdir = util::portdir();
+    /* we dont care about these */
+    optset("verbose", bool, false);
+    optset("timer", bool, false);
 
     if (optget("all", bool))
     {
@@ -107,6 +113,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
     }
 
     /* check PORTDIR */
+    std::string portdir = util::portdir();
     optset("portdir", std::string, portdir);
     if (not util::is_dir(portdir))
         throw bad_fileobject_E(portdir);
@@ -116,29 +123,34 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
     std::vector<std::string>::size_type n = 1;
     for (i = pkgs.begin() ; i != pkgs.end() ; ++i, ++n)
     {
+        bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
         std::vector<std::string> possibles = get_possibles(*i);
-        std::string longdesc;
+        std::string longdesc, metadata;
 
         /* is there more than one package with that name? */
         if (possibles.size() > 1)
         {
-            *stream << *i << " is ambiguous.  Possible matches are:"
-                << std::endl << std::endl;
+            std::cerr << *i << " is ambiguous." << std::endl << std::endl
+                << "Possible matches: " << std::endl;
 
             std::vector<std::string>::iterator p;
             for (p = possibles.begin() ; p != possibles.end() ; ++p)
-                *stream << "  " << color[green] << *p << color[none] << std::endl;
+                std::cerr << "   " << color[green] << *p << color[none] << std::endl;
 
+            return EXIT_FAILURE;
+        }
+        else if (possibles.empty() and pkgs.size() == 1)
+        {
+            std::cerr << *i << " does not seem to exist." << std::endl;
             return EXIT_FAILURE;
         }
         /* or none perhaps? */
         else if (possibles.empty())
         {
-            std::cerr << "Package '" << *i
-                << "' does not seem to exist." << std::endl;
-            return EXIT_FAILURE;
+            std::cerr << *i << "' does not seem to exist." << std::endl << std::endl;
+            continue;
         }
 
         if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
@@ -164,39 +176,52 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                 return EXIT_FAILURE;
             }
 
-            output("Package", possibles.front());
+            if (n != 1)
+                output.endl();
+
+            if (possibles.front().find("/") == std::string::npos)
+                cat = true;
+
+            if (cat)
+                output("Category", possibles.front());
+            else
+                output("Package", possibles.front());
 
             /* herds */
-            if (not herds.empty() or (herds.front() != "no-herd"))
+            if (not cat and (herds.empty() or (herds.front() == "no-herd")))
+                output("Herds(0)", "none");
+            else if (not herds.empty())
                 output(util::sprintf("Herds(%d)", herds.size()), herds);
 
             /* devs */
-            if (devs.size() == 1)
-                output(util::sprintf("Maintainers(%d)", devs.size()),
-                    devs.keys());
-            else if (devs.size() > 1)
-            {
+            if (devs.size() >= 1)
                 output(util::sprintf("Maintainers(%d)", devs.size()),
                     devs.keys().front());
-
+            
+            if (devs.size() > 1)
+            {
                 std::vector<std::string> dev_keys(devs.keys());
                 std::vector<std::string>::iterator d;
                 for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
                     output("", *d);
             }
+            else if (not cat and devs.empty())
+                output("Maintainers(0)", "none");
 
             /* long description */
-            if (not longdesc.empty())
+            if (longdesc.empty())
+                output("Description", "none");
+            else
                 output("Description", util::tidy_whitespace(longdesc));
         }
         else
-            output("", "No metadata.xml");
-
-        if (n != pkgs.size())
-            output.endl();
+        {
+            output("Package", possibles.front());
+            output("", "No metadata.xml.");
+        }
     }
 
-    output.flush(*stream);
+    output.flush(*optget("outstream", std::ostream *));
     return EXIT_SUCCESS;
 }
 

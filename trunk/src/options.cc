@@ -54,6 +54,7 @@ options_T::option_map_T::set_defaults()
     insert_opt("count", false);
     insert_opt("color", true);
     insert_opt("parse herds.xml", true);
+    insert_opt("no-herd", false);
 
     insert_opt("maxcol", static_cast<std::size_t>(78));
 

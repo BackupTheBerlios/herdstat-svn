@@ -44,6 +44,7 @@ class MetadataXMLHandler_T : public XMLHandler_T
         bool in_name;
         bool in_desc;
         bool in_longdesc;
+        bool found_lang;
 
         std::string cur_dev;
 

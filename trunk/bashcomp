@@ -9,7 +9,7 @@ _herdstat() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -V --version -p --package -d --dev -H --herdsxml
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
-        -f --fetch -c --count -n --nocolor"
+        -f --fetch -c --count -n --nocolor --no-herd -m --metadata"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -27,14 +27,24 @@ _herdstat() {
 	    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    ;;
 	*)
-	    local x dev=0 pkg=0
+	    local x dev=0 pkg=0 meta=0
 	    for x in ${COMP_WORDS[@]} ; do
+                # dev
 		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
 		    dev=1
                 fi
+
+                # package
                 if [[ ${x} == -*p* ]] ; then
                     pkg=1
 		fi
+
+                # metadata
+                if [[ ${x} == *m* && ${x} != "--timer" ]] && \
+                   [[ ${x} != "--herdsxml" ]]
+                then
+                    meta=1
+                fi
 	    done
 
 	    if [[ ${dev} -eq 1 && ${pkg} -eq 1 ]] ; then
@@ -46,6 +56,11 @@ _herdstat() {
             elif [[ ${pkg} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts}" \
                     -- ${cur}) )
+            elif [[ ${meta} -eq 1 ]] ; then
+                _pkgname -A $cur
+
+                local p=$(_portdir)
+                COMPREPLY=( ${COMPREPLY[@]} $(< ${portdir}/categories) )
 	    else
 		COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" \
                     -- ${cur}) )
