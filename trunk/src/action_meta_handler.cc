@@ -190,11 +190,10 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             std::vector<std::string>::iterator p;
             for (p = possibles.begin() ; p != possibles.end() ; ++p)
             {
-                std::cerr << "   "
-                    << (quiet ? "" : color[green])
-                    << *p
-                    << (quiet ? "" : color[none])
-                    << std::endl;
+                if (quiet or not optget("color", bool))
+                    std::cerr << "   " << *p << std::endl;
+                else
+                    std::cerr << "   " << color[green] << *p << color[none] << std::endl;
             }
 
             return EXIT_FAILURE;
