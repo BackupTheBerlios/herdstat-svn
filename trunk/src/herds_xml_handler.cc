@@ -83,7 +83,7 @@ HerdsXMLHandler_T::text(const std::string &str)
 
     /* <herd><description> */
     else if (in_herd_desc)
-        herds[cur_herd]->desc = util::collapse_whitespace(str);
+        herds[cur_herd]->desc = util::tidy_whitespace(str);
 
     /* <herd><email> */
     else if (in_herd_email)
@@ -110,7 +110,7 @@ HerdsXMLHandler_T::text(const std::string &str)
         herd_T::iterator i = herds[cur_herd]->find(cur_dev);
         if (i == herds[cur_herd]->end())
             return false;
-        i->second->push_back(str);
+        i->second->name = str;
     }
 
     /* <maintainer><role> */
@@ -119,7 +119,7 @@ HerdsXMLHandler_T::text(const std::string &str)
         herd_T::iterator i = herds[cur_herd]->find(cur_dev);
         if (i == herds[cur_herd]->end())
             return false;
-        i->second->push_back(str);
+        i->second->role = str;
     }
 
     return true;
