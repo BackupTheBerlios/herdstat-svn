@@ -30,6 +30,12 @@
 #include "devs.hh"
 #include "xmlparser.hh"
 
+/*
+ * Even though technically a herd is a group of packages, and not
+ * developers, they are represented as groups of developers here,
+ * with a couple attributes a herd would have (name, desc, etc).
+ */
+
 class herd_T  : public std::map<std::string, dev_attrs_T * >
 {
     public:

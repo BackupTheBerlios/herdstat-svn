@@ -44,6 +44,40 @@
 std::map<color_name_T, std::string> util::color_map_T::cmap;
 
 /*
+ * Try to determine user.  This is used for hilighting occurrences
+ * of the user's username in ouput.  ECHANGELOG_USER is checked first
+ * since a developer might use a different username than what his
+ * developer username is.
+ */
+std::string
+util::current_user()
+{
+    std::string user;
+    std::string::size_type pos;
+
+    char *result = getenv("ECHANGELOG_USER");
+    if (result)
+    {
+	user = result;
+	if ((pos = user.find("<")) != std::string::npos)
+	{
+	    user = user.substr(pos + 1);
+	    if ((pos = user.find(">")) != std::string::npos)
+		user = user.substr(0, pos);
+	}
+	else
+	    user.clear();
+    }
+    else
+    {
+	if ((result = getenv("USER")))
+	    user = result;
+    }
+
+    return (user.empty() ? "nobody" : user);
+}
+
+/*
  * Try to determine the columns of the current terminal; use
  * a sensible default if we can't get it for some reason.
  */

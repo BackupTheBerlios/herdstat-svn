@@ -143,6 +143,13 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     output.set_labelcolor(color[green]);
     output.set_attrs();
 
+    /* before trying to get a list of metadatas, see if the herd even exists */
+    if (herds.size() == 1 and not herds_xml.exists(herds[0]))
+    {
+        std::cerr << "Herd '" << herds[0] << "' doesn't seem to exist." << std::endl;
+        throw herd_E();
+    }
+
     if (not options.quiet())
         std::cout << "Parsing metadata.xml's (this may take a while)..."
             << std::endl;
@@ -188,7 +195,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     {
         std::map<std::string, std::string> pkgs;
 
-        /* does the herd exist? */
         if (not herds_xml.exists(*herd))
         {
             std::cerr << color[red] << "Herd '" << *herd
@@ -196,8 +202,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
             /* if the user specified more than one herd, then just print
              * the error and keep going; otherwise, we want to exit with
-             * an error code
-             */
+             * an error code */
             if (herds.size() > 1)
             {
                 std::cerr << std::endl;

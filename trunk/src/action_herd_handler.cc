@@ -76,19 +76,22 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
             /* does the herd exist? */
             if (not herds_xml.exists(*herd))
             {
-                std::cerr << color[red] << "Herd '" << *herd
-                    << "' doesn't seem to exist." << color[none] << std::endl;
-
                 /* if the user specified more than one herd, then just print
                  * the error and keep going; otherwise, we want to exit with
                  * an error code */
                 if (herds.size() > 1)
                 {
+                    std::cerr << color[red] << "Herd '" << *herd
+                        << "' doesn't seem to exist." << color[none] << std::endl;
                     std::cerr << std::endl;
                     continue;
                 }
                 else
+                {
+                    std::cerr << "Herd '" << *herd << "' doesn't seem to exist."
+                        << std::endl;
                     throw herd_E();
+                }
             }
 
             herds_xml[*herd]->display(std::cout);

@@ -46,17 +46,14 @@
 void
 show_all_devs(herds_T &herds)
 {
-    formatter_T out;
-    util::color_map_T color;
-    
     herd_T devs;
-    herd_T::iterator d;
 
     /* for each herd in herds.xml... */
     herds_T::iterator h;
     for (h = herds.begin() ; h != herds.end() ; ++h)
     {
         /* for each developer in that herd... */
+        herd_T::iterator d;
         for (d = h->second->begin() ; d != h->second->end() ; ++d)
         {
             /* if the developer is not already in our list, add it */
@@ -65,21 +62,7 @@ show_all_devs(herds_T &herds)
         }
     }
 
-    /* get a sorted vector */
-    std::vector<std::string> sorted_devs;
-    for (d = devs.begin() ; d != devs.end() ; ++d)
-        sorted_devs.push_back(d->first);
-    std::sort(sorted_devs.begin(), sorted_devs.end());
-
-    if (options.verbose())
-    {
-        out.append(util::sprintf("Developers(%d)", devs.size()), "");
-
-        std::vector<std::string>::iterator i;
-        for (i = sorted_devs.begin() ; i != sorted_devs.end() ; ++i)
-        {
-            out.append("", *i);
-        }
+    devs.display(std::cout);
 }
 
 /*
@@ -96,7 +79,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     
     /* set format attributes */
     formatter_T output;
-    output.set_maxlabel(10);
+    output.set_maxlabel(16);
     output.set_maxdata(options.maxcol() - output.maxlabel());
     output.set_colors(true);
     output.set_labelcolor(color[green]);
@@ -106,89 +89,92 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     if (devs[0] == "all")
         show_all_devs(herds_xml);
 
-    /* for each specified dev... */
-    std::vector<std::string>::iterator dev;
-    std::vector<std::string>::size_type n = 0;
-    for (dev = devs.begin() ; dev != devs.end() ; ++dev)
+    else
     {
-        std::vector<std::string> herds;
-
-        /* for each herd in herds.xml... */
-        herds_T::iterator h;
-        herds_T::size_type nherd = 0;
-        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        /* for each specified dev... */
+        std::vector<std::string>::iterator dev;
+        std::vector<std::string>::size_type n = 0;
+        for (dev = devs.begin() ; dev != devs.end() ; ++dev)
         {
-            std::string herd = h->first;
+            std::vector<std::string> herds;
 
-            /* is the dev in the current herd? */
-            herd_T::iterator d = herds_xml[herd]->find(*dev + "@gentoo.org");
-            if (d != herds_xml[herd]->end())
-                herds.push_back(herd);
-            else
+            /* for each herd in herds.xml... */
+            herds_T::iterator h;
+            herds_T::size_type nherd = 0;
+            for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
             {
-                /* there have been cases where the dev put just their
-                 * nick instead of their full email address             */
-                d = herds_xml[herd]->find(*dev);
+                std::string herd = h->first;
+
+                /* is the dev in the current herd? */
+                herd_T::iterator d = herds_xml[herd]->find(*dev + "@gentoo.org");
                 if (d != herds_xml[herd]->end())
                     herds.push_back(herd);
-            }
-        }
-
-        /* was the dev in any of the herds? */
-        if (herds.empty())
-        {
-            std::cerr << color[red] << "'" << *dev << "' doesn't seem to "
-                << "belong to any herds." << color[none] << std::endl;
-
-            if (devs.size() == 1)
-                throw dev_E();
-        }
-        else
-        {
-            if (not options.quiet())
-            {
-                output.append("Developer", *dev);
-
-                if (options.verbose())
+                else
                 {
-                    output.append(util::sprintf("Herds(%d)", herds.size()), "");
+                    /* there have been cases where the dev put just their
+                     * nick instead of their full email address             */
+                    d = herds_xml[herd]->find(*dev);
+                    if (d != herds_xml[herd]->end())
+                        herds.push_back(herd);
+                }
+            }
 
-                    std::vector<std::string>::iterator i;
-                    for (i = herds.begin() ; i != herds.end() ; ++i)
+            /* was the dev in any of the herds? */
+            if (herds.empty())
+            {
+                std::cerr << color[red] << "'" << *dev << "' doesn't seem to "
+                    << "belong to any herds." << color[none] << std::endl;
+
+                if (devs.size() == 1)
+                    throw dev_E();
+            }
+            else
+            {
+                if (not options.quiet())
+                {
+                    output.append("Developer", *dev);
+
+                    if (options.verbose())
                     {
-                        /* display herd */
-                        output.append("", color[blue] + (*i) + color[none]);
-                        /* display herd info */
-                        if (not herds_xml[*i]->mail.empty())
-                            output.append("", herds_xml[*i]->mail);
-                        if (not herds_xml[*i]->desc.empty())
-                            output.append("", herds_xml[*i]->desc);
+                        output.append(util::sprintf("Herds(%d)", herds.size()), "");
 
-                        if (++nherd != herds.size())
-                            output.endl();
+                        std::vector<std::string>::iterator i;
+                        for (i = herds.begin() ; i != herds.end() ; ++i)
+                        {
+                            /* display herd */
+                            output.append("", color[blue] + (*i) + color[none]);
+                            /* display herd info */
+                            if (not herds_xml[*i]->mail.empty())
+                                output.append("", herds_xml[*i]->mail);
+                            if (not herds_xml[*i]->desc.empty())
+                                output.append("", herds_xml[*i]->desc);
+
+                            if (++nherd != herds.size())
+                                output.endl();
+                        }
+                    }
+                    else
+                    {
+                        output.append(util::sprintf("Herds(%d)", herds.size()),
+                            herds);
                     }
                 }
                 else
                 {
-                    output.append(util::sprintf("Herds(%d)", herds.size()),
-                        herds);
+                    std::vector<std::string>::iterator i;
+                    for (i = herds.begin() ; i != herds.end() ; ++i)
+                        std::cout << *i << std::endl;
                 }
             }
-            else
-            {
-                std::vector<std::string>::iterator i;
-                for (i = herds.begin() ; i != herds.end() ; ++i)
-                    std::cout << *i << std::endl;
-            }
-        }
 
-        /* skip a line if we're not displaying the last one */
-        if (++n != devs.size())
-        {
-            if (options.quiet())
-                std::cout << std::endl;
-            else
-                output.endl();
+            /* skip a line if we're not displaying the last one */
+            if (++n != devs.size())
+            {
+                if (options.quiet())
+                    std::cout << std::endl;
+                else
+                    output.endl();
+            }
         }
     }
 

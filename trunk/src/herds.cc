@@ -48,22 +48,8 @@ herd_T::display(std::ostream &stream)
     formatter_T out;
     util::color_map_T color;
 
-    /* if ECHANGELOG_USER is set try to get the dev email
-     * so we can highlight it if it occurs in the output  */
-    std::string user;
+    std::string user = util::current_user();
     std::string::size_type oldlen = 0;
-    char *result = getenv("ECHANGELOG_USER");
-    if (result)
-    {
-        user = result;
-        std::string::size_type pos = user.find("<");
-        if (pos != std::string::npos)
-            user = user.substr(pos + 1);
-
-        pos = user.find(">");
-        if (pos != std::string::npos)
-            user = user.substr(0, pos);
-    }
 
     /* sort devs */
     std::vector<std::string> sorted_devs;
@@ -96,7 +82,8 @@ herd_T::display(std::ostream &stream)
 
     if (not options.quiet())
     {
-        out.append("Herd", name);
+        if (not name.empty())
+            out.append("Herd", name);
         if (not mail.empty())
             out.append("Email", mail);
         if (not desc.empty())

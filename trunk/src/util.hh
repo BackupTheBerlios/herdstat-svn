@@ -56,6 +56,7 @@ enum color_name_T
 
 namespace util
 {
+    std::string current_user();
     std::string::size_type getcols();
     const char *portdir();
     int fetch(const std::string &, const std::string &);
