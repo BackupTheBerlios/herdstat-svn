@@ -314,7 +314,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 output(util::sprintf("Packages(%d)", pkgs.size()),
                     pkgs.begin()->first);
         }
-        else if (not pkgs.empty())
+        else if (not pkgs.empty() and not count)
             output("", pkgs.begin()->first);
 
         /* display the category/package */
