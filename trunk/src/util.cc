@@ -416,12 +416,11 @@ void
 util::copy_file(const std::string &from, const std::string &to)
 {
     /* remove to if it exists */
-    if (util::is_file(to))
-	if (unlink(to.c_str()) != 0)
-	    throw bad_fileobject_E(to);
+    if (util::is_file(to) and (unlink(to.c_str()) != 0))
+	throw bad_fileobject_E(to);
 
     std::auto_ptr<std::ifstream> ffrom(new std::ifstream(from.c_str()));
-    std::auto_ptr<std::ostream> fto(new std::ofstream(to.c_str()));
+    std::auto_ptr<std::ofstream> fto(new std::ofstream(to.c_str()));
 
     if (not (*ffrom))
 	throw bad_fileobject_E(from);
@@ -431,9 +430,9 @@ util::copy_file(const std::string &from, const std::string &to)
     util::debug_msg("copying file '%s' to '%s'", from.c_str(), to.c_str());
 
     /* read from ffrom and write to fto */
-    std::string s;
-    while (std::getline(*ffrom, s))
-	*fto << s << std::endl;
+    std::copy(std::istream_iterator<std::string>(*ffrom),
+	std::istream_iterator<std::string>(),
+	std::ostream_iterator<std::string>(*fto, "\n"));
 }
 
 /*

@@ -5,6 +5,9 @@ ChangeLog for herdstat
 	* src/cache.hh: Added new cache_T class, broken out from the caching
 	code in metadatas.cc.
 	* src/metadatas.cc: Use cache_T.
+	* src/util.cc: Modified copy_file to use istream/ostream_iterator's.
+	* src/categories.hh: Using cache_T, categories_T is now even more
+	trivial, as the categories file is really just a manual cache.
 
 2005-04-02 Aaron Walker <ka0ttic@gentoo.org>
 

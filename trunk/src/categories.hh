@@ -32,33 +32,26 @@
 #include <vector>
 #include <memory>
 
+#include "cache.hh"
 #include "util.hh"
 #include "exceptions.hh"
+
+#define CATEGORIES "/profiles/categories"
 
 /*
  * categories_T represents a list of portage categories.
  */
 
-class categories_T : public std::vector<std::string>
+class categories_T : public cache_T<std::string>
 {
-    private:
-        void get_categories(const std::string &portdir)
-        {
-            const std::string path = portdir + "/profiles/categories";
-            std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
-            if (not (*f))
-                throw bad_fileobject_E(path);
-
-            std::string line;
-            while (std::getline(*f, line))
-                /* a nasty hack for a nasty hack */
-                if (line != "virtual")
-                    push_back(line);
-        }
-
     public:
-        categories_T() { get_categories(util::portdir()); }
-        categories_T(const std::string &portdir) { get_categories(portdir); }
+        categories_T()
+            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES) { }
+        categories_T(const std::string &portdir)
+            : cache_T<std::string>(portdir + CATEGORIES)
+        {
+            this->read();
+        }
 };
 
 #endif

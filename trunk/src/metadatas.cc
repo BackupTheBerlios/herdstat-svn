@@ -70,7 +70,7 @@ metadatas_T::metadatas_T(const std::string &p)
  */
 
 bool
-metadatas_T::valid()
+metadatas_T::valid() const
 {
     struct stat s;
     bool valid = false;

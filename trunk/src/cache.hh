@@ -66,7 +66,7 @@ class cache_T
                 std::istream_iterator<T>(), std::back_inserter(_cache));
         }
 
-        void write()
+        void write() const
         {
             std::auto_ptr<std::ofstream> f(new std::ofstream(_file.c_str()));
             if (not (*f))
@@ -76,8 +76,8 @@ class cache_T
                 std::ostream_iterator<T>(*f, "\n"));
         }
 
-        virtual bool valid() = 0;
-        virtual void fill()  = 0;
+        virtual bool valid() const { return true; }
+        virtual void fill() { }
 };
 
 #endif

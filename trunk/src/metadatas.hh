@@ -55,7 +55,7 @@ class metadatas_T : public cache_T<std::string>
     public:
         metadatas_T(const std::string &portdir);
 
-        virtual bool valid();
+        virtual bool valid() const;
         virtual void fill();
 };
 
