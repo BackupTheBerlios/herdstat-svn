@@ -34,21 +34,18 @@ _herdstat() {
             [[ -d ${p} ]] || return 0
 
             if [[ ${cur} == */* ]] ; then
-                words=$(builtin cd ${p}; compgen -G "${cur}*" | ${sedcmd})
+                words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+            elif [[ ${cur} == "" ]] ; then
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
+                       $(builtin cd ${p} ; compgen -G "*-*")"
             else
-                local ww=$(builtin cd ${p}; compgen -X "!*-*" -S '/' -G "${cur}*" | ${sedcmd})
-                ww="${ww} $(builtin cd ${p}; compgen -X "!*-*" -G "${cur}*" | ${sedcmd})"
-
-                local w
-                for x in ${ww} ; do
-                    w="${x}\n${w}"
-                done
-
-                words=$(echo -e ${w} | uniq)
-                [ $(echo "${words}" | ${grepcmd} | wc -l) = 1 ] && \
-                    words=$(builtin cd ${p}; compgen -G "*/*" | ${sedcmd})
+                words="$(builtin cd ${p} ; compgen -S '/' -G "${cur}*") \
+                        $(builtin cd ${p} ; compgen -G "${cur}*")"
             fi
-            COMPREPLY=($(echo "${words}" | ${grepcmd}))
+
+            COMPREPLY=($(for x in ${words} ; do \
+                            [[ ${x} == ${cur}* ]] && echo ${x} ; \
+                        done))
 
             if [[ -z "${COMPREPLY}" ]] ; then
                 COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
@@ -94,25 +91,24 @@ _herdstat() {
                 [[ -d ${p} ]] || return 0
 
                 if [[ ${cur} == */* ]] ; then
-                    words=$(builtin cd ${p}; compgen -G "${cur}*" | ${sedcmd})
+                    words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+                elif [[ ${cur} == "" ]] ; then
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
+                       $(builtin cd ${p} ; compgen -G "*-*")"
                 else
-                    local ww=$(builtin cd ${p}; compgen -X "!*-*" -S '/' -G "${cur}*" | ${sedcmd})
-                    ww="${ww} $(builtin cd ${p}; compgen -X "!*-*" -G "${cur}*" | ${sedcmd})"
-
-                    local w
-                    for x in ${ww} ; do w="${x}\n${w}"; done
-
-                    words=$(echo -e ${w} | uniq)
-                    [ $(echo "${words}" | ${grepcmd} | wc -l) = 1 ] && \
-                        words=$(builtin cd ${p}; compgen -G "*/*" | ${sedcmd})
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "${cur}*") \
+                        $(builtin cd ${p} ; compgen -G "${cur}*")"
                 fi
-                COMPREPLY=($(echo "${words}" | ${grepcmd}))
+
+                COMPREPLY=($(for x in ${words} ; do \
+                            [[ ${x} == ${cur}* ]] && echo ${x} ; \
+                        done))
 
                 if [[ -z "${COMPREPLY}" ]] ; then
                     COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
-                    for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                        for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
                     done)" -- $cur) )
-                fi
+            fi
 	    else
 		COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" \
                     -- ${cur}) )
