@@ -25,7 +25,9 @@
 #endif
 
 #include <fstream>
+#include <algorithm>
 #include <memory>
+#include <iterator>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -70,8 +72,8 @@ metadatas_T::cache_is_valid()
      */
 
     struct stat s;
-    return ((stat(cache_file.c_str(), &s) == 0) and 
-        ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0));
+    return ((stat(cache_file.c_str(), &s) == 0) and (s.st_size > 0) and
+        ((time(NULL) - s.st_mtime) < 86400));
 }
 
 /*
@@ -104,8 +106,8 @@ metadatas_T::write_cache()
     if (not (*cache))
         throw bad_fileobject_E(cache_file);
 
-    for (iterator i = _m.begin() ; i != _m.end() ; ++i)
-        *cache << (*i) << std::endl;
+    std::copy(_m.begin(), _m.end(),
+        std::ostream_iterator<std::string>(*cache, "\n"));
 }
 
 /*
