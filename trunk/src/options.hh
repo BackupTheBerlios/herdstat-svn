@@ -42,6 +42,7 @@ enum options_action_T
     action_herd,
     action_dev,
     action_pkg,
+    action_meta,
     action_stats
 };
 
@@ -61,13 +62,13 @@ class option_type_T
 	~option_type_T() { delete value; }
 
 	template<typename T>
-	option_type_T &operator=(const T &t)
+	option_type_T &operator= (const T &t)
 	{
 	    option_type_T(t).swap(*this);
 	    return *this;
 	}
 
-	option_type_T &operator=(const option_type_T &ot)
+	option_type_T &operator= (const option_type_T &ot)
 	{
 	    option_type_T(ot).swap(*this);
 	    return *this;
