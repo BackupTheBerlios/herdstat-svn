@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include <iostream>
+#include <fstream>
 #include <string>
 #include <map>
 #include <memory>
@@ -40,12 +40,307 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include "options.hh"
 #include "exceptions.hh"
 #include "util.hh"
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
+
+/*
+ * Compare the md5sum of two files returning true if they match.
+ */
+
+bool
+util::md5check(const std::string &file1, const std::string &file2)
+{
+    std::string str1, str2;
+
+    std::string cmd = "md5sum " + file1 + " " + file2;
+    FILE *p = popen(cmd.c_str(), "r");
+    if (p)
+    {
+	char line[PATH_MAX + 40];
+	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
+	    str1 = line;
+	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
+	    str2 = line;
+	pclose(p);
+    }
+
+    if (not str1.empty() and not str2.empty())
+    {
+	std::string::size_type pos;
+
+	if ((pos = str1.find_first_of(" \t")) != std::string::npos)
+	    str1 = str1.substr(0, pos);
+
+	if ((pos = str2.find_first_of(" \t")) != std::string::npos)
+	    str2 = str2.substr(0, pos);
+
+	util::debug_msg("md5sum (%s): %s", file1.c_str(), str1.c_str());
+	util::debug_msg("md5sum (%s): %s", file2.c_str(), str2.c_str());
+
+	return str1 == str2;
+    }
+
+    return false;
+}
+
+/*
+ * Try to determine if the current directory is
+ * a valid package directory.
+ */
+
+bool
+util::in_pkgdir()
+{
+    const char *pwd = util::getcwd().c_str();
+    DIR *dir = NULL;
+    struct dirent *d = NULL;
+    bool ebuild = false, filesdir = false;
+
+    if (not (dir = opendir(pwd)))
+	throw bad_fileobject_E(pwd);
+
+    while ((d = readdir(dir)))
+    {
+	char *s = NULL;
+	if ((s = std::strrchr(d->d_name, '.')))
+	{
+	    if (std::strcmp(++s, "ebuild") == 0)
+		ebuild = true;
+	}   
+	else if (std::strcmp(d->d_name, "files") == 0)
+	    filesdir = true;
+    }
+
+    closedir(dir);
+    return ebuild and filesdir;
+}
+
+std::string
+util::getcwd()
+{
+    char *pwd = ::getcwd(NULL, 0);
+    if (not pwd)
+	throw errno_error_E("getcwd");
+
+    std::string s(pwd);
+    std::free(pwd);
+    return s;
+}
+
+/* 
+ * Given the portdir, a package, and a variable name,
+ * try to retrieve the value of the specified variable
+ * from the ebuild.
+ */
+
+const char *
+util::get_ebuild_var(const std::string &portdir,
+		     const std::string &pkg,
+		     const std::string &var)
+{
+    std::string ebuild = ebuild_which(portdir, pkg);
+    std::string result = get_var(ebuild, var);
+
+    /* Handle HOMEPAGE specially, doing our best to try
+     * simple variable substituion; definitely does not 
+     * work for all cases (in which case it's left alone) */
+    if (var == "HOMEPAGE" and (result.find('$') != std::string::npos))
+    {
+	std::vector<std::string> vars;
+	std::string::size_type lpos = 0;
+
+	util::debug_msg("Parsing HOMEPAGE (%s)", result.c_str());
+
+	while (true)
+	{
+	    std::string::size_type begin = result.find("${", lpos);
+	    if (begin == std::string::npos)
+		break;
+
+	    std::string::size_type end = result.find("}", begin);
+	    if (end == std::string::npos)
+		break;
+	    
+	    std::string s(result.substr(begin + 2, end - (begin + 2)));
+
+	    util::debug_msg("Found var '%s'", s.c_str());
+	    vars.push_back(s);
+	    lpos = ++begin;
+	}
+
+	std::map<std::string, std::string> varmap = get_vars(ebuild, vars);
+	std::map<std::string, std::string>::iterator i;
+	for (i = varmap.begin() ; i != varmap.end() ; ++i)
+	{
+	    std::string s("${" + i->first + "}");
+	    std::string::size_type pos = result.find(s);
+	    if (pos == std::string::npos)
+		continue;
+
+	    if (not i->second.empty())
+	    {
+		util::debug_msg("Replacing '%s' with '%s'", s.c_str(),
+		    i->second.c_str());
+		result.replace(pos, s.length(), i->second, 0,
+		    i->second.length());
+	    }
+	    else
+	    {
+		/* chop path */
+		std::string::size_type p = ebuild.rfind('/');
+		if (p != std::string::npos)
+		    ebuild = ebuild.substr(p + 1);
+
+		/* chop .ebuild */
+		if ((p = ebuild.rfind(".ebuild")) != std::string::npos)
+		    ebuild = ebuild.substr(0, p);
+
+		/* chop revision */
+		if ((p = ebuild.rfind("-r")) != std::string::npos)
+		    ebuild = ebuild.substr(0, p);
+
+		/* ${P} */
+		if (i->first == "P")
+		{
+		    result.replace(pos, s.length(), ebuild, 0, ebuild.length());
+		    util::debug_msg("Replacing '${P}' with '%s'", ebuild.c_str());
+		}
+
+		/* ${PN} */
+		else if (i->first == "PN")
+		{
+		    if ((p = ebuild.rfind('-')) != std::string::npos)
+			ebuild = ebuild.substr(0, p);
+
+		    result.replace(pos, s.length(), ebuild, 0, ebuild.length());
+		    util::debug_msg("Replacing '${PN}' with '%s'", ebuild.c_str());
+		}
+
+		/* ${PV} */
+		else if (i->first == "PV")
+		{
+		    if ((p = ebuild.rfind('-')) != std::string::npos)
+			ebuild = ebuild.substr(p + 1);
+
+		    result.replace(pos, s.length(), ebuild, 0, ebuild.length());
+		    util::debug_msg("Replacing '${PV}' with '%s'", ebuild.c_str());
+		}
+	    }
+	}
+    }
+
+    return result.c_str();
+}
+
+/*
+ * Given a file, return the value of the specified variable
+ * (if it exists). Variable will only be found if it's in
+ * the form of VAR=value or VAR="value".
+ */
+
+const char *
+util::get_var(const std::string &path, const std::string &var)
+{
+    if (path.empty() or var.empty())
+	return "";
+
+    util::debug_msg("get_var: opening '%s'", path.c_str());
+
+    std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
+    if (not (*f))
+	throw bad_fileobject_E(path);
+
+    std::string result;
+    rcfile_T rc(*f);
+    rcfile_T::rcfile_keys_T::iterator pos = rc.keys.find(var);
+    if (pos != rc.keys.end())
+	result = pos->second;
+
+    util::debug_msg("Retrieved %s from %s: '%s'", var.c_str(),
+	path.c_str(), result.c_str());
+
+    return result.c_str();
+}
+
+/*
+ * Plural version of get_var()
+ */
+
+std::map<std::string, std::string>
+util::get_vars(const std::string &path, const std::vector<std::string> &vars)
+{
+    std::map<std::string, std::string> varmap;
+
+    if (path.empty() or vars.empty())
+	return varmap;
+
+    util::debug_msg("get_vars: opening '%s'", path.c_str());
+
+    std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
+    if (not (*f))
+	throw bad_fileobject_E(path);
+
+    rcfile_T rc(*f);
+
+    std::vector<std::string>::const_iterator i;
+    for (i = vars.begin() ; i != vars.end() ; ++i)
+    {
+	rcfile_T::rcfile_keys_T::iterator pos = rc.keys.find(*i);
+	if (pos != rc.keys.end())
+	    varmap[*i] = pos->second;
+	else
+	    varmap[*i] = "";
+    }
+
+    return varmap;
+}
+
+/*
+ * Do our best to guess the latest ebuild of the specified
+ * package. TODO: write an actual version parsing class since
+ * this often produces incorrect results.
+ */
+
+const char *
+util::ebuild_which(const std::string &portdir, const std::string &pkg)
+{
+    DIR *dir = NULL;
+    struct dirent *d = NULL;
+    const std::string path = portdir + "/" + pkg;
+    std::vector<std::string> ebuilds;
+    std::vector<std::string>::iterator e;
+
+    /* open package directory */
+    if (not (dir = opendir(path.c_str())))
+    {
+	std::cerr << "failed to open dir '" << path << "'." << std::endl;
+	return "";
+    }
+
+    /* read package directory looking for ebuilds */
+    while ((d = readdir(dir)))
+    {
+	char *s = NULL;
+	if ((s = std::strrchr(d->d_name, '.')))
+	    if (std::strcmp(++s, "ebuild") == 0)
+		ebuilds.push_back(path + "/" + d->d_name);
+    }
+
+    closedir(dir);
+
+    if (ebuilds.empty())
+	return "";
+
+    std::sort(ebuilds.begin(), ebuilds.end());
+    util::debug_msg("ebuild_which(%s) == '%s'", pkg.c_str(),
+	ebuilds.back().c_str());
+    return ebuilds.back().c_str();
+}
 
 /*
  * Given a string, convert all characters to lowercase
@@ -132,6 +427,8 @@ util::copy_file(const std::string &from, const std::string &to)
 	throw bad_fileobject_E(from);
     if (not (*fto))
 	throw bad_fileobject_E(to);
+
+    util::debug_msg("copying file '%s' to '%s'", from.c_str(), to.c_str());
 
     /* read from ffrom and write to fto */
     std::string s;
@@ -226,28 +523,15 @@ util::portdir()
     std::string portdir;
 
     if (util::is_file(make_conf))
-    {
-	std::auto_ptr<std::ifstream> f(new std::ifstream(make_conf));
-	if (not (*f))
-	    throw bad_fileobject_E(make_conf);
-
-	util::rcfile_T rc(*f);
-	util::rcfile_keys_T::iterator pos = rc.keys.find("PORTDIR");
-	if (pos != rc.keys.end())
-	    portdir = pos->second;
-    }
+	portdir = get_var(make_conf, "PORTDIR");
 
     if (portdir.empty() and util::is_file(make_glob))
-    {
-	std::auto_ptr<std::ifstream> f(new std::ifstream(make_glob));
-	if (not (*f))
-	    throw bad_fileobject_E(make_glob);
+	portdir = get_var(make_glob, "PORTDIR");
 
-	util::rcfile_T rc(*f);
-	util::rcfile_keys_T::iterator pos = rc.keys.find("PORTDIR");
-	if (pos != rc.keys.end())
-	    portdir = pos->second;
-    }
+    /* environment overrides all */
+    char *result = getenv("PORTDIR");
+    if (result)
+	portdir = result;
 
     return (portdir.empty() ? "/usr/portage" : portdir.c_str());
 }
@@ -519,4 +803,16 @@ util::rcfile_T::rcfile_T(std::ifstream &stream)
             keys[key] = val;
         }
     }
+
+//    if (optget("debug", bool))
+//        dump(std::cout);
+}
+
+void
+util::rcfile_T::dump(std::ostream &stream)
+{
+    rcfile_keys_T::iterator k;
+    for (k = keys.begin() ; k != keys.end() ; ++k)
+	stream << "Key: '" << k->first << "', Value: '" << k->second << "'."
+	    << std::endl;
 }

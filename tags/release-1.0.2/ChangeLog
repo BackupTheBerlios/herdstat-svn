@@ -1,7 +1,74 @@
 ChangeLog for herdstat
 
+2005-04-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.0.2 release).
+	* src/metadatas.cc: If $PORTDIR/metadata/timestamp exists, dont
+	re-cache the metadata.xml list until it changes.
+	* src/util.cc, src/util.hh: Modified get_ebuild_var() to handle
+	HOMEPAGE specially, doing variable substituion in an attempt to
+	produce readable HOMEPAGE output.  Also added a plural version of
+	get_var(), get_vars() since it's not practical to open the same file
+	many times.  Added md5check().
+	* src/action_meta_handler.cc: Instead of throwing an instance of
+	args_usage_E if -m is specified w/no non-opt args, print a message
+	telling the user they must be in a package directory or category.
+	Added a few comments.  Added --quiet support for pythonhead.
+	* src/action_pkg_handler.cc: Fixed bug where first package was
+	displayed w/no color while the rest were blue when --verbose.
+
+2005-03-31 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/categories.hh: Added new categories_T class.
+	* src/metadatas.cc: Modified to use new categories_T.
+	* src/action_meta_handler.cc: Display ebuild's DESCRIPTION and
+	HOMEPAGE even if no metadata.xml exists.  Allow user to run 'herdstat
+	-m' with no non-opt args *IF* in a package directory or category.
+	* src/exceptions.hh: Added errno_error_E and modified bad_fileobject_E
+	to derive from it.
+	* src/util.cc, src/util.hh: Added getcwd(). Moved get_categories() to
+	it's own categories_T class.
+
+2005-03-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, bashcomp: Added --with-herd.
+	* src/util.cc, src/util.hh: Added a generic get_var() for retrieving
+	variables from files using rcfile_T. Modified portdir() to use it.
+	Added ebuild_which() which haphazardly tries to determine the latest
+	ebuild of a package (does a crappy job).  I'll write a real version
+	parser if 100% accuracy is needed.  Added get_ebuild_var() which uses
+	get_var() to retrieve a variable value from an ebuild.
+	* src/action_meta_handler.cc: Modified to show ebuild DESCRIPTION if
+	metadata longdesc is non-existent. Also show HOMEPAGE if non-empty.
+	* src/herdstat.cc: Catch std::runtime_error when trying to set a non-C
+	locale, print an error, and exit.
+	* src/options.cc, src/herdstat.cc, src/action_pkg_handler.cc: Added a
+	--with-herd option, a generalization of --no-herd.  --no-herd will be
+	kept around and will be considered shorthand for --with-herd=no-herd.
+
+2005-03-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.0.1-release).
+	* doc/herdstat.1.in, bashcomp: Updated for --metadata and --no-herd.
+	* src/action_pkg_handler.cc, src/options.cc: Added --no-herd option
+	for only displaying packages in herd "no-herd".
+	* src/action_meta_handler.cc, src/action_meta_handler.hh: Added
+	metadata handler for looking up package/category metadata (--metadata).
+	* src/options.cc: Added 'parse herds.xml' option since
+	action_meta_handler will not need to parse herds.xml. Also added
+	action_meta to action_options_T.
+	* src/util.hh: Renamed status_T to progress_T. Modified it to not
+	print leading zeros.
+	* src/metadatas.cc, src/metadatas.hh: Moved metadata.xml retrieval
+	code from action_pkg_handler.cc into it's own class.
+	* src/action_pkg_handler.cc: Moved metadata.xml retrieval code to
+	metadatas.{cc,hh}.  Also reworked the way we handle invalid
+	devs/herds.  Got the progress thinggy to work as it should when
+	parsing metadata.xml's.
+
 2005-03-26 Aaron Walker <ka0ttic@gentoo.org>
 	
+	* configure.ac: Update version (1.0-release).
 	* src/util.hh: Added status_T class for showing percent of task
 	completion.
 	* src/action_pkg_handler.cc: Use util::status_T for metadata caching

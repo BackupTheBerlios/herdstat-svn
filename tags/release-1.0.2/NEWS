@@ -1,6 +1,45 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.0.2:
+    New features:
+     - --metadata now shows the package's HOMEPAGE (if it exists in the
+       ebuild).  herdstat does it's best to try and perform variable
+       substituion on any variable occurrences in HOMEPAGE in an attempt to
+       improve readability. Also shows the ebuild's DESCRIPTION if a longdesc
+       is unavailable in metadata.xml.
+     - --metadata now supports --quiet.
+     - Added --with-herd, a generalization of --no-herd (which is now
+       shorthand for --with-herd=no-herd) for only displaying developer's
+       packages that belong in the specified herd.
+     - User can now run 'herdstat -m' with no non-option args if inside a
+       package directory or category.
+     - If $PORTDIR/metadata/timestamp exists, don't re-cache the metadata.xml
+       list until it changes.
+
+    Bug fixes:
+     - Fixed bug where a std::runtime_error exception was thrown (and not
+       caught) if the LC_ALL env variable is set to an invalid locale.
+
+1.0.1:
+    New features:
+     - New --metadata option that displays metadata information for the
+       specified package(s)/category(s).  Blame Obz for wanting this.
+     - New --no-herd option that when specified with --package --dev only
+       shows packages belong to herd "no-herd". Blame ciaranm for wanting
+       this.
+
+    Bug fixes:
+     - package handler quirks fixed wrt to stuff that doesnt exist.
+
+1.0:
+    New features:
+     - Added progress thinggy for metadata caching, since that's the biggest
+       bottleneck.
+
+    Bug fixes:
+     - Use C++ version of isspace and tolower so that locale is considered.
+
 1.0_rc2:
     New features:
      - Cache the metadata.xml list for 24hrs to reduce package lookup times.

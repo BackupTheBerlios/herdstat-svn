@@ -175,6 +175,8 @@ formatter_T::append(const std::string &label, const std::string &data)
 
     if (not data.empty())
     {
+        util::debug_msg("data = '%s'", data.c_str());
+
         if (quiet())
             append(label, util::splitstr(data));
         else

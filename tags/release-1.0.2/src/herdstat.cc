@@ -54,12 +54,15 @@
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
+#include "action_meta_handler.hh"
 #include "action_stats_handler.hh"
+
+#define FETCH_LOCATION	LOCALSTATEDIR"/herds.xml"
 
 static const std::string default_herdsxml =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
-static const char *short_opts = "H:o:hVvDdtpqfcn";
+static const char *short_opts = "H:o:hVvDdtpqfcnm";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -71,6 +74,8 @@ static struct option long_opts[] =
     {"debug",	    no_argument,	0,  'D'},
     {"count",	    no_argument,	0,  'c'},
     {"nocolor",	    no_argument,	0,  'n'},
+    {"no-herd",	    no_argument,	0,  '\n'},
+    {"with-herd",   required_argument,	0,  '\v'},
     /* force a fetch of herds.xml */
     {"fetch",	    no_argument,	0,  'f'},
     /* time how long it takes for XML parsing */
@@ -81,6 +86,8 @@ static struct option long_opts[] =
     {"herdsxml",    required_argument,	0,  'H'},
     /* show package stats for the specified herds */
     {"package",	    no_argument,	0,  'p'},
+    /* display package metadata information */
+    {"metadata",    no_argument,	0,  'm'},
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     { 0, 0, 0, 0 }
@@ -108,31 +115,36 @@ help()
 	<< "usage: " << PACKAGE << " [options] [args]" << std::endl
 
 #ifdef HAVE_GETOPT_LONG
-	<< " -h, --help            Display this help message." << std::endl
-	<< " -V, --version         Display version information." << std::endl
+	<< " -h, --help             Display this help message." << std::endl
+	<< " -V, --version          Display version information." << std::endl
 	<< std::endl
 	<< "Where [options] can be any of the following:" << std::endl
-	<< " -p, --package         Look up packages by herd." << std::endl
-	<< " -d, --dev             Look up herds by developer." << std::endl
-	<< " -H, --herdsxml <file> Specify location of herds.xml." << std::endl
-	<< " -o, --outfile  <file> Send output to the specified file" << std::endl
-	<< "                       instead of stdout." << std::endl
-	<< " -f, --fetch           Force a fetch of herds.xml." << std::endl
-	<< " -v, --verbose         Display verbose output." << std::endl
-	<< " -q, --quiet           Don't display labels and fancy colors. Use this"
+	<< " -p, --package          Look up packages by herd." << std::endl
+	<< " -d, --dev              Look up herds by developer." << std::endl
+	<< " -m, --metadata         Look up metadata by package/category." << std::endl
+	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
+	<< "                        display all packages that belong to the specified herd." << std::endl
+	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
+	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
+	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
+	<< "                        instead of stdout." << std::endl
+	<< " -f, --fetch            Force a fetch of herds.xml." << std::endl
+	<< " -v, --verbose          Display verbose output." << std::endl
+	<< " -q, --quiet            Don't display labels and fancy colors. Use this"
 	<< std::endl
-	<< "                       option to pipe herdstat output to other programs"
+	<< "                        option to pipe herdstat output to other programs"
 	<< std::endl
-	<< " -D, --debug           Display debugging messages." << std::endl
-	<< " -t, --timer           Display elapsed time of XML parsing." << std::endl
-	<< " -c, --count           Display the number of items instead of the" << std::endl
-	<< "                       items themself." << std::endl
-	<< " -n, --nocolor         Don't display colored output." << std::endl
+	<< " -D, --debug            Display debugging messages." << std::endl
+	<< " -t, --timer            Display elapsed time of XML parsing." << std::endl
+	<< " -c, --count            Display the number of items instead of the" << std::endl
+	<< "                        items themself." << std::endl
+	<< " -n, --nocolor          Don't display colored output." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
-	<< " default action        1 or more herds." << std::endl
-	<< " -p, --package         1 or more herds." << std::endl
-	<< " -d, --dev             1 or more developers." << std::endl
+	<< " default action         1 or more herds." << std::endl
+	<< " -p, --package          1 or more herds." << std::endl
+	<< " -d, --dev              1 or more developers." << std::endl
+	<< " -m, --metadata         1 or more categories/packages." << std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl
 	<< "specified, " << PACKAGE << " will display all packages maintained by" << std::endl
@@ -145,6 +157,7 @@ help()
 	<< "Where [options] can be any of the following:" << std::endl
 	<< " -p              Look up packages by herd." << std::endl
 	<< " -d              Look up herds by developer." << std::endl
+	<< " -m              Look up metadata by package/category." << std::endl
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
@@ -164,6 +177,7 @@ help()
 	<< " default action  1 or more herds." << std::endl
 	<< " -p              1 or more herds." << std::endl
 	<< " -d              1 or more developers." << std::endl
+	<< " -m              1 or more categories/packages." << std::endl
 	<< "Both the default action and the -d action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both -d and -p are specified," << std::endl
 	<< PACKAGE << " will display all packages maintained by the specified" << std::endl
@@ -214,6 +228,13 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		    optset("dev", bool, true);
 		optset("action", options_action_T, action_pkg);
 		break;
+	    /* --metadata */
+	    case 'm':
+		if (optget("action", options_action_T) != action_unspecified)
+		    throw args_one_action_only_E();
+		optset("action", options_action_T, action_meta);
+		optset("parse herds.xml", bool, false);
+		break;
 	    /* --outfile */
 	    case 'o':
 		if (strcmp(optarg, "stdout") != 0)
@@ -224,6 +245,14 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		    optset("quiet", bool, true);
 		    optset("timer", bool, false);
 		}
+		break;
+	    /* --no-herd */
+	    case '\n':
+		optset("with-herd", std::string, "no-herd");
+		break;
+	    /* --with-herd */
+	    case '\v':
+		optset("with-herd", std::string, optarg);
 		break;
 	    /* --fetch */
 	    case 'f':
@@ -282,7 +311,8 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	while (optind < argc)
 	    args->push_back(argv[optind++]);
     }
-    else if (optget("action", options_action_T) != action_unspecified)
+    else if ((optget("action", options_action_T) != action_unspecified) and
+	    (optget("action", options_action_T) != action_meta))
 	throw args_usage_E();
 
     return 0;
@@ -294,8 +324,6 @@ main(int argc, char **argv)
     options_T options;
     formatter_T output;
     util::timer_T timer;
-    std::string fetched_location = util::sprintf("%s/%s/herds.xml",
-	LOCALSTATEDIR, PACKAGE);
 
     /* try to determine current columns, otherwise use default */
     optset("maxcol", std::size_t, util::getcols());
@@ -310,9 +338,9 @@ main(int argc, char **argv)
 	 * see the explanation below where we fetch as to why
 	 * we go through the trouble of doing this. */
 	struct stat s;
-	if ((stat(fetched_location.c_str(), &s) == 0) and
+	if ((stat(FETCH_LOCATION, &s) == 0) and
 	    ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
-	    optset("herds.xml", std::string, fetched_location);
+	    optset("herds.xml", std::string, FETCH_LOCATION);
     }
 
     try
@@ -323,7 +351,8 @@ main(int argc, char **argv)
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw args_E();
 
-	if (nonopt_args.empty())
+	if (nonopt_args.empty() and
+	    optget("action", options_action_T) != action_meta)
 	{
 	    optset("action", options_action_T, action_stats);
 	    optset("quiet", bool, false);
@@ -338,8 +367,8 @@ main(int argc, char **argv)
 	    nonopt_args.erase(pos);
 
 	/* did the user specify the all target? */
-	pos = std::find(nonopt_args.begin(), nonopt_args.end(), "all");
-	if (pos != nonopt_args.end())
+	if (std::find(nonopt_args.begin(),
+		nonopt_args.end(), "all") != nonopt_args.end())
 	{
 	    optset("all", bool, true);
 	    nonopt_args.clear();
@@ -352,49 +381,50 @@ main(int argc, char **argv)
 	if (not optget("quiet", bool) and optget("fetch", bool) and nonopt_args.empty())
 	    optset("verbose", bool, true);
 
-	/* every action handler needs to parse herds.xml for one reason
-	 * or another, so let's get it over with. */
 	struct stat s;
 	try
 	{
-	    if (optget("fetch", bool) and
-		(optget("herds.xml", std::string).find("://") == std::string::npos))
-		optset("herds.xml", std::string, default_herdsxml);
-
-	    if (optget("herds.xml", std::string).find("://") != std::string::npos)
+	    if (optget("parse herds.xml", bool))
 	    {
-		/* NOTE: ideally we'd love to only fetch it when the timestamp
-		 * and size are different, however, because the default
-		 * location to download herds.xml is from ViewCVS, there is no
-		 * Last-Modified header, meaning wget can't do timestamps :( */
+		if (optget("fetch", bool) and
+		    (optget("herds.xml", std::string).find("://") == std::string::npos))
+		    optset("herds.xml", std::string, default_herdsxml);
 
-		if (not optget("quiet", bool))
+		if (optget("herds.xml", std::string).find("://") != std::string::npos)
 		{
-		    std::cout
-			<< "Fetching herds.xml..."
-			<< std::endl << std::endl;
+		    /* NOTE: ideally we'd love to only fetch it when the timestamp
+		     * and size are different, however, because the default
+		     * location to download herds.xml is from ViewCVS, there is no
+		     * Last-Modified header, meaning wget can't do timestamps :( */
+
+		    if (not optget("quiet", bool))
+		    {
+			std::cout
+			    << "Fetching herds.xml..."
+			    << std::endl << std::endl;
+		    }
+
+		    /* backup cached copy if it exists so we can use it
+		     * if fetching fails */
+		    if (util::is_file(FETCH_LOCATION))
+			util::copy_file(FETCH_LOCATION, FETCH_LOCATION".bak");
+
+		    /* fetch it */
+		    if (util::fetch(optget("herds.xml", std::string), FETCH_LOCATION,
+			optget("verbose", bool)) != 0)
+			throw fetch_E();
+
+		    /* because we tell wget to clobber the file, if fetching fails for
+		     * some reason, it'll truncate the old one - make sure the file
+		     * is greater than 0 bytes */
+		    if ((stat(FETCH_LOCATION, &s) == 0) and (s.st_size > 0))
+			optset("herds.xml", std::string, FETCH_LOCATION);
+		    else
+			throw fetch_E();
+
+		    /* remove back up copy */
+		    unlink(FETCH_LOCATION".bak");
 		}
-
-		/* backup cached copy if it exists so we can use it
-		 * if fetching fails */
-		if (util::is_file(fetched_location))
-		    util::copy_file(fetched_location, fetched_location + ".bak");
-
-		/* fetch it */
-		if (util::fetch(optget("herds.xml", std::string), fetched_location,
-		    optget("verbose", bool)) != 0)
-		    throw fetch_E();
-
-		/* because we tell wget to clobber the file, if fetching fails for
-		 * some reason, it'll truncate the old one - make sure the file
-		 * is greater than 0 bytes */
-		if ((stat(fetched_location.c_str(), &s) == 0) and (s.st_size > 0))
-		    optset("herds.xml", std::string, fetched_location);
-		else
-		    throw fetch_E();
-
-		/* remove back up copy */
-		unlink((fetched_location + ".bak").c_str());
 	    }
 	}
 	catch (const fetch_E &e)
@@ -403,11 +433,11 @@ main(int argc, char **argv)
 		<< std::endl << std::endl;
 
 	    /* if we can't fetch it but have an old cached copy, use it */
-	    if (util::is_file(fetched_location + ".bak"))
+	    if (util::is_file(FETCH_LOCATION".bak"))
 	    {
 		std::cerr << "Using cached copy... ";
-		util::move_file(fetched_location + ".bak", fetched_location);
-		optset("herds.xml", std::string, fetched_location);
+		util::move_file(FETCH_LOCATION".bak", FETCH_LOCATION);
+		optset("herds.xml", std::string, FETCH_LOCATION);
 	    }
 		
 	    std::cerr
@@ -415,11 +445,11 @@ main(int argc, char **argv)
 		<< std::endl << "setting the HERDS environment variable."
 		<< std::endl;
 
-	    if (stat(fetched_location.c_str(), &s) != 0)
+	    if (stat(FETCH_LOCATION, &s) != 0)
 		return EXIT_FAILURE;
 	    else if (s.st_size == 0)
 	    {
-		unlink(fetched_location.c_str());
+		unlink(FETCH_LOCATION);
 		return EXIT_FAILURE;
 	    }
 	    else
@@ -427,7 +457,8 @@ main(int argc, char **argv)
 	}
 
 	/* make sure herds.xml exists */
-	if (not util::is_file(optget("herds.xml", std::string)))
+	if (optget("parse herds.xml", bool) and
+	    not util::is_file(optget("herds.xml", std::string)))
 	    throw bad_fileobject_E(optget("herds.xml", std::string));
 
 	/* if there's no nonoption args, we're done */
@@ -442,7 +473,9 @@ main(int argc, char **argv)
 
 	    /* parse herds.xml */
 	    XMLParser_T parser(&(*handler));
-	    parser.parse(optget("herds.xml", std::string));
+	    
+	    if (optget("parse herds.xml", bool))
+		parser.parse(optget("herds.xml", std::string));
 
 	    if (optget("timer", bool))
 		timer.stop();
@@ -463,7 +496,22 @@ main(int argc, char **argv)
 	    if (not *outstream)
 		throw bad_fileobject_E(optget("outfile", std::string));
 	    optset("outstream", std::ostream *, outstream);
-	    optset("locale", std::string, std::locale::classic().name());
+	}
+	else
+	{
+	    try
+	    {
+		optset("locale", std::string, std::locale("").name());
+	    }
+	    catch (const std::runtime_error)
+	    {
+		std::string error("Invalid locale");
+		result = getenv("LC_ALL");
+		if (result)
+		    error += " '" + std::string(result) + "'.";
+		std::cerr << error << std::endl;
+		return EXIT_FAILURE;
+	    }
 	}
 	
 	/* set locale */
@@ -488,6 +536,7 @@ main(int argc, char **argv)
 	handlers[action_herd]  = new action_herd_handler_T();
 	handlers[action_dev]   = new action_dev_handler_T();
 	handlers[action_pkg]   = new action_pkg_handler_T();
+	handlers[action_meta]  = new action_meta_handler_T();
 	handlers[action_stats] = new action_stats_handler_T();
 
 	action_handler_T *action_handler =
@@ -513,7 +562,7 @@ main(int argc, char **argv)
 	if (optget("timer", bool))
 	    throw timer_E();
     }
-    catch (const bad_fileobject_E &e)
+    catch (const errno_error_E &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;

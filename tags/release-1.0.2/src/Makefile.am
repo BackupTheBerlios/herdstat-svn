@@ -11,10 +11,13 @@ herdstat_SOURCES = exceptions.hh \
 		   herds_xml_handler.hh herds_xml_handler.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
 		   formatter.hh formatter.cc \
+		   categories.hh \
+		   metadatas.hh metadatas.cc \
 		   action_handler.hh \
 		   action_herd_handler.hh action_herd_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
 		   action_pkg_handler.hh action_pkg_handler.cc \
+		   action_meta_handler.hh action_meta_handler.cc \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   herdstat.cc
 

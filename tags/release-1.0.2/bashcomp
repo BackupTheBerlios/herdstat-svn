@@ -1,0 +1,125 @@
+# $Id$
+# bash command line completion for herdstat.
+# Author: Aaron Walker <ka0ttic@gentoo.org>
+
+_herdstat() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-h --help -V --version -p --package -d --dev -H --herdsxml
+	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
+        -f --fetch -c --count -n --nocolor --no-herd -m --metadata
+        --with-herd"
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+	    return 0
+    elif [[ ${COMP_CWORD} -eq 1 ]] ; then
+	    COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" -- ${cur}) )
+	    return 0
+    fi
+
+    case "${prev}" in
+	-H|--herdsxml|-o|--outfile)
+	    COMPREPLY=( $(compgen -f -- ${cur}) )
+	    ;;
+	-d|--dev)
+	    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
+	    ;;
+        --with-herd)
+            COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) no-herd" -- ${cur}))
+            ;;
+        -m|--metadata)
+            local words p=$(_portdir)
+            local sedcmd="sed -e :^[^-]*$:d"
+            local grepcmd="grep -E ^${cur}.*"
+            
+            [[ -d ${p} ]] || return 0
+
+            if [[ ${cur} == */* ]] ; then
+                words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+            elif [[ ${cur} == "" ]] ; then
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
+                       $(builtin cd ${p} ; compgen -G "*-*")"
+            else
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur) \
+                        $(builtin cd ${p} ; compgen -G "*-*" -- $cur)"
+            fi
+
+            COMPREPLY=($(for x in ${words} ; do \
+                            [[ ${x} == ${cur}* ]] && echo ${x} ; \
+                        done))
+
+            if [[ -z "${COMPREPLY}" ]] ; then
+                COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
+                    for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                    done)" -- $cur) )
+            fi
+            ;;
+	*)
+	    local x dev=0 pkg=0 meta=0
+	    for x in ${COMP_WORDS[@]} ; do
+                # dev
+		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
+		    dev=1
+                fi
+
+                # package
+                if [[ ${x} == -*p* ]] ; then
+                    pkg=1
+		fi
+
+                # metadata
+                if [[ ${x} == *m* && ${x} != "--timer" ]] && \
+                   [[ ${x} != "--herdsxml" ]]
+                then
+                    meta=1
+                fi
+	    done
+
+	    if [[ ${dev} -eq 1 && ${pkg} -eq 1 ]] ; then
+		COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts}" \
+                    -- ${cur}) )
+            elif [[ ${dev} -eq 1 ]] ; then
+		COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" \
+                    -- ${cur}) )
+            elif [[ ${pkg} -eq 1 ]] ; then
+                COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts}" \
+                    -- ${cur}) )
+            elif [[ ${meta} -eq 1 ]] ; then
+                local words p=$(_portdir)
+                local sedcmd="sed -e :^[^-]*$:d"
+                local grepcmd="grep -E ^${cur}.*"
+            
+                [[ -d ${p} ]] || return 0
+
+            if [[ ${cur} == */* ]] ; then
+                words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+            elif [[ ${cur} == "" ]] ; then
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*") \
+                       $(builtin cd ${p} ; compgen -G "*-*")"
+            else
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur) \
+                        $(builtin cd ${p} ; compgen -G "*-*" -- $cur)"
+            fi
+
+                COMPREPLY=($(for x in ${words} ; do \
+                            [[ ${x} == ${cur}* ]] && echo ${x} ; \
+                        done))
+
+                if [[ -z "${COMPREPLY}" ]] ; then
+                    COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
+                        for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                    done)" -- $cur) )
+            fi
+	    else
+		COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" \
+                    -- ${cur}) )
+	    fi
+	    ;;
+    esac
+}
+complete -o filenames -F _herdstat herdstat
+
+# vim: set ft=sh tw=80 sw=4 et :

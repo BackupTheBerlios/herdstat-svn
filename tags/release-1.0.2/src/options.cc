@@ -30,6 +30,8 @@
 #include <map>
 #include <utility>
 #include <sys/types.h>
+
+#include "util.hh"
 #include "options.hh"
 
 options_T::option_map_T options_T::optmap;
@@ -53,10 +55,12 @@ options_T::option_map_T::set_defaults()
     insert_opt("dev", false);
     insert_opt("count", false);
     insert_opt("color", true);
+    insert_opt("parse herds.xml", true);
 
     insert_opt("maxcol", static_cast<std::size_t>(78));
 
-    insert_opt("portdir", std::string("/usr/portage"));
+    insert_opt("with-herd", std::string(""));
+    insert_opt("portdir", std::string(util::portdir()));
     insert_opt("outfile", std::string("stdout"));
     insert_opt("herds.xml",
         std::string("http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"));
@@ -66,7 +70,7 @@ options_T::option_map_T::set_defaults()
     insert_opt("action",
         static_cast<options_action_T>(action_unspecified));
 
-    insert_opt("locale", std::locale("").name());
+    insert_opt("locale", std::locale::classic().name());
 }
 
 /* vim: set tw=80 sw=4 et : */

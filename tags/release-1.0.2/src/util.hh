@@ -31,6 +31,7 @@
 #include <map>
 #include <vector>
 #include <cstdarg>
+#include <cstdio>
 #include <sys/time.h>
 
 #ifndef PATH_MAX
@@ -55,6 +56,15 @@ enum color_name_T
 
 namespace util
 {
+    bool md5check(const std::string &, const std::string &);
+    bool in_pkgdir();
+    std::string getcwd();
+    const char *get_ebuild_var(const std::string &, const std::string &,
+	const std::string &);
+    const char *ebuild_which(const std::string &, const std::string &);
+    const char *get_var(const std::string &, const std::string &);
+    std::map<std::string, std::string> get_vars(const std::string &,
+	const std::vector<std::string> &);
     std::string lowercase(const std::string &);
     std::string tidy_whitespace(const std::string &);
     std::string get_user_from_email(const std::string &);
@@ -111,44 +121,38 @@ namespace util
 	    std::string &operator[](color_name_T c) { return cmap[c]; }
     };
 
-    typedef std::map<std::string, std::string> rcfile_keys_T;
     class rcfile_T
     {
 	public:
+	    typedef std::map<std::string, std::string> rcfile_keys_T;
 	    rcfile_T(std::ifstream &);
+	    void dump(std::ostream &);
 	    rcfile_keys_T keys;
     };
 
-    class status_T
+    class progress_T
     {
 	private:
-	    unsigned max;
 	    float cur, step;
 
 	public:
-	    status_T(unsigned m = 0)
-	    {
-		if(m != 0)
-		{
-		    max  = m;
-		    cur  = 0;
-		    step = 100.0 / m;
-		    printf("  0%%");
-		}
-	    }
-
+	    progress_T() : cur(0) { }
 	    void start(unsigned m)
 	    {
-		max  = m;
-		cur  = 0;
 		step = 100.0 / m;
-		printf("  0%%");
+		std::printf("  0%%");
 	    }
 
 	    void operator++ ()
 	    {
-		printf("\b\b\b\b%.3i%%", (int) (cur += step));
-		fflush(stdout);
+		int inc = static_cast<int>(cur += step);
+		if (inc < 10)
+		    std::printf("\b\b%.1d%%", inc);
+		else if (inc < 100)
+		    std::printf("\b\b\b%.2d%%", inc);
+		else
+		    std::printf("\b\b\b\b%.3d%%", inc);
+		std::fflush(stdout);
 	    }
     };
 }

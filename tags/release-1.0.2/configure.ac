@@ -1,14 +1,14 @@
 # Process this file with autoconf to produce a configure script.
 # $Id$
 
-AC_INIT([herdstat], [1.0_rc3], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.0.2], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.8 foreign dist-bzip2 no-dist-gzip])
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
-AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir", [Local state directory])
+AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
 
 AC_CHECK_PROGS(SED, sed)
 if test x$SED = "x"; then
