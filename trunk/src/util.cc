@@ -116,19 +116,17 @@ util::current_user()
 	    user = user.substr(pos + 1);
 	    if ((pos = user.find('>')) != std::string::npos)
 		user = user.substr(0, pos);
-	    if ((pos = user.find('@')) != std::string::npos)
-		user = user.substr(0, pos);
 	}
 	else
 	    user.clear();
     }
-    else
+    else if ((result = getenv("USER")))
     {
-	if ((result = getenv("USER")))
-	    user = result;
+	user = result;
+	user += "@gentoo.org";
     }
 
-    return (user.empty() ? "nobody" : user);
+    return (user.empty() ? "nobody@gentoo.org" : user);
 }
 
 /*
