@@ -27,13 +27,10 @@
 # include "config.h"
 #endif
 
-#include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 #include <map>
-#include <exception>
-#include <cstdio>
-#include <cstdarg>
 
 #include "util.hh"
 
@@ -56,8 +53,6 @@ class format_attrs_T
         std::string::size_type maxctotal;
         std::string::size_type maxclabel;
         std::string::size_type maxcdata;
-
-        std::vector<std::string> hilight;
 };
 
 class formatter_T
@@ -73,7 +68,7 @@ class formatter_T
 
         void endl() { buffer.push_back(""); }
         void append(const std::string &, const std::string &);
-        void append(const std::string &, std::vector<std::string> &);
+        void append(const std::string &, std::vector<std::string>);
         void flush(std::ostream &);
 
         void set_attrs();
@@ -105,8 +100,6 @@ class formatter_T
 
         void set_datacolor(std::string &s) { attr.data_color = s; }
         std::string &datacolor() { return attr.data_color; }
-
-        void add_hilite(std::string &s) { attr.hilight.push_back(s); }
 };
 
 #endif

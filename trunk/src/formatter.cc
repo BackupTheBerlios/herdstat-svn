@@ -24,11 +24,10 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <string>
 #include <vector>
-#include <utility>
 #include <algorithm>
+#include <iterator>
 
 #include "util.hh"
 #include "formatter.hh"
@@ -62,16 +61,15 @@ formatter_T::set_attrs()
 {
     util::color_map_T color;
 
-    if (not attr.quiet)
+    if (quiet())
+        attr.colors = false;
+    else
         /* +1 for ':' */
         attr.maxlabel++;
 
     /* -2 just for padding */
     attr.maxdata -= 2;
     attr.maxtotal = attr.maxlabel + attr.maxdata;
-
-    if (attr.quiet)
-        attr.colors = false;
 
     /* if we're using colors, we need to compensate
      * for the increase in string length.           */
@@ -95,22 +93,31 @@ formatter_T::set_attrs()
 }
 
 /*
- * Overloaded append() that takes a vector, converts it to a string,
- * and calls the real append()
+ * Overloaded append() that takes a vector
  */
 
 void
-formatter_T::append(const std::string &label, std::vector<std::string> &data)
+formatter_T::append(const std::string &label, std::vector<std::string> data)
 {
-    std::string s;
     std::vector<std::string>::iterator i;
-    for (i = data.begin() ; i != data.end() ; ++i)
-        s += *i + " ";
-    
-    if (s[s.length() - 1] == ' ')
-        s.erase(s.length() - 1);
 
-    append(label, s);
+    /* if quiet, handle it here, as we're going to end up splitting
+     * the data string into a vector anyways */
+    if (quiet())
+        std::copy(data.begin(), data.end(), std::back_inserter(buffer));
+
+    /* otherwise, produce a data string and call the real append() */
+    else
+    {
+        std::string s;
+        for (i = data.begin() ; i != data.end() ; ++i)
+            s += *i + " ";
+    
+        if (s[s.length() - 1] == ' ')
+            s.erase(s.length() - 1);
+
+        append(label, s);
+    }
 }
 
 /*
@@ -124,54 +131,63 @@ formatter_T::append(const std::string &label, const std::string &data)
     util::color_map_T color;
     std::string cur;
 
-    if (label.length() > attr.maxlabel)
-        throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
-            label.c_str(), attr.maxlabel);
+    /* don't display the label (or indent) if the quiet attr is set */
+    if (not quiet())
+    {
+        if (label.length() > attr.maxlabel)
+            throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
+                label.c_str(), attr.maxlabel);
 
-    cur = color[green] + label + color[none] +
-        (label.empty() ? "" : ":");
+        cur = color[green] + label + color[none] +
+            (label.empty() ? "" : ":");
 
-    while (cur.length() < attr.maxclabel)
-        cur.append(" ");
-
-    cur.append(attr.data_color);
+        while (cur.length() < attr.maxclabel)
+            cur.append(" ");
+    }
 
     if (not data.empty())
     {
-        /* will it all fit on one line? */
-        if ((cur.length() + data.length() +
-            color[none].length()) < attr.maxctotal)
-            cur.append(data);
+        if (quiet())
+            append(label, util::splitstr(data));
         else
         {
-            /* line's full, so find a location where we can truncate */
-            std::string::size_type pos = data.rfind(" ", attr.maxdata);
-            cur.append(pos == std::string::npos ? data : data.substr(0, pos));
-            buffer.push_back(cur);
-            cur.clear();
-            
-            /* indent */
-            while (cur.length() < attr.maxlabel)
-                cur.append(" ");
+            cur.append(attr.data_color);
 
-            /* handle leftovers */
-            std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
-
-            std::vector<std::string>::iterator i;
-            for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
+            /* will it all fit on one line? */
+            if ((cur.length() + data.length() +
+                color[none].length()) < attr.maxctotal)
+                cur.append(data);
+            else
             {
-                /* does it fit on the current line? */
-                if ((cur.length() + (*i).length()) > attr.maxtotal)
-                {
-                    buffer.push_back(cur);
-                    cur.clear();
-
-                    /* indent */
-                    while (cur.length() < attr.maxlabel)
-                        cur.append(" ");
-                }
+                /* line's full, so find a location where we can truncate */
+                std::string::size_type pos = data.rfind(" ", attr.maxdata);
+                cur.append(pos == std::string::npos ? data : data.substr(0, pos));
+                buffer.push_back(cur);
+                cur.clear();
             
-                cur += *i + " ";
+                /* indent */
+                while (cur.length() < attr.maxlabel)
+                    cur.append(" ");
+
+                /* handle leftovers */
+                std::vector<std::string> leftovers = util::splitstr(data.substr(pos));
+
+                std::vector<std::string>::iterator i;
+                for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
+                {
+                    /* does it fit on the current line? */
+                    if ((cur.length() + (*i).length()) > attr.maxtotal)
+                    {
+                        buffer.push_back(cur);
+                        cur.clear();
+
+                        /* indent */
+                        while (cur.length() < attr.maxlabel)
+                            cur.append(" ");
+                    }
+            
+                    cur += *i + " ";
+                }
             }
         }
     }
@@ -181,17 +197,16 @@ formatter_T::append(const std::string &label, const std::string &data)
 }
 
 /*
- * flush everything in the buffer to the specified stream
+ * Flush our buffer's contents to the specified stream,
+ * removing each element in the buffer as we do so.
  */
 
 void
 formatter_T::flush(std::ostream &stream)
 {
-    std::vector<std::string>::iterator i;
-    for (i = buffer.begin() ; i != buffer.end() ; ++i)
-        stream << *i << std::endl;
-
-    buffer.clear();
+    std::remove_copy(buffer.begin(), buffer.end(),
+        std::ostream_iterator<std::string>(stream, "\n"),
+        "supercalifragilisticexpialidocious");
 }
 
 /* vim: set tw=80 sw=4 et : */
