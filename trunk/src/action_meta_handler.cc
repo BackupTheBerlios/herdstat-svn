@@ -29,9 +29,13 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
 #include <unistd.h>
 #include <dirent.h>
 
+#include "categories.hh"
 #include "herds.hh"
 #include "formatter.hh"
 #include "options.hh"
@@ -47,10 +51,9 @@
  */
 
 std::vector<std::string>
-get_possibles(const std::string &pkg)
+get_possibles(const std::string &portdir, const std::string &pkg)
 {
     std::vector<std::string> pkgs;
-    std::string portdir = optget("portdir", std::string);
 
     /* if category was specified, just check for existence */
     std::string::size_type pos = pkg.find('/');
@@ -61,16 +64,17 @@ get_possibles(const std::string &pkg)
         return pkgs;
     }
 
-    std::vector<std::string> categories = util::get_categories(portdir);
-    std::vector<std::string>::iterator c;
+    categories_T categories;
+    categories_T::iterator c;
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         std::string path = portdir + "/" + (*c);
 
+        /* was a category specified? only one possible */
         if (*c == pkg)
         {
             pkgs.push_back(*c);
-            return pkgs;
+            break;
         }
 
         /* open category */
@@ -91,7 +95,7 @@ get_possibles(const std::string &pkg)
 
 int
 action_meta_handler_T::operator() (herds_T &herds_xml,
-                                    std::vector<std::string> &pkgs)
+                                    std::vector<std::string> &opts)
 {
     util::color_map_T color;
     formatter_T output;
@@ -117,15 +121,55 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
     if (not util::is_dir(portdir))
         throw bad_fileobject_E(portdir);
 
+    /* we can be called with 0 opts if we are currently
+     * in a directory that contains a metadata.xml */
+    if (opts.empty())
+    {
+        unsigned short depth = 0;
+
+        /* are we in a package's directory? */
+        if (util::in_pkgdir())
+            depth = 2;
+        /* not in pkgdir and metdata exists,
+         * so assume we're in a category */
+        else if (util::is_file("metadata.xml"))
+            depth = 1;
+        else
+            throw args_usage_E();
+
+        std::string leftover;
+        std::string path = util::getcwd();
+        while (depth > 0)
+        {
+            std::string::size_type pos = path.rfind('/');
+            if (pos != std::string::npos)
+            {
+                if (leftover.empty())
+                    leftover = path.substr(pos + 1);
+                else
+                    leftover = path.substr(pos + 1) + "/" + leftover;
+
+                path = path.substr(0, pos);
+            }
+            --depth;
+        }
+
+        portdir = path;
+        opts.push_back(leftover);
+        
+        util::debug_msg("set portdir to '%s'", portdir.c_str());
+        util::debug_msg("added '%s' to opts.", leftover.c_str());
+    }
+
     /* for each specified package/category... */
     std::vector<std::string>::iterator i;
     std::vector<std::string>::size_type n = 1;
-    for (i = pkgs.begin() ; i != pkgs.end() ; ++i, ++n)
+    for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::vector<std::string> possibles = get_possibles(*i);
+        std::vector<std::string> possibles = get_possibles(portdir, *i);
         std::string longdesc, metadata;
 
         /* is there more than one package with that name? */
@@ -140,7 +184,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             return EXIT_FAILURE;
         }
-        else if (possibles.empty() and pkgs.size() == 1)
+        else if (possibles.empty() and opts.size() == 1)
         {
             std::cerr << *i << " does not seem to exist." << std::endl;
             return EXIT_FAILURE;
@@ -148,19 +192,25 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         /* or none perhaps? */
         else if (possibles.empty())
         {
-            std::cerr << *i << "' does not seem to exist." << std::endl << std::endl;
+            std::cerr << *i << " does not seem to exist." << std::endl << std::endl;
             continue;
         }
+            
+        /* if no '/' exists, assume it's a category */
+        if (possibles.front().find("/") == std::string::npos)
+            cat = true;
+        
+        output(cat ? "Category" : "Package", possibles.front());
 
         if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
         {
+            /* parse it */
             try
             {
                 std::auto_ptr<MetadataXMLHandler_T>
                     handler(new MetadataXMLHandler_T());
                 XMLParser_T parser(&(*handler));
 
-                /* parse it */
                 parser.parse(portdir + "/" + possibles.front() +
                              "/metadata.xml");
 
@@ -177,15 +227,6 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             if (n != 1)
                 output.endl();
-
-            /* if no '/' exists, assume it's a category */
-            if (possibles.front().find("/") == std::string::npos)
-                cat = true;
-
-            if (cat)
-                output("Category", possibles.front());
-            else
-                output("Package", possibles.front());
 
             /* herds */
             if (not cat and (herds.empty() or (herds.front() == "no-herd")))
@@ -235,8 +276,20 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         }
         else
         {
-            output("Package", possibles.front());
-            output("", "No metadata.xml.");
+            output("", color[red] + "No metadata.xml." + color[none]);
+            
+            if (not cat)
+            {
+                std::string homepage = util::get_ebuild_var(portdir,
+                    possibles.front(), "HOMEPAGE");
+                if (not homepage.empty())
+                    output("Homepage", homepage);
+
+                longdesc = util::get_ebuild_var(portdir, possibles.front(),
+                    "DESCRIPTION");
+                if (not longdesc.empty())
+                    output("Description", longdesc);
+            }
         }
     }
 
