@@ -2,6 +2,8 @@ ChangeLog for herdstat
 
 2005-04-02 Aaron Walker <ka0ttic@gentoo.org>
 
+	* src/metadatas.cc: Fixed bug where new timestamp isnt copied when
+	md5sum fails.
 	* src/action_meta_handler.cc: Don't display colors in the ambigous
 	package warning when --quiet.
 	* src/action_pkg_handler.cc: Fix bug where first package of list was
