@@ -90,6 +90,9 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     std::vector<std::string> not_found;
 
     std::ostream *stream = optget("outstream", std::ostream *);
+
+    /* this code takes long enough as it is... no need for
+     * a zillion calls to optget inside loops */
     bool quiet = optget("quiet", bool);
     bool verbose = optget("verbose", bool);
     bool timer = optget("timer", bool);
@@ -304,8 +307,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
             if (pkgs.empty())
                 output("Packages(0)", "none");
+            /* display first package on same line */
+            else if (verbose)
+                output(util::sprintf("Packages(%d)", pkgs.size()),
+                    color[blue] + pkgs.begin()->first + color[none]);
             else
-                /* display first package on same line */
                 output(util::sprintf("Packages(%d)", pkgs.size()),
                     pkgs.begin()->first);
         }
