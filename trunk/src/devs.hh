@@ -44,16 +44,24 @@ class dev_attrs_T : public std::vector<std::string>
         {
             formatter_T out;
 
-            if (this->size() > 1 and optget("all", bool))
-                out.append("", this->front());
-            else
+            if (optget("all", bool) and not name.empty())
+                out.append("", name);
+            else if (not optget("all", bool))
             {
+                if (not name.empty())
+                    out.append("", name);
+                if (not role.empty())
+                    out.append("", role);
+
                 for (iterator i = this->begin() ; i != this->end() ; ++i)
                     out.append("", *i);
             }
 
             out.endl();
         }
+
+        std::string role;
+        std::string name;
 };
 
 #endif
