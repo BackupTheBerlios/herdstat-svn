@@ -22,9 +22,13 @@ Display package information for the specified herd(s).
 .B "\-d, \-\-dev"
 Display herd information for the specified developer(s).
 .TP
-.B "\-H, \-\-herdsxml <file>"
+.B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
 for an alternative way of setting the herds.xml location.
+.TP
+.B "\-o, \-\-outfile \fI<file>\fR"
+Send output to the specified file instead of stdout.  \fI<file>\fR can also be
+either stdout (default if -o is not specified) or stderr. This option implies --quiet.
 .TP
 .B "\-v, \-\-verbose"
 Display verbose output.
@@ -60,6 +64,8 @@ Display all developers in the netmon and x11 herds.
 Display all packages in the netmon herd.
 .IP "\fB$ @PACKAGE@ -d ka0ttic\fR"
 Display all herds that the developer ka0ttic is in.
+.IP "\fB$ @PACKAGE@ -o ~/x11-devs.txt x11\fR"
+Send the output of '@PACKAGE@ x11' to ~/x11-devs.txt.
 .IP "\fB$ @PACKAGE@ all\fR"
 Display all herds.
 .IP "\fB$ for x in $(@PACKAGE@ -pq cron); do ... ; done\fR" 
