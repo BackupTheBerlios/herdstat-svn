@@ -1,4 +1,4 @@
-# $Header: /var/cvsroot/gentoo-x86/app-portage/herdstat/files/herdstat.bashcomp,v 1.2 2005/03/09 16:41:34 ka0ttic Exp $
+# $Id$
 # bash command line completion for herdstat.
 # Author: Aaron Walker <ka0ttic@gentoo.org>
 
@@ -27,10 +27,34 @@ _herdstat() {
 	    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
 	    ;;
         -m|--metadata)
-            _pkgname -A $cur
+            local words p=$(_portdir)
+            local sedcmd="sed -e :^[^-]*$:d"
+            local grepcmd="grep -E ^${cur}.*"
+            
+            [[ -d ${p} ]] || return 0
 
-            local p=$(_portdir)
-            COMPREPLY=( ${COMPREPLY[@]} $(< ${portdir}/categories) )
+            if [[ ${cur} == */* ]] ; then
+                words=$(builtin cd ${p}; compgen -G "${cur}*" | ${sedcmd})
+            else
+                local ww=$(builtin cd ${p}; compgen -X "!*-*" -S '/' -G "${cur}*" | ${sedcmd})
+                ww="${ww} $(builtin cd ${p}; compgen -X "!*-*" -G "${cur}*" | ${sedcmd})"
+
+                local w
+                for x in ${ww} ; do
+                    w="${x}\n${w}"
+                done
+
+                words=$(echo -e ${w} | uniq)
+                [ $(echo "${words}" | ${grepcmd} | wc -l) = 1 ] && \
+                    words=$(builtin cd ${p}; compgen -G "*/*" | ${sedcmd})
+            fi
+            COMPREPLY=($(echo "${words}" | ${grepcmd}))
+
+            if [[ -z "${COMPREPLY}" ]] ; then
+                COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
+                    for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                    done)" -- $cur) )
+            fi
             ;;
 	*)
 	    local x dev=0 pkg=0 meta=0
@@ -63,10 +87,32 @@ _herdstat() {
                 COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts}" \
                     -- ${cur}) )
             elif [[ ${meta} -eq 1 ]] ; then
-                _pkgname -A $cur
+                local words p=$(_portdir)
+                local sedcmd="sed -e :^[^-]*$:d"
+                local grepcmd="grep -E ^${cur}.*"
+            
+                [[ -d ${p} ]] || return 0
 
-                local p=$(_portdir)
-                COMPREPLY=( ${COMPREPLY[@]} $(< ${portdir}/categories) )
+                if [[ ${cur} == */* ]] ; then
+                    words=$(builtin cd ${p}; compgen -G "${cur}*" | ${sedcmd})
+                else
+                    local ww=$(builtin cd ${p}; compgen -X "!*-*" -S '/' -G "${cur}*" | ${sedcmd})
+                    ww="${ww} $(builtin cd ${p}; compgen -X "!*-*" -G "${cur}*" | ${sedcmd})"
+
+                    local w
+                    for x in ${ww} ; do w="${x}\n${w}"; done
+
+                    words=$(echo -e ${w} | uniq)
+                    [ $(echo "${words}" | ${grepcmd} | wc -l) = 1 ] && \
+                        words=$(builtin cd ${p}; compgen -G "*/*" | ${sedcmd})
+                fi
+                COMPREPLY=($(echo "${words}" | ${grepcmd}))
+
+                if [[ -z "${COMPREPLY}" ]] ; then
+                    COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
+                    for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                    done)" -- $cur) )
+                fi
 	    else
 		COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" \
                     -- ${cur}) )

@@ -1,6 +1,16 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.0.1:
+    New features:
+     - New --metadata option that displays metadata information for the
+       specified package(s)/category(s).  Blame Obz for this.
+     - New --no-herd option that when specified with --package --dev only
+       shows packages belong to herd "no-herd".
+
+    Bug fixes:
+     - package handler quirks fixed wrt to stuff that doesnt exist.
+
 1.0:
     New features:
      - Added progress thinggy for metadata caching, since that's the biggest

@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-03-27 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.0.1-release).
 	* doc/herdstat.1.in: Updated for --metadata and --no-herd.
 	* src/action_pkg_handler.cc, src/options.cc: Added --no-herd option
 	for only displaying packages in herd "no-herd".
