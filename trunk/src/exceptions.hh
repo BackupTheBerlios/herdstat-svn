@@ -103,13 +103,12 @@ class invalid_option_E                  : public herdstat_msg_base_E
         }
 };
 
-class bad_fileobject_E                  : public herdstat_msg_base_E
+class errno_error_E                     : public herdstat_msg_base_E
 {
     public:
-        bad_fileobject_E() { }
-        bad_fileobject_E(const char *msg) : herdstat_msg_base_E(msg) { }
-        bad_fileobject_E(const std::string &msg) : herdstat_msg_base_E(msg) { }
-
+        errno_error_E() { }
+        errno_error_E(const char *msg) : herdstat_msg_base_E(msg) { }
+        errno_error_E(const std::string &msg) : herdstat_msg_base_E(msg) { }
         virtual const char *what() const throw()
         {
             std::string s(str);
@@ -117,6 +116,14 @@ class bad_fileobject_E                  : public herdstat_msg_base_E
                 return std::strerror(errno);
             return (s + ": " + std::strerror(errno)).c_str();
         }
+};
+
+class bad_fileobject_E                  : public errno_error_E
+{
+    public:
+        bad_fileobject_E() { }
+        bad_fileobject_E(const char *msg) : errno_error_E(msg) { }
+        bad_fileobject_E(const std::string &msg) : errno_error_E(msg) { }
 };
 
 class bad_herdsXML_E                    : public herdstat_base_E { };
