@@ -170,7 +170,7 @@ util::get_ebuild_var(const std::string &portdir,
 
 	    util::debug_msg("Found var '%s'", s.c_str());
 	    vars.push_back(s);
-	    lpos = ++begin;
+	    lpos = ++end;
 	}
 
 	std::map<std::string, std::string> varmap = get_vars(ebuild, vars);
