@@ -27,14 +27,8 @@
 # include "config.h"
 #endif
 
-#include <fstream>
-#include <string>
-#include <vector>
-#include <memory>
-
-#include "cache.hh"
 #include "util.hh"
-#include "exceptions.hh"
+#include "cache.hh"
 
 #define CATEGORIES "/profiles/categories"
 
@@ -46,7 +40,11 @@ class categories_T : public cache_T<std::string>
 {
     public:
         categories_T()
-            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES) { }
+            : cache_T<std::string>(std::string(util::portdir()) + CATEGORIES)
+        {
+            this->read();
+        }
+
         categories_T(const std::string &portdir)
             : cache_T<std::string>(portdir + CATEGORIES)
         {
