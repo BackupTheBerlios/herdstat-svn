@@ -59,8 +59,6 @@ format_attrs_T::format_attrs_T()
 void
 formatter_T::set_attrs()
 {
-    util::color_map_T color;
-
     if (quiet())
         attr.colors = false;
     else
@@ -78,9 +76,7 @@ formatter_T::set_attrs()
         attr.maxclabel = attr.maxlabel
                        + attr.label_color.length()
                        + color[none].length();
-        attr.maxcdata  = attr.maxdata
-                       + attr.data_color.length()
-                       + color[none].length();
+        attr.maxcdata  = attr.maxdata;
         attr.maxctotal = attr.maxclabel + attr.maxcdata;
     }
     else
@@ -90,6 +86,30 @@ formatter_T::set_attrs()
         attr.maxcdata  = attr.maxdata;
         attr.maxctotal = attr.maxtotal;
     }
+}
+
+/*
+ * Given a vector of data, see if any of the elements
+ * match words that should be highlighted.  Return the
+ * string, highlighted or not.
+ */
+
+std::string
+formatter_T::highlight(std::vector<std::string> data)
+{
+    std::string s;
+    std::vector<std::string>::iterator i;
+
+    for (i = data.begin() ; i != data.end() ; ++i)
+    {
+        if (std::find(attr.highlights.begin(),
+            attr.highlights.end(), *i) != attr.highlights.end())
+            s += attr.highlight_color + (*i) + color[none] + " ";
+        else
+            s += *i + " ";
+    }
+
+    return s;
 }
 
 /*
@@ -128,7 +148,6 @@ formatter_T::append(const std::string &label, std::vector<std::string> data)
 void
 formatter_T::append(const std::string &label, const std::string &data)
 {
-    util::color_map_T color;
     std::string cur;
 
     /* don't display the label (or indent) if the quiet attr is set */
@@ -151,20 +170,17 @@ formatter_T::append(const std::string &label, const std::string &data)
             append(label, util::splitstr(data));
         else
         {
-            cur.append(attr.data_color);
-
-            /* will it all fit on one line? */
-            if ((cur.length() + data.length() +
-                color[none].length()) < attr.maxctotal)
-                cur.append(data);
+            if ((cur.length() + data.length()) < attr.maxctotal)
+                cur += highlight(util::splitstr(data));
             else
             {
                 /* line's full, so find a location where we can truncate */
                 std::string::size_type pos = data.rfind(" ", attr.maxdata);
-                cur.append(pos == std::string::npos ? data : data.substr(0, pos));
+                cur += highlight(util::splitstr(
+                    (pos == std::string::npos ? data : data.substr(0, pos))));
                 buffer.push_back(cur);
                 cur.clear();
-            
+
                 /* indent */
                 while (cur.length() < attr.maxlabel)
                     cur.append(" ");
@@ -175,8 +191,42 @@ formatter_T::append(const std::string &label, const std::string &data)
                 std::vector<std::string>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
                 {
+                    std::string::size_type oldlen;
+                    bool highlight_found = false;
+
+                    /* should the current word be highlighted? */
+                    if (std::find(attr.highlights.begin(),
+                        attr.highlights.end(), *i) != attr.highlights.end())
+                    {
+                        highlight_found = true;
+
+                        /* adjust maxtotal appropriately */
+                        oldlen = attr.maxtotal;
+                        attr.maxtotal = oldlen + attr.highlight_color.length() +
+                            color[none].length();
+                    }
+
+                    std::string::size_type curlen;
+
+                    /*
+                     * Does cur contain a previously highlighted word? If so,
+                     * we need to compensate for the color lengths.
+                     */
+                    if ((cur.find("\033") != std::string::npos))
+                        curlen = cur.length() - attr.highlight_color.length() -
+                            color[none].length();
+
+                    /* compensate for current highlight? */
+                    else if (highlight_found)
+                        curlen = cur.length() + attr.highlight_color.length() +
+                            color[none].length();
+
+                    /* don't compensate */
+                    else
+                        curlen = cur.length();
+
                     /* does it fit on the current line? */
-                    if ((cur.length() + (*i).length()) > attr.maxtotal)
+                    if ((curlen + (*i).length()) > attr.maxtotal)
                     {
                         buffer.push_back(cur);
                         cur.clear();
@@ -186,7 +236,15 @@ formatter_T::append(const std::string &label, const std::string &data)
                             cur.append(" ");
                     }
             
-                    cur += *i + " ";
+                    if (highlight_found)
+                    {
+                        cur += attr.highlight_color + (*i) + color[none] + " ";
+
+                        /* restore saved maxtotal */
+                        attr.maxtotal = oldlen;
+                    }   
+                    else
+                        cur += *i + " ";
                 }
             }
         }
@@ -206,7 +264,7 @@ formatter_T::flush(std::ostream &stream)
 {
     std::remove_copy(buffer.begin(), buffer.end(),
         std::ostream_iterator<std::string>(stream, "\n"),
-        "supercalifragilisticexpialidocious");
+        "supercalifragilisticexpialidocious"); // :)
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -45,6 +45,7 @@ class format_attrs_T
 
         std::string label_color;
         std::string data_color;
+        std::string highlight_color;
 
         std::string::size_type maxtotal;
         std::string::size_type maxlabel;
@@ -53,6 +54,8 @@ class format_attrs_T
         std::string::size_type maxctotal;
         std::string::size_type maxclabel;
         std::string::size_type maxcdata;
+
+        std::vector<std::string> highlights;
 };
 
 class formatter_T
@@ -60,6 +63,7 @@ class formatter_T
     private:
         static std::vector<std::string> buffer;
         static format_attrs_T attr;
+        util::color_map_T color;
 
     public:
         typedef int size_type;
@@ -71,6 +75,7 @@ class formatter_T
         void append(const std::string &, std::vector<std::string>);
         void flush(std::ostream &);
         const std::string &peek() { return buffer.back(); }
+        std::string highlight(std::vector<std::string>);
 
         void set_attrs();
 
@@ -101,6 +106,11 @@ class formatter_T
 
         void set_datacolor(std::string &s) { attr.data_color = s; }
         std::string &datacolor() { return attr.data_color; }
+
+        void set_highlightcolor(std::string &s) { attr.highlight_color = s; }
+        std::string &highlightcolor() { return attr.highlight_color; }
+
+        void add_highlight(std::string s) { attr.highlights.push_back(s); }
 };
 
 #endif
