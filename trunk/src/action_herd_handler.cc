@@ -82,6 +82,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
                     std::cerr << color[red] << "Herd '" << *herd
                         << "' doesn't seem to exist." << color[none] << std::endl;
                     std::cerr << std::endl;
+                    ++n;
                     continue;
                 }
                 else

@@ -134,27 +134,13 @@ herds_T::display(std::ostream &stream)
     formatter_T out;
 
     std::vector<std::string> hvec;
-    float ndev = 0;
-    std::string biggest_herdstr;
-    herd_T::size_type biggest_herd = 0;
-
-    iterator h;
-    for (h = this->begin() ; h != this->end() ; ++h)
-    {
-        ndev += h->second->size();
-        if (h->second->size() > biggest_herd)
-        {
-            biggest_herd = h->second->size();
-            biggest_herdstr = h->first;
-        }
-    }
 
     if (optget("verbose", bool) and not optget("quiet", bool))
         out.append(util::sprintf("Herds(%d)", this->size()), "");
 
     /* for each herd in herds.xml... */
     size_type n = 0;
-    for (h = this->begin() ; h != this->end() ; ++h)
+    for (iterator h = this->begin() ; h != this->end() ; ++h)
     {
         if (optget("verbose", bool))
         {
@@ -176,14 +162,6 @@ herds_T::display(std::ostream &stream)
 
     if (hvec.size() > 0)
         out.append(util::sprintf("Herds(%d)", this->size()), hvec);
-    
-    if (not optget("quiet", bool))
-    {
-        if (optget("verbose", bool))
-            out.endl();
-        out.append("Avg devs/herd", util::sprintf("%.2f", ndev / this->size()));
-        out.append(util::sprintf("Most devs(%d)", biggest_herd), biggest_herdstr);
-    }
 }
 
 /* vim: set tw=80 sw=4 et : */

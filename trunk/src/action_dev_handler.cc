@@ -61,10 +61,14 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     /* all target? */
     if (devs[0] == "all")
     {
-        /* treat ALL developers in herds.xml as a single herd */
+        /*
+         * treat ALL developers in herds.xml as a single herd
+         */
+
         herd_T all_devs;
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
+            /* for each developer in the herd... */
             herd_T::iterator d;
             for (d = h->second->begin() ; d != h->second->end() ; ++d)
             {
@@ -73,6 +77,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                     all_devs[d->first] = d->second;
             }
         }
+
         all_devs.display(*stream);
     }
     else

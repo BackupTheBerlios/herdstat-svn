@@ -41,7 +41,8 @@ enum options_action_T
     action_unspecified,
     action_herd,
     action_dev,
-    action_pkg
+    action_pkg,
+    action_stats
 };
 
 /*

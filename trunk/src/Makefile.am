@@ -1,4 +1,4 @@
-# $Id: Makefile.am 104 2005-03-06 19:47:53Z ka0ttic $
+# $Id$
 
 bin_PROGRAMS = herdstat
 
@@ -15,6 +15,7 @@ herdstat_SOURCES = exceptions.hh \
 		   action_herd_handler.hh action_herd_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
 		   action_pkg_handler.hh action_pkg_handler.cc \
+		   action_stats_handler.hh action_stats_handler.cc \
 		   herdstat.cc
 
 LIBS = @LIBS@ @XMLWRAPP_LIBS@

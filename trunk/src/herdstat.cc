@@ -53,6 +53,7 @@
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
+#include "action_stats_handler.hh"
 
 static const std::string default_herdsxml =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
@@ -253,8 +254,7 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	while (optind < argc)
 	    args->push_back(argv[optind++]);
     }
-    /* --fetch is the only option that allows ZERO non-option args */
-    else if (not optget("fetch", bool))
+    else if (optget("action", options_action_T) != action_unspecified)
 	throw args_usage_E();
 
     return 0;
@@ -297,6 +297,9 @@ main(int argc, char **argv)
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw args_E();
+
+	if (nonopt_args.empty())
+	    optset("action", options_action_T, action_stats);
 
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output				*/
@@ -365,6 +368,10 @@ main(int argc, char **argv)
 		    optset("herds.xml", std::string, fetched_location);
 		else
 		    throw fetch_E();
+
+		/* remove back up copy */
+		if (util::is_file(fetched_location + ".bak"))
+		    unlink((fetched_location + ".bak").c_str());
 	    }
 	}
 	catch (const fetch_E &e)
@@ -449,9 +456,10 @@ main(int argc, char **argv)
 	    optset("action", options_action_T, action_herd);
 
 	std::map<options_action_T, action_handler_T * > handlers;
-	handlers[action_herd] = new action_herd_handler_T();
-	handlers[action_dev]  = new action_dev_handler_T();
-	handlers[action_pkg]  = new action_pkg_handler_T();
+	handlers[action_herd]  = new action_herd_handler_T();
+	handlers[action_dev]   = new action_dev_handler_T();
+	handlers[action_pkg]   = new action_pkg_handler_T();
+	handlers[action_stats] = new action_stats_handler_T();
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];
