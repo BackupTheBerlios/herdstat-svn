@@ -135,8 +135,13 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         else if (util::is_file("metadata.xml"))
             depth = 1;
         else
-            throw args_usage_E();
+        {
+            std::cerr << "You must be in a package directory or category if you" << std::endl
+                << "want to run " << PACKAGE << " -m with no non-option arguments." << std::endl;
+            return EXIT_FAILURE;
+        }
 
+        /* Loop, trimming each directory from the end until depth == 0 */
         std::string leftover;
         std::string path = util::getcwd();
         while (depth > 0)
@@ -154,6 +159,8 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             --depth;
         }
 
+        /* now assign portdir to our path, treating the leftovers as the
+         * category or category/package */
         portdir = path;
         opts.push_back(leftover);
         
@@ -274,10 +281,13 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             else
                 output("Description", util::tidy_whitespace(longdesc));
         }
+
+        /* package or category exists, but metadata.xml doesn't */
         else
         {
             output("", color[red] + "No metadata.xml." + color[none]);
             
+            /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
                 std::string homepage = util::get_ebuild_var(portdir,

@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-04-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_meta_handler.cc: Instead of throwing an instance of
+	args_usage_E if -m is specified w/no non-opt args, print a message
+	telling the user they must be in a package directory or category.
+	Added a few comments.
+
 2005-03-31 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/categories.hh: Added new categories_T class.
