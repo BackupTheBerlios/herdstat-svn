@@ -31,7 +31,7 @@ _herdstat() {
 	*)
 	    local x dev
 	    for x in ${COMP_WORDS[@]} ; do
-		if [[ ${x} == "-d" || ${x} == "--dev" ]] ; then
+		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
 		    dev=1
 		    break
 		fi
