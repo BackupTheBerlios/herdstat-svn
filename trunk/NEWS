@@ -1,6 +1,22 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+0.6:
+    New features:
+     - You are now able to specify both --dev and --package at the same time
+       in order to query the packages maintained by a specific developer.
+     - Added --count option.  Using this option would produce the same result
+       as running 'herdstat ... | grep -v '^$' | wc -l'.
+
+    Bug fixes:
+     - Ignore --quiet if herdstat is invoked with no non-option arguments.
+     - Fixed completion bug where stderr wasn't redirected, this causing 
+       weird completion funkyness if an error occurred.
+     - Ignore case when it comes to developer usernames, otherwise we get
+       duplicates (ex: pyrania/pYrania).
+     - Fixed bug where a newline would get displayed after a herd, even if
+       the number of pkgs in that herd == 0.
+
 0.5:
     New features:
      - When herdstat is run with no arguments, display a summary of statistics.
