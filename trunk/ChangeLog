@@ -4,9 +4,8 @@ ChangeLog for herdstat
 
 	* configure.ac: Update version (1.0_rc2-release).
 	* src/action_pkg_handler.cc: Modified get_metadatas() to cache the
-	list of metadata.xml's for 24hrs; use bash (if available) to get the
-	list. This should decrease the lookup time slightly. Will fall back to
-	the original method if bash execution fails.
+	list of metadata.xml's for 24hrs; This should make subsequent queries
+	a lot faster.
 	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc, src/herds.cc,
 	src/devs.hh, src/action_pkg_handler.cc: Call util::tidy_whitespace()
 	for only the data shown, not ALL data when filling the containers.

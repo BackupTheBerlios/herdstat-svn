@@ -51,6 +51,11 @@
 #include "exceptions.hh"
 #include "action_pkg_handler.hh"
 
+/* rough number of metadata's in the tree, updated from time to time
+ * as it grows. Used for the initial reserve() so that a ton of re-
+ * allocations can be prevented. */
+#define METADATA_RESERVE    8200
+
 /*
  * Retrieve a list of all categories from PORTDIR/profiles/categories
  */
@@ -81,17 +86,17 @@ std::vector<std::string>
 get_metadatas(const std::string &portdir)
 {
     std::vector<std::string> metadatas;
-    metadatas.reserve(8000);
+    metadatas.reserve(METADATA_RESERVE);
 
     struct stat s;
     std::string cache = util::sprintf("%s/%s/metadatas", LOCALSTATEDIR, PACKAGE);
-    std::string cmd =
-        "bash -c 'for x in " + portdir + "/*-*/*/metadata.xml ; do echo $x ; done'";
 
     /* check if cache exists, is newer than 24hrs, and is >0 bytes */
     if ((stat(cache.c_str(), &s) == 0) and
         ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
     {
+        /* if so, we're good to go. get it and return */
+
         util::debug_msg("cache exists and is newer than 24hrs... using it.");
 
         std::auto_ptr<std::istream> f(new std::ifstream(cache.c_str()));
@@ -111,59 +116,35 @@ get_metadatas(const std::string &portdir)
         throw bad_fileobject_E("Failed to open '%s': %s", cache.c_str(),
             strerror(errno));
 
-    util::debug_msg("executing '%s'", cmd.c_str());
-
-    FILE *p = popen(cmd.c_str(), "r");
-    if (p)
-    {
-        std::string output;
-        char line[PATH_MAX+1];
-
-        while (std::fgets(line, sizeof(line) - 1, p) != NULL)
-        {
-            output = line;
-            if (output[output.length() - 1] == '\n')
-                output.erase(output.length() - 1);
-
-            metadatas.push_back(output);
-            *fcache << output << std::endl;
-        }
-        pclose(p);
-    }
-    else
-    {
-        util::debug_msg("failed to run bash, using the slower method...");
-
-        std::vector<std::string> categories = get_categories(portdir);
-        std::vector<std::string>::iterator c;
+    std::vector<std::string> categories = get_categories(portdir);
+    std::vector<std::string>::iterator c;
     
-        for (c = categories.begin() ; c != categories.end() ; ++c)
-        {
-            std::string cat = portdir + "/" + (*c);
+    for (c = categories.begin() ; c != categories.end() ; ++c)
+    {
+        std::string cat = portdir + "/" + (*c);
 
-            /* open category */
-            DIR *dir = opendir(cat.c_str());
-            if (not dir)
-                continue;
+        /* open category */
+        DIR *dir = opendir(cat.c_str());
+        if (not dir)
+            continue;
         
-            util::debug_msg("opened directory %s", cat.c_str());
+        util::debug_msg("opened directory %s", cat.c_str());
 
-            struct dirent *d;
-            while ((d = readdir(dir)))
+        struct dirent *d;
+        while ((d = readdir(dir)))
+        {
+            /* skip anything starting with a '.' */
+            if (std::strncmp(d->d_name, ".", 1) == 0)
+                continue;
+
+            std::string metadata = cat + "/" + d->d_name + "/metadata.xml";
+            if (util::is_file(metadata))
             {
-                /* skip anything starting with a '.' */
-                if (std::strncmp(d->d_name, ".", 1) == 0)
-                    continue;
-
-                std::string metadata = cat + "/" + d->d_name + "/metadata.xml";
-                if (util::is_file(metadata))
-                {
-                    metadatas.push_back(metadata);
-                    *fcache << metadata << std::endl;
-                }
+                metadatas.push_back(metadata);
+                *fcache << metadata << std::endl;
             }
-            closedir(dir);
         }
+        closedir(dir);
     }
     
     return metadatas;
@@ -233,44 +214,35 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         *stream << "Parsing metadata.xml's (this may take a while)..."
             << std::endl;
 
-    /* get a list of every metadata.xml */
-    std::vector<std::string> metadatas;
-    metadatas.reserve(8000);
-    try
+    /* PORTDIR */
+    optset("portdir", std::string, util::portdir());
+    char *result = getenv("PORTDIR");
+    if (result)
+	optset("portdir", std::string, result);
+
+    /* make sure it exists */
+    if (not util::is_dir(optget("portdir", std::string)))
+	throw bad_fileobject_E("PORTDIR '%s' does not exist.",
+	    optget("portdir", std::string).c_str());
+
+    if (optget("timer", bool))
+        timer.start();
+
+    /* get a list of all metadata.xml's */
+    std::vector<std::string> metadatas = get_metadatas(optget("portdir",
+        std::string));
+
+    if (optget("timer", bool))
     {
-	/* PORTDIR */
-	optset("portdir", std::string, util::portdir());
-        char *result = getenv("PORTDIR");
-	if (result)
-	    optset("portdir", std::string, result);
-
-        /* make sure it exists */
-	if (not util::is_dir(optget("portdir", std::string)))
-	    throw bad_fileobject_E("PORTDIR '%s' does not exist.",
-		optget("portdir", std::string).c_str());
-
-        if (optget("timer", bool))
-            timer.start();
-
-        /* get a list of all metadata.xml's */
-        metadatas = get_metadatas(optget("portdir", std::string));
-
-        if (optget("timer", bool))
-        {
-            timer.stop();
-            util::debug_msg("Took %ldms to get a list of every metadata.xml in the tree.",
-                timer.elapsed());
-        }
-    }
-    catch (const bad_fileobject_E &e)
-    {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
+        timer.stop();
+        util::debug_msg("Took %ldms to get a list of every metadata.xml in the tree.",
+            timer.elapsed());
     }
 
     if (not optget("quiet", bool))
         output.endl();
-
+    
+    /* total pkgs */
     std::map<std::string, std::string>::size_type size = 0;
 
     /* for each specified herd/dev... */
