@@ -47,6 +47,36 @@ util::fileobject_T::fileobject_T(const std::string &n, util::type_T t)
 }
 
 /**************************
+ * file_T                 *
+ **************************/
+
+void
+util::file_T::open()
+{
+    if (stream)
+    {
+        if (stream->is_open())
+            return;
+
+        stream->open(_name.c_str());
+    }
+    else
+        stream = new C(_name.c_str());
+}
+
+void
+util::file_T::open(const char *n)
+{
+
+}
+
+void
+util::file_T::read()
+{
+
+}
+
+/**************************
  * dir_T                  *
  **************************/
 

@@ -39,17 +39,6 @@
 
 namespace util
 {
-    bool is_dir(const char *);
-    bool is_dir(const std::string &);
-    bool is_dir(const struct stat &);
-    bool is_file(const char *);
-    bool is_file(const std::string &);
-    bool is_file(const struct stat &);
-    const char *basename(const char *);
-    const char *basename(std::string const &);
-    const char *dirname(const char *);
-    const char *dirname(std::string const &);
-
     enum type_T { dir, file };
 
     /* generic file object */
@@ -93,25 +82,36 @@ namespace util
             type_T type() const { return _type; }
 
             virtual void display(std::ostream &) { }
+            virtual void open() = 0;
+            virtual void open(const char *) = 0;
+            virtual void read() = 0;
     };
 
     /* represents a regular file */
+    template <class C>
     class file_T : public fileobject_T
     {
         protected:
-            std::fstream *stream;
+            C *stream;
 
         public:
             file_T(const std::string &n)
                 : fileobject_T(n, file), stream(NULL) { }
             file_T(const char *n)
                 : fileobject_T(n, file), stream(NULL) { }
-            file_T(const std::string &n, std::fstream *s)
+            file_T(const std::string &n, C *s)
                 : fileobject_T(n, file), stream(s) { }
-            file_T(const char *n, std::fstream *s)
+            file_T(const char *n, C *s)
                 : fileobject_T(n, file), stream(s) { }
             virtual ~file_T() { if (stream) delete stream; }
+
+            virtual void open();
+            virtual void open(const char *);
+            virtual void read();
     };
+
+    typedef file_T<std::ofstream> ofile_T;
+    typedef file_T<std::ifstream> ifile_T;
 
     /* represents a fileobject_T container (aka a directory).
      * of course, directories are file objects themselves... */
@@ -131,7 +131,10 @@ namespace util
                 : fileobject_T(n, dir) { read(recurse); }
             virtual ~dir_T();
 
-            void read(bool recurse);
+            virtual void open() { }
+            virtual void open(const char *) { }
+            virtual void read() { return false; }
+            virtual void read(bool recurse);
             virtual void display(std::ostream &);
 
             /* small subset of vector methods */
@@ -139,6 +142,18 @@ namespace util
             iterator end() { return _contents.end(); }
             size_type size() const { return _contents.size(); }
     };
+
+    /* general purpose file-related functions */
+    bool is_dir(const char *);
+    bool is_dir(const std::string &);
+    bool is_dir(const struct stat &);
+    bool is_file(const char *);
+    bool is_file(const std::string &);
+    bool is_file(const struct stat &);
+    const char *basename(const char *);
+    const char *basename(std::string const &);
+    const char *dirname(const char *);
+    const char *dirname(std::string const &);
 }
 
 #endif
