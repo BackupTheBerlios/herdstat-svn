@@ -34,6 +34,10 @@
 #include <algorithm>
 #include "exceptions.hh"
 
+/*
+ * Represents a cache of objects of type T.
+ */
+
 template <typename T>
 class cache_T
 {
@@ -45,7 +49,6 @@ class cache_T
         typedef typename std::vector<T>::iterator iterator;
         typedef typename std::vector<T>::size_type size_type;
 
-        cache_T() { }
         cache_T(const std::string &f) : _file(f) { }
         virtual ~cache_T() { }
 
@@ -73,7 +76,6 @@ class cache_T
                 std::ostream_iterator<T>(*f, "\n"));
         }
 
-        /* these must be defined by derived classes */
         virtual bool valid() = 0;
         virtual void fill()  = 0;
 };
