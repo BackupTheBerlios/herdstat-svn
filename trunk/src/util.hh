@@ -62,6 +62,8 @@ namespace util
 	const std::string &);
     const char *ebuild_which(const std::string &, const std::string &);
     const char *get_var(const std::string &, const std::string &);
+    std::map<std::string, std::string> get_vars(const std::string &,
+	const std::vector<std::string> &);
     std::string lowercase(const std::string &);
     std::string tidy_whitespace(const std::string &);
     std::string get_user_from_email(const std::string &);

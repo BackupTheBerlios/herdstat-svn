@@ -104,7 +104,97 @@ util::get_ebuild_var(const std::string &portdir,
 		     const std::string &var)
 {
     std::string ebuild = ebuild_which(portdir, pkg);
-    return get_var(ebuild, var);
+    std::string result = get_var(ebuild, var);
+
+    /* Handle HOMEPAGE specially, doing our best to try
+     * simple variable substituion; definitely does not 
+     * work for all cases (in which case it's left alone) */
+    if (var == "HOMEPAGE" and (result.find('$') != std::string::npos))
+    {
+	std::vector<std::string> vars;
+	std::string::size_type lpos = 0;
+
+	util::debug_msg("Parsing HOMEPAGE (%s)", result.c_str());
+
+	while (true)
+	{
+	    std::string::size_type begin = result.find("${", lpos);
+	    if (begin == std::string::npos)
+		break;
+
+	    std::string::size_type end = result.find("}", begin);
+	    if (end == std::string::npos)
+		break;
+	    
+	    std::string s(result.substr(begin + 2, end - (begin + 2)));
+
+	    util::debug_msg("Found var '%s'", s.c_str());
+	    vars.push_back(s);
+	    lpos = ++begin;
+	}
+
+	std::map<std::string, std::string> varmap = get_vars(ebuild, vars);
+	std::map<std::string, std::string>::iterator i;
+	for (i = varmap.begin() ; i != varmap.end() ; ++i)
+	{
+	    std::string s("${" + i->first + "}");
+	    std::string::size_type pos = result.find(s);
+	    if (pos == std::string::npos)
+		continue;
+
+	    if (not i->second.empty())
+	    {
+		util::debug_msg("Replacing '%s' with '%s'", s.c_str(),
+		    i->second.c_str());
+		result.replace(pos, s.length(), i->second, 0,
+		    i->second.length());
+	    }
+	    else
+	    {
+		/* chop path */
+		std::string::size_type p = ebuild.rfind('/');
+		if (p != std::string::npos)
+		    ebuild = ebuild.substr(p + 1);
+
+		/* chop .ebuild */
+		if ((p = ebuild.rfind(".ebuild")) != std::string::npos)
+		    ebuild = ebuild.substr(0, p);
+
+		/* chop revision */
+		if ((p = ebuild.rfind("-r")) != std::string::npos)
+		    ebuild = ebuild.substr(0, p);
+
+		/* ${P} */
+		if (i->first == "P")
+		{
+		    result.replace(pos, s.length(), ebuild, 0, ebuild.length());
+		    util::debug_msg("Replacing '${P}' with '%s'", ebuild.c_str());
+		}
+
+		/* ${PN} */
+		else if (i->first == "PN")
+		{
+		    if ((p = ebuild.rfind('-')) != std::string::npos)
+			ebuild = ebuild.substr(0, p);
+
+		    result.replace(pos, s.length(), ebuild, 0, ebuild.length());
+		    util::debug_msg("Replacing '${PN}' with '%s'", ebuild.c_str());
+		}
+
+		/* ${PV} */
+		else if (i->first == "PV")
+		{
+		    if ((p = ebuild.rfind('-')) != std::string::npos)
+			ebuild = ebuild.substr(p + 1);
+
+		    result.replace(pos, s.length(), ebuild, 0, ebuild.length());
+		    util::debug_msg("Replacing '${PV}' with '%s'", ebuild.c_str());
+		}
+	    }
+	}
+    }
+
+    return result.c_str();
 }
 
 /*
@@ -135,6 +225,39 @@ util::get_var(const std::string &path, const std::string &var)
 	path.c_str(), result.c_str());
 
     return result.c_str();
+}
+
+/*
+ * Plural version of get_var()
+ */
+
+std::map<std::string, std::string>
+util::get_vars(const std::string &path, const std::vector<std::string> &vars)
+{
+    std::map<std::string, std::string> varmap;
+
+    if (path.empty() or vars.empty())
+	return varmap;
+
+    util::debug_msg("get_vars: opening '%s'", path.c_str());
+
+    std::auto_ptr<std::ifstream> f(new std::ifstream(path.c_str()));
+    if (not (*f))
+	throw bad_fileobject_E(path);
+
+    rcfile_T rc(*f);
+
+    std::vector<std::string>::const_iterator i;
+    for (i = vars.begin() ; i != vars.end() ; ++i)
+    {
+	rcfile_T::rcfile_keys_T::iterator pos = rc.keys.find(*i);
+	if (pos != rc.keys.end())
+	    varmap[*i] = pos->second;
+	else
+	    varmap[*i] = "";
+    }
+
+    return varmap;
 }
 
 /*
