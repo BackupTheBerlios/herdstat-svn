@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-04-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_meta_handler.cc: Don't display colors in the ambigous
+	package warning when --quiet.
+
 2005-04-01 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.0.2 release).

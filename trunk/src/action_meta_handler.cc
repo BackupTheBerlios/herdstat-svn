@@ -29,6 +29,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <iterator>
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>
@@ -196,7 +197,13 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             std::vector<std::string>::iterator p;
             for (p = possibles.begin() ; p != possibles.end() ; ++p)
-                std::cerr << "   " << color[green] << *p << color[none] << std::endl;
+            {
+                std::cerr << "   "
+                    << (quiet ? "" : color[green])
+                    << *p
+                    << (quiet ? "" : color[none])
+                    << std::endl;
+            }
 
             return EXIT_FAILURE;
         }
@@ -261,7 +268,9 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             {
                 if (quiet)
                 {
-                    std::for_each(herds.begin(), herds.end(), display_quietly);
+//                    std::for_each(herds.begin(), herds.end(), display_quietly);
+                    std::copy(herds.begin(), herds.end(),
+                        std::ostream_iterator<std::string>(*stream, " "));
                     *stream << std::endl;
                 }
                 else
@@ -274,7 +283,9 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                 if (devs.size() > 1)
                 {
                     std::vector<std::string> dev_keys(devs.keys());
-                    std::for_each(dev_keys.begin(), dev_keys.end(), display_quietly);
+//                    std::for_each(dev_keys.begin(), dev_keys.end(), display_quietly);
+                    std::copy(dev_keys.begin(), dev_keys.end(),
+                        std::ostream_iterator<std::string>(*stream, " "));
                     *stream << std::endl;
                 }
                 else if (devs.size() == 1)
