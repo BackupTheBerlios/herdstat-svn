@@ -88,9 +88,9 @@ get_metadatas(const std::string &portdir)
     std::vector<std::string> metadatas;
     metadatas.reserve(METADATA_RESERVE);
 
-    struct stat s;
     std::string cache = util::sprintf("%s/%s/metadatas", LOCALSTATEDIR, PACKAGE);
 
+    struct stat s;
     /* check if cache exists, is newer than 24hrs, and is >0 bytes */
     if ((stat(cache.c_str(), &s) == 0) and
         ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
@@ -118,7 +118,6 @@ get_metadatas(const std::string &portdir)
 
     std::vector<std::string> categories = get_categories(portdir);
     std::vector<std::string>::iterator c;
-    
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         std::string cat = portdir + "/" + (*c);
