@@ -21,6 +21,9 @@ herdstat_SOURCES = exceptions.hh \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   herdstat.cc
 
+herdstat_LDADD = ../lib/libutil.la
+
+INCLUDES = -I../lib
 LIBS = @LIBS@ @XMLWRAPP_LIBS@
 AM_CXXFLAGS = @XMLWRAPP_CFLAGS@ -pedantic -ansi -Wall
 

@@ -23,6 +23,7 @@ AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
+AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 dnl Required headers
@@ -61,5 +62,6 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
+	  lib/Makefile
 	  src/Makefile
 	  doc/Makefile)
