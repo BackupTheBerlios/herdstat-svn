@@ -162,22 +162,24 @@ herds_T::display(std::ostream &stream)
     std::vector<std::string> hvec;
     float ndev = 0;
 
-    if (options.verbose())
-        out.append(util::sprintf("Herds(%d)", this->size()), "");
-
     iterator h;
     size_type n = 0;
     for (h = this->begin() ; h != this->end() ; ++h)
         ndev += h->second->size();
 
-    if (options.verbose())
+    if (options.verbose() and not options.quiet())
+    {
         out.append("Avg devs/herd", util::sprintf("%.2f",
             ndev / this->size()));
+        out.append(util::sprintf("Herds(%d)", this->size()), "");
+    }
 
     /* for each herd in herds.xml... */
     for (h = this->begin() ; h != this->end() ; ++h)
     {
-        if (options.verbose())
+        if (options.quiet())
+            stream << h->first << std::endl;
+        else if (options.verbose())
         {
             out.append("", color[blue] + h->first + color[none]);
 
@@ -192,7 +194,7 @@ herds_T::display(std::ostream &stream)
             hvec.push_back(h->first);
     }
 
-    if (not options.verbose())
+    if (not options.verbose() and not options.quiet())
     {
         out.append(util::sprintf("Herds(%d)", this->size()), hvec);
         out.append("Avg devs/herd", util::sprintf("%.2f", ndev / this->size()));
