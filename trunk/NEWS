@@ -1,6 +1,14 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.0:
+    New features:
+     - Added progress thinggy for metadata caching, since that's the biggest
+       bottleneck.
+
+    Bug fixes:
+     - Use C++ version of isspace and tolower so that locale is considered.
+
 1.0_rc2:
     New features:
      - Cache the metadata.xml list for 24hrs to reduce package lookup times.

@@ -165,7 +165,7 @@ get_metadatas(const std::string &portdir)
     else if (not quiet)
     {
         *(optget("outstream", std::ostream *)) << " (total "
-            << metadatas.size() << ")" << std::endl;
+            << metadatas.size() << ")" << std::endl << std::endl;
     }
     
     return metadatas;
@@ -196,7 +196,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     util::color_map_T color;
     util::timer_T timer;
     std::ostream *stream = optget("outstream", std::ostream *);
-    std::vector<std::string>::iterator i;
 
     /* set format attributes */
     formatter_T output;
@@ -211,43 +210,21 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         return EXIT_FAILURE;
     }
 
-    std::vector<std::string> foundopts(opts);
-
     /* before trying to get a list of metadatas,
      * see if the herd/dev even exists */
-    for (i = opts.begin() ; i != opts.end() ; ++i)
+    if (opts.size() == 1)
     {
-        if (optget("dev", bool))
+        if (optget("dev", bool) and not dev_exists(herds_xml, opts.front()))
         {
-            if (not dev_exists(herds_xml, *i))
-            {
-                if (opts.size() == 1)
-                {
-                    std::cerr << "Developer '" << *i
-                        << "' doesn't seem to belong to any herds." << std::endl;
-
-                    throw dev_E();
-                }
-
-                foundopts.erase(std::remove(foundopts.begin(),
-                    foundopts.end(), *i), foundopts.end());
-            }
+            std::cerr << "Developer '" << opts.front()
+                << "' does not seem to exist." << std::endl;
+            throw dev_E();
         }
-        else
+        else if (not optget("dev", bool) and not herds_xml.exists(opts.front()))
         {
-            if (not herds_xml.exists(*i))
-            {
-                if (opts.size() == 1)
-                {
-                    std::cerr << "Herd '" << *i << "' doesn't seem to exist."
-                        << std::endl;
-
-                    throw herd_E();
-                }
-
-                foundopts.erase(std::remove(foundopts.begin(),
-                    foundopts.end(), *i), foundopts.end());
-            }
+            std::cerr << "Herd '" << opts.front() 
+                << "' does not seem to exist." << std::endl;
+            throw herd_E();
         }
     }
 
@@ -265,8 +242,8 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         timer.start();
 
     /* get a list of all metadata.xml's */
-    std::vector<std::string> metadatas = get_metadatas(optget("portdir",
-        std::string));
+    std::vector<std::string> metadatas =
+        get_metadatas(optget("portdir", std::string));
 
     if (optget("timer", bool))
     {
@@ -275,20 +252,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             timer.elapsed());
     }
 
-    if (not optget("quiet", bool))
-        output.endl();
-    
     /* total pkgs */
     std::map<std::string, std::string>::size_type size = 0;
 
-    util::status_T status;
-    if (not optget("quiet", bool) and not (optget("debug", bool)))
-    {
-        *stream << "Parsing metadata.xml's: ";
-        status.start(foundopts.size());
-    }
-
     /* for each specified herd/dev... */
+    std::vector<std::string>::iterator i;
     std::vector<std::string>::size_type n = 1;
     for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
@@ -301,7 +269,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not optget("quiet", bool))
                     std::cerr << std::endl << "Developer '" << *i
-                        << "' doesn't seem to belong to any herds." << std::endl;
+                        << "' doesn't seem to exist." << std::endl;
 
                 continue;
             }
@@ -312,7 +280,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not optget("quiet", bool))
                     std::cerr << std::endl << "Herd '" << *i
-                        << "' doesn't seem to exist in herds.xml." << std::endl;
+                        << "' doesn't seem to exist." << std::endl;
 
                 continue;
             }
@@ -381,14 +349,10 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             }
         }
         
-        size += pkgs.size();
-
         if (optget("timer", bool))
             timer.stop();
 
-        if ((n == 1) and (not optget("quiet", bool) and
-                          not optget("debug", bool)))
-            output.endl();
+        size += pkgs.size();
 
         if (not optget("quiet", bool))
         {
@@ -460,9 +424,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 (optget("quiet", bool) and pkgs.size() > 0))
                     output.endl();
         }
-
-        if (not optget("quiet", bool) and not (optget("debug", bool)))
-            ++status;
     }
 
     if (optget("count", bool))

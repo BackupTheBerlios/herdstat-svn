@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-03-26 Aaron Walker <ka0ttic@gentoo.org>
 	
+	* configure.ac: Update version (1.0-release).
 	* src/util.hh: Added status_T class for showing percent of task
 	completion.
 	* src/action_pkg_handler.cc: Use util::status_T for metadata caching

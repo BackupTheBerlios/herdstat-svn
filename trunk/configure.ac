@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 # $Id$
 
-AC_INIT([herdstat], [1.0_rc3], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.0], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AC_PREREQ([2.59])
