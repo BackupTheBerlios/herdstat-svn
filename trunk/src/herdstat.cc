@@ -57,6 +57,8 @@
 #include "action_meta_handler.hh"
 #include "action_stats_handler.hh"
 
+#define FETCH_LOCATION	LOCALSTATEDIR"/herds.xml"
+
 static const std::string default_herdsxml =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
@@ -322,8 +324,6 @@ main(int argc, char **argv)
     options_T options;
     formatter_T output;
     util::timer_T timer;
-    std::string fetched_location = util::sprintf("%s/%s/herds.xml",
-	LOCALSTATEDIR, PACKAGE);
 
     /* try to determine current columns, otherwise use default */
     optset("maxcol", std::size_t, util::getcols());
@@ -338,9 +338,9 @@ main(int argc, char **argv)
 	 * see the explanation below where we fetch as to why
 	 * we go through the trouble of doing this. */
 	struct stat s;
-	if ((stat(fetched_location.c_str(), &s) == 0) and
+	if ((stat(FETCH_LOCATION, &s) == 0) and
 	    ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
-	    optset("herds.xml", std::string, fetched_location);
+	    optset("herds.xml", std::string, FETCH_LOCATION);
     }
 
     try
@@ -367,8 +367,8 @@ main(int argc, char **argv)
 	    nonopt_args.erase(pos);
 
 	/* did the user specify the all target? */
-	pos = std::find(nonopt_args.begin(), nonopt_args.end(), "all");
-	if (pos != nonopt_args.end())
+	if (std::find(nonopt_args.begin(),
+		nonopt_args.end(), "all") != nonopt_args.end())
 	{
 	    optset("all", bool, true);
 	    nonopt_args.clear();
@@ -406,24 +406,24 @@ main(int argc, char **argv)
 
 		    /* backup cached copy if it exists so we can use it
 		     * if fetching fails */
-		    if (util::is_file(fetched_location))
-			util::copy_file(fetched_location, fetched_location + ".bak");
+		    if (util::is_file(FETCH_LOCATION))
+			util::copy_file(FETCH_LOCATION, FETCH_LOCATION".bak");
 
 		    /* fetch it */
-		    if (util::fetch(optget("herds.xml", std::string), fetched_location,
+		    if (util::fetch(optget("herds.xml", std::string), FETCH_LOCATION,
 			optget("verbose", bool)) != 0)
 			throw fetch_E();
 
 		    /* because we tell wget to clobber the file, if fetching fails for
 		     * some reason, it'll truncate the old one - make sure the file
 		     * is greater than 0 bytes */
-		    if ((stat(fetched_location.c_str(), &s) == 0) and (s.st_size > 0))
-			optset("herds.xml", std::string, fetched_location);
+		    if ((stat(FETCH_LOCATION, &s) == 0) and (s.st_size > 0))
+			optset("herds.xml", std::string, FETCH_LOCATION);
 		    else
 			throw fetch_E();
 
 		    /* remove back up copy */
-		    unlink((fetched_location + ".bak").c_str());
+		    unlink(FETCH_LOCATION".bak");
 		}
 	    }
 	}
@@ -433,11 +433,11 @@ main(int argc, char **argv)
 		<< std::endl << std::endl;
 
 	    /* if we can't fetch it but have an old cached copy, use it */
-	    if (util::is_file(fetched_location + ".bak"))
+	    if (util::is_file(FETCH_LOCATION".bak"))
 	    {
 		std::cerr << "Using cached copy... ";
-		util::move_file(fetched_location + ".bak", fetched_location);
-		optset("herds.xml", std::string, fetched_location);
+		util::move_file(FETCH_LOCATION".bak", FETCH_LOCATION);
+		optset("herds.xml", std::string, FETCH_LOCATION);
 	    }
 		
 	    std::cerr
@@ -445,11 +445,11 @@ main(int argc, char **argv)
 		<< std::endl << "setting the HERDS environment variable."
 		<< std::endl;
 
-	    if (stat(fetched_location.c_str(), &s) != 0)
+	    if (stat(FETCH_LOCATION, &s) != 0)
 		return EXIT_FAILURE;
 	    else if (s.st_size == 0)
 	    {
-		unlink(fetched_location.c_str());
+		unlink(FETCH_LOCATION);
 		return EXIT_FAILURE;
 	    }
 	    else

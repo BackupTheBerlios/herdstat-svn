@@ -8,7 +8,7 @@ AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.8 foreign dist-bzip2 no-dist-gzip])
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
-AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir", [Local state directory])
+AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
 
 AC_CHECK_PROGS(SED, sed)
 if test x$SED = "x"; then

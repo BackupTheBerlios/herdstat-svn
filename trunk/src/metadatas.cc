@@ -42,8 +42,7 @@
 #include "categories.hh"
 #include "metadatas.hh"
 
-metadatas_T::metadatas_T(const std::string &p, const std::string &c)
-    : portdir(p), cache_file(c)
+metadatas_T::metadatas_T(const std::string &p) : portdir(p)
 {
     /* check cache
      *  - exists and not expired? - read it
@@ -56,7 +55,7 @@ metadatas_T::metadatas_T(const std::string &p, const std::string &c)
         read_cache();
     else
     {
-        get_metadatas();
+        get();
         write_cache();
     }
 }
@@ -64,16 +63,35 @@ metadatas_T::metadatas_T(const std::string &p, const std::string &c)
 bool
 metadatas_T::cache_is_valid()
 {
-    /* 
-     * cache is considered valid if
-     *  a) it exists
-     *  b) it's not older than 24hrs
-     *  c) it's size is >0 bytes
-     */
-
     struct stat s;
-    return ((stat(cache_file.c_str(), &s) == 0) and (s.st_size > 0) and
-        ((time(NULL) - s.st_mtime) < 86400));
+    bool valid = false;
+
+    if (stat(CACHE, &s) == 0)
+    {
+        const std::string path = portdir + "/metadata/timestamp";
+        bool timestamp = util::is_file(path);
+        bool lastsync  = util::is_file(LASTSYNC);
+
+        if (timestamp and lastsync)
+        {
+            if (util::md5check(path, LASTSYNC))
+                valid = true;
+        }
+        /* no timestamp, so no rsync, just expire after 24hrs */
+        else if (lastsync)
+        {
+            unlink(LASTSYNC);
+            valid = ((time(NULL) - s.st_mtime) < 86400);
+        }
+        else if (timestamp)
+            util::copy_file(path, LASTSYNC); 
+
+        /* only valid if size > 0 */
+        if (valid)
+            valid = (s.st_size > 0);            
+    }
+    
+    return valid;
 }
 
 /*
@@ -83,9 +101,9 @@ metadatas_T::cache_is_valid()
 void
 metadatas_T::read_cache()
 {
-    std::auto_ptr<std::ifstream> cache(new std::ifstream(cache_file.c_str()));
+    std::auto_ptr<std::ifstream> cache(new std::ifstream(CACHE));
     if (not (*cache))
-        throw bad_fileobject_E(cache_file);
+        throw bad_fileobject_E(CACHE);
 
     std::string line;
     while (std::getline(*cache, line))
@@ -102,9 +120,9 @@ metadatas_T::read_cache()
 void
 metadatas_T::write_cache()
 {
-    std::auto_ptr<std::ofstream> cache(new std::ofstream(cache_file.c_str()));
+    std::auto_ptr<std::ofstream> cache(new std::ofstream(CACHE));
     if (not (*cache))
-        throw bad_fileobject_E(cache_file);
+        throw bad_fileobject_E(CACHE);
 
     std::copy(_m.begin(), _m.end(),
         std::ostream_iterator<std::string>(*cache, "\n"));
@@ -115,9 +133,9 @@ metadatas_T::write_cache()
  */
 
 void
-metadatas_T::get_metadatas()
+metadatas_T::get()
 {
-    categories_T categories;
+    categories_T categories(portdir);
     util::progress_T progress;
     util::timer_T t;
     bool status = not optget("quiet", bool) and not optget("debug", bool);

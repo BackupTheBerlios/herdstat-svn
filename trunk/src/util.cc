@@ -49,6 +49,46 @@
 std::map<color_name_T, std::string> util::color_map_T::cmap;
 
 /*
+ * Compare the md5sum of two files returning true if they match.
+ */
+
+bool
+util::md5check(const std::string &file1, const std::string &file2)
+{
+    std::string str1, str2;
+
+    std::string cmd = "md5sum " + file1 + " " + file2;
+    FILE *p = popen(cmd.c_str(), "r");
+    if (p)
+    {
+	char line[PATH_MAX + 40];
+	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
+	    str1 = line;
+	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
+	    str2 = line;
+	pclose(p);
+    }
+
+    if (not str1.empty() and not str2.empty())
+    {
+	std::string::size_type pos;
+
+	if ((pos = str1.find_first_of(" \t")) != std::string::npos)
+	    str1 = str1.substr(0, pos);
+
+	if ((pos = str2.find_first_of(" \t")) != std::string::npos)
+	    str2 = str2.substr(0, pos);
+
+	util::debug_msg("md5sum (%s): %s", file1.c_str(), str1.c_str());
+	util::debug_msg("md5sum (%s): %s", file2.c_str(), str2.c_str());
+
+	return str1 == str2;
+    }
+
+    return false;
+}
+
+/*
  * Try to determine if the current directory is
  * a valid package directory.
  */
@@ -387,6 +427,8 @@ util::copy_file(const std::string &from, const std::string &to)
 	throw bad_fileobject_E(from);
     if (not (*fto))
 	throw bad_fileobject_E(to);
+
+    util::debug_msg("copying file '%s' to '%s'", from.c_str(), to.c_str());
 
     /* read from ffrom and write to fto */
     std::string s;

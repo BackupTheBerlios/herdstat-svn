@@ -30,14 +30,17 @@
 #include <string>
 #include <vector>
 
-#define CACHE  LOCALSTATEDIR"/"PACKAGE"/metadatas"
+/* metadata cache location */
+#define CACHE  LOCALSTATEDIR"/metadatas"
+/* copy of PORTDIR/metadata/timestamp (if portdir was rsync'd) */
+#define LASTSYNC LOCALSTATEDIR"/lastsync"
 
 /*
  * rough number of metadata.xml's in the tree, updated from time to
  * time as it grows. Used for initial vector size so that a ton of
  * re-allocations can be prevented
  */
-#define METADATA_RESERVE    8200
+#define METADATA_RESERVE    8240
 
 /*
  * An instance of metadatas_T represents a list of every metadata.xml
@@ -51,17 +54,16 @@ class metadatas_T
         bool cache_is_valid();
         void read_cache();
         void write_cache();
-        void get_metadatas();
+        void get();
 
         const std::string portdir;
-        const std::string cache_file;
         std::vector<std::string> _m;
 
     public:
         typedef std::vector<std::string>::iterator iterator;
         typedef std::vector<std::string>::size_type size_type;
 
-        metadatas_T(const std::string &, const std::string &c = CACHE);
+        metadatas_T(const std::string &);
 
         iterator begin() { return _m.begin(); }
         iterator end() { return _m.end(); }

@@ -56,6 +56,7 @@ enum color_name_T
 
 namespace util
 {
+    bool md5check(const std::string &, const std::string &);
     bool in_pkgdir();
     std::string getcwd();
     const char *get_ebuild_var(const std::string &, const std::string &,

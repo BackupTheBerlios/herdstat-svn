@@ -93,15 +93,25 @@ get_possibles(const std::string &portdir, const std::string &pkg)
     return pkgs;
 }
 
+
+void
+display_quietly(std::string s)
+{
+    *(optget("outstream", std::ostream *)) << s << " ";
+}
+
 int
 action_meta_handler_T::operator() (herds_T &herds_xml,
                                     std::vector<std::string> &opts)
 {
     util::color_map_T color;
     formatter_T output;
+    std::ostream *stream = optget("outstream", std::ostream *);
+    bool quiet = optget("quiet", bool);
+
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
-    output.set_quiet(false);
+    output.set_quiet(quiet);
     output.set_attrs();
 
     /* we dont care about these */
@@ -116,8 +126,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
     }
 
     /* check PORTDIR */
-    std::string portdir = util::portdir();
-    optset("portdir", std::string, portdir);
+    std::string portdir = optget("portdir", std::string);
     if (not util::is_dir(portdir))
         throw bad_fileobject_E(portdir);
 
@@ -207,10 +216,15 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         if (possibles.front().find("/") == std::string::npos)
             cat = true;
         
-        if (n != 1)
+        if (n != 1 and quiet)
+            *stream << std::endl;
+        else if (n != 1)
             output.endl();
 
-        output(cat ? "Category" : "Package", possibles.front());
+        if (quiet)
+            *stream << possibles.front() << std::endl;
+        else
+            output(cat ? "Category" : "Package", possibles.front());
 
         if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
         {
@@ -237,31 +251,68 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             /* herds */
             if (not cat and (herds.empty() or (herds.front() == "no-herd")))
-                output("Herds(0)", "none");
+            {
+                if (quiet)
+                    *stream << "none" << std::endl;
+                else
+                    output("Herds(0)", "none");
+            }
             else if (not herds.empty())
-                output(util::sprintf("Herds(%d)", herds.size()), herds);
+            {
+                if (quiet)
+                {
+                    std::for_each(herds.begin(), herds.end(), display_quietly);
+                    *stream << std::endl;
+                }
+                else
+                    output(util::sprintf("Herds(%d)", herds.size()), herds);
+            }
 
             /* devs */
-            if (devs.size() >= 1)
-                output(util::sprintf("Maintainers(%d)", devs.size()),
-                    devs.keys().front());
-            
-            if (devs.size() > 1)
+            if (quiet)
             {
-                std::vector<std::string> dev_keys(devs.keys());
-                std::vector<std::string>::iterator d;
-                for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
-                    output("", *d);
+                if (devs.size() > 1)
+                {
+                    std::vector<std::string> dev_keys(devs.keys());
+                    std::for_each(dev_keys.begin(), dev_keys.end(), display_quietly);
+                    *stream << std::endl;
+                }
+                else if (devs.size() == 1)
+                    *stream << devs.keys().front() << std::endl;
+                else if (not cat)
+                    *stream << "none" << std::endl;
             }
-            else if (not cat and devs.empty())
-                output("Maintainers(0)", "none");
+            else
+            {
+                if (devs.size() >= 1)
+                    output(util::sprintf("Maintainers(%d)", devs.size()),
+                        devs.keys().front());
+            
+                if (devs.size() > 1)
+                {
+                    std::vector<std::string> dev_keys(devs.keys());
+                    std::vector<std::string>::iterator d;
+                    for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
+                        output("", *d);
+                }
+                else if (not cat and devs.empty())
+                    output("Maintainers(0)", "none");
+            }
 
             if (not cat)
             {
                 /* HOMEPAGE */
                 std::string homepage = util::get_ebuild_var(portdir,
                     possibles.front(), "HOMEPAGE");
-                if (not homepage.empty())
+
+                if (quiet)
+                {
+                    if (homepage.empty())
+                        homepage = "none";
+                        
+                    *stream << homepage << std::endl;
+                }
+                else if (not homepage.empty())
                     output("Homepage", homepage);
             }
 
@@ -274,10 +325,21 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                     longdesc = util::get_ebuild_var(portdir, possibles.front(),
                         "DESCRIPTION");
 
-                    if (not longdesc.empty())
+                    if (quiet)
+                    {
+                        if (longdesc.empty())
+                            longdesc = "none";
+
+                        *stream << longdesc << std::endl;
+                    }
+                    else if (not longdesc.empty());
                         output("Description", longdesc);
                 }
+                else
+                    *stream << "none" << std::endl;
             }
+            else if (quiet)
+                *stream << util::tidy_whitespace(longdesc) << std::endl;
             else
                 output("Description", util::tidy_whitespace(longdesc));
         }
@@ -285,25 +347,45 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         /* package or category exists, but metadata.xml doesn't */
         else
         {
-            output("", color[red] + "No metadata.xml." + color[none]);
+            if (quiet)
+                *stream << "No metadata.xml" << std::endl;
+            else
+                output("", color[red] + "No metadata.xml." + color[none]);
             
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
                 std::string homepage = util::get_ebuild_var(portdir,
                     possibles.front(), "HOMEPAGE");
-                if (not homepage.empty())
+                
+                if (quiet)
+                {
+                    if (homepage.empty())
+                        homepage = "none";
+
+                    *stream << homepage << std::endl;
+                }
+                else if (not homepage.empty())
                     output("Homepage", homepage);
 
                 longdesc = util::get_ebuild_var(portdir, possibles.front(),
                     "DESCRIPTION");
-                if (not longdesc.empty())
+
+                if (quiet)
+                {
+                    if (longdesc.empty())
+                        longdesc = "none";
+
+                    *stream << longdesc << std::endl;
+                }
+                else if (not longdesc.empty())
                     output("Description", longdesc);
             }
         }
     }
 
-    output.flush(*optget("outstream", std::ostream *));
+    if (not quiet)
+        output.flush(*stream);
     return EXIT_SUCCESS;
 }
 

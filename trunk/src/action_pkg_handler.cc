@@ -116,7 +116,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     }
 
     /* check PORTDIR */
-    optset("portdir", std::string, util::portdir());
     if (not util::is_dir(optget("portdir", std::string)))
 	throw bad_fileobject_E(optget("portdir", std::string));
 

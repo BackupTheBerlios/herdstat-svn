@@ -31,6 +31,7 @@
 #include <utility>
 #include <sys/types.h>
 
+#include "util.hh"
 #include "options.hh"
 
 options_T::option_map_T options_T::optmap;
@@ -59,7 +60,7 @@ options_T::option_map_T::set_defaults()
     insert_opt("maxcol", static_cast<std::size_t>(78));
 
     insert_opt("with-herd", std::string(""));
-    insert_opt("portdir", std::string("/usr/portage"));
+    insert_opt("portdir", std::string(util::portdir()));
     insert_opt("outfile", std::string("stdout"));
     insert_opt("herds.xml",
         std::string("http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"));

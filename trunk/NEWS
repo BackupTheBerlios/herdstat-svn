@@ -8,11 +8,14 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        substituion on any variable occurrences in HOMEPAGE in an attempt to
        improve readability. Also shows the ebuild's DESCRIPTION if a longdesc
        is unavailable in metadata.xml.
+     - --metadata now supports --quiet.
      - Added --with-herd, a generalization of --no-herd (which is now
        shorthand for --with-herd=no-herd) for only displaying developer's
        packages that belong in the specified herd.
      - User can now run 'herdstat -m' with no non-option args if inside a
        package directory or category.
+     - If $PORTDIR/metadata/timestamp exists, don't re-cache the metadata.xml
+       list until it changes.
 
     Bug fixes:
      - Fixed bug where a std::runtime_error exception was thrown (and not
