@@ -1,0 +1,19 @@
+herdstat - a utility that parses Gentoo's herds.xml and displays
+developer/package statistics.
+
+http://developer.berlios.de/projects/herdstat/
+
+Please submit bugs and patches via http://bugs.gentoo.org/.
+
+Install
+=======
+Run:
+  ./configure
+  make
+  make install
+
+Usage
+=====
+Read herdstat(1) for information on using herdstat.
+Running herdstat --help will also display detailed usage
+information.
