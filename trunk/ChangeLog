@@ -1,5 +1,22 @@
 ChangeLog for herdstat
 
+2005-03-17 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/formatter.cc, src/formatter.hh: Added highlighting
+	functionality.  New functions highlight(), add_highlight(),
+	set_highlightcolor(), highlightcolor().  Added vector to
+	format_attrs_T for storing words we should highlight on.
+	* src/herds.cc: Remove nasty highlighting hack since it's now
+	incorporated in formatter_T.
+	* src/devs.hh: Added name & role members.  Only data other than those
+	two will be stored in the dev_attrs_T vector.
+	* src/herds_xml_handler.cc: Store name and role in respective
+	dev_attrs_T members instead of the vector.
+	* src/action_dev_handler.cc: Display developer's full name (if
+	available) and their email address.
+	* src/action_pkg_handler.cc: Fixed bug where a newline would get
+	displayed after a herd, even if the number of pkgs in that herd == 0.
+
 2005-03-16 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/herdstat.cc: Ignore --quiet if invoked with no other arguments.
@@ -8,7 +25,7 @@ ChangeLog for herdstat
 	* src/util.cc, src/util.hh: Added lowercase().
 	* src/herds_xml_handler.cc: Run developer username through
 	util::lowercase() before saving it.  Should get rid of another
-	duplicate or so.
+	duplicate or two.
 
 2005-03-15 Aaron Walker <ka0ttic@gentoo.org>
 

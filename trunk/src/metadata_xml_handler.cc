@@ -75,17 +75,21 @@ MetadataXMLHandler_T::text(const std::string &str)
     /* <maintainer><email> */
     else if (in_email)
     {
-        cur_dev = str;
-        devs[str] = new dev_attrs_T();
+        cur_dev = (str.find('@') == std::string::npos ? str + "@gentoo.org" : str);
+        devs[cur_dev] = new dev_attrs_T();
     }
 
-    /* <maintainer><name> OR <maintainer><description> */
-    else if (in_name or in_desc)
-        devs[cur_dev]->push_back(util::collapse_whitespace(str));
+    /* <maintainer><name> */
+    else if (in_name)
+        devs[cur_dev]->name = str;
+
+    /* <maintainer><description> */
+    else if (in_desc)
+        devs[cur_dev]->push_back(util::tidy_whitespace(str));
 
     /* <longdescription> */
     else if (in_longdesc)
-        longdesc = util::collapse_whitespace(str);
+        longdesc = util::tidy_whitespace(str);
 
     return true;
 }

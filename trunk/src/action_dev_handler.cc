@@ -84,13 +84,13 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     {
         /* for each specified dev... */
         std::vector<std::string>::iterator dev;
-        std::vector<std::string>::size_type n = 0;
-        for (dev = devs.begin() ; dev != devs.end() ; ++dev)
+        std::vector<std::string>::size_type n = 1;
+        for (dev = devs.begin() ; dev != devs.end() ; ++dev, ++n)
         {
+            std::string name;
             std::vector<std::string> herds;
 
             /* for each herd in herds.xml... */
-            herds_T::size_type nherd = 0;
             for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
             {
                 std::string herd = h->first;
@@ -98,14 +98,22 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                 /* is the dev in the current herd? */
                 herd_T::iterator d = herds_xml[herd]->find(*dev + "@gentoo.org");
                 if (d != herds_xml[herd]->end())
+                {
                     herds.push_back(herd);
+                    if (not d->second->name.empty())
+                        name = d->second->name;
+                }
                 else
                 {
                     /* there have been cases where the dev put just their
                      * nick instead of their full email address             */
                     d = herds_xml[herd]->find(*dev);
                     if (d != herds_xml[herd]->end())
+                    {
                         herds.push_back(herd);
+                        if (not d->second->name.empty())
+                            name = d->second->name;
+                    }
                 }
             }
 
@@ -121,14 +129,22 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             else
             {
                 if (not optget("quiet", bool))
-                    output.append("Developer", *dev);
+                {
+                    if (not name.empty())
+                        output.append("Developer", name + " (" + (*dev) + ")");
+                    else
+                        output.append("Developer", *dev);
+
+                    output.append("Email", *dev + "@gentoo.org");
+                }
 
                 if (optget("verbose", bool))
                 {
                     output.append(util::sprintf("Herds(%d)", herds.size()), "");
 
                     std::vector<std::string>::iterator i;
-                    for (i = herds.begin() ; i != herds.end() ; ++i)
+                    herds_T::size_type nh = 1;
+                    for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
                     {
                         /* display herd */
                         output.append("", color[blue] + (*i) + color[none]);
@@ -139,7 +155,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                         if (not herds_xml[*i]->desc.empty())
                             output.append("", herds_xml[*i]->desc);
 
-                        if (++nherd != herds.size())
+                        if (nh != herds.size())
                             output.endl();
                     }
                 }
@@ -148,7 +164,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             }
 
             /* skip a line if we're not displaying the last one */
-            if (++n != devs.size())
+            if (n != devs.size())
                 output.endl();
         }
     }

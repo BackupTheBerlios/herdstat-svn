@@ -175,8 +175,8 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     /* for each specified herd... */
     std::vector<std::string>::iterator herd;
-    std::vector<std::string>::size_type n = 0;
-    for (herd = herds.begin() ; herd != herds.end() ; ++herd)
+    std::vector<std::string>::size_type n = 1;
+    for (herd = herds.begin() ; herd != herds.end() ; ++herd, ++n)
     {
         std::map<std::string, std::string> pkgs;
 
@@ -257,8 +257,8 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
         /* display the category/package */
         std::map<std::string, std::string>::iterator p;
-        std::map<std::string, std::string>::size_type pn = 0;
-        for (p = pkgs.begin() ; p != pkgs.end() ; ++p)
+        std::map<std::string, std::string>::size_type pn = 1;
+        for (p = pkgs.begin() ; p != pkgs.end() ; ++p, ++pn)
         {
             /* TODO: the below code works, but until we figure out a way
              * to cleanup all the whitespace, the output looks like shit */
@@ -273,7 +273,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
                     p->second.c_str());
 
-                if (++pn != pkgs.size())
+                if (pn != pkgs.size())
                     output.endl();
             }
             else if (optget("verbose", bool))
@@ -283,8 +283,12 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         }
 
         /* only skip a line if we're not on the last one */
-        if (++n != herds.size())
-            output.endl();
+        if (n != herds.size())
+        {
+            if ((not optget("quiet", bool)) or
+                (optget("quiet", bool) and pkgs.size() > 0))
+                    output.endl();
+        }
     }
 
     output.flush(*stream);

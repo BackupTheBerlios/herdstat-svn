@@ -68,8 +68,8 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
     {
         /* for each specified herd... */
         std::vector<std::string>::iterator herd;
-        std::vector<std::string>::size_type n = 0;
-        for (herd = herds.begin() ; herd != herds.end() ; ++herd)
+        std::vector<std::string>::size_type n = 1;
+        for (herd = herds.begin() ; herd != herds.end() ; ++herd, ++n)
         {
             /* does the herd exist? */
             if (not herds_xml.exists(*herd))
@@ -82,7 +82,6 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
                     std::cerr << color[red] << "Herd '" << *herd
                         << "' doesn't seem to exist." << color[none] << std::endl;
                     std::cerr << std::endl;
-                    ++n;
                     continue;
                 }
                 else
@@ -96,7 +95,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
             herds_xml[*herd]->display(*stream);
 
             /* only skip a line if we're not displaying the last one */
-            if (++n != herds.size())
+            if (n != herds.size())
                 output.endl();
         }
     }

@@ -58,7 +58,7 @@ util::lowercase(const std::string &str)
 }
 
 /*
- * Given a string, collapse all whitespace.
+ * Given a string, tidy whitespace.
  */
 
 bool
@@ -68,7 +68,7 @@ bothspaces(char c1, char c2)
 }
 
 std::string
-util::collapse_whitespace(const std::string &s)
+util::tidy_whitespace(const std::string &s)
 {
     std::string result;
 

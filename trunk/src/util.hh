@@ -56,7 +56,7 @@ enum color_name_T
 namespace util
 {
     std::string lowercase(const std::string &);
-    std::string collapse_whitespace(const std::string &);
+    std::string tidy_whitespace(const std::string &);
     std::string get_user_from_email(const std::string &);
     void copy_file(const std::string &, const std::string &);
     void move_file(const std::string &, const std::string &);
