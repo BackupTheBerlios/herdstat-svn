@@ -98,7 +98,12 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
 
             /* only skip a line if we're not displaying the last one */
             if (++n != herds.size())
-                output.endl();
+            {
+                if (options.quiet())
+                    std::cout << std::endl;
+                else
+                    output.endl();
+            }
         }
     }
         

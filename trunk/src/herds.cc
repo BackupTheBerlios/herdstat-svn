@@ -119,7 +119,6 @@ herd_T::display(std::ostream &stream)
             std::vector<std::string>::iterator i;
             for (i = sorted_devs.begin() ; i != sorted_devs.end() ; ++i)
                 std::cout << *i << std::endl;
-            std::cout << std::endl;
         }
         else
         {
