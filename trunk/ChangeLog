@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-03-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_dev_handler.cc: Fixed too low maxlabel value causing an
+	exception when '-d all' is specified.
+
 2005-03-18 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (0.6 release).
