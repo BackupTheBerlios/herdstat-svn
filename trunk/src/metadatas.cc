@@ -42,24 +42,26 @@
 #include "categories.hh"
 #include "metadatas.hh"
 
-metadatas_T::metadatas_T(const std::string &p) : cache(CACHE), portdir(p)
+metadatas_T::metadatas_T(const std::string &p)
+    : cache_T<std::string>(CACHE), portdir(p)
 {
     /* check cache
      *  - exists and not expired? - read it
      *  - otherwise get metadata list and cache it
      */
     
-    _m.reserve(METADATA_RESERVE);
+    _cache.reserve(METADATA_RESERVE);
     
-    if (cache_is_valid())
+    if (this->valid())
     {
-        _m = cache.read();
-        util::debug_msg("read %d metadata.xml's from the cache.", _m.size());
+        this->read();
+        util::debug_msg("read %d metadata.xml's from the cache.", this->size());
     }
     else
     {
-        get();
-        cache.write(_m);
+        this->fill();
+        this->write();
+        util::debug_msg("cached %d metadata.xml's.", this->size());
     }
 }
 
@@ -68,13 +70,16 @@ metadatas_T::metadatas_T(const std::string &p) : cache(CACHE), portdir(p)
  */
 
 bool
-metadatas_T::cache_is_valid()
+metadatas_T::valid()
 {
     struct stat s;
     bool valid = false;
 
     if (stat(CACHE, &s) == 0)
     {
+        /* If the user's PORTDIR has a metadata/timestamp, it's been rsync'd
+         * so only invalidate the cache when the timestamp's md5sum changes. */
+
         const std::string path = portdir + "/metadata/timestamp";
         bool timestamp = util::is_file(path);
         bool lastsync  = util::is_file(LASTSYNC);
@@ -104,11 +109,12 @@ metadatas_T::cache_is_valid()
 }
 
 /*
- * Walk each category in the portage tree, searching for package metadata.xml's
+ * Walk each category in the portage tree, searching for package metadata.xml's,
+ * filling our cache.
  */
 
 void
-metadatas_T::get()
+metadatas_T::fill()
 {
     categories_T categories(portdir);
     util::progress_T progress;
@@ -130,7 +136,7 @@ metadatas_T::get()
     categories_T::iterator cat;
     for (cat = categories.begin() ; cat != categories.end() ; ++cat)
     {
-        std::string path = portdir + "/" + (*cat);
+        const std::string path = portdir + "/" + (*cat);
 
         /* open category */
         DIR *dir = opendir(path.c_str());
@@ -152,7 +158,7 @@ metadatas_T::get()
             /* instead of walking each directory, comparing d->d_name to
              * "metadata.xml", just stat the dir/metadata.xml */
             if (util::is_file(path + "/" + d->d_name + "/metadata.xml"))
-                _m.push_back(path + "/" + d->d_name + "/metadata.xml");
+                _cache.push_back(path + "/" + d->d_name + "/metadata.xml");
         }
 
         closedir(dir);
@@ -162,13 +168,13 @@ metadatas_T::get()
     {
         t.stop();
         util::debug_msg("Took %ldms to get %d metadata.xml's.",
-            t.elapsed(), _m.size());
+            t.elapsed(), this->size());
     }
 
     if (status)
     {
         *(optget("outstream", std::ostream *)) << " (total "
-            << _m.size() << ")" << std::endl;
+            << this->size() << ")" << std::endl;
     }
 }
 

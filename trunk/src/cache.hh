@@ -34,42 +34,48 @@
 #include <algorithm>
 #include "exceptions.hh"
 
+template <typename T>
 class cache_T
 {
     protected:
-        std::string _file;
-        std::vector<std::string> _cache;
+        const std::string _file;
+        std::vector<T> _cache;
 
     public:
-        typedef std::vector<std::string>::iterator iterator;
-        typedef std::vector<std::string>::size_type size_type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::size_type size_type;
 
         cache_T() { }
         cache_T(const std::string &f) : _file(f) { }
         virtual ~cache_T() { }
 
-        virtual std::vector<std::string> &read()
+        iterator begin() { return _cache.begin(); }
+        iterator end() { return _cache.end(); }
+        size_type size() const { return _cache.size(); }
+
+        void read()
         {
             std::auto_ptr<std::ifstream> f(new std::ifstream(_file.c_str()));
             if (not (*f))
                 throw bad_fileobject_E(_file);
 
-            std::copy(std::istream_iterator<std::string>(*f),
-                std::istream_iterator<std::string>(), std::back_inserter(_cache));
-
-            return _cache;
+            std::copy(std::istream_iterator<T>(*f),
+                std::istream_iterator<T>(), std::back_inserter(_cache));
         }
 
-        virtual void write() { write(_cache); }
-        virtual void write(std::vector<std::string> &data)
+        void write()
         {
             std::auto_ptr<std::ofstream> f(new std::ofstream(_file.c_str()));
             if (not (*f))
                 throw bad_fileobject_E(_file);
  
-            std::copy(data.begin(), data.end(),
-                std::ostream_iterator<std::string>(*f, "\n"));
+            std::copy(_cache.begin(), _cache.end(),
+                std::ostream_iterator<T>(*f, "\n"));
         }
+
+        /* these must be defined by derived classes */
+        virtual bool valid() = 0;
+        virtual void fill()  = 0;
 };
 
 #endif

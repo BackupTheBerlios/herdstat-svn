@@ -27,9 +27,6 @@
 # include "config.h"
 #endif
 
-#include <string>
-#include <vector>
-
 #include "cache.hh"
 
 /* metadata cache location */
@@ -50,25 +47,16 @@
  * are excluded).
  */
 
-class metadatas_T
+class metadatas_T : public cache_T<std::string>
 {
     private:
-        bool cache_is_valid();
-        void get();
-
-        cache_T cache;
         const std::string portdir;
-        std::vector<std::string> _m;
 
     public:
-        typedef std::vector<std::string>::iterator iterator;
-        typedef std::vector<std::string>::size_type size_type;
+        metadatas_T(const std::string &portdir);
 
-        metadatas_T(const std::string &);
-
-        iterator begin() { return _m.begin(); }
-        iterator end() { return _m.end(); }
-        size_type size() const { return _m.size(); }
+        virtual bool valid();
+        virtual void fill();
 };
 
 #endif
