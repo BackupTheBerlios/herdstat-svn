@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-03-14 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Update version (release-0.4).
 	* src/util.cc, src/util.hh: Added collapse_whitespace() which
 	collapses any consecutive whitepsace, strips leading/trailing
 	whitespace, and converts any '\n''s in the middle into spaces.
