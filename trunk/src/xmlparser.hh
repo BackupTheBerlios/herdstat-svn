@@ -33,6 +33,10 @@
 #include <xmlwrapp/event_parser.h>
 #include "exceptions.hh"
 
+/*
+ * Abstract XML Content Handler
+ */
+
 class XMLHandler_T : public xml::event_parser
 {
     protected:
@@ -40,6 +44,10 @@ class XMLHandler_T : public xml::event_parser
         virtual bool end_element(const std::string &) = 0;
         virtual bool text(const std::string &) = 0;
 };
+
+/*
+ * XML Parser - takes a pointer to a XMLHandler_T object
+ */
 
 class XMLParser_T
 {
@@ -55,12 +63,14 @@ class XMLParser_T
 
         virtual ~XMLParser_T() { }
 
+        /* parse the given filename */
         virtual void parse(const std::string &f)
         {
             if (not handler->parse_file(f.c_str()))
                 throw XMLParser_E(f, handler->get_error_message());
         }
 
+        /* parse the given open stream */
         virtual void parse(std::istream &stream)
         {
             if (not handler->parse_stream(stream))
