@@ -27,14 +27,10 @@
 # include "config.h"
 #endif
 
-#include <iostream>
-#include <sstream>
+#include <ostream>
 #include <string>
-#include <algorithm>
-#include <typeinfo>
 #include <map>
-#include <cstdlib>
-#include "exceptions.hh"
+#include "option_type.hh"
 
 enum options_action_T
 {
@@ -44,96 +40,6 @@ enum options_action_T
     action_pkg,
     action_stats
 };
-
-/*
- * Generic type container for storing option values internally as their
- * actual type (bool, string, etc).
- */
-
-class option_type_T
-{
-    public:
-	option_type_T() : value(NULL) { }
-	template<typename T> 
-	option_type_T(const T &v) : value(new option_type_holder<T>(v)) { }
-	option_type_T(const option_type_T &ot)
-	    : value(ot.value ? ot.value->clone() : 0) { }
-	~option_type_T() { delete value; }
-
-	template<typename T>
-	option_type_T &operator=(const T &t)
-	{
-	    option_type_T(t).swap(*this);
-	    return *this;
-	}
-
-	option_type_T &operator=(const option_type_T &ot)
-	{
-	    option_type_T(ot).swap(*this);
-	    return *this;
-	}
-
-	option_type_T &swap(option_type_T &ot)
-	{
-	    std::swap(value, ot.value);
-	    return *this;
-	}
-
-	void dump(std::ostream &stream) const { value->dump(stream); }
-
-	bool empty() const { return (not value); }
-
-	const std::type_info &type() const 
-	    { return value ? value->type() : typeid(void); }
-
-	/* abstract base for option_type_holder */
-	class option_type_holder_base
-	{
-	    public:
-		virtual ~option_type_holder_base() { }
-		virtual const std::type_info &type() const = 0;
-		virtual option_type_holder_base *clone() const = 0;
-		virtual void dump(std::ostream &stream) const = 0;
-	};
-
-	template<typename T>
-	class option_type_holder : public option_type_holder_base
-	{
-	    public:
-		option_type_holder(const T &val) : v(val) { }
-		virtual const std::type_info &type() const
-		    { return typeid(T); }
-		virtual option_type_holder_base *clone() const
-		    { return new option_type_holder(v); }
-		virtual void dump(std::ostream &stream) const
-		    { stream << v; }
-		T v;
-	};
-
-	option_type_holder_base *value;
-};
-
-template<typename T>
-T *option_cast(option_type_T *opt)
-{
-    return opt && opt->type() == typeid(T) ?
-	&static_cast<option_type_T::option_type_holder<T> *>(opt->value)->v : 0;
-}
-
-template<typename T>
-const T *option_cast(const option_type_T *opt)
-{
-    return option_cast<T>(const_cast<option_type_T * >(opt));
-}
-
-template<typename T>
-T option_cast(const option_type_T &opt)
-{
-    const T *result = option_cast<T>(&opt);
-    if (not result)
-	throw bad_option_cast_E();
-    return *result;
-}
 
 class options_T
 {

@@ -66,7 +66,7 @@ class formatter_T
         util::color_map_T color;
 
     public:
-        typedef int size_type;
+        typedef size_t size_type;
 
         formatter_T() { }
 

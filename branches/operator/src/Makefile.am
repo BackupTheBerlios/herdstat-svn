@@ -3,6 +3,7 @@
 bin_PROGRAMS = herdstat
 
 herdstat_SOURCES = exceptions.hh \
+		   option_type.hh \
 		   options.hh options.cc \
 		   util.hh util.cc \
 		   devs.hh \
