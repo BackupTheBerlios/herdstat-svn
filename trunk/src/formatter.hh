@@ -44,6 +44,8 @@ class format_attrs_T
         format_attrs_T();
 
         bool colors;
+        bool quiet;
+
         std::string label_color;
         std::string data_color;
 
@@ -54,6 +56,8 @@ class format_attrs_T
         std::string::size_type maxctotal;
         std::string::size_type maxclabel;
         std::string::size_type maxcdata;
+
+        std::vector<std::string> hilight;
 };
 
 class formatter_T
@@ -93,11 +97,16 @@ class formatter_T
         void set_colors(bool value) { attr.colors = value; }
         bool colors() { return attr.colors; }
 
+        void set_quiet(bool value) { attr.value = value; }
+        bool quiet() { return attr.quiet; }
+
         void set_labelcolor(std::string &s) { attr.label_color = s; }
         std::string &labelcolor() { return attr.label_color; }
 
         void set_datacolor(std::string &s) { attr.data_color = s; }
         std::string &datacolor() { return attr.data_color; }
+
+        void add_hilite(std::string &s) { attr.hilight.push_back(s); }
 };
 
 #endif

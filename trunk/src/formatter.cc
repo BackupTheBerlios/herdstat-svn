@@ -45,6 +45,7 @@ std::vector<std::string> formatter_T::buffer;
 format_attrs_T::format_attrs_T()
 {
     colors = false;
+    quiet = false;
     maxtotal = 78;
     maxlabel = 20;
     maxdata  = 58;
@@ -61,11 +62,16 @@ formatter_T::set_attrs()
 {
     util::color_map_T color;
 
-    /* +1 for ':' */
-    attr.maxlabel++;
+    if (not attr.quiet)
+        /* +1 for ':' */
+        attr.maxlabel++;
+
     /* -2 just for padding */
     attr.maxdata -= 2;
     attr.maxtotal = attr.maxlabel + attr.maxdata;
+
+    if (attr.quiet)
+        attr.colors = false;
 
     /* if we're using colors, we need to compensate
      * for the increase in string length.           */
