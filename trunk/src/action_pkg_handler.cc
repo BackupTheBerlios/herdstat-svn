@@ -34,10 +34,13 @@
 #include <memory>
 #include <string>
 #include <cstdlib>
+#include <cstdio>
+#include <ctime>
 #include <cstring>
 #include <cerrno>
-#include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <dirent.h>
 
 #include "metadata_xml_handler.hh"
@@ -78,33 +81,91 @@ std::vector<std::string>
 get_metadatas(const std::string &portdir)
 {
     std::vector<std::string> metadatas;
-    std::vector<std::string> categories = get_categories(portdir);
-    std::vector<std::string>::iterator c;
-    
-    for (c = categories.begin() ; c != categories.end() ; ++c)
+    metadatas.reserve(8000);
+
+    struct stat s;
+    std::string cache = util::sprintf("%s/%s/metadatas", LOCALSTATEDIR, PACKAGE);
+    std::string cmd =
+        "bash -c 'for x in " + portdir + "/*-*/*/metadata.xml ; do echo $x ; done'";
+
+    /* check if cache exists, is newer than 24hrs, and is >0 bytes */
+    if ((stat(cache.c_str(), &s) == 0) and
+        ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
     {
-        std::string cat = portdir + "/" + (*c);
+        util::debug_msg("cache exists and is newer than 24hrs... using it.");
 
-        /* open category */
-        DIR *dir = opendir(cat.c_str());
-        if (not dir)
-            continue;
-        
-        util::debug_msg("opened directory %s", cat.c_str());
+        std::auto_ptr<std::istream> f(new std::ifstream(cache.c_str()));
+        if (not (*f))
+            throw bad_fileobject_E("Failed to open '%s': %s", cache.c_str(),
+                strerror(errno));
 
-        struct dirent *d;
-        while ((d = readdir(dir)))
-        {
-            /* skip anything starting with a '.' */
-            if (std::strncmp(d->d_name, ".", 1) == 0)
-                continue;
+        std::string s;
+        while (std::getline(*f, s))
+            metadatas.push_back(s);
 
-            std::string metadata = cat + "/" + d->d_name + "/metadata.xml";
-            if (util::is_file(metadata))
-                metadatas.push_back(metadata);
-        }
-        closedir(dir);
+        return metadatas; 
     }
+
+    std::auto_ptr<std::ostream> fcache(new std::ofstream(cache.c_str()));
+    if (not (*fcache))
+        throw bad_fileobject_E("Failed to open '%s': %s", cache.c_str(),
+            strerror(errno));
+
+    util::debug_msg("executing '%s'", cmd.c_str());
+
+    FILE *p = popen(cmd.c_str(), "r");
+    if (p)
+    {
+        std::string output;
+        char line[PATH_MAX+1];
+
+        while (std::fgets(line, sizeof(line) - 1, p) != NULL)
+        {
+            output = line;
+            if (output[output.length() - 1] == '\n')
+                output.erase(output.length() - 1);
+
+            metadatas.push_back(output);
+            *fcache << output << std::endl;
+        }
+        pclose(p);
+    }
+    else
+    {
+        util::debug_msg("failed to run bash, using the slower method...");
+
+        std::vector<std::string> categories = get_categories(portdir);
+        std::vector<std::string>::iterator c;
+    
+        for (c = categories.begin() ; c != categories.end() ; ++c)
+        {
+            std::string cat = portdir + "/" + (*c);
+
+            /* open category */
+            DIR *dir = opendir(cat.c_str());
+            if (not dir)
+                continue;
+        
+            util::debug_msg("opened directory %s", cat.c_str());
+
+            struct dirent *d;
+            while ((d = readdir(dir)))
+            {
+                /* skip anything starting with a '.' */
+                if (std::strncmp(d->d_name, ".", 1) == 0)
+                    continue;
+
+                std::string metadata = cat + "/" + d->d_name + "/metadata.xml";
+                if (util::is_file(metadata))
+                {
+                    metadatas.push_back(metadata);
+                    *fcache << metadata << std::endl;
+                }
+            }
+            closedir(dir);
+        }
+    }
+    
     return metadatas;
 }
 
@@ -153,9 +214,8 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     {
         if (not dev_exists(herds_xml, opts[0]))
         {
-            if (not optget("quiet", bool))
-                std::cerr << "Developer '" << opts[0]
-                    << "' doesn't seem to exist." << std::endl;
+            std::cerr << "Developer '" << opts[0]
+                << "' doesn't seem to belong to any herds." << std::endl;
             throw dev_E();
         }
     }
@@ -163,9 +223,8 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     {
         if (not herds_xml.exists(opts[0]))
         {
-            if (not optget("quiet", bool))
-                std::cerr << "Herd '" << opts[0] << "' doesn't seem to exist."
-                    << std::endl;
+            std::cerr << "Herd '" << opts[0] << "' doesn't seem to exist."
+                << std::endl;
             throw herd_E();
         }
     }
@@ -176,6 +235,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     /* get a list of every metadata.xml */
     std::vector<std::string> metadatas;
+    metadatas.reserve(8000);
     try
     {
 	/* PORTDIR */
@@ -227,12 +287,9 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not optget("quiet", bool))
                     std::cerr << std::endl << "Developer '" << *i
-                        << "' doesn't seem to exist in herds.xml." << std::endl;
+                        << "' doesn't seem to belong to any herds." << std::endl;
 
-                if (opts.size() > 1)
-                    continue;
-                else
-                    throw dev_E();
+                continue;
             }
         }
         else
@@ -243,10 +300,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                     std::cerr << std::endl << "Herd '" << *i
                         << "' doesn't seem to exist in herds.xml." << std::endl;
 
-                if (opts.size() > 1)
-                    continue;
-                else
-                    throw herd_E();
+                continue;
             }
         }
 
@@ -312,7 +366,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 return EXIT_FAILURE;
             }
         }
-
+        
         size += pkgs.size();
 
         if (optget("timer", bool))
@@ -336,7 +390,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 if (not herds_xml[*i]->mail.empty())
                     output("Email", herds_xml[*i]->mail);
                 if (not herds_xml[*i]->desc.empty())
-                    output("Description", herds_xml[*i]->desc);
+                    output("Description", util::tidy_whitespace(herds_xml[*i]->desc));
             }
 
             output(util::sprintf("Packages(%d)", pkgs.size()), "");
@@ -347,8 +401,13 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         std::map<std::string, std::string>::size_type pn = 1;
         for (p = pkgs.begin() ; p != pkgs.end() ; ++p, ++pn)
         {
+            std::string longdesc;
+            
+            if (not p->second.empty())
+                longdesc = util::tidy_whitespace(p->second);
+
             if ((optget("verbose", bool) and not optget("quiet", bool))
-                and not p->second.empty())
+                and not longdesc.empty())
             {
                 if (output.size() > 1 and output.peek() != "")
                     output.endl();
@@ -358,9 +417,9 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 else
                     output("", p->first);
 
-                output("", p->second);
+                output("", longdesc);
                 util::debug_msg("longdesc(%s): '%s'", p->first.c_str(),
-                    p->second.c_str());
+                    longdesc.c_str());
 
                 if (pn != pkgs.size())
                     output.endl();
