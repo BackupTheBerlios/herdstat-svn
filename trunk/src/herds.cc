@@ -106,7 +106,7 @@ herd_T::display(std::ostream &stream)
             /* display developer attributes (name, role, etc) */
             iterator x;
             if ((x = this->find(*i)) != this->end())
-                x->second->display(std::cout);
+                x->second->display(stream);
         }
     }
     else

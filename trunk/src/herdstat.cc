@@ -370,7 +370,7 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	    }
 	    else
-		std::cout << std::endl;
+		std::cerr << std::endl;
 	}
 
 	if (not util::is_file(options.herds_xml()))
