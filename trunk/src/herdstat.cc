@@ -125,14 +125,17 @@ help()
 	<< " -t, --timer           Display elapsed time of XML parsing." << std::endl
 	<< " -c, --count           Instead of displaying data items, display the" << std::endl
 	<< "                       number of items." << std::endl
+	<< " -c, --count           Display the number of items instead of the" << std::endl
+	<< "                       items themself." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action        1 or more herds." << std::endl
 	<< " -p, --package         1 or more herds." << std::endl
 	<< " -d, --dev             1 or more developers." << std::endl
-	<< "Both the default action and the --dev action support an 'all' target"
-	<< std::endl << "that show all of the devs or herds." << std::endl
-
+	<< "Both the default action and the --dev action support an 'all' target" << std::endl
+	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl
+	<< "specified, " << PACKAGE << " will display all packages maintained by" << std::endl
+	<< "the specified developer." << std::endl
 #else
 
 	<< " -h              Display this help message." << std::endl
@@ -152,15 +155,17 @@ help()
 	<< std::endl
 	<< " -D              Display debugging messages." << std::endl
 	<< " -t              Display elapsed time of XML parsing." << std::endl
-	<< " -c              Instead of displaying data items, display the" << std::endl
-	<< "                 number of items." << std::endl
+	<< " -c              Display the number of items instead of the" << std::endl
+	<< "                 items themself." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action  1 or more herds." << std::endl
 	<< " -p              1 or more herds." << std::endl
 	<< " -d              1 or more developers." << std::endl
-	<< "Both the default action and the -d action support an 'all' target"
-	<< std::endl << "that show all of the devs or herds." << std::endl
+	<< "Both the default action and the -d action support an 'all' target" << std::endl
+	<< "that show all of the devs or herds.  If both -d and -p are specified," << std::endl
+	<< PACKAGE << " will display all packages maintained by the specified" << std::endl
+	<< "developer." << std::endl
 
 #endif /* HAVE_GETOPT_LONG */
 
