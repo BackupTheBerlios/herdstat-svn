@@ -44,6 +44,58 @@
 std::map<color_name_T, std::string> util::color_map_T::cmap;
 
 /*
+ * Given an email address, return the username.
+ */
+
+std::string
+util::get_user_from_email(const std::string &email)
+{
+    std::string::size_type pos = email.find('@');
+    return (pos == std::string::npos ? email : email.substr(0, pos));
+}
+
+/*
+ * Copy file from to copy to
+ */
+
+void
+util::copy_file(const std::string &from, const std::string &to)
+{
+    /* remove to if it exists */
+    if (util::is_file(to))
+    {
+	if (unlink(to.c_str()) != 0)
+	    throw bad_fileobject_E("unlink: %s: %s", to.c_str(),
+		strerror(errno));
+    }
+
+    std::auto_ptr<std::ifstream> ffrom(new std::ifstream(from.c_str()));
+    std::auto_ptr<std::ostream> fto(new std::ofstream(to.c_str()));
+
+    if (not (*ffrom))
+	throw bad_fileobject_E("%s: %s", from.c_str(), strerror(errno));
+    if (not (*fto))
+	throw bad_fileobject_E("%s: %s", to.c_str(), strerror(errno));
+
+    /* read from ffrom and write to fto */
+    std::string s;
+    while (std::getline(*ffrom, s))
+	*fto << s << std::endl;
+}
+
+/*
+ * Copy then remove old
+ */
+
+void
+util::move_file(const std::string &from, const std::string &to)
+{
+    util::copy_file(from, to);
+    if (unlink(from.c_str()) != 0)
+	throw bad_fileobject_E("unlink: %s: %s", from.c_str(), strerror(errno));
+}
+
+/*
  * Try to determine user.  This is used for hilighting occurrences
  * of the user's username in ouput.  ECHANGELOG_USER is checked first
  * since a developer might use a different username than what his
@@ -59,10 +111,12 @@ util::current_user()
     if (result)
     {
 	user = result;
-	if ((pos = user.find("<")) != std::string::npos)
+	if ((pos = user.find('<')) != std::string::npos)
 	{
 	    user = user.substr(pos + 1);
-	    if ((pos = user.find(">")) != std::string::npos)
+	    if ((pos = user.find('>')) != std::string::npos)
+		user = user.substr(0, pos);
+	    if ((pos = user.find('@')) != std::string::npos)
 		user = user.substr(0, pos);
 	}
 	else
@@ -154,9 +208,15 @@ util::fetch(const char *url, const char *file)
 
     /* we have permission to write */
     if (access(dir, W_OK) != 0)
+    {
+	std::cerr << "You don't have proper permissions to write to "
+	    << dir << "." << std::endl
+	    << "Did you forget to add yourself to the portage group?"
+	    << std::endl;
 	throw bad_fileobject_E("%s: %s", dir, strerror(errno));
+    }
 
-    std::string cmd = util::sprintf("%s -rq -t3 -T5 -O %s '%s'", WGET, file, url);
+    std::string cmd = util::sprintf("%s -rq -T5 -O %s '%s'", WGET, file, url);
 
     util::debug_msg("Executing '%s'", cmd.c_str());
 
