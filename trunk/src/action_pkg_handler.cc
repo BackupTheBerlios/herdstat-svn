@@ -133,8 +133,6 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     formatter_T output;
     output.set_maxlabel(16);
     output.set_maxdata(options.maxcol() - output.maxlabel());
-    output.set_colors(true);
-    output.set_labelcolor(color[green]);
     output.set_attrs();
 
     /* before trying to get a list of metadatas, see if the herd even exists */
@@ -267,21 +265,16 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         std::map<std::string, std::string>::iterator p;
         for (p = pkgs.begin() ; p != pkgs.end() ; ++p)
         {
-            if (options.quiet())
-                *stream << p->first << std::endl;
-            else
-            {
-                /* TODO: the below code works, but until we figure out a way
-                 * to cleanup all the whitespace, the output looks like shit */
+            /* TODO: the below code works, but until we figure out a way
+             * to cleanup all the whitespace, the output looks like shit */
 
-//                if (options.verbose() and not p->second.empty())
-//                {
-//                    output.append("", color[blue] + p->first + color[none]);
-//                    output.append("", p->second);
-//                }
-//                else
-                    output.append("", p->first);
-            }
+//          if (options.verbose() and not p->second.empty())
+//          {
+//              output.append("", color[blue] + p->first + color[none]);
+//              output.append("", p->second);
+//          }
+//          else
+                output.append("", p->first);
         }
 
         /* only skip a line if we're not on the last one */
@@ -289,8 +282,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
             output.endl();
     }
 
-    if (not options.quiet())
-        output.flush(*stream);
+    output.flush(*stream);
 
     if (options.timer())
     {

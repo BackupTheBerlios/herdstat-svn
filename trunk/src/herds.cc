@@ -72,13 +72,7 @@ herd_T::display(std::ostream &stream)
             out.append("Herd", name);
 
         if (not mail.empty())
-        {
-            /* add @gentoo.org if its not there already */
-            std::string::size_type pos = mail.find('@');
-            if (pos == std::string::npos)
-                mail += "@gentoo.org";
             out.append("Email", mail);
-        }
 
         if (not desc.empty())
             out.append("Description", desc);
@@ -89,10 +83,7 @@ herd_T::display(std::ostream &stream)
     
     for (i = devs.begin() ; i != devs.end() ; ++i)
     {
-        if (options.quiet())
-            stream << util::get_user_from_email(*i) << std::endl;
-
-        else if (options.verbose())
+        if (options.verbose())
         {
             /* highlight email if current user is in the herd */
             if (*i == user)
@@ -107,14 +98,14 @@ herd_T::display(std::ostream &stream)
         }
         else
         {
+            *i = util::get_user_from_email(*i);
+
             /* if the current user is in the herd, we highlight the nick
              * and adjust maxctotal appropriately */
-            if (*i != user)
-                *i = util::get_user_from_email(*i);
-            else
+
+            if (not options.quiet() and (user == (*i + "@gentoo.org")))
             {
-                *i = color[yellow] +
-                     util::get_user_from_email(*i) + color[none];
+                *i = color[yellow] + (*i) + color[none];
 
                 oldlen = out.maxctotal();
                 out.set_maxctotal(oldlen + color[yellow].length() +
@@ -123,7 +114,7 @@ herd_T::display(std::ostream &stream)
         }
     }
 
-    if (not options.verbose() and not options.quiet())
+    if (not options.verbose())
         out.append(util::sprintf("Developers(%d)", devs.size()), devs);
 
     if (oldlen != 0)
@@ -164,9 +155,7 @@ herds_T::display(std::ostream &stream)
     size_type n = 0;
     for (h = this->begin() ; h != this->end() ; ++h)
     {
-        if (options.quiet())
-            stream << h->first << std::endl;
-        else if (options.verbose())
+        if (options.verbose())
         {
             /* herd name */
             out.append("", color[blue] + h->first + color[none]);

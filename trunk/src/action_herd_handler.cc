@@ -58,9 +58,6 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
     formatter_T output;
     output.set_maxlabel(15);
     output.set_maxdata(options.maxcol() - output.maxlabel());
-    output.set_colors(true);
-    output.set_quiet(options.quiet());
-    output.set_labelcolor(color[green]);
     output.set_attrs();
 
     /* was the all target specified? */
@@ -100,17 +97,11 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
 
             /* only skip a line if we're not displaying the last one */
             if (++n != herds.size())
-            {
-                if (options.quiet())
-                    *stream << std::endl;
-                else
-                    output.endl();
-            }
+                output.endl();
         }
     }
         
-    if (not options.quiet())
-        output.flush(*stream);
+    output.flush(*stream);
 
     if (options.timer())
         *stream << std::endl;
