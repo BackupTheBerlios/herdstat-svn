@@ -83,7 +83,7 @@ herd_T::display(std::ostream &stream)
             util::debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
         }
 
-        if (optget("verbose", bool))
+        if (optget("verbose", bool) and not optget("quiet", bool))
             out.append(util::sprintf("Developers(%d)", this->size()), "");
     }
     
@@ -91,9 +91,8 @@ herd_T::display(std::ostream &stream)
     {
         if (not optget("verbose", bool))
             *i = util::get_user_from_email(*i);
-        else
+        else if (not optget("quiet", bool))
         {
-            /* highlight email if current user is in the herd */
             if (*i == user)
                 out.append("", *i);
             else
@@ -106,7 +105,8 @@ herd_T::display(std::ostream &stream)
         }
     }
 
-    if (not optget("verbose", bool))
+    if (not optget("verbose", bool) or
+        (optget("verbose", bool) and optget("quiet", bool)))
         out.append(util::sprintf("Developers(%d)", devs.size()), devs);
 }
 
