@@ -46,6 +46,7 @@
 void
 show_all_devs(herds_T &herds)
 {
+    options_T options;
     herd_T devs;
 
     /* for each herd in herds.xml... */
@@ -62,7 +63,7 @@ show_all_devs(herds_T &herds)
         }
     }
 
-    devs.display(std::cout);
+    devs.display(*(options.outstream()));
 }
 
 /*
@@ -76,6 +77,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
 {
     options_T options;
     util::color_map_T color;
+    std::ostream *stream = options.outstream();
     
     /* set format attributes */
     formatter_T output;
@@ -163,7 +165,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
                 {
                     std::vector<std::string>::iterator i;
                     for (i = herds.begin() ; i != herds.end() ; ++i)
-                        std::cout << *i << std::endl;
+                        *stream << *i << std::endl;
                 }
             }
 
@@ -171,7 +173,7 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             if (++n != devs.size())
             {
                 if (options.quiet())
-                    std::cout << std::endl;
+                    *stream << std::endl;
                 else
                     output.endl();
             }
@@ -179,10 +181,10 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
     }
 
     if (not options.quiet())
-        output.flush(std::cout);
+        output.flush(*stream);
 
     if (options.timer())
-        std::cout << std::endl;
+        *stream << std::endl;
 
     return EXIT_SUCCESS;
 }

@@ -127,6 +127,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     options_T options;
     util::color_map_T color;
     util::timer_T timer;
+    std::ostream *stream = options.outstream();
 
     /* set format attributes */
     formatter_T output;
@@ -144,7 +145,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     }
 
     if (not options.quiet())
-        std::cout << "Parsing metadata.xml's (this may take a while)..."
+        *stream << "Parsing metadata.xml's (this may take a while)..."
             << std::endl;
 
     /* get a list of every metadata.xml */
@@ -267,7 +268,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         for (p = pkgs.begin() ; p != pkgs.end() ; ++p)
         {
             if (options.quiet())
-                std::cout << p->first << std::endl;
+                *stream << p->first << std::endl;
             else
             {
                 /* TODO: the below code works, but until we figure out a way
@@ -289,11 +290,11 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     }
 
     if (not options.quiet())
-        output.flush(std::cout);
+        output.flush(*stream);
 
     if (options.timer())
     {
-        std::cout << std::endl << "Took " << timer.elapsed() << "ms to parse "
+        *stream << std::endl << "Took " << timer.elapsed() << "ms to parse "
             << metadatas.size() << " metadata.xml's ("
             << std::setprecision(4)
             << (static_cast<float>(timer.elapsed()) / metadatas.size())
@@ -301,7 +302,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     }
     else if (options.verbose())
     {
-        std::cout << std::endl
+        *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
 

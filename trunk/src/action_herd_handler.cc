@@ -52,6 +52,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
 {
     options_T options;
     util::color_map_T color;
+    std::ostream *stream = options.outstream();
 
     /* set format attributes */
     formatter_T output;
@@ -63,7 +64,7 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
 
     /* was the all target specified? */
     if (herds[0] == "all")
-        herds_xml.display(std::cout);
+        herds_xml.display(*stream);
 
     /* nope, so only display stats for specified herds */
     else
@@ -94,13 +95,13 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
                 }
             }
 
-            herds_xml[*herd]->display(std::cout);
+            herds_xml[*herd]->display(*stream);
 
             /* only skip a line if we're not displaying the last one */
             if (++n != herds.size())
             {
                 if (options.quiet())
-                    std::cout << std::endl;
+                    *stream << std::endl;
                 else
                     output.endl();
             }
@@ -108,10 +109,10 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
     }
         
     if (not options.quiet())
-        output.flush(std::cout);
+        output.flush(*stream);
 
     if (options.timer())
-        std::cout << std::endl;
+        *stream << std::endl;
 
     return EXIT_SUCCESS;
 }
