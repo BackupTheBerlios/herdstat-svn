@@ -1,5 +1,17 @@
 ChangeLog for herdstat
 
+2005-03-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc: Set the common format attrs here. Also added new
+	option --fetch.
+	* src/options.cc, src/options.hh: Added option fetch.
+	* src/formatter.cc: Added quiet to format_attrs_T. Updated both
+	append() functions to use it. In flush(), use remove_copy() and an
+	ostream_iterator instead of a loop.
+	* src/herds.cc, src/action_herd_handler.cc, src/action_dev_handler.cc,
+	src/action_pkg_handler.cc: Removed a lot of the options_T::quiet()
+	checks since formatter_T now handles *most* of it.
+
 2005-03-10 Aaron Walker <ka0ttic@gentoo.org>
 
 	* Makefile.am: Added TODO target for automatically generating the TODO

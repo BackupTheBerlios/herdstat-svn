@@ -5,12 +5,10 @@ MAINTAINERCLEANFILES = Makefile.in *~
 EXTRA_DIST = herdstat.1.in
 
 date  = date '+%b %Y'
-dosed = @SED@ -e "s,\@VERSION\@,$(VERSION),g" \
-	      -e "s,\@PACKAGE\@,$(PACKAGE),g"
-
 
 herdstat.1: herdstat.1.in
-	$(dosed) $? > $@
+	@SED@ -e "s,\@VERSION\@,$(VERSION),g" \
+	      -e "s,\@PACKAGE\@,$(PACKAGE),g" $? > $@
 
 dist-hook:
 	@SED@ -i "s/\"[a-zA-Z]\{3\} [0-9]\{4\}\"/\"`$(date)`\"/" \
