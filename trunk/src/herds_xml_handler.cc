@@ -83,7 +83,7 @@ HerdsXMLHandler_T::text(const std::string &str)
 
     /* <herd><description> */
     else if (in_herd_desc)
-        herds[cur_herd]->desc = util::tidy_whitespace(str);
+        herds[cur_herd]->desc = str;
 
     /* <herd><email> */
     else if (in_herd_email)

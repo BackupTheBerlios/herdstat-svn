@@ -30,6 +30,8 @@
 #include <ostream>
 #include <vector>
 #include <string>
+
+#include "util.hh"
 #include "formatter.hh"
 #include "options.hh"
 
@@ -51,7 +53,7 @@ class dev_attrs_T : public std::vector<std::string>
                 if (not name.empty())
                     out("", name);
                 if (not role.empty())
-                    out("", role);
+                    out("", util::tidy_whitespace(role));
 
                 for (iterator i = this->begin() ; i != this->end() ; ++i)
                     out("", *i);

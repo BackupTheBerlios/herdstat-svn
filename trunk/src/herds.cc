@@ -142,7 +142,7 @@ herds_T::display(std::ostream &stream)
             iterator x;
             if ((x = this->find(h->first)) != this->end())
                 if (not x->second->desc.empty())
-                    out("", x->second->desc);
+                    out("", util::tidy_whitespace(x->second->desc));
 
             if (not optget("count", bool) and n != this->size())
                 out.endl();

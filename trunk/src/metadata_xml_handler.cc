@@ -85,11 +85,11 @@ MetadataXMLHandler_T::text(const std::string &str)
 
     /* <maintainer><description> */
     else if (in_desc)
-        devs[cur_dev]->role = util::tidy_whitespace(str);
+        devs[cur_dev]->role = str;
 
     /* <longdescription> */
     else if (in_longdesc)
-        longdesc = util::tidy_whitespace(str);
+        longdesc =str;
 
     return true;
 }

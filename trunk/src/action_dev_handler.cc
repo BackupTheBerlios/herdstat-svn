@@ -120,9 +120,8 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
             /* was the dev in any of the herds? */
             if (herds.empty())
             {
-                if (not optget("quiet", bool))
-                    std::cerr << "Developer '" << *dev << "' doesn't seem to "
-                        << "belong to any herds." << std::endl;
+                std::cerr << "Developer '" << *dev << "' doesn't seem to "
+                    << "belong to any herds." << std::endl;
 
                 if (devs.size() == 1)
                     throw dev_E();

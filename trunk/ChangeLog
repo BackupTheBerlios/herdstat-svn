@@ -1,5 +1,20 @@
 ChangeLog for herdstat
 
+2005-03-24 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.0_rc2-release).
+	* src/action_pkg_handler.cc: Modified get_metadatas() to cache the
+	list of metadata.xml's for 24hrs; use bash (if available) to get the
+	list. This should decrease the lookup time slightly. Will fall back to
+	the original method if bash execution fails.
+	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc, src/herds.cc,
+	src/devs.hh, src/action_pkg_handler.cc: Call util::tidy_whitespace()
+	for only the data shown, not ALL data when filling the containers.
+	This should make a slight dent in elapsed runtime.
+	* src/formatter.cc: Added a sleu of debug_msg calls to aid in
+	debugging. Fixed formatting bug causing some lines to not wrap and
+	indent properly.
+
 2005-03-23 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/herdstat.cc: Add formatter_T::set_highlightcolor() and

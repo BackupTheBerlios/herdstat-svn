@@ -1,7 +1,20 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
-0.6.1:
+1.0_rc2:
+    New features:
+     - Cache the metadata.xml list for 24hrs to reduce package lookup times.
+
+    Bug fixes:
+     - Fixed pretty big formatting bug that caused long lines to not be wrapped
+       and indented properly.
+     - Instead of cleaning whitespace of long strings (such as herd/package
+       descriptions) in the XML handler for EVERY single element, only clean
+       the stuff that will be displayed.  Reduces the number of calls to
+       util::tidy_whitespace() from ~2700 calls to 133.  Makes a pretty big
+       difference since it calls several STL algorithms.
+
+1.0_rc1:
     New features:
      - Added --nocolor.
 
