@@ -64,6 +64,8 @@ Display all herds that the developer ka0ttic is in.
 Display all herds.
 .IP "\fB$ for x in $(@PACKAGE@ -pq cron); do ... ; done\fR" 
 Perform an action on every package in the cron herd.
+.IP "\fB$ @PACKAGE@ $(@PACKAGE@ -dq vapier)\fR"
+Display the default herd output for all herds that the developer vapier is in.
 .IP "\fB$ @PACKAGE@ -pq $(@PACKAGE@ -dq ka0ttic)\fR"
 Display every package that belongs to a herd that ka0ttic is a member of.
 .SH ENVIRONMENT
