@@ -48,7 +48,7 @@ Display information for the specified developer(s).  If --package is specified,
 displays package information. Otherwise, displays herd information.
 .TP
 .B "\-m, \-\-metadata"
-Display information for the specified package(s)/categorie(s). A package name
+Display information for the specified package(s)/categories. A package name
 can be the name only (no category) only if there's not another package with the
 same name.  In that case you must specify the category.  On a small note, this
 option does not recognize most boolean flags (verbose, quiet, etc).

@@ -118,7 +118,7 @@ help()
 	<< "Where [options] can be any of the following:" << std::endl
 	<< " -p, --package         Look up packages by herd." << std::endl
 	<< " -d, --dev             Look up herds by developer." << std::endl
-	<< " -m, --metadata        Look up metadata by package." << std::endl
+	<< " -m, --metadata        Look up metadata by package/category." << std::endl
 	<< " -H, --herdsxml <file> Specify location of herds.xml." << std::endl
 	<< " -o, --outfile  <file> Send output to the specified file" << std::endl
 	<< "                       instead of stdout." << std::endl
@@ -153,7 +153,7 @@ help()
 	<< "Where [options] can be any of the following:" << std::endl
 	<< " -p              Look up packages by herd." << std::endl
 	<< " -d              Look up herds by developer." << std::endl
-	<< " -m              Look up metadata by package." << std::endl
+	<< " -m              Look up metadata by package/category." << std::endl
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
