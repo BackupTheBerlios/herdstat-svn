@@ -1,6 +1,12 @@
 ChangeLog for herdstat
 
-2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
+2005-03-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc: Ignore --quiet if invoked with no other arguments.
+	* bashcomp: Added 2>/dev/null to any herdstat invocations so that no
+	errors (failed to fetch fex) show up in the completions.
+
+2005-03-15 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/exceptions.hh: va_start doesn't necessarily need a const char *.
 	Thanks to azarah for helping me with this.  This fix gets rid of the
