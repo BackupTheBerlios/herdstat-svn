@@ -68,17 +68,24 @@ MetadataXMLHandler_T::end_element(const std::string &name)
 bool
 MetadataXMLHandler_T::text(const std::string &str)
 {
+    /* <herd> */
     if (in_herd)
         herds.push_back(str);
+
+    /* <maintainer><email> */
     else if (in_email)
     {
         cur_dev = str;
         devs[str] = new dev_attrs_T();
     }
+
+    /* <maintainer><name> OR <maintainer><description> */
     else if (in_name or in_desc)
-        devs[cur_dev]->push_back(str);
+        devs[cur_dev]->push_back(util::collapse_whitespace(str));
+
+    /* <longdescription> */
     else if (in_longdesc)
-        longdesc = str;
+        longdesc = util::collapse_whitespace(str);
 
     return true;
 }

@@ -263,6 +263,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
         /* display the category/package */
         std::map<std::string, std::string>::iterator p;
+        std::map<std::string, std::string>::size_type pn = 0;
         for (p = pkgs.begin() ; p != pkgs.end() ; ++p)
         {
             /* TODO: the below code works, but until we figure out a way
@@ -279,6 +280,9 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 output.append("", color[blue] + p->first + color[none]);
             else
                 output.append("", p->first);
+
+            if (++pn != pkgs.size())
+                output.endl();
         }
 
         /* only skip a line if we're not on the last one */

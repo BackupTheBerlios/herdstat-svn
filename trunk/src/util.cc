@@ -28,11 +28,14 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <iterator>
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cstdarg>
 #include <cerrno>
+#include <cctype>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -42,6 +45,40 @@
 #include "util.hh"
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
+
+/*
+ * Given a string, collapse all whitespace.
+ */
+
+bool
+bothspaces(char c1, char c2)
+{
+    return std::isspace(c1) and std::isspace(c2);
+}
+
+std::string
+util::collapse_whitespace(const std::string &s)
+{
+    std::string result;
+
+    /* collapse whitespace */
+    std::unique_copy(s.begin(), s.end(), std::back_inserter(result), bothspaces);
+
+    /* remove any leading whitespace */
+    std::string::size_type pos = result.find_first_not_of(" \t\n");
+    if (pos != std::string::npos)
+	result.erase(0, pos);
+
+    /* convert any newlines in the middle to a space */
+    std::replace(result.begin(), result.end(), '\n', ' ');
+
+    /* remove any trailing whitespace */
+    pos = result.find_last_not_of(" \t\n");
+    if (pos != std::string::npos)
+	result.erase(++pos);
+	
+    return result;
+}
 
 /*
  * Given an email address, return the username.

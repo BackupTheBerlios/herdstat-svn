@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include "util.hh"
 #include "herds_xml_handler.hh"
 
 bool
@@ -73,25 +74,34 @@ HerdsXMLHandler_T::end_element(const std::string &name)
 bool
 HerdsXMLHandler_T::text(const std::string &str)
 {
+    /* <herd><name> */
     if (in_herd_name)
     {
         cur_herd = str;
         herds[str] = new herd_T(str);
     }
+
+    /* <herd><description> */
     else if (in_herd_desc)
-        herds[cur_herd]->desc = str;
+        herds[cur_herd]->desc = util::collapse_whitespace(str);
+
+    /* <herd><email> */
     else if (in_herd_email)
     {
         /* append @gentoo.org if needed */
         herds[cur_herd]->mail =
             (str.find('@') == std::string::npos ? str + "@gentoo.org" : str);
     }
+
+    /* <maintainer><email> */
     else if (in_maintainer_email)
     {
         /* append @gentoo.org if needed */
         cur_dev = (str.find('@') == std::string::npos ? str + "@gentoo.org" : str);
         herds[cur_herd]->insert(std::make_pair(cur_dev, new dev_attrs_T()));
     }
+
+    /* <maintainer><name> */
     else if (in_maintainer_name)
     {
         herd_T::iterator i = herds[cur_herd]->find(cur_dev);
@@ -99,6 +109,8 @@ HerdsXMLHandler_T::text(const std::string &str)
             return false;
         i->second->push_back(str);
     }
+
+    /* <maintainer><role> */
     else if (in_maintainer_role)
     {
         herd_T::iterator i = herds[cur_herd]->find(cur_dev);

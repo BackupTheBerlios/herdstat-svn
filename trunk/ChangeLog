@@ -2,6 +2,12 @@ ChangeLog for herdstat
 
 2005-03-14 Aaron Walker <ka0ttic@gentoo.org>
 
+	* src/util.cc, src/util.hh: Added collapse_whitespace() which
+	collapses any consecutive whitepsace, strips leading/trailing
+	whitespace, and converts any '\n''s in the middle into spaces.
+	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc: Run data
+	through util::collapse_whitespace() while parsing and store the
+	result.
 	* src/options.cc, src/options.hh: Added generic container for holding
 	options (option_type_T). options_T now holds an internal static map of
 	strings (option names) and their corresponding data in whatever type
