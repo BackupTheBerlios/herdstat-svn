@@ -28,7 +28,6 @@
 #endif
 
 #include "devs.hh"
-#include "xmlparser.hh"
 
 /*
  * Even though technically a herd is a group of packages, and not
@@ -41,12 +40,18 @@ class herd_T  : public std::map<std::string, dev_attrs_T * >
     public:
         herd_T() { }
         herd_T(const std::string &n) : name(n) { }
+
+        std::vector<std::string> keys();
         void display(std::ostream &);
 
         std::string name;
         std::string desc;
         std::string mail;
 };
+
+/*
+ * A group of herds, mapped from herd name to a herd_T object
+ */
 
 class herds_T : public std::map<std::string, herd_T * >
 {

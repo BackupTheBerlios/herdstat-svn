@@ -38,6 +38,19 @@
 #include "herds.hh"
 
 /*
+ * Return a vector of all keys
+ */
+
+std::vector<std::string>
+herd_T::keys()
+{
+    std::vector<std::string> v;
+    for (iterator i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->first);
+    return v;
+}
+
+/*
  * Display a herd and it's developers.
  */
 
@@ -47,36 +60,17 @@ herd_T::display(std::ostream &stream)
     options_T options;
     formatter_T out;
     util::color_map_T color;
-
     std::string user = util::current_user();
+    std::string::size_type oldlen = 0;
+    std::vector<std::string> devs = this->keys();
+    std::vector<std::string>::iterator i;
 
-    /* sort devs */
-    std::vector<std::string> sorted_devs;
-    {
-        for (iterator i = this->begin() ; i != this->end() ; ++i)
-        {
-            std::string dev = i->first;
-            if (not options.verbose())
-            {
-                /* strip domain names from email addy */
-                std::string::size_type pos = dev.find('@');
-                if (pos != std::string::npos)
-                    dev = dev.substr(0, pos);
-                /* skip any invalid email addy's; for example, if dev 'joe'
-                 * uses 'joe' in one place and then 'joe@gentoo.org' in
-                 * another, it'll cause duplicates                          */
-                else
-                    continue;
-            }
-            sorted_devs.push_back(dev);
-        }
-    }
-    std::sort(sorted_devs.begin(), sorted_devs.end());
-
+    /* display header */
     if (not options.quiet())
     {
         if (not name.empty())
             out.append("Herd", name);
+
         if (not mail.empty())
         {
             /* add @gentoo.org if its not there already */
@@ -85,20 +79,23 @@ herd_T::display(std::ostream &stream)
                 mail += "@gentoo.org";
             out.append("Email", mail);
         }
+
         if (not desc.empty())
             out.append("Description", desc);
+
+        if (options.verbose())
+            out.append(util::sprintf("Developers(%d)", this->size()), "");
     }
-
-    if (options.verbose())
+    
+    for (i = devs.begin() ; i != devs.end() ; ++i)
     {
-        out.append(util::sprintf("Developers(%d)", this->size()), "");
+        if (options.quiet())
+            stream << util::get_user_from_email(*i) << std::endl;
 
-        std::vector<std::string>::iterator i;
-        for (i = sorted_devs.begin() ; i != sorted_devs.end() ; ++i)
+        else if (options.verbose())
         {
-            /* display full email; if the user is in the herd, hilite it
-             * to make them feel speshul :) */
-            if (*i == (user + "@gentoo.org"))
+            /* highlight email if current user is in the herd */
+            if (*i == user)
                 out.append("", color[yellow] + (*i) + color[none]);
             else
                 out.append("", color[blue] + (*i) + color[none]);
@@ -108,39 +105,29 @@ herd_T::display(std::ostream &stream)
             if ((x = this->find(*i)) != this->end())
                 x->second->display(stream);
         }
-    }
-    else
-    {
-        if (options.quiet())
-        {
-            std::vector<std::string>::iterator i;
-            for (i = sorted_devs.begin() ; i != sorted_devs.end() ; ++i)
-                stream << *i << std::endl;
-        }
         else
         {
-            std::string::size_type oldlen = 0;
-
             /* if the current user is in the herd, we highlight the nick
-             * and adjust maxctotal appropriately                       */
-            std::vector<std::string>::iterator pos =
-                std::find(sorted_devs.begin(), sorted_devs.end(), user);
-            if (pos != sorted_devs.end())
+             * and adjust maxctotal appropriately */
+            if (*i != user)
+                *i = util::get_user_from_email(*i);
+            else
             {
-                *pos = color[yellow] + user + color[none];
-    
+                *i = color[yellow] +
+                     util::get_user_from_email(*i) + color[none];
+
                 oldlen = out.maxctotal();
                 out.set_maxctotal(oldlen + color[yellow].length() +
                     color[none].length());
             }
-
-            out.append(util::sprintf("Developers(%d)", sorted_devs.size()), sorted_devs);
-
-            /* ...and restore it */
-            if (oldlen != 0)
-                out.set_maxctotal(oldlen);
         }
     }
+
+    if (not options.verbose() and not options.quiet())
+        out.append(util::sprintf("Developers(%d)", devs.size()), devs);
+
+    if (oldlen != 0)
+        out.set_maxctotal(oldlen);
 }
 
 /*
