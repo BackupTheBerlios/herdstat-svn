@@ -35,6 +35,7 @@ Force a fetch of herds.xml.  This is only valid if a) you didn't set a herds.xml
 location with -H or $HERDS, or b) the location you did set is a URL supported by
 wget.  If no non-option arguments are specified, @PACKAGE@ will simply fetch
 herds.xml and exit.
+.TP
 .B "\-v, \-\-verbose"
 Display verbose output.
 .TP
