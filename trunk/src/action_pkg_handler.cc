@@ -91,14 +91,9 @@ get_metadatas(const std::string &portdir)
     std::string cache = util::sprintf("%s/%s/metadatas", LOCALSTATEDIR, PACKAGE);
 
     struct stat s;
-    /* check if cache exists, is newer than 24hrs, and is >0 bytes */
-    if ((stat(cache.c_str(), &s) == 0) and
-        ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
+    /* does cache exist? */
+    if (stat(cache.c_str(), &s) == 0)
     {
-        /* if so, we're good to go. get it and return */
-
-        util::debug_msg("cache exists and is newer than 24hrs... using it.");
-
         std::auto_ptr<std::istream> f(new std::ifstream(cache.c_str()));
         if (not (*f))
             throw bad_fileobject_E("Failed to open '%s': %s", cache.c_str(),
@@ -108,7 +103,22 @@ get_metadatas(const std::string &portdir)
         while (std::getline(*f, s))
             metadatas.push_back(s);
 
-        return metadatas; 
+        /* has cache expired? */
+        if (((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
+        {
+            /* if so, we're good to go. get it and return */
+
+            util::debug_msg("cache exists and is newer than 24hrs... using it.");
+
+        }
+
+        /* expired */
+//        else if (s.st_size > 0)
+//        {
+
+//        }
+
+        return metadatas;
     }
 
     std::auto_ptr<std::ostream> fcache(new std::ofstream(cache.c_str()));

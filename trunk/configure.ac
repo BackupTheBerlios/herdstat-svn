@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 # $Id$
 
-AC_INIT([herdstat], [1.0_rc2], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.0_rc3], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AC_PREREQ([2.59])
@@ -25,11 +25,16 @@ AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_INSTALL
 
-AC_HEADER_STDC
-
 dnl Required headers
+AC_HEADER_STDC
 AC_HEADER_DIRENT(,
     [AC_MSG_ERROR([dirent.h is required])])
+AC_CHECK_HEADERS(sys/time.h,,
+    [AC_MSG_ERROR([sys/time.h is required])])
+AC_CHECK_HEADERS(cstdarg,, [AC_MSG_ERROR([cstdarg is required])])
+AC_CHECK_HEADERS(cerrno,, [AC_MSG_ERROR([cerrno is required])])
+AC_CHECK_HEADERS(ctime,, [AC_MSG_ERROR([ctime is required])])
+AC_CHECK_HEADERS(cctype,, [AC_MSG_ERROR([cctype is required])])
 
 dnl Required funcs
 AC_CHECK_FUNCS(asprintf,,

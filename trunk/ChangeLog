@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-03-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/util.cc: Use C++ version of std::isspace and std::tolower with
+	locale.
+
 2005-03-24 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.0_rc2-release).
