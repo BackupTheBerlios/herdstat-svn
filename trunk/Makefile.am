@@ -11,7 +11,7 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       stamp-h.in \
 		       *~
 
-EXTRA_DIST = autogen.sh .todo
+EXTRA_DIST = autogen.sh .todo bashcomp
 
 TODO: .todo
 	test -x $(prefix)/bin/devtodo && devtodo all --TODO

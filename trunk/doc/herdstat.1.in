@@ -30,6 +30,11 @@ for an alternative way of setting the herds.xml location.
 Send output to the specified file instead of stdout.  \fI<file>\fR can also be
 either stdout (default if -o is not specified) or stderr. This option implies --quiet.
 .TP
+.B "\-f, \-\-fetch"
+Force a fetch of herds.xml.  This is only valid if a) you didn't set a herds.xml
+location with -H or $HERDS, or b) the location you did set is a URL supported by
+wget.  If no non-option arguments are specified, @PACKAGE@ will simply fetch
+herds.xml and exit.
 .B "\-v, \-\-verbose"
 Display verbose output.
 .TP

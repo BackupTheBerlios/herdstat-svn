@@ -1,5 +1,9 @@
 ChangeLog for herdstat
 
+2005-03-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, bashcomp: Updated for --fetch.
+
 2005-03-11 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/util.cc, src/util.hh: Don't use wget -q if --verbose.
