@@ -98,7 +98,7 @@ herd_T::display(std::ostream &stream)
         {
             /* display full email; if the user is in the herd, hilite it
              * to make them feel speshul :) */
-            if (*i == user)
+            if (*i == (user + "@gentoo.org"))
                 out.append("", color[yellow] + (*i) + color[none]);
             else
                 out.append("", color[blue] + (*i) + color[none]);
@@ -115,7 +115,7 @@ herd_T::display(std::ostream &stream)
         {
             std::vector<std::string>::iterator i;
             for (i = sorted_devs.begin() ; i != sorted_devs.end() ; ++i)
-                std::cout << *i << std::endl;
+                stream << *i << std::endl;
         }
         else
         {
