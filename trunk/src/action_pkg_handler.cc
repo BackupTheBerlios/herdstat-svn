@@ -58,16 +58,13 @@ get_categories(const std::string &portdir)
 {
     std::string catfile = portdir + "/profiles/categories";
     std::vector<std::string> categories;
-    std::auto_ptr<std::istream> f(new std::ifstream(catfile.c_str()));
 
+    std::auto_ptr<std::istream> f(new std::ifstream(catfile.c_str()));
     if ((*f))
     {
-        while (not f->eof())
-        {
-            std::string s;
-            if (std::getline(*f, s))
-                categories.push_back(s);
-        }
+        std::string s;
+        while (std::getline(*f, s))
+            categories.push_back(s);
     }
     else
         throw bad_fileobject_E("Failed to open '%s': %s", catfile.c_str(),
@@ -91,24 +88,20 @@ get_metadatas(const std::string &portdir)
     {
         std::string cat = portdir + "/" + (*c);
 
-        /* make sure it's valid before trying to open it.
-         * unfortunately profiles/categories isn't always 100% up-to-date.  */
-        if (not util::is_dir(cat))
-            continue;
-
         /* open category */
         DIR *dir = opendir(cat.c_str());
         if (not dir)
-        {
-            throw bad_fileobject_E("Failed to open directory '%s': %s",
-                cat.c_str(), strerror(errno));
-        }
+            continue;
         
         util::debug_msg("opened directory %s", cat.c_str());
 
         struct dirent *d;
         while ((d = readdir(dir)))
         {
+            /* skip anything starting with a '.' */
+            if (std::strncmp(d->d_name, ".", 1) == 0)
+                continue;
+
             std::string metadata = cat + "/" + d->d_name + "/metadata.xml";
             if (util::is_file(metadata))
                 metadatas.push_back(metadata);
