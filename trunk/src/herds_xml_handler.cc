@@ -84,8 +84,9 @@ HerdsXMLHandler_T::text(const std::string &str)
         herds[cur_herd]->mail = str;
     else if (in_maintainer_email)
     {
-        cur_dev = str;
-        herds[cur_herd]->insert(std::make_pair(str, new dev_attrs_T()));
+        /* append @gentoo.org if needed */
+        cur_dev = (str.find('@') == std::string::npos ? str + "@gentoo.org" : str);
+        herds[cur_herd]->insert(std::make_pair(cur_dev, new dev_attrs_T()));
     }
     else if (in_maintainer_name)
     {
