@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include <iostream>
+#include <fstream>
 #include <string>
 #include <map>
 #include <memory>
@@ -46,6 +46,27 @@
 #include "util.hh"
 
 std::map<color_name_T, std::string> util::color_map_T::cmap;
+
+/*
+ * Return a list of categories retrieved from PORTDIR/profiles/categories
+ */
+
+std::vector<std::string>
+util::get_categories(const std::string &portdir)
+{
+    std::string catfile = portdir + "/profiles/categories";
+    std::vector<std::string> categories;
+
+    std::auto_ptr<std::ifstream> f(new std::ifstream(catfile.c_str()));
+    if (not (*f))
+        throw bad_fileobject_E(catfile);
+
+    std::string line;
+    while (std::getline(*f, line))
+        categories.push_back(line);
+
+    return categories;
+}
 
 /*
  * Given a string, convert all characters to lowercase
@@ -248,6 +269,11 @@ util::portdir()
 	if (pos != rc.keys.end())
 	    portdir = pos->second;
     }
+
+    /* environment overrides all */
+    char *result = getenv("PORTDIR");
+    if (result)
+	portdir = result;
 
     return (portdir.empty() ? "/usr/portage" : portdir.c_str());
 }

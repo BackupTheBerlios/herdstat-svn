@@ -56,6 +56,7 @@ enum color_name_T
 
 namespace util
 {
+    std::vector<std::string> get_categories(const std::string &);
     std::string lowercase(const std::string &);
     std::string tidy_whitespace(const std::string &);
     std::string get_user_from_email(const std::string &);
@@ -120,35 +121,28 @@ namespace util
 	    rcfile_keys_T keys;
     };
 
-    class status_T
+    class progress_T
     {
 	private:
-	    unsigned max;
 	    float cur, step;
 
 	public:
-	    status_T(unsigned m = 0)
-	    {
-		if(m != 0)
-		{
-		    max  = m;
-		    cur  = 0;
-		    step = 100.0 / m;
-		    std::printf("  0%%");
-		}
-	    }
-
+	    progress_T() : cur(0) { }
 	    void start(unsigned m)
 	    {
-		max  = m;
-		cur  = 0;
 		step = 100.0 / m;
 		std::printf("  0%%");
 	    }
 
 	    void operator++ ()
 	    {
-		std::printf("\b\b\b\b%.3i%%", (int) (cur += step));
+		int inc = static_cast<int>(cur += step);
+		if (inc < 10)
+		    std::printf("\b\b%.1d%%", inc);
+		else if (inc < 100)
+		    std::printf("\b\b\b%.2d%%", inc);
+		else
+		    std::printf("\b\b\b\b%.3d%%", inc);
 		std::fflush(stdout);
 	    }
     };
