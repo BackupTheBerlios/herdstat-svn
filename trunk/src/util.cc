@@ -70,6 +70,9 @@ bothspaces(char c1, char c2)
 std::string
 util::tidy_whitespace(const std::string &s)
 {
+    if (s.empty())
+	return "";
+
     std::string result;
 
     /* collapse whitespace */
@@ -438,8 +441,16 @@ util::debug_msg(const char *msg, ...)
     
     va_list v;
     va_start(v, msg);
-    *(optget("outstream", std::ostream *)) << "!!! " << util::sprintf(msg, v)
-	<< std::endl;
+    
+    std::string s = util::sprintf(msg, v);
+
+    /* make ASCII colors visible - TODO: anyway to escape them?
+     * simply inserting a '\' before it doesnt work... */
+    std::string::size_type pos = s.find("\033");
+    if (pos != std::string::npos)
+	s.erase(pos, 1);
+
+    *(optget("outstream", std::ostream *)) << "!!! " << s << std::endl;
     va_end(v);
 }
 
