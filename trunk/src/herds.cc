@@ -87,12 +87,18 @@ herd_T::display(std::ostream &stream)
             out.append(util::sprintf("Developers(%d)", this->size()), "");
     }
     
+    /* for each developer in this herd... */
     for (i = devs.begin() ; i != devs.end() ; ++i)
     {
+        
         if (not optget("verbose", bool))
+            /* just show the username not the entire email address */
             *i = util::get_user_from_email(*i);
+
         else if (not optget("quiet", bool))
         {
+            /* formatter_T can handle highlighting,
+             * so dont do anything special */
             if (*i == user)
                 out.append("", *i);
             else
