@@ -29,8 +29,10 @@
 
 #include <exception>
 #include <string>
-#include <sstream>
+#include <cstdlib>
 #include <cstdarg>
+#include <cerrno>
+#include <cstring>
 #include "util.hh"
 
 /* base exceptions */
@@ -95,33 +97,23 @@ class invalid_option_E                  : public herdstat_msg_base_E
         invalid_option_E(std::string const &msg) : herdstat_msg_base_E(msg) {}
         virtual const char *what() const throw()
         {
-            std::ostringstream out;
-            out << "Invalid option '" << str << "' ";
-            return out.str().c_str();
+            return util::sprintf("Invalid option '%s'", str).c_str();
         }
 };
 
-class bad_fileobject_E                  : public herdstat_va_base_E
+class bad_fileobject_E                  : public herdstat_msg_base_E
 {
     public:
         bad_fileobject_E() { }
-        bad_fileobject_E(const char *msg, va_list v) 
-            : herdstat_va_base_E(msg, v) { }
-        bad_fileobject_E(const std::string &msg, va_list v)
-            : herdstat_va_base_E(msg, v) { }
+        bad_fileobject_E(const char *msg) : herdstat_msg_base_E(msg) { }
+        bad_fileobject_E(const std::string &msg) : herdstat_msg_base_E(msg) { }
 
-        bad_fileobject_E(const char *msg, ...)
+        virtual const char *what() const throw()
         {
-            va_start(v, msg);
-            str = util::sprintf(msg, v).c_str();
-            va_end(v);
-        }
-
-        bad_fileobject_E(const std::string &msg, ...)
-        {
-            va_start(v, msg.c_str());
-            str = util::sprintf(msg.c_str(), v).c_str();
-            va_end(v);
+            std::string s(str);
+            if (s.empty())
+                return std::strerror(errno);
+            return (s + ": " + std::strerror(errno)).c_str();
         }
 };
 

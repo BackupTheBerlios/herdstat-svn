@@ -122,19 +122,16 @@ util::copy_file(const std::string &from, const std::string &to)
 {
     /* remove to if it exists */
     if (util::is_file(to))
-    {
 	if (unlink(to.c_str()) != 0)
-	    throw bad_fileobject_E("unlink: %s: %s", to.c_str(),
-		strerror(errno));
-    }
+	    throw bad_fileobject_E(to);
 
     std::auto_ptr<std::ifstream> ffrom(new std::ifstream(from.c_str()));
     std::auto_ptr<std::ostream> fto(new std::ofstream(to.c_str()));
 
     if (not (*ffrom))
-	throw bad_fileobject_E("%s: %s", from.c_str(), strerror(errno));
+	throw bad_fileobject_E(from);
     if (not (*fto))
-	throw bad_fileobject_E("%s: %s", to.c_str(), strerror(errno));
+	throw bad_fileobject_E(to);
 
     /* read from ffrom and write to fto */
     std::string s;
@@ -151,7 +148,7 @@ util::move_file(const std::string &from, const std::string &to)
 {
     util::copy_file(from, to);
     if (unlink(from.c_str()) != 0)
-	throw bad_fileobject_E("unlink: %s: %s", from.c_str(), strerror(errno));
+	throw bad_fileobject_E(from);
 }
 
 /*
@@ -232,7 +229,7 @@ util::portdir()
     {
 	std::auto_ptr<std::ifstream> f(new std::ifstream(make_conf));
 	if (not (*f))
-	    throw bad_fileobject_E("%s: %s", make_conf, strerror(errno));
+	    throw bad_fileobject_E(make_conf);
 
 	util::rcfile_T rc(*f);
 	util::rcfile_keys_T::iterator pos = rc.keys.find("PORTDIR");
@@ -244,7 +241,7 @@ util::portdir()
     {
 	std::auto_ptr<std::ifstream> f(new std::ifstream(make_glob));
 	if (not (*f))
-	    throw bad_fileobject_E("%s: %s", make_glob, strerror(errno));
+	    throw bad_fileobject_E(make_glob);
 
 	util::rcfile_T rc(*f);
 	util::rcfile_keys_T::iterator pos = rc.keys.find("PORTDIR");
@@ -277,7 +274,7 @@ util::fetch(const char *url, const char *file, bool verbose)
 	    << dir << "." << std::endl
 	    << "Did you forget to add yourself to the portage group?"
 	    << std::endl;
-	throw bad_fileobject_E("%s: %s", dir, strerror(errno));
+	throw bad_fileobject_E(dir);
     }
 
     std::string cmd;
@@ -361,9 +358,9 @@ const char *
 util::dirname(const char *path)
 {
     std::string s = path;
-   std::size_t path_len = strlen(path);
-   std::size_t base_len = strlen(util::basename(path));
-   std::size_t len = (path[path_len - 1] == '/' ? 2 : 1);
+    std::size_t path_len = std::strlen(path);
+    std::size_t base_len = std::strlen(util::basename(path));
+    std::size_t len = (path[path_len - 1] == '/' ? 2 : 1);
     len = path_len - base_len - (path_len - base_len - len == 0 ? len - 1 : len);
 
     return s.substr(0, len).c_str();

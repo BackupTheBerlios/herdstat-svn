@@ -54,7 +54,7 @@
 /* rough number of metadata's in the tree, updated from time to time
  * as it grows. Used for the initial reserve() so that a ton of re-
  * allocations can be prevented. */
-#define METADATA_RESERVE    8200
+#define METADATA_RESERVE    8300
 
 /*
  * Retrieve a list of all categories from PORTDIR/profiles/categories
@@ -68,8 +68,7 @@ get_categories(const std::string &portdir)
 
     std::auto_ptr<std::istream> f(new std::ifstream(catfile.c_str()));
     if (not (*f))
-        throw bad_fileobject_E("Failed to open '%s': %s", catfile.c_str(),
-            strerror(errno));
+        throw bad_fileobject_E(catfile);
 
     std::string s;
     while (std::getline(*f, s))
@@ -85,59 +84,61 @@ get_categories(const std::string &portdir)
 std::vector<std::string>
 get_metadatas(const std::string &portdir)
 {
+    bool new_only = false;
     std::vector<std::string> metadatas;
     metadatas.reserve(METADATA_RESERVE);
 
-    std::string cache = util::sprintf("%s/%s/metadatas", LOCALSTATEDIR, PACKAGE);
+    std::string cache_location = util::sprintf("%s/%s/metadatas", LOCALSTATEDIR, PACKAGE);
 
-    struct stat s;
     /* does cache exist? */
-    if (stat(cache.c_str(), &s) == 0)
+    struct stat s;
+    if (stat(cache_location.c_str(), &s) == 0)
     {
-        std::auto_ptr<std::istream> f(new std::ifstream(cache.c_str()));
+        std::auto_ptr<std::istream> f(new std::ifstream(cache_location.c_str()));
         if (not (*f))
-            throw bad_fileobject_E("Failed to open '%s': %s", cache.c_str(),
-                strerror(errno));
+            throw bad_fileobject_E(cache_location);
 
-        std::string s;
-        while (std::getline(*f, s))
-            metadatas.push_back(s);
+        std::string line;
+        while (std::getline(*f, line))
+            metadatas.push_back(line);
+
+        util::debug_msg("read a total of %d metadata.xml's from the cache.",
+            metadatas.size());
 
         /* has cache expired? */
         if (((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
         {
-            /* if so, we're good to go. get it and return */
-
+            /* no so use it as is */
             util::debug_msg("cache exists and is newer than 24hrs... using it.");
-
+            return metadatas;
         }
 
-        /* expired */
-//        else if (s.st_size > 0)
-//        {
-
-//        }
-
-        return metadatas;
+        /* expired, so only look for ones not in the list */
+        else if (s.st_size > 0)
+        {
+            util::debug_msg("cache exists but is expired... looking for new ones.");
+            new_only = true;
+        }
     }
 
-    std::auto_ptr<std::ostream> fcache(new std::ofstream(cache.c_str()));
+    std::auto_ptr<std::ofstream> cache(new std::ofstream(cache_location.c_str(),
+                                        std::ios::out|std::ios::app));
     if (not (*fcache))
-        throw bad_fileobject_E("Failed to open '%s': %s", cache.c_str(),
-            strerror(errno));
+        throw bad_fileobject_E(cache_location);
 
     std::vector<std::string> categories = get_categories(portdir);
     std::vector<std::string>::iterator c;
+    std::vector<std::string>::size_type orig = metadatas.size();
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
-        std::string cat = portdir + "/" + (*c);
+        std::string path = portdir + "/" + (*c);
 
         /* open category */
-        DIR *dir = opendir(cat.c_str());
+        DIR *dir = opendir(path.c_str());
         if (not dir)
             continue;
         
-        util::debug_msg("opened directory %s", cat.c_str());
+        util::debug_msg("opened directory %s", path.c_str());
 
         struct dirent *d;
         while ((d = readdir(dir)))
@@ -146,7 +147,15 @@ get_metadatas(const std::string &portdir)
             if (std::strncmp(d->d_name, ".", 1) == 0)
                 continue;
 
-            std::string metadata = cat + "/" + d->d_name + "/metadata.xml";
+            /* instead of walking each directory, just stat dir/metadata.xml */
+            std::string metadata = path + "/" + d->d_name + "/metadata.xml";
+
+            /* does it exist in the old cache */
+            if (new_only and (std::find(metadatas.begin(), metadatas.end(),
+                                        metadata) != metadatas.end()))
+                continue;
+
+            /* make sure it exists */
             if (util::is_file(metadata))
             {
                 metadatas.push_back(metadata);
@@ -155,6 +164,9 @@ get_metadatas(const std::string &portdir)
         }
         closedir(dir);
     }
+
+    if (optget("debug", bool))
+        util::debug_msg("cached %d metadata.xml's", metadatas.size() - orig);
     
     return metadatas;
 }
@@ -231,8 +243,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
     /* make sure it exists */
     if (not util::is_dir(optget("portdir", std::string)))
-	throw bad_fileobject_E("PORTDIR '%s' does not exist.",
-	    optget("portdir", std::string).c_str());
+	throw bad_fileobject_E(optget("portdir", std::string));
 
     if (optget("timer", bool))
         timer.start();

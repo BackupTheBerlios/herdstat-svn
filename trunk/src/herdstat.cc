@@ -428,8 +428,7 @@ main(int argc, char **argv)
 
 	/* make sure herds.xml exists */
 	if (not util::is_file(optget("herds.xml", std::string)))
-	    throw bad_fileobject_E("%s: %s", optget("herds.xml", std::string).c_str(),
-		strerror(errno));
+	    throw bad_fileobject_E(optget("herds.xml", std::string));
 
 	/* if there's no nonoption args, we're done */
 	if (optget("fetch", bool) and nonopt_args.empty())
@@ -462,8 +461,7 @@ main(int argc, char **argv)
 	{
 	    outstream = new std::ofstream(optget("outfile", std::string).c_str());
 	    if (not *outstream)
-		throw bad_fileobject_E("%s: %s", optget("outfile", std::string).c_str(),
-		    strerror(errno));
+		throw bad_fileobject_E(optget("outfile", std::string));
 	    optset("outstream", std::ostream *, outstream);
 	    optset("locale", std::string, std::locale::classic().name());
 	}
