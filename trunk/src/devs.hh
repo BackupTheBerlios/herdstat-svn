@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include <fstream>
+#include <ostream>
 #include <vector>
 #include <string>
 #include "formatter.hh"
