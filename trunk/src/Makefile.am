@@ -16,6 +16,7 @@ herdstat_SOURCES = exceptions.hh \
 		   action_herd_handler.hh action_herd_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
 		   action_pkg_handler.hh action_pkg_handler.cc \
+		   action_meta_handler.hh action_meta_handler.cc \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   herdstat.cc
 

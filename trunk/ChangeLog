@@ -2,13 +2,19 @@ ChangeLog for herdstat
 
 2005-03-27 Aaron Walker <ka0ttic@gentoo.org>
 
+	* src/action_meta_handler.cc, src/action_meta_handler.hh: Added
+	metadata handler for looking up package metadata.
+	* src/options.cc: Added 'parse herds.xml' option since
+	action_meta_handler will not need to parse herds.xml. Also added
+	action_meta to action_options_T.
 	* src/util.hh: Renamed status_T to progress_T. Modified it to not
 	print leading zeros.
 	* src/metadatas.cc, src/metadatas.hh: Moved metadata.xml retrieval
 	code from action_pkg_handler.cc into it's own class.
 	* src/action_pkg_handler.cc: Moved metadata.xml retrieval code to
 	metadatas.{cc,hh}.  Also reworked the way we handle invalid
-	devs/herds.
+	devs/herds.  Got the progress thinggy to work as it should when
+	parsing metadata.xml's.
 
 2005-03-26 Aaron Walker <ka0ttic@gentoo.org>
 	

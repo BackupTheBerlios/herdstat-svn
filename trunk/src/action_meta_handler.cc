@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_pkgto_handler.cc
+ * herdstat -- src/action_meta_handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -39,7 +39,7 @@
 #include "exceptions.hh"
 #include "xmlparser.hh"
 #include "metadata_xml_handler.hh"
-#include "action_pkgto_handler.hh"
+#include "action_meta_handler.hh"
 
 /*
  * Find all packages with the given name. Return a list of each
@@ -55,6 +55,14 @@ get_possibles(const std::string &pkg)
     std::vector<std::string>::iterator c;
     std::vector<std::string> categories = util::get_categories(portdir);
     
+    /* if category was specified, just check for existence */
+    std::string::size_type pos = pkg.find('/');
+    if (pos != std::string::npos and util::is_dir(portdir + "/" + pkg))
+    {
+        pkgs.push_back(pkg);
+        return pkgs;
+    }
+
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         std::string path = portdir + "/" + (*c);
@@ -76,7 +84,7 @@ get_possibles(const std::string &pkg)
 }
 
 int
-action_pkgto_handler_T::operator() (herds_T &herds_xml,
+action_meta_handler_T::operator() (herds_T &herds_xml,
                                     std::vector<std::string> &pkgs)
 {
     util::color_map_T color;
@@ -86,6 +94,7 @@ action_pkgto_handler_T::operator() (herds_T &herds_xml,
     formatter_T output;
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
+    output.set_quiet(false);
     output.set_attrs();
 
     std::string portdir = util::portdir();
@@ -107,16 +116,10 @@ action_pkgto_handler_T::operator() (herds_T &herds_xml,
     std::vector<std::string>::size_type n = 1;
     for (i = pkgs.begin() ; i != pkgs.end() ; ++i, ++n)
     {
-        std::vector<std::string> possibles;
-        std::vector<std::string> herds;
         herd_T devs;
-
-        /* was a category specified? */
-        std::string::size_type pos = i->find("/");
-        if (pos != std::string::npos)
-            possibles.push_back(*i);
-        else
-            possibles = get_possibles(*i);
+        std::vector<std::string> herds;
+        std::vector<std::string> possibles = get_possibles(*i);
+        std::string longdesc;
 
         /* is there more than one package with that name? */
         if (possibles.size() > 1)
@@ -130,20 +133,15 @@ action_pkgto_handler_T::operator() (herds_T &herds_xml,
 
             return EXIT_FAILURE;
         }
-
-        /* package exists? */
-        if (not util::is_dir(portdir + "/" + possibles.front()))
+        /* or none perhaps? */
+        else if (possibles.empty())
         {
-            std::cerr << "Package '" << possibles.front()
+            std::cerr << "Package '" << *i
                 << "' does not seem to exist." << std::endl;
+            return EXIT_FAILURE;
         }
 
-        std::string metadata =
-            portdir + "/" + possibles.front() + "/metadata.xml";
-
-        output("Package", possibles.front());
-        
-        if (util::is_file(metadata))
+        if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
         {
             try
             {
@@ -152,10 +150,12 @@ action_pkgto_handler_T::operator() (herds_T &herds_xml,
                 XMLParser_T parser(&(*handler));
 
                 /* parse it */
-                parser.parse(metadata);
+                parser.parse(portdir + "/" + possibles.front() +
+                             "/metadata.xml");
 
                 herds = handler->herds;
                 devs = handler->devs;
+                longdesc = handler->longdesc;
             }
             catch (const XMLParser_E &e)
             {
@@ -164,31 +164,39 @@ action_pkgto_handler_T::operator() (herds_T &herds_xml,
                 return EXIT_FAILURE;
             }
 
-            if (herds.empty())
-                output("Herds(0)", "None");
-            else
+            output("Package", possibles.front());
+
+            /* herds */
+            if (not herds.empty() or (herds.front() != "no-herd"))
                 output(util::sprintf("Herds(%d)", herds.size()), herds);
 
-            if (devs.empty())
-                output("Maintainers(0)", "None");
-            else
+            /* devs */
+            if (devs.size() == 1)
                 output(util::sprintf("Maintainers(%d)", devs.size()),
                     devs.keys());
+            else if (devs.size() > 1)
+            {
+                output(util::sprintf("Maintainers(%d)", devs.size()),
+                    devs.keys().front());
+
+                std::vector<std::string> dev_keys(devs.keys());
+                std::vector<std::string>::iterator d;
+                for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
+                    output("", *d);
+            }
+
+            /* long description */
+            if (not longdesc.empty())
+                output("Description", util::tidy_whitespace(longdesc));
         }
         else
-        {
             output("", "No metadata.xml");
-        }
 
         if (n != pkgs.size())
             output.endl();
     }
 
     output.flush(*stream);
-
-    if (optget("timer", bool))
-        *stream << std::endl;
-
     return EXIT_SUCCESS;
 }
 

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_pkgto_handler.hh
+ * herdstat -- src/action_meta_handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_PKGTO_HANDLER_HH
-#define HAVE_ACTION_PKGTO_HANDLER_HH 1
+#ifndef HAVE_ACTION_META_HANDLER_HH
+#define HAVE_ACTION_META_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -29,10 +29,10 @@
 
 #include "action_handler.hh"
 
-class action_pkgto_handler_T : public action_handler_T
+class action_meta_handler_T : public action_handler_T
 {
     public:
-        action_pkgto_handler_T() { }
+        action_meta_handler_T() { }
         virtual int operator() (herds_T &, std::vector<std::string> &);
 };
 
