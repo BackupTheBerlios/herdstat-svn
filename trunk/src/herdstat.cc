@@ -33,6 +33,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <cerrno>
 #include <ctime>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -252,8 +253,8 @@ main(int argc, char **argv)
     else
     {
 	/* if a fetched copy exists and is newer than 24hrs, use it.
-	 * see the explanation below where we fetch as to why we go
-	 * through the trouble of doing this. */
+	 * see the explanation below where we fetch as to why
+	 * we go through the trouble of doing this. */
 	struct stat s;
 	if ((stat(fetched_location.c_str(), &s) == 0) and
 	    ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
@@ -261,7 +262,7 @@ main(int argc, char **argv)
     }
 
     try
-    {
+    { 
 	std::vector<std::string> nonopt_args;
 
 	/* handle command line options */
@@ -289,40 +290,76 @@ main(int argc, char **argv)
 
 	/* every action handler needs to parse herds.xml for one reason
 	 * or another, so let's get it over with. */
-	std::auto_ptr<HerdsXMLHandler_T> handler(new HerdsXMLHandler_T());
+	struct stat s;
 	try
 	{
-	    /* NOTE: ideally we'd love to only fetch it when the timestamp and
-	     * size are different, however, because the default location to
-	     * download herds.xml is from ViewCVS, there is no Last-Modified
-	     * header, meaning wget can't do timestamps :(
-	     */
-
-	    /* fetch herds.xml? */
 	    if (options.herds_xml().find("://") != std::string::npos)
 	    {
+		/* NOTE: ideally we'd love to only fetch it when the timestamp
+		 * and size are different, however, because the default
+		 * location to download herds.xml is from ViewCVS, there is no
+		 * Last-Modified header, meaning wget can't do timestamps :( */
+
 		if (not options.quiet())
 		{
 		    std::cout
-			<< "Fetching herds.xml... (you can use a local "
-			<< "copy by setting the HERDS variable)"
+			<< "Fetching herds.xml..."
 			<< std::endl << std::endl;
 		}
+
+		/* backup cached copy if it exists so we can possibly use it
+		 * if fetching fails */
+		if (util::is_file(fetched_location))
+		    util::copy_file(fetched_location, fetched_location + ".bak");
 
 		/* fetch it */
 		if (util::fetch(options.herds_xml(), fetched_location) != 0)
 		    throw fetch_E();
 
-		/* instead of wget failing if it can fetch it, it'll write a
+		/* instead of wget failing if it can't fetch it, it'll write a
 		 * 0-byte file... make sure the file is greater than 0 bytes */
-		struct stat s;
-		if ((stat(fetched_location.c_str(), &s) == 0) and
-		    (s.st_size > 0))
+		if ((stat(fetched_location.c_str(), &s) == 0) and (s.st_size > 0))
 		    options.set_herds_xml(fetched_location);
 		else
 		    throw fetch_E();
 	    }
+	}
+	catch (const fetch_E &e)
+	{
+	    std::cerr << "Error fetching " << options.herds_xml()
+		<< std::endl << std::endl;
 
+	    /* if we can't fetch it but have an old cached copy, use it */
+	    if (util::is_file(fetched_location + ".bak"))
+	    {
+		std::cerr << "Using cached copy... ";
+		util::move_file(fetched_location + ".bak", fetched_location);
+		options.set_herds_xml(fetched_location);
+	    }
+		
+	    std::cerr
+		<< "If you have a local copy, specify it using -H or by "
+		<< std::endl << "setting the HERDS environment variable."
+		<< std::endl;
+
+	    if (stat(fetched_location.c_str(), &s) != 0)
+		return EXIT_FAILURE;
+	    else if (s.st_size == 0)
+	    {
+		unlink(fetched_location.c_str());
+		return EXIT_FAILURE;
+	    }
+	    else
+		std::cout << std::endl;
+	}
+
+	if (not util::is_file(options.herds_xml()))
+	    throw bad_fileobject_E("%s: %s", options.herds_xml().c_str(),
+		strerror(errno));
+
+	std::auto_ptr<HerdsXMLHandler_T> handler(new HerdsXMLHandler_T());
+	try
+	{
 	    if (options.timer())
 		timer.start();
 
@@ -332,15 +369,6 @@ main(int argc, char **argv)
 
 	    if (options.timer())
 		timer.stop();
-	}
-	catch (const fetch_E)
-	{
-	    std::cerr << "Error fetching " << options.herds_xml()
-		<< std::endl << std::endl
-		<< "If you have a local copy, specify it using -H or by "
-		<< std::endl << "setting the HERDS environment variable."
-		<< std::endl;
-	    return EXIT_FAILURE;
 	}
 	catch (const XMLParser_E &e)
 	{

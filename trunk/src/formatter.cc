@@ -60,7 +60,11 @@ void
 formatter_T::set_attrs()
 {
     util::color_map_T color;
+
+    /* +1 for ':' */
     attr.maxlabel++;
+    /* -2 just for padding */
+    attr.maxdata -= 2;
     attr.maxtotal = attr.maxlabel + attr.maxdata;
 
     /* if we're using colors, we need to compensate
