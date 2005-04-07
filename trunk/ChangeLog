@@ -2,6 +2,8 @@ ChangeLog for herdstat
 
 2005-04-07 Aaron Walker <ka0ttic@gentoo.org>
 
+	* lib/portage_version.cc, lib/portage_version.hh: Added
+	version_string_T and the plural version versions_T.
 	* lib/string.cc, lib/string.hh: Added vec2str() for converting a
 	vector of strings into a string delimited by the specified delimiter.
 	* lib/portage_misc.cc, lib/portage_misc.hh, lib/portage_config.cc,

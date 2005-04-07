@@ -7,7 +7,8 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     vars.hh vars.cc \
 		     file.hh file.cc \
 		     portage_misc.hh portage_misc.cc \
-		     portage_config.hh portage_config.cc
+		     portage_config.hh portage_config.cc \
+		     portage_version.hh portage_version.cc
 
 AM_CXXFLAGS = -pedantic -ansi -Wall
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
