@@ -78,6 +78,8 @@ util::file_T::close()
 {
     assert(stream);
     stream->close();
+    delete stream;
+    stream = NULL;
 }
 
 /**************************
@@ -222,5 +224,26 @@ util::dirname(const char *path)
 
 const char *
 util::dirname(std::string const &path) { return util::dirname(path.c_str()); }
+
+const char *
+util::chop_fileext(const char *path, unsigned short depth)
+{
+    std::string result(path);
+
+    for (; depth > 0 ; --depth)
+    {
+        std::string::size_type pos = result.rfind('.');
+        if (pos != std::string::npos)
+            result = result.substr(0, pos);
+    }
+
+    return result.c_str();
+}
+
+const char *
+util::chop_fileext(const std::string &path, unsigned short depth)
+{
+    return util::chop_fileext(path.c_str(), depth);
+}
 
 /* vim: set tw=80 sw=4 et : */

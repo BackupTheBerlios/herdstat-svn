@@ -53,6 +53,8 @@ namespace util
     const char *basename(std::string const &);
     const char *dirname(const char *);
     const char *dirname(std::string const &);
+    const char *chop_fileext(const char *, unsigned short depth = 1);
+    const char *chop_fileext(const std::string &, unsigned short depth = 1);
 
     enum type_T { FTYPE_FILE, FTYPE_DIR };
 
@@ -123,7 +125,7 @@ namespace util
             typedef std::vector<std::string>::iterator iterator;
             typedef std::vector<std::string>::size_type size_type;
 
-            file_T() : fileobject_T(FTYPE_FILE) { }
+            file_T() : fileobject_T(FTYPE_FILE), stream(NULL) { }
             file_T(const std::string &n)
                 : fileobject_T(n, FTYPE_FILE), stream(NULL) { }
             file_T(const char *n)
