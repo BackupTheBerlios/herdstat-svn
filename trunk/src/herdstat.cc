@@ -318,17 +318,97 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 }
 
 int
+fetch_herds_xml()
+{
+    struct stat s;
+    try
+    {
+	if (optget("parse herds.xml", bool))
+	{
+	    if (optget("fetch", bool) and
+		(optget("herds.xml", std::string).find("://") == std::string::npos))
+		optset("herds.xml", std::string, default_herdsxml);
+
+	    if (optget("herds.xml", std::string).find("://") != std::string::npos)
+	    {
+		/* NOTE: ideally we'd love to only fetch it when the timestamp
+		 * and size are different, however, because the default
+		 * location to download herds.xml is from ViewCVS, there is no
+		 * Last-Modified header, meaning wget can't do timestamps :( */
+
+		if (not optget("quiet", bool))
+		{
+		    std::cout
+			<< "Fetching herds.xml..."
+			<< std::endl << std::endl;
+		}
+
+		/* backup cached copy if it exists so we can use it
+		 * if fetching fails */
+		if (util::is_file(FETCH_LOCATION))
+		    util::copy_file(FETCH_LOCATION, FETCH_LOCATION".bak");
+
+		/* fetch it */
+		if (util::fetch(optget("herds.xml", std::string), FETCH_LOCATION,
+		    optget("verbose", bool)) != 0)
+		    throw fetch_E();
+
+		/* because we tell wget to clobber the file, if fetching fails for
+		 * some reason, it'll truncate the old one - make sure the file
+		 * is greater than 0 bytes */
+		if ((stat(FETCH_LOCATION, &s) == 0) and (s.st_size > 0))
+		    optset("herds.xml", std::string, FETCH_LOCATION);
+		else
+		    throw fetch_E();
+
+		/* remove back up copy */
+		unlink(FETCH_LOCATION".bak");
+	    }
+	}
+    }
+    catch (const fetch_E &e)
+    {
+	std::cerr << "Error fetching " << optget("herds.xml", std::string)
+	    << std::endl << std::endl;
+
+	/* if we can't fetch it but have an old cached copy, use it */
+	if (util::is_file(FETCH_LOCATION".bak"))
+	{
+	    std::cerr << "Using cached copy... ";
+	    util::move_file(FETCH_LOCATION".bak", FETCH_LOCATION);
+	    optset("herds.xml", std::string, FETCH_LOCATION);
+	}
+		
+	std::cerr
+	    << "If you have a local copy, specify it using -H or by "
+	    << std::endl << "setting the HERDS environment variable."
+	    << std::endl;
+
+	if (stat(FETCH_LOCATION, &s) != 0)
+	    return EXIT_FAILURE;
+	else if (s.st_size == 0)
+	{
+	    unlink(FETCH_LOCATION);
+	    return EXIT_FAILURE;
+	}
+	else
+	    std::cerr << std::endl;
+    }
+    
+    return EXIT_SUCCESS;
+}
+
+int
 main(int argc, char **argv)
 {
     options_T options;
-    formatter_T output;
     util::timer_T timer;
 
     /* try to determine current columns, otherwise use default */
     optset("maxcol", std::size_t, util::getcols());
 
     /* HERDS */
-    char *result = getenv("HERDS");
+    char *result = std::getenv("HERDS");
     if (result)
 	optset("herds.xml", std::string, result);
     else
@@ -380,80 +460,8 @@ main(int argc, char **argv)
 	if (not optget("quiet", bool) and optget("fetch", bool) and nonopt_args.empty())
 	    optset("verbose", bool, true);
 
-	struct stat s;
-	try
-	{
-	    if (optget("parse herds.xml", bool))
-	    {
-		if (optget("fetch", bool) and
-		    (optget("herds.xml", std::string).find("://") == std::string::npos))
-		    optset("herds.xml", std::string, default_herdsxml);
-
-		if (optget("herds.xml", std::string).find("://") != std::string::npos)
-		{
-		    /* NOTE: ideally we'd love to only fetch it when the timestamp
-		     * and size are different, however, because the default
-		     * location to download herds.xml is from ViewCVS, there is no
-		     * Last-Modified header, meaning wget can't do timestamps :( */
-
-		    if (not optget("quiet", bool))
-		    {
-			std::cout
-			    << "Fetching herds.xml..."
-			    << std::endl << std::endl;
-		    }
-
-		    /* backup cached copy if it exists so we can use it
-		     * if fetching fails */
-		    if (util::is_file(FETCH_LOCATION))
-			util::copy_file(FETCH_LOCATION, FETCH_LOCATION".bak");
-
-		    /* fetch it */
-		    if (util::fetch(optget("herds.xml", std::string), FETCH_LOCATION,
-			optget("verbose", bool)) != 0)
-			throw fetch_E();
-
-		    /* because we tell wget to clobber the file, if fetching fails for
-		     * some reason, it'll truncate the old one - make sure the file
-		     * is greater than 0 bytes */
-		    if ((stat(FETCH_LOCATION, &s) == 0) and (s.st_size > 0))
-			optset("herds.xml", std::string, FETCH_LOCATION);
-		    else
-			throw fetch_E();
-
-		    /* remove back up copy */
-		    unlink(FETCH_LOCATION".bak");
-		}
-	    }
-	}
-	catch (const fetch_E &e)
-	{
-	    std::cerr << "Error fetching " << optget("herds.xml", std::string)
-		<< std::endl << std::endl;
-
-	    /* if we can't fetch it but have an old cached copy, use it */
-	    if (util::is_file(FETCH_LOCATION".bak"))
-	    {
-		std::cerr << "Using cached copy... ";
-		util::move_file(FETCH_LOCATION".bak", FETCH_LOCATION);
-		optset("herds.xml", std::string, FETCH_LOCATION);
-	    }
-		
-	    std::cerr
-		<< "If you have a local copy, specify it using -H or by "
-		<< std::endl << "setting the HERDS environment variable."
-		<< std::endl;
-
-	    if (stat(FETCH_LOCATION, &s) != 0)
-		return EXIT_FAILURE;
-	    else if (s.st_size == 0)
-	    {
-		unlink(FETCH_LOCATION);
-		return EXIT_FAILURE;
-	    }
-	    else
-		std::cerr << std::endl;
-	}
+	if (fetch_herds_xml() != EXIT_SUCCESS)
+	    return EXIT_FAILURE;
 
 	/* make sure herds.xml exists */
 	if (optget("parse herds.xml", bool) and
@@ -505,7 +513,7 @@ main(int argc, char **argv)
 	    catch (const std::runtime_error)
 	    {
 		std::string error("Invalid locale");
-		result = getenv("LC_ALL");
+		result = std::getenv("LC_ALL");
 		if (result)
 		    error += " '" + std::string(result) + "'.";
 		std::cerr << error << std::endl;
