@@ -105,6 +105,43 @@ portage::ebuild_which(const std::string &portdir, const std::string &pkg)
     return ebuilds.back().c_str();
 }
 
+std::vector<std::string>
+portage::find_package(const std::string &portdir, const std::string &pkg)
+{
+    std::vector<std::string> pkgs;
+
+    /* if category was specified, just check for existence */
+    std::string::size_type pos = pkg.find('/');
+    if (pos != std::string::npos)
+    {
+        if (util::is_dir(portdir + "/" + pkg))
+            pkgs.push_back(pkg);
+        return pkgs;
+    }
+
+    portage::categories_T categories;
+    portage::categories_T::iterator c;
+    for (c = categories.begin() ; c != categories.end() ; ++c)
+    {
+        /* was a category specified? only one possible */
+        if (*c == pkg)
+        {
+            pkgs.push_back(*c);
+            break;
+        }
+
+        util::dir_T category(portdir + "/" + (*c));
+        util::dir_T::iterator d;
+
+        /* for each package in the category */
+        for (d = category.begin() ; d != category.end() ; ++d)
+            if (pkg == (*d)->basename())
+                pkgs.push_back(*c + "/" + pkg);
+    }
+
+    return pkgs;
+}
+
 /*
  * Given the path to an ebuild, return a vector comprised
  * of the version components (package name, version, revision).

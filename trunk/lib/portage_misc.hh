@@ -28,14 +28,41 @@
 #endif
 
 #include "vars.hh"
+#include "portage_config.hh"
 
 namespace portage
 {
     bool in_pkg_dir();
     const char *ebuild_which(const std::string &, const std::string &);
+    std::vector<std::string> find_package(const std::string &, const std::string &);
     std::vector<std::string> get_version_components(const std::string &);
     std::map<std::string, std::string> get_version_map(const std::string &);
     std::string parse_homepage(const std::string &, util::vars_T &);
+    std::vector<std::string> find_package(const std::string &, const std::string &);
+
+    /* represents a list of package categories */
+    class categories_T : public util::file_T
+    {
+        public:
+            categories_T()
+                : file_T(std::string(portage::portdir()) + "/profiles/categories")
+            { init(); }
+            categories_T(const std::string &p) : file_T(p + "/profiles/categories")
+            { init(); }
+
+            void init()
+            {
+                this->open();
+                this->read();
+
+                /* remove 'virtual' ... */
+                if (this->_contents.size() > 0 and
+                    this->_contents.back() == "virtual")
+                    this->_contents.erase(_contents.end());
+            }
+
+            size_type size() const { return _contents.size(); }
+    };
 }
 
 #endif

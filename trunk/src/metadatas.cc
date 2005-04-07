@@ -34,7 +34,6 @@
 
 #include "common.hh"
 #include "exceptions.hh"
-#include "categories.hh"
 #include "metadatas.hh"
 
 /*
@@ -92,7 +91,7 @@ metadatas_T::valid() const
 void
 metadatas_T::fill()
 {
-    categories_T categories(portdir);
+    portage::categories_T categories(portdir);
     util::progress_T progress;
     util::timer_T t;
     bool status = not optget("quiet", bool) and not optget("debug", bool);
@@ -109,7 +108,7 @@ metadatas_T::fill()
         t.start();
 
     /* for each category */
-    categories_T::iterator cat;
+    portage::categories_T::iterator cat;
     for (cat = categories.begin() ; cat != categories.end() ; ++cat)
     {
         const std::string path(portdir + "/" + (*cat));

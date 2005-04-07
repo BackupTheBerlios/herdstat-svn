@@ -37,57 +37,12 @@
 #include <dirent.h>
 
 #include "common.hh"
-#include "categories.hh"
 #include "herds.hh"
 #include "formatter.hh"
 #include "exceptions.hh"
 #include "xmlparser.hh"
 #include "metadata_xml_handler.hh"
 #include "action_meta_handler.hh"
-
-/*
- * Find all packages with the given name. Return a list of each
- * one found in cat/pkg form.
- */
-
-std::vector<std::string>
-get_possibles(const std::string &portdir, const std::string &pkg)
-{
-    std::vector<std::string> pkgs;
-
-    /* if category was specified, just check for existence */
-    std::string::size_type pos = pkg.find('/');
-    if (pos != std::string::npos)
-    {
-        if (util::is_dir(portdir + "/" + pkg))
-            pkgs.push_back(pkg);
-        return pkgs;
-    }
-
-    categories_T categories;
-    categories_T::iterator c;
-    for (c = categories.begin() ; c != categories.end() ; ++c)
-    {
-        std::string path = portdir + "/" + (*c);
-
-        /* was a category specified? only one possible */
-        if (*c == pkg)
-        {
-            pkgs.push_back(*c);
-            break;
-        }
-
-        util::dir_T category(path);
-        util::dir_T::iterator d;
-
-        /* for each package in the category */
-        for (d = category.begin() ; d != category.end() ; ++d)
-            if (pkg == (*d)->basename())
-                pkgs.push_back(*c + "/" + pkg);
-    }
-
-    return pkgs;
-}
 
 int
 action_meta_handler_T::operator() (herds_T &herds_xml,
@@ -174,7 +129,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::vector<std::string> possibles = get_possibles(portdir, *i);
+        std::vector<std::string> possibles = portage::find_package(portdir, *i);
         std::string longdesc, metadata;
 
         /* is there more than one package with that name? */
