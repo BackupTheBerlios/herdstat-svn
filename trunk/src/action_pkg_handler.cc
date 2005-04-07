@@ -152,7 +152,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
 
         if (dev and not dev_exists(herds_xml, *i))
         {
-            if (foundopts.empty())
+            if (status and foundopts.empty())
                 ++progress;
 
             if (opts.size() == 1)
@@ -168,7 +168,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         }
         else if (not dev and not herds_xml.exists(*i))
         {
-            if (foundopts.empty())
+            if (status and foundopts.empty())
                 ++progress;
 
             if (opts.size() == 1)
