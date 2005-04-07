@@ -127,7 +127,9 @@ formatter_T::append(const std::string &label, std::vector<std::string> data)
 {
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
-    if (quiet())
+    if (attr.quiet and attr.quiet_delim == " ")
+        buffer.push_back(util::vec2str(data));
+    else if (attr.quiet)
         std::copy(data.begin(), data.end(), std::back_inserter(buffer));
 
     /* otherwise, produce a data string and call the real append() */

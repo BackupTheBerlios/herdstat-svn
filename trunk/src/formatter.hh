@@ -32,8 +32,6 @@
 #include <vector>
 #include <map>
 
-
-
 class formatter_T
 {
     private:
@@ -44,6 +42,8 @@ class formatter_T
 
             bool colors;
             bool quiet;
+
+            std::string quiet_delim;
 
             std::string label_color;
             std::string data_color;
@@ -84,7 +84,14 @@ class formatter_T
             append(l, d);
         }
 
-        void endl() { buffer.push_back(""); }
+        void endl()
+        {
+            if (attr.quiet and attr.quiet_delim == " ")
+                buffer.push_back("\n");
+            else
+                buffer.push_back("");
+        }
+
         void flush(std::ostream &);
         const std::string &peek() const { return buffer.back(); }
         std::vector<std::string>::size_type size() const { return buffer.size(); }
@@ -104,7 +111,11 @@ class formatter_T
         void set_colors(bool value) { attr.colors = value; }
         bool colors() { return attr.colors; }
 
-        void set_quiet(bool value) { attr.quiet = value; }
+        void set_quiet(bool value, const std::string delim = "\n")
+        {
+            attr.quiet = value;
+            attr.quiet_delim = delim;
+        }
         bool quiet() { return attr.quiet; }
 
         void set_labelcolor(std::string &s) { attr.label_color = s; }

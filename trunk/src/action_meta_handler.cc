@@ -100,7 +100,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
-    output.set_quiet(quiet);
+    output.set_quiet(quiet, " ");
     output.set_attrs();
 
     /* we dont care about these */
@@ -126,7 +126,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         unsigned short depth = 0;
 
         /* are we in a package's directory? */
-        if (util::in_pkg_dir())
+        if (portage::in_pkg_dir())
             depth = 2;
         /* not in pkgdir and metdata exists,
          * so assume we're in a category */
@@ -208,16 +208,11 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             
         /* if no '/' exists, assume it's a category */
         cat = (possibles.front().find('/') == std::string::npos);
-        
-        if (n != 1 and quiet)
-            *stream << std::endl;
-        else if (n != 1)
+
+        if (n != 1)
             output.endl();
 
-        if (quiet)
-            *stream << possibles.front() << std::endl;
-        else
-            output(cat ? "Category" : "Package", possibles.front());
+        output(cat ? "Category" : "Package", possibles.front());
 
         if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
         {
@@ -246,38 +241,17 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             /* herds */
             if (not cat and (herds.empty() or (herds.front() == "no-herd")))
-            {
-                if (quiet)
-                    *stream << "none" << std::endl;
-                else
-                    output("Herds(0)", "none");
-            }
+                output("Herds(0)", "none");
             else if (not herds.empty())
-            {
-                if (quiet)
-                {
-                    std::copy(herds.begin(), herds.end(),
-                        std::ostream_iterator<std::string>(*stream, " "));
-                    *stream << std::endl;
-                }
-                else
-                    output(util::sprintf("Herds(%d)", herds.size()), herds);
-            }
+                output(util::sprintf("Herds(%d)", herds.size()), herds);
 
             /* devs */
             if (quiet)
             {
-                if (devs.size() > 1)
-                {
-                    std::vector<std::string> dev_keys(devs.keys());
-                    std::copy(dev_keys.begin(), dev_keys.end(),
-                        std::ostream_iterator<std::string>(*stream, " "));
-                    *stream << std::endl;
-                }
-                else if (devs.size() == 1)
-                    *stream << devs.keys().front() << std::endl;
+                if (devs.size() >= 1)
+                    output("", devs.keys());
                 else if (not cat)
-                    *stream << "none" << std::endl;
+                    output("", "none");
             }
             else
             {
@@ -298,21 +272,17 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             if (not cat)
             {
-                std::string ebuild(util::ebuild_which(portdir, possibles.front()));
+                std::string ebuild(portage::ebuild_which(portdir,
+                    possibles.front()));
                 ebuild_vars.read(ebuild);
 
-                if (quiet)
-                {
-                    if (ebuild_vars["HOMEPAGE"].empty())
-                        ebuild_vars["HOMEPAGE"] = "none";
-                        
-                    *stream << util::parse_homepage(ebuild_vars["HOMEPAGE"],
-                        ebuild_vars) << std::endl;
-                }
-                else if (not ebuild_vars["HOMEPAGE"].empty())
+                if (quiet and ebuild_vars["HOMEPAGE"].empty())
+                    ebuild_vars["HOMEPAGE"] = "none";
+
+                if (not ebuild_vars["HOMEPAGE"].empty())
                 {
                     output("Homepage",
-                        util::parse_homepage(ebuild_vars["HOMEPAGE"],
+                        portage::parse_homepage(ebuild_vars["HOMEPAGE"],
                             ebuild_vars));
                 }
             }
@@ -322,21 +292,15 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             {
                 if (not cat)
                 {
-                    if (quiet)
-                    {
-                        if (ebuild_vars["DESCRIPTION"].empty())
-                            ebuild_vars["DESCRIPTION"] = "none";
-
-                        *stream << ebuild_vars["DESCRIPTION"] << std::endl;
-                    }
-                    else if (not ebuild_vars["DESCRIPTION"].empty());
+                    if (quiet and ebuild_vars["DESCRIPTION"].empty())
+                        ebuild_vars["DESCRIPTION"] = "none";
+                    
+                    if (not ebuild_vars["DESCRIPTION"].empty());
                         output("Description", ebuild_vars["DESCRIPTION"]);
                 }
                 else
-                    *stream << "none" << std::endl;
+                    output("Description", "none");
             }
-            else if (quiet)
-                *stream << util::tidy_whitespace(longdesc) << std::endl;
             else
                 output("Description", util::tidy_whitespace(longdesc));
         }
@@ -345,45 +309,36 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         else
         {
             if (quiet)
-                *stream << "No metadata.xml" << std::endl;
+                output("", "No metadata.xml");
             else
                 output("", color[red] + "No metadata.xml." + color[none]);
             
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
-                util::vars_T ebuild_vars(util::ebuild_which(portdir,
+                util::vars_T ebuild_vars(portage::ebuild_which(portdir,
                     possibles.front()));
                 
-                if (quiet)
+                if (quiet and ebuild_vars["HOMEPAGE"].empty())
+                    ebuild_vars["HOMEPAGE"] = "none";
+
+                if (not ebuild_vars["HOMEPAGE"].empty())
                 {
-                    if (ebuild_vars["HOMEPAGE"].empty())
-                        ebuild_vars["HOMEPAGE"] = "none";
-                        
-                    *stream << util::parse_homepage(ebuild_vars["HOMEPAGE"],
-                        ebuild_vars) << std::endl;
-                }
-                else if (not ebuild_vars["HOMEPAGE"].empty())
-                {
-                    output("Homepage", util::parse_homepage(ebuild_vars["HOMEPAGE"],
+                    output("Homepage",
+                        portage::parse_homepage(ebuild_vars["HOMEPAGE"],
                         ebuild_vars));
                 }
 
-                if (quiet)
-                {
-                    if (ebuild_vars["DESCRIPTION"].empty())
-                        ebuild_vars["DESCRIPTION"] = "none";
+                if (quiet and ebuild_vars["DESCRIPTION"].empty())
+                    ebuild_vars["DESCRIPTION"] = "none";
 
-                    *stream << ebuild_vars["DESCRIPTION"] << std::endl;
-                }
-                else if (not ebuild_vars["DESCRIPTION"].empty())
+                if (not ebuild_vars["DESCRIPTION"].empty())
                     output("Description", ebuild_vars["DESCRIPTION"]);
             }
         }
     }
 
-    if (not quiet)
-        output.flush(*stream);
+    output.flush(*stream);
     return EXIT_SUCCESS;
 }
 
