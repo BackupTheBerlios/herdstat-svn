@@ -29,17 +29,23 @@
 
 #include "vars.hh"
 
-namespace util
+namespace portage
 {
-    class portage_config_T : public util::vars_T
+    class config_T : public util::vars_T
     {
         public:
-            portage_config_T()
+            config_T()
             {
+                /* read default config */
                 this->read("/etc/make.globals");
+                this->close();
+                /* read make.conf overriding any defined settings */
                 this->read("/etc/make.conf");
+                this->close();
             }
     };
+
+    const char *portdir();
 }
 
 #endif

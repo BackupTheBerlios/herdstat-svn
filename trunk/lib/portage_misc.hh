@@ -29,13 +29,33 @@
 
 #include "vars.hh"
 
-namespace util
+namespace portage
 {
     bool in_pkg_dir();
     const char *ebuild_which(const std::string &, const std::string &);
     std::vector<std::string> get_version_components(const std::string &);
     std::map<std::string, std::string> get_version_map(const std::string &);
-    std::string parse_homepage(const std::string &, vars_T &);
+    std::string parse_homepage(const std::string &, util::vars_T &);
+
+    class version_string_T
+    {
+        protected:
+            void split(); /* <- get_version_components/get_version_map */
+
+            const std::string _ebuild;  /* abs path of ebuild */
+            const std::string _verstr;  /* full version string */
+            std::map<const std::string,
+                const std::string> _v;  /* version component map */
+
+        public:
+            version_string_T(const std::string &path) : _ebuild(path),
+                _verstr(util::chop_fileext(util::basename(path)))
+            { this->split(); }
+
+            const std::string &operator() () const { return _verstr; }
+            const std::string &operator[] (const std::string &s) const
+            { return _v[s]; }
+    };
 }
 
 #endif

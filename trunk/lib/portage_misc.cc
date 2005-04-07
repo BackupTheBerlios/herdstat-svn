@@ -42,7 +42,7 @@
  */
 
 bool
-util::in_pkg_dir()
+portage::in_pkg_dir()
 {
     const char *pwd = util::getcwd().c_str();
     DIR *dir = NULL;
@@ -75,7 +75,7 @@ util::in_pkg_dir()
  */
 
 const char *
-util::ebuild_which(const std::string &portdir, const std::string &pkg)
+portage::ebuild_which(const std::string &portdir, const std::string &pkg)
 {
     DIR *dir = NULL;
     struct dirent *d = NULL;
@@ -111,7 +111,7 @@ util::ebuild_which(const std::string &portdir, const std::string &pkg)
  */
 
 std::vector<std::string>
-util::get_version_components(const std::string &path)
+portage::get_version_components(const std::string &path)
 {
     std::vector<std::string> components, parts;
     std::string::size_type pos;
@@ -124,7 +124,7 @@ util::get_version_components(const std::string &path)
     if ((pos = ebuild.rfind("-r")) == std::string::npos)
         ebuild.append("-r0");
 
-    parts = split(ebuild, '-');
+    parts = util::split(ebuild, '-');
 
     /* if parts > 3, package name contains a '-' */
     if (parts.size() > 3)
@@ -150,10 +150,10 @@ util::get_version_components(const std::string &path)
 }
 
 std::map<std::string, std::string>
-util::get_version_map(const std::string &path)
+portage::get_version_map(const std::string &path)
 {
     std::map<std::string, std::string> version;
-    std::vector<std::string> components = util::get_version_components(path);
+    std::vector<std::string> components = portage::get_version_components(path);
 
     version["PN"] = components[0];
     version["PV"] = components[1];
@@ -172,7 +172,7 @@ util::get_version_map(const std::string &path)
  */
 
 std::string
-util::parse_homepage(const std::string &homepage, vars_T &vars)
+portage::parse_homepage(const std::string &homepage, util::vars_T &vars)
 {
     std::string h(homepage);
 
@@ -205,14 +205,14 @@ util::parse_homepage(const std::string &homepage, vars_T &vars)
             if (pos == std::string::npos)
                 continue;
 
-            vars_T::iterator x = vars.find(*i);
+            util::vars_T::iterator x = vars.find(*i);
             if (x != vars.end())
                 subst = x->second;
             else
             {
                 /* TODO: make a version class that does this */
                 std::map<std::string, std::string> version =
-                    util::get_version_map(vars.name());
+                    portage::get_version_map(vars.name());
                 std::map<std::string, std::string>::iterator y = version.find(*i);
                 if (y != version.end())
                     subst = y->second;

@@ -157,7 +157,7 @@ util::current_user()
     std::string user;
     std::string::size_type pos;
 
-    char *result = getenv("ECHANGELOG_USER");
+    char *result = std::getenv("ECHANGELOG_USER");
     if (result)
     {
 	user = result;
@@ -170,7 +170,7 @@ util::current_user()
 	else
 	    user.clear();
     }
-    else if ((result = getenv("USER")))
+    else if ((result = std::getenv("USER")))
     {
 	user = result;
 	user += "@gentoo.org";
@@ -205,24 +205,6 @@ util::getcols()
     }
 
     return 78;
-}
-
-/*
- * Determine PORTDIR
- */
-
-const char *
-util::portdir()
-{
-    util::portage_config_T config;
-    std::string portdir = config["PORTDIR"];
-
-    /* environment overrides all */
-    char *result = getenv("PORTDIR");
-    if (result)
-	portdir = result;
-
-    return (portdir.empty() ? "/usr/portage" : portdir.c_str());
 }
 
 /*

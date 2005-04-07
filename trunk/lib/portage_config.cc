@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/categories.hh
+ * herdstat -- lib/portage_config.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,44 +20,28 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_CATEGORIES_HH
-#define HAVE_CATEGORIES_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <algorithm>
-#include "util.hh"
-#include "exceptions.hh"
-
-#define CATEGORIES "/profiles/categories"
+#include "portage_config.hh"
 
 /*
- * categories_T represents a list of portage categories.
+ * Determine PORTDIR
  */
 
-class categories_T : public util::file_T
+const char *
+portage::portdir()
 {
-    public:
-        categories_T() : file_T(std::string(portage::portdir()) + CATEGORIES)
-        { init(); }        
-        categories_T(const std::string &p) : file_T(p + CATEGORIES) { init(); }
+    portage::config_T config;
+    std::string portdir = config["PORTDIR"];
 
-        void init()
-        {
-            this->open();
-            this->read();
+    /* environment overrides all */
+    char *result = std::getenv("PORTDIR");
+    if (result)
+	portdir = result;
 
-            /* remove 'virtual' -- a hack for a hack */
-            _contents.erase(
-                std::remove(_contents.begin(), _contents.end(), "virtual"),
-                _contents.end());
-        }
-
-        size_type size() const { return _contents.size(); }
-};
-
-#endif
+    return (portdir.empty() ? "/usr/portage" : portdir.c_str());
+}
 
 /* vim: set tw=80 sw=4 et : */
