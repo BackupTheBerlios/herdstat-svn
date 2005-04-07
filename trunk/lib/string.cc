@@ -132,6 +132,7 @@ util::sprintf(const char *str, va_list v)
  * Given a string and a delimiter, split the string,
  * returning all the substrings in a vector
  */
+
 std::vector<std::string>
 util::split(const std::string &str, const char delim)
 {
@@ -155,6 +156,27 @@ util::split(const std::string &str, const char delim)
 	lpos = ++pos;
     }
     return vec;
+}
+
+/*
+ * Convert the given vector to one string
+ * consisting of the elements delimited by
+ * the specified delimiter.
+ */
+
+std::string
+util::vec2str(const std::vector<std::string> &v, const char delim)
+{
+    std::string result;
+
+    std::vector<std::string>::const_iterator i;
+    for (i = v.begin() ; i != v.end() ; ++i)
+        result += *i + delim;
+    
+    /* erase the extra delim */
+    result.erase(result.length() - 1);
+
+    return result;
 }
 
 /* vim: set tw=80 sw=4 et : */

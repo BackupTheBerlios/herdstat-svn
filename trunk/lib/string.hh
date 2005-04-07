@@ -36,6 +36,7 @@ namespace util
     std::string sprintf(const char *, ...);
     std::string sprintf(const char *, va_list);
     std::vector<std::string> split(const std::string &, const char d = ' ');
+    std::string vec2str(const std::vector<std::string> &, const char d = ' ');
 }
 
 #endif
