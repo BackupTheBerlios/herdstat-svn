@@ -33,8 +33,6 @@ void
 util::vars_T::read(const char *path)
 {
     _name.assign(path);
-    this->open(path);
-    assert(stream);
     this->read();
 }
 
@@ -42,14 +40,15 @@ void
 util::vars_T::read(const std::string &path)
 {
     _name.assign(path);
-    this->open(path.c_str());
-    assert(stream);
     this->read();
 }
 
 void
 util::vars_T::read()
 {
+    if (not stream or not stream->is_open())
+        this->open();
+
     std::string line;
     std::string::size_type pos;
 
