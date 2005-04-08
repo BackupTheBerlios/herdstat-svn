@@ -55,7 +55,6 @@ int main(int argc, char **argv)
         if (pos == std::string::npos)
             continue;
 
-        std::pair<portage::versions_T::iterator, bool> p = 
         versions.insert(new portage::version_string_T(name));
     }
 

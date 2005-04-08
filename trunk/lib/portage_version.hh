@@ -33,6 +33,8 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <cstdlib>
+#include <cassert>
 
 #include "file.hh"
 
@@ -126,8 +128,12 @@ namespace portage
             iterator begin() { return _vs.begin(); }
             iterator end() { return _vs.end(); }
             size_type size() const { return _vs.size(); }
-            std::pair<iterator, bool> insert(portage::version_string_T *s)
-            { return _vs.insert(s); }
+            
+            void insert(portage::version_string_T *s)
+            {
+                std::pair<iterator, bool> p = _vs.insert(s);
+                assert(p.second);
+            }
     };
 }
 
