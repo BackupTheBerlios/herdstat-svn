@@ -44,6 +44,7 @@
 #include "timer.hh"
 #include "progress.hh"
 #include "util_exceptions.hh"
+#include "portage_exceptions.hh"
 #include "portage_misc.hh"
 #include "portage_config.hh"
 #include "portage_version.hh"

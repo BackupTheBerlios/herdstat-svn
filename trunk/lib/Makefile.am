@@ -6,12 +6,23 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     progress.hh \
 		     vars.hh vars.cc \
 		     file.hh file.cc \
+		     portage_exceptions.hh \
 		     portage_misc.hh portage_misc.cc \
 		     portage_config.hh portage_config.cc \
 		     portage_version.hh portage_version.cc
 
 AM_CXXFLAGS = -pedantic -ansi -Wall
+CLEANFILES = version-test
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
+
+version-test: $(noinst_LTLIBRARIES) version-test.cc
+	g++ $(AM_CXXFLAGS) -ggdb3 -c version-test.cc
+	g++ $(AM_CXXFLAGS) -o version-test version-test.o \
+		.libs/libutil.a /usr/lib/gcc-lib/i686-pc-linux-gnu/3.3.5/libstdc++.so \
+		-L/usr/i686-pc-linux-gnu/bin -L/usr/i686-pc-linux-gnu/lib \
+		-L/usr/lib/gcc-lib/i686-pc-linux-gnu/../../../i686-pc-linux-gnu/lib \
+		-lgcc_s -lc -Wl,--rpath -Wl,//usr/lib/gcc-lib/i686-pc-linux-gnu/3.3.5 \
+		-Wl,--rpath -Wl,//usr/lib/gcc-lib/i686-pc-linux-gnu/3.3.5
 
 srchtml:
 	for x in $(libutil_la_SOURCES) ; do \

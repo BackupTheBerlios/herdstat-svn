@@ -24,11 +24,20 @@
 # include "config.h"
 #endif
 
+#include <utility>
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
+#include <set>
 
 #include "util.hh"
+
+bool sortSuffix (portage::version_suffix_T s1,
+                 portage::version_suffix_T s2)
+{
+    return s1 < s2;
+}
 
 int main(int argc, char **argv)
 {
@@ -46,7 +55,8 @@ int main(int argc, char **argv)
         if (pos == std::string::npos)
             continue;
 
-        versions.push_back(new portage::version_string_T(name));
+        std::pair<portage::versions_T::iterator, bool> p = 
+        versions.insert(new portage::version_string_T(name));
     }
 
     portage::versions_T::iterator v;
@@ -62,6 +72,24 @@ int main(int argc, char **argv)
         std::cout << "PF: " << (*version)["PF"] << std::endl;
         std::cout << std::endl;
     }
+
+//    std::vector<portage::version_suffix_T> svec;
+//    svec.push_back(portage::version_suffix_T("1.0_alpha"));
+//    svec.push_back(portage::version_suffix_T("1.0_beta3"));
+//    svec.push_back(portage::version_suffix_T("1.0_p3"));
+//    svec.push_back(portage::version_suffix_T("1.0"));
+//    svec.push_back(portage::version_suffix_T("1.0_p7"));
+//    svec.push_back(portage::version_suffix_T("1.0_p"));
+//    svec.push_back(portage::version_suffix_T("1.0.1"));
+//    svec.push_back(portage::version_suffix_T("1.0_pre20050301"));
+//    svec.push_back(portage::version_suffix_T("1.0_rc7"));
+
+//    std::stable_sort(svec.begin(), svec.end(), sortSuffix);
+
+//    std::cout << std::endl;
+//    std::vector<portage::version_suffix_T>::iterator i;
+//    for (i = svec.begin() ; i != svec.end() ; ++i)
+//        std::cout << i->suffix() << i->version() << std::endl;
 
     for (v = versions.begin() ; v != versions.end() ; ++v)
         delete *v;
