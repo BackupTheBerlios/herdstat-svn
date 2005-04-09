@@ -179,4 +179,28 @@ util::vec2str(const std::vector<std::string> &v, const char delim)
     return result;
 }
 
+std::vector<std::string>
+util::string::split(const char delim)
+{
+    std::vector<std::string> vec;
+    size_type pos, lpos = 0;
+    
+    while (true)
+    {
+	if ((pos = this->find(delim, lpos)) == npos)
+	{
+	    vec.push_back(this->substr(lpos));
+	    break;
+	}
+
+	/* don't append empty strings (two
+	 * delimiters in a row were encountered) */
+	if (this->substr(lpos, pos - lpos).length() > 0)
+	    vec.push_back(this->substr(lpos, pos - lpos));
+
+	lpos = ++pos;
+    }
+    return vec;
+}
+
 /* vim: set tw=80 sw=4 et : */

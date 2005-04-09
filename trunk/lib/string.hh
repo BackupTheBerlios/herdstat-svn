@@ -37,6 +37,18 @@ namespace util
     std::string sprintf(const char *, va_list);
     std::vector<std::string> split(const std::string &, const char d = ' ');
     std::string vec2str(const std::vector<std::string> &, const char d = ' ');
+
+    class string : public std::string
+    {
+        public:
+            explicit string() : std::string() { }
+            string(const char *n) : std::string(n) { }
+            string(const std::string &n) : std::string(n) { }
+            string(const string &n) : std::string(n) { }
+            virtual ~string() { }
+
+            virtual std::vector<std::string> split(const char delim = ' ');
+    };
 }
 
 #endif

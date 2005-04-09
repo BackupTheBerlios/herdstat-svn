@@ -38,6 +38,8 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#include "string.hh"
+
 #define DEFAULT_MODE std::ios::in
 
 namespace util
@@ -59,15 +61,21 @@ namespace util
     enum type_T { FTYPE_FILE, FTYPE_DIR };
 
     /* Represents a path to a file object */
-    class path_T : public std::string
+    class path_T : public util::string
     {
         public:
-            explicit path_T() : std::string() { }
-            path_T(const char *n) : std::string(n) { }
-            path_T(const std::string &n) : std::string(n) { }
+            explicit path_T() : util::string() { }
+            path_T(const char *n) : util::string(n) { }
+            path_T(const std::string &n) : util::string(n) { }
+            path_T(const path_T &n) : util::string(n) { }
 
             const std::string basename() const { return util::basename(*this); }
             const std::string dirname() const { return util::dirname(*this); }
+
+            virtual std::vector<std::string> split(const char delim = '/')
+            {
+                return util::string::split(delim);
+            }
     };
 
     /* generic file object */

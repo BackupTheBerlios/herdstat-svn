@@ -181,7 +181,7 @@ util::dir_T::read()
              std::strcmp(d->d_name, "..") == 0)
             continue;
 
-        _contents.push_back(d->d_name);
+        _contents.push_back(_path + "/" + d->d_name);
     }
 }
 

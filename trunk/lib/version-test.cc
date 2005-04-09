@@ -33,12 +33,6 @@
 
 #include "util.hh"
 
-bool sortSuffix (portage::version_suffix_T s1,
-                 portage::version_suffix_T s2)
-{
-    return s1 < s2;
-}
-
 int main(int argc, char **argv)
 {
     if (argc != 2)
@@ -53,6 +47,19 @@ int main(int argc, char **argv)
         std::string::size_type pos = d->rfind(".ebuild");
         if (pos == std::string::npos)
             continue;
+
+        std::cout << "*d = " << *d << std::endl;
+        util::path_T path(*d);
+        std::cout << "path: " << path << std::endl;
+        std::cout << "base: " << path.basename() << std::endl;
+        std::cout << "dir:  " << path.dirname()  << std::endl;
+
+        std::vector<std::string> parts = path.split();
+        std::vector<std::string>::iterator i;
+        std::cout << "split: ";
+        for (i = parts.begin() ; i != parts.end() ; ++i)
+            std::cout << *i << " ";
+        std::cout << std::endl;
 
         versions.insert(new portage::version_string_T(*d));
     }
