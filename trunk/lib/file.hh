@@ -58,11 +58,32 @@ namespace util
 
     enum type_T { FTYPE_FILE, FTYPE_DIR };
 
+    class path_T
+    {
+        protected:
+            const std::string _path;
+
+        public:
+            typedef std::string::iterator  iterator;
+            typedef std::string::size_type size_type;
+
+            path_T(const char *path) : _path(path) { }
+            path_T(const std::string &path) : _path(path) { }
+
+            iterator begin() { return _path.begin(); }
+            iterator end() { return _path.end(); }
+            size_type size() const { return _path.size(); }
+
+            const std::string &operator() () const { return _path; }
+            const std::string basename() const { return util::basename(_path); }
+            const std::string dirname() const { return util::dirname(_path); }
+    };
+
     /* generic file object */
     class fileobject_T
     {
         protected:
-            std::string _name;   /* file object's name */
+            path_T _path;        /* path object */
             struct stat _sbuf;   /* stat structure */
             type_T _type;
             bool _exists;
@@ -98,8 +119,8 @@ namespace util
             blkcnt_type blkcnt() const { return _sbuf.st_blocks; }
 
             std::string &name() { return _name; }
-            std::string basename() const { return util::basename(_name); }
-            std::string dirname() const { return util::dirname(_name); }
+            std::string basename() const { return _path.basename(); }
+            std::string dirname() const { return _path.dirname(); }
             type_T type() const { return _type; }
             bool exists() const { return _exists; }
 
@@ -161,6 +182,7 @@ namespace util
             virtual void display(std::ostream &);
     };
 
+    /* generic directory object */
     template <class C>
     class base_dir_T : public fileobject_T
     {
@@ -204,7 +226,7 @@ namespace util
             }
 
             virtual void close();
-            virtual void display();
+            virtual void display(std::ostream &);
             virtual void read() = 0;
     };
 
@@ -214,13 +236,13 @@ namespace util
     {
         public:
 
-            dir_T(const char *n, bool r = false)
+            dirobject_T(const char *n, bool r = false)
                 : base_dir_T<fileobject_T * >(n, r) { }
-            dir_T(const std::string &n, bool r = false)
+            dirobject_T(const std::string &n, bool r = false)
                 : base_dir_T<fileobject_T * >(n, r) { }
-            virtual ~dir_T();
+            virtual ~dirobject_T();
             virtual void read();
-            virtual void display();
+            virtual void display(std::ostream &);
     };
 
     /* acts as a DIR * / struct dirent wrapper

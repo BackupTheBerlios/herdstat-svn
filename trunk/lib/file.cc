@@ -109,6 +109,14 @@ util::base_dir_T<C>::open()
         throw util::bad_fileobject_E(_name);
 }
 
+template <class C>
+void
+util::base_dir_T<C>::display(std::ostream &stream)
+{
+    for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
+        stream << *i << std::endl;
+}
+
 /**************************
  * dirobject_T            *
  **************************/
@@ -129,8 +137,8 @@ util::dirobject_T::read()
 
         if (util::is_dir(path))
         {
-            if (recurse)
-                f = new util::dirobject_T(path, recurse);
+            if (_recurse)
+                f = new util::dirobject_T(path, _recurse);
             else
                 f = new util::fileobject_T(path, FTYPE_DIR);
         }
@@ -160,6 +168,21 @@ util::dirobject_T::~dirobject_T()
 {
     for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
         delete *i;
+}
+
+void
+util::dir_T::read()
+{
+    struct dirent *d = NULL;
+    while ((d = readdir(_dir)))
+    {
+        /* skip . and .. */
+        if ((std::strcmp(d->d_name, ".") == 0) or
+             std::strcmp(d->d_name, "..") == 0)
+            continue;
+
+        _contents.push_back(d->d_name);
+    }
 }
 
 /******************************************
