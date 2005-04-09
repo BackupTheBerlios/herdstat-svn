@@ -255,7 +255,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                             attr.no_color.length();
 
                         debug_msg("highlighted '%s'; setting curlen to %d",
-                            (*i).c_str(), curlen);
+                            i->c_str(), curlen);
                     }
 
                     /* don't compensate */
@@ -266,7 +266,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                     }
 
                     /* does it fit on the current line? */
-                    if ((curlen + (*i).length()) > attr.maxtotal)
+                    if ((curlen + i->length()) > attr.maxtotal)
                     {
                         debug_msg("pushing back '%s'", cur.c_str());
                         buffer.push_back(cur);

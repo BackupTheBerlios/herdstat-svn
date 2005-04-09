@@ -50,12 +50,11 @@ int main(int argc, char **argv)
     util::dir_T::iterator d;
     for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
     {
-        std::string name = (*d)->name();
-        std::string::size_type pos = name.rfind(".ebuild");
+        std::string::size_type pos = d->rfind(".ebuild");
         if (pos == std::string::npos)
             continue;
 
-        versions.insert(new portage::version_string_T(name));
+        versions.insert(new portage::version_string_T(*d));
     }
 
     portage::versions_T::iterator v;

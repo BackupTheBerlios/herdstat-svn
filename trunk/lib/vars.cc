@@ -32,14 +32,14 @@
 void
 util::vars_T::read(const char *path)
 {
-    _name.assign(path);
+    _path.assign(path);
     this->read();
 }
 
 void
 util::vars_T::read(const std::string &path)
 {
-    _name.assign(path);
+    _path.assign(path);
     this->read();
 }
 

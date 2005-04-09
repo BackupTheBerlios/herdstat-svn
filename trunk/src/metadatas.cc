@@ -125,8 +125,8 @@ metadatas_T::fill()
         {
             /* instead of walking each directory, comparing d->d_name to
              * "metadata.xml", just stat the dir/metadata.xml */
-            if (util::is_file((*d)->name() + "/metadata.xml"))
-                _cache.push_back((*d)->name() + "/metadata.xml");
+            if (util::is_file(*d + "/metadata.xml"))
+                _cache.push_back(*d + "/metadata.xml");
         }
     }
 

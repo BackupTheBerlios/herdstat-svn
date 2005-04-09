@@ -256,12 +256,12 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                 {
                     /* get category/package from absolute path */
                     std::string cat_and_pkg =
-                        (*m).substr(optget("portdir", std::string).size() + 1);
+                        m->substr(optget("portdir", std::string).size() + 1);
                     std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
                     if (pos != std::string::npos)
                         cat_and_pkg = cat_and_pkg.substr(0, pos);
 
-                    debug_msg("Match found in %s.", (*m).c_str());
+                    debug_msg("Match found in %s.", m->c_str());
 
                     pkgs[cat_and_pkg] = handler->longdesc;
                 }

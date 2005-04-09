@@ -135,7 +135,7 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
 
         /* for each package in the category */
         for (d = category.begin() ; d != category.end() ; ++d)
-            if (pkg == (*d)->basename())
+            if (pkg == d->basename())
                 pkgs.push_back(*c + "/" + pkg);
     }
 

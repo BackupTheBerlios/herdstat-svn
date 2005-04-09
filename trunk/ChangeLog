@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-04-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.cc, lib/file.hh: Added generic directory container from
+	which we derive two types (dirobject_T formerly known as dir_T and
+	dir_T which just hold's the filenames not whole file objects. Also
+	added path_T to represent path strings.
+
 2005-04-07 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_misc.cc, lib/portage_misc.hh, src/categories.hh,

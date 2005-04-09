@@ -38,9 +38,9 @@
 void
 util::file_T::open(const char *n, std::ios_base::openmode mode)
 {
-    if (_name.empty())
+    if (_path.empty())
     {
-        _name = n;
+        _path = n;
         this->stat();
     }
 
@@ -95,7 +95,7 @@ util::base_dir_T<C>::close()
     closedir(_dir);
 #else /* CLOSEDIR_VOID */
     if (closedir(_dir) != 0)
-        throw util::errno_E("closedir: " + _name);
+        throw util::errno_E("closedir: " + _path);
 #endif /* CLOSEDIR_VOID */
 }
 
@@ -103,10 +103,10 @@ template <class C>
 void
 util::base_dir_T<C>::open()
 {
-    assert(not _name.empty());
-    _dir = opendir(_name.c_str());
+    assert(not _path.empty());
+    _dir = opendir(_path.c_str());
     if (not _dir)
-        throw util::bad_fileobject_E(_name);
+        throw util::bad_fileobject_E(_path);
 }
 
 template <class C>
@@ -133,7 +133,7 @@ util::dirobject_T::read()
             continue;
 
         util::fileobject_T *f = NULL;
-        std::string path(_name + "/" + d->d_name);
+        std::string path(_path + "/" + d->d_name);
 
         if (util::is_dir(path))
         {
