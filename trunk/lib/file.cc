@@ -82,44 +82,62 @@ util::file_T::close()
     stream = NULL;
 }
 
+
 /**************************
- * dir_T                  *
+ * base_dir_T             *
  **************************/
 
+template <class C>
 void
-util::dir_T::open()
+util::base_dir_T<C>::close()
+{
+#ifdef CLOSEDIR_VOID
+    closedir(_dir);
+#else /* CLOSEDIR_VOID */
+    if (closedir(_dir) != 0)
+        throw util::errno_E("closedir: " + _name);
+#endif /* CLOSEDIR_VOID */
+}
+
+template <class C>
+void
+util::base_dir_T<C>::open()
 {
     assert(not _name.empty());
-    dirp = opendir(_name.c_str());
-    if (not dirp)
+    _dir = opendir(_name.c_str());
+    if (not _dir)
         throw util::bad_fileobject_E(_name);
 }
 
+/**************************
+ * dirobject_T            *
+ **************************/
+
 void
-util::dir_T::read(bool recurse)
+util::dirobject_T::read()
 {
     struct dirent *d = NULL;
-    while ((d = readdir(dirp)))
+    while ((d = readdir(_dir)))
     {
         /* skip . and .. for obvious reasons */
         if ((std::strcmp(d->d_name, ".") == 0) or
              std::strcmp(d->d_name, "..") == 0)
             continue;
 
-        fileobject_T *f = NULL;
+        util::fileobject_T *f = NULL;
         std::string path(_name + "/" + d->d_name);
 
         if (util::is_dir(path))
         {
             if (recurse)
-                f = new dir_T(path, recurse);
+                f = new util::dirobject_T(path, recurse);
             else
-                f = new fileobject_T(path, FTYPE_DIR);
+                f = new util::fileobject_T(path, FTYPE_DIR);
         }
         else if (util::is_file(path))
-            f = new file_T(path);
+            f = new util::file_T(path);
         else
-            f = new fileobject_T(path, FTYPE_FILE);
+            f = new util::fileobject_T(path, FTYPE_FILE);
 
         assert(f);
         _contents.push_back(f);
@@ -127,18 +145,7 @@ util::dir_T::read(bool recurse)
 }
 
 void
-util::dir_T::close()
-{
-#ifdef CLOSEDIR_VOID
-    closedir(dirp);
-#else /* CLOSEDIR_VOID */
-    if (closedir(dirp) != 0)
-        throw util::errno_E("closedir: " + _name);
-#endif /* CLOSEDIR_VOID */
-}
-
-void
-util::dir_T::display(std::ostream &stream)
+util::dirobject_T::display(std::ostream &stream)
 {
     for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
     {
@@ -149,7 +156,7 @@ util::dir_T::display(std::ostream &stream)
     }
 }
 
-util::dir_T::~dir_T()
+util::dirobject_T::~dirobject_T()
 {
     for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
         delete *i;

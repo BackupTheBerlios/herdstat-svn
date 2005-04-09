@@ -161,53 +161,81 @@ namespace util
             virtual void display(std::ostream &);
     };
 
-    /* represents a fileobject_T container (aka a directory).
-     * of course, directories are file objects themselves... */
-    class dir_T : public fileobject_T
+    template <class C>
+    class base_dir_T : public fileobject_T
     {
         protected:
-            DIR *dirp;
-            std::vector<fileobject_T * > _contents;
+            bool _recurse;
+            DIR *_dir;
+            std::vector<C> _contents;
 
         public:
-            typedef std::vector<fileobject_T * >::iterator iterator;
-            typedef std::vector<fileobject_T * >::const_iterator const_iterator;
-            typedef std::vector<fileobject_T * >::size_type size_type;
+            typedef typename std::vector<C>::iterator iterator;
+            typedef typename std::vector<C>::const_iterator const_iterator;
+            typedef typename std::vector<C>::size_type size_type;
 
-            dir_T(const char *n, bool recurse = false)
-                : fileobject_T(n, FTYPE_DIR), dirp(NULL)
+            base_dir_T(const char *n, bool r = false)
+                : fileobject_T(n, FTYPE_DIR), _recurse(r), _dir(NULL)
             {
                 this->open();
-                this->read(recurse);
+                this->read();
             }
-            
-            dir_T(const std::string &n, bool recurse = false)
-                : fileobject_T(n, FTYPE_DIR), dirp(NULL)
+
+            base_dir_T(const std::string &n, bool r = false)
+                : fileobject_T(n, FTYPE_DIR), _recurse(r), _dir(NULL)
             {
                 this->open();
-                this->read(recurse);
+                this->read();
             }
 
-            virtual ~dir_T();
-
-            virtual void open();
-            
-            virtual void open(const char *n)
-            {
-                _name = n;
-                this->stat();
-                this->open();
-            }
-
-            virtual void close();
-            virtual void read() { }
-            virtual void read(bool recurse);
-            virtual void display(std::ostream &);
+            virtual ~base_dir_T() { }
 
             /* small subset of vector methods */
             iterator begin() { return _contents.begin(); }
             iterator end() { return _contents.end(); }
             size_type bufsize() const { return _contents.size(); }
+
+            virtual void open();
+            virtual void open(const char *n)
+            {
+                _name.assign(n);
+                this->stat();
+                this->open();
+            }
+
+            virtual void close();
+            virtual void display();
+            virtual void read() = 0;
+    };
+
+    /* represents a fileobject_T container (aka a directory).
+     * of course, directories are file objects themselves... */
+    class dirobject_T : public base_dir_T<fileobject_T * >
+    {
+        public:
+
+            dir_T(const char *n, bool r = false)
+                : base_dir_T<fileobject_T * >(n, r) { }
+            dir_T(const std::string &n, bool r = false)
+                : base_dir_T<fileobject_T * >(n, r) { }
+            virtual ~dir_T();
+            virtual void read();
+            virtual void display();
+    };
+
+    /* acts as a DIR * / struct dirent wrapper
+     * (only provides the filename) instead of
+     * creating fileobject_T objects for each
+     * child like dirobject_T */
+    class dir_T : public base_dir_T<std::string>
+    {
+        public:
+            dir_T(const char *n, bool r = false)
+                : base_dir_T<std::string>(n, r) { }
+            dir_T(const std::string &n, bool r = false) 
+                : base_dir_T<std::string>(n, r) { }
+            virtual ~dir_T() { }
+            virtual void read();
     };
 }
 
