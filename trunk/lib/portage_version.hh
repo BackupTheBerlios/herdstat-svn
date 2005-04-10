@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <set>
 #include <map>
 #include <vector>
@@ -128,8 +129,12 @@ namespace portage
             
             void insert(portage::version_string_T *s)
             {
+                std::cout << "versions_T::insert ===> trying to insert "
+                    << (*s)() << std::endl;
                 std::pair<iterator, bool> p = _vs.insert(s);
                 assert(p.second);
+                std::cout << "versions_T::insert ===> successfully inserted "
+                    << (*s)() << std::endl;
             }
     };
 }

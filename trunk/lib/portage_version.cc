@@ -165,9 +165,20 @@ portage::version_string_T::operator() () const
 bool
 portage::version_string_T::operator< (version_string_T &that)
 {
-    return ( (this->_v["nosuffix"] < that["nosuffix"]) and
-             (this->_suffix < that._suffix) and
-             (this->_v["PR"] < that["PR"]) );
+    bool ver = (this->_v["nosuffix"] < that["nosuffix"]);
+    bool suf = (this->_suffix < that._suffix);
+    bool rev = (this->_v["PR"] < that["PR"]);
+    std::cout << ver << std::endl;
+    std::cout << "this->version = " << this->_v["nosuffix"] << std::endl;
+    std::cout << "that->version = " << that["nosuffix"] << std::endl;
+    std::cout << suf << std::endl;
+    std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
+    std::cout << "that->suffix  = " << that._suffix.suffix() << std::endl;
+    std::cout << rev << std::endl;
+    std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
+    std::cout << "that->rev     = " << that["PR"] << std::endl;
+
+    return (ver and suf and rev);
 }
 
 bool
@@ -228,6 +239,8 @@ portage::version_string_T::split()
     /* save PV minus suffix */
     if ((pos = _v["PV"].rfind('_')) != std::string::npos)
         _v["nosuffix"] = _v["PV"].substr(0, pos);
+    else
+        _v["nosuffix"] = _v["PV"];
 }
 
 /* vim: set tw=80 sw=4 et : */
