@@ -180,7 +180,7 @@ util::vec2str(const std::vector<std::string> &v, const char delim)
 }
 
 std::vector<std::string>
-util::string::split(const char delim)
+util::string::split(const char delim) const
 {
     std::vector<std::string> vec;
     size_type pos, lpos = 0;

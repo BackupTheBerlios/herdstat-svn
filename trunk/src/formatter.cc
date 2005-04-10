@@ -152,7 +152,7 @@ formatter_T::append(const std::string &label, std::vector<std::string> data)
  */
 
 void
-formatter_T::append(const std::string &label, const std::string &data)
+formatter_T::append(const std::string &label, const util::string &data)
 {
     std::string cur;
 
@@ -180,7 +180,7 @@ formatter_T::append(const std::string &label, const std::string &data)
         debug_msg("data = '%s'", data.c_str());
 
         if (quiet())
-            append(label, util::split(data));
+            append(label, data.split());
         else
         {
             size_type maxlen =
@@ -189,21 +189,23 @@ formatter_T::append(const std::string &label, const std::string &data)
 
             if ((cur.length() + data.length()) < maxlen)
             {
-                cur += highlight(util::split(data));
+                cur += highlight(data.split());
                 debug_msg("it all fits on one line");
             }
             else
             {
                 /* line's full, so find a location where we can truncate */
-                std::string::size_type pos = data.rfind(" ", attr.maxdata);
-                cur += highlight(util::split(
-                    (pos == std::string::npos ? data : data.substr(0, pos))));
+                util::string::size_type pos = data.rfind(" ", attr.maxdata);
+                if (pos == util::string::npos)
+                    cur += highlight(data.split());
+                else
+                    cur += highlight(util::string(data.substr(0, pos)).split());
 
                 debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
                 cur.clear();
 
-                if (pos == std::string::npos)
+                if (pos == util::string::npos)
                     return;
 
                 /* indent */
@@ -213,7 +215,7 @@ formatter_T::append(const std::string &label, const std::string &data)
                 debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
-                std::vector<std::string> leftovers = util::split(data.substr(pos));
+                std::vector<std::string> leftovers = util::string(data.substr(pos)).split();
 
                 std::vector<std::string>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)

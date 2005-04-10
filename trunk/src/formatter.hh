@@ -62,7 +62,7 @@ class formatter_T
         };
 
         std::string highlight(std::vector<std::string>);
-        void append(const std::string &, const std::string &);
+        void append(const std::string &, const util::string &);
         void append(const std::string &, std::vector<std::string>);
 
         static std::vector<std::string> buffer;
@@ -74,7 +74,7 @@ class formatter_T
 
         formatter_T() { }
 
-        void operator() (const std::string &l, const std::string &d)
+        void operator() (const std::string &l, const util::string &d)
         {
             append(l, d);
         }

@@ -71,19 +71,16 @@ namespace portage
     {
         protected:
             void init();
-            void split_verstr();
+            void split();
 
-            const std::string _ebuild;             /* abs path of ebuild */
-            std::string _verstr;                   /* full version string */
-            std::map<std::string, std::string> _v; /* version component map */
+            const util::path_T _ebuild;             /* abs path of ebuild */
+            util::string _verstr;                   /* full version string */
+            std::map<std::string, std::string> _v;  /* version component map */
             portage::version_suffix_T _suffix;
 
         public:
-            version_string_T(const char *path) : _ebuild(path),
-                _verstr(util::chop_fileext(util::basename(path)))
-            { this->init(); }
-            version_string_T(const std::string &path) : _ebuild(path),
-                _verstr(util::chop_fileext(util::basename(path)))
+            version_string_T(const util::path_T &path) : _ebuild(path),
+                _verstr(util::chop_fileext(path.basename()))
             { this->init(); }
 
             const portage::version_suffix_T &suffix() const { return _suffix; }

@@ -103,7 +103,7 @@ namespace util
             { this->stat(); }
             fileobject_T(const std::string &n, type_T t) : _path(n), _type(t)
             { this->stat(); }
-            virtual ~fileobject_T() { }
+            virtual ~fileobject_T() { this->close(); }
 
             size_type size() const { return _sbuf.st_size; }
             time_type mtime() const { return _sbuf.st_mtime; }
@@ -154,7 +154,7 @@ namespace util
                 : fileobject_T(n, FTYPE_FILE), stream(s) { }
             file_T(const char *n, std::fstream *s)
                 : fileobject_T(n, FTYPE_FILE), stream(s) { }
-            virtual ~file_T() { if (stream) delete stream; }
+            virtual ~file_T() { }
 
             iterator begin() { return _contents.begin(); }
             iterator end() { return _contents.end(); }
@@ -203,7 +203,7 @@ namespace util
                 : fileobject_T(n, FTYPE_DIR), _recurse(r), _dir(NULL)
             { this->open(); }
 
-            virtual ~base_dir_T() { this->close(); }
+            virtual ~base_dir_T() { }
 
             /* small subset of vector methods */
             iterator begin() { return _contents.begin(); }

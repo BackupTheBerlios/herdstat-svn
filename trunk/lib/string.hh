@@ -47,7 +47,7 @@ namespace util
             string(const string &n) : std::string(n) { }
             virtual ~string() { }
 
-            virtual std::vector<std::string> split(const char delim = ' ');
+            virtual std::vector<std::string> split(const char delim = ' ') const;
     };
 }
 

@@ -143,7 +143,7 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 void
 portage::version_string_T::init()
 {
-    this->split_verstr();
+    this->split();
     _suffix = _v["PVR"];
 }
 
@@ -184,7 +184,7 @@ portage::version_string_T::operator== (version_string_T &that)
  */
 
 void
-portage::version_string_T::split_verstr()
+portage::version_string_T::split()
 {
     std::string::size_type pos;
     std::vector<std::string> parts, comps;
@@ -196,7 +196,7 @@ portage::version_string_T::split_verstr()
     if ((pos = _verstr.rfind("-r")) == std::string::npos)
         _verstr.append("-r0");
 
-    parts = util::split(_verstr, '-');
+    parts = _verstr.split('-');
 
     /* If parts > 3, ${PN} contains a '-' */
     if (parts.size() > 3)

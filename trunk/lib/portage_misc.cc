@@ -148,11 +148,11 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
  */
 
 std::vector<std::string>
-portage::get_version_components(const std::string &path)
+portage::get_version_components(const util::path_T &path)
 {
     std::vector<std::string> components, parts;
     std::string::size_type pos;
-    std::string ebuild(util::basename(path));
+    util::string ebuild(path.basename());
 
     /* chop .ebuild */
     if ((pos = ebuild.rfind(".ebuild")) != std::string::npos)
@@ -161,7 +161,7 @@ portage::get_version_components(const std::string &path)
     if ((pos = ebuild.rfind("-r")) == std::string::npos)
         ebuild.append("-r0");
 
-    parts = util::split(ebuild, '-');
+    parts = ebuild.split('-');
 
     /* if parts > 3, package name contains a '-' */
     if (parts.size() > 3)
