@@ -27,7 +27,11 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <cstdlib>
+#include <climits>
 #include <cassert>
+#include <stdint.h>
+#include <inttypes.h>
 
 #include "string.hh"
 #include "portage_exceptions.hh"
@@ -93,7 +97,20 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-                return this->version() < that.version();
+            {
+                unsigned long thisver =
+                    std::strtoul(this->version().c_str(), NULL, 10);
+                unsigned long thatver =
+                    std::strtoul(that.version().c_str(), NULL, 10);
+
+                /* if all else fails, do a string comparison */
+                if ((thisver == ULONG_MAX) or (thatver == ULONG_MAX))
+                    return this->version() < that.version();
+                else
+                    return thisver < thatver;
+            }
+            else if (this->version().empty() and that.version().empty())
+                return true;
             else
                 return ( that.version().empty() ? false : true );
         }
@@ -129,15 +146,30 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-                return this->version() == that.version();
+            {
+                unsigned long thisver =
+                    std::strtoul(this->version().c_str(), NULL, 10);
+                unsigned long thatver =
+                    std::strtoul(that.version().c_str(), NULL, 10);
+
+                /* if all else fails, do a string comparison */
+                if ((thisver == ULONG_MAX) or (thatver == ULONG_MAX))
+                    return this->version() == that.version();
+                else
+                    return thisver == thatver;
+            }
+            else if (this->version().empty() and that.version().empty())
+                return true;
             else
                 return ( that.version().empty() ? false : true );
         }
 
         return ti == si;
     }
+    else if ((ti != _suffices.end()) or (si != _suffices.end()))
+        return false;
 
-    return false;
+    return true;
 }
 
 void
@@ -165,20 +197,46 @@ portage::version_string_T::operator() () const
 bool
 portage::version_string_T::operator< (version_string_T &that)
 {
-    bool ver = (this->_v["nosuffix"] < that["nosuffix"]);
-    bool suf = (this->_suffix < that._suffix);
-    bool rev = (this->_v["PR"] < that["PR"]);
-    std::cout << ver << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+    std::cout << "Comparing this (" << this->_v["nosuffix"] + this->_suffix.suffix() + "-" + this->_v["PR"]
+        << ") to that (" << that["nosuffix"] + that._suffix.suffix() + "-" + that["PR"] << ")."
+        << std::endl;
+
+
+    std::cout << (this->_v["nosuffix"] < that["nosuffix"]) << std::endl;
     std::cout << "this->version = " << this->_v["nosuffix"] << std::endl;
     std::cout << "that->version = " << that["nosuffix"] << std::endl;
-    std::cout << suf << std::endl;
-    std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
-    std::cout << "that->suffix  = " << that._suffix.suffix() << std::endl;
-    std::cout << rev << std::endl;
-    std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
-    std::cout << "that->rev     = " << that["PR"] << std::endl;
 
-    return (ver and suf and rev);
+    if (this->_v["nosuffix"] < that["nosuffix"])
+        return true;
+    else if (this->_v["nosuffix"] == that["nosuffix"])
+    {
+            std::cout << (this->_suffix < that._suffix) << std::endl;
+            std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
+            std::cout << "that->suffix  = " << that._suffix.suffix() << std::endl;
+
+        if (this->_suffix < that._suffix)
+            return true;
+        else if (this->_suffix == that._suffix)
+        {
+            std::cout << (this->_v["PR"] <= that["PR"]) << std::endl;
+            std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
+            std::cout << "that->rev     = " << that["PR"] << std::endl;
+
+            uintmax_t thispr = strtoumax(this->_v["PR"].c_str(), NULL, 10);
+            uintmax_t thatpr = strtoumax(that["PR"].c_str(), NULL, 10);
+
+            /* if all else fails, do string comparison */
+            if ((thispr == UINTMAX_MAX) or (thatpr == UINTMAX_MAX))
+                return this->_v["PR"] <= that["PR"];
+            else
+                return thispr <= thatpr;
+        }
+    }
+
+    std::cout << "-----------------------------------------" << std::endl;
+
+    return false;
 }
 
 bool

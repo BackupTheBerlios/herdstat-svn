@@ -36,7 +36,11 @@
 int main(int argc, char **argv)
 {
     if (argc != 2)
+    {
+        std::cerr << "usage: " << util::basename(argv[0]) << " <category/package>"
+            << std::endl;
         return 1;
+    }
 
     portage::versions_T versions;
 
@@ -55,14 +59,15 @@ int main(int argc, char **argv)
     for (v = versions.begin() ; v != versions.end() ; ++v)
     {
         portage::version_string_T *version = *v;
-        std::cout << "Full version: " << (*version)() << std::endl;
-        std::cout << "P: " << (*version)["P"] << std::endl;
-        std::cout << "PN: " << (*version)["PN"] << std::endl;
-        std::cout << "PV: " << (*version)["PV"] << std::endl;
-        std::cout << "PVR: " << (*version)["PVR"] << std::endl;
-        std::cout << "PR: " << (*version)["PR"] << std::endl;
-        std::cout << "PF: " << (*version)["PF"] << std::endl;
-        std::cout << std::endl;
+//        std::cout << "Full version: " << (*version)() << std::endl;
+//        std::cout << "P: " << (*version)["P"] << std::endl;
+//        std::cout << "PN: " << (*version)["PN"] << std::endl;
+//        std::cout << "PV: " << (*version)["PV"] << std::endl;
+//        std::cout << "PVR: " << (*version)["PVR"] << std::endl;
+//        std::cout << "PR: " << (*version)["PR"] << std::endl;
+//        std::cout << "PF: " << (*version)["PF"] << std::endl;
+//        std::cout << std::endl;
+            std::cout << (*version)() << std::endl;
     }
 
 //    std::vector<portage::version_suffix_T> svec;
