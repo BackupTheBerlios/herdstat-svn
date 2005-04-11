@@ -30,26 +30,42 @@
 #include <cstdlib>
 #include <climits>
 #include <cassert>
-#include <stdint.h>
-#include <inttypes.h>
+
+#ifdef HAVE_STDINT_H
+/* It looks like glibc's stdint.h wraps the UINTMAX_MAX define
+ * in a #if !defined __cplusplus || defined __STDC_LIMIT_MACROS,
+ * so enable it, as we need it for strtoumax().  */
+# ifndef __STDC_LIMIT_MACROS
+#  define __STDC_LIMIT_MACROS
+# endif /* __STDC_LIMIT_MACROS */
+# include <stdint.h>
+/* don't use strtoumax if UINTMAX_MAX is still unavailable */
+# ifndef UINTMAX_MAX
+#  undef HAVE_STRTOUMAX
+# endif /* UINTMAX_MAX */
+#endif /* HAVE_STDINT_H */
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif /* HAVE_INTTYPES_H */
 
 #include "string.hh"
 #include "portage_exceptions.hh"
 #include "portage_version.hh"
 
-std::vector<std::string> portage::version_suffix_T::_suffices;
+std::vector<std::string> portage::version_suffix_T::_suffixes;
 
 void
 portage::version_suffix_T::init(const std::string &s)
 {
-    /* valid suffices (in order) */
-    if (_suffices.empty())
+    /* valid suffixes (in order) */
+    if (_suffixes.empty())
     {
-        _suffices.push_back("alpha");
-        _suffices.push_back("beta");
-        _suffices.push_back("pre");
-        _suffices.push_back("rc");
-        _suffices.push_back("p");
+        _suffixes.push_back("alpha");
+        _suffixes.push_back("beta");
+        _suffixes.push_back("pre");
+        _suffixes.push_back("rc");
+        _suffixes.push_back("p");
     }
 
     this->get_suffix(s);
@@ -76,8 +92,8 @@ portage::version_suffix_T::get_suffix(const std::string &s)
         }
 
         /* valid suffix? */
-        if (std::find(_suffices.begin(), _suffices.end(),
-            _suffix) == _suffices.end())
+        if (std::find(_suffixes.begin(), _suffixes.end(),
+            _suffix) == _suffixes.end())
             throw portage::bad_version_suffix_E(_suffix);
     }
 }
@@ -87,17 +103,18 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
 {
     std::vector<std::string>::iterator ti, si;
 
-    ti = std::find(_suffices.begin(), _suffices.end(), this->suffix());
-    si = std::find(_suffices.begin(), _suffices.end(), that.suffix());
+    ti = std::find(_suffixes.begin(), _suffixes.end(), this->suffix());
+    si = std::find(_suffixes.begin(), _suffixes.end(), that.suffix());
 
     /* both have a suffix */
-    if ((ti != _suffices.end()) and (si != _suffices.end()))
+    if ((ti != _suffixes.end()) and (si != _suffixes.end()))
     {
         /* same suffix, so compare suffix version */
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
             {
+#ifdef HAVE_STRTOUL
                 unsigned long thisver =
                     std::strtoul(this->version().c_str(), NULL, 10);
                 unsigned long thatver =
@@ -108,6 +125,9 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
                     return this->version() < that.version();
                 else
                     return thisver < thatver;
+#else
+                return this->version() < that.version();
+#endif /* HAVE_STRTOUL */
             }
             else if (this->version().empty() and that.version().empty())
                 return true;
@@ -119,12 +139,12 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
     }
 
     /* that has no suffix */
-    else if (ti != _suffices.end())
+    else if (ti != _suffixes.end())
         /* only the 'p' suffix is > than no suffix */
         return (*ti == "p" ? false : true);
     
     /* this has no suffix */
-    else if (si != _suffices.end())
+    else if (si != _suffixes.end())
         /* only the 'p' suffix is > than no suffix */
         return (*si == "p" ? true : false);
 
@@ -136,17 +156,18 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 {
     std::vector<std::string>::iterator ti, si;
 
-    ti = std::find(_suffices.begin(), _suffices.end(), this->suffix());
-    si = std::find(_suffices.begin(), _suffices.end(), that.suffix());
+    ti = std::find(_suffixes.begin(), _suffixes.end(), this->suffix());
+    si = std::find(_suffixes.begin(), _suffixes.end(), that.suffix());
 
     /* both have a suffix */
-    if ((ti != _suffices.end()) and (si != _suffices.end()))
+    if ((ti != _suffixes.end()) and (si != _suffixes.end()))
     {
         /* same suffix, so compare suffix version */
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
             {
+#ifdef HAVE_STRTOUL
                 unsigned long thisver =
                     std::strtoul(this->version().c_str(), NULL, 10);
                 unsigned long thatver =
@@ -157,6 +178,9 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
                     return this->version() == that.version();
                 else
                     return thisver == thatver;
+#else
+                return this->version() == that.version();
+#endif /* HAVE_STRTOUL */
             }
             else if (this->version().empty() and that.version().empty())
                 return true;
@@ -166,7 +190,7 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 
         return ti == si;
     }
-    else if ((ti != _suffices.end()) or (si != _suffices.end()))
+    else if ((ti != _suffixes.end()) or (si != _suffixes.end()))
         return false;
 
     return true;
@@ -197,44 +221,92 @@ portage::version_string_T::operator() () const
 bool
 portage::version_string_T::operator< (version_string_T &that)
 {
-    std::cout << "-----------------------------------------" << std::endl;
-    std::cout << "Comparing this (" << this->_v["nosuffix"] + this->_suffix.suffix() + "-" + this->_v["PR"]
-        << ") to that (" << that["nosuffix"] + that._suffix.suffix() + "-" + that["PR"] << ")."
-        << std::endl;
+//    std::cout << "-----------------------------------------" << std::endl;
+//    std::cout << "Comparing this (" << this->_v["nosuffix"] + this->_suffix.suffix() + "-" + this->_v["PR"]
+//        << ") to that (" << that["nosuffix"] + that._suffix.suffix() + "-" + that["PR"] << ")."
+//        << std::endl;
 
 
-    std::cout << (this->_v["nosuffix"] < that["nosuffix"]) << std::endl;
-    std::cout << "this->version = " << this->_v["nosuffix"] << std::endl;
-    std::cout << "that->version = " << that["nosuffix"] << std::endl;
+//    std::cout << (this->_v["nosuffix"] < that["nosuffix"]) << std::endl;
+//    std::cout << "this->version = " << this->_v["nosuffix"] << std::endl;
+//    std::cout << "that->version = " << that["nosuffix"] << std::endl;
+
+//    std::string ver(this->_v["nosuffix"]);
+//    if (ver.find('.') != std::string::npos)
+//    {
+//        std::string::size_type lpos = 0;
+
+//        while (true)
+//        {
+//            std::string::size_type pos = ver.find('.', lpos);
+//            if (pos == std::string::npos)
+//                break;
+
+//            if (ver.substr(lpos, pos - lpos).length() == 1)
+//            {
+//                this->_v["nosuffix"].insert(pos - 1, "0", 0, 1);
+//                _pos.push_back(pos - 2);
+//            }
+
+//            lpos == ++pos;
+//    }
 
     if (this->_v["nosuffix"] < that["nosuffix"])
         return true;
     else if (this->_v["nosuffix"] == that["nosuffix"])
     {
-            std::cout << (this->_suffix < that._suffix) << std::endl;
-            std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
-            std::cout << "that->suffix  = " << that._suffix.suffix() << std::endl;
+//            std::cout << (this->_suffix < that._suffix) << std::endl;
+//            std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
+//            std::cout << "that->suffix  = " << that._suffix.suffix() << std::endl;
 
         if (this->_suffix < that._suffix)
             return true;
         else if (this->_suffix == that._suffix)
         {
-            std::cout << (this->_v["PR"] <= that["PR"]) << std::endl;
-            std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
-            std::cout << "that->rev     = " << that["PR"] << std::endl;
+//            std::cout << (this->_v["PR"] <= that["PR"]) << std::endl;
+//            std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
+//            std::cout << "that->rev     = " << that["PR"] << std::endl;
 
-            uintmax_t thispr = strtoumax(this->_v["PR"].c_str(), NULL, 10);
-            uintmax_t thatpr = strtoumax(that["PR"].c_str(), NULL, 10);
+#ifdef HAVE_STRTOUMAX
+            uintmax_t thisrev = strtoumax(this->_v["PR"].substr(1).c_str(), NULL, 10);
+            uintmax_t thatrev = strtoumax(that["PR"].substr(1).c_str(), NULL, 10);
 
-            /* if all else fails, do string comparison */
-            if ((thispr == UINTMAX_MAX) or (thatpr == UINTMAX_MAX))
-                return this->_v["PR"] <= that["PR"];
-            else
-                return thispr <= thatpr;
+            bool success = false;
+            switch (thisrev)
+            {
+                case 0:
+                    if (this->_v["PR"] == "r0")
+                        success = true;
+                    break;
+                case INTMAX_MIN:
+                case INTMAX_MAX:
+                case UINTMAX_MAX:
+                    break;
+                default:
+                    success = true;
+            }
+
+            if (success)
+            {
+                switch (thatrev)
+                {
+                    case 0:
+                        if (that["PR"] == "r0")
+                            return thisrev <= thatrev;
+                        else
+                            return this->_v["PR"] <= that["PR"];
+                    case INTMAX_MIN:
+                    case INTMAX_MAX:
+                    case UINTMAX_MAX:
+                        return this->_v["PR"] <= that["PR"];
+                    default:
+                        return thisrev <= thatrev;
+                }
+            }
+#endif /* HAVE_STRTOUMAX */
+            return this->_v["PR"] <= that["PR"];
         }
     }
-
-    std::cout << "-----------------------------------------" << std::endl;
 
     return false;
 }

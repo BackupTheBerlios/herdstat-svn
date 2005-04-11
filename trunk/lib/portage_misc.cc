@@ -68,12 +68,6 @@ portage::in_pkg_dir()
     return (ebuild and filesdir);
 }
 
-/*
- * Do our best to guess the latest ebuild of the specified
- * package. TODO: write an actual version parsing class since
- * this often produces incorrect results.
- */
-
 const char *
 portage::ebuild_which(const std::string &portdir, const std::string &pkg)
 {
@@ -213,7 +207,8 @@ portage::parse_homepage(const std::string &homepage, util::vars_T &vars)
 {
     std::string h(homepage);
 
-    if (h.find('$') != std::string::npos)
+    /* any variables present? */
+    if (h.find("${") != std::string::npos)
     {
         std::vector<std::string> v;
         std::vector<std::string>::iterator i;
@@ -233,6 +228,7 @@ portage::parse_homepage(const std::string &homepage, util::vars_T &vars)
             lpos = ++end;
         }
 
+        /* for each variable we found in $HOMEPAGE */
         for (i = v.begin() ; i != v.end() ; ++i)
         {
             std::string subst;
@@ -242,17 +238,17 @@ portage::parse_homepage(const std::string &homepage, util::vars_T &vars)
             if (pos == std::string::npos)
                 continue;
 
+            /* is that variable defined in the ebuild? */
             util::vars_T::iterator x = vars.find(*i);
             if (x != vars.end())
-                subst = x->second;
+                subst = x->second; /* found it */
             else
             {
-                /* TODO: make a version class that does this */
-                std::map<std::string, std::string> version =
-                    portage::get_version_map(vars.name());
-                std::map<std::string, std::string>::iterator y = version.find(*i);
-                if (y != version.end())
-                    subst = y->second;
+                /* is the variable part of the version ($P, $PN, $PV, etc) */
+                portage::version_string_T version(vars.name());
+                portage::version_string_T::iterator v = version.find(*i);
+                if (v != version.end())
+                    subst = v->second;
             }
 
             if (not subst.empty())

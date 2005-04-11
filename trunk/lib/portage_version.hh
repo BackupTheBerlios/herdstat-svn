@@ -47,7 +47,7 @@ namespace portage
         protected:
             void get_suffix(const std::string &);
 
-            static std::vector<std::string> _suffices; /* valid suffices */
+            static std::vector<std::string> _suffixes; /* valid suffixes */
             std::string _suffix;        /* suffix */
             std::string _suffix_ver;    /* suffix version */
 
@@ -77,9 +77,18 @@ namespace portage
             const util::path_T _ebuild;             /* abs path of ebuild */
             util::string _verstr;                   /* full version string */
             std::map<std::string, std::string> _v;  /* version component map */
-            portage::version_suffix_T _suffix;
+            portage::version_suffix_T _suffix;      /* version suffix object */
+            std::vector<std::string::size_type> _pos; /* vector of locations
+                                                         where the verstr was
+                                                         altered to improve
+                                                         sorting accuracy    */
 
         public:
+            typedef std::map<std::string,
+                    std::string>::iterator iterator;
+            typedef std::map<std::string,
+                    std::string>::const_iterator const_iterator;
+
             version_string_T(const util::path_T &path) : _ebuild(path),
                 _verstr(util::chop_fileext(path.basename()))
             { this->init(); }
@@ -87,14 +96,22 @@ namespace portage
             const portage::version_suffix_T &suffix() const { return _suffix; }
 
             const std::string operator() () const;
-            const std::string &operator[] (const std::string &s)
-            { return _v[s]; }
-            const std::string &operator[] (const char *s) { return _v[s]; }
 
             bool operator< (version_string_T &);
             bool operator> (version_string_T &v) { return !(*this < v); }
             bool operator==(version_string_T &);
             bool operator!=(version_string_T &v) { return !(*this == v); }
+
+            /* map subset for accessing P, PN, PV, etc */
+            const std::string &operator[] (const std::string &s)
+            { return _v[s]; }
+            const std::string &operator[] (const char *s) { return _v[s]; }
+            iterator begin() { return _v.begin(); }
+            const_iterator begin() const { return _v.begin(); }
+            iterator end() { return _v.end(); }
+            const_iterator end() const { return _v.end(); }
+            iterator find(const std::string &s) { return _v.find(s); }
+            const_iterator find(const std::string &s) const { return _v.find(s); }
     };
 
     /* version_string_T sorting criterion */
@@ -129,12 +146,12 @@ namespace portage
             
             void insert(portage::version_string_T *s)
             {
-                std::cout << "versions_T::insert ===> trying to insert "
-                    << (*s)() << std::endl;
+//                std::cout << "versions_T::insert ===> trying to insert "
+//                    << (*s)() << std::endl;
                 std::pair<iterator, bool> p = _vs.insert(s);
                 assert(p.second);
-                std::cout << "versions_T::insert ===> successfully inserted "
-                    << (*s)() << std::endl;
+//                std::cout << "versions_T::insert ===> successfully inserted "
+//                    << (*s)() << std::endl;
             }
     };
 }

@@ -30,6 +30,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <cstdlib>
+#include <cassert>
 
 #include "util.hh"
 
@@ -42,9 +44,23 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    portage::versions_T versions;
+    std::vector<std::string> possibles = portage::find_package("/usr/portage", argv[1]);
+    if (possibles.size() > 1)
+    {
+        std::cerr << argv[1] << " is ambiguous. Possible matches are:" << std::endl;
+        std::vector<std::string>::iterator i;
+        for (i = possibles.begin() ; i != possibles.end() ; ++i)
+            std::cerr << *i << std::endl;
+        return EXIT_FAILURE;
+    }
+    else if (possibles.empty())
+    {
+        std::cerr << argv[1] << " doesn't seem to exist." << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    util::dir_T pkgdir(std::string("/usr/portage/") + argv[1]);
+    portage::versions_T versions;
+    util::dir_T pkgdir(std::string("/usr/portage/") + possibles.front());
     util::dir_T::iterator d;
     for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
     {
