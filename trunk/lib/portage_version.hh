@@ -45,6 +45,7 @@ namespace portage
     class version_suffix_T
     {
         protected:
+            void init(const std::string &);
             void get_suffix(const std::string &);
 
             static std::vector<std::string> _suffixes; /* valid suffixes */
@@ -53,18 +54,40 @@ namespace portage
 
         public:
             version_suffix_T() { }
-            version_suffix_T(const char *s) { this->init(s); }
-            version_suffix_T(const std::string &s) { this->init(s); }
+            version_suffix_T(const char *pvr) { this->init(pvr); }
+            version_suffix_T(const std::string &pvr) { this->init(pvr); }
 
-            void init(const std::string &);
-            const std::string &suffix() const { return _suffix; }
-            const std::string &version() const { return _suffix_ver; }
+            const std::string &suffix() const { return this->_suffix; }
+            const std::string &version() const { return this->_suffix_ver; }
 
-            void operator= (std::string &s) { this->init(s); }
+            void assign(std::string &pvr) { this->init(pvr); }
+
             bool operator< (version_suffix_T &);
             bool operator> (version_suffix_T &s) { return !(*this < s); }
             bool operator==(version_suffix_T &);
             bool operator!=(version_suffix_T &s) { return !(*this == s); }
+    };
+
+    /* represents ${PV} minus the suffix */
+    class version_nosuffix_T
+    {
+        protected:
+            void init(const std::string &);
+            util::string _version;
+
+        public:
+            version_nosuffix_T() { }
+            version_nosuffix_T(const char *pv) { this->init(pv); }
+            version_nosuffix_T(const std::string &pv) { this->init(pv); }
+
+            const std::string &operator() () const { return this->_version; }
+
+            void assign(std::string &pv) { this->init(pv); }
+
+            bool operator< (version_nosuffix_T &);
+            bool operator> (version_nosuffix_T &s) { return !(*this < s); }
+            bool operator==(version_nosuffix_T &);
+            bool operator!=(version_nosuffix_T &s) { return !(*this == s); }
     };
 
     /* Represents a single version string */
@@ -78,6 +101,7 @@ namespace portage
             util::string _verstr;                   /* full version string */
             std::map<std::string, std::string> _v;  /* version component map */
             portage::version_suffix_T _suffix;      /* version suffix object */
+            portage::version_nosuffix_T _version;   /* version minus suffix */
             std::vector<std::string::size_type> _pos; /* vector of locations
                                                          where the verstr was
                                                          altered to improve
@@ -93,9 +117,11 @@ namespace portage
                 _verstr(util::chop_fileext(path.basename()))
             { this->init(); }
 
-            const portage::version_suffix_T &suffix() const { return _suffix; }
+            const portage::version_suffix_T &suffix() const
+            { return this->_suffix; }
 
             const std::string operator() () const;
+            const std::string &version() const { return this->_version(); }
 
             bool operator< (version_string_T &);
             bool operator> (version_string_T &v) { return !(*this < v); }
@@ -104,14 +130,17 @@ namespace portage
 
             /* map subset for accessing P, PN, PV, etc */
             const std::string &operator[] (const std::string &s)
-            { return _v[s]; }
-            const std::string &operator[] (const char *s) { return _v[s]; }
-            iterator begin() { return _v.begin(); }
-            const_iterator begin() const { return _v.begin(); }
-            iterator end() { return _v.end(); }
-            const_iterator end() const { return _v.end(); }
-            iterator find(const std::string &s) { return _v.find(s); }
-            const_iterator find(const std::string &s) const { return _v.find(s); }
+            { return this->_v[s]; }
+            const std::string &operator[] (const char *s)
+            { return this->_v[s]; }
+            
+            iterator begin() { return this->_v.begin(); }
+            const_iterator begin() const { return this->_v.begin(); }
+            iterator end() { return this->_v.end(); }
+            const_iterator end() const { return this->_v.end(); }
+            iterator find(const std::string &s) { return this->_v.find(s); }
+            const_iterator find(const std::string &s) const
+            { return this->_v.find(s); }
     };
 
     /* version_string_T sorting criterion */
@@ -137,18 +166,23 @@ namespace portage
             typedef std::set<portage::version_string_T *,
                              version_sort_T>::iterator iterator;
             typedef std::set<portage::version_string_T *,
+                             version_sort_T>::const_iterator const_iterator;
+            typedef std::set<portage::version_string_T *,
                              version_sort_T>::size_type size_type;
 
             /* small set subset */
-            iterator begin() { return _vs.begin(); }
-            iterator end() { return _vs.end(); }
-            size_type size() const { return _vs.size(); }
+            iterator begin() { return this->_vs.begin(); }
+            const_iterator begin() const { return this->_vs.begin(); }
+            iterator end() { return this->_vs.end(); }
+            const_iterator end() const { return this->_vs.end(); }
+            size_type size() const { return this->_vs.size(); }
+            /* TODO: add find() access function */
             
             void insert(portage::version_string_T *s)
             {
 //                std::cout << "versions_T::insert ===> trying to insert "
 //                    << (*s)() << std::endl;
-                std::pair<iterator, bool> p = _vs.insert(s);
+                std::pair<iterator, bool> p = this->_vs.insert(s);
                 assert(p.second);
 //                std::cout << "versions_T::insert ===> successfully inserted "
 //                    << (*s)() << std::endl;

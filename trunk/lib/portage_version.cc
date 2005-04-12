@@ -55,17 +55,40 @@
 
 std::vector<std::string> portage::version_suffix_T::_suffixes;
 
+uintmax_t
+strtouint(const char *str)
+{
+#ifdef HAVE_STRTOUMAX
+    uintmax_t i = strtoumax(str, NULL, 10);
+
+    switch (i)
+    {
+	case 0:
+	    if (std::strcmp(str, "0") == 0)
+		return i;
+	    break;
+	case INTMAX_MIN:
+	case INTMAX_MAX:
+	case UINTMAX_MAX:
+	    break;
+	default:
+	    return i;
+    }
+#endif /* HAVE_STRTOUMAX */
+    return std::atoi(str);
+}
+
 void
 portage::version_suffix_T::init(const std::string &s)
 {
     /* valid suffixes (in order) */
-    if (_suffixes.empty())
+    if (this->_suffixes.empty())
     {
-        _suffixes.push_back("alpha");
-        _suffixes.push_back("beta");
-        _suffixes.push_back("pre");
-        _suffixes.push_back("rc");
-        _suffixes.push_back("p");
+        this->_suffixes.push_back("alpha");
+        this->_suffixes.push_back("beta");
+        this->_suffixes.push_back("pre");
+        this->_suffixes.push_back("rc");
+        this->_suffixes.push_back("p");
     }
 
     this->get_suffix(s);
@@ -81,20 +104,20 @@ portage::version_suffix_T::get_suffix(const std::string &s)
 
     if ((pos = result.rfind('_')) != std::string::npos)
     {
-        _suffix = result.substr(pos + 1);
+        this->_suffix = result.substr(pos + 1);
         
         /* chop any trailing suffix version */
-        pos = _suffix.find_first_of("0123456789");
+        pos = this->_suffix.find_first_of("0123456789");
         if (pos != std::string::npos)
         {
-            _suffix_ver = _suffix.substr(pos);
-            _suffix = _suffix.substr(0, pos);
+            this->_suffix_ver = this->_suffix.substr(pos);
+            this->_suffix = this->_suffix.substr(0, pos);
         }
 
         /* valid suffix? */
-        if (std::find(_suffixes.begin(), _suffixes.end(),
-            _suffix) == _suffixes.end())
-            throw portage::bad_version_suffix_E(_suffix);
+        if (std::find(this->_suffixes.begin(), this->_suffixes.end(),
+            this->_suffix) == this->_suffixes.end())
+            throw portage::bad_version_suffix_E(this->_suffix);
     }
 }
 
@@ -103,11 +126,13 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
 {
     std::vector<std::string>::iterator ti, si;
 
-    ti = std::find(_suffixes.begin(), _suffixes.end(), this->suffix());
-    si = std::find(_suffixes.begin(), _suffixes.end(), that.suffix());
+    ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
+        this->suffix());
+    si = std::find(this->_suffixes.begin(), this->_suffixes.end(),
+        that.suffix());
 
     /* both have a suffix */
-    if ((ti != _suffixes.end()) and (si != _suffixes.end()))
+    if ((ti != this->_suffixes.end()) and (si != this->_suffixes.end()))
     {
         /* same suffix, so compare suffix version */
         if (ti == si)
@@ -139,12 +164,12 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
     }
 
     /* that has no suffix */
-    else if (ti != _suffixes.end())
+    else if (ti != this->_suffixes.end())
         /* only the 'p' suffix is > than no suffix */
         return (*ti == "p" ? false : true);
     
     /* this has no suffix */
-    else if (si != _suffixes.end())
+    else if (si != this->_suffixes.end())
         /* only the 'p' suffix is > than no suffix */
         return (*si == "p" ? true : false);
 
@@ -156,11 +181,13 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 {
     std::vector<std::string>::iterator ti, si;
 
-    ti = std::find(_suffixes.begin(), _suffixes.end(), this->suffix());
-    si = std::find(_suffixes.begin(), _suffixes.end(), that.suffix());
+    ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
+        this->suffix());
+    si = std::find(this->_suffixes.begin(), this->_suffixes.end(),
+        that.suffix());
 
     /* both have a suffix */
-    if ((ti != _suffixes.end()) and (si != _suffixes.end()))
+    if ((ti != this->_suffixes.end()) and (si != this->_suffixes.end()))
     {
         /* same suffix, so compare suffix version */
         if (ti == si)
@@ -190,17 +217,86 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 
         return ti == si;
     }
-    else if ((ti != _suffixes.end()) or (si != _suffixes.end()))
+    else if ((ti != this->_suffixes.end()) or (si != this->_suffixes.end()))
         return false;
 
     return true;
 }
 
 void
+portage::version_nosuffix_T::init(const std::string &PV)
+{
+    std::string::size_type pos = PV.find('_');
+    if (pos != std::string::npos)
+        this->_version = PV.substr(0, pos);
+    else
+        this->_version = PV;
+}
+
+bool
+portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
+{
+    bool differ = false;
+    bool result = false;
+
+    if (this->_version == that._version)
+        return false;
+
+    std::vector<std::string> thisparts = this->_version.split('.');
+    std::vector<std::string> thatparts = that._version.split('.');
+    std::vector<std::string>::size_type stoppos =
+        std::min<std::vector<std::string>::size_type>(thisparts.size(),
+                                                      thatparts.size());
+
+    /* TODO: if thisparts.size() and thatpart.size() == 1, convert to long
+     * and compare */
+
+    std::vector<std::string>::iterator thisiter, thatiter;
+    for (thisiter = thisparts.begin(), thatiter = thatparts.begin() ;
+         stoppos != 0 ; ++thisiter, ++thatiter, --stoppos)
+    {
+        /* loop until the version components differ */
+
+        uintmax_t thisver = strtouint(thisiter->c_str());
+        uintmax_t thatver = strtouint(thatiter->c_str());
+
+        bool same = false;
+        if (thisver == thatver)
+        {
+            if (*thisiter == std::string("0") + *thatiter)
+                same = true;
+            else
+                continue;
+        }
+        
+        if (same)
+            result = true;
+        else
+            result = thisver < thatver;
+
+        differ = true;
+        break;
+    }
+
+    if (not differ)
+        return thisparts.size() <= thatparts.size();
+
+    return result;
+}
+
+bool
+portage::version_nosuffix_T::operator== (version_nosuffix_T &that)
+{
+    /* string comparison should be sufficient for == */
+    return this->_version == that._version;
+}
+
+void
 portage::version_string_T::init()
 {
     this->split();
-    _suffix = _v["PVR"];
+    this->_suffix.assign(this->_v["PVR"]);
+    this->_version.assign(this->_v["PV"]);
 }
 
 /*
@@ -211,49 +307,29 @@ const std::string
 portage::version_string_T::operator() () const
 {
     /* chop -r0 if necessary */
-    std::string::size_type pos = _verstr.rfind("-r0");
+    std::string::size_type pos = this->_verstr.rfind("-r0");
     if (pos != std::string::npos)
-        return _verstr.substr(0, pos);
+        return this->_verstr.substr(0, pos);
 
-    return _verstr;
+    return this->_verstr;
 }
 
 bool
 portage::version_string_T::operator< (version_string_T &that)
 {
 //    std::cout << "-----------------------------------------" << std::endl;
-//    std::cout << "Comparing this (" << this->_v["nosuffix"] + this->_suffix.suffix() + "-" + this->_v["PR"]
-//        << ") to that (" << that["nosuffix"] + that._suffix.suffix() + "-" + that["PR"] << ")."
+//    std::cout << "Comparing this (" << this->version() + this->_suffix.suffix() + "-" + this->_v["PR"]
+//        << ") to that (" << that.version() + that._suffix.suffix() + "-" + that["PR"] << ")."
 //        << std::endl;
 
 
-//    std::cout << (this->_v["nosuffix"] < that["nosuffix"]) << std::endl;
-//    std::cout << "this->version = " << this->_v["nosuffix"] << std::endl;
-//    std::cout << "that->version = " << that["nosuffix"] << std::endl;
+//    std::cout << (this->_version < that._version) << std::endl;
+//    std::cout << "this->version = " << this->version() << std::endl;
+//    std::cout << "that->version = " << that.version() << std::endl;
 
-//    std::string ver(this->_v["nosuffix"]);
-//    if (ver.find('.') != std::string::npos)
-//    {
-//        std::string::size_type lpos = 0;
-
-//        while (true)
-//        {
-//            std::string::size_type pos = ver.find('.', lpos);
-//            if (pos == std::string::npos)
-//                break;
-
-//            if (ver.substr(lpos, pos - lpos).length() == 1)
-//            {
-//                this->_v["nosuffix"].insert(pos - 1, "0", 0, 1);
-//                _pos.push_back(pos - 2);
-//            }
-
-//            lpos == ++pos;
-//    }
-
-    if (this->_v["nosuffix"] < that["nosuffix"])
+    if (this->_version < that._version)
         return true;
-    else if (this->_v["nosuffix"] == that["nosuffix"])
+    else if (this->_version == that._version)
     {
 //            std::cout << (this->_suffix < that._suffix) << std::endl;
 //            std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
@@ -267,44 +343,13 @@ portage::version_string_T::operator< (version_string_T &that)
 //            std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
 //            std::cout << "that->rev     = " << that["PR"] << std::endl;
 
-#ifdef HAVE_STRTOUMAX
-            uintmax_t thisrev = strtoumax(this->_v["PR"].substr(1).c_str(), NULL, 10);
-            uintmax_t thatrev = strtoumax(that["PR"].substr(1).c_str(), NULL, 10);
+            /* attempt to convert the revision to an uint for comparison.
+             * do a string comparison if all else fails (or strtoumax is
+             * unavailable). */
 
-            bool success = false;
-            switch (thisrev)
-            {
-                case 0:
-                    if (this->_v["PR"] == "r0")
-                        success = true;
-                    break;
-                case INTMAX_MIN:
-                case INTMAX_MAX:
-                case UINTMAX_MAX:
-                    break;
-                default:
-                    success = true;
-            }
-
-            if (success)
-            {
-                switch (thatrev)
-                {
-                    case 0:
-                        if (that["PR"] == "r0")
-                            return thisrev <= thatrev;
-                        else
-                            return this->_v["PR"] <= that["PR"];
-                    case INTMAX_MIN:
-                    case INTMAX_MAX:
-                    case UINTMAX_MAX:
-                        return this->_v["PR"] <= that["PR"];
-                    default:
-                        return thisrev <= thatrev;
-                }
-            }
-#endif /* HAVE_STRTOUMAX */
-            return this->_v["PR"] <= that["PR"];
+            uintmax_t thisrev = strtouint(this->_v["PR"].substr(1).c_str());
+            uintmax_t thatrev = strtouint(that["PR"].substr(1).c_str());
+            return thisrev <= thatrev;
         }
     }
 
@@ -314,7 +359,7 @@ portage::version_string_T::operator< (version_string_T &that)
 bool
 portage::version_string_T::operator== (version_string_T &that)
 {
-    return ( (this->_v["nosuffix"] == that["nosuffix"]) and
+    return ( (this->_version == that._version) and
              (this->_suffix == that._suffix) and
              (this->_v["PR"] == that["PR"]) );
 }
@@ -331,13 +376,13 @@ portage::version_string_T::split()
     std::vector<std::string> parts, comps;
     std::vector<std::string>::iterator i;
 
-    assert(not _verstr.empty());
+    assert(not this->_verstr.empty());
 
     /* append -r0 if necessary */
-    if ((pos = _verstr.rfind("-r")) == std::string::npos)
-        _verstr.append("-r0");
+    if ((pos = this->_verstr.rfind("-r")) == std::string::npos)
+        this->_verstr.append("-r0");
 
-    parts = _verstr.split('-');
+    parts = this->_verstr.split('-');
 
     /* If parts > 3, ${PN} contains a '-' */
     if (parts.size() > 3)
@@ -359,18 +404,12 @@ portage::version_string_T::split()
     assert(comps.size() == 3);
 
     /* fill our map with the components */
-    _v["PN"] = comps[0];
-    _v["PV"] = comps[1];
-    _v["PR"] = comps[2];
-    _v["P"]   = _v["PN"] + "-" + _v["PV"];
-    _v["PVR"] = _v["PV"] + "-" + _v["PR"];
-    _v["PF"]  = _v["PN"] + "-" + _v["PVR"];
-
-    /* save PV minus suffix */
-    if ((pos = _v["PV"].rfind('_')) != std::string::npos)
-        _v["nosuffix"] = _v["PV"].substr(0, pos);
-    else
-        _v["nosuffix"] = _v["PV"];
+    this->_v["PN"] = comps[0];
+    this->_v["PV"] = comps[1];
+    this->_v["PR"] = comps[2];
+    this->_v["P"]   = this->_v["PN"] + "-" + this->_v["PV"];
+    this->_v["PVR"] = this->_v["PV"] + "-" + this->_v["PR"];
+    this->_v["PF"]  = this->_v["PN"] + "-" + this->_v["PVR"];
 }
 
 /* vim: set tw=80 sw=4 et : */

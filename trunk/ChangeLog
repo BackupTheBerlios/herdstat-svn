@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-04-12 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_version.cc, lib/portage_version.hh: Added
+	version_nosuffix_T for representing ${PV} minus the suffix.
+	version_string_T::operator< now uses version_nosuffix_T::operator< for
+	comparison instead of simple string comparison, and thus is now more
+	reliable.
+
 2005-04-11 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_version.cc, lib/portage_version.hh: Finally have the
