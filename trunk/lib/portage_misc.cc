@@ -71,35 +71,23 @@ portage::in_pkg_dir()
 const char *
 portage::ebuild_which(const std::string &portdir, const std::string &pkg)
 {
-    DIR *dir = NULL;
-    struct dirent *d = NULL;
-    const std::string path = portdir + "/" + pkg;
-    std::vector<std::string> ebuilds;
-    std::vector<std::string>::iterator e;
+    const util::path_T path(portdir + "/" + pkg);
+    util::dir_T pkgdir(path);
+    portage::versions_T versions;
 
-    /* open package directory */
-    if (not (dir = opendir(path.c_str())))
-        throw util::bad_fileobject_E(path);
-
-    /* read package directory looking for ebuilds */
-    while ((d = readdir(dir)))
+    for (util::dir_T::iterator d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
     {
-	char *s = NULL;
-	if ((s = std::strrchr(d->d_name, '.')))
-	    if (std::strcmp(++s, "ebuild") == 0)
-		ebuilds.push_back(path + "/" + d->d_name);
+        util::path_T::size_type pos = d->rfind(".ebuild");
+        if (pos == util::path_T::npos)
+            continue;
+
+        versions.insert(new portage::version_string_T(*d));
     }
 
-    closedir(dir);
-
-    if (ebuilds.empty())
-	return "";
-
-    std::sort(ebuilds.begin(), ebuilds.end());
-    return ebuilds.back().c_str();
+    return (path + "/" + (*versions.back())() + ".ebuild").c_str();
 }
 
-std::vector<std::string>
+const std::string
 portage::find_package(const std::string &portdir, const std::string &pkg)
 {
     std::vector<std::string> pkgs;
@@ -133,7 +121,12 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
                 pkgs.push_back(*c + "/" + pkg);
     }
 
-    return pkgs;
+    if (pkgs.size() > 1)
+        throw ambiguous_pkg_E(pkgs);
+    else if (pkgs.size() < 1)
+        throw nonexistent_pkg_E(pkg);
+
+    return pkgs.front();
 }
 
 /*

@@ -34,11 +34,10 @@ namespace portage
 {
     bool in_pkg_dir();
     const char *ebuild_which(const std::string &, const std::string &);
-    std::vector<std::string> find_package(const std::string &, const std::string &);
     std::vector<std::string> get_version_components(const util::path_T &);
     std::map<std::string, std::string> get_version_map(const std::string &);
     std::string parse_homepage(const std::string &, util::vars_T &);
-    std::vector<std::string> find_package(const std::string &, const std::string &);
+    const std::string find_package(const std::string &, const std::string &);
 
     /* represents a list of package categories */
     class categories_T : public util::file_T

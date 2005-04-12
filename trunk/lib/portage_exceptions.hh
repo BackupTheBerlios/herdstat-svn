@@ -45,6 +45,47 @@ namespace portage
                 return s.c_str();
             }
     };
+
+    class ambiguous_pkg_E : public util::msg_base_E
+    {
+        private:
+            const std::vector<std::string> _v;
+
+        public:
+            ambiguous_pkg_E() { }
+            ambiguous_pkg_E(const std::vector<std::string> &v) : _v(v) { }
+            virtual const char *what() const throw()
+            {
+                if (not this->_v.empty())
+                {
+                    std::string::size_type pos = this->_v.front().find('/');
+                    if (pos != std::string::npos)
+                    {
+                        std::cerr << this->_v.front().substr(pos)
+                            << " is ambiguous.  Possibles matches are: "
+                            << std::endl;
+                    }
+                }
+
+                std::vector<std::string>::const_iterator i;
+                for (i = this->_v.begin() ; i != this->_v.end() ; ++i)
+                    std::cerr << "\033[0;32m" << *i << "\033[0;00m" << std::endl;
+
+                return "";
+            }
+    };
+
+    class nonexistent_pkg_E : public util::msg_base_E
+    {
+        public:
+            nonexistent_pkg_E() { }
+            nonexistent_pkg_E(const char *msg) : util::msg_base_E(msg) { }
+            nonexistent_pkg_E(const std::string &msg) : util::msg_base_E(msg) { }
+            virtual const char *what() const throw()
+            {
+                return (std::string(str) + " doesn't seem to exist.").c_str();
+            }
+    };
 }
 
 #endif

@@ -172,8 +172,10 @@ namespace portage
             iterator end() { return this->_vs.end(); }
             const_iterator end() const { return this->_vs.end(); }
             size_type size() const { return this->_vs.size(); }
-            /* TODO: add find() access function */
-            
+
+            portage::version_string_T *front() { return *(++this->begin()); }
+            portage::version_string_T *back() { return *(--this->end()); }
+
             void insert(portage::version_string_T *s)
             {
 //                std::cout << "versions_T::insert ===> trying to insert "

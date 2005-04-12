@@ -55,6 +55,7 @@
 #include "action_dev_handler.hh"
 #include "action_meta_handler.hh"
 #include "action_stats_handler.hh"
+#include "action_which_handler.hh"
 
 #define FETCH_LOCATION	LOCALSTATEDIR"/herds.xml"
 
@@ -545,6 +546,7 @@ main(int argc, char **argv)
 	handlers[action_pkg]   = new action_pkg_handler_T();
 	handlers[action_meta]  = new action_meta_handler_T();
 	handlers[action_stats] = new action_stats_handler_T();
+	handlers[action_which] = new action_which_handler_T();
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];
@@ -569,7 +571,7 @@ main(int argc, char **argv)
 	if (optget("timer", bool))
 	    throw timer_E();
     }
-    catch (const util::errno_E &e)
+    catch (const util::base_E &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;

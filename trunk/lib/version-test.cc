@@ -71,6 +71,8 @@ int main(int argc, char **argv)
         versions.insert(new portage::version_string_T(*d));
     }
 
+    std::cout << portage::ebuild_which("/usr/portage", possibles.front()) << std::endl;
+
     portage::versions_T::iterator v;
     for (v = versions.begin() ; v != versions.end() ; ++v)
     {
