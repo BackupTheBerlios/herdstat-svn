@@ -56,16 +56,16 @@
 std::vector<std::string> portage::version_suffix_T::_suffixes;
 
 uintmax_t
-strtouint(const char *str)
+strtouint(const std::string &str)
 {
 #ifdef HAVE_STRTOUMAX
-    uintmax_t i = strtoumax(str, NULL, 10);
+    uintmax_t i = strtoumax(str.c_str(), NULL, 10);
 
     switch (i)
     {
 	case 0:
-	    if (std::strcmp(str, "0") == 0)
-		return i;
+	    if (str == "0")
+		return 0;
 	    break;
 	case INTMAX_MIN:
 	case INTMAX_MAX:
@@ -75,20 +75,25 @@ strtouint(const char *str)
 	    return i;
     }
 #endif /* HAVE_STRTOUMAX */
-    return std::atoi(str);
+    return std::atoi(str.c_str());
 }
 
 unsigned long
-strtoul(const char *)
+strtoul(const std::string &str)
 {
-    unsigned long result;
+    unsigned long result = 0;
 
 #ifdef HAVE_STRTOUL
-
-#else /* HAVE_STRTOUL */
-
+    result = std::strtoul(str.c_str(), NULL, 10);
+    if (result == ULONG_MAX)
+        result = 0;
 #endif /* HAVE_STRTOUL */
+    
+    /* zero's only valid when str == "0" */
+    if ((result == 0) and (str != "0"))
+        result = std::atol(str.c_str());
 
+    return result;
 }
 
 void
@@ -151,22 +156,7 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-            {
-#ifdef HAVE_STRTOUL
-                unsigned long thisver =
-                    std::strtoul(this->version().c_str(), NULL, 10);
-                unsigned long thatver =
-                    std::strtoul(that.version().c_str(), NULL, 10);
-
-                /* if all else fails, do a string comparison */
-                if ((thisver == ULONG_MAX) or (thatver == ULONG_MAX))
-                    return this->version() < that.version();
-                else
-                    return thisver < thatver;
-#else
-                return this->version() < that.version();
-#endif /* HAVE_STRTOUL */
-            }
+                return ( strtoul(this->version()) < strtoul(that.version()) );
             else if (this->version().empty() and that.version().empty())
                 return true;
             else
@@ -206,22 +196,7 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-            {
-#ifdef HAVE_STRTOUL
-                unsigned long thisver =
-                    std::strtoul(this->version().c_str(), NULL, 10);
-                unsigned long thatver =
-                    std::strtoul(that.version().c_str(), NULL, 10);
-
-                /* if all else fails, do a string comparison */
-                if ((thisver == ULONG_MAX) or (thatver == ULONG_MAX))
-                    return this->version() == that.version();
-                else
-                    return thisver == thatver;
-#else
-                return this->version() == that.version();
-#endif /* HAVE_STRTOUL */
-            }
+                return ( strtoul(this->version()) == strtoul(that.version()) );
             else if (this->version().empty() and that.version().empty())
                 return true;
             else
@@ -270,23 +245,21 @@ portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
     {
         /* loop until the version components differ */
 
-        uintmax_t thisver = strtouint(thisiter->c_str());
-        uintmax_t thatver = strtouint(thatiter->c_str());
+        uintmax_t thisver = strtouint(*thisiter);
+        uintmax_t thatver = strtouint(*thatiter);
 
         bool same = false;
         if (thisver == thatver)
         {
-            if (*thisiter == std::string("0") + *thatiter)
+            /* 1 == 01 ? they're the same in comparison speak but totally
+             * not the same in version string speak */
+            if (*thisiter == (std::string("0") + *thatiter))
                 same = true;
             else
                 continue;
         }
         
-        if (same)
-            result = true;
-        else
-            result = thisver < thatver;
-
+        result = ( same ? true : thisver < thatver );
         differ = true;
         break;
     }

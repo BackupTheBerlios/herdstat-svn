@@ -58,10 +58,10 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 
 dnl Optional headers
-AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(inttypes.h getopt.h)
 
 dnl Optional functions
-AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_FUNCS(strtoul strtoumax getopt_long)
 
 PKG_CHECK_MODULES(XMLWRAPP, xmlwrapp >= 0.5)
 
