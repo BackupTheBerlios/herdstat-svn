@@ -34,7 +34,7 @@
 #ifdef HAVE_STDINT_H
 /* It looks like glibc's stdint.h wraps the UINTMAX_MAX define
  * in a #if !defined __cplusplus || defined __STDC_LIMIT_MACROS,
- * so enable it, as we need it for strtoumax().  */
+ * so enable it, as we need it to check the return value of strtoumax(). */
 # ifndef __STDC_LIMIT_MACROS
 #  define __STDC_LIMIT_MACROS
 # endif /* __STDC_LIMIT_MACROS */
@@ -76,6 +76,19 @@ strtouint(const char *str)
     }
 #endif /* HAVE_STRTOUMAX */
     return std::atoi(str);
+}
+
+unsigned long
+strtoul(const char *)
+{
+    unsigned long result;
+
+#ifdef HAVE_STRTOUL
+
+#else /* HAVE_STRTOUL */
+
+#endif /* HAVE_STRTOUL */
+
 }
 
 void

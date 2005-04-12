@@ -63,9 +63,9 @@ namespace portage
             void assign(std::string &pvr) { this->init(pvr); }
 
             bool operator< (version_suffix_T &);
-            bool operator> (version_suffix_T &s) { return !(*this < s); }
+            bool operator> (version_suffix_T &s) { return not (*this < s); }
             bool operator==(version_suffix_T &);
-            bool operator!=(version_suffix_T &s) { return !(*this == s); }
+            bool operator!=(version_suffix_T &s) { return not (*this == s); }
     };
 
     /* represents ${PV} minus the suffix */
@@ -102,10 +102,6 @@ namespace portage
             std::map<std::string, std::string> _v;  /* version component map */
             portage::version_suffix_T _suffix;      /* version suffix object */
             portage::version_nosuffix_T _version;   /* version minus suffix */
-            std::vector<std::string::size_type> _pos; /* vector of locations
-                                                         where the verstr was
-                                                         altered to improve
-                                                         sorting accuracy    */
 
         public:
             typedef std::map<std::string,
