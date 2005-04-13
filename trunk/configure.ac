@@ -2,18 +2,13 @@
 # $Id$
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.0.3], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.0_alpha], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 foreign dist-bzip2 no-dist-gzip])
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
 AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
-
-AC_CHECK_PROGS(SED, sed)
-if test x$SED = "x"; then
-    AC_MSG_ERROR([sed is required])
-fi
 
 AC_CHECK_PROGS(_WGET, wget)
 if test x$_WGET = "x"; then
@@ -23,9 +18,13 @@ AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
+AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+
+# SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
+AC_SUBST(SED)
 
 dnl Required headers
 AC_HEADER_STDC
@@ -45,23 +44,14 @@ AC_CHECK_FUNCS(vasprintf,,
     [AC_CHECK_FUNCS(vsnprintf,,
     [AC_CHECK_FUNCS(vsprintf,,
     [AC_MSG_ERROR([either vasprintf, vsnprintf, or vsprintf is required])])])])
-AC_CHECK_FUNCS(getcwd,,
-    [AC_MSG_ERROR([getcwd is required])])
 AC_CHECK_FUNCS(gettimeofday,,
     [AC_MSG_ERROR([gettimeofday is required])])
-AC_CHECK_FUNCS(strerror,,
-    [AC_MSG_ERROR([strerror is required])])
-AC_CHECK_FUNCS(strrchr,,
-    [AC_MSG_ERROR([strrchr is required])])
-
-AC_C_CONST
-AC_TYPE_SIZE_T
 
 dnl Optional headers
-AC_CHECK_HEADERS(inttypes.h getopt.h)
+AC_CHECK_HEADERS(getopt.h)
 
 dnl Optional functions
-AC_CHECK_FUNCS(strtoul strtoumax getopt_long)
+AC_CHECK_FUNCS(strtoumax getopt_long)
 
 PKG_CHECK_MODULES(XMLWRAPP, xmlwrapp >= 0.5)
 

@@ -33,8 +33,7 @@
 #include <iterator>
 #include <algorithm>
 
-#include "util.hh"
-#include "exceptions.hh"
+#include "common.hh"
 
 /*
  * Represents a cache of objects of type T.

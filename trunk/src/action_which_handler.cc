@@ -25,7 +25,6 @@
 #endif
 
 #include "common.hh"
-#include "formatter.hh"
 #include "action_which_handler.hh"
 
 int

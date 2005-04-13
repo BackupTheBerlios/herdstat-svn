@@ -56,6 +56,9 @@ can be the name only (no category) only if there's not another package with the
 same name.  In that case you must specify the category.  On a small note, this
 option does not recognize most boolean flags (verbose, quiet, etc).
 .TP
+.B "\-w, \-\-which"
+Display full path to ebuild for the specified package(s).
+.TP
 .B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
 for an alternative way of setting the herds.xml location.

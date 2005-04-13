@@ -48,7 +48,6 @@
 #include "herds.hh"
 #include "formatter.hh"
 #include "xmlparser.hh"
-#include "exceptions.hh"
 #include "herds_xml_handler.hh"
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
@@ -62,7 +61,7 @@
 static const std::string default_herdsxml =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
-static const char *short_opts = "H:o:hVvDdtpqfcnm";
+static const char *short_opts = "H:o:hVvDdtpqfcnmw";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -88,6 +87,7 @@ static struct option long_opts[] =
     {"package",	    no_argument,	0,  'p'},
     /* display package metadata information */
     {"metadata",    no_argument,	0,  'm'},
+    {"which",	    no_argument,	0,  'w'},
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     { 0, 0, 0, 0 }
@@ -122,6 +122,7 @@ help()
 	<< " -p, --package          Look up packages by herd." << std::endl
 	<< " -d, --dev              Look up herds by developer." << std::endl
 	<< " -m, --metadata         Look up metadata by package/category." << std::endl
+	<< " -w, --which            Look up full path to ebuild for specified packages." << std::endl
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
 	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
@@ -145,6 +146,8 @@ help()
 	<< " -p, --package          1 or more herds." << std::endl
 	<< " -d, --dev              1 or more developers." << std::endl
 	<< " -m, --metadata         1 or more categories/packages." << std::endl
+	<< " -w, --which            1 or more packages." << std::endl
+	<< std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl
 	<< "specified, " << PACKAGE << " will display all packages maintained by" << std::endl
@@ -158,6 +161,7 @@ help()
 	<< " -p              Look up packages by herd." << std::endl
 	<< " -d              Look up herds by developer." << std::endl
 	<< " -m              Look up metadata by package/category." << std::endl
+	<< " -w              Look up full path to ebuild for specified packages." << std::endl
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
@@ -178,6 +182,8 @@ help()
 	<< " -p              1 or more herds." << std::endl
 	<< " -d              1 or more developers." << std::endl
 	<< " -m              1 or more categories/packages." << std::endl
+	<< " -w              1 or more packages." << std::endl
+	<< std::endl
 	<< "Both the default action and the -d action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both -d and -p are specified," << std::endl
 	<< PACKAGE << " will display all packages maintained by the specified" << std::endl
@@ -188,7 +194,7 @@ help()
 	<< std::endl
 	<< PACKAGE << " respects the HERDS environment variable." << std::endl
 	<< "Set it in your shell rcfile to permanently set the location of "
-	<< "your herds.xml" << std::endl;
+	<< "your herds.xml." << std::endl;
 }
 
 int
@@ -234,6 +240,12 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_meta);
 		optset("parse herds.xml", bool, false);
+		break;
+	    /* --which */
+	    case 'w':
+		if (optget("action", options_action_T) != action_unspecified)
+		    throw args_one_action_only_E();
+		optset("action", options_action_T, action_which);
 		break;
 	    /* --outfile */
 	    case 'o':
@@ -404,6 +416,7 @@ main(int argc, char **argv)
 {
     options_T options;
     util::timer_T timer;
+    util::color_map_T color;
 
     /* try to determine current columns, otherwise use default */
     optset("maxcol", std::size_t, util::getcols());
@@ -527,7 +540,6 @@ main(int argc, char **argv)
 	    (std::locale(optget("locale", std::string).c_str()));
 
 	/* set common format attributes */
-	util::color_map_T color;
 	formatter_T output;
 	output.set_colors(optget("color", bool));
 	output.set_quiet(optget("quiet", bool));
@@ -570,6 +582,21 @@ main(int argc, char **argv)
 
 	if (optget("timer", bool))
 	    throw timer_E();
+    }
+    catch (const portage::ambiguous_pkg_E &e)
+    {
+	std::cerr << e.name()
+	    << " is ambiguous. Possible matches are: "
+	    << std::endl << std::endl;
+
+	std::vector<std::string>::const_iterator i;
+	for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
+	{
+	    if (optget("quiet", bool) or not optget("color", bool))
+		std::cerr << *i << std::endl;
+	    else
+		std::cerr << color[green] << *i << color[none] << std::endl;
+	}
     }
     catch (const util::base_E &e)
     {

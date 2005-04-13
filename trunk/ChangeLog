@@ -1,5 +1,24 @@
 ChangeLog for herdstat
 
+2005-04-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_exceptions.hh: Added ambiguous_pkg_E and
+	nonexistent_pkg_E exceptions.
+	* lib/portage_misc.cc, lib/portage_misc.hh: Modified find_package() to
+	return the full category/package string instead of a vector of
+	possibles.  find_package() now throws ambiguous_pkg_E() or
+	nonexistent_pkg_E() where appropriate instead of making the caller
+	handle it.
+	* src/action_meta_handler.cc: Removed possibles handling code now that
+	find_package handles it.
+	* src/action_which_handler.cc: Added "which" action handler which is
+	comparable to running 'equery which' but maybe a tad faster.  With the
+	new versions_T/version_string_T classes, this is too trivial not to
+	add.
+	* src/options.hh: Added option_which to options_actions_T.
+	* src/herdstat.cc: Added --which option.
+	* bashcomp, doc/herdstat.1.in: Updated for --which.
+
 2005-04-12 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_version.cc, lib/portage_version.hh: Added
@@ -7,6 +26,8 @@ ChangeLog for herdstat
 	version_string_T::operator< now uses version_nosuffix_T::operator< for
 	comparison instead of simple string comparison, and thus is now more
 	reliable.
+	* lib/portage_misc.cc: Updated ebuild_which() to use newly finished
+	versions_T/version_string_T classes.
 
 2005-04-11 Aaron Walker <ka0ttic@gentoo.org>
 

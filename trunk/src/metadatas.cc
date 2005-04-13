@@ -33,7 +33,6 @@
 #include <dirent.h>
 
 #include "common.hh"
-#include "exceptions.hh"
 #include "metadatas.hh"
 
 /*

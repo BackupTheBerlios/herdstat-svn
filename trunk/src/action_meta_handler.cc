@@ -39,7 +39,6 @@
 #include "common.hh"
 #include "herds.hh"
 #include "formatter.hh"
-#include "exceptions.hh"
 #include "xmlparser.hh"
 #include "metadata_xml_handler.hh"
 #include "action_meta_handler.hh"
@@ -129,47 +128,18 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::vector<std::string> possibles = portage::find_package(portdir, *i);
+        std::string package = portage::find_package(portdir, *i);
         std::string longdesc, metadata;
 
-        /* is there more than one package with that name? */
-        if (possibles.size() > 1)
-        {
-            std::cerr << *i << " is ambiguous.  Possibles matches:"
-                << std::endl << std::endl;
-
-            std::vector<std::string>::iterator p;
-            for (p = possibles.begin() ; p != possibles.end() ; ++p)
-            {
-                if (quiet or not optget("color", bool))
-                    std::cerr << "   " << *p << std::endl;
-                else
-                    std::cerr << "   " << color[green] << *p << color[none] << std::endl;
-            }
-
-            return EXIT_FAILURE;
-        }
-        else if (possibles.empty() and opts.size() == 1)
-        {
-            std::cerr << *i << " does not seem to exist." << std::endl;
-            return EXIT_FAILURE;
-        }
-        /* or none perhaps? */
-        else if (possibles.empty())
-        {
-            std::cerr << *i << " does not seem to exist." << std::endl << std::endl;
-            continue;
-        }
-            
         /* if no '/' exists, assume it's a category */
-        cat = (possibles.front().find('/') == std::string::npos);
+        cat = (package.find('/') == std::string::npos);
 
         if (n != 1)
             output.endl();
 
-        output(cat ? "Category" : "Package", possibles.front());
+        output(cat ? "Category" : "Package", package);
 
-        if (util::is_file(portdir + "/" + possibles.front() + "/metadata.xml"))
+        if (util::is_file(portdir + "/" + package + "/metadata.xml"))
         {
             util::vars_T ebuild_vars;
 
@@ -180,8 +150,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                     handler(new MetadataXMLHandler_T());
                 XMLParser_T parser(&(*handler));
 
-                parser.parse(portdir + "/" + possibles.front() +
-                             "/metadata.xml");
+                parser.parse(portdir + "/" + package + "/metadata.xml");
 
                 herds = handler->herds;
                 devs = handler->devs;
@@ -227,8 +196,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             if (not cat)
             {
-                std::string ebuild(portage::ebuild_which(portdir,
-                    possibles.front()));
+                std::string ebuild(portage::ebuild_which(portdir, package));
                 ebuild_vars.read(ebuild);
 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
@@ -271,8 +239,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
-                util::vars_T ebuild_vars(portage::ebuild_which(portdir,
-                    possibles.front()));
+                util::vars_T ebuild_vars(portage::ebuild_which(portdir, package));
                 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
                     ebuild_vars["HOMEPAGE"] = "none";

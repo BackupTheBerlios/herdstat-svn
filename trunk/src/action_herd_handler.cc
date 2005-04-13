@@ -37,7 +37,6 @@
 #include "common.hh"
 #include "herds.hh"
 #include "formatter.hh"
-#include "exceptions.hh"
 #include "action_herd_handler.hh"
 
 /*

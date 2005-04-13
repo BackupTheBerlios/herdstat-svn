@@ -33,7 +33,6 @@
 #include "herds.hh"
 #include "xmlparser.hh"
 #include "herds_xml_handler.hh"
-#include "exceptions.hh"
 #include "formatter.hh"
 #include "action_dev_handler.hh"
 

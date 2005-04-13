@@ -39,7 +39,6 @@
 #include "metadata_xml_handler.hh"
 #include "herds_xml_handler.hh"
 #include "formatter.hh"
-#include "exceptions.hh"
 #include "action_pkg_handler.hh"
 
 /*

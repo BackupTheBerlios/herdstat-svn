@@ -31,7 +31,6 @@
 
 #include "common.hh"
 #include "formatter.hh"
-#include "exceptions.hh"
 
 formatter_T::attrs_T formatter_T::attr;
 std::vector<std::string> formatter_T::buffer;
