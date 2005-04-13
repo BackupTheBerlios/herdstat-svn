@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include "util_exceptions.hh"
 
 namespace portage
@@ -41,38 +42,34 @@ namespace portage
             virtual const char *what() const throw()
             {
                 std::string s("Invalid version suffix: ");
-                s += str;
+                s += this->str;
                 return s.c_str();
             }
     };
 
-    class ambiguous_pkg_E : public util::msg_base_E
+    class ambiguous_pkg_E : public util::base_E
     {
-        private:
-            const std::vector<std::string> _v;
+        protected:
+            std::string _name;
 
         public:
             ambiguous_pkg_E() { }
-            ambiguous_pkg_E(const std::vector<std::string> &v) : _v(v) { }
-            virtual const char *what() const throw()
+            ambiguous_pkg_E(const std::vector<std::string> &v) : packages(v) { }
+            virtual ~ambiguous_pkg_E() throw() { }
+
+            virtual const std::string name() const
             {
-                if (not this->_v.empty())
+                std::string s;
+                if (not this->packages.empty())
                 {
-                    std::string::size_type pos = this->_v.front().find('/');
-                    if (pos != std::string::npos)
-                    {
-                        std::cerr << this->_v.front().substr(pos)
-                            << " is ambiguous.  Possibles matches are: "
-                            << std::endl;
-                    }
+                    std::string::size_type pos = this->packages.front().find('/');
+                    s = (pos == std::string::npos ? this->packages.front() :
+                            this->packages.front().substr(pos + 1));
                 }
-
-                std::vector<std::string>::const_iterator i;
-                for (i = this->_v.begin() ; i != this->_v.end() ; ++i)
-                    std::cerr << "\033[0;32m" << *i << "\033[0;00m" << std::endl;
-
-                return "";
+                return s;
             }
+
+            const std::vector<std::string> packages;
     };
 
     class nonexistent_pkg_E : public util::msg_base_E
@@ -83,7 +80,8 @@ namespace portage
             nonexistent_pkg_E(const std::string &msg) : util::msg_base_E(msg) { }
             virtual const char *what() const throw()
             {
-                return (std::string(str) + " doesn't seem to exist.").c_str();
+                return (std::string(this->str) +
+                        " doesn't seem to exist.").c_str();
             }
     };
 }
