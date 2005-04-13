@@ -38,48 +38,48 @@
 void
 util::file_T::open(const char *n, std::ios_base::openmode mode)
 {
-    if (_path.empty())
+    if (this->_path.empty())
     {
-        _path = n;
+        this->_path = n;
         this->stat();
     }
 
-    if (stream)
+    if (this->stream)
     {
-        if (stream->is_open())
+        if (this->stream->is_open())
             return;
 
-        stream->open(n, mode);
+        this->stream->open(n, mode);
     }
     else
-        stream = new std::fstream(n, mode);
+        this->stream = new std::fstream(n, mode);
 }
 
 void
 util::file_T::read(std::vector<std::string> *v)
 {
-    assert(stream);
-    assert(stream->is_open());
+    assert(this->stream);
+    assert(this->stream->is_open());
 
     std::string line;
-    while (std::getline(*stream, line))
+    while (std::getline(*(this->stream), line))
         v->push_back(line);
 }
 
 void
 util::file_T::display(std::ostream &stream)
 {
-    std::copy(_contents.begin(), _contents.end(),
+    std::copy(this->_contents.begin(), this->_contents.end(),
         std::ostream_iterator<std::string>(stream, "\n"));
 }
 
 void
 util::file_T::close()
 {
-    assert(stream);
-    stream->close();
-    delete stream;
-    stream = NULL;
+    assert(this->stream);
+    this->stream->close();
+    delete this->stream;
+    this->stream = NULL;
 }
 
 
@@ -92,10 +92,10 @@ void
 util::base_dir_T<C>::close()
 {
 #ifdef CLOSEDIR_VOID
-    closedir(_dir);
+    closedir(this->_dir);
 #else /* CLOSEDIR_VOID */
-    if (closedir(_dir) != 0)
-        throw util::errno_E("closedir: " + _path);
+    if (closedir(this->_dir) != 0)
+        throw util::errno_E("closedir: " + this->_path);
 #endif /* CLOSEDIR_VOID */
 }
 
@@ -103,17 +103,18 @@ template <class C>
 void
 util::base_dir_T<C>::open()
 {
-    assert(not _path.empty());
-    _dir = opendir(_path.c_str());
-    if (not _dir)
-        throw util::bad_fileobject_E(_path);
+    assert(not this->_path.empty());
+    this->_dir = opendir(this->_path.c_str());
+    if (not this->_dir)
+        throw util::bad_fileobject_E(this->_path);
 }
 
 template <class C>
 void
 util::base_dir_T<C>::display(std::ostream &stream)
 {
-    for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
+    iterator i;
+    for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
         stream << *i << std::endl;
 }
 
@@ -125,7 +126,7 @@ void
 util::dirobject_T::read()
 {
     struct dirent *d = NULL;
-    while ((d = readdir(_dir)))
+    while ((d = readdir(this->_dir)))
     {
         /* skip . and .. for obvious reasons */
         if ((std::strcmp(d->d_name, ".") == 0) or
@@ -133,12 +134,12 @@ util::dirobject_T::read()
             continue;
 
         util::fileobject_T *f = NULL;
-        std::string path(_path + "/" + d->d_name);
+        std::string path(this->_path + "/" + d->d_name);
 
         if (util::is_dir(path))
         {
-            if (_recurse)
-                f = new util::dirobject_T(path, _recurse);
+            if (this->_recurse)
+                f = new util::dirobject_T(path, this->_recurse);
             else
                 f = new util::fileobject_T(path, FTYPE_DIR);
         }
@@ -148,14 +149,15 @@ util::dirobject_T::read()
             f = new util::fileobject_T(path, FTYPE_FILE);
 
         assert(f);
-        _contents.push_back(f);
+        this->_contents.push_back(f);
     }
 }
 
 void
 util::dirobject_T::display(std::ostream &stream)
 {
-    for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
+    iterator i;
+    for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
     {
         stream << (*i)->name() << ": " << (*i)->size() << "b" << std::endl;
 
@@ -166,7 +168,8 @@ util::dirobject_T::display(std::ostream &stream)
 
 util::dirobject_T::~dirobject_T()
 {
-    for (iterator i = _contents.begin() ; i != _contents.end() ; ++i)
+    iterator i;
+    for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
         delete *i;
 }
 
@@ -174,14 +177,14 @@ void
 util::dir_T::read()
 {
     struct dirent *d = NULL;
-    while ((d = readdir(_dir)))
+    while ((d = readdir(this->_dir)))
     {
         /* skip . and .. */
         if ((std::strcmp(d->d_name, ".") == 0) or
              std::strcmp(d->d_name, "..") == 0)
             continue;
 
-        _contents.push_back(_path + "/" + d->d_name);
+        this->_contents.push_back(this->_path + "/" + d->d_name);
     }
 }
 

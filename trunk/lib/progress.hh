@@ -38,13 +38,13 @@ namespace util
 	    progress_T() : cur(0) { }
 	    void start(unsigned m)
 	    {
-		step = 100.0 / m;
+		this->step = 100.0 / m;
 		std::printf("  0%%");
 	    }
 
 	    void operator++ ()
 	    {
-		int inc = static_cast<int>(cur += step);
+		int inc = static_cast<int>(this->cur += this->step);
 		if (inc < 10)
 		    std::printf("\b\b%.1d%%", inc);
 		else if (inc < 100)

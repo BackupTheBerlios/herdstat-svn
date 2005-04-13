@@ -101,7 +101,7 @@ namespace util
             static cmap cm;
 
         public:
-	    std::string &operator[](color_name_T c) { return cm[c]; }
+	    std::string &operator[](color_name_T c) { return this->cm[c]; }
     };
 }
 

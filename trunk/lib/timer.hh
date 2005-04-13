@@ -36,24 +36,24 @@ namespace util
     {
         private:
 	    struct timeval _begin, _end;
-	    long ms;
+	    long _ms;
 
         public:
             void start()
 	    {
-	        ms = 0;
-	        gettimeofday(&_begin, NULL);
+	        this->_ms = 0;
+	        gettimeofday(&(this->_begin), NULL);
 	    }
 
 	    void stop()
 	    {
-	        gettimeofday(&_end, NULL);
-	        ms = _end.tv_sec - _begin.tv_sec;
-	        ms *= 1000;
-	        ms += (_end.tv_usec - _begin.tv_usec) / 1000;
+	        gettimeofday(&(this->_end), NULL);
+	        this->_ms = this->_end.tv_sec - this->_begin.tv_sec;
+	        this->_ms *= 1000;
+	        this->_ms += (this->_end.tv_usec - this->_begin.tv_usec) / 1000;
 	    }
 
-            long elapsed() const { return ms; }
+            long elapsed() const { return this->_ms; }
     };
 }
 

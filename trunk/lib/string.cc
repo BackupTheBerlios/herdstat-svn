@@ -187,7 +187,7 @@ util::string::split(const char delim) const
     
     while (true)
     {
-	if ((pos = this->find(delim, lpos)) == npos)
+	if ((pos = this->find(delim, lpos)) == this->npos)
 	{
 	    vec.push_back(this->substr(lpos));
 	    break;

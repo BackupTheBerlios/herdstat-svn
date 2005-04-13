@@ -156,7 +156,8 @@ namespace portage
     class versions_T
     {
         protected:
-            std::set<portage::version_string_T *, version_sort_T> _vs;
+            std::set<portage::version_string_T *,
+                     portage::version_sort_T> _vs;
 
         public:
             typedef std::set<portage::version_string_T *,
@@ -165,6 +166,8 @@ namespace portage
                              version_sort_T>::const_iterator const_iterator;
             typedef std::set<portage::version_string_T *,
                              version_sort_T>::size_type size_type;
+
+            virtual ~versions_T();
 
             /* small set subset */
             iterator begin() { return this->_vs.begin(); }
@@ -176,15 +179,7 @@ namespace portage
             portage::version_string_T *front() { return *(++this->begin()); }
             portage::version_string_T *back() { return *(--this->end()); }
 
-            void insert(portage::version_string_T *s)
-            {
-//                std::cout << "versions_T::insert ===> trying to insert "
-//                    << (*s)() << std::endl;
-                std::pair<iterator, bool> p = this->_vs.insert(s);
-                assert(p.second);
-//                std::cout << "versions_T::insert ===> successfully inserted "
-//                    << (*s)() << std::endl;
-            }
+            virtual void insert(const util::path_T &path);
     };
 }
 

@@ -45,7 +45,7 @@ namespace util
             msg_base_E() { }
             msg_base_E(const char *msg) : str(msg) { }
             msg_base_E(const std::string &msg) : str(msg.c_str()) { }
-            virtual const char *what() const throw() { return str; }
+            virtual const char *what() const throw() { return this->str; }
     };
 
     class errno_E                               : public msg_base_E
@@ -56,7 +56,7 @@ namespace util
             errno_E(const std::string &msg) : msg_base_E(msg) { }
             virtual const char *what() const throw()
             {
-                std::string s(str);
+                std::string s(this->str);
                 if (s.empty())
                     return std::strerror(errno);
                 return (s + ": " + std::strerror(errno)).c_str();

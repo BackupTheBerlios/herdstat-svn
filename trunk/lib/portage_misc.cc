@@ -71,6 +71,7 @@ portage::in_pkg_dir()
 const char *
 portage::ebuild_which(const std::string &portdir, const std::string &pkg)
 {
+    bool found = false;
     const util::path_T path(portdir + "/" + pkg);
     util::dir_T pkgdir(path);
     portage::versions_T versions;
@@ -81,8 +82,12 @@ portage::ebuild_which(const std::string &portdir, const std::string &pkg)
         if (pos == util::path_T::npos)
             continue;
 
-        versions.insert(new portage::version_string_T(*d));
+        found = true;
+        versions.insert(*d);
     }
+
+    if (not found)
+        throw portage::nonexistent_pkg_E(pkg);
 
     return (path + "/" + (*versions.back())() + ".ebuild").c_str();
 }
@@ -90,27 +95,19 @@ portage::ebuild_which(const std::string &portdir, const std::string &pkg)
 const std::string
 portage::find_package(const std::string &portdir, const std::string &pkg)
 {
-    std::vector<std::string> pkgs;
-
     /* if category was specified, just check for existence */
-    std::string::size_type pos = pkg.find('/');
-    if (pos != std::string::npos)
-    {
-        if (util::is_dir(portdir + "/" + pkg))
-            pkgs.push_back(pkg);
-        return pkgs;
-    }
+    if ((pkg.find('/') != std::string::npos) and
+        (util::is_dir(portdir + "/" + pkg)))
+        return pkg;
 
+    std::vector<std::string> pkgs;
     portage::categories_T categories;
     portage::categories_T::iterator c;
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         /* was a category specified? only one possible */
         if (*c == pkg)
-        {
-            pkgs.push_back(*c);
-            break;
-        }
+            return pkg;
 
         util::dir_T category(portdir + "/" + (*c));
         util::dir_T::iterator d;
@@ -127,67 +124,6 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
         throw nonexistent_pkg_E(pkg);
 
     return pkgs.front();
-}
-
-/*
- * Given the path to an ebuild, return a vector comprised
- * of the version components (package name, version, revision).
- */
-
-std::vector<std::string>
-portage::get_version_components(const util::path_T &path)
-{
-    std::vector<std::string> components, parts;
-    std::string::size_type pos;
-    util::string ebuild(path.basename());
-
-    /* chop .ebuild */
-    if ((pos = ebuild.rfind(".ebuild")) != std::string::npos)
-        ebuild = ebuild.substr(0, pos);
-
-    if ((pos = ebuild.rfind("-r")) == std::string::npos)
-        ebuild.append("-r0");
-
-    parts = ebuild.split('-');
-
-    /* if parts > 3, package name contains a '-' */
-    if (parts.size() > 3)
-    {
-        /* reconstruct PN */
-        std::string PN = parts.front();
-	parts.erase(parts.begin());
-
-        while (parts.size() >= 3)
-        {
-            PN += "-" + parts.front();
-            parts.erase(parts.begin());
-        }
-
-        components.push_back(PN);
-    }
-
-    std::copy(parts.begin(), parts.end(), std::back_inserter(components));
-
-    assert(components.size() == 3);
-
-    return components;
-}
-
-std::map<std::string, std::string>
-portage::get_version_map(const std::string &path)
-{
-    std::map<std::string, std::string> version;
-    std::vector<std::string> components = portage::get_version_components(path);
-
-    version["PN"] = components[0];
-    version["PV"] = components[1];
-    version["PR"] = components[2];
-
-    version["P"]  = version["PN"] + "-" + version["PV"];
-    version["PVR"] = version["PV"] + "-" + version["PR"];
-    version["PF"] = version["PN"] + "-" + version["PVR"];
-
-    return version;
 }
 
 /*

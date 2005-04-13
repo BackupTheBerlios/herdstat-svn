@@ -32,27 +32,27 @@
 void
 util::vars_T::read(const char *path)
 {
-    _path.assign(path);
+    this->_path.assign(path);
     this->read();
 }
 
 void
 util::vars_T::read(const std::string &path)
 {
-    _path.assign(path);
+    this->_path.assign(path);
     this->read();
 }
 
 void
 util::vars_T::read()
 {
-    if (not stream or not stream->is_open())
+    if (not this->stream or not this->stream->is_open())
         this->open();
 
     std::string line;
     std::string::size_type pos;
 
-    while (std::getline(*stream, line))
+    while (std::getline(*(this->stream), line))
     {
         pos = line.find_first_not_of(" \t");
         if (pos != std::string::npos)
@@ -85,7 +85,7 @@ util::vars_T::read()
                     val.erase(pos, pos + 1);
             }
  
-            _keys[key] = val;
+            this->_keys[key] = val;
         }
     }
 }

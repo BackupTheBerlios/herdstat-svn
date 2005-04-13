@@ -44,23 +44,32 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    std::vector<std::string> possibles = portage::find_package("/usr/portage", argv[1]);
-    if (possibles.size() > 1)
+    const std::string portdir = portage::portdir();
+
+    std::string package;
+    try
     {
-        std::cerr << argv[1] << " is ambiguous. Possible matches are:" << std::endl;
-        std::vector<std::string>::iterator i;
-        for (i = possibles.begin() ; i != possibles.end() ; ++i)
+        package = portage::find_package(portdir, argv[1]);
+    }
+    catch (const portage::ambiguous_pkg_E &e)
+    {
+        std::cerr << e.name()
+            << " is ambiguous. Possible matches are:"
+            << std::endl << std::endl;
+
+        std::vector<std::string>::const_iterator i;
+        for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             std::cerr << *i << std::endl;
         return EXIT_FAILURE;
     }
-    else if (possibles.empty())
+    catch (const portage::nonexistent_pkg_E &e)
     {
-        std::cerr << argv[1] << " doesn't seem to exist." << std::endl;
+        std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
     portage::versions_T versions;
-    util::dir_T pkgdir(std::string("/usr/portage/") + possibles.front());
+    util::dir_T pkgdir(portdir + "/" + package);
     util::dir_T::iterator d;
     for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
     {
@@ -68,10 +77,8 @@ int main(int argc, char **argv)
         if (pos == std::string::npos)
             continue;
 
-        versions.insert(new portage::version_string_T(*d));
+        versions.insert(*d);
     }
-
-    std::cout << portage::ebuild_which("/usr/portage", possibles.front()) << std::endl;
 
     portage::versions_T::iterator v;
     for (v = versions.begin() ; v != versions.end() ; ++v)
@@ -85,29 +92,8 @@ int main(int argc, char **argv)
 //        std::cout << "PR: " << (*version)["PR"] << std::endl;
 //        std::cout << "PF: " << (*version)["PF"] << std::endl;
 //        std::cout << std::endl;
-            std::cout << (*version)() << std::endl;
+        std::cout << (*version)() << std::endl;
     }
-
-//    std::vector<portage::version_suffix_T> svec;
-//    svec.push_back(portage::version_suffix_T("1.0_alpha"));
-//    svec.push_back(portage::version_suffix_T("1.0_beta3"));
-//    svec.push_back(portage::version_suffix_T("1.0_p3"));
-//    svec.push_back(portage::version_suffix_T("1.0"));
-//    svec.push_back(portage::version_suffix_T("1.0_p7"));
-//    svec.push_back(portage::version_suffix_T("1.0_p"));
-//    svec.push_back(portage::version_suffix_T("1.0.1"));
-//    svec.push_back(portage::version_suffix_T("1.0_pre20050301"));
-//    svec.push_back(portage::version_suffix_T("1.0_rc7"));
-
-//    std::stable_sort(svec.begin(), svec.end(), sortSuffix);
-
-//    std::cout << std::endl;
-//    std::vector<portage::version_suffix_T>::iterator i;
-//    for (i = svec.begin() ; i != svec.end() ; ++i)
-//        std::cout << i->suffix() << i->version() << std::endl;
-
-    for (v = versions.begin() ; v != versions.end() ; ++v)
-        delete *v;
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -55,6 +55,10 @@
 
 std::vector<std::string> portage::version_suffix_T::_suffixes;
 
+/*
+ * strtoumax wrapper
+ */
+
 uintmax_t
 strtouint(const std::string &str)
 {
@@ -78,6 +82,10 @@ strtouint(const std::string &str)
     return std::atoi(str.c_str());
 }
 
+/*
+ * strtoul wrapper
+ */
+
 unsigned long
 strtoul(const std::string &str)
 {
@@ -95,6 +103,10 @@ strtoul(const std::string &str)
 
     return result;
 }
+
+/********************
+ * version_suffix_T *
+ ********************/
 
 void
 portage::version_suffix_T::init(const std::string &s)
@@ -211,6 +223,10 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
     return true;
 }
 
+/**********************
+ * version_nosuffix_T *
+ **********************/
+
 void
 portage::version_nosuffix_T::init(const std::string &PV)
 {
@@ -277,6 +293,10 @@ portage::version_nosuffix_T::operator== (version_nosuffix_T &that)
     return this->_version == that._version;
 }
 
+/********************
+ * version_string_T *
+ ********************/
+
 void
 portage::version_string_T::init()
 {
@@ -303,36 +323,14 @@ portage::version_string_T::operator() () const
 bool
 portage::version_string_T::operator< (version_string_T &that)
 {
-//    std::cout << "-----------------------------------------" << std::endl;
-//    std::cout << "Comparing this (" << this->version() + this->_suffix.suffix() + "-" + this->_v["PR"]
-//        << ") to that (" << that.version() + that._suffix.suffix() + "-" + that["PR"] << ")."
-//        << std::endl;
-
-
-//    std::cout << (this->_version < that._version) << std::endl;
-//    std::cout << "this->version = " << this->version() << std::endl;
-//    std::cout << "that->version = " << that.version() << std::endl;
-
     if (this->_version < that._version)
         return true;
     else if (this->_version == that._version)
     {
-//            std::cout << (this->_suffix < that._suffix) << std::endl;
-//            std::cout << "this->suffix  = " << this->_suffix.suffix() << std::endl;
-//            std::cout << "that->suffix  = " << that._suffix.suffix() << std::endl;
-
         if (this->_suffix < that._suffix)
             return true;
         else if (this->_suffix == that._suffix)
         {
-//            std::cout << (this->_v["PR"] <= that["PR"]) << std::endl;
-//            std::cout << "this->rev     = " << this->_v["PR"] << std::endl;
-//            std::cout << "that->rev     = " << that["PR"] << std::endl;
-
-            /* attempt to convert the revision to an uint for comparison.
-             * do a string comparison if all else fails (or strtoumax is
-             * unavailable). */
-
             uintmax_t thisrev = strtouint(this->_v["PR"].substr(1).c_str());
             uintmax_t thatrev = strtouint(that["PR"].substr(1).c_str());
             return thisrev <= thatrev;
@@ -396,6 +394,31 @@ portage::version_string_T::split()
     this->_v["P"]   = this->_v["PN"] + "-" + this->_v["PV"];
     this->_v["PVR"] = this->_v["PV"] + "-" + this->_v["PR"];
     this->_v["PF"]  = this->_v["PN"] + "-" + this->_v["PVR"];
+}
+
+/*****************
+ * versions_T    *
+ *****************/
+
+void
+portage::versions_T::insert(const util::path_T &path)
+{
+    portage::version_string_T *v = new portage::version_string_T(path);
+
+//    std::cout << "versions_T::insert ===> trying to insert "
+//        << (*v)() << std::endl;
+    
+    std::pair<iterator, bool> p = this->_vs.insert(v);
+    assert(p.second);
+
+//    std::cout << "versions_T::insert ===> successfully inserted "
+//        << (*v)() << std::endl;
+}
+
+portage::versions_T::~versions_T()
+{
+    for (iterator i = this->_vs.begin() ; i != this->_vs.end() ; ++i)
+        delete *i;
 }
 
 /* vim: set tw=80 sw=4 et : */

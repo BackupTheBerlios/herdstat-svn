@@ -72,16 +72,21 @@ namespace util
             const std::string basename() const { return util::basename(*this); }
             const std::string dirname() const { return util::dirname(*this); }
 
+            /* same as util::string::split but with a diff default delim */
             virtual std::vector<std::string> split(const char delim = '/')
-            {
-                return util::string::split(delim);
-            }
+            { return util::string::split(delim); }
     };
 
     /* generic file object */
     class fileobject_T
     {
         protected:
+            void stat()
+            {
+                this->_exists = ( ::stat(this->_path.c_str(),
+                    &this->_sbuf) == 0 ? true : false );
+            }
+
             path_T _path;        /* path object */
             struct stat _sbuf;   /* stat structure */
             type_T _type;
@@ -99,34 +104,27 @@ namespace util
             typedef blkcnt_t blkcnt_type;
 
             fileobject_T(type_T t) : _type(t) { }
-            fileobject_T(const char *n, type_T t) : _path(n), _type(t)
-            { this->stat(); }
-            fileobject_T(const std::string &n, type_T t) : _path(n), _type(t)
+            fileobject_T(const path_T &path, type_T t) : _path(path), _type(t)
             { this->stat(); }
             virtual ~fileobject_T() { this->close(); }
 
-            size_type size() const { return _sbuf.st_size; }
-            time_type mtime() const { return _sbuf.st_mtime; }
-            time_type atime() const { return _sbuf.st_atime; }
-            time_type ctime() const { return _sbuf.st_ctime; }
-            uid_type uid() const { return _sbuf.st_uid; }
-            gid_type gid() const { return _sbuf.st_gid; }
-            mode_type mode() const { return _sbuf.st_mode; }
-            inode_type inode() const { return _sbuf.st_ino; }
-            device_type device() const { return _sbuf.st_dev; }
-            blksize_type blksize() const { return _sbuf.st_blksize; }
-            blkcnt_type blkcnt() const { return _sbuf.st_blocks; }
+            size_type size() const { return this->_sbuf.st_size; }
+            time_type mtime() const { return this->_sbuf.st_mtime; }
+            time_type atime() const { return this->_sbuf.st_atime; }
+            time_type ctime() const { return this->_sbuf.st_ctime; }
+            uid_type uid() const { return this->_sbuf.st_uid; }
+            gid_type gid() const { return this->_sbuf.st_gid; }
+            mode_type mode() const { return this->_sbuf.st_mode; }
+            inode_type inode() const { return this->_sbuf.st_ino; }
+            device_type device() const { return this->_sbuf.st_dev; }
+            blksize_type blksize() const { return this->_sbuf.st_blksize; }
+            blkcnt_type blkcnt() const { return this->_sbuf.st_blocks; }
 
-            std::string &name() { return _path; }
-            std::string basename() const { return _path.basename(); }
-            std::string dirname() const { return _path.dirname(); }
-            type_T type() const { return _type; }
-            bool exists() const { return _exists; }
-
-            void stat()
-            {
-                _exists = ( ::stat(_path.c_str(), &_sbuf) == 0 ? true : false );
-            }
+            std::string &name() { return this->_path; }
+            std::string basename() const { return this->_path.basename(); }
+            std::string dirname() const { return this->_path.dirname(); }
+            type_T type() const { return this->_type; }
+            bool exists() const { return this->_exists; }
 
             virtual void display(std::ostream &) { }
             virtual void open() { }
@@ -146,37 +144,33 @@ namespace util
             typedef std::vector<std::string>::size_type size_type;
 
             file_T() : fileobject_T(FTYPE_FILE), stream(NULL) { }
-            file_T(const std::string &n)
-                : fileobject_T(n, FTYPE_FILE), stream(NULL) { }
-            file_T(const char *n)
-                : fileobject_T(n, FTYPE_FILE), stream(NULL) { }
-            file_T(const std::string &n, std::fstream *s)
-                : fileobject_T(n, FTYPE_FILE), stream(s) { }
-            file_T(const char *n, std::fstream *s)
-                : fileobject_T(n, FTYPE_FILE), stream(s) { }
+            file_T(const path_T &path)
+                : fileobject_T(path, FTYPE_FILE), stream(NULL) { }
+            file_T(const path_T &path, std::fstream *s)
+                : fileobject_T(path, FTYPE_FILE), stream(NULL) { }
             virtual ~file_T() { }
 
-            iterator begin() { return _contents.begin(); }
-            iterator end() { return _contents.end(); }
-            size_type bufsize() const { return _contents.size(); }
-            void push_back(const std::string &s) { _contents.push_back(s); }
+            iterator begin() { return this->_contents.begin(); }
+            iterator end() { return this->_contents.end(); }
+            size_type bufsize() const { return this->_contents.size(); }
+            void push_back(const std::string &s)
+            { this->_contents.push_back(s); }
 
-            virtual void open() { this->open(_path.c_str(), DEFAULT_MODE); }
+            virtual void open()
+            { this->open(this->_path.c_str(), DEFAULT_MODE); }
             virtual void open(const char *n,
                 std::ios_base::openmode mode = DEFAULT_MODE);
             virtual void open(std::ios_base::openmode mode)
-            { this->open(_path.c_str(), mode); }
+            { this->open(this->_path.c_str(), mode); }
 
             virtual void close();
 
-            virtual void read() { this->read(&_contents); }
+            virtual void read() { this->read(&(this->_contents)); }
             virtual void read(std::vector<std::string> *);
 
-            virtual void write() { this->display(*stream); }
+            virtual void write() { this->display(*(this->stream)); }
             virtual void write(const std::vector<std::string> &v)
-            {
-                _contents = v; this->write();
-            }
+            { this->_contents = v; this->write(); }
 
             virtual void display(std::ostream &);
     };
@@ -195,25 +189,21 @@ namespace util
             typedef typename std::vector<C>::const_iterator const_iterator;
             typedef typename std::vector<C>::size_type size_type;
 
-            base_dir_T(const char *n, bool r = false)
-                : fileobject_T(n, FTYPE_DIR), _recurse(r), _dir(NULL)
-            { this->open(); }
-
-            base_dir_T(const std::string &n, bool r = false)
-                : fileobject_T(n, FTYPE_DIR), _recurse(r), _dir(NULL)
+            base_dir_T(const path_T &path, bool r = false)
+                : fileobject_T(path, FTYPE_DIR), _recurse(r), _dir(NULL)
             { this->open(); }
 
             virtual ~base_dir_T() { }
 
             /* small subset of vector methods */
-            iterator begin() { return _contents.begin(); }
-            iterator end() { return _contents.end(); }
-            size_type bufsize() const { return _contents.size(); }
+            iterator begin() { return this->_contents.begin(); }
+            iterator end() { return this->_contents.end(); }
+            size_type bufsize() const { return this->_contents.size(); }
 
             virtual void open();
             virtual void open(const char *n)
             {
-                _path.assign(n);
+                this->_path.assign(n);
                 this->stat();
                 this->open();
             }
@@ -228,11 +218,8 @@ namespace util
     class dirobject_T : public base_dir_T<fileobject_T * >
     {
         public:
-
-            dirobject_T(const char *n, bool r = false)
-                : base_dir_T<fileobject_T * >(n, r) { this->read(); }
-            dirobject_T(const std::string &n, bool r = false)
-                : base_dir_T<fileobject_T * >(n, r) { this->read(); }
+            dirobject_T(const path_T &path, bool r = false)
+                : base_dir_T<fileobject_T * >(path, r) { this->read(); }
             virtual ~dirobject_T();
             virtual void read();
             virtual void display(std::ostream &);
@@ -244,10 +231,8 @@ namespace util
     class dir_T : public base_dir_T<path_T>
     {
         public:
-            dir_T(const char *n, bool r = false)
-                : base_dir_T<path_T>(n, r) { this->read(); }
-            dir_T(const std::string &n, bool r = false) 
-                : base_dir_T<path_T>(n, r) { this->read(); }
+            dir_T(const path_T &path, bool r = false)
+                : base_dir_T<path_T>(path, r) { this->read(); }
             virtual ~dir_T() { }
             virtual void read();
     };

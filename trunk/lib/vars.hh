@@ -34,7 +34,7 @@
 
 namespace util
 {
-    class vars_T : public file_T
+    class vars_T : public util::file_T
     {
         private:
             std::map<std::string, std::string> _keys;
@@ -45,26 +45,27 @@ namespace util
 
             vars_T() { }
 
-            vars_T(const char *path) : file_T(path)
+            vars_T(const char *path) : util::file_T(path)
             {
                 this->open();
                 this->read();
             }
 
-            vars_T(const std::string &path) : file_T(path)
+            vars_T(const std::string &path) : util::file_T(path)
             {
                 this->open();
                 this->read();
             }
 
             /* map subset */
-            size_type count(const std::string &s) { return _keys.count(s); }
-            iterator begin() { return _keys.begin(); }
-            iterator end() { return _keys.end(); }
-            iterator find(const std::string &s) { return _keys.find(s); }
-            void clear() { _keys.clear(); }
+            size_type count(const std::string &s)
+            { return this->_keys.count(s); }
+            iterator begin() { return this->_keys.begin(); }
+            iterator end() { return this->_keys.end(); }
+            iterator find(const std::string &s) { return this->_keys.find(s); }
+            void clear() { this->_keys.clear(); }
             bool empty() const { return (this->size() == 0); }
-            std::string &operator[] (const std::string &s) { return _keys[s]; }
+            std::string &operator[] (const std::string &s) { return this->_keys[s]; }
 
             virtual void read();
             virtual void read(const char *);
