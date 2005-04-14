@@ -31,14 +31,40 @@ int
 action_which_handler_T::operator() (herds_T &null,
                                     std::vector<std::string> &opts)
 {
+    util::color_map_T color;
     const std::string portdir = optget("portdir", std::string);
 
     std::vector<std::string>::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
     {
-        std::string pkg = portage::find_package(portdir, *i);
-        std::cout << portage::ebuild_which(optget("portdir", std::string), pkg)
-            << std::endl;
+        std::string pkg;
+
+        try
+        {
+            pkg = portage::find_package(portdir, *i);
+            
+            std::cout
+                << portage::ebuild_which(optget("portdir", std::string), pkg)
+                << std::endl;
+        }
+        catch (const portage::ambiguous_pkg_E &e)
+        {
+            std::cerr << e.name()
+                << " is ambiguous. Possible matches are: "
+                << std::endl << std::endl;
+            
+            std::vector<std::string>::const_iterator i;
+            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
+            {
+                if (optget("quiet", bool) or not optget("color", bool))
+                    std::cerr << *i << std::endl;
+                else
+                    std::cerr << color[green] << *i << color[none] << std::endl;
+            }
+
+            if (opts.size() == 1)
+                return EXIT_FAILURE;
+        }
     }
 
     return EXIT_SUCCESS;

@@ -583,21 +583,6 @@ main(int argc, char **argv)
 	if (optget("timer", bool))
 	    throw timer_E();
     }
-    catch (const portage::ambiguous_pkg_E &e)
-    {
-	std::cerr << e.name()
-	    << " is ambiguous. Possible matches are: "
-	    << std::endl << std::endl;
-
-	std::vector<std::string>::const_iterator i;
-	for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
-	{
-	    if (optget("quiet", bool) or not optget("color", bool))
-		std::cerr << *i << std::endl;
-	    else
-		std::cerr << color[green] << *i << color[none] << std::endl;
-	}
-    }
     catch (const util::base_E &e)
     {
 	std::cerr << e.what() << std::endl;

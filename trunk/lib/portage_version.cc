@@ -24,20 +24,13 @@
 # include "config.h"
 #endif
 
-#include <iostream>
-#include <vector>
-#include <iterator>
-#include <cstdlib>
-#include <climits>
-#include <cassert>
-
 #ifdef HAVE_STDINT_H
 /* It looks like glibc's stdint.h wraps the UINTMAX_MAX define
  * in a #if !defined __cplusplus || defined __STDC_LIMIT_MACROS,
  * so enable it, as we need it to check the return value of strtoumax(). */
-# ifndef __STDC_LIMIT_MACROS
-#  define __STDC_LIMIT_MACROS
-# endif /* __STDC_LIMIT_MACROS */
+#ifndef __STDC_LIMIT_MACROS
+# define __STDC_LIMIT_MACROS
+#endif /* __STDC_LIMIT_MACROS */
 # include <stdint.h>
 /* don't use strtoumax if UINTMAX_MAX is still unavailable */
 # ifndef UINTMAX_MAX
@@ -48,6 +41,13 @@
 #ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #endif /* HAVE_INTTYPES_H */
+
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <cstdlib>
+#include <climits>
+#include <cassert>
 
 #include "string.hh"
 #include "portage_exceptions.hh"

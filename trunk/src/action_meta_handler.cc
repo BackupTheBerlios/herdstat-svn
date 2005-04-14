@@ -128,8 +128,32 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::string package = portage::find_package(portdir, *i);
-        std::string longdesc, metadata;
+        std::string longdesc, metadata, package;
+
+        try
+        {
+            package = portage::find_package(portdir, *i);
+        }
+        catch (const portage::ambiguous_pkg_E &e)
+        {
+            std::cerr << e.name()
+                << " is ambiguous. Possible matches are: "
+                << std::endl << std::endl;
+            
+            std::vector<std::string>::const_iterator i;
+            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
+            {
+                if (quiet or not optget("color", bool))
+                    std::cerr << *i << std::endl;
+                else
+                    std::cerr << color[green] << *i << color[none] << std::endl;
+            }
+
+            if (opts.size() == 1)
+                return EXIT_FAILURE;
+            else
+                continue;
+        }
 
         /* if no '/' exists, assume it's a category */
         cat = (package.find('/') == std::string::npos);
