@@ -45,6 +45,7 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <memory>
 #include <cstdlib>
 #include <climits>
 #include <cassert>
@@ -399,6 +400,15 @@ portage::version_string_T::split()
 /*****************
  * versions_T    *
  *****************/
+
+portage::versions_T::iterator
+portage::versions_T::find(const std::string &path)
+{
+    portage::version_string_T *v = new portage::version_string_T(path);
+    portage::versions_T::iterator i = this->_vs.find(v);
+    delete v;
+    return i;
+}
 
 bool
 portage::versions_T::insert(const util::path_T &path)

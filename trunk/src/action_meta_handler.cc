@@ -229,7 +229,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
 
             if (not cat)
             {
-                std::string ebuild(portage::ebuild_which(portdir, package));
+                std::string ebuild(portage::ebuild_which(package));
                 ebuild_vars.read(ebuild);
 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
@@ -272,7 +272,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
-                util::vars_T ebuild_vars(portage::ebuild_which(portdir, package));
+                util::vars_T ebuild_vars(portage::ebuild_which(package));
                 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
                     ebuild_vars["HOMEPAGE"] = "none";

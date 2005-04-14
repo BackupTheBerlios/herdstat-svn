@@ -40,9 +40,7 @@ action_which_handler_T::operator() (herds_T &null,
     {
         try
         {
-            *stream << portage::ebuild_which(portdir,
-                portage::find_package(portdir, *i))
-                << std::endl;
+            *stream << portage::ebuild_which(*i) << std::endl;
         }
         catch (const portage::ambiguous_pkg_E &e)
         {

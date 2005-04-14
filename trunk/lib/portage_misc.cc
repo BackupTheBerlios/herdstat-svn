@@ -68,34 +68,90 @@ portage::in_pkg_dir()
     return (ebuild and filesdir);
 }
 
-const char *
-portage::ebuild_which(const std::string &portdir, const std::string &pkg)
+const std::string
+portage::ebuild_which(const std::string &pkg)
 {
-    bool found = false;
-    const util::path_T path(portdir + "/" + pkg);
-    util::dir_T pkgdir(path);
+    std::string package(pkg);
+    bool pfound = false, ofound = false;
     portage::versions_T versions;
+    portage::config_T config;
+    std::vector<std::string> overlays(config.overlays());
+    const std::string portdir(config.portdir());
 
-    for (util::dir_T::iterator d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+    /* search PORTDIR/category/package */
+    if (pkg.find('/') == std::string::npos)
     {
-        util::path_T::size_type pos = d->rfind(".ebuild");
-        if (pos == util::path_T::npos)
-            continue;
-
-        found = true;
-        assert(versions.insert(*d));
+        try
+        {
+            package = portage::find_package(portdir, pkg);
+        }
+        catch (const portage::nonexistent_pkg_E &e)
+        {
+            /* do nothing to prevent it being caught elsewhere */
+        }
     }
 
-    if (not found)
+    if (util::is_dir(portdir + "/" + package))
+    {
+        util::dir_T pkgdir(portdir + "/" + package);
+        util::dir_T::iterator d;
+        for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+        {
+            util::path_T::size_type pos = d->rfind(".ebuild");
+            if (pos == util::path_T::npos)
+                continue;
+
+            pfound = true;
+            assert(versions.insert(*d));
+        }
+    }
+
+    /* check the overlay(s) too */
+    std::vector<std::string>::iterator i;
+    for (i = overlays.begin() ; i != overlays.end() ; ++i)
+    {
+        if (not util::is_dir(*i))
+            continue;
+
+        if (pkg.find('/') == std::string::npos)
+        {
+            try
+            {
+                package = portage::find_package(*i, pkg);
+            }
+            catch (const portage::nonexistent_pkg_E &e)
+            {
+                /* do nothing to prevent it being caught elsewhere */
+            }
+        }
+
+        if (not util::is_dir(*i + "/" + package))
+            continue;
+        
+        util::dir_T pkgdir(*i + "/" + package);
+        util::dir_T::iterator d;
+        for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+        {
+            util::path_T::size_type pos = d->rfind(".ebuild");
+            if (pos == util::path_T::npos)
+                continue;
+
+            ofound = true;
+            /* we don't assert this one because there may be dupes */
+            versions.insert(*d);
+        }
+    }
+
+    if (not pfound and not ofound)
         throw portage::nonexistent_pkg_E(pkg);
 
-    return (path + "/" + (*versions.back())() + ".ebuild").c_str();
+    return versions.back()->ebuild();
 }
 
 const std::string
 portage::find_package(const std::string &portdir, const std::string &pkg)
 {
-    /* if category was specified, just check for existence */
+    /* if category/package was specified, just check for existence */
     if ((pkg.find('/') != std::string::npos) and
         (util::is_dir(portdir + "/" + pkg)))
         return pkg;
@@ -131,7 +187,7 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
  * in an attempt to make the URL readable.
  */
 
-std::string
+const std::string
 portage::parse_homepage(const std::string &homepage, util::vars_T &vars)
 {
     std::string h(homepage);

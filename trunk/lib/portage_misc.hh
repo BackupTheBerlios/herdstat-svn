@@ -33,8 +33,8 @@
 namespace portage
 {
     bool in_pkg_dir();
-    const char *ebuild_which(const std::string &, const std::string &);
-    std::string parse_homepage(const std::string &, util::vars_T &);
+    const std::string ebuild_which(const std::string &);
+    const std::string parse_homepage(const std::string &, util::vars_T &);
     const std::string find_package(const std::string &, const std::string &);
 
     /* represents a list of package categories */
