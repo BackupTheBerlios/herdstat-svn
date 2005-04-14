@@ -118,6 +118,7 @@ namespace portage
 
             const std::string operator() () const;
             const std::string &version() const { return this->_version(); }
+            const std::string &ebuild() const { return this->_ebuild; }
 
             bool operator< (version_string_T &);
             bool operator> (version_string_T &v) { return !(*this < v); }
@@ -179,7 +180,7 @@ namespace portage
             portage::version_string_T *front() { return *(++this->begin()); }
             portage::version_string_T *back() { return *(--this->end()); }
 
-            virtual void insert(const util::path_T &path);
+            virtual bool insert(const util::path_T &path);
     };
 }
 

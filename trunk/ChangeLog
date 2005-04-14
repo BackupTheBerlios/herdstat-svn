@@ -1,5 +1,17 @@
 ChangeLog for herdstat
 
+2005-04-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util.cc, lib/util.hh, lib/file.cc, lib/file.hh: Moved copy_file
+	and move_file to file.{cc,hh}.
+	* src/action_meta_handler.cc, src/action_which_handler.cc,
+	src/herdstat.cc: catch ambiguous_pkg_E and nonexistent_pkg_E in
+	action_{which,meta}_handler instead of main() so we can continue in
+	the opts loop if opts > 1.
+	* lib/file.cc: Use a for loop instead of std::copy and and an
+	ostream_iterator for file_T::display since for some reason it isn't
+	copying the entire vector to the stream.
+
 2005-04-13 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_exceptions.hh: Added ambiguous_pkg_E and
@@ -113,7 +125,7 @@ ChangeLog for herdstat
 
 	* src/metadatas.cc: Fixed bug where new timestamp isnt copied when
 	md5sum fails.
-	* src/action_meta_handler.cc: Don't display colors in the ambigous
+	* src/action_meta_handler.cc: Don't display colors in the ambiguous
 	package warning when --quiet.
 	* src/action_pkg_handler.cc: Fix bug where first package of list was
 	displayed when --count was specified.

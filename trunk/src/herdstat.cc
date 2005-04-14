@@ -246,6 +246,7 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		if (optget("action", options_action_T) != action_unspecified)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_which);
+		optset("parse herds.xml", bool, false);
 		break;
 	    /* --outfile */
 	    case 'o':

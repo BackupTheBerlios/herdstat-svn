@@ -33,18 +33,15 @@ action_which_handler_T::operator() (herds_T &null,
 {
     util::color_map_T color;
     const std::string portdir = optget("portdir", std::string);
+    std::ostream *stream = optget("outstream", std::ostream *);
 
     std::vector<std::string>::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
     {
-        std::string pkg;
-
         try
         {
-            pkg = portage::find_package(portdir, *i);
-            
-            std::cout
-                << portage::ebuild_which(optget("portdir", std::string), pkg)
+            *stream << portage::ebuild_which(portdir,
+                portage::find_package(portdir, *i))
                 << std::endl;
         }
         catch (const portage::ambiguous_pkg_E &e)
@@ -61,6 +58,13 @@ action_which_handler_T::operator() (herds_T &null,
                 else
                     std::cerr << color[green] << *i << color[none] << std::endl;
             }
+
+            if (opts.size() == 1)
+                return EXIT_FAILURE;
+        }
+        catch (const portage::nonexistent_pkg_E &e)
+        {
+            std::cerr << *i << " doesn't seem to exist." << std::endl;
 
             if (opts.size() == 1)
                 return EXIT_FAILURE;

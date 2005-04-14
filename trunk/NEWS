@@ -1,6 +1,16 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.0_alpha:
+    New features:
+     - New --which option comparable to 'equery which' but a bit faster. This
+       feature was too trivial not to add.
+
+    Many, many, many behind-the-scenes changes/refactoring.  All utility/portage
+    code has been moved to its own convenience library.  All utility stuff is
+    still in the 'util' namespace, but the portage code has been put into its
+    own 'portage' namespace.
+
 1.0.2:
     New features:
      - --metadata now shows the package's HOMEPAGE (if it exists in the

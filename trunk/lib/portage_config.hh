@@ -31,6 +31,8 @@
 
 namespace portage
 {
+    const char *portdir();
+
     class config_T : public util::vars_T
     {
         public:
@@ -43,9 +45,10 @@ namespace portage
                 this->read("/etc/make.conf");
                 this->close();
             }
-    };
 
-    const char *portdir();
+            const std::string portdir();
+            const std::vector<std::string> overlays();
+    };
 }
 
 #endif

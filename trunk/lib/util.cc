@@ -109,48 +109,12 @@ util::get_user_from_email(const std::string &email)
 }
 
 /*
- * Copy file from to copy to
- */
-
-void
-util::copy_file(const std::string &from, const std::string &to)
-{
-    /* remove to if it exists */
-    if (util::is_file(to) and (unlink(to.c_str()) != 0))
-	throw util::bad_fileobject_E(to);
-
-    std::auto_ptr<std::ifstream> ffrom(new std::ifstream(from.c_str()));
-    std::auto_ptr<std::ofstream> fto(new std::ofstream(to.c_str()));
-
-    if (not (*ffrom))
-	throw util::bad_fileobject_E(from);
-    if (not (*fto))
-	throw util::bad_fileobject_E(to);
-
-    /* read from ffrom and write to fto */
-    std::copy(std::istream_iterator<std::string>(*ffrom),
-	std::istream_iterator<std::string>(),
-	std::ostream_iterator<std::string>(*fto, "\n"));
-}
-
-/*
- * Copy then remove old
- */
-
-void
-util::move_file(const std::string &from, const std::string &to)
-{
-    util::copy_file(from, to);
-    if (unlink(from.c_str()) != 0)
-	throw util::bad_fileobject_E(from);
-}
-
-/*
  * Try to determine user.  This is used for hilighting occurrences
  * of the user's username in ouput.  ECHANGELOG_USER is checked first
  * since a developer might use a different username than what his
  * developer username is.
  */
+
 std::string
 util::current_user()
 {

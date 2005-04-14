@@ -69,8 +69,16 @@ util::file_T::read(std::vector<std::string> *v)
 void
 util::file_T::display(std::ostream &stream)
 {
-    std::copy(this->_contents.begin(), this->_contents.end(),
-        std::ostream_iterator<std::string>(stream, "\n"));
+    std::vector<std::string>::iterator i;
+    for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
+        stream << *i << std::endl;
+
+    /* for some reason, the below statement only copies some
+     * of the vector....
+     */
+
+//    std::copy(this->_contents.begin(), this->_contents.end(),
+//        std::ostream_iterator<std::string>(stream, "\n"));
 }
 
 void
@@ -277,6 +285,43 @@ const char *
 util::chop_fileext(const std::string &path, unsigned short depth)
 {
     return util::chop_fileext(path.c_str(), depth);
+}
+
+/*
+ * Copy file from to copy to
+ */
+
+void
+util::copy_file(const std::string &from, const std::string &to)
+{
+    /* remove to if it exists */
+    if (util::is_file(to) and (unlink(to.c_str()) != 0))
+	throw util::bad_fileobject_E(to);
+
+    std::auto_ptr<std::ifstream> ffrom(new std::ifstream(from.c_str()));
+    std::auto_ptr<std::ofstream> fto(new std::ofstream(to.c_str()));
+
+    if (not (*ffrom))
+	throw util::bad_fileobject_E(from);
+    if (not (*fto))
+	throw util::bad_fileobject_E(to);
+
+    /* read from ffrom and write to fto */
+    std::string line;
+    while (std::getline(*ffrom, line))
+	*fto << line << std::endl;
+}
+
+/*
+ * Copy then remove old
+ */
+
+void
+util::move_file(const std::string &from, const std::string &to)
+{
+    util::copy_file(from, to);
+    if (unlink(from.c_str()) != 0)
+	throw util::bad_fileobject_E(from);
 }
 
 /* vim: set tw=80 sw=4 et : */

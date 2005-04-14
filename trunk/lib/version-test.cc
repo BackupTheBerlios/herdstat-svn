@@ -77,7 +77,7 @@ int main(int argc, char **argv)
         if (pos == std::string::npos)
             continue;
 
-        versions.insert(*d);
+        assert(versions.insert(*d));
     }
 
     portage::versions_T::iterator v;

@@ -44,4 +44,37 @@ portage::portdir()
     return (portdir.empty() ? "/usr/portage" : portdir.c_str());
 }
 
+/*
+ * Determine PORTDIR
+ */
+
+const std::string
+portage::config_T::portdir()
+{
+    std::string portdir = (*this)["PORTDIR"];
+
+    /* environment overrides all */
+    char *result = std::getenv("PORTDIR");
+    if (result)
+	portdir = result;
+
+    return (portdir.empty() ? "/usr/portage" : portdir);
+}
+
+/*
+ * Determine PORTDIR_OVERLAY
+ */
+
+const std::vector<std::string>
+portage::config_T::overlays()
+{
+    util::string overlays = (*this)["PORTDIR_OVERLAY"];
+
+    char *result = std::getenv("PORTDIR_OVERLAY");
+    if (result)
+        overlays = result;
+
+    return overlays.split();
+}
+
 /* vim: set tw=80 sw=4 et : */

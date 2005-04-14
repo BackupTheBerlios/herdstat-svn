@@ -400,7 +400,7 @@ portage::version_string_T::split()
  * versions_T    *
  *****************/
 
-void
+bool
 portage::versions_T::insert(const util::path_T &path)
 {
     portage::version_string_T *v = new portage::version_string_T(path);
@@ -409,10 +409,14 @@ portage::versions_T::insert(const util::path_T &path)
 //        << (*v)() << std::endl;
     
     std::pair<iterator, bool> p = this->_vs.insert(v);
-    assert(p.second);
+    
+    if (not p.second)
+        delete v;
 
 //    std::cout << "versions_T::insert ===> successfully inserted "
 //        << (*v)() << std::endl;
+
+    return p.second;
 }
 
 portage::versions_T::~versions_T()

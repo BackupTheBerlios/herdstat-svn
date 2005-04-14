@@ -154,6 +154,15 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
             else
                 continue;
         }
+        catch (const portage::nonexistent_pkg_E &e)
+        {
+            std::cerr << *i << " doesn't seem to exist." << std::endl;
+
+            if (opts.size() == 1)
+                return EXIT_FAILURE;
+            else
+                continue;
+        }
 
         /* if no '/' exists, assume it's a category */
         cat = (package.find('/') == std::string::npos);

@@ -70,8 +70,6 @@ namespace util
     bool md5check(const std::string &, const std::string &);
     std::string getcwd();
     std::string get_user_from_email(const std::string &);
-    void copy_file(const std::string &, const std::string &);
-    void move_file(const std::string &, const std::string &);
     std::string current_user();
     std::string::size_type getcols();
     int fetch(const std::string &, const std::string &, bool);

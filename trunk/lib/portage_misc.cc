@@ -83,7 +83,7 @@ portage::ebuild_which(const std::string &portdir, const std::string &pkg)
             continue;
 
         found = true;
-        versions.insert(*d);
+        assert(versions.insert(*d));
     }
 
     if (not found)

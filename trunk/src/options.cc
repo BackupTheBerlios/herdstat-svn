@@ -59,7 +59,6 @@ options_T::option_map_T::set_defaults()
     insert_opt("maxcol", static_cast<std::size_t>(78));
 
     insert_opt("with-herd", std::string(""));
-    insert_opt("portdir", std::string(portage::portdir()));
     insert_opt("outfile", std::string("stdout"));
     insert_opt("herds.xml",
         std::string("http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"));
@@ -70,6 +69,10 @@ options_T::option_map_T::set_defaults()
         static_cast<options_action_T>(action_unspecified));
 
     insert_opt("locale", std::locale::classic().name());
+
+    /* portage options */
+    portage::config_T config;
+    insert_opt("portdir", config.portdir());
 }
 
 /* vim: set tw=80 sw=4 et : */

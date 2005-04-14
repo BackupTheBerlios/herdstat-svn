@@ -57,6 +57,8 @@ namespace util
     const char *dirname(std::string const &);
     const char *chop_fileext(const char *, unsigned short depth = 1);
     const char *chop_fileext(const std::string &, unsigned short depth = 1);
+    void copy_file(const std::string &, const std::string &);
+    void move_file(const std::string &, const std::string &);
 
     enum type_T { FTYPE_FILE, FTYPE_DIR };
 
