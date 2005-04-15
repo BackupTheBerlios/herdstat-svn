@@ -37,6 +37,8 @@ namespace util
     class vars_T : public util::file_T
     {
         private:
+            void subst();
+
             std::map<std::string, std::string> _keys;
 
         public:
@@ -49,12 +51,14 @@ namespace util
             {
                 this->open();
                 this->read();
+                this->subst();
             }
 
             vars_T(const std::string &path) : util::file_T(path)
             {
                 this->open();
                 this->read();
+                this->subst();
             }
 
             /* map subset */

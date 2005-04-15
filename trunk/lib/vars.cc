@@ -24,16 +24,19 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <cassert>
 
 #include "vars.hh"
 #include "util_exceptions.hh"
+#include "portage_version.hh"
 
 void
 util::vars_T::read(const char *path)
 {
     this->_path.assign(path);
     this->read();
+    this->subst();
 }
 
 void
@@ -41,6 +44,7 @@ util::vars_T::read(const std::string &path)
 {
     this->_path.assign(path);
     this->read();
+    this->subst();
 }
 
 void
@@ -86,6 +90,89 @@ util::vars_T::read()
             }
  
             this->_keys[key] = val;
+        }
+    }
+}
+
+/*
+ * Loop through our map, performing any substitutions
+ * on any variable occurences.
+ */
+
+void
+util::vars_T::subst()
+{
+    std::cout << "!!! Performing variable substitutions in " << this->name() << std::endl;
+
+    /* if we're operating on an ebuild, insert variable
+     * components ($P, $PN, etc) into our map */
+    if (this->name().rfind(".ebuild") != util::path_T::npos)
+    {
+        portage::version_string_T version(this->name());
+        portage::version_string_T::iterator v;
+
+        for (v = version.begin() ; v != version.end() ; ++v)
+            this->_keys[v->first] = v->second;
+    }
+
+    for (iterator i = this->_keys.begin() ; i != this->_keys.end() ; ++i)
+    {
+        std::string *value(&(i->second));
+
+        std::cout << i->first << " = " << i->second << std::endl;
+
+        if (value->find("${") != std::string::npos)
+        {
+            std::vector<std::string> vars;
+            std::vector<std::string>::iterator v;
+            std::string::size_type lpos = 0;
+
+            /* find variables that need substituting */
+            while (true)
+            {
+                std::string::size_type begin = value->find("${", lpos);
+                if (begin == std::string::npos)
+                    break;
+
+                std::string::size_type end = value->find("}", begin);
+                if (end == std::string::npos)
+                    break;
+
+                /* don't try to replace escaped variables */
+//                if ((begin > 0) and (value->at(begin - 1) == '\\'))
+//                {
+//                    lpos == ++end;
+//                    continue;
+//                }
+
+                /* save it */
+                vars.push_back(value->substr(begin + 2, end - (begin + 2)));
+                lpos = ++end;
+            }
+
+            /* for each variable we found */
+            for (v = vars.begin() ; v != vars.end() ; ++v)
+            {
+                std::string subst;
+                std::string var("${"+(*v)+"}");
+
+                std::string::size_type pos = value->find(var);
+                if (pos == std::string::npos)
+                    continue;
+
+//                std::cout << "Found variable " << var << std::endl;
+
+                /* is that variable defined? */
+                iterator x = this->find(*v);
+                if (x != this->end())
+                {
+                    subst = x->second;
+                    std::cout << "Found value '" << subst << "'." << std::endl;
+                }
+
+                if (not subst.empty())
+                    value->replace(pos, var.length(), subst, 0, subst.length());
+            }
         }
     }
 }
