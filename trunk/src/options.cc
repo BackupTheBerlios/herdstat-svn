@@ -54,15 +54,11 @@ options_T::option_map_T::set_defaults()
     insert_opt("dev", false);
     insert_opt("count", false);
     insert_opt("color", true);
-    insert_opt("parse herds.xml", true);
 
     insert_opt("maxcol", static_cast<std::size_t>(78));
 
     insert_opt("with-herd", std::string(""));
     insert_opt("outfile", std::string("stdout"));
-    insert_opt("herds.xml",
-        std::string("http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"));
-    
     insert_opt("outstream", &std::cout);
 
     insert_opt("action",
