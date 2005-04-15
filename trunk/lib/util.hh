@@ -67,6 +67,7 @@ enum color_name_T
 
 namespace util
 {
+    void debug(const char *, ...);
     bool md5check(const std::string &, const std::string &);
     std::string getcwd();
     std::string get_user_from_email(const std::string &);

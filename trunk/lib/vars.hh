@@ -29,6 +29,7 @@
 
 #include <fstream>
 #include <string>
+#include <utility>
 #include <map>
 #include "file.hh"
 
@@ -37,8 +38,9 @@ namespace util
     class vars_T : public util::file_T
     {
         private:
-            void subst();
+            void subst(std::string &);
 
+            bool _ebuild;
             std::map<std::string, std::string> _keys;
 
         public:
@@ -46,19 +48,10 @@ namespace util
             typedef std::map<std::string, std::string>::iterator iterator;
 
             vars_T() { }
-
-            vars_T(const char *path) : util::file_T(path)
+            vars_T(const util::path_T &path) : util::file_T(path)
             {
                 this->open();
                 this->read();
-                this->subst();
-            }
-
-            vars_T(const std::string &path) : util::file_T(path)
-            {
-                this->open();
-                this->read();
-                this->subst();
             }
 
             /* map subset */
@@ -72,8 +65,7 @@ namespace util
             std::string &operator[] (const std::string &s) { return this->_keys[s]; }
 
             virtual void read();
-            virtual void read(const char *);
-            virtual void read(const std::string &);
+            virtual void read(const util::path_T &);
     };
 }
 

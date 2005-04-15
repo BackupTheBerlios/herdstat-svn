@@ -30,21 +30,13 @@
 #include "vars.hh"
 #include "util_exceptions.hh"
 #include "portage_version.hh"
+#include "util.hh"
 
 void
-util::vars_T::read(const char *path)
+util::vars_T::read(const util::path_T &path)
 {
     this->_path.assign(path);
     this->read();
-    this->subst();
-}
-
-void
-util::vars_T::read(const std::string &path)
-{
-    this->_path.assign(path);
-    this->read();
-    this->subst();
 }
 
 /*
@@ -99,33 +91,14 @@ util::vars_T::read()
             this->_keys[key] = val;
         }
     }
-}
 
-template <class T> void
-do_subst(const std::string &value, T &container)
-{
+    /* are we an ebuild? */
+    this->_ebuild = ((this->name().length() > 7) and
+            (this->name().substr(this->name().length() - 7) == ".ebuild"));
 
-}
-
-/*
- * Loop through our map, doing our best to performing any
- * substitutions on variable occurences.  Obviously won't
- * work for variables defined elsewhere (only exceptions
- * being version components (${P}, ${PN}, etc) in ebuilds).
- */
-
-void
-util::vars_T::subst()
-{
-    std::cout << "!!! Performing variable substitutions in "
-        << this->name() << std::endl;
-
-    bool ebuild = (this->name().length() > 7 and
-        this->name().substr(this->name().length() - 7) == ".ebuild");
-
-    /* if we're operating on an ebuild, insert variable
-     * components ($P, $PN, etc) into our map */
-    if (ebuild)
+    /* if so, insert its variable components
+     * (${P}, ${PN}, ${PV}, etc) into our map */
+    if (this->_ebuild)
     {
         portage::version_string_T version(this->name());
         portage::version_string_T::iterator v;
@@ -134,60 +107,68 @@ util::vars_T::subst()
             this->_keys[v->first] = v->second;
     }
 
+    /* loop through our map performing variable substitutions */
     for (iterator i = this->_keys.begin() ; i != this->_keys.end() ; ++i)
+        this->subst(i->second);
+}
+
+/*
+ * Search the given variable value for any variable occurrences,
+ * recursively calling ourselves each time we find another occurrence.
+ */
+
+void
+util::vars_T::subst(std::string &value)
+{
+    if (value.find("${") != std::string::npos)
     {
-        std::string *value(&(i->second));
+        std::vector<std::string> vars;
+        std::vector<std::string>::iterator v;
+        std::string::size_type lpos = 0;
 
-        if (ebuild)
-            std::cout << i->first << " = " << i->second << std::endl;
-
-        if (value->find("${") != std::string::npos)
+        /* find variables that need substituting */
+        while (true)
         {
-            std::vector<std::string> vars;
-            std::vector<std::string>::iterator v;
-            std::string::size_type lpos = 0;
+            std::string::size_type begin = value.find("${", lpos);
+            if (begin == std::string::npos)
+                break;
 
-            /* find variables that need substituting */
-            while (true)
+            std::string::size_type end = value.find("}", begin);
+            if (end == std::string::npos)
+                break;
+
+            /* save it */
+            vars.push_back(value.substr(begin + 2, end - (begin + 2)));
+            lpos = ++end;
+        }
+
+        /* for each variable we found */
+        for (v = vars.begin() ; v != vars.end() ; ++v)
+        {
+            std::string subst;
+            std::string var("${"+(*v)+"}");
+
+            std::string::size_type pos = value.find(var);
+            if (pos == std::string::npos)
+                continue;
+
+            if (this->_ebuild)
+                util::debug("Found variable '%s'", var.c_str());
+
+            /* is that variable defined? */
+            iterator x = this->find(*v);
+            if (x != this->end())
             {
-                std::string::size_type begin = value->find("${", lpos);
-                if (begin == std::string::npos)
-                    break;
-
-                std::string::size_type end = value->find("}", begin);
-                if (end == std::string::npos)
-                    break;
-
-                /* save it */
-                vars.push_back(value->substr(begin + 2, end - (begin + 2)));
-                lpos = ++end;
+                subst = x->second;
+                if (this->_ebuild)
+                    util::debug("Found value '%s'", subst.c_str());
             }
 
-            /* for each variable we found */
-            for (v = vars.begin() ; v != vars.end() ; ++v)
-            {
-                std::string subst;
-                std::string var("${"+(*v)+"}");
+            if (subst.find("${") != std::string::npos)
+                this->subst(subst);
 
-                std::string::size_type pos = value->find(var);
-                if (pos == std::string::npos)
-                    continue;
-
-                if (ebuild)
-                    std::cout << "Found variable " << var << std::endl;
-
-                /* is that variable defined? */
-                iterator x = this->find(*v);
-                if (x != this->end())
-                {
-                    subst = x->second;
-                    if (ebuild)
-                        std::cout << "Found value '" << subst << "'." << std::endl;
-                }
-
-                if (not subst.empty())
-                    value->replace(pos, var.length(), subst, 0, subst.length());
-            }
+            if (not subst.empty())
+                value.replace(pos, var.length(), subst, 0, subst.length());
         }
     }
 }

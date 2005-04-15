@@ -243,11 +243,10 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             {
                 if (not cat)
                 {
-                    if (quiet and ebuild_vars["DESCRIPTION"].empty())
+                    if (ebuild_vars["DESCRIPTION"].empty())
                         ebuild_vars["DESCRIPTION"] = "none";
                     
-                    if (not ebuild_vars["DESCRIPTION"].empty());
-                        output("Description", ebuild_vars["DESCRIPTION"]);
+                    output("Description", ebuild_vars["DESCRIPTION"]);
                 }
                 else
                     output("Description", "none");

@@ -26,26 +26,31 @@
 
 #include <iostream>
 #include <string>
-#include <map>
-#include <memory>
-#include <algorithm>
-#include <iterator>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <cstdarg>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
 
 #include "util.hh"
 
 util::color_map_T::cmap util::color_map_T::cm;
 
+void
+util::debug(const char *msg, ...)
+{
+#ifdef DEBUG
+    va_list v;
+    va_start(v, msg);
+
+    std::string s(util::sprintf(msg, v));
+    std::cerr << "!!! " << s << std::endl;
+    
+    va_end(v);
+#endif /* DEBUG */
+}
+
 /*
- * Compare the md5sum of two files returning true if they match.
+ * Compare the md5sum of two files, returning true if they match.
  */
 
 bool
