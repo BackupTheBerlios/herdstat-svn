@@ -77,6 +77,12 @@ namespace util
             /* same as util::string::split but with a diff default delim */
             virtual std::vector<std::string> split(const char delim = '/')
             { return util::string::split(delim); }
+
+            bool exists() const
+            {
+                struct stat s;
+                return stat(this->c_str(), &s) == 0;
+            }
     };
 
     /* generic file object */
