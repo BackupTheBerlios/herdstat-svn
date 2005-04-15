@@ -109,7 +109,7 @@ util::vars_T::read()
 
     /* loop through our map performing variable substitutions */
     for (iterator i = this->_keys.begin() ; i != this->_keys.end() ; ++i)
-        this->subst(i->second);
+        this->subst(i->first, i->second);
 }
 
 /*
@@ -118,7 +118,7 @@ util::vars_T::read()
  */
 
 void
-util::vars_T::subst(std::string &value)
+util::vars_T::subst(const std::string &key, std::string &value)
 {
     if (value.find("${") != std::string::npos)
     {
@@ -138,7 +138,8 @@ util::vars_T::subst(std::string &value)
                 break;
 
             /* save it */
-            vars.push_back(value.substr(begin + 2, end - (begin + 2)));
+            if (value.substr(begin + 2, end - (begin + 2)) != key)
+                vars.push_back(value.substr(begin + 2, end - (begin + 2)));
             lpos = ++end;
         }
 
@@ -152,20 +153,20 @@ util::vars_T::subst(std::string &value)
             if (pos == std::string::npos)
                 continue;
 
-            if (this->_ebuild)
-                util::debug("Found variable '%s'", var.c_str());
+//            if (this->_ebuild)
+//                util::debug("Found variable '%s'", var.c_str());
 
             /* is that variable defined? */
             iterator x = this->find(*v);
             if (x != this->end())
             {
                 subst = x->second;
-                if (this->_ebuild)
-                    util::debug("Found value '%s'", subst.c_str());
+//                if (this->_ebuild)
+//                    util::debug("Found value '%s'", subst.c_str());
             }
 
             if (subst.find("${") != std::string::npos)
-                this->subst(subst);
+                this->subst(*v, subst);
 
             if (not subst.empty())
                 value.replace(pos, var.length(), subst, 0, subst.length());

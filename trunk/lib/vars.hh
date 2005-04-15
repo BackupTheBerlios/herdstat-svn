@@ -38,7 +38,7 @@ namespace util
     class vars_T : public util::file_T
     {
         private:
-            void subst(std::string &);
+            void subst(const std::string &, std::string &);
 
             bool _ebuild;
             std::map<std::string, std::string> _keys;

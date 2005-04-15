@@ -98,70 +98,71 @@ _herdstat() {
 	    local x dev=0 pkg=0 meta=0 which=0
 	    for x in ${COMP_WORDS[@]} ; do
                 # dev
-		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
+		if [[ ${x} == -* ]] && [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
 		    dev=1
                 fi
 
                 # package
-                if [[ ${x} == -*p* ]] ; then
+                if [[ ${x} == -* && ${x} == *p* ]] ; then
                     pkg=1
 		fi
 
                 # metadata
-                if [[ ${x} == *m* && ${x} != "--timer" ]] && \
-                   [[ ${x} != "--herdsxml" ]]
+                if [[ ${x} == -* && ${x} != "--herdsxml" ]] && \
+                    [[ ${x} == *m* && ${x} != "--timer" ]]
                 then
                     meta=1
-                elif [[ ${x} == *w* && ${x} != "--with-herd" ]] ; then
+                elif [[ ${x} == -* ]] && \
+                     [[ ${x} == *w* && ${x} != "--with-herd" ]] ; then
                     which=1
                 fi
 	    done
 
 	    if [[ ${dev} -eq 1 && ${pkg} -eq 1 ]] ; then
 		    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts}" -- ${cur}) )
-        elif [[ ${dev} -eq 1 ]] ; then
+            elif [[ ${dev} -eq 1 ]] ; then
 		    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts} all" -- ${cur}) )
-        elif [[ ${pkg} -eq 1 ]] ; then
-            COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts}" -- ${cur}) )
-        elif [[ ${meta} -eq 1 || ${which} -eq 1 ]] ; then
-            local words p=$(_portdir)
+            elif [[ ${pkg} -eq 1 ]] ; then
+                COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts}" -- ${cur}) )
+            elif [[ ${meta} -eq 1 || ${which} -eq 1 ]] ; then
+                local words p=$(_portdir)
             
-            [[ -d ${p} ]] || return 0
+                [[ -d ${p} ]] || return 0
 
-            if [[ ${cur} == */* ]] ; then
-                words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
-            elif [[ ${cur} == "" ]] ; then
-                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
-                # --metadata can complete on categories only (no / suffix)
-                [[ ${meta} -eq 1 ]] && \
-                    words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
-            else
-                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur)"
-                # --metadata can complete on categories only (no / suffix)
-                [[ ${meta} -eq 1 ]] && \
+                if [[ ${cur} == */* ]] ; then
+                    words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+                elif [[ ${cur} == "" ]] ; then
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
+                    # --metadata can complete on categories only (no / suffix)
+                    [[ ${meta} -eq 1 ]] && \
                         words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
-            fi
+                else
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur)"
+                    # --metadata can complete on categories only (no / suffix)
+                    [[ ${meta} -eq 1 ]] && \
+                        words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
+                fi
                 
-            local i n=0
-            for i in ${words} ; do
-                [[ ${i} == ${cur}* ]] && n=$((n+1))
-            done
+                local i n=0
+                for i in ${words} ; do
+                    [[ ${i} == ${cur}* ]] && n=$((n+1))
+                done
 
-            if [[ ${n} -eq 1 ]] ; then
-                words=$(builtin cd ${p} ; compgen -G "*-*/*")
-            fi
+                if [[ ${n} -eq 1 ]] ; then
+                    words=$(builtin cd ${p} ; compgen -G "*-*/*")
+                fi
 
-            COMPREPLY=($(for x in ${words} ; do \
+                COMPREPLY=($(for x in ${words} ; do \
                         [[ ${x} == ${cur}* ]] && echo ${x} ; \
                     done))
 
-            if [[ -z "${COMPREPLY}" ]] ; then
-                COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
-                    for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
-                done)" -- $cur) )
-            fi
+                if [[ -z "${COMPREPLY}" ]] ; then
+                    COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
+                        for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                        done)" -- $cur) )
+                fi
 	    else
-		    COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts} all" -- ${cur}) )
+		COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts} all" -- ${cur}) )
 	    fi
 	    ;;
     esac
