@@ -165,6 +165,9 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
         if (*c == pkg)
             return pkg;
 
+        if (not util::is_dir(portdir + "/" + (*c)))
+            continue;
+
         util::dir_T category(portdir + "/" + (*c));
         util::dir_T::iterator d;
 
