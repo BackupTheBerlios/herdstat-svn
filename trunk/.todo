@@ -12,6 +12,9 @@
             Use dev-perl/Date-Leapyear as a test case.
         </note>
     </note>
+    <note priority="veryhigh" time="1113568219">
+        Use portage::config_T as an actual option instead of portdir, etc
+    </note>
     <note priority="medium" time="1113548810">
         IDEA: maybe make a --summary option for the package handler that prints total # of pkgs, #pkgs per category, etc
     </note>

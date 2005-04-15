@@ -47,6 +47,13 @@ util::vars_T::read(const std::string &path)
     this->subst();
 }
 
+/*
+ * Read from our stream, saving any VARIABLE=["']value['"]
+ * statements in our map.  Lines beginning with a '#'
+ * are considered to be comments.  Should work with shell
+ * scripts or VARIABLE=value-type configuration files.
+ */
+
 void
 util::vars_T::read()
 {
@@ -94,19 +101,31 @@ util::vars_T::read()
     }
 }
 
+template <class T> void
+do_subst(const std::string &value, T &container)
+{
+
+}
+
 /*
- * Loop through our map, performing any substitutions
- * on any variable occurences.
+ * Loop through our map, doing our best to performing any
+ * substitutions on variable occurences.  Obviously won't
+ * work for variables defined elsewhere (only exceptions
+ * being version components (${P}, ${PN}, etc) in ebuilds).
  */
 
 void
 util::vars_T::subst()
 {
-    std::cout << "!!! Performing variable substitutions in " << this->name() << std::endl;
+    std::cout << "!!! Performing variable substitutions in "
+        << this->name() << std::endl;
+
+    bool ebuild = (this->name().length() > 7 and
+        this->name().substr(this->name().length() - 7) == ".ebuild");
 
     /* if we're operating on an ebuild, insert variable
      * components ($P, $PN, etc) into our map */
-    if (this->name().rfind(".ebuild") != util::path_T::npos)
+    if (ebuild)
     {
         portage::version_string_T version(this->name());
         portage::version_string_T::iterator v;
@@ -119,7 +138,8 @@ util::vars_T::subst()
     {
         std::string *value(&(i->second));
 
-        std::cout << i->first << " = " << i->second << std::endl;
+        if (ebuild)
+            std::cout << i->first << " = " << i->second << std::endl;
 
         if (value->find("${") != std::string::npos)
         {
@@ -138,13 +158,6 @@ util::vars_T::subst()
                 if (end == std::string::npos)
                     break;
 
-                /* don't try to replace escaped variables */
-//                if ((begin > 0) and (value->at(begin - 1) == '\\'))
-//                {
-//                    lpos == ++end;
-//                    continue;
-//                }
-
                 /* save it */
                 vars.push_back(value->substr(begin + 2, end - (begin + 2)));
                 lpos = ++end;
@@ -160,14 +173,16 @@ util::vars_T::subst()
                 if (pos == std::string::npos)
                     continue;
 
-//                std::cout << "Found variable " << var << std::endl;
+                if (ebuild)
+                    std::cout << "Found variable " << var << std::endl;
 
                 /* is that variable defined? */
                 iterator x = this->find(*v);
                 if (x != this->end())
                 {
                     subst = x->second;
-                    std::cout << "Found value '" << subst << "'." << std::endl;
+                    if (ebuild)
+                        std::cout << "Found value '" << subst << "'." << std::endl;
                 }
 
                 if (not subst.empty())
