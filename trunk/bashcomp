@@ -2,6 +2,32 @@
 # bash command line completion for herdstat.
 # Author: Aaron Walker <ka0ttic@gentoo.org>
 
+_complete_herd()
+{
+    if [[ -f /var/lib/herdstat/herds ]] &&
+        [[ $(stat /var/lib/herdstat/herds | sed -n -e 's/^Modify: \([[:digit:]]\+-[[:digit:]]\+-[[:digit:]]\+\).*$/\1/p') == "$(date +%F)" ]]
+    then
+        echo $(< /var/lib/herdstat/herds)
+    else
+        local herds=$(herdstat -q all 2>/dev/null)
+        echo ${herds} > /var/lib/herdstat/herds
+        echo ${herds}
+    fi
+}
+
+_complete_dev()
+{
+    if [[ -f /var/lib/herdstat/devs ]] &&
+        [[ $(stat /var/lib/herdstat/devs | sed -n -e 's/^Modify: \([[:digit:]]\+-[[:digit:]]\+-[[:digit:]]\+\).*$/\1/p') == "$(date +%F)" ]]
+    then
+        echo $(< /var/lib/herdstat/devs)
+    else
+        local devs=$(herdstat -dq all 2>/dev/null)
+        echo ${devs} > /var/lib/herdstat/devs
+        echo ${devs}
+    fi
+}
+
 _herdstat() {
     local cur prev opts
     COMPREPLY=()
@@ -16,7 +42,7 @@ _herdstat() {
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 	    return 0
     elif [[ ${COMP_CWORD} -eq 1 ]] ; then
-	    COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" -- ${cur}) )
+	    COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts} all" -- ${cur}) )
 	    return 0
     fi
 
@@ -25,10 +51,10 @@ _herdstat() {
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
 	    ;;
 	-d|--dev)
-	    COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" -- ${cur}) )
+	    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts} all" -- ${cur}) )
 	    ;;
         --with-herd)
-            COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) no-herd" -- ${cur}))
+            COMPREPLY=( $(compgen -W "$(_complete_herd) no-herd" -- ${cur}))
             ;;
         -m|--metadata|-w|--which)
             local words p=$(_portdir)
@@ -92,54 +118,50 @@ _herdstat() {
 	    done
 
 	    if [[ ${dev} -eq 1 && ${pkg} -eq 1 ]] ; then
-		COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts}" \
-                    -- ${cur}) )
-            elif [[ ${dev} -eq 1 ]] ; then
-		COMPREPLY=( $(compgen -W "$(herdstat -dq all 2>/dev/null) ${opts} all" \
-                    -- ${cur}) )
-            elif [[ ${pkg} -eq 1 ]] ; then
-                COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts}" \
-                    -- ${cur}) )
-            elif [[ ${meta} -eq 1 || ${which} -eq 1 ]] ; then
-                local words p=$(_portdir)
+		    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts}" -- ${cur}) )
+        elif [[ ${dev} -eq 1 ]] ; then
+		    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts} all" -- ${cur}) )
+        elif [[ ${pkg} -eq 1 ]] ; then
+            COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts}" -- ${cur}) )
+        elif [[ ${meta} -eq 1 || ${which} -eq 1 ]] ; then
+            local words p=$(_portdir)
             
-                [[ -d ${p} ]] || return 0
+            [[ -d ${p} ]] || return 0
 
-                if [[ ${cur} == */* ]] ; then
-                    words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
-                elif [[ ${cur} == "" ]] ; then
-                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
-                    # --metadata can complete on categories only (no / suffix)
-                    [[ ${meta} -eq 1 ]] && \
+            if [[ ${cur} == */* ]] ; then
+                words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
+            elif [[ ${cur} == "" ]] ; then
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
+                # --metadata can complete on categories only (no / suffix)
+                [[ ${meta} -eq 1 ]] && \
+                    words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
+            else
+                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur)"
+                # --metadata can complete on categories only (no / suffix)
+                [[ ${meta} -eq 1 ]] && \
                         words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
-                else
-                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur)"
-                    # --metadata can complete on categories only (no / suffix)
-                    [[ ${meta} -eq 1 ]] && \
-                        words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
-                fi
+            fi
                 
-                local i n=0
-                for i in ${words} ; do
-                    [[ ${i} == ${cur}* ]] && n=$((n+1))
-                done
+            local i n=0
+            for i in ${words} ; do
+                [[ ${i} == ${cur}* ]] && n=$((n+1))
+            done
 
-                if [[ ${n} -eq 1 ]] ; then
-                    words=$(builtin cd ${p} ; compgen -G "*-*/*")
-                fi
+            if [[ ${n} -eq 1 ]] ; then
+                words=$(builtin cd ${p} ; compgen -G "*-*/*")
+            fi
 
-                COMPREPLY=($(for x in ${words} ; do \
-                            [[ ${x} == ${cur}* ]] && echo ${x} ; \
-                        done))
+            COMPREPLY=($(for x in ${words} ; do \
+                        [[ ${x} == ${cur}* ]] && echo ${x} ; \
+                    done))
 
-                if [[ -z "${COMPREPLY}" ]] ; then
-                    COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
-                        for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
-                    done)" -- $cur) )
-                fi
+            if [[ -z "${COMPREPLY}" ]] ; then
+                COMPREPLY=( $(compgen -W "$(builtin cd ${p}; \
+                    for x in *-*/${cur}* ; do [[ -d $x ]] && echo ${x##*/} ;
+                done)" -- $cur) )
+            fi
 	    else
-		COMPREPLY=( $(compgen -W "$(herdstat -q all 2>/dev/null) ${opts} all" \
-                    -- ${cur}) )
+		    COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts} all" -- ${cur}) )
 	    fi
 	    ;;
     esac
