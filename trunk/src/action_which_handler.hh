@@ -32,8 +32,7 @@
 class action_which_handler_T : public action_handler_T
 {
     public:
-        action_which_handler_T() { }
-        virtual int operator() (herds_T &, std::vector<std::string> &);
+        virtual int operator() (std::vector<std::string> &);
 };
 
 #endif

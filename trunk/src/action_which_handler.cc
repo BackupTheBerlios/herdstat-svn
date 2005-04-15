@@ -28,8 +28,7 @@
 #include "action_which_handler.hh"
 
 int
-action_which_handler_T::operator() (herds_T &null,
-                                    std::vector<std::string> &opts)
+action_which_handler_T::operator() (std::vector<std::string> &opts)
 {
     util::color_map_T color;
     const std::string portdir = optget("portdir", std::string);

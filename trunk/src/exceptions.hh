@@ -30,6 +30,7 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
 #include <cerrno>
@@ -129,7 +130,18 @@ class bad_fileobject_E                  : public errno_error_E
 
 class bad_herdsXML_E                    : public herdstat_base_E { };
 
-class timer_E                           : public herdstat_base_E { };
+class timer_E                           : public herdstat_base_E
+{
+    private:
+        long _ms;
+
+    public:
+        timer_E(long ms) : herdstat_base_E(), _ms(ms) { }
+        virtual const char *what() const throw()
+        {
+            return util::sprintf("%ld", _ms).c_str();
+        }
+};
 
 /* action handler exceptions */
 class action_E                          : public herdstat_base_E { };

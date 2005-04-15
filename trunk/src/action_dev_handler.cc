@@ -30,9 +30,7 @@
 #include <memory>
 
 #include "common.hh"
-#include "herds.hh"
-#include "xmlparser.hh"
-#include "herds_xml_handler.hh"
+#include "herds_xml.hh"
 #include "formatter.hh"
 #include "action_dev_handler.hh"
 
@@ -42,8 +40,7 @@
  */
 
 int
-action_dev_handler_T::operator() (herds_T &herds_xml,
-                                  std::vector<std::string> &devs)
+action_dev_handler_T::operator() (std::vector<std::string> &devs)
 {
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
@@ -58,6 +55,8 @@ action_dev_handler_T::operator() (herds_T &herds_xml,
 
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
+
+    herds_xml_T herds_xml;
 
     herds_T::iterator h;
 

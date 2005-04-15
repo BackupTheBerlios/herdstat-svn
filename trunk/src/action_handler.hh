@@ -28,13 +28,11 @@
 #endif
 
 #include <vector>
-#include <cstdlib>
-#include "herds.hh"
 
 class action_handler_T
 {
     public:
-        virtual int operator() (herds_T &, std::vector<std::string> &) = 0;
+        virtual int operator() (std::vector<std::string> &) = 0;
 };
 
 #endif

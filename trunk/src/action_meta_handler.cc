@@ -44,8 +44,7 @@
 #include "action_meta_handler.hh"
 
 int
-action_meta_handler_T::operator() (herds_T &herds_xml,
-                                    std::vector<std::string> &opts)
+action_meta_handler_T::operator() (std::vector<std::string> &opts)
 {
     util::color_map_T color;
     formatter_T output;
@@ -236,11 +235,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                     ebuild_vars["HOMEPAGE"] = "none";
 
                 if (not ebuild_vars["HOMEPAGE"].empty())
-                {
-                    output("Homepage",
-                        portage::parse_homepage(ebuild_vars["HOMEPAGE"],
-                            ebuild_vars));
-                }
+                    output("Homepage", ebuild_vars["HOMEPAGE"]);
             }
 
             /* long description */
@@ -278,11 +273,7 @@ action_meta_handler_T::operator() (herds_T &herds_xml,
                     ebuild_vars["HOMEPAGE"] = "none";
 
                 if (not ebuild_vars["HOMEPAGE"].empty())
-                {
-                    output("Homepage",
-                        portage::parse_homepage(ebuild_vars["HOMEPAGE"],
-                        ebuild_vars));
-                }
+                    output("Homepage", ebuild_vars["HOMEPAGE"]);
 
                 if (quiet and ebuild_vars["DESCRIPTION"].empty())
                     ebuild_vars["DESCRIPTION"] = "none";

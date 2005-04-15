@@ -36,8 +36,8 @@
 
 #include "common.hh"
 #include "metadatas.hh"
+#include "herds_xml.hh"
 #include "metadata_xml_handler.hh"
-#include "herds_xml_handler.hh"
 #include "formatter.hh"
 #include "action_pkg_handler.hh"
 
@@ -78,8 +78,7 @@ dev_name(herds_T &herds_xml, std::string &dev)
  */
 
 int
-action_pkg_handler_T::operator() (herds_T &herds_xml,
-                                  std::vector<std::string> &opts)
+action_pkg_handler_T::operator() (std::vector<std::string> &opts)
 {
     util::color_map_T color;
     util::timer_T t;
@@ -117,12 +116,14 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
     if (not util::is_dir(optget("portdir", std::string)))
 	throw bad_fileobject_E(optget("portdir", std::string));
 
+    herds_xml_T herds_xml;
+
     /* check opts */
     std::vector<std::string> foundopts(opts);
     std::vector<std::string>::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
     {
-        if ((dev and not dev_exists(herds_xml, *i)) or
+        if ((dev and not dev_exists(herds_xml.herds(), *i)) or
             (not dev and not herds_xml.exists(*i)))
         {
             foundopts.erase(std::remove(foundopts.begin(),
@@ -149,7 +150,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
         dev_attrs_T attr;
         std::map<std::string, std::string> pkgs;
 
-        if (dev and not dev_exists(herds_xml, *i))
+        if (dev and not dev_exists(herds_xml.herds(), *i))
         {
             if (status and foundopts.empty())
                 ++progress;
@@ -236,7 +237,7 @@ action_pkg_handler_T::operator() (herds_T &herds_xml,
                             found = true;
                             std::copy(d->second->begin(), d->second->end(),
                                 attr.begin());
-                            attr.name = dev_name(herds_xml, *i);
+                            attr.name = dev_name(herds_xml.herds(), *i);
                             attr.role = d->second->role;
                         }
                     }

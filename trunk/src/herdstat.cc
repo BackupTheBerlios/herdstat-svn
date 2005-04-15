@@ -45,21 +45,15 @@
 #endif
 
 #include "common.hh"
-#include "herds.hh"
+#include "herds_xml.hh"
 #include "formatter.hh"
 #include "xmlparser.hh"
-#include "herds_xml_handler.hh"
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
 #include "action_meta_handler.hh"
 #include "action_stats_handler.hh"
 #include "action_which_handler.hh"
-
-#define FETCH_LOCATION	LOCALSTATEDIR"/herds.xml"
-
-static const std::string default_herdsxml =
-    "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
 static const char *short_opts = "H:o:hVvDdtpqfcnmw";
 
@@ -332,110 +326,13 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 }
 
 int
-fetch_herds_xml()
-{
-    struct stat s;
-    try
-    {
-	if (optget("parse herds.xml", bool))
-	{
-	    if (optget("fetch", bool) and
-		(optget("herds.xml", std::string).find("://") == std::string::npos))
-		optset("herds.xml", std::string, default_herdsxml);
-
-	    if (optget("herds.xml", std::string).find("://") != std::string::npos)
-	    {
-		/* NOTE: ideally we'd love to only fetch it when the timestamp
-		 * and size are different, however, because the default
-		 * location to download herds.xml is from ViewCVS, there is no
-		 * Last-Modified header, meaning wget can't do timestamps :( */
-
-		if (not optget("quiet", bool))
-		{
-		    std::cout
-			<< "Fetching herds.xml..."
-			<< std::endl << std::endl;
-		}
-
-		/* backup cached copy if it exists so we can use it
-		 * if fetching fails */
-		if (util::is_file(FETCH_LOCATION))
-		    util::copy_file(FETCH_LOCATION, FETCH_LOCATION".bak");
-
-		/* fetch it */
-		if (util::fetch(optget("herds.xml", std::string), FETCH_LOCATION,
-		    optget("verbose", bool)) != 0)
-		    throw fetch_E();
-
-		/* because we tell wget to clobber the file, if fetching fails for
-		 * some reason, it'll truncate the old one - make sure the file
-		 * is greater than 0 bytes */
-		if ((stat(FETCH_LOCATION, &s) == 0) and (s.st_size > 0))
-		    optset("herds.xml", std::string, FETCH_LOCATION);
-		else
-		    throw fetch_E();
-
-		/* remove back up copy */
-		unlink(FETCH_LOCATION".bak");
-	    }
-	}
-    }
-    catch (const fetch_E &e)
-    {
-	std::cerr << "Error fetching " << optget("herds.xml", std::string)
-	    << std::endl << std::endl;
-
-	/* if we can't fetch it but have an old cached copy, use it */
-	if (util::is_file(FETCH_LOCATION".bak"))
-	{
-	    std::cerr << "Using cached copy... ";
-	    util::move_file(FETCH_LOCATION".bak", FETCH_LOCATION);
-	    optset("herds.xml", std::string, FETCH_LOCATION);
-	}
-		
-	std::cerr
-	    << "If you have a local copy, specify it using -H or by "
-	    << std::endl << "setting the HERDS environment variable."
-	    << std::endl;
-
-	if (stat(FETCH_LOCATION, &s) != 0)
-	    return EXIT_FAILURE;
-	else if (s.st_size == 0)
-	{
-	    unlink(FETCH_LOCATION);
-	    return EXIT_FAILURE;
-	}
-	else
-	    std::cerr << std::endl;
-    }
-    
-    return EXIT_SUCCESS;
-}
-
-int
 main(int argc, char **argv)
 {
     options_T options;
-    util::timer_T timer;
     util::color_map_T color;
 
     /* try to determine current columns, otherwise use default */
     optset("maxcol", std::size_t, util::getcols());
-
-    /* HERDS */
-    char *result = std::getenv("HERDS");
-    if (result)
-	optset("herds.xml", std::string, result);
-    else
-    {
-	/* if a fetched copy exists and is newer than 24hrs, use it.
-	 * see the explanation below where we fetch as to why
-	 * we go through the trouble of doing this. */
-	struct stat s;
-	if ((stat(FETCH_LOCATION, &s) == 0) and
-	    ((time(NULL) - s.st_mtime) < 86400) and (s.st_size > 0))
-	    optset("herds.xml", std::string, FETCH_LOCATION);
-    }
 
     try
     { 
@@ -453,7 +350,7 @@ main(int argc, char **argv)
 	}
 
 	/* remove duplicates; also has the nice side advantage
-	 * of sorting the output				*/
+	 * of sorting the output */
 	std::sort(nonopt_args.begin(), nonopt_args.end());
 	std::vector<std::string>::iterator pos =
 	    std::unique(nonopt_args.begin(), nonopt_args.end());
@@ -469,44 +366,18 @@ main(int argc, char **argv)
 	    nonopt_args.push_back("all");
 	}
 
+	/* dump options */
 	if (optget("debug", bool))
 	    options.dump(*optget("outstream", std::ostream *));
 
-	if (not optget("quiet", bool) and optget("fetch", bool) and nonopt_args.empty())
-	    optset("verbose", bool, true);
-
-	if (fetch_herds_xml() != EXIT_SUCCESS)
-	    return EXIT_FAILURE;
-
-	/* make sure herds.xml exists */
-	if (optget("parse herds.xml", bool) and
-	    not util::is_file(optget("herds.xml", std::string)))
-	    throw bad_fileobject_E(optget("herds.xml", std::string));
-
-	/* if there's no nonoption args, we're done */
+	/* --fetch and no options: fetch herds.xml and exit */
 	if (optget("fetch", bool) and nonopt_args.empty())
+	{
+	    if (not optget("quiet", bool))
+		optset("verbose", bool, true);
+
+	    herds_xml_T herdsxml(true);
 	    return EXIT_SUCCESS;
-
-	std::auto_ptr<HerdsXMLHandler_T> handler(new HerdsXMLHandler_T());
-	try
-	{
-	    if (optget("timer", bool))
-		timer.start();
-
-	    /* parse herds.xml */
-	    XMLParser_T parser(&(*handler));
-	    
-	    if (optget("parse herds.xml", bool))
-		parser.parse(optget("herds.xml", std::string));
-
-	    if (optget("timer", bool))
-		timer.stop();
-	}
-	catch (const XMLParser_E &e)
-	{
-	    std::cerr << "Error parsing '" << e.file() << "': "	<< e.error()
-		<< std::endl;
-	    return EXIT_FAILURE;
 	}
 
 	/* setup outfile */
@@ -528,7 +399,7 @@ main(int argc, char **argv)
 	    catch (const std::runtime_error)
 	    {
 		std::string error("Invalid locale");
-		result = std::getenv("LC_ALL");
+		char *result = std::getenv("LC_ALL");
 		if (result)
 		    error += " '" + std::string(result) + "'.";
 		std::cerr << error << std::endl;
@@ -567,7 +438,7 @@ main(int argc, char **argv)
 	{
 	    try
 	    {
-		if ((*action_handler)(handler->herds, nonopt_args) != EXIT_SUCCESS)
+		if ((*action_handler)(nonopt_args) != EXIT_SUCCESS)
 		    return EXIT_FAILURE;
 	    }
 	    catch (action_E)
@@ -581,8 +452,16 @@ main(int argc, char **argv)
 	if (outstream)
 	    delete outstream;
 
-	if (optget("timer", bool))
-	    throw timer_E();
+    }
+    catch (const XMLParser_E &e)
+    {
+	std::cerr << "Error parsing '" << e.file() << "': " << e.error()
+	    << std::endl;
+	return EXIT_FAILURE;
+    }
+    catch (const fetch_E)
+    {
+	return EXIT_FAILURE;
     }
     catch (const util::base_E &e)
     {
@@ -594,10 +473,10 @@ main(int argc, char **argv)
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const timer_E)
+    catch (const timer_E &e)
     {
 	std::cout
-	    << "Took " << timer.elapsed() << "ms to parse herds.xml." << std::endl;
+	    << "Took " << e.what() << "ms to parse herds.xml." << std::endl;
     }
     catch (const args_help_E)
     {

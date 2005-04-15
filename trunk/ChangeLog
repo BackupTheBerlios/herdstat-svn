@@ -1,5 +1,26 @@
 ChangeLog for herdstat
 
+2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.hh: Added bool util::path_T::exists().
+	* src/herds_xml.cc, src/herds_xml.hh, src/herdstat.cc,
+	src/action_dev_handler.cc, src/action_dev_handler.hh,
+	src/action_herd_handler.cc, src/action_herd_handler.hh,
+	src/action_meta_handler.cc, src/action_meta_handler.hh,
+	src/action_pkg_handler.cc, src/action_pkg_handler.hh,
+	src/action_stats_handler.cc, src/action_stats_handler.hh,
+	src/action_which_handler.cc, src/action_which_handler.hh,
+	src/action_handler.hh: Moved all fetching and parsing logic into it's
+	own class, herds_xml_T.  We no longer parse herds.xml in main() which
+	means we no longer need to pass a herds_T to all the action handlers.
+	Instead we have each action handler that needs it create an instance
+	of herds_xml_T which will take care of any fetching/parsing.
+	* src/options.cc: Removed "parse herds.xml" and "herds.xml" options
+	since they're no longer necessary.
+	* src/herds_xml_handler.hh: Removed unnecessary exists() member.
+	* bashcomp: Updated to cache output of 'herdstat -q all' and 'herdstat
+	-dq all'.
+
 2005-04-14 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/util.cc, lib/util.hh, lib/file.cc, lib/file.hh: Moved copy_file

@@ -67,11 +67,6 @@ class HerdsXMLHandler_T : public XMLHandler_T
         }
         virtual ~HerdsXMLHandler_T();
 
-        bool exists(const std::string &h)
-        {
-            return (herds.find(h) != herds.end());
-        }
-
         herds_T herds;
 };
 

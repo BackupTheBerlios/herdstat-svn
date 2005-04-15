@@ -35,7 +35,7 @@
 #include <unistd.h>
 
 #include "common.hh"
-#include "herds.hh"
+#include "herds_xml.hh"
 #include "formatter.hh"
 #include "action_herd_handler.hh"
 
@@ -45,8 +45,7 @@
  */
 
 int
-action_herd_handler_T::operator() (herds_T &herds_xml,
-                                   std::vector<std::string> &herds)
+action_herd_handler_T::operator() (std::vector<std::string> &herds)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
 
@@ -60,6 +59,8 @@ action_herd_handler_T::operator() (herds_T &herds_xml,
 
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
+
+    herds_xml_T herds_xml;
 
     /* was the all target specified? */
     if (optget("all", bool))
