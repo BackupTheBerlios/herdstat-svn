@@ -113,11 +113,11 @@ portage::ebuild_which(const std::string &pkg)
         if (not util::is_dir(*i))
             continue;
 
-        if (pkg.find('/') == std::string::npos)
+        if (package.find('/') == std::string::npos)
         {
             try
             {
-                package = portage::find_package(*i, pkg);
+                package = portage::find_package(*i, package);
             }
             catch (const portage::nonexistent_pkg_E &e)
             {
