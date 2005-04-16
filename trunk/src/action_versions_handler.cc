@@ -35,7 +35,6 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     std::ostream *stream = optget("outstream", std::ostream *);
     portage::config_T config(optget("portage.config", portage::config_T));
     const std::string portdir(config.portdir());
-    const bool quiet = optget("quiet", bool);
 
     formatter_T output;
     output.set_maxlabel(8);
@@ -52,7 +51,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
             std::string package = portage::find_package(portdir, *i);
             portage::versions_T versions(portdir + "/" + package);
 
-            if (not quiet)
+            if (optget("quiet", bool))
             {
                 output("Package", package);
                 output.endl();
