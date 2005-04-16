@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-04-16 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.0_pre1)
 	* lib/vars.cc, lib/vars.hh: Fixed bug where any reference to a
 	variable not yet in the var map would not get replaced.  Added subst()
 	method to accomplish this, which recursively calls itself until all
@@ -15,6 +16,7 @@ ChangeLog for herdstat
 	is specified.
 	* src/action_meta_handler.cc: Fixed bug that caused funky formatting
 	in --metadata output when multiple url's are listed in ${HOMEPAGE}.
+	Added search_overlays().
 
 2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
 
