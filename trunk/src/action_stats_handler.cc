@@ -123,9 +123,6 @@ action_stats_handler_T::operator() (std::vector<std::string> &null)
 
     output.flush(*stream);
 
-    if (optget("timer", bool))
-        *stream << std::endl;
-
     return EXIT_SUCCESS;
 }
 

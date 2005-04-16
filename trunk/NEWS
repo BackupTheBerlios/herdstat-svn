@@ -1,10 +1,21 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
-1.1.0_alpha:
+1.1.0_pre1:
     New features:
      - New --which option comparable to 'equery which' but a bit faster. This
        feature was too trivial not to add.
+
+    Bug fixes:
+     - Fixed bug where util::vars_T would fail to substitute a variable if it
+       hadn't already evaluated it.
+     - Fixed completion bug where if any previous option contained a 'm' or
+       'q' it would assume -m or -q were specified and complete appropriately.
+     - --metadata now shows the DESCRIPTION/HOMEPAGE from the *latest* ebuild
+       (whereas before versions were only sorted with string comparison
+       often resulting in inaccurate results).
+     - Fixed bug that caused funky formatting in --metadata output when
+       multiple url's are listed in ${HOMEPAGE}.
 
     Many, many, many behind-the-scenes changes/refactoring.  All utility/portage
     code has been moved to its own convenience library.  All utility stuff is

@@ -68,6 +68,17 @@ portage::in_pkg_dir()
     return (ebuild and filesdir);
 }
 
+/*
+ * Is the given path an ebuild?
+ */
+
+bool
+portage::is_ebuild(const util::path_T &path)
+{
+    return ( (path.length() > 7) and
+             (path.substr(path.length() - 7) == ".ebuild") );
+}
+
 const std::string
 portage::ebuild_which(const std::string &pkg)
 {

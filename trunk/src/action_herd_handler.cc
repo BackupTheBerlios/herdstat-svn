@@ -113,9 +113,6 @@ action_herd_handler_T::operator() (std::vector<std::string> &herds)
 
     output.flush(*stream);
 
-    if (optget("timer", bool))
-        *stream << std::endl;
-
     return EXIT_SUCCESS;
 }
 

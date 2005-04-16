@@ -92,11 +92,9 @@ strtoul(const std::string &str)
 {
     unsigned long result = 0;
 
-#ifdef HAVE_STRTOUL
     result = std::strtoul(str.c_str(), NULL, 10);
     if (result == ULONG_MAX)
         result = 0;
-#endif /* HAVE_STRTOUL */
     
     /* zero's only valid when str == "0" */
     if ((result == 0) and (str != "0"))

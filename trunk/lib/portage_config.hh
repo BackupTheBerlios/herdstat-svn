@@ -51,6 +51,25 @@ namespace portage
     };
 }
 
+/* operator<< for portage::config_T */
+template<class charT, class traits>
+std::basic_ostream<charT, traits> &
+operator<< (std::basic_ostream<charT, traits> &stream,
+            const portage::config_T &that)
+{
+    stream << std::endl;
+    portage::config_T::const_iterator i;
+    for (i = that.begin() ; i != that.end() ; ++i)
+    {
+        std::string s;
+        while (s.length() < 20)
+            s.append(" ");
+        s += i->first + " = " + i->second;
+        stream << s << std::endl;
+    }
+    return stream;
+}
+
 #endif
 
 /* vim: set tw=80 sw=4 et : */

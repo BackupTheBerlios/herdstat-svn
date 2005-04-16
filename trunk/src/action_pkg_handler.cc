@@ -86,17 +86,19 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     std::map<std::string, std::string>::size_type size = 0;
     std::vector<std::string> not_found;
 
+    portage::config_T config(optget("portage.config", portage::config_T));
+    const std::string portdir(config.portdir());
     std::ostream *stream = optget("outstream", std::ostream *);
 
     /* this code takes long enough as it is... no need for
      * a zillion calls to optget inside loops */
-    bool quiet = optget("quiet", bool);
-    bool verbose = optget("verbose", bool);
-    bool timer = optget("timer", bool);
-    bool count = optget("count", bool);
-    bool debug = optget("debug", bool);
-    bool dev = optget("dev", bool);
-    bool status = not quiet and not debug;
+    const bool quiet = optget("quiet", bool);
+    const bool verbose = optget("verbose", bool);
+    const bool timer = optget("timer", bool);
+    const bool count = optget("count", bool);
+    const bool debug = optget("debug", bool);
+    const bool dev = optget("dev", bool);
+    const bool status = not quiet and not debug;
 
     /* set format attributes */
     formatter_T output;
@@ -113,8 +115,8 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     }
 
     /* check PORTDIR */
-    if (not util::is_dir(optget("portdir", std::string)))
-	throw bad_fileobject_E(optget("portdir", std::string));
+    if (not util::is_dir(portdir))
+	throw bad_fileobject_E(portdir);
 
     herds_xml_T herds_xml;
 
@@ -132,7 +134,7 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     }
 
     /* our list of metadata.xml's */
-    metadatas_T metadatas(optget("portdir", std::string));
+    metadatas_T metadatas(portdir);
 
     if (status)
     {
@@ -255,8 +257,7 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
                 if (found)
                 {
                     /* get category/package from absolute path */
-                    std::string cat_and_pkg =
-                        m->substr(optget("portdir", std::string).size() + 1);
+                    std::string cat_and_pkg = m->substr(portdir.size() + 1);
                     std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
                     if (pos != std::string::npos)
                         cat_and_pkg = cat_and_pkg.substr(0, pos);

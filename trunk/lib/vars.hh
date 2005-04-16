@@ -31,6 +31,7 @@
 #include <string>
 #include <utility>
 #include <map>
+
 #include "file.hh"
 
 namespace util
@@ -38,17 +39,20 @@ namespace util
     class vars_T : public util::file_T
     {
         private:
-            void subst(const std::string &, std::string &);
+            void subst(std::string &);
 
-            bool _ebuild;
-            std::map<std::string, std::string> _keys;
+            unsigned short _depth;  /* subst() recursion depth */
+            bool _ebuild;           /* are we an ebuild? */
+            std::map<std::string, std::string> _keys; /* var map */
 
         public:
             typedef std::map<std::string, std::string>::size_type size_type;
             typedef std::map<std::string, std::string>::iterator iterator;
+            typedef std::map<std::string, std::string>::const_iterator
+                                                        const_iterator;
 
-            vars_T() { }
-            vars_T(const util::path_T &path) : util::file_T(path)
+            vars_T() : _depth(0) { }
+            vars_T(const util::path_T &path) : util::file_T(path), _depth(0)
             {
                 this->open();
                 this->read();
@@ -58,11 +62,16 @@ namespace util
             size_type count(const std::string &s)
             { return this->_keys.count(s); }
             iterator begin() { return this->_keys.begin(); }
+            const_iterator begin() const { return this->_keys.begin(); }
             iterator end() { return this->_keys.end(); }
+            const_iterator end() const { return this->_keys.end(); }
             iterator find(const std::string &s) { return this->_keys.find(s); }
+            const_iterator find(const std::string &s) const
+            { return this->_keys.find(s); }
             void clear() { this->_keys.clear(); }
             bool empty() const { return (this->size() == 0); }
-            std::string &operator[] (const std::string &s) { return this->_keys[s]; }
+            std::string &operator[] (const std::string &s)
+            { return this->_keys[s]; }
 
             virtual void read();
             virtual void read(const util::path_T &);

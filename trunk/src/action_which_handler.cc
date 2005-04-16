@@ -31,8 +31,9 @@ int
 action_which_handler_T::operator() (std::vector<std::string> &opts)
 {
     util::color_map_T color;
-    const std::string portdir = optget("portdir", std::string);
     std::ostream *stream = optget("outstream", std::ostream *);
+    portage::config_T config(optget("portage.config", portage::config_T));
+    const std::string portdir(config.portdir());
 
     std::vector<std::string>::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)

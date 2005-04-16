@@ -68,7 +68,7 @@ options_T::option_map_T::set_defaults()
 
     /* portage options */
     portage::config_T config;
-    insert_opt("portdir", config.portdir());
+    insert_opt("portage.config", config);
 }
 
 /* vim: set tw=80 sw=4 et : */

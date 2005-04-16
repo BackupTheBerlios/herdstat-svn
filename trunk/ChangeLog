@@ -1,5 +1,21 @@
 ChangeLog for herdstat
 
+2005-04-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/vars.cc, lib/vars.hh: Fixed bug where any reference to a
+	variable not yet in the var map would not get replaced.  Added subst()
+	method to accomplish this, which recursively calls itself until all
+	variable occurences have been replaced (unless we can't find it of
+	course).
+	* src/options.cc: Instead of saving portage::config_T::portdir(), save
+	the config_T object itself.
+	* lib/portage_config.hh: Added a operator<< for portage::config_T so
+	that it can properly be stored in option_T::option_map_T.  Dumps
+	entire portage config along with the rest of our options when --debug
+	is specified.
+	* src/action_meta_handler.cc: Fixed bug that caused funky formatting
+	in --metadata output when multiple url's are listed in ${HOMEPAGE}.
+
 2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/file.hh: Added bool util::path_T::exists().
@@ -19,7 +35,9 @@ ChangeLog for herdstat
 	since they're no longer necessary.
 	* src/herds_xml_handler.hh: Removed unnecessary exists() member.
 	* bashcomp: Updated to cache output of 'herdstat -q all' and 'herdstat
-	-dq all'.
+	-dq all'.  Fixed bug where if any previous option contained a 'm' or
+	'q' it would assume -m or -q were specified and complete
+	appropriately.
 
 2005-04-14 Aaron Walker <ka0ttic@gentoo.org>
 

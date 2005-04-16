@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 #include <algorithm>
 #include <iterator>
 #include <cstdlib>
@@ -43,13 +44,50 @@
 #include "metadata_xml_handler.hh"
 #include "action_meta_handler.hh"
 
+/*
+ * Given a vector of overlays, search them
+ * for the specified package, returning a pair<overlay,package>.
+ */
+
+std::pair<std::string, std::string>
+search_overlays(const std::vector<std::string> &overlays,
+                const std::string &pkg)
+{
+    std::pair<std::string, std::string> p;
+
+    /* search overlays */
+    std::vector<std::string>::const_iterator o;
+    for (o = overlays.begin() ; o != overlays.end() ; ++o)
+    {
+        try
+        {
+            p.second = portage::find_package(*o, pkg);
+
+            if (util::is_file(*o + "/" + p.second + "/metadata.xml"))
+                p.first  = *o;
+            else
+                continue;
+        }
+        catch (const portage::nonexistent_pkg_E)
+        {
+            continue;
+        }
+    }
+
+    return p;
+}
+
 int
 action_meta_handler_T::operator() (std::vector<std::string> &opts)
 {
     util::color_map_T color;
     formatter_T output;
     std::ostream *stream = optget("outstream", std::ostream *);
-    bool quiet = optget("quiet", bool);
+    const bool quiet = optget("quiet", bool);
+
+    portage::config_T config(optget("portage.config", portage::config_T));
+    std::string portdir(config.portdir());
+    std::vector<std::string> overlays(config.overlays());
 
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
@@ -68,7 +106,6 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
     }
 
     /* check PORTDIR */
-    std::string portdir = optget("portdir", std::string);
     if (not util::is_dir(portdir))
         throw bad_fileobject_E(portdir);
 
@@ -129,9 +166,25 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         std::vector<std::string> herds;
         std::string longdesc, metadata, package;
 
+        std::pair<std::string, std::string> p;
         try
         {
+            /* search PORTDIR (or $PWD if opts == 0) */
             package = portage::find_package(portdir, *i);
+
+            p = search_overlays(overlays, *i);
+
+            /* found in a overlay? */
+            if (not p.second.empty())
+            {
+                /* is it a package? or a category whose metadata exists? */
+                if ((p.second.find('/') != std::string::npos) or
+                    util::is_file(p.first + "/" + p.second + "/metadata.xml"))
+                {
+                    portdir = p.first;
+                    package = p.second;
+                }
+            }
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
@@ -155,12 +208,32 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
-            std::cerr << *i << " doesn't seem to exist." << std::endl;
+            bool found = false;
 
-            if (opts.size() == 1)
-                return EXIT_FAILURE;
-            else
-                continue;
+            p = search_overlays(overlays, *i);
+
+            /* found in a overlay? */
+            if (not p.second.empty())
+            {
+                /* is it a package? or a category whose metadata exists? */
+                if ((p.second.find('/') != std::string::npos) or
+                    util::is_file(p.first + "/" + p.second + "/metadata.xml"))
+                {
+                    found = true;
+                    portdir = p.first;
+                    package = p.second;
+                }
+            }
+
+            if (not found)
+            {
+                std::cerr << *i << " doesn't seem to exist." << std::endl;
+
+                if (opts.size() == 1)
+                    return EXIT_FAILURE;
+                else
+                    continue;
+            }
         }
 
         /* if no '/' exists, assume it's a category */
@@ -235,7 +308,20 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
                     ebuild_vars["HOMEPAGE"] = "none";
 
                 if (not ebuild_vars["HOMEPAGE"].empty())
-                    output("Homepage", ebuild_vars["HOMEPAGE"]);
+                {
+                    std::vector<std::string> parts =
+                        util::split(ebuild_vars["HOMEPAGE"]);
+
+                    if (parts.size() >= 1)
+                        output("Homepage", parts.front());
+
+                    if (parts.size() > 1)
+                    {
+                        std::vector<std::string>::iterator h;
+                        for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
+                            output("", *h);
+                    }
+                }
             }
 
             /* long description */
@@ -272,7 +358,20 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
                     ebuild_vars["HOMEPAGE"] = "none";
 
                 if (not ebuild_vars["HOMEPAGE"].empty())
-                    output("Homepage", ebuild_vars["HOMEPAGE"]);
+                {
+                    std::vector<std::string> parts =
+                        util::split(ebuild_vars["HOMEPAGE"]);
+
+                    if (parts.size() >= 1)
+                        output("Homepage", parts.front());
+
+                    if (parts.size() > 1)
+                    {
+                        std::vector<std::string>::iterator h;
+                        for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
+                            output("", *h);
+                    }
+                }
 
                 if (quiet and ebuild_vars["DESCRIPTION"].empty())
                     ebuild_vars["DESCRIPTION"] = "none";
