@@ -39,7 +39,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     formatter_T output;
     output.set_maxlabel(8);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
-    output.set_quiet(quiet);
+    output.set_quiet(optget("quiet", bool));
     output.set_attrs();
 
     std::vector<std::string>::iterator i;
@@ -51,7 +51,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
             std::string package = portage::find_package(portdir, *i);
             portage::versions_T versions(portdir + "/" + package);
 
-            if (optget("quiet", bool))
+            if (not optget("quiet", bool))
             {
                 output("Package", package);
                 output.endl();
@@ -59,7 +59,14 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
 
             portage::versions_T::iterator v;
             for (v = versions.begin() ; v != versions.end() ; ++v)
-                output("", (*(*v))["PVR"]);
+            {
+                std::string s((*(*v))["PVR"]);
+                std::string::size_type pos = s.rfind("-r0");
+                if (pos != std::string::npos)
+                    s = s.substr(0, pos);
+
+                output("", s);
+            }
 
             if (n != opts.size())
                 output.endl();
