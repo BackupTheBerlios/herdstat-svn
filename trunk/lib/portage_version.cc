@@ -51,6 +51,7 @@
 #include <cassert>
 
 #include "string.hh"
+#include "portage_misc.hh"
 #include "portage_exceptions.hh"
 #include "portage_version.hh"
 
@@ -398,6 +399,16 @@ portage::version_string_T::split()
 /*****************
  * versions_T    *
  *****************/
+
+portage::versions_T::versions_T(const util::path_T &path)
+{
+    util::dir_T pkgdir(path);
+    util::dir_T::iterator d;
+    
+    for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+        if (portage::is_ebuild(*d))
+            assert(this->insert(*d));
+}
 
 portage::versions_T::iterator
 portage::versions_T::find(const std::string &path)

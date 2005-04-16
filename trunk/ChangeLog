@@ -2,6 +2,9 @@ ChangeLog for herdstat
 
 2005-04-16 Aaron Walker <ka0ttic@gentoo.org>
 
+	* src/action_versions_handler.cc, src/action_versions_handler.hh:
+	Added versions action handler for just displaying package versions.
+
 	* configure.ac: Updated version (1.1.0_pre1)
 	* lib/vars.cc, lib/vars.hh: Fixed bug where any reference to a
 	variable not yet in the var map would not get replaced.  Added subst()

@@ -54,6 +54,7 @@
 #include "action_meta_handler.hh"
 #include "action_stats_handler.hh"
 #include "action_which_handler.hh"
+#include "action_versions_handler.hh"
 
 static const char *short_opts = "H:o:hVvDdtpqfcnmw";
 
@@ -82,6 +83,7 @@ static struct option long_opts[] =
     /* display package metadata information */
     {"metadata",    no_argument,	0,  'm'},
     {"which",	    no_argument,	0,  'w'},
+    {"versions",    no_argument,	0,  '\b'},
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     { 0, 0, 0, 0 }
@@ -117,6 +119,7 @@ help()
 	<< " -d, --dev              Look up herds by developer." << std::endl
 	<< " -m, --metadata         Look up metadata by package/category." << std::endl
 	<< " -w, --which            Look up full path to ebuild for specified packages." << std::endl
+	<< "     --versions	    Look up versions of specified packages." << std::endl
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
 	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
@@ -233,14 +236,18 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		if (optget("action", options_action_T) != action_unspecified)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_meta);
-		optset("parse herds.xml", bool, false);
 		break;
 	    /* --which */
 	    case 'w':
 		if (optget("action", options_action_T) != action_unspecified)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_which);
-		optset("parse herds.xml", bool, false);
+		break;
+	    /* --versions */
+	    case '\b':
+		if (optget("action", options_action_T) != action_unspecified)
+		    throw args_one_action_only_E();
+		optset("action", options_action_T, action_versions);
 		break;
 	    /* --outfile */
 	    case 'o':
@@ -431,6 +438,7 @@ main(int argc, char **argv)
 	handlers[action_meta]  = new action_meta_handler_T();
 	handlers[action_stats] = new action_stats_handler_T();
 	handlers[action_which] = new action_which_handler_T();
+	handlers[action_versions] = new action_versions_handler_T();
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];

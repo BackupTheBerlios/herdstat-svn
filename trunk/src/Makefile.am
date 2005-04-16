@@ -21,6 +21,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   action_meta_handler.hh action_meta_handler.cc \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   action_which_handler.hh action_which_handler.cc \
+		   action_versions_handler.hh action_versions_handler.cc \
 		   herdstat.cc
 
 herdstat_LDADD = ../lib/libutil.la

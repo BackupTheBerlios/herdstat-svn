@@ -44,7 +44,8 @@ enum options_action_T
     action_pkg,
     action_meta,
     action_stats,
-    action_which
+    action_which,
+    action_versions
 };
 
 /*

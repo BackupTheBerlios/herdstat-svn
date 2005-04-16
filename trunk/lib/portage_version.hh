@@ -168,6 +168,8 @@ namespace portage
             typedef std::set<portage::version_string_T *,
                              version_sort_T>::size_type size_type;
 
+            versions_T() { }
+            versions_T(const util::path_T &path);
             virtual ~versions_T();
 
             /* small set subset */
