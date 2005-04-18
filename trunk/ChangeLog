@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-04-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/formatter.cc: fixed bug in append(string, vector) that caused an
+	abort if data.size() == 0.  Thanks to tove for the heads up.
+
 2005-04-16 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/action_versions_handler.cc, src/action_versions_handler.hh:

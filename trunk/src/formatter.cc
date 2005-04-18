@@ -140,7 +140,8 @@ formatter_T::append(const std::string &label, std::vector<std::string> data)
         for (i = data.begin() ; i != data.end() ; ++i)
             s += *i + " ";
     
-        s.erase(s.length() - 1);
+        if (s[s.length() - 1] == ' ')
+            s.erase(s.length() - 1);
         append(label, s);
     }
 }
