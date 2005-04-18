@@ -6,4 +6,7 @@
     <note priority="medium" time="1113548810">
         IDEA: maybe make a --summary option for the package handler that prints total # of pkgs, #pkgs per category, etc
     </note>
+    <note priority="medium" time="1113659421">
+        Add a [N] or something to signify metadatas in a overlay
+    </note>
 </todo>

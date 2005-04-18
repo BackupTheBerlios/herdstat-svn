@@ -179,6 +179,7 @@ namespace portage
             const_iterator end() const { return this->_vs.end(); }
             iterator find(const std::string &);
             size_type size() const { return this->_vs.size(); }
+            bool empty() const { return this->size() == 0; }
 
             portage::version_string_T *front() { return *(++this->begin()); }
             portage::version_string_T *back() { return *(--this->end()); }
