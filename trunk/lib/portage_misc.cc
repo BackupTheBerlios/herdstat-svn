@@ -45,21 +45,28 @@
 bool
 portage::in_pkg_dir()
 {
-    const util::dir_T dir(util::getcwd());
-    bool ebuild = false, filesdir = false, manifest = false;
+    const char *pwd = util::getcwd().c_str();
+    DIR *dir = NULL;
+    struct dirent *d = NULL;
+    bool ebuild = false, filesdir = false;
 
-    util::dir_T::const_iterator d;
-    for (d = dir.begin() ; d != dir.end() ; ++d)
+    if (not (dir = opendir(pwd)))
+        throw util::bad_fileobject_E(pwd);
+
+    while ((d = readdir(dir)))
     {
-        if (portage::is_ebuild(*d))
-            ebuild = true;
-        else if (*d == "Manifest")
-            manifest = true;
-        else if (*d == "files")
+        char *s = NULL;
+        if ((s = std::strrchr(d->d_name, '.')))
+        {
+            if (std::strcmp(++s, "ebuild") == 0)
+                ebuild = true;
+        }   
+        else if (std::strcmp(d->d_name, "files") == 0)
             filesdir = true;
     }
 
-    return (ebuild and filesdir and manifest);
+    closedir(dir);
+    return (ebuild and filesdir);
 }
 
 /*

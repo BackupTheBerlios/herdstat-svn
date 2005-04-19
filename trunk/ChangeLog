@@ -3,7 +3,6 @@ ChangeLog for herdstat
 2005-04-19 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.0_pre2)
-	* lib/portage_misc.cc: Updated in_pkg_dir to use util::dir_T.
 
 2005-04-18 Aaron Walker <ka0ttic@gentoo.org>
 
