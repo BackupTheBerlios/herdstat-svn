@@ -34,7 +34,6 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
     portage::config_T config(optget("portage.config", portage::config_T));
-    const std::string portdir(config.portdir());
 
     formatter_T output;
     output.set_maxlabel(8);
@@ -48,7 +47,11 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     {
         try
         {
-            std::string package = portage::find_package(portdir, *i);
+            std::pair<std::string, std::string> p =
+                portage::find_package(config, *i);
+            std::string portdir(p.first);
+            std::string package(p.second);
+
             portage::versions_T versions(portdir + "/" + package);
 
             if (not optget("quiet", bool))

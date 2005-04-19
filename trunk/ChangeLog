@@ -4,6 +4,19 @@ ChangeLog for herdstat
 
 	* src/formatter.cc: fixed bug in append(string, vector) that caused an
 	abort if data.size() == 0.  Thanks to tove for the heads up.
+	* lib/portage_misc.cc, lib/portage_misc.hh: Move find_package to
+	find_package_in and make find_package take a config_T object and call
+	find_package_in for PORTDIR and PORTDIR_OVERLAY's.  Moved
+	search_overlays here from meta action handler.  Also added an
+	overloaded ebuild_which that takes a portdir.  The original
+	ebuild_which now does it's work and then calls the new ebuild_which
+	for each portdir.  This fixed a bug where the metadata would be
+	retrieved from one directory and the ebuild data from another (in the
+	case of an overlay).
+	* src/action_meta_handler.cc, src/action_versions_handler.cc: Modified
+	to use new find_package() which means it now respects PORTDIR_OVERLAY
+	as it should.  Modified meta handler to display any overlays that any
+	queries came from.
 
 2005-04-16 Aaron Walker <ka0ttic@gentoo.org>
 

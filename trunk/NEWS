@@ -2,9 +2,19 @@ This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.0_pre2:
+    New features:
+     - --metadata now shows whether the displayed query results came from an
+       overlay and if so, which one.
+
     Bug fixes:
      - Fixed bug where trying to view a herd with 0 developers would cause an
-       abort.
+       abort.  Thanks to Torsten Veller (tove@gentoo.org) for the heads up.
+     - Fixed bug where --metadata would show the metadata from an overlay but
+       show HOMEPAGE and DESCRIPTION from an ebuild that was elsewhere (because
+       that's what ebuild_which() returned) if the ebuild was "greater" than
+       the ebuild in the overlay (ie. if the ebuild in portdir was 1.1 and the
+       ebuild in overlay was 1.0).  Now --metadata shows the HOMEPAGE/DESCRIPTION
+       from the "greatest" ebuild found in the same directory.
 
 1.1.0_pre1:
     New features:

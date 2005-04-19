@@ -49,34 +49,6 @@
  * for the specified package, returning a pair<overlay,package>.
  */
 
-std::pair<std::string, std::string>
-search_overlays(const std::vector<std::string> &overlays,
-                const std::string &pkg)
-{
-    std::pair<std::string, std::string> p;
-
-    /* search overlays */
-    std::vector<std::string>::const_iterator o;
-    for (o = overlays.begin() ; o != overlays.end() ; ++o)
-    {
-        try
-        {
-            p.second = portage::find_package(*o, pkg);
-
-            if (util::is_file(*o + "/" + p.second + "/metadata.xml"))
-                p.first  = *o;
-            else
-                continue;
-        }
-        catch (const portage::nonexistent_pkg_E)
-        {
-            continue;
-        }
-    }
-
-    return p;
-}
-
 int
 action_meta_handler_T::operator() (std::vector<std::string> &opts)
 {
@@ -84,10 +56,13 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
     formatter_T output;
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool quiet = optget("quiet", bool);
+    bool pwd = false;
 
     portage::config_T config(optget("portage.config", portage::config_T));
-    std::string portdir(config.portdir());
-    std::vector<std::string> overlays(config.overlays());
+    const std::string real_portdir(config.portdir());
+    std::string portdir;
+
+    std::vector<std::string> portdirs;
 
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
@@ -104,10 +79,6 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             << std::endl;
         return EXIT_FAILURE;
     }
-
-    /* check PORTDIR */
-    if (not util::is_dir(portdir))
-        throw bad_fileobject_E(portdir);
 
     /* we can be called with 0 opts if we are currently
      * in a directory that contains a metadata.xml */
@@ -149,6 +120,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
         /* now assign portdir to our path, treating the leftovers as the
          * category or category/package */
+        pwd = true;
         portdir = path;
         opts.push_back(leftover);
         
@@ -164,26 +136,21 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::string longdesc, metadata, package;
+        std::vector<std::string>::size_type portdirn;
+        std::string longdesc, package;
 
-        std::pair<std::string, std::string> p;
         try
         {
-            /* search PORTDIR (or $PWD if opts == 0) */
-            package = portage::find_package(portdir, *i);
-
-            p = search_overlays(overlays, *i);
-
-            /* found in a overlay? */
-            if (not p.second.empty())
+            /* The only reason portdir should be set already is if opts
+             * did == 0 and portdir set to $PWD */
+            if (pwd)
+                package = portage::find_package_in(portdir, *i);
+            else
             {
-                /* is it a package? or a category whose metadata exists? */
-                if ((p.second.find('/') != std::string::npos) or
-                    util::is_file(p.first + "/" + p.second + "/metadata.xml"))
-                {
-                    portdir = p.first;
-                    package = p.second;
-                }
+                std::pair<std::string, std::string> p =
+                    portage::find_package(config, *i);
+                portdir = p.first;
+                package = p.second;
             }
         }
         catch (const portage::ambiguous_pkg_E &e)
@@ -208,31 +175,31 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
-            bool found = false;
+            std::cerr << *i << " doesn't seem to exist." << std::endl;
 
-            p = search_overlays(overlays, *i);
+            if (opts.size() == 1)
+                return EXIT_FAILURE;
+            else
+                continue;
+        }
 
-            /* found in a overlay? */
-            if (not p.second.empty())
+        if (portdir != real_portdir and not pwd)
+        {
+            /* have we already added it? */
+            std::vector<std::string>::iterator pos =
+                std::find(portdirs.begin(), portdirs.end(), portdir);
+
+            if (pos == portdirs.end())
             {
-                /* is it a package? or a category whose metadata exists? */
-                if ((p.second.find('/') != std::string::npos) or
-                    util::is_file(p.first + "/" + p.second + "/metadata.xml"))
-                {
-                    found = true;
-                    portdir = p.first;
-                    package = p.second;
-                }
+                portdirs.push_back(portdir);
+                portdirn = portdirs.size();
             }
-
-            if (not found)
+            else
             {
-                std::cerr << *i << " doesn't seem to exist." << std::endl;
-
-                if (opts.size() == 1)
-                    return EXIT_FAILURE;
-                else
-                    continue;
+                portdirn = 1;
+                for (pos = portdirs.begin() ; pos != portdirs.end() ; ++pos, ++portdirn)
+                    if (*pos == portdir)
+                        break;
             }
         }
 
@@ -242,7 +209,12 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         if (n != 1)
             output.endl();
 
-        output(cat ? "Category" : "Package", package);
+        if (portdir == real_portdir or pwd)
+            output(cat ? "Category" : "Package", package);
+        else if (not pwd)
+            output(cat ? "Category" : "Package",
+                util::sprintf("%s%s[%d]%s", package.c_str(), color[cyan].c_str(),
+                portdirn, color[none].c_str()));
 
         if (util::is_file(portdir + "/" + package + "/metadata.xml"))
         {
@@ -301,7 +273,8 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
             if (not cat)
             {
-                std::string ebuild(portage::ebuild_which(package));
+                std::string ebuild(portage::ebuild_which(portdir, package));
+
                 ebuild_vars.read(ebuild);
 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
@@ -352,7 +325,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
-                util::vars_T ebuild_vars(portage::ebuild_which(package));
+                util::vars_T ebuild_vars(portage::ebuild_which(portdir, package));
                 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
                     ebuild_vars["HOMEPAGE"] = "none";
@@ -383,6 +356,18 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
     }
 
     output.flush(*stream);
+
+    if (portdirs.size() > 0)
+    {
+        *stream << std::endl << "Portage Overlays:" << std::endl;
+
+        std::vector<std::string>::iterator p;
+        n = 1;
+        for (p = portdirs.begin() ; p != portdirs.end() ; ++p, ++n)
+            *stream << "  " << color[cyan] << "[" << n << "]" << color[none]
+                << " " << *p << std::endl;
+    }
+
     return EXIT_SUCCESS;
 }
 

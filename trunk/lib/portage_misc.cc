@@ -82,25 +82,26 @@ portage::is_ebuild(const util::path_T &path)
 const std::string
 portage::ebuild_which(const std::string &pkg)
 {
-    std::string package(pkg);
-    bool pfound = false, ofound = false;
+    std::string portdir, package;
     portage::versions_T versions;
     portage::config_T config;
-    std::vector<std::string> overlays(config.overlays());
-    const std::string portdir(config.portdir());
 
-    /* search PORTDIR/category/package */
+    std::pair<std::string, std::string> p =
+        portage::find_package(config, pkg);
+    portdir = p.first;
+    package = p.second;
+
+    return portage::ebuild_which(portdir, package);
+}
+
+const std::string
+portage::ebuild_which(const std::string &portdir, const std::string &pkg)
+{
+    std::string package(pkg);
+    portage::versions_T versions;
+
     if (pkg.find('/') == std::string::npos)
-    {
-        try
-        {
-            package = portage::find_package(portdir, pkg);
-        }
-        catch (const portage::nonexistent_pkg_E &e)
-        {
-            /* do nothing to prevent it being caught elsewhere */
-        }
-    }
+        package = find_package_in(portdir, pkg);
 
     if (util::is_dir(portdir + "/" + package))
     {
@@ -108,59 +109,21 @@ portage::ebuild_which(const std::string &pkg)
         util::dir_T::iterator d;
         for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
         {
-            util::path_T::size_type pos = d->rfind(".ebuild");
-            if (pos == util::path_T::npos)
+            if (not portage::is_ebuild(*d))
                 continue;
 
-            pfound = true;
             assert(versions.insert(*d));
         }
     }
 
-    /* check the overlay(s) too */
-    std::vector<std::string>::iterator i;
-    for (i = overlays.begin() ; i != overlays.end() ; ++i)
-    {
-        if (not util::is_dir(*i))
-            continue;
-
-        if (package.find('/') == std::string::npos)
-        {
-            try
-            {
-                package = portage::find_package(*i, package);
-            }
-            catch (const portage::nonexistent_pkg_E &e)
-            {
-                /* do nothing to prevent it being caught elsewhere */
-            }
-        }
-
-        if (not util::is_dir(*i + "/" + package))
-            continue;
-        
-        util::dir_T pkgdir(*i + "/" + package);
-        util::dir_T::iterator d;
-        for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
-        {
-            util::path_T::size_type pos = d->rfind(".ebuild");
-            if (pos == util::path_T::npos)
-                continue;
-
-            ofound = true;
-            /* we don't assert this one because there may be dupes */
-            versions.insert(*d);
-        }
-    }
-
-    if (not pfound and not ofound)
+    if (versions.empty())
         throw portage::nonexistent_pkg_E(pkg);
 
     return versions.back()->ebuild();
 }
 
 const std::string
-portage::find_package(const std::string &portdir, const std::string &pkg)
+portage::find_package_in(const std::string &portdir, const std::string &pkg)
 {
     /* if category/package was specified, just check for existence */
     if ((pkg.find('/') != std::string::npos) and
@@ -173,7 +136,7 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         /* was a category specified? only one possible */
-        if (*c == pkg)
+        if (*c == pkg and util::is_dir(portdir + "/" + pkg))
             return pkg;
 
         if (not util::is_dir(portdir + "/" + (*c)))
@@ -197,65 +160,71 @@ portage::find_package(const std::string &portdir, const std::string &pkg)
 }
 
 /*
- * Given a HOMEPAGE string, do our best to perform variable substituion
- * in an attempt to make the URL readable.
+ * Given a vector of overlays, call find_package_in()
+ * for each one, searching for the package.  This function
+ * is used soley by find_package().
  */
 
-const std::string
-portage::parse_homepage(const std::string &homepage, util::vars_T &vars)
+static std::pair<std::string, std::string>
+search_overlays(const std::vector<std::string> &overlays,
+                const std::string &pkg)
 {
-    std::string h(homepage);
+    std::pair<std::string, std::string> p;
 
-    /* any variables present? */
-    if (h.find("${") != std::string::npos)
+    /* search overlays */
+    std::vector<std::string>::const_iterator o;
+    for (o = overlays.begin() ; o != overlays.end() ; ++o)
     {
-        std::vector<std::string> v;
-        std::vector<std::string>::iterator i;
-        std::string::size_type lpos = 0;
-
-        while (true)
+        try
         {
-            std::string::size_type begin = h.find("${", lpos);
-            if (begin == std::string::npos)
-                break;
-
-            std::string::size_type end = h.find("}", begin);
-            if (end == std::string::npos)
-                break;
-
-            v.push_back(h.substr(begin + 2, end - (begin + 2)));
-            lpos = ++end;
+            p.second = portage::find_package_in(*o, pkg);
+            p.first  = *o;
         }
-
-        /* for each variable we found in $HOMEPAGE */
-        for (i = v.begin() ; i != v.end() ; ++i)
+        catch (const portage::nonexistent_pkg_E)
         {
-            std::string subst;
-            std::string var("${"+(*i)+"}");
-
-            std::string::size_type pos = h.find(var);
-            if (pos == std::string::npos)
-                continue;
-
-            /* is that variable defined in the ebuild? */
-            util::vars_T::iterator x = vars.find(*i);
-            if (x != vars.end())
-                subst = x->second; /* found it */
-            else
-            {
-                /* is the variable part of the version ($P, $PN, $PV, etc) */
-                portage::version_string_T version(vars.name());
-                portage::version_string_T::iterator v = version.find(*i);
-                if (v != version.end())
-                    subst = v->second;
-            }
-
-            if (not subst.empty())
-                h.replace(pos, var.length(), subst, 0, subst.length());
+            continue;
         }
     }
 
-    return h;
+    return p;
+}
+
+std::pair<std::string, std::string>
+portage::find_package(portage::config_T &config,
+                      const std::string &pkg)
+{
+    std::string package;
+    std::string portdir(config.portdir());
+    const std::vector<std::string> overlays(config.overlays());
+    std::pair<std::string, std::string> p;
+
+    try
+    {
+        package = portage::find_package_in(portdir, pkg);
+
+        p = search_overlays(overlays, pkg);
+        if (not p.second.empty())
+        {
+            portdir = p.first;
+            package = p.second;
+        }
+
+        p.first = portdir;
+        p.second = package;
+    }
+    catch (const portage::nonexistent_pkg_E)
+    {
+        bool found = false;
+
+        p = search_overlays(overlays, pkg);
+        if (not p.second.empty())
+            found = true;
+
+        if (not found)
+            throw;
+    }
+
+    return p;
 }
 
 /* vim: set tw=80 sw=4 et : */
