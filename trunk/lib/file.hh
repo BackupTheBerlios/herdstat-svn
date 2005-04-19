@@ -205,8 +205,11 @@ namespace util
 
             /* small subset of vector methods */
             iterator begin() { return this->_contents.begin(); }
+            const_iterator begin() const { return this->_contents.begin(); }
             iterator end() { return this->_contents.end(); }
+            const_iterator end() const { return this->_contents.end(); }
             size_type bufsize() const { return this->_contents.size(); }
+            bool empty() const { return this->_contents.size() == 0; }
 
             virtual void open();
             virtual void open(const char *n)

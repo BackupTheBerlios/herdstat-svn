@@ -136,7 +136,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::vector<std::string>::size_type portdirn;
+        std::vector<std::string>::size_type portdirn = 0;
         std::string longdesc, package;
 
         try
@@ -183,17 +183,20 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
                 continue;
         }
 
+        /* are we in an overlay? */
         if (portdir != real_portdir and not pwd)
         {
             /* have we already added it? */
             std::vector<std::string>::iterator pos =
                 std::find(portdirs.begin(), portdirs.end(), portdir);
 
+            /* doesn't exist, add it */
             if (pos == portdirs.end())
             {
                 portdirs.push_back(portdir);
                 portdirn = portdirs.size();
             }
+            /* exists, find it's position */
             else
             {
                 portdirn = 1;
@@ -211,11 +214,14 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
         if (portdir == real_portdir or pwd)
             output(cat ? "Category" : "Package", package);
+
+        /* it's in an overlay, so show a little thinggy to mark it as such */
         else if (not pwd)
             output(cat ? "Category" : "Package",
                 util::sprintf("%s%s[%d]%s", package.c_str(), color[cyan].c_str(),
                 portdirn, color[none].c_str()));
 
+        /* does the metadata.xml exist? */
         if (util::is_file(portdir + "/" + package + "/metadata.xml"))
         {
             util::vars_T ebuild_vars;
@@ -357,6 +363,8 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
     output.flush(*stream);
 
+    /* give a numbered list of all the unique overlay's that were
+     * encountered while processing the queries */
     if (portdirs.size() > 0)
     {
         *stream << std::endl << "Portage Overlays:" << std::endl;

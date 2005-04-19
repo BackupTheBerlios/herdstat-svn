@@ -97,23 +97,22 @@ _herdstat() {
 	*)
 	    local x dev=0 pkg=0 meta=0 which=0
 	    for x in ${COMP_WORDS[@]} ; do
+                [[ ${x} == -* ]] || continue
+
                 # dev
-		if [[ ${x} == -* ]] && [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
+		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
 		    dev=1
                 fi
 
                 # package
-                if [[ ${x} == -* && ${x} == *p* ]] ; then
-                    pkg=1
-		fi
+                [[ ${x} == *p* ]] && pkg=1
 
                 # metadata
-                if [[ ${x} == -* && ${x} != "--herdsxml" ]] && \
+                if [[ ${x} != "--herdsxml" ]] && \
                     [[ ${x} == *m* && ${x} != "--timer" ]]
                 then
                     meta=1
-                elif [[ ${x} == -* ]] && \
-                     [[ ${x} == *w* && ${x} != "--with-herd" ]] ; then
+                elif [[ ${x} == *w* && ${x} != "--with-herd" ]] ; then
                     which=1
                 fi
 	    done
