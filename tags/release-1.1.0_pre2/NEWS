@@ -1,0 +1,163 @@
+This file contains a summary of changes in released versions.  Please read the
+ChangeLog file for a more detailed listing of changes/bug fixes.
+
+1.1.0_pre2:
+    New features:
+     - --metadata now shows whether the displayed query results came from an
+       overlay and if so, which one.
+
+    Bug fixes:
+     - Fixed bug where trying to view a herd with 0 developers would cause an
+       abort.  Thanks to Torsten Veller (tove@gentoo.org) for the heads up.
+     - Fixed bug where --metadata would show the metadata from an overlay but
+       show HOMEPAGE and DESCRIPTION from an ebuild that was elsewhere (because
+       that's what ebuild_which() returned) if the ebuild was "greater" than
+       the ebuild in the overlay (ie. if the ebuild in portdir was 1.1 and the
+       ebuild in overlay was 1.0).  Now --metadata shows the HOMEPAGE/DESCRIPTION
+       from the "greatest" ebuild found in the same directory.
+
+1.1.0_pre1:
+    New features:
+     - New --which option comparable to 'equery which' but a bit faster. This
+       feature was too trivial not to add.
+
+    Bug fixes:
+     - Fixed bug where util::vars_T would fail to substitute a variable if it
+       hadn't already evaluated it.
+     - Fixed completion bug where if any previous option contained a 'm' or
+       'q' it would assume -m or -q were specified and complete appropriately.
+     - --metadata now shows the DESCRIPTION/HOMEPAGE from the *latest* ebuild
+       (whereas before versions were only sorted with string comparison
+       often resulting in inaccurate results).
+     - Fixed bug that caused funky formatting in --metadata output when
+       multiple url's are listed in ${HOMEPAGE}.
+
+    Many, many, many behind-the-scenes changes/refactoring.  All utility/portage
+    code has been moved to its own convenience library.  All utility stuff is
+    still in the 'util' namespace, but the portage code has been put into its
+    own 'portage' namespace.
+
+1.0.2:
+    New features:
+     - --metadata now shows the package's HOMEPAGE (if it exists in the
+       ebuild).  herdstat does it's best to try and perform variable
+       substituion on any variable occurrences in HOMEPAGE in an attempt to
+       improve readability. Also shows the ebuild's DESCRIPTION if a longdesc
+       is unavailable in metadata.xml.
+     - --metadata now supports --quiet.
+     - Added --with-herd, a generalization of --no-herd (which is now
+       shorthand for --with-herd=no-herd) for only displaying developer's
+       packages that belong in the specified herd.
+     - User can now run 'herdstat -m' with no non-option args if inside a
+       package directory or category.
+     - If $PORTDIR/metadata/timestamp exists, don't re-cache the metadata.xml
+       list until it changes.
+
+    Bug fixes:
+     - Fixed bug where a std::runtime_error exception was thrown (and not
+       caught) if the LC_ALL env variable is set to an invalid locale.
+
+1.0.1:
+    New features:
+     - New --metadata option that displays metadata information for the
+       specified package(s)/category(s).  Blame Obz for wanting this.
+     - New --no-herd option that when specified with --package --dev only
+       shows packages belong to herd "no-herd". Blame ciaranm for wanting
+       this.
+
+    Bug fixes:
+     - package handler quirks fixed wrt to stuff that doesnt exist.
+
+1.0:
+    New features:
+     - Added progress thinggy for metadata caching, since that's the biggest
+       bottleneck.
+
+    Bug fixes:
+     - Use C++ version of isspace and tolower so that locale is considered.
+
+1.0_rc2:
+    New features:
+     - Cache the metadata.xml list for 24hrs to reduce package lookup times.
+
+    Bug fixes:
+     - Fixed pretty big formatting bug that caused long lines to not be wrapped
+       and indented properly.
+     - Instead of cleaning whitespace of long strings (such as herd/package
+       descriptions) in the XML handler for EVERY single element, only clean
+       the stuff that will be displayed.  Reduces the number of calls to
+       util::tidy_whitespace() from ~2700 calls to 133.  Makes a pretty big
+       difference since it calls several STL algorithms.
+
+1.0_rc1:
+    New features:
+     - Added --nocolor.
+
+    Bug fixes:
+     - Reverted gcc-4 warning fixes since they cause havoc with gcc-3.3.x.
+     - Fixed exception if '-d all' is specified.
+
+0.6:
+    New features:
+     - You are now able to specify both --dev and --package at the same time
+       in order to query the packages maintained by a specific developer.
+     - Added --count option.  Using this option would produce the same result
+       as running 'herdstat ... | grep -v '^$' | wc -l'.
+
+    Bug fixes:
+     - Ignore --quiet if herdstat is invoked with no non-option arguments.
+     - Fixed completion bug where stderr wasn't redirected, this causing 
+       weird completion funkyness if an error occurred.
+     - Ignore case when it comes to developer usernames, otherwise we get
+       duplicates (ex: pyrania/pYrania).
+     - Fixed bug where a newline would get displayed after a herd, even if
+       the number of pkgs in that herd == 0.
+
+0.5:
+    New features:
+     - When herdstat is run with no arguments, display a summary of statistics.
+
+    Bug fixes:
+     - Fixed borked --package output.
+     - Remove backed-up copy of fetched herds.xml if it's unneeded.
+
+0.4:
+    New features:
+     - Added --fetch for telling herdstat to forcibly fetch herds.xml.
+
+    Bug fixes:
+     - All funky looking output caused by extra whitespace within XML elements
+       is now cleaned before being displayed.
+     - '@gentoo.org' is now appended to any invalid email addresses that lack it.
+
+0.3:
+    New features:
+     - Added --outfile command-line option that allows the user to easily send
+       the output to the specified file instead of stdout.
+
+    Bug fixes:
+     - Fixed the errant parentheses in bash command-line completion.
+     - Fixed user highlighting in --verbose output.
+     - Fixed bug where output was explicitly being sent to stdout instead of
+       the specified stream when --quiet was specified.
+     - Fixed bug where 'herdstat -dv all' would display developer roles (which
+       of course should only happen in herd output).
+
+0.2:
+    New features:
+     - Herd output now show's herd's email address (if available).
+     - Both --dev and the default action now support an 'all' target (for
+       example 'herdstat all').
+     - Bash command-line completion is now included.
+
+    Bug fixes:
+     - Fixed several fetching-related bugs. Now uses the cached copy of
+       herds.xml (if it exists) if for some reason fetching fails. Also
+       fixed a bug where (since we tell wget to clobber the old file) if
+       wget fails, it writes a 0 byte file (and thus all queries fail).
+     - PORTDIR determination code fixed/quicker.
+     - Fixed bug where highlighting of the user's nick was done prior to
+       sorting, thus causing the user's nick to always appear first in
+       output.
+
+vim: set ft=txt :
