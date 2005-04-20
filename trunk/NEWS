@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.0_pre3:
+    New features:
+     - Added --no-overlay option that prevents overlays listed in
+       PORTDIR_OVERLAY from being searched.
+
 1.1.0_pre2:
     New features:
      - --metadata now shows whether the displayed query results came from an

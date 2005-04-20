@@ -400,7 +400,8 @@ portage::version_string_T::split()
  * versions_T    *
  *****************/
 
-portage::versions_T::versions_T(const util::path_T &path)
+void
+portage::versions_T::assign(const util::path_T &path)
 {
     util::dir_T pkgdir(path);
     util::dir_T::iterator d;

@@ -54,9 +54,11 @@ options_T::option_map_T::set_defaults()
     insert_opt("dev", false);
     insert_opt("count", false);
     insert_opt("color", true);
+    insert_opt("overlay", true);
 
     insert_opt("maxcol", static_cast<std::size_t>(78));
 
+    insert_opt("herds.xml", std::string(""));
     insert_opt("with-herd", std::string(""));
     insert_opt("outfile", std::string("stdout"));
     insert_opt("outstream", &std::cout);

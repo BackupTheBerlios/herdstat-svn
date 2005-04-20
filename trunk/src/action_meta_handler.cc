@@ -148,7 +148,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             else
             {
                 std::pair<std::string, std::string> p =
-                    portage::find_package(config, *i);
+                    portage::find_package(config, *i, optget("overlay", bool));
                 portdir = p.first;
                 package = p.second;
             }
@@ -227,7 +227,6 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             util::vars_T ebuild_vars;
 
             /* parse it */
-            try
             {
                 std::auto_ptr<MetadataXMLHandler_T>
                     handler(new MetadataXMLHandler_T());
@@ -238,12 +237,6 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
                 herds = handler->herds;
                 devs = handler->devs;
                 longdesc = handler->longdesc;
-            }
-            catch (const XMLParser_E &e)
-            {
-                std::cerr << "Error parsing '" << e.file() << "': "
-                    << e.error() << std::endl;
-                return EXIT_FAILURE;
             }
 
             /* herds */
@@ -279,8 +272,16 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
             if (not cat)
             {
-                std::string ebuild(portage::ebuild_which(portdir, package));
-
+                std::string ebuild;
+                try
+                {
+                    ebuild = portage::ebuild_which(portdir, package);
+                }
+                catch (const portage::nonexistent_pkg_E)
+                {
+                    ebuild = portage::ebuild_which(real_portdir, package);
+                }
+                
                 ebuild_vars.read(ebuild);
 
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
@@ -331,8 +332,18 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             /* at least show ebuild DESCRIPTION and HOMEPAGE */
             if (not cat)
             {
-                util::vars_T ebuild_vars(portage::ebuild_which(portdir, package));
+                std::string ebuild;
+                try
+                {
+                    ebuild = portage::ebuild_which(portdir, package);
+                }
+                catch (const portage::nonexistent_pkg_E)
+                {
+                    ebuild = portage::ebuild_which(real_portdir, package);
+                }
                 
+                util::vars_T ebuild_vars(ebuild);
+
                 if (quiet and ebuild_vars["HOMEPAGE"].empty())
                     ebuild_vars["HOMEPAGE"] = "none";
 

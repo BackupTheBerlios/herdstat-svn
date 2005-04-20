@@ -56,7 +56,7 @@
 #include "action_which_handler.hh"
 #include "action_versions_handler.hh"
 
-static const char *short_opts = "H:o:hVvDdtpqfcnmw";
+static const char *short_opts = "H:o:hVvDdtpqfcnmwN";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -86,6 +86,7 @@ static struct option long_opts[] =
     {"versions",    no_argument,	0,  '\b'},
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
+    {"no-overlay",  no_argument,	0,  'N'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -123,6 +124,7 @@ help()
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
 	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
+	<< " -N, --no-overlay       Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
 	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
 	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
 	<< "                        instead of stdout." << std::endl
@@ -159,6 +161,7 @@ help()
 	<< " -d              Look up herds by developer." << std::endl
 	<< " -m              Look up metadata by package/category." << std::endl
 	<< " -w              Look up full path to ebuild for specified packages." << std::endl
+	<< " -N              Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
@@ -249,6 +252,9 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_versions);
 		break;
+	    case 'N':
+		optset("overlay", bool, false);
+		break;
 	    /* --outfile */
 	    case 'o':
 		if (strcmp(optarg, "stdout") != 0)
@@ -326,7 +332,8 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 	    args->push_back(argv[optind++]);
     }
     else if ((optget("action", options_action_T) != action_unspecified) and
-	    (optget("action", options_action_T) != action_meta))
+	    (optget("action", options_action_T) != action_meta) and
+	    (optget("action", options_action_T) != action_versions))
 	throw args_usage_E();
 
     return 0;
@@ -350,7 +357,9 @@ main(int argc, char **argv)
 	    throw args_E();
 
 	if (nonopt_args.empty() and
-	    optget("action", options_action_T) != action_meta)
+	    optget("action", options_action_T) != action_meta and
+	    optget("action", options_action_T) != action_versions and
+	    not optget("fetch", bool))
 	{
 	    optset("action", options_action_T, action_stats);
 	    optset("quiet", bool, false);

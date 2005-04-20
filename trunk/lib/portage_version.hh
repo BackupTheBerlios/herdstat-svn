@@ -169,7 +169,7 @@ namespace portage
                              version_sort_T>::size_type size_type;
 
             versions_T() { }
-            versions_T(const util::path_T &path);
+            versions_T(const util::path_T &path) { this->assign(path); }
             virtual ~versions_T();
 
             /* small set subset */
@@ -184,7 +184,8 @@ namespace portage
             portage::version_string_T *front() { return *(++this->begin()); }
             portage::version_string_T *back() { return *(--this->end()); }
 
-            virtual bool insert(const util::path_T &path);
+            virtual bool insert(const util::path_T &);
+            virtual void assign(const util::path_T &);
     };
 }
 

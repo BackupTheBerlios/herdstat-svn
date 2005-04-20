@@ -81,14 +81,15 @@ portage::is_ebuild(const util::path_T &path)
 }
 
 const std::string
-portage::ebuild_which(const std::string &pkg)
+portage::ebuild_which(portage::config_T &config,
+                      const std::string &pkg,
+                      bool overlays)
 {
     std::string portdir, package;
     portage::versions_T versions;
-    portage::config_T config;
 
     std::pair<std::string, std::string> p =
-        portage::find_package(config, pkg);
+        portage::find_package(config, pkg, overlays);
     portdir = p.first;
     package = p.second;
 
@@ -192,7 +193,8 @@ search_overlays(const std::vector<std::string> &overlays,
 
 std::pair<std::string, std::string>
 portage::find_package(portage::config_T &config,
-                      const std::string &pkg)
+                      const std::string &pkg,
+                      bool do_overlays)
 {
     std::string package;
     std::string portdir(config.portdir());
@@ -203,11 +205,14 @@ portage::find_package(portage::config_T &config,
     {
         package = portage::find_package_in(portdir, pkg);
 
-        p = search_overlays(overlays, pkg);
-        if (not p.second.empty())
+        if (do_overlays)
         {
-            portdir = p.first;
-            package = p.second;
+            p = search_overlays(overlays, pkg);
+            if (not p.second.empty())
+            {
+                portdir = p.first;
+                package = p.second;
+            }
         }
 
         p.first = portdir;
@@ -217,9 +222,12 @@ portage::find_package(portage::config_T &config,
     {
         bool found = false;
 
-        p = search_overlays(overlays, pkg);
-        if (not p.second.empty())
-            found = true;
+        if (do_overlays)
+        {
+            p = search_overlays(overlays, pkg);
+            if (not p.second.empty())
+                found = true;
+        }
 
         if (not found)
             throw;

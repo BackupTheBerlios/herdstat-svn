@@ -33,14 +33,17 @@ action_which_handler_T::operator() (std::vector<std::string> &opts)
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
     portage::config_T config(optget("portage.config", portage::config_T));
-    const std::string portdir(config.portdir());
+    const std::string real_portdir(config.portdir());
 
     std::vector<std::string>::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
     {
+        std::string ebuild;
+        std::pair<std::string, std::string> p;
+
         try
         {
-            *stream << portage::ebuild_which(*i) << std::endl;
+            p = portage::find_package(config, *i, optget("overlay", bool));
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
@@ -67,6 +70,17 @@ action_which_handler_T::operator() (std::vector<std::string> &opts)
             if (opts.size() == 1)
                 return EXIT_FAILURE;
         }
+
+        try
+        {
+            ebuild = portage::ebuild_which(p.first, p.second);
+        }
+        catch (const portage::nonexistent_pkg_E)
+        {
+            ebuild = portage::ebuild_which(real_portdir, p.second);
+        }
+
+        *stream << ebuild << std::endl;
     }
 
     return EXIT_SUCCESS;

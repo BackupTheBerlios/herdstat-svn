@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-04-20 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_misc.cc, lib/portage_misc.hh,
+	src/action_meta_handler.cc, src/action_versions_handler.cc: Added
+	optional argument to find_package that determines whether or not to
+	search overlays.
+	* src/options.cc, src/herdstat.cc: Added --no-overlay option.
+	* bashcomp, doc/herdstat.1.in: Added --versions and --no-overlay.
+	* src/action_meta_handler.cc, src/action_pkg_handler.cc: Removed the
+	catch XMLParser_E clause since we catch it in main().
+
 2005-04-19 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.0_pre2)

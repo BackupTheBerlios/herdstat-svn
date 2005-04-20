@@ -43,6 +43,9 @@ belonging to the specified herd.
 .B "\-\-no-herd"
 Shorthand for --with-herd=no-herd.
 .TP
+.B "\-N, \-\-no-overlay"
+Don't search overlay(s) in PORTDIR_OVERLAY.
+.TP
 .B "\-p, \-\-package"
 Display package information for the specified herd(s) or developer(s).
 .TP
@@ -58,6 +61,9 @@ option does not recognize most boolean flags (verbose, quiet, etc).
 .TP
 .B "\-w, \-\-which"
 Display full path to ebuild for the specified package(s).
+.TP
+.B "     \-\-versions"
+Display versions of the specified package(s).
 .TP
 .B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section

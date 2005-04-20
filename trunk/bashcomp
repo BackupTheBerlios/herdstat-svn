@@ -36,7 +36,7 @@ _herdstat() {
     opts="-h --help -V --version -p --package -d --dev -H --herdsxml
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
         -f --fetch -c --count -n --nocolor --no-herd -m --metadata
-        --with-herd -w --which"
+        --with-herd -w --which --versions --no-overlay"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -56,7 +56,7 @@ _herdstat() {
         --with-herd)
             COMPREPLY=( $(compgen -W "$(_complete_herd) no-herd" -- ${cur}))
             ;;
-        -m|--metadata|-w|--which)
+        -m|--metadata|-w|--which|--versions)
             local words p=$(_portdir)
             
             [[ -d ${p} ]] || return 0
@@ -100,7 +100,7 @@ _herdstat() {
                 [[ ${x} == -* ]] || continue
 
                 # dev
-		if [[ ${x} == -*d* && ${x} != "--debug" ]] ; then
+		if [[ ${x} == *d* && ${x} != "--debug" ]] ; then
 		    dev=1
                 fi
 
@@ -112,7 +112,8 @@ _herdstat() {
                     [[ ${x} == *m* && ${x} != "--timer" ]]
                 then
                     meta=1
-                elif [[ ${x} == *w* && ${x} != "--with-herd" ]] ; then
+                elif [[ ${x} == *w* && ${x} != "--with-herd" ]] || \
+                     [[ ${x} == "--versions" ]] ; then
                     which=1
                 fi
 	    done

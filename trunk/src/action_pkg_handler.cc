@@ -192,6 +192,8 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
         metadatas_T::iterator m;
         for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
         {
+            bool found = false;
+
             if (status)
                 ++progress;
 
@@ -201,77 +203,66 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
             if (not util::is_file(*m))
                 continue;
 
-            try
+            std::auto_ptr<MetadataXMLHandler_T>
+                handler(new MetadataXMLHandler_T());
+            XMLParser_T parser(&(*handler));
+
+            /* parse it */
+            parser.parse(*m);
+
+            if (dev)
             {
-                bool found = false;
-
-                std::auto_ptr<MetadataXMLHandler_T> handler(new
-                    MetadataXMLHandler_T());
-                XMLParser_T parser(&(*handler));
-
-                /* parse metadata.xml */
-                parser.parse(*m);
-
-                if (dev)
-                {
-                    /* search the metadata for our dev */
-                    herd_T::iterator d = handler->devs.find(*i + "@gentoo.org");
-                    if (d == handler->devs.end())
-                        continue;
-                    else
-                    {
-                        bool copy = false;
-                        if (not optget("with-herd", std::string).empty())
-                        {
-                            if (std::find(handler->herds.begin(),
-                                handler->herds.end(),
-                                optget("with-herd", std::string)) !=
-                                handler->herds.end())
-                            {
-                                copy = true;
-                            }
-                        }
-                        else
-                            copy = true;
-
-                        if (copy)
-                        {
-                            found = true;
-                            std::copy(d->second->begin(), d->second->end(),
-                                attr.begin());
-                            attr.name = dev_name(herds_xml.herds(), *i);
-                            attr.role = d->second->role;
-                        }
-                    }
-                }
+                /* search the metadata for our dev */
+                herd_T::iterator d = handler->devs.find(*i + "@gentoo.org");
+                if (d == handler->devs.end())
+                    continue;
                 else
                 {
-                    /* search the metadata for our herd */
-                    if (std::find(handler->herds.begin(),
-                        handler->herds.end(), *i) == handler->herds.end())
-                        continue;
+                    bool copy = false;
+                    const std::string herd = optget("with-herd", std::string);
+                    
+                    if (not herd.empty())
+                    {
+                        if (std::find(handler->herds.begin(),
+                            handler->herds.end(), herd) != handler->herds.end())
+                        {
+                            copy = true;
+                        }
+                    }
                     else
+                        copy = true;
+
+                    if (copy)
+                    {
                         found = true;
-                }
-
-                if (found)
-                {
-                    /* get category/package from absolute path */
-                    std::string cat_and_pkg = m->substr(portdir.size() + 1);
-                    std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
-                    if (pos != std::string::npos)
-                        cat_and_pkg = cat_and_pkg.substr(0, pos);
-
-                    debug_msg("Match found in %s.", m->c_str());
-
-                    pkgs[cat_and_pkg] = handler->longdesc;
+                        std::copy(d->second->begin(), d->second->end(),
+                            attr.begin());
+                        attr.name = dev_name(herds_xml.herds(), *i);
+                        attr.role = d->second->role;
+                    }
                 }
             }
-            catch (const XMLParser_E &e)
+            else
             {
-                std::cerr << "Error parsing '" << e.file()
-                    << "': " << e.error() << std::endl;
-                return EXIT_FAILURE;
+                /* search the metadata for our herd */
+                if (std::find(handler->herds.begin(),
+                    handler->herds.end(), *i) == handler->herds.end())
+                    continue;
+                else
+                    found = true;
+            }
+
+            if (found)
+            {
+                /* get category/package from absolute path */
+                std::string cat_and_pkg = m->substr(portdir.size() + 1);
+                std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
+                if (pos != std::string::npos)
+                    cat_and_pkg = cat_and_pkg.substr(0, pos);
+
+                debug_msg("Match found in %s.", m->c_str());
+
+                pkgs[cat_and_pkg] = handler->longdesc;
             }
         }
         

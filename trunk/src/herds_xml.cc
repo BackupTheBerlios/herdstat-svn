@@ -35,8 +35,12 @@ herds_xml_T::init()
     char *result = NULL;
     struct stat s;
     
-    if ((result = std::getenv("HERDS")))
+    if (not optget("herds.xml", std::string).empty())
+        this->_path.assign(optget("herds.xml", std::string));
+    
+    else if ((result = std::getenv("HERDS")))
         this->_path.assign(result);
+    
     /* check if previously fetched copy is recent */
     else if ((stat(HERDS_XML_FETCH_LOCATION, &s) == 0) and
             ((time(NULL) - s.st_mtime) < HERDS_XML_EXPIRE) and (s.st_size > 0))
