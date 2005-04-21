@@ -25,6 +25,7 @@
 #endif
 
 #include "common.hh"
+#include "overlaydisplay.hh"
 #include "formatter.hh"
 #include "action_versions_handler.hh"
 
@@ -37,6 +38,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     const std::string real_portdir(config.portdir());
     std::string portdir;
     bool pwd = false;
+    OverlayDisplay_T od;
 
     formatter_T output;
     output.set_maxlabel(8);
@@ -111,6 +113,9 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
                 package = p.second;
             }
 
+            if (portdir != real_portdir and not pwd)
+                od.insert(portdir);
+
             portage::versions_T versions(portdir + "/" + package);
 
             /* versions would be empty if the directory exists, but no
@@ -120,7 +125,11 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
 
             if (not optget("quiet", bool))
             {
-                output("Package", package);
+                if (portdir == real_portdir or pwd)
+                    output("Package", package);
+                else
+                    output("Package", package + od[portdir]);
+
                 output.endl();
             }
 

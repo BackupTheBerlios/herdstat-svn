@@ -84,14 +84,7 @@ class formatter_T
             append(l, d);
         }
 
-        void endl()
-        {
-            if (attr.quiet and attr.quiet_delim == " ")
-                buffer.push_back("\n");
-            else
-                buffer.push_back("");
-        }
-
+        void endl() { buffer.push_back(""); }
         void flush(std::ostream &);
         const std::string &peek() const { return buffer.back(); }
         std::vector<std::string>::size_type size() const { return buffer.size(); }

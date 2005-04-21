@@ -42,21 +42,10 @@
 #include "action_pkg_handler.hh"
 
 /*
- * Check given herds.xml container for the specified developer
+ * Search herds.xml for the specified developer.
+ * Return the developer's name if found or an empty
+ * string otherwise.
  */
-
-bool
-dev_exists(herds_T &herds_xml, std::string &dev)
-{
-    for (herds_T::iterator h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
-    {
-        herd_T::iterator d = herds_xml[h->first]->find(dev + "@gentoo.org");
-        if (d != herds_xml[h->first]->end())
-            return true;
-    }
-
-    return false;
-}
 
 std::string
 dev_name(herds_T &herds_xml, std::string &dev)
@@ -85,6 +74,7 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     util::progress_T progress;
     std::map<std::string, std::string>::size_type size = 0;
     std::vector<std::string> not_found;
+    std::vector<std::string>::iterator i;
 
     portage::config_T config(optget("portage.config", portage::config_T));
     const std::string portdir(config.portdir());
@@ -120,29 +110,13 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
 
     herds_xml_T herds_xml;
 
-    /* check opts */
-    std::vector<std::string> foundopts(opts);
-    std::vector<std::string>::iterator i;
-    for (i = opts.begin() ; i != opts.end() ; ++i)
-    {
-        if ((dev and not dev_exists(herds_xml.herds(), *i)) or
-            (not dev and not herds_xml.exists(*i)))
-        {
-            foundopts.erase(std::remove(foundopts.begin(),
-                foundopts.end(), *i), foundopts.end());
-        }
-    }
-
     /* our list of metadata.xml's */
     metadatas_T metadatas(portdir);
 
     if (status)
     {
         *stream << "Parsing metadata.xml's: ";
-        if (not foundopts.empty())
-            progress.start(foundopts.size() * metadatas.size());
-        else
-            progress.start(opts.size());
+        progress.start(opts.size() * metadatas.size());
     }
 
     /* for each specified herd/dev... */
@@ -151,39 +125,6 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     {
         dev_attrs_T attr;
         std::map<std::string, std::string> pkgs;
-
-        if (dev and not dev_exists(herds_xml.herds(), *i))
-        {
-            if (status and foundopts.empty())
-                ++progress;
-
-            if (opts.size() == 1)
-            {
-                if (not quiet)
-                    std::cerr << std::endl << "Developer '" << *i
-                        << "' doesn't seem to exist."; 
-                throw dev_E();
-            }
-
-            not_found.push_back(*i);
-            continue;
-        }
-        else if (not dev and not herds_xml.exists(*i))
-        {
-            if (status and foundopts.empty())
-                ++progress;
-
-            if (opts.size() == 1)
-            {
-                if (not quiet)
-                    std::cerr << std::endl << "Herd '" << *i
-                        << "' doesn't seem to exist.";
-                throw herd_E();
-            }
-
-            not_found.push_back(*i);
-            continue;
-        }
 
         if (timer)
             t.start();
@@ -269,6 +210,35 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
         if (timer)
             t.stop();
 
+        if (pkgs.empty())
+        {
+            /* only display error if opts.size() == 1 */
+            if (opts.size() == 1)
+            {
+                if (not quiet)
+                {
+                    if (dev)
+                    {
+                        std::cerr << std::endl
+                            << "Failed to find developer '" << *i
+                            << "' in any metadata.xml's." << std::endl;
+                    }
+                    else
+                    {
+                        std::cerr << std::endl
+                            << "Failed to find herd '" << *i
+                            << "' in any metadata.xml's." << std::endl;
+                    }
+                }
+
+                return EXIT_FAILURE;
+            }
+
+            /* otherwise, save it and we'll deal with it later */
+            not_found.push_back(*i);
+            continue;
+        }
+
         size += pkgs.size();
 
         if ((n == 1) and status)
@@ -348,7 +318,7 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
         }
 
         /* only skip a line if we're not on the last one */
-        if (not count and n != foundopts.size())
+        if (not count and n != opts.size())
             if (not quiet or (quiet and pkgs.size() > 0))
                 output.endl();
     }
@@ -361,15 +331,17 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     for (i = not_found.begin() ; i != not_found.end() ; ++i)
     {
         if (dev)
-            *stream << std::endl << "Developer '" << *i <<
-                "' does not seem to exist.";
+            std::cerr << std::endl
+                << "Failed to find developer '" << *i <<
+                "' in any metadata.xml's.";
         else
-            *stream << std::endl << "Herd '" << *i <<
-                "' does not seem to exist.";
+            std::cerr << std::endl
+                << "Failed to find herd '" << *i <<
+                "' in any metadata.xml's.";
     }
 
     if (not not_found.empty())
-        *stream << std::endl;
+        std::cerr << std::endl;
 
     if (timer)
     {

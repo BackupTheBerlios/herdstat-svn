@@ -41,6 +41,7 @@
 #include "herds.hh"
 #include "formatter.hh"
 #include "xmlparser.hh"
+#include "overlaydisplay.hh"
 #include "metadata_xml_handler.hh"
 #include "action_meta_handler.hh"
 
@@ -52,18 +53,17 @@
 int
 action_meta_handler_T::operator() (std::vector<std::string> &opts)
 {
-    util::color_map_T color;
-    formatter_T output;
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool quiet = optget("quiet", bool);
-    bool pwd = false;
-
     portage::config_T config(optget("portage.config", portage::config_T));
+
+    util::color_map_T color;
+    bool pwd = false;
     const std::string real_portdir(config.portdir());
     std::string portdir;
+    OverlayDisplay_T od;
 
-    std::vector<std::string> portdirs;
-
+    formatter_T output;
     output.set_maxlabel(16);
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_quiet(quiet, " ");
@@ -136,7 +136,6 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::vector<std::string>::size_type portdirn = 0;
         std::string longdesc, package;
 
         try
@@ -185,26 +184,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
         /* are we in an overlay? */
         if (portdir != real_portdir and not pwd)
-        {
-            /* have we already added it? */
-            std::vector<std::string>::iterator pos =
-                std::find(portdirs.begin(), portdirs.end(), portdir);
-
-            /* doesn't exist, add it */
-            if (pos == portdirs.end())
-            {
-                portdirs.push_back(portdir);
-                portdirn = portdirs.size();
-            }
-            /* exists, find it's position */
-            else
-            {
-                portdirn = 1;
-                for (pos = portdirs.begin() ; pos != portdirs.end() ; ++pos, ++portdirn)
-                    if (*pos == portdir)
-                        break;
-            }
-        }
+            od.insert(portdir);
 
         /* if no '/' exists, assume it's a category */
         cat = (package.find('/') == std::string::npos);
@@ -216,10 +196,8 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             output(cat ? "Category" : "Package", package);
 
         /* it's in an overlay, so show a little thinggy to mark it as such */
-        else if (not pwd)
-            output(cat ? "Category" : "Package",
-                util::sprintf("%s%s[%d]%s", package.c_str(), color[cyan].c_str(),
-                portdirn, color[none].c_str()));
+        else
+            output(cat ? "Category" : "Package", package + od[portdir]);
 
         /* does the metadata.xml exist? */
         if (util::is_file(portdir + "/" + package + "/metadata.xml"))
@@ -373,20 +351,6 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
     }
 
     output.flush(*stream);
-
-    /* give a numbered list of all the unique overlay's that were
-     * encountered while processing the queries */
-    if (portdirs.size() > 0)
-    {
-        *stream << std::endl << "Portage Overlays:" << std::endl;
-
-        std::vector<std::string>::iterator p;
-        n = 1;
-        for (p = portdirs.begin() ; p != portdirs.end() ; ++p, ++n)
-            *stream << "  " << color[cyan] << "[" << n << "]" << color[none]
-                << " " << *p << std::endl;
-    }
-
     return EXIT_SUCCESS;
 }
 

@@ -1,5 +1,17 @@
 ChangeLog for herdstat
 
+2005-04-21 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/overlaydisplay.hh: Added OverlayDisplay_T class for keeping
+	track of which overlays are used, their number, and then displaying
+	the little overlay key upon destruction.
+	* src/action_meta_handler.cc, src/action_versions_handler.cc: Make
+	use of OverlayDisplay_T for marking packages/categories that appear in
+	overlays.
+	* src/action_pkg_handler.cc: Fixed bug where pkg handler would not
+	even search the metadata.xml's if the developer/herd is not listed in
+	herds.xml.
+
 2005-04-20 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_misc.cc, lib/portage_misc.hh,

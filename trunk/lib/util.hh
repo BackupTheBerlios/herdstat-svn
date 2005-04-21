@@ -32,6 +32,8 @@
 #include <map>
 #include <vector>
 #include <cstdarg>
+#include <cstdlib>
+#include <cstddef>
 #include <cstdio>
 
 #ifndef PATH_MAX
@@ -79,10 +81,10 @@ namespace util
     class color_map_T
     {
         private:
-            class cmap : public std::map<color_name_T, std::string>
+            class cmap_T : public std::map<color_name_T, std::string>
             {
                 public:
-                    cmap()
+                    cmap_T()
                     {
                         (*this)[red]     = "\033[0;31m";
                         (*this)[green]   = "\033[0;32m";
@@ -97,10 +99,10 @@ namespace util
                     }
             };
 
-            static cmap cm;
+            static cmap_T _cm;
 
         public:
-	    std::string &operator[](color_name_T c) { return this->cm[c]; }
+	    std::string &operator[](color_name_T c) { return this->_cm[c]; }
     };
 }
 

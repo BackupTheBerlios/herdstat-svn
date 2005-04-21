@@ -382,10 +382,6 @@ main(int argc, char **argv)
 	    nonopt_args.push_back("all");
 	}
 
-	/* dump options */
-	if (optget("debug", bool))
-	    options.dump(*optget("outstream", std::ostream *));
-
 	/* --fetch and no options: fetch herds.xml and exit */
 	if (optget("fetch", bool) and nonopt_args.empty())
 	{
@@ -422,7 +418,11 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	    }
 	}
-	
+
+	/* dump options */
+	if (optget("debug", bool))
+	    options.dump(*optget("outstream", std::ostream *));	
+
 	/* set locale */
 	optget("outstream", std::ostream *)->imbue
 	    (std::locale(optget("locale", std::string).c_str()));

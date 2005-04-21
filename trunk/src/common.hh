@@ -22,6 +22,7 @@
 
 #include <string>
 #include <cstdarg>
+#include <cassert>
 #include "options.hh"
 #include "util.hh"
 #include "exceptions.hh"

@@ -1,10 +1,17 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
-1.1.0_pre3:
+1.1.0_rc1:
     New features:
      - Added --no-overlay option that prevents overlays listed in
        PORTDIR_OVERLAY from being searched.
+     - --versions now also shows whether the displayed query results came
+       from an overlay.
+
+    Bug fixes:
+     - Fixed bug where --package would not search metadata.xml's if the
+       specified herd/developer (mainly concerned about the latter) isn't
+       listed in herds.xml.
 
 1.1.0_pre2:
     New features:
