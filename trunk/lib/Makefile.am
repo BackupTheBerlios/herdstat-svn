@@ -11,7 +11,7 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     portage_config.hh portage_config.cc \
 		     portage_version.hh portage_version.cc
 
-AM_CXXFLAGS = -pedantic -ansi -Wall
+AM_CXXFLAGS = -pedantic -ansi -Wall -Wno-long-long
 CLEANFILES = version-test
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 

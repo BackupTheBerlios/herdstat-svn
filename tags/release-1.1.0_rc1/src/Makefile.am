@@ -29,7 +29,7 @@ herdstat_LDADD = ../lib/libutil.la
 
 INCLUDES = -I../lib
 LIBS = @LIBS@ @XMLWRAPP_LIBS@
-AM_CXXFLAGS = @XMLWRAPP_CFLAGS@ -pedantic -ansi -Wall
+AM_CXXFLAGS = -pedantic -ansi -Wall
 
 MAINTAINERCLEANFILES = Makefile.in *~
 
