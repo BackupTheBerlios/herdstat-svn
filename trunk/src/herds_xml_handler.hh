@@ -57,8 +57,6 @@ class HerdsXMLHandler_T : public XMLHandler_T
         virtual bool text(const std::string &);
 
     public:
-        typedef std::map<std::string, std::string>  descs_T;
-
         HerdsXMLHandler_T()
         {
             in_herd = in_herd_name = in_herd_email = in_herd_desc =

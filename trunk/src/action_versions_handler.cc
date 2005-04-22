@@ -177,6 +177,6 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     output.flush(*stream);
 
     return EXIT_SUCCESS;
-};
+}
 
 /* vim: set tw=80 sw=4 et : */

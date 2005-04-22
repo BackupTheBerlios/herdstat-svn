@@ -33,7 +33,7 @@
 
 #include "util.hh"
 
-util::color_map_T::cmap util::color_map_T::cm;
+util::color_map_T::cmap_T util::color_map_T::_cm;
 
 void
 util::debug(const char *msg, ...)

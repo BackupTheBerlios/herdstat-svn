@@ -24,21 +24,10 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <locale>
 #include <map>
 #include <vector>
 #include <algorithm>
-#include <memory>
-#include <cstring>
-#include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
-#include <cerrno>
-#include <ctime>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
@@ -108,7 +97,8 @@ usage()
 void
 help()
 {
-    std::cout
+    version();
+    std::cout << std::endl
 	<< "usage: " << PACKAGE << " [options] [args]" << std::endl
 
 #ifdef HAVE_GETOPT_LONG
@@ -392,7 +382,7 @@ main(int argc, char **argv)
 	    return EXIT_SUCCESS;
 	}
 
-	/* setup outfile */
+	/* setup output stream */
 	std::ostream *outstream = NULL;
 	if (optget("outfile", std::string) != "stdout" and
 	    optget("outfile", std::string) != "stderr")
@@ -404,6 +394,7 @@ main(int argc, char **argv)
 	}
 	else
 	{
+	    /* save locale name */
 	    try
 	    {
 		optset("locale", std::string, std::locale("").name());
@@ -440,6 +431,7 @@ main(int argc, char **argv)
 	if (optget("action", options_action_T) == action_unspecified)
 	    optset("action", options_action_T, action_herd);
 
+	/* setup action handlers */
 	std::map<options_action_T, action_handler_T * > handlers;
 	handlers[action_herd]  = new action_herd_handler_T();
 	handlers[action_dev]   = new action_dev_handler_T();
@@ -451,6 +443,7 @@ main(int argc, char **argv)
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];
+
 	if (action_handler)
 	{
 	    try

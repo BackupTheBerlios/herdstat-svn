@@ -111,6 +111,8 @@ HerdsXMLHandler_T::text(const std::string &str)
         if (i == herds[cur_herd]->end())
             return false;
         i->second->name = str;
+        if (cur_dev == "flameeyes@gentoo.org")
+        debug_msg("dev = '%s', maintainer name = '%s'", cur_dev.c_str(), str.c_str());
     }
 
     /* <maintainer><role> */

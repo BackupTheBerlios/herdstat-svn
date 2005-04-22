@@ -32,6 +32,7 @@
 class action_herd_handler_T : public action_handler_T
 {
     public:
+        virtual ~action_herd_handler_T() { }
 	virtual int operator() (std::vector<std::string> &);
 };
 

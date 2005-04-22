@@ -32,6 +32,7 @@
 class action_handler_T
 {
     public:
+        virtual ~action_handler_T() { }
         virtual int operator() (std::vector<std::string> &) = 0;
 };
 

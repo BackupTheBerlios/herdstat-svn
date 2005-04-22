@@ -20,9 +20,14 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#include <iostream>
 #include <string>
+#include <cstdlib>
+#include <cstddef>
 #include <cstdarg>
 #include <cassert>
+#include <cstdio>
+#include <cstring>
 #include "options.hh"
 #include "util.hh"
 #include "exceptions.hh"
