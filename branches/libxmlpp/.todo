@@ -3,6 +3,15 @@
     <title>
         Todo list for herdstat
     </title>
+    <note priority="veryhigh" time="1114076322">
+        Fix bug where names that contain unicode chars only display the unicode char and everything after it (truncating everything before it).
+        <note priority="high" time="1114231378">
+            Make use of glibmm's Glib::ustring?
+        </note>
+        <note priority="low" time="1114163643">
+            Looks like a xmlwrapp bug
+        </note>
+    </note>
     <note priority="veryhigh" time="1114230861">
         It'd be nice to be able to specify -m --versions at the same time to get both
     </note>

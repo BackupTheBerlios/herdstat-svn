@@ -1,0 +1,21 @@
+herdstat - http://developer.berlios.de/projects/herdstat/
+See AUTHORS for developer contact information.
+
+Features
+========
+herdstat is a multi-purpose query tool capable of things such as:
+
+    * Displaying herd information (bugzilla alias, developer information,
+      package information).
+    * Displaying developer information (email address, real name (if present
+      in herds.xml), herd information, package information).
+    * Displaying category/package metadata.
+
+Bugs
+====
+Please submit bugs and patches via http://bugs.gentoo.org/.
+
+Usage
+=====
+Read herdstat(1) for information on using herdstat. Running herdstat --help
+will also display detailed usage information.
