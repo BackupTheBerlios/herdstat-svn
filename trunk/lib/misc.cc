@@ -1,7 +1,7 @@
 /*
- * herdstat -- lib/util.cc
+ * herdstat -- lib/misc.cc
  * $Id$
- * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
+ * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
  *
@@ -210,3 +210,5 @@ util::fetch(const char *url, const char *file, bool verbose)
 
     return std::system(cmd.c_str());
 }
+
+/* vim: set tw=80 sw=4 et : */
