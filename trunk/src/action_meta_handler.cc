@@ -27,6 +27,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <memory>
 #include <utility>
 #include <algorithm>
@@ -57,6 +58,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
     const bool quiet = optget("quiet", bool);
     const bool regex = optget("regex", bool);
     portage::config_T config(optget("portage.config", portage::config_T));
+    std::multimap<std::string, std::string> matches;
 
     util::color_map_T color;
     bool pwd = false;
@@ -145,10 +147,10 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         else
             regexp.assign(re, REG_ICASE);
 
-//        opts = portage::find_package_regex(config, regexp,
-//            optget("overlay", bool));
-        
-        if (opts.empty())
+        matches = portage::find_package_regex(config, regexp,
+                                              optget("overlay", bool));
+
+        if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '" << re << "'."
                 << std::endl;
@@ -156,26 +158,40 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         }
     }
 
-    /* for each specified package/category... */
     std::vector<std::string>::iterator i;
-    std::vector<std::string>::size_type n = 1;
-    for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
+    for (i = opts.begin() ; i != opts.end() ; ++i)
+    {
+        if (not portdir.empty())
+            matches.insert(std::make_pair(portdir, *i));
+        else
+            matches.insert(std::make_pair("", *i));
+    }
+
+    /* for each specified package/category... */
+    std::multimap<std::string, std::string>::iterator m;
+    std::multimap<std::string, std::string>::size_type n = 1;
+    for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         bool cat = false;
         herd_T devs;
         std::vector<std::string> herds;
-        std::string longdesc, package;
+        std::string longdesc, package, metadata;
 
         try
         {
             /* The only reason portdir should be set already is if
              * opts == 0 and portdir is set to $PWD */
             if (pwd)
-                package = portage::find_package_in(portdir, *i);
+                package = portage::find_package_in(portdir, m->second);
+            else if (regex and not m->first.empty())
+            {
+                portdir = m->first;
+                package = m->second;
+            }
             else
             {
                 std::pair<std::string, std::string> p =
-                    portage::find_package(config, *i, optget("overlay", bool));
+                    portage::find_package(config, m->second, optget("overlay", bool));
                 portdir = p.first;
                 package = p.second;
             }
@@ -190,25 +206,27 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
                 if (quiet or not optget("color", bool))
-                    std::cerr << *i << std::endl;
+                    std::cerr << m->second << std::endl;
                 else
-                    std::cerr << color[green] << *i << color[none] << std::endl;
+                    std::cerr << color[green] << m->second << color[none] << std::endl;
             }
 
-            if (opts.size() == 1)
+            if (matches.size() == 1)
                 return EXIT_FAILURE;
             else
                 continue;
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
-            std::cerr << *i << " doesn't seem to exist." << std::endl;
+            std::cerr << m->second << " doesn't seem to exist." << std::endl;
 
-            if (opts.size() == 1)
+            if (matches.size() == 1)
                 return EXIT_FAILURE;
             else
                 continue;
         }
+
+        metadata = portdir + "/" + package + "/metadata.xml";
 
         /* are we in an overlay? */
         if (portdir != real_portdir and not pwd)
@@ -227,8 +245,10 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         else
             output(cat ? "Category" : "Package", package + od[portdir]);
 
+        assert(not metadata.empty());
+
         /* does the metadata.xml exist? */
-        if (util::is_file(portdir + "/" + package + "/metadata.xml"))
+        if (util::is_file(metadata))
         {
             util::vars_T ebuild_vars;
 
@@ -238,7 +258,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
                     handler(new MetadataXMLHandler_T());
                 XMLParser_T parser(&(*handler));
 
-                parser.parse(portdir + "/" + package + "/metadata.xml");
+                parser.parse(metadata);
 
                 herds = handler->herds;
                 devs = handler->devs;

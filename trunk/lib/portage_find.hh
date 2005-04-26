@@ -27,6 +27,12 @@
 # include "config.h"
 #endif
 
+#include <string>
+#include <vector>
+#include <map>
+#include <utility>
+#include "regex.hh"
+
 namespace portage
 {
     /*************************************************************************/
@@ -40,14 +46,13 @@ namespace portage
     find_package_in(const std::string &, const std::string &);
     /*************************************************************************/    
     std::vector<std::string>
-    find_package_regex_in(const std::string &, const util::regex_T &);
+    find_package_regex_in(const std::string &, util::regex_T &);
     /*************************************************************************/
     std::pair<std::string, std::string>
     find_package(portage::config_T &, const std::string &, bool overlays = true);
     /*************************************************************************/
-    std::vector<std::string>
-    find_package_regex(portage::config_T &, const util::regex_T &,
-                                            bool overlays = true);
+    std::multimap<std::string, std::string>
+    find_package_regex(portage::config_T &, util::regex_T &, bool overlays = true);
     /*************************************************************************/
 }
 

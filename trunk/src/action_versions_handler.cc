@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
+
 #include "common.hh"
 #include "overlaydisplay.hh"
 #include "formatter.hh"
@@ -34,6 +36,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
 {
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
+    const bool regex = optget("regex", bool);
     portage::config_T config(optget("portage.config", portage::config_T));
     const std::string real_portdir(config.portdir());
     std::string portdir;
@@ -93,6 +96,39 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
         
         debug_msg("set portdir to '%s'", portdir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
+    }
+    else if (regex and opts.size() > 1)
+    {
+        std::cerr << "You may only specify one regular expression." << std::endl;
+        return EXIT_FAILURE;
+    }
+    else if (regex)
+    {
+        util::regex_T regexp;
+        std::string re(opts.front());
+        opts.clear();
+        
+        if (optget("eregex", bool))
+            regexp.assign(re, REG_EXTENDED|REG_ICASE);
+        else
+            regexp.assign(re, REG_ICASE);
+        
+        const std::multimap<std::string, std::string> matches =
+            portage::find_package_regex(config, regexp, optget("overlay", bool));
+        std::multimap<std::string, std::string>::const_iterator m;
+        for (m = matches.begin() ; m != matches.end() ; ++m)
+        {
+            if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
+                opts.push_back(m->second);
+        }
+        
+        if (matches.empty())
+        {
+            std::cerr << "Failed to find any packages matching '" << re << "'."
+                << std::endl;
+            return EXIT_FAILURE;
+        }
+
     }
 
     std::vector<std::string>::iterator i;

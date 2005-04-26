@@ -28,6 +28,9 @@
 #endif
 
 #include <iostream>
+#include <vector>
+#include <string>
+
 #include "util_exceptions.hh"
 
 namespace portage

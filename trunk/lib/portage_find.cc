@@ -24,7 +24,8 @@
 # include "config.h"
 #endif
 
-#include <utility>
+#include "portage_misc.hh"
+#include "portage_version.hh"
 #include "portage_exceptions.hh"
 #include "portage_config.hh"
 #include "portage_find.hh"
@@ -116,8 +117,7 @@ portage::find_package_in(const std::string &portdir, const std::string &pkg)
  */
 
 std::vector<std::string>
-portage::find_package_regex_in(const std::string &portdir,
-                               const util::regex_T &regex)
+portage::find_package_regex_in(const std::string &portdir, util::regex_T &regex)
 {
     std::vector<std::string> matches;
     const portage::categories_T categories;
@@ -133,9 +133,13 @@ portage::find_package_regex_in(const std::string &portdir,
 
         for (d = category.begin() ; d != category.end() ; ++d)
         {
-            /* Does category/package match the regex? */
-            if (regex == (*c + "/" + d->basename()))
-                matches.push_back(*c + "/" + d->basename());
+            util::path_T base(d->basename());
+            if (base[0] == '.' or base == "CVS" or not util::is_dir(*d))
+                continue;
+
+            /* Does category/package or package match the regex? */
+            if ((regex == base) or (regex == (*c + "/" + base)))
+                matches.push_back(*c + "/" + base);
         }
     }
 
@@ -219,10 +223,10 @@ portage::find_package(portage::config_T &config,
 
 static std::multimap<std::string, std::string>
 search_overlays_regex(const std::vector<std::string> &overlays,
-                      const util::regex_T &regex)
+                      util::regex_T &regex)
 {
-    const std::vector<std::string> result;
-    std::vector<std::string>::const_iterator r;
+    std::vector<std::string> result;
+    std::vector<std::string>::iterator r;
     std::multimap<std::string, std::string> matches;
     std::multimap<std::string, std::string>::iterator m;
 
@@ -234,12 +238,10 @@ search_overlays_regex(const std::vector<std::string> &overlays,
         {
             result = portage::find_package_regex_in(*o, regex);
             for (r = result.begin() ; r != result.end() ; ++r)
-                matches[*o] = *r;
+                matches.insert(std::make_pair(*o, *r));
         }
         catch (const portage::nonexistent_pkg_E)
-        {
-            continue;
-        }
+        { continue; }
     }
 
     return matches;
@@ -247,13 +249,13 @@ search_overlays_regex(const std::vector<std::string> &overlays,
 
 std::multimap<std::string, std::string>
 portage::find_package_regex(portage::config_T &config,
-                            const util::regex_T &regex,
+                            util::regex_T &regex,
                             bool do_overlays)
 {
     std::string portdir(config.portdir());
     const std::vector<std::string> overlays(config.overlays());
-    const std::vector<std::string> result;
-    std::vector<std::string>::const_iterator r;
+    std::vector<std::string> result;
+    std::vector<std::string>::iterator r;
     std::multimap<std::string, std::string> matches;
     std::multimap<std::string, std::string>::iterator m;
 
@@ -261,7 +263,7 @@ portage::find_package_regex(portage::config_T &config,
     {
         result = portage::find_package_regex_in(portdir, regex);
         for (r = result.begin() ; r != result.end() ; ++r)
-            matches[portdir] = *r;
+            matches.insert(std::make_pair(portdir, *r));
 
         if (do_overlays)
         {
@@ -272,7 +274,7 @@ portage::find_package_regex(portage::config_T &config,
             for (o = omatches.begin() ; o != omatches.end() ; ++o)
             {
                 if (not o->second.empty())
-                    matches[o->first] = o->second;
+                    matches.insert(std::make_pair(o->first, o->second));
             }
         }
     }
@@ -291,7 +293,7 @@ portage::find_package_regex(portage::config_T &config,
                 if (not o->second.empty())
                 {
                     found = true;
-                    matches[o->first] = o->second;
+                    matches.insert(std::make_pair(o->first, o->second));
                 }
             }   
         }

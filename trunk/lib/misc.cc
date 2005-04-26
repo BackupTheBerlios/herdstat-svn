@@ -25,13 +25,15 @@
 #endif
 
 #include <iostream>
-#include <string>
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
 #include <unistd.h>
 
-#include "util.hh"
+#include "file.hh"
+#include "string.hh"
+#include "util_exceptions.hh"
+#include "misc.hh"
 
 util::color_map_T::cmap_T util::color_map_T::_cm;
 

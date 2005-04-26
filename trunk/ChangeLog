@@ -13,7 +13,10 @@ ChangeLog for herdstat
 	find_package_regex().
 	* src/herdstat.cc, src/options.cc: Added --regex and --extended
 	options.
-	* src/action_pkg_handler.cc: Added regex_T support.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_meta_handler.cc, src/action_pkg_handler.cc,
+	src/action_versions_handler.cc, src/action_which_handler.cc: Added
+	regex_T support.
 
 2005-04-22 Aaron Walker <ka0ttic@gentoo.org>
 

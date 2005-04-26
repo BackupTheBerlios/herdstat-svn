@@ -28,10 +28,12 @@
 #endif
 
 #include "file.hh"
+#include "portage_config.hh"
 
 namespace portage
 {
     bool in_pkg_dir();
+    bool is_pkg_dir(const util::path_T &);
     bool is_ebuild(const util::path_T &);
 
     /* represents a list of package categories */
