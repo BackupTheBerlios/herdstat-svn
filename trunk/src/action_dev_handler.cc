@@ -94,6 +94,40 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
             << std::endl;
         return EXIT_FAILURE;
     }
+    else if (regex)
+    {
+        util::regex_T regexp;
+        std::string re(devs.front());
+        devs.clear();
+
+        if (optget("eregex", bool))
+            regexp.assign(re, REG_EXTENDED|REG_ICASE);
+        else
+            regexp.assign(re, REG_ICASE);
+
+        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        {
+            herd_T::iterator d;
+            std::string herd = h->first;
+
+            for (d = herds_xml[herd]->begin() ; 
+                 d != herds_xml[herd]->end() ; ++d)
+            {
+                if (regexp == d->first)
+                    devs.push_back(util::get_user_from_email(d->first));
+            }
+        }
+
+        if (devs.empty())
+        {
+            std::cerr << "Failed to find any developers matching '" << re
+                << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        std::sort(devs.begin(), devs.end());
+        devs.erase(std::unique(devs.begin(), devs.end()), devs.end());
+    }
 
     std::vector<std::string>::size_type size = 0;
 
@@ -102,45 +136,21 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
     std::vector<std::string>::size_type n = 1;
     for (dev = devs.begin() ; dev != devs.end() ; ++dev, ++n)
     {
-        util::regex_T regexp;
         std::string name;
         std::vector<std::string> herds;
-
-        if (regex and optget("eregex", bool))
-            regexp.assign(*dev, REG_EXTENDED|REG_ICASE);
-        else if (regex)
-            regexp.assign(*dev, REG_ICASE);
 
         /* for each herd in herds.xml... */
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
-            herd_T::iterator d;
             std::string herd = h->first;
-
-            if (regex)
+            
+            /* is the dev in the current herd? */
+            herd_T::iterator d = herds_xml[herd]->find(*dev + "@gentoo.org");
+            if (d != herds_xml[herd]->end())
             {
-                /* loop through herds.xml, searching for a developer
-                 * matching the regex */
-                for (d = herds_xml[herd]->begin() ;
-                     d != herds_xml[herd]->end()  ; ++d)
-                {
-                    if (regexp == d->first)
-                        herds.push_back(herd);
-                }
-
-                if (herds.empty())
-                    continue;
-            }
-            else
-            {
-                /* is the dev in the current herd? */
-                d = herds_xml[herd]->find(*dev + "@gentoo.org");
-                if (d != herds_xml[herd]->end())
-                {
-                    herds.push_back(herd);
-                    if (not d->second->name.empty())
-                        name = d->second->name;
-                }
+                herds.push_back(herd);
+                if (not d->second->name.empty())
+                    name = d->second->name;
             }
         }
 
@@ -159,14 +169,9 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
         {
             if (not optget("quiet", bool))
             {
-                if (regex)
-                    output("Regex", *dev);
-                else
-                {
-                    output("Developer",
-                        (name.empty() ? *dev : name + " (" + (*dev) + ")"));
-                    output("Email", *dev + "@gentoo.org");
-                }
+                output("Developer",
+                    (name.empty() ? *dev : name + " (" + (*dev) + ")"));
+                output("Email", *dev + "@gentoo.org");
             }
 
             if (optget("verbose", bool) and not optget("quiet", bool))
