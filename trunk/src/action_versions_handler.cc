@@ -37,6 +37,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool regex = optget("regex", bool);
+    std::multimap<std::string, std::string> matches;
     portage::config_T config(optget("portage.config", portage::config_T));
     const std::string real_portdir(config.portdir());
     std::string portdir;
@@ -113,14 +114,8 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
         else
             regexp.assign(re, REG_ICASE);
         
-        const std::multimap<std::string, std::string> matches =
-            portage::find_package_regex(config, regexp, optget("overlay", bool));
-        std::multimap<std::string, std::string>::const_iterator m;
-        for (m = matches.begin() ; m != matches.end() ; ++m)
-        {
-            if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
-                opts.push_back(m->second);
-        }
+        matches = portage::find_package_regex(config, regexp,
+            optget("overlay", bool));
         
         if (matches.empty())
         {
@@ -132,19 +127,28 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
     }
 
     std::vector<std::string>::iterator i;
-    std::vector<std::string>::size_type n = 1;
-    for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
+    for (i = opts.begin() ; i != opts.end() ; ++i)
+        matches.insert(std::make_pair("", *i));
+
+    std::multimap<std::string, std::string>::iterator m;
+    std::multimap<std::string, std::string>::size_type n = 1;
+    for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         std::string package;
 
         try
         {
             if (pwd)
-                package = portage::find_package_in(portdir, *i);
+                package = portage::find_package_in(portdir, m->second);
+            else if (regex and not m->first.empty())
+            {
+                portdir = m->first;
+                package = m->second;
+            }
             else
             {
                 std::pair<std::string, std::string> p =
-                    portage::find_package(config, *i, optget("overlay", bool));
+                    portage::find_package(config, m->second, optget("overlay", bool));
                 portdir = p.first;
                 package = p.second;
             }
@@ -180,7 +184,7 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
                 output("", s);
             }
 
-            if (n != opts.size())
+            if (n != matches.size())
                 output.endl();
         }
         catch (const portage::ambiguous_pkg_E &e)
@@ -189,23 +193,23 @@ action_versions_handler_T::operator() (std::vector<std::string> &opts)
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
 
-            std::vector<std::string>::const_iterator i;
-            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
+            std::vector<std::string>::const_iterator x;
+            for (x = e.packages.begin() ; x != e.packages.end() ; ++x)
             {
                 if (optget("quiet", bool) or not optget("color", bool))
-                    std::cerr << *i << std::endl;
+                    std::cerr << *x << std::endl;
                 else
-                    std::cerr << color[green] << *i << color[none] << std::endl;
+                    std::cerr << color[green] << *x << color[none] << std::endl;
             }
 
-            if (opts.size() == 1)
+            if (matches.size() == 1)
                 return EXIT_FAILURE;
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
-            std::cerr << *i << " doesn't seem to exist." << std::endl;
+            std::cerr << m->second << " doesn't seem to exist." << std::endl;
 
-            if (opts.size() == 1)
+            if (matches.size() == 1)
                 return EXIT_FAILURE;
         }
     }

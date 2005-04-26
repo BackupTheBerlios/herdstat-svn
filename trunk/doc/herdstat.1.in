@@ -46,6 +46,12 @@ Shorthand for --with-herd=no-herd.
 .B "\-N, \-\-no-overlay"
 Don't search overlay(s) in PORTDIR_OVERLAY.
 .TP
+.B "\-r, \-\-regex"
+Display results matching the specified regular expression.
+.TP
+.B "\-E, \-\-extended"
+When used in conjunction with --regex, use extended regular expressions.
+.TP
 .B "\-p, \-\-package"
 Display package information for the specified herd(s) or developer(s).
 .TP
@@ -104,6 +110,8 @@ Display all developers in the netmon and x11 herds.
 Display metadata information for the app-vim category.
 .IP "\fB$ @PACKAGE@ -m rkhunter\fR"
 Display metadata information for the rkhunter package.
+.IP "\fB$ @PACKAGE@ -mr ^xmms\fR"
+Display metadata information for all packages whose name begin with xmms.
 .IP "\fB$ @PACKAGE@ -p netmon\fR"
 Display all packages in the netmon herd.
 .IP "\fB$ @PACKAGE@ -d ka0ttic\fR"
@@ -112,6 +120,8 @@ Display all herds that the developer ka0ttic is in.
 Display all packages ka0ttic maintains.
 .IP "\fB$ @PACKAGE@ -dp ka0ttic --with-herd cron\fR"
 Display all packages ka0ttic maintains that belong to the cron herd.
+.IP "\fB$ @PACKAGE@ -dpr ^kl\fR"
+Display all packages that developers, whose nick match ^kl, maintain.
 .IP "\fB$ @PACKAGE@ -pc base-system\fR"
 Display the number of packages in the base-system herd.
 .IP "\fB$ @PACKAGE@ -dpc ka0ttic\fR"

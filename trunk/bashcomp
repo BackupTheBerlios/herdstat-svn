@@ -36,7 +36,8 @@ _herdstat() {
     opts="-h --help -V --version -p --package -d --dev -H --herdsxml
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
         -f --fetch -c --count -n --nocolor --no-herd -m --metadata
-        --with-herd -w --which --versions --no-overlay"
+        --with-herd -w --which --versions --no-overlay -r --regex
+        -E --extended"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -50,6 +51,9 @@ _herdstat() {
 	-H|--herdsxml|-o|--outfile)
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
 	    ;;
+        -r|--regex)
+            COMPREPLY=()
+            ;;
 	-d|--dev)
 	    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts} all" -- ${cur}) )
 	    ;;

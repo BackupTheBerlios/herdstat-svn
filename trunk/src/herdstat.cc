@@ -76,7 +76,7 @@ static struct option long_opts[] =
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     {"no-overlay",  no_argument,	0,  'N'},
-    {"regex",	    required_argument,	0,  'r'},
+    {"regex",	    no_argument,	0,  'r'},
     {"extended",    no_argument,	0,  'E'},
     { 0, 0, 0, 0 }
 };

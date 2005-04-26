@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.0_rc2:
+    New features:
+     - Added --regex and --extended for only displaying results that match
+       the specified regular expresion (extended if --extended is specified).
+
 1.1.0_rc1:
     New features:
      - Added --no-overlay option that prevents overlays listed in

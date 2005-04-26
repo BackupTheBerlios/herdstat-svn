@@ -35,6 +35,7 @@ action_which_handler_T::operator() (std::vector<std::string> &opts)
     portage::config_T config(optget("portage.config", portage::config_T));
     const std::string real_portdir(config.portdir());
     const bool regex = optget("regex", bool);
+    std::multimap<std::string, std::string> matches;
 
     if (optget("all", bool))
     {
@@ -59,14 +60,8 @@ action_which_handler_T::operator() (std::vector<std::string> &opts)
         else
             regexp.assign(re, REG_ICASE);
 
-        const std::multimap<std::string, std::string> matches =
-            portage::find_package_regex(config, regexp, optget("overlay", bool));
-        std::multimap<std::string, std::string>::const_iterator m;
-        for (m = matches.begin() ; m != matches.end() ; ++m)
-        {
-            if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
-                opts.push_back(m->second);
-        }
+        matches = portage::find_package_regex(config, regexp,
+                    optget("overlay", bool));
 
         if (matches.empty())
         {
@@ -78,13 +73,23 @@ action_which_handler_T::operator() (std::vector<std::string> &opts)
 
     std::vector<std::string>::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
+        matches.insert(std::make_pair("", *i));
+
+    std::multimap<std::string, std::string>::iterator m;
+    for (m = matches.begin() ; m != matches.end() ; ++m)
     {
         std::string ebuild;
         std::pair<std::string, std::string> p;
 
         try
         {
-            p = portage::find_package(config, *i, optget("overlay", bool));
+            if (regex)
+            {
+                p.first = m->first;
+                p.second = m->second;
+            }
+            else
+                p = portage::find_package(config, m->second, optget("overlay", bool));
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
