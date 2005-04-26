@@ -46,16 +46,16 @@ namespace util
         private:
             void cleanup();
 
-            bool _compiled;
-            int _cflags;
-            int _eflags;
-            regex_t _regex;
+            bool    _compiled;  /* has this->_regex been compiled? */
+            int     _cflags,    /* cflags, see regcomp(3) */
+                    _eflags;    /* eflags, see regexec(3) */
+            regex_t _regex;     /* our regex structure, see regex.h(P) */
 
         public:
             regex_T() : _compiled(false), _cflags(0), _eflags(0) { }
-            regex_T(const std::string &regex, int c = 0, int e = 0)
+            regex_T(const std::string &r, int c = 0, int e = 0)
                 : _compiled(false), _cflags(c), _eflags(e)
-            { this->assign(regex, c, e); }
+            { this->assign(r, c, e); }
             ~regex_T() { if (this->_compiled) this->cleanup(); }
 
             void assign(const std::string &, int c = 0, int e = 0);

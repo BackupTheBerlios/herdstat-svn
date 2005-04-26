@@ -11,7 +11,8 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     portage_exceptions.hh \
 		     portage_misc.hh portage_misc.cc \
 		     portage_config.hh portage_config.cc \
-		     portage_version.hh portage_version.cc
+		     portage_version.hh portage_version.cc \
+		     portage_find.hh portage_find.cc
 
 AM_CXXFLAGS = -pedantic -ansi -Wall -Wno-long-long
 CLEANFILES = version-test

@@ -52,5 +52,6 @@
 #include "portage_misc.hh"
 #include "portage_config.hh"
 #include "portage_version.hh"
+#include "portage_find.hh"
 
 #endif

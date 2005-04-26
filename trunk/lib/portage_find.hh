@@ -1,0 +1,56 @@
+/*
+ * herdstat -- lib/portage_find.hh
+ * $Id$
+ * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
+ *
+ * This file is part of herdstat.
+ *
+ * herdstat is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 325, Boston, MA  02111-1257  USA
+ */
+
+#ifndef HAVE_PORTAGE_FIND_HH
+#define HAVE_PORTAGE_FIND_HH 1
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+namespace portage
+{
+    /*************************************************************************/
+    const std::string
+    ebuild_which(portage::config_T &, const std::string &, bool overlays = true);
+    /*************************************************************************/
+    const std::string
+    ebuild_which(const std::string &, const std::string &);
+    /*************************************************************************/
+    const std::string
+    find_package_in(const std::string &, const std::string &);
+    /*************************************************************************/    
+    std::vector<std::string>
+    find_package_regex_in(const std::string &, const util::regex_T &);
+    /*************************************************************************/
+    std::pair<std::string, std::string>
+    find_package(portage::config_T &, const std::string &, bool overlays = true);
+    /*************************************************************************/
+    std::vector<std::string>
+    find_package_regex(portage::config_T &, const util::regex_T &,
+                                            bool overlays = true);
+    /*************************************************************************/
+}
+
+#endif
+
+/* vim: set tw=80 sw=4 et : */
