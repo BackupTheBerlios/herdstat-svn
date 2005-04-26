@@ -29,6 +29,7 @@
 
 #include <utility>
 #include "vars.hh"
+#include "regex.hh"
 #include "portage_config.hh"
 
 namespace portage
@@ -39,9 +40,14 @@ namespace portage
                                                         bool overlays = true);
     const std::string ebuild_which(const std::string &, const std::string &);
     const std::string find_package_in(const std::string &, const std::string &);
+    std::vector<std::string> find_package_regex_in(const std::string &,
+                                                   const util::regex_T &);
     std::pair<std::string, std::string> find_package(portage::config_T &,
                                                      const std::string &,
                                                      bool overlays = true);
+    std::vector<std::string> find_package_regex(portage::config_T &,
+                                                const util::regex_T &,
+                                                bool overlays = true);
 
     /* represents a list of package categories */
     class categories_T : public util::file_T

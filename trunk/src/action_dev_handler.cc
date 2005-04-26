@@ -44,6 +44,7 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
 {
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
+    const bool regex = optget("regex", bool);
     
     /* set format attributes */
     formatter_T output;
@@ -57,7 +58,6 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
     output.set_attrs();
 
     herds_xml_T herds_xml;
-
     herds_T::iterator h;
 
     /* all target? */
@@ -84,26 +84,57 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
 
         if (optget("count", bool))
             output("", util::sprintf("%d", all_devs.size()));
+
+        output.flush(*stream);
+        return EXIT_SUCCESS;
     }
-    else
+    else if (regex and devs.size() > 1)
     {
-        std::vector<std::string>::size_type size = 0;
+        std::cerr << "You may only specify one regular expression."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
 
-        /* for each specified dev... */
-        std::vector<std::string>::iterator dev;
-        std::vector<std::string>::size_type n = 1;
-        for (dev = devs.begin() ; dev != devs.end() ; ++dev, ++n)
+    std::vector<std::string>::size_type size = 0;
+
+    /* for each specified dev... */
+    std::vector<std::string>::iterator dev;
+    std::vector<std::string>::size_type n = 1;
+    for (dev = devs.begin() ; dev != devs.end() ; ++dev, ++n)
+    {
+        util::regex_T regexp;
+        std::string name;
+        std::vector<std::string> herds;
+
+        if (regex and optget("eregex", bool))
+            regexp.assign(*dev, REG_EXTENDED|REG_ICASE);
+        else if (regex)
+            regexp.assign(*dev, REG_ICASE);
+
+        /* for each herd in herds.xml... */
+        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
-            std::string name;
-            std::vector<std::string> herds;
+            herd_T::iterator d;
+            std::string herd = h->first;
 
-            /* for each herd in herds.xml... */
-            for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+            if (regex)
             {
-                std::string herd = h->first;
+                /* loop through herds.xml, searching for a developer
+                 * matching the regex */
+                for (d = herds_xml[herd]->begin() ;
+                     d != herds_xml[herd]->end()  ; ++d)
+                {
+                    if (regexp == d->first)
+                        herds.push_back(herd);
+                }
 
+                if (herds.empty())
+                    continue;
+            }
+            else
+            {
                 /* is the dev in the current herd? */
-                herd_T::iterator d = herds_xml[herd]->find(*dev + "@gentoo.org");
+                d = herds_xml[herd]->find(*dev + "@gentoo.org");
                 if (d != herds_xml[herd]->end())
                 {
                     herds.push_back(herd);
@@ -111,69 +142,70 @@ action_dev_handler_T::operator() (std::vector<std::string> &devs)
                         name = d->second->name;
                 }
             }
+        }
 
-            size += herds.size();
+        size += herds.size();
 
-            /* was the dev in any of the herds? */
-            if (herds.empty())
+        /* was the dev in any of the herds? */
+        if (herds.empty())
+        {
+            std::cerr << "Developer '" << *dev << "' doesn't seem to "
+                << "belong to any herds." << std::endl;
+
+            if (devs.size() == 1)
+                throw dev_E();
+        }
+        else
+        {
+            if (not optget("quiet", bool))
             {
-                std::cerr << "Developer '" << *dev << "' doesn't seem to "
-                    << "belong to any herds." << std::endl;
-
-                if (devs.size() == 1)
-                    throw dev_E();
-            }
-            else
-            {
-                if (not optget("quiet", bool))
+                if (regex)
+                    output("Regex", *dev);
+                else
                 {
                     output("Developer",
                         (name.empty() ? *dev : name + " (" + (*dev) + ")"));
                     output("Email", *dev + "@gentoo.org");
                 }
-
-                if (optget("verbose", bool) and not optget("quiet", bool))
-                {
-                    output(util::sprintf("Herds(%d)", herds.size()), "");
-
-                    std::vector<std::string>::iterator i;
-                    herds_T::size_type nh = 1;
-                    for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
-                    {
-                        /* display herd */
-                        if (optget("color", bool))
-                            output("", color[blue] + (*i) + color[none]);
-                        else
-                            output("", *i);
-                        
-                        /* display herd info */
-                        if (not herds_xml[*i]->mail.empty())
-                            output("", herds_xml[*i]->mail);
-                        if (not herds_xml[*i]->desc.empty())
-                            output("", herds_xml[*i]->desc);
-
-                        if (nh != herds.size())
-                            output.endl();
-                    }
-                }
-                else if (not optget("count", bool))
-                    output(util::sprintf("Herds(%d)", herds.size()), herds);
             }
 
-            /* skip a line if we're not displaying the last one */
-            if (not optget("count", bool) and n != devs.size())
-                output.endl();
+            if (optget("verbose", bool) and not optget("quiet", bool))
+            {
+                output(util::sprintf("Herds(%d)", herds.size()), "");
+
+                std::vector<std::string>::iterator i;
+                herds_T::size_type nh = 1;
+                for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
+                {
+                    /* display herd */
+                    if (optget("color", bool))
+                        output("", color[blue] + (*i) + color[none]);
+                    else
+                        output("", *i);
+                        
+                    /* display herd info */
+                    if (not herds_xml[*i]->mail.empty())
+                        output("", herds_xml[*i]->mail);
+                    if (not herds_xml[*i]->desc.empty())
+                        output("", herds_xml[*i]->desc);
+
+                    if (nh != herds.size())
+                        output.endl();
+                }
+            }
+            else if (not optget("count", bool))
+                output(util::sprintf("Herds(%d)", herds.size()), herds);
         }
 
-        if (optget("count", bool))
-            output("", util::sprintf("%d", size));
+        /* skip a line if we're not displaying the last one */
+        if (not optget("count", bool) and n != devs.size())
+            output.endl();
     }
 
+    if (optget("count", bool))
+        output("", util::sprintf("%d", size));
+
     output.flush(*stream);
-
-    if (optget("timer", bool))
-        *stream << std::endl;
-
     return EXIT_SUCCESS;
 }
 

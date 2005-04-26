@@ -55,6 +55,8 @@ options_T::option_map_T::set_defaults()
     insert_opt("count", false);
     insert_opt("color", true);
     insert_opt("overlay", true);
+    insert_opt("eregex", false);
+    insert_opt("regex", false);
 
     insert_opt("maxcol", static_cast<std::size_t>(78));
 

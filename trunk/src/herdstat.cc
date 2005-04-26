@@ -45,7 +45,7 @@
 #include "action_which_handler.hh"
 #include "action_versions_handler.hh"
 
-static const char *short_opts = "H:o:hVvDdtpqfcnmwN";
+static const char *short_opts = "H:o:hVvDdtpqfcnmwNEr";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -76,6 +76,8 @@ static struct option long_opts[] =
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     {"no-overlay",  no_argument,	0,  'N'},
+    {"regex",	    required_argument,	0,  'r'},
+    {"extended",    no_argument,	0,  'E'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -115,6 +117,8 @@ help()
 	<< "                        display all packages that belong to the specified herd." << std::endl
 	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
 	<< " -N, --no-overlay       Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
+	<< " -r, --regex	    Display results matching the specified regular expression." << std::endl
+	<< " -E, --extended         When used in conjunction with --regex, use extended regexp's." << std::endl
 	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
 	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
 	<< "                        instead of stdout." << std::endl
@@ -152,6 +156,8 @@ help()
 	<< " -m              Look up metadata by package/category." << std::endl
 	<< " -w              Look up full path to ebuild for specified packages." << std::endl
 	<< " -N              Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
+	<< " -r              Display results matching the specified regular expression." << std::endl
+	<< " -E              When used in conjuction with -r, use extended regexp's." << std::endl
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
@@ -255,6 +261,14 @@ handle_opts(int argc, char **argv, std::vector<std::string> *args)
 		    optset("quiet", bool, true);
 		    optset("timer", bool, false);
 		}
+		break;
+	    /* --regex */
+	    case 'r':
+		optset("regex", bool, true);
+		break;
+	    /* --extended */
+	    case 'E':
+		optset("eregex", bool, true);
 		break;
 	    /* --no-herd */
 	    case '\n':

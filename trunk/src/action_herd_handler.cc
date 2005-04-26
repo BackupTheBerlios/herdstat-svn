@@ -48,6 +48,7 @@ int
 action_herd_handler_T::operator() (std::vector<std::string> &herds)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
+    const bool regex = optget("regex", bool);
 
     /* set format attributes */
     formatter_T output;
@@ -69,50 +70,72 @@ action_herd_handler_T::operator() (std::vector<std::string> &herds)
         
         if (optget("count", bool))
             output("", util::sprintf("%d", herds_xml.size()));
+
+        output.flush(*stream);
+        return EXIT_SUCCESS;
+    }
+    else if (regex and herds.size() > 1)
+    {
+        std::cerr << "You may only specify one regular expression."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+    else if (regex)
+    {
+        util::regex_T regexp;
+
+        if (optget("eregex", bool))
+            regexp.assign(herds.front(), REG_EXTENDED|REG_ICASE);
+        else
+            regexp.assign(herds.front(), REG_ICASE);
+        
+        herds.clear();
+
+        herds_xml_T::iterator h;
+        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        {
+            if (regexp == h->first)
+                herds.push_back(h->first);
+        }
     }
 
-    /* nope, so only display stats for specified herds */
-    else
+    herd_T::size_type size = 0;
+
+    /* for each specified herd... */
+    std::vector<std::string>::iterator herd;
+    std::vector<std::string>::size_type n = 1;
+    for (herd = herds.begin() ; herd != herds.end() ; ++herd, ++n)
     {
-        herd_T::size_type size = 0;
-
-        /* for each specified herd... */
-        std::vector<std::string>::iterator herd;
-        std::vector<std::string>::size_type n = 1;
-        for (herd = herds.begin() ; herd != herds.end() ; ++herd, ++n)
+        /* does the herd exist? */
+        if (not herds_xml.exists(*herd))
         {
-            /* does the herd exist? */
-            if (not herds_xml.exists(*herd))
+            std::cerr << "Herd '" << *herd << "' doesn't seem to exist."
+                << std::endl;
+
+            /* if the user specified more than one herd, then just print
+             * the error and keep going; otherwise, we want to exit with
+             * an error code */
+            if (herds.size() > 1)
             {
-                std::cerr << "Herd '" << *herd << "' doesn't seem to exist."
-                    << std::endl;
-
-                /* if the user specified more than one herd, then just print
-                 * the error and keep going; otherwise, we want to exit with
-                 * an error code */
-                if (herds.size() > 1)
-                {
-                    std::cerr << std::endl;
-                    continue;
-                }
-                else
-                    throw herd_E();
+                std::cerr << std::endl;
+                continue;
             }
-
-            herds_xml[*herd]->display(*stream);
-            size += herds_xml[*herd]->size();
-
-            /* only skip a line if we're not displaying the last one */
-            if (not optget("count", bool) and n != herds.size())
-                output.endl();
+            else
+                throw herd_E();
         }
 
-        if (optget("count", bool))
-            output("", util::sprintf("%d", size));
+        herds_xml[*herd]->display(*stream);
+        size += herds_xml[*herd]->size();
+
+        /* only skip a line if we're not displaying the last one */
+        if (not optget("count", bool) and n != herds.size())
+            output.endl();
     }
 
-    output.flush(*stream);
+    if (optget("count", bool))
+        output("", util::sprintf("%d", size));
 
+    output.flush(*stream);
     return EXIT_SUCCESS;
 }
 

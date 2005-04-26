@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-04-26 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util.cc, lib/util.hh, lib/misc.cc, lib/misc.hh: Moved everything
+	in util.{cc,hh} to misc.{cc,hh}. Removed util.cc. util.hh now just
+	includes all the lib/ headers.
+	* lib/regex.cc, lib/regex.hh: Added regex_T, an interface to the POSIX
+	regular expression interface (regcomp, regexec, etc).
+	* src/herdstat.cc, src/options.cc: Added --regex and --extended
+	options.
+	* src/action_pkg_handler.cc: Added regex_T support.
+
 2005-04-22 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.0_rc1)

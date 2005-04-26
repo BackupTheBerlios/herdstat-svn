@@ -149,6 +149,7 @@ namespace util
 
         public:
             typedef std::vector<std::string>::iterator iterator;
+            typedef std::vector<std::string>::const_iterator const_iterator;
             typedef std::vector<std::string>::size_type size_type;
 
             file_T() : fileobject_T(FTYPE_FILE), stream(NULL) { }
@@ -159,7 +160,9 @@ namespace util
             virtual ~file_T() { }
 
             iterator begin() { return this->_contents.begin(); }
+            const_iterator begin() const { return this->_contents.begin(); }
             iterator end() { return this->_contents.end(); }
+            const_iterator end() const { return this->_contents.end(); }
             size_type bufsize() const { return this->_contents.size(); }
             void push_back(const std::string &s)
             { this->_contents.push_back(s); }

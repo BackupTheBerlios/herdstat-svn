@@ -133,8 +133,8 @@ portage::find_package_in(const std::string &portdir, const std::string &pkg)
         return pkg;
 
     std::vector<std::string> pkgs;
-    portage::categories_T categories;
-    portage::categories_T::iterator c;
+    const portage::categories_T categories;
+    portage::categories_T::const_iterator c;
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         /* was a category specified? only one possible */
@@ -159,6 +159,38 @@ portage::find_package_in(const std::string &portdir, const std::string &pkg)
         throw nonexistent_pkg_E(pkg);
 
     return pkgs.front();
+}
+
+/*
+ * Given a portdir and a regular expression object,
+ * search for all packages matching the regular expression.
+ */
+
+std::vector<std::string>
+portage::find_package_regex_in(const std::string &portdir,
+                               const util::regex_T &regex)
+{
+    std::vector<std::string> matches;
+    const portage::categories_T categories;
+    portage::categories_T::const_iterator c;
+
+    for (c = categories.begin() ; c != categories.end() ; ++c)
+    {
+        if (not util::is_dir(portdir + "/" + (*c)))
+            continue;
+
+        const util::dir_T category(portdir + "/" + (*c));
+        util::dir_T::const_iterator d;
+
+        for (d = category.begin() ; d != category.end() ; ++d)
+        {
+            /* Does category/package match the regex? */
+            if (regex == (*c + "/" + d->basename()))
+                matches.push_back(*c + "/" + d->basename());
+        }
+    }
+
+    return matches;
 }
 
 /*
@@ -234,6 +266,53 @@ portage::find_package(portage::config_T &config,
     }
 
     return p;
+}
+
+static std::pair<std::string, std::string>
+search_overlays_regex(const std::vector<std::string> &overlays,
+                const util::regex_T &regex)
+{
+    std::pair<std::string, std::string> p;
+
+    /* search overlays */
+    std::vector<std::string>::const_iterator o;
+    for (o = overlays.begin() ; o != overlays.end() ; ++o)
+    {
+        try
+        {
+            p.second = portage::find_package_in(*o, pkg);
+            p.first  = *o;
+        }
+        catch (const portage::nonexistent_pkg_E)
+        {
+            continue;
+        }
+    }
+
+    return p;
+}
+
+std::vector<std::string>
+portage::find_package_regex(portage::config_T &config,
+                            const util::regex_T &regex,
+                            bool do_overlays)
+{
+    std::string portdir(config.portdir());
+    const std::vector<std::string> overlays(config.overlays());
+    std::pair<std::string, std::string> p;
+
+    std::map<std::string, std::string> m;
+
+    try
+    {
+        matches = portage::find_package_regex_in(portdir, regex);
+    }
+    catch (const portage::nonexistent_pkg_E)
+    {
+
+    }
+
+    return matches;
 }
 
 /* vim: set tw=80 sw=4 et : */

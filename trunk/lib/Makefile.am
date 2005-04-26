@@ -1,6 +1,8 @@
 noinst_LTLIBRARIES = libutil.la
 libutil_la_SOURCES = util_exceptions.hh \
-		     util.hh util.cc \
+		     util.hh \
+		     misc.hh misc.cc \
+		     regex.hh regex.cc \
 		     string.hh string.cc \
 		     timer.hh \
 		     progress.hh \

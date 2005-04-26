@@ -32,6 +32,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>
+#include <sys/types.h>
+#include <regex.h>
 
 namespace util
 {
@@ -69,6 +71,40 @@ namespace util
             bad_fileobject_E() { }
             bad_fileobject_E(const char *msg) : errno_E(msg) { }
             bad_fileobject_E(const std::string &msg) : errno_E(msg) { }
+    };
+
+    class bad_regex_E                           : public base_E
+    {
+        private:
+            const char *_str;
+            int _err;
+            regex_t *_re;
+
+        public:
+            bad_regex_E() : _str(NULL), _err(0), _re(NULL) { }
+            bad_regex_E(int e, regex_t *re) : _str(NULL), _err(e), _re(re) { }
+            bad_regex_E(const std::string &s) : _str(s.c_str()), _err(0),
+                                                _re(NULL) { }
+            virtual const char *what() const throw()
+            {
+	        if (not this->_str and (not this->_re or this->_err == 0))
+		    return "";
+
+	        if (this->_str)
+	        {
+		    std::size_t len = regerror(this->_err, this->_re, NULL, 0);
+		    char *buf = (char *)std::malloc(len);
+		    if (not buf)
+		        throw msg_base_E("Failed to allocate memory.");
+
+		    regerror(this->_err, this->_re, buf, len);
+		    std::string s(buf);
+		    std::free(buf);
+		    return s.c_str();
+	        }
+
+	        return this->_str ? this->_str : "";
+            }
     };
 }
 

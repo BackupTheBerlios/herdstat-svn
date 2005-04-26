@@ -88,6 +88,8 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     const bool count = optget("count", bool);
     const bool debug = optget("debug", bool);
     const bool dev = optget("dev", bool);
+    const bool regex = optget("regex", bool);
+    const bool eregex = optget("eregex", bool);
     const bool status = not quiet and not debug;
 
     /* set format attributes */
@@ -100,6 +102,13 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     if (optget("all", bool))
     {
         std::cerr << "Package action handler does not support the 'all' target."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+    /* only 1 regex allowed at a time */
+    else if (regex and opts.size() > 1)
+    {
+        std::cerr << "You may only specify one regular expression."
             << std::endl;
         return EXIT_FAILURE;
     }
@@ -123,8 +132,14 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
     std::vector<std::string>::size_type n = 1;
     for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
+        util::regex_T regexp;
         dev_attrs_T attr;
         std::map<std::string, std::string> pkgs;
+
+        if (regex and eregex)
+            regexp.assign(*i, REG_EXTENDED|REG_ICASE);
+        else if (regex)
+            regexp.assign(*i, REG_ICASE);
 
         if (timer)
             t.start();
@@ -153,58 +168,93 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
 
             if (dev)
             {
-                /* search the metadata for our dev */
-                herd_T::iterator d = handler->devs.find(*i + "@gentoo.org");
-                if (d == handler->devs.end())
-                    continue;
-                else
+                herd_T::iterator d;
+                if (regex)
                 {
-                    bool copy = false;
-                    const std::string herd = optget("with-herd", std::string);
-                    
-                    if (not herd.empty())
+                    /* search metadata.xml for all devs matching regex */
+                    for (d = handler->devs.begin() ;
+                         d != handler->devs.end() ; ++d)
                     {
-                        if (std::find(handler->herds.begin(),
-                            handler->herds.end(), herd) != handler->herds.end())
+                        if (regexp == util::get_user_from_email(d->first))
                         {
-                            copy = true;
+                            found = true;
+                            break;
                         }
                     }
-                    else
-                        copy = true;
 
-                    if (copy)
+                    if (not found)
+                        continue;
+                }
+                else
+                {
+                    /* search the metadata for our dev */
+                    d = handler->devs.find(*i + "@gentoo.org");
+                    if (d == handler->devs.end())
+                        continue;
+                    else
                     {
-                        found = true;
-                        std::copy(d->second->begin(), d->second->end(),
-                            attr.begin());
-                        attr.name = dev_name(herds_xml.herds(), *i);
-                        attr.role = d->second->role;
+                        const std::string herd = optget("with-herd", std::string);
+                    
+                        if (not herd.empty())
+                        {
+                            if (std::find(handler->herds.begin(),
+                                handler->herds.end(), herd) != handler->herds.end())
+                            {
+                                found = true;
+                            }
+                        }
+                        else
+                            found = true;
                     }
+                }
+
+                if (found)
+                {
+                    std::copy(d->second->begin(), d->second->end(),
+                        attr.begin());
+                    attr.name = dev_name(herds_xml.herds(), *i);
+                    attr.role = d->second->role;
                 }
             }
             else
             {
-                /* search the metadata for our herd */
-                if (std::find(handler->herds.begin(),
-                    handler->herds.end(), *i) == handler->herds.end())
-                    continue;
+                if (regex)
+                {
+                    /* search metadata.xml for all herds matching regex */
+                    std::vector<std::string>::iterator h;
+                    for (h = handler->herds.begin() ;
+                         h != handler->herds.end()  ; ++h)
+                    {
+                        if (regexp == *h)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (not found)
+                        continue;
+                }
                 else
-                    found = true;
+                {
+                    /* search the metadata.xml for our herd */
+                    if (std::find(handler->herds.begin(),
+                        handler->herds.end(), *i) == handler->herds.end())
+                        continue;
+                    else
+                        found = true;
+                }
             }
 
-            if (found)
-            {
-                /* get category/package from absolute path */
-                std::string cat_and_pkg = m->substr(portdir.size() + 1);
-                std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
-                if (pos != std::string::npos)
-                    cat_and_pkg = cat_and_pkg.substr(0, pos);
+            /* get category/package from absolute path */
+            std::string cat_and_pkg = m->substr(portdir.size() + 1);
+            std::string::size_type pos = cat_and_pkg.find("/metadata.xml");
+            if (pos != std::string::npos)
+                cat_and_pkg = cat_and_pkg.substr(0, pos);
 
-                debug_msg("Match found in %s.", m->c_str());
+            debug_msg("Match found in %s.", m->c_str());
 
-                pkgs[cat_and_pkg] = handler->longdesc;
-            }
+            pkgs[cat_and_pkg] = handler->longdesc;
         }
         
         if (timer)
@@ -246,7 +296,9 @@ action_pkg_handler_T::operator() (std::vector<std::string> &opts)
 
         if (not quiet)
         {
-            if (dev)
+            if (regex)
+                output("Regex", *i);
+            else if (dev)
             {
                 if (attr.name.empty())
                     output("Developer", *i);

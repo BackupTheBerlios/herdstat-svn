@@ -32,6 +32,8 @@ AC_HEADER_TIME(,
     [AC_MSG_ERROR([sys/time.h is required])])
 AC_HEADER_DIRENT(,
     [AC_MSG_ERROR([dirent.h is required])])
+AC_CHECK_HEADERS(regex.h,,
+    [AC_MSG_ERROR([regex.h is required])])
 
 dnl Required funcs
 AC_FUNC_CLOSEDIR_VOID
@@ -46,6 +48,14 @@ AC_CHECK_FUNCS(vasprintf,,
     [AC_MSG_ERROR([either vasprintf, vsnprintf, or vsprintf is required])])])])
 AC_CHECK_FUNCS(gettimeofday,,
     [AC_MSG_ERROR([gettimeofday is required])])
+AC_CHECK_FUNCS(regcomp,,
+    [AC_MSG_ERROR([regcomp is required])])
+AC_CHECK_FUNCS(regexec,,
+    [AC_MSG_ERROR([regexec is required])])
+AC_CHECK_FUNCS(regfree,,
+    [AC_MSG_ERROR([regfree is required])])
+AC_CHECK_FUNCS(regerror,,
+    [AC_MSG_ERROR([regerror is required])])
 
 dnl Optional headers
 AC_CHECK_HEADERS(getopt.h)

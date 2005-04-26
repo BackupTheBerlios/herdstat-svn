@@ -55,6 +55,7 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool quiet = optget("quiet", bool);
+    const bool regex = optget("regex", bool);
     portage::config_T config(optget("portage.config", portage::config_T));
 
     util::color_map_T color;
@@ -127,6 +128,33 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
         debug_msg("set portdir to '%s'", portdir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
     }
+    else if (regex and opts.size() > 1)
+    {
+        std::cerr << "You may only specify one regular expression."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+    else if (regex)
+    {
+        util::regex_T regexp;
+        std::string re(opts.front());
+        opts.clear();
+
+        if (optget("eregex", bool))
+            regexp.assign(re, REG_EXTENDED|REG_ICASE);
+        else
+            regexp.assign(re, REG_ICASE);
+
+//        opts = portage::find_package_regex(config, regexp,
+//            optget("overlay", bool));
+        
+        if (opts.empty())
+        {
+            std::cerr << "Failed to find any packages matching '" << re << "'."
+                << std::endl;
+            return EXIT_FAILURE;
+        }
+    }
 
     /* for each specified package/category... */
     std::vector<std::string>::iterator i;
@@ -140,8 +168,8 @@ action_meta_handler_T::operator() (std::vector<std::string> &opts)
 
         try
         {
-            /* The only reason portdir should be set already is if opts
-             * did == 0 and portdir set to $PWD */
+            /* The only reason portdir should be set already is if
+             * opts == 0 and portdir is set to $PWD */
             if (pwd)
                 package = portage::find_package_in(portdir, *i);
             else
