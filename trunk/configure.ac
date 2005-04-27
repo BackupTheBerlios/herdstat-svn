@@ -2,7 +2,7 @@
 # $Id$
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.0_rc1], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.0_rc2], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 foreign dist-bzip2 no-dist-gzip])
