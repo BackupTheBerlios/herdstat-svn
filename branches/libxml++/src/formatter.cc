@@ -96,10 +96,10 @@ formatter_T::set_attrs()
  */
 
 util::string
-formatter_T::highlight(std::vector<util::string> data)
+formatter_T::highlight(const std::vector<util::string> &data)
 {
     util::string s;
-    std::vector<util::string>::iterator i;
+    std::vector<util::string>::const_iterator i;
 
     if (not colors())
         attr.highlight_color.clear();
@@ -121,7 +121,7 @@ formatter_T::highlight(std::vector<util::string> data)
  */
 
 void
-formatter_T::append(const util::string &label, std::vector<util::string> data)
+formatter_T::append(const util::string &label, const std::vector<util::string> &data)
 {
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
@@ -132,17 +132,7 @@ formatter_T::append(const util::string &label, std::vector<util::string> data)
 
     /* otherwise, produce a data string and call the real append() */
     else
-    {
-        util::string s;
-
-        std::vector<util::string>::iterator i;
-        for (i = data.begin() ; i != data.end() ; ++i)
-            s += *i + " ";
-    
-        if (s[s.length() - 1] == ' ')
-            s.erase(s.length() - 1);
-        append(label, s);
-    }
+        append(label, util::vec2str(data));
 }
 
 /*

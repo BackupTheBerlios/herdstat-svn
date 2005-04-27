@@ -63,9 +63,9 @@ class formatter_T
             std::vector<util::string> highlights;
         };
 
-        util::string highlight(std::vector<util::string>);
+        util::string highlight(const std::vector<util::string> &);
         void append(const util::string &, const util::string &);
-        void append(const util::string &, std::vector<util::string>);
+        void append(const util::string &, const std::vector<util::string> &);
 
         static std::vector<util::string> buffer;
         static attrs_T attr;
@@ -81,7 +81,7 @@ class formatter_T
             append(l, d);
         }
 
-        void operator() (const util::string &l, std::vector<util::string> d)
+        void operator() (const util::string &l, const std::vector<util::string> &d)
         {
             append(l, d);
         }

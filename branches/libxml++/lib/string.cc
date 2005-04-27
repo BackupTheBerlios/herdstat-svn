@@ -179,9 +179,6 @@ util::vec2str(const std::vector<util::string> &v, const char delim)
     for (i = v.begin() ; i != v.end() ; ++i)
         result += *i + delim;
     
-    /* erase the extra delim */
-    result.erase(result.length() - 1);
-
     return result;
 }
 

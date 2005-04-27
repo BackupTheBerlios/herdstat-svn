@@ -106,14 +106,14 @@ action_which_handler_T::operator() (std::vector<util::string> &opts)
                     std::cerr << color[green] << *i << color[none] << std::endl;
             }
 
-            if (opts.size() == 1)
+            if (matches.size() == 1)
                 return EXIT_FAILURE;
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
             std::cerr << *i << " doesn't seem to exist." << std::endl;
 
-            if (opts.size() == 1)
+            if (matches.size() == 1)
                 return EXIT_FAILURE;
         }
 
