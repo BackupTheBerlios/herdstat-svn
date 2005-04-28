@@ -24,54 +24,17 @@
 # include "config.h"
 #endif
 
-#include <string>
-#include <cstring>
-#include <cassert>
-#include <sys/types.h>
-#include <unistd.h>
-#include <dirent.h>
+#include "misc.hh"
+#include "file.hh"
+#include "portage_misc.hh"
 
-#include "util.hh"
-
-/*
- * Determine whether or not the current directory is
- * a valid package directory.  Must have a Manifest,
- * at least one ebuild, and a files directory.
- */
-
-bool
-portage::in_pkg_dir()
-{
-//    const char *pwd = util::getcwd().c_str();
-//    DIR *dir = NULL;
-//    struct dirent *d = NULL;
-//    bool ebuild = false, filesdir = false;
-
-//    if (not (dir = opendir(pwd)))
-//        throw util::bad_fileobject_E(pwd);
-
-//    while ((d = readdir(dir)))
-//    {
-//        char *s = NULL;
-//        if ((s = std::strrchr(d->d_name, '.')))
-//        {
-//            if (std::strcmp(++s, "ebuild") == 0)
-//                ebuild = true;
-//        }   
-//        else if (std::strcmp(d->d_name, "files") == 0)
-//            filesdir = true;
-//    }
-
-//    closedir(dir);
-//    return (ebuild and filesdir);
-
-    return portage::is_pkg_dir(util::getcwd());
-}
-
-/*
- * Is the given path a package directory?
- */
-
+/*****************************************************************************
+ * Current working directory a package directory?                            *
+ *****************************************************************************/
+bool portage::in_pkg_dir() { return portage::is_pkg_dir(util::getcwd()); }
+/*****************************************************************************
+ * Given path a package directory?                                           *
+ *****************************************************************************/
 bool
 portage::is_pkg_dir(const util::path_T &path)
 {
@@ -92,16 +55,15 @@ portage::is_pkg_dir(const util::path_T &path)
 
     return (ebuild and filesdir);
 }
-
-/*
- * Is the given path an ebuild?
- */
-
+/*****************************************************************************
+ * Is the given path an ebuild?                                              *
+ *****************************************************************************/
 bool
 portage::is_ebuild(const util::path_T &path)
 {
     return ( (path.length() > 7) and
              (path.substr(path.length() - 7) == ".ebuild") );
 }
+/*****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

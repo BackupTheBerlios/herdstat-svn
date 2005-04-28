@@ -24,15 +24,6 @@
 # include "config.h"
 #endif
 
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-
-#include "common.hh"
 #include "metadatas.hh"
 
 /*

@@ -28,7 +28,6 @@
 #endif
 
 #include <exception>
-#include <string>
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>

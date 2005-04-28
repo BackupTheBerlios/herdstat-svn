@@ -41,12 +41,13 @@
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
+#include "action_find_handler.hh"
 #include "action_meta_handler.hh"
 #include "action_stats_handler.hh"
 #include "action_which_handler.hh"
 #include "action_versions_handler.hh"
 
-static const char *short_opts = "H:o:hVvDdtpqfcnmwNEr";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErf";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -61,7 +62,7 @@ static struct option long_opts[] =
     {"no-herd",	    no_argument,	0,  '\n'},
     {"with-herd",   required_argument,	0,  '\v'},
     /* force a fetch of herds.xml */
-    {"fetch",	    no_argument,	0,  'f'},
+    {"fetch",	    no_argument,	0,  'F'},
     /* time how long it takes for XML parsing */
     {"timer",	    no_argument,	0,  't'},
     /* instead of displaying devs for a herd, display herds for a dev */
@@ -74,6 +75,7 @@ static struct option long_opts[] =
     {"metadata",    no_argument,	0,  'm'},
     {"which",	    no_argument,	0,  'w'},
     {"versions",    no_argument,	0,  '\b'},
+    {"find",	    no_argument,	0,  'f'},
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     {"no-overlay",  no_argument,	0,  'N'},
@@ -113,6 +115,7 @@ help()
 	<< " -d, --dev              Look up herds by developer." << std::endl
 	<< " -m, --metadata         Look up metadata by package/category." << std::endl
 	<< " -w, --which            Look up full path to ebuild for specified packages." << std::endl
+	<< " -f, --find             Look up category/package for the specified packages." << std::endl
 	<< "     --versions	    Look up versions of specified packages." << std::endl
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
@@ -123,7 +126,7 @@ help()
 	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
 	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
 	<< "                        instead of stdout." << std::endl
-	<< " -f, --fetch            Force a fetch of herds.xml." << std::endl
+	<< " -F, --fetch            Force a fetch of herds.xml." << std::endl
 	<< " -v, --verbose          Display verbose output." << std::endl
 	<< " -q, --quiet            Don't display labels and fancy colors. Use this"
 	<< std::endl
@@ -155,6 +158,7 @@ help()
 	<< " -p              Look up packages by herd." << std::endl
 	<< " -d              Look up herds by developer." << std::endl
 	<< " -m              Look up metadata by package/category." << std::endl
+	<< " -f              Look up category/package of the specified packages." << std::endl
 	<< " -w              Look up full path to ebuild for specified packages." << std::endl
 	<< " -N              Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
 	<< " -r              Display results matching the specified regular expression." << std::endl
@@ -162,7 +166,7 @@ help()
 	<< " -H <file>       Specify location of herds.xml." << std::endl
 	<< " -o <file>       Send output to the specified file" << std::endl
 	<< "                 instead of stdout." << std::endl
-	<< " -f              Force a fetch of herds.xml." << std::endl
+	<< " -F              Force a fetch of herds.xml." << std::endl
 	<< " -v              Display verbose output." << std::endl
 	<< " -q              Don't display labels and fancy colors. Use this"
 	<< std::endl
@@ -243,6 +247,12 @@ handle_opts(int argc, char **argv, std::vector<util::string> *args)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_which);
 		break;
+	    /* --find */
+	    case 'f':
+		if (optget("action", options_action_T) != action_unspecified)
+		    throw args_one_action_only_E();
+		optset("action", options_action_T, action_find);
+		break;
 	    /* --versions */
 	    case '\b':
 		if (optget("action", options_action_T) != action_unspecified)
@@ -281,7 +291,7 @@ handle_opts(int argc, char **argv, std::vector<util::string> *args)
 		optset("with-herd", util::string, optarg);
 		break;
 	    /* --fetch */
-	    case 'f':
+	    case 'F':
 		optset("fetch", bool, true);
 		break;
 	    /* --verbose */
@@ -449,13 +459,14 @@ main(int argc, char **argv)
 
 	/* setup action handlers */
 	std::map<options_action_T, action_handler_T * > handlers;
-	handlers[action_herd]  = new action_herd_handler_T();
-	handlers[action_dev]   = new action_dev_handler_T();
-	handlers[action_pkg]   = new action_pkg_handler_T();
-	handlers[action_meta]  = new action_meta_handler_T();
-	handlers[action_stats] = new action_stats_handler_T();
-	handlers[action_which] = new action_which_handler_T();
+	handlers[action_herd]     = new action_herd_handler_T();
+	handlers[action_dev]      = new action_dev_handler_T();
+	handlers[action_pkg]      = new action_pkg_handler_T();
+	handlers[action_meta]     = new action_meta_handler_T();
+	handlers[action_stats]    = new action_stats_handler_T();
+	handlers[action_which]    = new action_which_handler_T();
 	handlers[action_versions] = new action_versions_handler_T();
+	handlers[action_find]     = new action_find_handler_T();
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];

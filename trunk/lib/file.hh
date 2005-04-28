@@ -30,7 +30,6 @@
 #include <ios>
 #include <fstream>
 #include <ostream>
-#include <string>
 #include <vector>
 #include <cstdlib>
 #include <sys/types.h>
@@ -44,21 +43,23 @@
 
 namespace util
 {
+    class path_T;
+
     /* general purpose file-related functions */
     bool is_dir(const char *);
-    bool is_dir(const std::string &);
+    bool is_dir(const util::path_T &);
     bool is_dir(const struct stat &);
     bool is_file(const char *);
-    bool is_file(const std::string &);
+    bool is_file(const util::path_T &);
     bool is_file(const struct stat &);
     const char *basename(const char *);
-    const char *basename(std::string const &);
+    const char *basename(const util::path_T &);
     const char *dirname(const char *);
-    const char *dirname(std::string const &);
+    const char *dirname(const util::path_T &);
     const char *chop_fileext(const char *, unsigned short depth = 1);
-    const char *chop_fileext(const std::string &, unsigned short depth = 1);
-    void copy_file(const std::string &, const std::string &);
-    void move_file(const std::string &, const std::string &);
+    const char *chop_fileext(const util::path_T &, unsigned short depth = 1);
+    void copy_file(const util::path_T &, const util::path_T &);
+    void move_file(const util::path_T &, const util::path_T &);
 
     enum type_T { FTYPE_FILE, FTYPE_DIR };
 
@@ -165,7 +166,7 @@ namespace util
             iterator end() { return this->_contents.end(); }
             const_iterator end() const { return this->_contents.end(); }
             size_type bufsize() const { return this->_contents.size(); }
-            void push_back(const std::string &s)
+            void push_back(const util::string &s)
             { this->_contents.push_back(s); }
 
             virtual void open()

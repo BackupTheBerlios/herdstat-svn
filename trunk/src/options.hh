@@ -27,14 +27,12 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <sstream>
-#include <string>
 #include <algorithm>
 #include <typeinfo>
 #include <map>
-#include <cstdlib>
-#include "exceptions.hh"
+
+#include "common.hh"
 
 enum options_action_T
 {
@@ -45,7 +43,8 @@ enum options_action_T
     action_meta,
     action_stats,
     action_which,
-    action_versions
+    action_versions,
+    action_find
 };
 
 /*

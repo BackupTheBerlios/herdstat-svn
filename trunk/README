@@ -10,6 +10,8 @@ herdstat is a multi-purpose query tool capable of things such as:
     * Displaying developer information (email address, real name (if present
       in herds.xml), herd information, package information).
     * Displaying category/package metadata.
+    * Displaying the path to the ebuild of the latest version of a package.
+    * Displaying all packages that match specified criteria.
 
 Bugs
 ====

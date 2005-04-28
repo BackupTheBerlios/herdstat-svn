@@ -29,10 +29,7 @@
 #include <algorithm>
 #include <iterator>
 #include <map>
-#include <vector>
 #include <memory>
-#include <string>
-#include <cstdlib>
 
 #include "common.hh"
 #include "metadatas.hh"
@@ -168,7 +165,9 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
 
             if (dev)
             {
+                const util::string herd = optget("with-herd", util::string);
                 herd_T::iterator d;
+
                 if (regex)
                 {
                     /* search metadata.xml for all devs matching regex */
@@ -177,8 +176,21 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
                     {
                         if (regexp == util::get_user_from_email(d->first))
                         {
-                            found = true;
-                            break;
+                            /* matches regex and --with-herd? */
+                            if (not herd.empty())
+                            {
+                                if (std::find(handler->herds.begin(),
+                                              handler->herds.end(),
+                                              herd) != handler->herds.end())
+                                {
+                                    found = true;
+                                }
+                            }
+                            else
+                                found = true;
+
+                            if (found)
+                                break;
                         }
                     }
 
@@ -193,8 +205,6 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
                         continue;
                     else
                     {
-                        const util::string herd = optget("with-herd", util::string);
-                    
                         if (not herd.empty())
                         {
                             if (std::find(handler->herds.begin(),

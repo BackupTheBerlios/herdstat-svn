@@ -34,7 +34,7 @@ const char *
 portage::portdir()
 {
     portage::config_T config;
-    std::string portdir = config["PORTDIR"];
+    util::path_T portdir = config["PORTDIR"];
 
     /* environment overrides all */
     char *result = std::getenv("PORTDIR");
@@ -51,7 +51,7 @@ portage::portdir()
 const util::string
 portage::config_T::portdir()
 {
-    util::string portdir = (*this)["PORTDIR"];
+    util::path_T portdir = (*this)["PORTDIR"];
 
     /* environment overrides all */
     char *result = std::getenv("PORTDIR");

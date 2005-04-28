@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include <vector>
+#include "common.hh"
 
 class action_handler_T
 {

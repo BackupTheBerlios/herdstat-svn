@@ -25,18 +25,11 @@
 #endif
 
 #include <ostream>
-#include <string>
-#include <vector>
 #include <map>
 #include <memory>
 #include <utility>
 #include <algorithm>
 #include <iterator>
-#include <cstdlib>
-#include <cstring>
-#include <cerrno>
-#include <unistd.h>
-#include <dirent.h>
 
 #include "common.hh"
 #include "herds.hh"

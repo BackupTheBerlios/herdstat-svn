@@ -37,15 +37,6 @@ AC_CHECK_HEADERS(regex.h,,
 
 dnl Required funcs
 AC_FUNC_CLOSEDIR_VOID
-AC_FUNC_STAT(,
-    [AC_MSG_ERROR([stat is required])])
-AC_CHECK_FUNCS(asprintf,,
-    [AC_CHECK_FUNCS(snprintf,,
-    [AC_MSG_ERROR([either asprintf or snprintf is required])])])
-AC_CHECK_FUNCS(vasprintf,,
-    [AC_CHECK_FUNCS(vsnprintf,,
-    [AC_CHECK_FUNCS(vsprintf,,
-    [AC_MSG_ERROR([either vasprintf, vsnprintf, or vsprintf is required])])])])
 AC_CHECK_FUNCS(gettimeofday,,
     [AC_MSG_ERROR([gettimeofday is required])])
 AC_CHECK_FUNCS(regcomp,,

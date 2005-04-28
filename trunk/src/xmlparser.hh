@@ -28,9 +28,8 @@
 #endif
 
 #include <istream>
-#include <string>
 #include <libxml++/libxml++.h>
-#include "exceptions.hh"
+#include "common.hh"
 
 /*
  * Abstract XML Content Handler
@@ -82,20 +81,21 @@ class XMLParser_T
         virtual ~XMLParser_T() { }
 
         /* parse the given filename */
-        virtual void parse(const util::string &f)
+        virtual void parse(const util::path_T &path)
         {
             try
             {
-                handler->parse_file(f);
+                handler->parse_file(path);
             }
             catch (const xmlpp::exception &e)
             {
-                throw XMLParser_E(f, e.what());
+                throw XMLParser_E(path, e.what());
             }
         }
 
         /* parse the given open stream */
-        virtual void parse(std::istream &stream)
+        virtual void parse(std::istream &stream,
+                           const util::path_T path = "stream")
         {
             try
             {
@@ -103,7 +103,7 @@ class XMLParser_T
             }
             catch (const xmlpp::exception &e)
             {
-                throw XMLParser_E("stream", e.what());
+                throw XMLParser_E(path, e.what());
             }
         }
 };

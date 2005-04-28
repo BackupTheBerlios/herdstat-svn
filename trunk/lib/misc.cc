@@ -35,26 +35,25 @@
 #include "util_exceptions.hh"
 #include "misc.hh"
 
+/** static members **********************************************************/
 util::color_map_T::cmap_T util::color_map_T::_cm;
-
+/****************************************************************************/
 void
-util::debug(const char *msg, ...)
+util::debug(const gchar *fmt, ...)
 {
 #ifdef DEBUG
     va_list v;
-    va_start(v, msg);
+    va_start(v, fmt);
 
-    util::string s(util::sprintf(msg, v));
+    util::string s(util::sprintf(fmt, v));
     std::cerr << "!!! " << s << std::endl;
     
     va_end(v);
 #endif /* DEBUG */
 }
-
-/*
+/****************************************************************************
  * Compare the md5sum of two files, returning true if they match.
- */
-
+ ****************************************************************************/
 bool
 util::md5check(const util::string &file1, const util::string &file2)
 {
@@ -87,11 +86,7 @@ util::md5check(const util::string &file1, const util::string &file2)
 
     return false;
 }
-
-/*
- * getcwd() wrapper
- */
-
+/****************************************************************************/
 util::string
 util::getcwd()
 {
@@ -103,11 +98,9 @@ util::getcwd()
     std::free(pwd);
     return s;
 }
-
-/*
+/****************************************************************************
  * Given an email address, return the username.
- */
-
+ ****************************************************************************/
 util::string
 util::get_user_from_email(const util::string &email)
 {
@@ -117,14 +110,12 @@ util::get_user_from_email(const util::string &email)
 
     return email.substr(0, pos);
 }
-
-/*
+/****************************************************************************
  * Try to determine user.  This is used for hilighting occurrences
  * of the user's username in ouput.  ECHANGELOG_USER is checked first
  * since a developer might use a different username than what his
  * developer username is.
- */
-
+ ****************************************************************************/
 util::string
 util::current_user()
 {
@@ -152,12 +143,10 @@ util::current_user()
 
     return (user.empty() ? "nobody@gentoo.org" : user);
 }
-
-/*
+/****************************************************************************
  * Try to determine the columns of the current terminal; use
  * a sensible default if we can't get it for some reason.
- */
-
+ ****************************************************************************/
 util::string::size_type
 util::getcols()
 {
@@ -180,17 +169,13 @@ util::getcols()
 
     return 78;
 }
-
-/*
- * Download the specified file to the specified directory
- */
-
+/****************************************************************************/
 int
 util::fetch(const util::string &url, const util::string &dir, bool verbose)
 {
     return util::fetch(url.c_str(), dir.c_str(), verbose);
 }
-
+/****************************************************************************/
 int
 util::fetch(const char *url, const char *file, bool verbose)
 {

@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "cache.hh"
+#include "common.hh"
 
 /* metadata cache location */
 #define CACHE               LOCALSTATEDIR"/metadatas"
@@ -37,7 +37,7 @@
 /* rough number of metadata.xml's in the tree, updated from time to
  * time as it grows. Used for initial vector size so that a ton of
  * re-allocations can be prevented */
-#define METADATA_RESERVE    8350
+#define METADATA_RESERVE    8400
 #define DEFAULT_EXPIRE      86400
 
 /*
@@ -46,7 +46,7 @@
  * are excluded).
  */
 
-class metadatas_T : public cache_T
+class metadatas_T : public util::cache_T
 {
     private:
         const util::string portdir;

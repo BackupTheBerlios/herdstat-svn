@@ -61,7 +61,7 @@ operator<< (std::basic_ostream<charT, traits> &stream,
     portage::config_T::const_iterator i;
     for (i = that.begin() ; i != that.end() ; ++i)
     {
-        std::string s;
+        util::string s;
         while (s.length() < 20)
             s.append(" ");
         s += i->first + " = " + i->second;

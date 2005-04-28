@@ -24,14 +24,11 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <locale>
-#include <string>
-#include <map>
 #include <utility>
 #include <sys/types.h>
 
-#include "common.hh"
+#include "options.hh"
 
 options_T::option_map_T options_T::optmap;
 
@@ -68,7 +65,7 @@ options_T::option_map_T::set_defaults()
     insert_opt("action",
         static_cast<options_action_T>(action_unspecified));
 
-    insert_opt("locale", std::locale::classic().name());
+    insert_opt("locale", util::string(std::locale::classic().name()));
 
     /* portage options */
     portage::config_T config;

@@ -25,11 +25,8 @@
 #endif
 
 #include <fstream>
-#include <string>
-#include <vector>
 #include <utility>
 #include <algorithm>
-#include <cstdlib>
 
 #include "formatter.hh"
 #include "herds.hh"

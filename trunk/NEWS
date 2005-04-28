@@ -8,10 +8,17 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
      - More UTF-8 friendly.  There's still a glibmm ustring bug that's causes
        an exception to be thrown when displaying UTF-8 chars, but hopefully
        that'll be resolved soon.
+     - New --find flag which displays the full category/package for any
+       specified packages/regular expression.
 
     Bug fixes:
      - Fixed bug in version sorting code that failed to properly strip the
        revision number of version strings containing a suffix and a revision.
+     - Fixed bug in version sorting code that assumed the text after a '_'
+       was a prefix, therefore failing on package names that contain a '_'.
+     - Fixed bug in version sorting code that assumed the '-r' was a revision
+       when in fact it was part of ${PN}.  We now check to ensure that a
+       digit is present after the '-r' before assuming it's a revision.
 
     herdstat now uses the superior libxml++ for XML parsing rather than
     xmlwrapp.

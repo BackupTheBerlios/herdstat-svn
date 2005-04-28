@@ -24,36 +24,27 @@
 # include "config.h"
 #endif
 
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <iterator>
 
 #include "formatter.hh"
 
+/** static members **********************************************************/
 formatter_T::attrs_T formatter_T::attr;
 std::vector<util::string> formatter_T::buffer;
-
-/*
- * Default constructor
- * Set sane default attributes
- */
-
+/****************************************************************************/
 formatter_T::attrs_T::attrs_T()
 {
-    colors = false;
-    quiet = false;
+    colors = quiet = false;
     maxtotal = 78;
     maxlabel = 20;
     maxdata  = 58;
 }
-
-/*
+/****************************************************************************
  * Finalize the attributes ; calculate increase in string length
  * because of the colors, etc. This is called once by the caller
  * after the attrs have been set.
- */
-
+ ****************************************************************************/
 void
 formatter_T::set_attrs()
 {
@@ -88,13 +79,11 @@ formatter_T::set_attrs()
         attr.maxctotal = attr.maxtotal;
     }
 }
-
-/*
+/****************************************************************************
  * Given a vector of data, see if any of the elements
  * match words that should be highlighted.  Return the
  * string, highlighted or not.
- */
-
+ ****************************************************************************/
 util::string
 formatter_T::highlight(const std::vector<util::string> &data)
 {
@@ -115,31 +104,27 @@ formatter_T::highlight(const std::vector<util::string> &data)
 
     return s;
 }
-
-/*
- * Overloaded append() that takes a vector
- */
-
+/****************************************************************************/
 void
-formatter_T::append(const util::string &label, const std::vector<util::string> &data)
+formatter_T::append(const util::string &label,
+                    const std::vector<util::string> &data)
 {
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
     if (attr.quiet and attr.quiet_delim == " ")
-        buffer.push_back(util::vec2str(data));
+        buffer.push_back(util::stringify(data));
+
     else if (attr.quiet)
         std::copy(data.begin(), data.end(), std::back_inserter(buffer));
 
     /* otherwise, produce a data string and call the real append() */
     else
-        append(label, util::vec2str(data));
+        append(label, util::stringify(data));
 }
-
-/*
+/****************************************************************************
  * Append text to the output buffer.  Smartly handle lines that are bigger
  * than maxcol (new line and indent), and make sure it all aligns nicely.
- */
-
+ ****************************************************************************/
 void
 formatter_T::append(const util::string &label, const util::string &data)
 {
@@ -288,12 +273,10 @@ formatter_T::append(const util::string &label, const util::string &data)
         buffer.push_back(cur);
     }
 }
-
-/*
+/****************************************************************************
  * Flush our buffer's contents to the specified stream,
  * removing each element in the buffer as we do so.
- */
-
+ ***************************************************************************/
 void
 formatter_T::flush(std::ostream &stream)
 {
@@ -301,5 +284,6 @@ formatter_T::flush(std::ostream &stream)
         std::ostream_iterator<util::string>(stream, "\n"),
         "supercalifragilisticexpialidocious"); // :)
 }
+/****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

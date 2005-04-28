@@ -1,5 +1,26 @@
 ChangeLog for herdstat
 
+2005-04-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Remove *printf checks since we now use g_vasprintf().
+	* lib/misc.cc, lib/misc.hh, lib/string.cc, lib/string.hh,
+	lib/regex.cc, lib/regex.hh, lib/vars.cc, lib/vars.hh: Finished
+	s/std::string/util::string/ transition.
+	* lib/portage_version.cc, lib/portage_version.hh: Fixed a few bugs in
+	the version code.  Package names containing a '_' were previously
+	assumed to be a suffix causing an invalid_version_suffix_E to be
+	thrown.  Also, package names containing a '-r' were assumed to be a
+	revision, causing the -r* part of the package name to end up in the
+	version string.
+	* src/action_find_handler.cc, src/action_find_handler.hh: Added find
+	action handler (--find).
+	* lib/Makefile.am, src/Makefile.am, src/cache.hh, lib/cache.hh: Moved
+	cache.hh to lib/ as it's fairly generic and there's no reason to keep
+	it in src/.
+	* lib/string.cc, lib/string.hh: Use g_vasprintf() instead of
+	vasprintf.
+	* doc/herdstat.1.in, bashcomp, src/herdstat.cc: Added --find.
+
 2005-04-27 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/xmlparser.hh, src/herds_xml_handler.cc,

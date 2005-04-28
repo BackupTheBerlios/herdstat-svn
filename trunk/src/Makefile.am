@@ -12,14 +12,14 @@ herdstat_SOURCES = common.hh common.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
 		   herds_xml.hh herds_xml.cc \
 		   formatter.hh formatter.cc \
-		   cache.hh \
 		   metadatas.hh metadatas.cc \
 		   overlaydisplay.hh \
 		   action_handler.hh \
-		   action_herd_handler.hh action_herd_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
-		   action_pkg_handler.hh action_pkg_handler.cc \
+		   action_herd_handler.hh action_herd_handler.cc \
+		   action_find_handler.hh action_find_handler.cc \
 		   action_meta_handler.hh action_meta_handler.cc \
+		   action_pkg_handler.hh action_pkg_handler.cc \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   action_which_handler.hh action_which_handler.cc \
 		   action_versions_handler.hh action_versions_handler.cc \

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/common.hh
+ * herdstat -- src/action_find_handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,29 +20,21 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#include <iostream>
-#include <cstdlib>
-#include <cstddef>
-#include <cstdarg>
-#include <cassert>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
-#include <glib/gtypes.h>
-#include <glibmm.h>
-
-#include "options.hh"
-#include "util.hh"
-#include "exceptions.hh"
-
-#ifndef HAVE_COMMON_HH
-#define HAVE_COMMON_HH 1
+#ifndef HAVE_ACTION_FIND_HANDLER_HH
+#define HAVE_ACTION_FIND_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-void debug_msg(const gchar *, ...);
+#include "action_handler.hh"
+
+class action_find_handler_T : public action_handler_T
+{
+    public:
+        virtual ~action_find_handler_T() { }
+        virtual int operator() (std::vector<util::string> &);
+};
 
 #endif
 

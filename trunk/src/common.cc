@@ -27,15 +27,15 @@
 #include "common.hh"
 
 void
-debug_msg(const char *msg, ...)
+debug_msg(const gchar *fmt, ...)
 {
     if (not optget("debug", bool))
 	return;
     
     va_list v;
-    va_start(v, msg);
+    va_start(v, fmt);
     
-    util::string s = util::sprintf(msg, v);
+    util::string s = util::sprintf(fmt, v);
 
     /* make ASCII colors visible - TODO: anyway to escape them?
      * simply inserting a '\' before it doesnt work... */

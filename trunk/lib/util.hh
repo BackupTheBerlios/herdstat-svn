@@ -28,7 +28,6 @@
 #endif
 
 #include <fstream>
-#include <string>
 #include <map>
 #include <vector>
 #include <cstdarg>
@@ -42,6 +41,7 @@
 
 #include "misc.hh"
 #include "file.hh"
+#include "cache.hh"
 #include "vars.hh"
 #include "regex.hh"
 #include "string.hh"

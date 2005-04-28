@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_which_handler.cc
+ * herdstat -- src/action_find_handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -24,23 +24,25 @@
 # include "config.h"
 #endif
 
-#include "common.hh"
-#include "action_which_handler.hh"
+#include <map>
+#include <utility>
+#include <algorithm>
+#include <iterator>
+#include "action_find_handler.hh"
 
 int
-action_which_handler_T::operator() (std::vector<util::string> &opts)
+action_find_handler_T::operator() (std::vector<util::string> &opts)
 {
-    util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
     portage::config_T config(optget("portage.config", portage::config_T));
-    const util::string real_portdir(config.portdir());
     const bool regex = optget("regex", bool);
     const bool overlay = optget("overlay", bool);
     std::multimap<util::string, util::string> matches;
+    std::vector<util::string> results;
 
     if (optget("all", bool))
     {
-        std::cerr << "which action handler does not support the 'all' target."
+        std::cerr << "find handler does not support the 'all' target."
             << std::endl;
         return EXIT_FAILURE;
     }
@@ -54,7 +56,6 @@ action_which_handler_T::operator() (std::vector<util::string> &opts)
     {
         util::regex_T regexp;
         util::string re(opts.front());
-        opts.clear();
 
         if (optget("eregex", bool))
             regexp.assign(re, REG_EXTENDED|REG_ICASE);
@@ -79,7 +80,6 @@ action_which_handler_T::operator() (std::vector<util::string> &opts)
     std::multimap<util::string, util::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
-        util::string ebuild;
         std::pair<util::string, util::string> p;
 
         try
@@ -91,21 +91,11 @@ action_which_handler_T::operator() (std::vector<util::string> &opts)
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
-            std::cerr << e.name()
-                << " is ambiguous. Possible matches are: "
-                << std::endl << std::endl;
-            
             std::vector<util::string>::const_iterator i;
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
-            {
-                if (optget("quiet", bool) or not optget("color", bool))
-                    std::cerr << *i << std::endl;
-                else
-                    std::cerr << color[green] << *i << color[none] << std::endl;
-            }
+                *stream << *i << std::endl;
 
-            if (matches.size() == 1)
-                return EXIT_FAILURE;
+            continue;
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
@@ -113,18 +103,22 @@ action_which_handler_T::operator() (std::vector<util::string> &opts)
 
             if (matches.size() == 1)
                 return EXIT_FAILURE;
+            
+            continue;
         }
+        
+        results.push_back(p.second);
+    }
 
-        try
-        {
-            ebuild = portage::ebuild_which(p.first, p.second);
-        }
-        catch (const portage::nonexistent_pkg_E)
-        {
-            ebuild = portage::ebuild_which(real_portdir, p.second);
-        }
+    std::sort(results.begin(), results.end());
+    results.erase(std::unique(results.begin(), results.end()), results.end());
 
-        *stream << ebuild << std::endl;
+    if (optget("count", bool))
+        *stream << results.size() << std::endl;
+    else
+    {
+        std::copy(results.begin(), results.end(), 
+            std::ostream_iterator<util::string>(*stream, "\n"));
     }
 
     return EXIT_SUCCESS;

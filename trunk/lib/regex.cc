@@ -35,13 +35,9 @@
 #include "regex.hh"
 #include "util_exceptions.hh"
 
-/*
- * Compare the given string to our regular expression,
- * return true if it matches
- */
-
+/*****************************************************************************/
 bool
-util::regex_T::operator== (const std::string &cmp)
+util::regex_T::operator== (const util::string &cmp)
 {
     assert(this->_compiled = true);
 
@@ -51,18 +47,14 @@ util::regex_T::operator== (const std::string &cmp)
 
     return rv == 0;
 }
-
-/*
- * Assign a new regular expression, making sure to cleanup
- * any previous regex's
- */
-
+/*****************************************************************************/
 void
-util::regex_T::assign(const std::string &regex, int cflags, int eflags)
+util::regex_T::assign(const util::string &regex, int cflags, int eflags)
 {
     if (this->_compiled)
         this->cleanup();
 
+    this->_str    = regex;
     this->_cflags = cflags;
     this->_eflags = eflags;
 
@@ -73,18 +65,15 @@ util::regex_T::assign(const std::string &regex, int cflags, int eflags)
 
     this->_compiled = true;
 }
-
-/*
- * Cleanup
- */
-
+/*****************************************************************************/
 void
 util::regex_T::cleanup()
 {
     regfree(&(this->_regex));
     this->_compiled = false;
-    this->_eflags = 0;
-    this->_cflags = 0;
+    this->_eflags = this->_cflags = 0;
+    this->_str.clear();
 }
+/*****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

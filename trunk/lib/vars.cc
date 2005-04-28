@@ -52,39 +52,40 @@ util::vars_T::read()
     if (not this->stream or not this->stream->is_open())
         this->open();
 
-    std::string line;
-    std::string::size_type pos;
+    std::string s;
+    util::string::size_type pos;
 
-    while (std::getline(*(this->stream), line))
+    while (std::getline(*(this->stream), s))
     {
+        util::string line(s);
         pos = line.find_first_not_of(" \t");
-        if (pos != std::string::npos)
+        if (pos != util::string::npos)
             line.erase(0, pos);
 
         if (line.length() < 1 or line[0] == '#')
             continue;
 
         pos = line.find('=');
-        if (pos != std::string::npos)
+        if (pos != util::string::npos)
         {
-            std::string key = line.substr(0, pos);
-            std::string val = line.substr(pos + 1);
+            util::string key = line.substr(0, pos);
+            util::string val = line.substr(pos + 1);
 
             /* handle leading/trailing whitespace */
-            if (std::string::npos != (pos = key.find_first_not_of(" \t")))
+            if (util::string::npos != (pos = key.find_first_not_of(" \t")))
                 key.erase(0, pos);
-            if (std::string::npos != (pos = val.find_first_not_of(" \t")))
+            if (util::string::npos != (pos = val.find_first_not_of(" \t")))
                 val.erase(0, pos);
-            if (std::string::npos != (pos = key.find_last_not_of(" \t")))
+            if (util::string::npos != (pos = key.find_last_not_of(" \t")))
                 key.erase(++pos);
-            if (std::string::npos != (pos = val.find_last_not_of(" \t")))
+            if (util::string::npos != (pos = val.find_last_not_of(" \t")))
                 val.erase(++pos);
  
             /* handle quotes */
-            if (std::string::npos != (pos = val.find_first_of("'\"")))
+            if (util::string::npos != (pos = val.find_first_of("'\"")))
             {
                 val.erase(pos, pos + 1);
-                if (std::string::npos != (pos = val.find_last_of("'\"")))
+                if (util::string::npos != (pos = val.find_last_of("'\"")))
                     val.erase(pos, pos + 1);
             }
  
@@ -117,60 +118,47 @@ util::vars_T::read()
  */
 
 void
-util::vars_T::subst(std::string &value)
+util::vars_T::subst(util::string &value)
 {
 
-    std::vector<std::string> vars;
-    std::vector<std::string>::iterator v;
-    std::string::size_type lpos = 0;
+    std::vector<util::string> vars;
+    std::vector<util::string>::iterator v;
+    util::string::size_type lpos = 0;
 
     /* find variables that need substituting */
     while (true)
     {
-        std::string::size_type begin = value.find("${", lpos);
-        if (begin == std::string::npos)
+        util::string::size_type begin = value.find("${", lpos);
+        if (begin == util::string::npos)
             break;
 
-        std::string::size_type end = value.find("}", begin);
-        if (end == std::string::npos)
+        util::string::size_type end = value.find("}", begin);
+        if (end == util::string::npos)
             break;
-
-        const std::string var(value.substr(begin + 2, end - (begin + 2)));
 
         /* save it */
         if (this->_depth < 20)
-        {
-//            if (this->_ebuild)
-//                util::debug("saving occurrence '%s'", var.c_str());
-
-            vars.push_back(var);
-        }
+            vars.push_back(value.substr(begin + 2, end - (begin + 2)));
+        
         lpos = ++end;
     }
 
     /* for each variable we found */
     for (v = vars.begin() ; v != vars.end() ; ++v)
     {
-        std::string subst;
-        std::string var("${"+(*v)+"}");
+        util::string subst;
+        util::string var("${"+(*v)+"}");
 
-        std::string::size_type pos = value.find(var);
-        if (pos == std::string::npos)
+        util::string::size_type pos = value.find(var);
+        if (pos == util::string::npos)
             continue;
-
-//        if (this->_ebuild)
-//            util::debug("Found variable '%s'", var.c_str());
 
         /* is that variable defined? */
         iterator x = this->find(*v);
         if (x != this->end())
-        {
             subst = x->second;
-//            if (this->_ebuild)
-//                util::debug("Found value '%s'", subst.c_str());
-        }
 
-        if (subst.find("${") != std::string::npos)
+        if (subst.find("${") != util::string::npos)
         {
             ++(this->_depth);
             this->subst(subst);

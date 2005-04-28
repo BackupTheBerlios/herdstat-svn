@@ -31,10 +31,9 @@
 
 #include "util.hh"
 
-/**************************
- * file_T                 *
- **************************/
-
+/*****************************************************************************
+ * file_T                                                                    *
+ *****************************************************************************/
 void
 util::file_T::open(const char *n, std::ios_base::openmode mode)
 {
@@ -54,7 +53,7 @@ util::file_T::open(const char *n, std::ios_base::openmode mode)
     else
         this->stream = new std::fstream(n, mode);
 }
-
+/*****************************************************************************/
 void
 util::file_T::read(std::vector<util::string> *v)
 {
@@ -65,7 +64,7 @@ util::file_T::read(std::vector<util::string> *v)
     while (std::getline(*(this->stream), line))
         v->push_back(util::string(line));
 }
-
+/*****************************************************************************/
 void
 util::file_T::display(std::ostream &stream)
 {
@@ -78,9 +77,9 @@ util::file_T::display(std::ostream &stream)
      */
 
 //    std::copy(this->_contents.begin(), this->_contents.end(),
-//        std::ostream_iterator<std::string>(stream, "\n"));
+//        std::ostream_iterator<util::string>(stream, "\n"));
 }
-
+/*****************************************************************************/
 void
 util::file_T::close()
 {
@@ -89,12 +88,9 @@ util::file_T::close()
     delete this->stream;
     this->stream = NULL;
 }
-
-
-/**************************
- * base_dir_T             *
- **************************/
-
+/*****************************************************************************
+ * base_dir_T                                                                *
+ *****************************************************************************/
 template <class C>
 void
 util::base_dir_T<C>::close()
@@ -106,7 +102,7 @@ util::base_dir_T<C>::close()
         throw util::errno_E("closedir: " + this->_path);
 #endif /* CLOSEDIR_VOID */
 }
-
+/*****************************************************************************/
 template <class C>
 void
 util::base_dir_T<C>::open()
@@ -116,7 +112,7 @@ util::base_dir_T<C>::open()
     if (not this->_dir)
         throw util::bad_fileobject_E(this->_path);
 }
-
+/*****************************************************************************/
 template <class C>
 void
 util::base_dir_T<C>::display(std::ostream &stream)
@@ -125,11 +121,9 @@ util::base_dir_T<C>::display(std::ostream &stream)
     for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
         stream << *i << std::endl;
 }
-
-/**************************
- * dirobject_T            *
- **************************/
-
+/*****************************************************************************
+ * dirobject_T                                                               *
+ *****************************************************************************/
 void
 util::dirobject_T::read()
 {
@@ -142,7 +136,7 @@ util::dirobject_T::read()
             continue;
 
         util::fileobject_T *f = NULL;
-        std::string path(this->_path + "/" + d->d_name);
+        util::path_T path(this->_path + "/" + d->d_name);
 
         if (util::is_dir(path))
         {
@@ -160,7 +154,7 @@ util::dirobject_T::read()
         this->_contents.push_back(f);
     }
 }
-
+/*****************************************************************************/
 void
 util::dirobject_T::display(std::ostream &stream)
 {
@@ -173,14 +167,14 @@ util::dirobject_T::display(std::ostream &stream)
             (*i)->display(stream);
     }
 }
-
+/*****************************************************************************/
 util::dirobject_T::~dirobject_T()
 {
     iterator i;
     for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
         delete *i;
 }
-
+/*****************************************************************************/
 void
 util::dir_T::read()
 {
@@ -195,11 +189,9 @@ util::dir_T::read()
         this->_contents.push_back(this->_path + "/" + d->d_name);
     }
 }
-
-/******************************************
- * general purpose file-related functions *
- ******************************************/
-
+/*****************************************************************************
+ * general purpose file-related functions                                    *
+ *****************************************************************************/
 bool
 util::is_dir(const char *path)
 {
@@ -208,14 +200,11 @@ util::is_dir(const char *path)
 	return false;
     return S_ISDIR(s.st_mode);
 }
-
-bool util::is_dir(const std::string &path) { return is_dir(path.c_str()); }
+/*****************************************************************************/
+bool util::is_dir(const util::path_T &path) { return is_dir(path.c_str()); }
+/*****************************************************************************/
 bool util::is_dir(const struct stat &s) { return S_ISDIR(s.st_mode); }
-
-/*
- * Is the specified path a regular file?
- */
-
+/*****************************************************************************/
 bool
 util::is_file(const char *path)
 {
@@ -224,75 +213,72 @@ util::is_file(const char *path)
 	return false;
     return S_ISREG(s.st_mode);
 }
-
-bool util::is_file(const std::string &path) { return is_file(path.c_str()); }
+/*****************************************************************************/
+bool util::is_file(const util::path_T &path) { return is_file(path.c_str()); }
+/*****************************************************************************/
 bool util::is_file(const struct stat &s) { return S_ISREG(s.st_mode); }
-
+/*****************************************************************************/
 const char *
 util::basename(const char *path)
 {
-    std::string result(path);
-    std::string::size_type pos;
+    util::path_T result(path);
+    util::path_T::size_type pos;
 
     /* chop all trailing /'s */
     while (result[result.length() - 1] == '/' and result.length() > 1)
 	result.erase(result.length() - 1);
 
-    if ((pos = result.rfind('/')) != std::string::npos)
+    if ((pos = result.rfind('/')) != util::path_T::npos)
 	result = result.substr(pos + 1);
 
     return ( result.empty() ? "/" : result.c_str() );
 }
-
+/*****************************************************************************/
 const char *
-util::basename(std::string const &path) { return util::basename(path.c_str()); }
-
+util::basename(const util::path_T &path) { return util::basename(path.c_str()); }
+/*****************************************************************************/
 const char *
 util::dirname(const char *path)
 {
-    std::string result(path);
-    std::string::size_type pos;
+    util::path_T result(path);
+    util::path_T::size_type pos;
 
     /* chop all trailing /'s */
     while (result[result.length() - 1] == '/' and result.length() > 1)
 	result.erase(result.length() - 1);
 
-    if ((pos = result.rfind('/')) != std::string::npos)
+    if ((pos = result.rfind('/')) != util::path_T::npos)
 	result = result.substr(0, pos);
 
     return ( result.empty() ? "/" : result.c_str() );
 }
-
+/*****************************************************************************/
 const char *
-util::dirname(std::string const &path) { return util::dirname(path.c_str()); }
-
+util::dirname(const util::path_T &path) { return util::dirname(path.c_str()); }
+/*****************************************************************************/
 const char *
 util::chop_fileext(const char *path, unsigned short depth)
 {
-    std::string result(path);
+    util::path_T result(path);
 
     for (; depth > 0 ; --depth)
     {
-        std::string::size_type pos = result.rfind('.');
-        if (pos != std::string::npos)
+        util::path_T::size_type pos = result.rfind('.');
+        if (pos != util::path_T::npos)
             result = result.substr(0, pos);
     }
 
     return result.c_str();
 }
-
+/*****************************************************************************/
 const char *
-util::chop_fileext(const std::string &path, unsigned short depth)
+util::chop_fileext(const util::path_T &path, unsigned short depth)
 {
     return util::chop_fileext(path.c_str(), depth);
 }
-
-/*
- * Copy file from to copy to
- */
-
+/*****************************************************************************/
 void
-util::copy_file(const std::string &from, const std::string &to)
+util::copy_file(const util::path_T &from, const util::path_T &to)
 {
     /* remove to if it exists */
     if (util::is_file(to) and (unlink(to.c_str()) != 0))
@@ -311,17 +297,14 @@ util::copy_file(const std::string &from, const std::string &to)
     while (std::getline(*ffrom, line))
 	*fto << line << std::endl;
 }
-
-/*
- * Copy then remove old
- */
-
+/*****************************************************************************/
 void
-util::move_file(const std::string &from, const std::string &to)
+util::move_file(const util::path_T &from, const util::path_T &to)
 {
     util::copy_file(from, to);
     if (unlink(from.c_str()) != 0)
 	throw util::bad_fileobject_E(from);
 }
+/*****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

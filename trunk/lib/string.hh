@@ -27,8 +27,8 @@
 # include "config.h"
 #endif
 
-#include <string>
 #include <vector>
+#include <glib/gtypes.h>
 #include <glibmm/ustring.h>
 
 namespace util
@@ -43,17 +43,18 @@ namespace util
             string(const string &n) : Glib::ustring(n) { }
             virtual ~string() { }
 
-            virtual std::vector<util::string> split(const char delim = ' ') const;
+            virtual std::vector<util::string>
+            split(const util::string::value_type delim = ' ') const;
     };
 
     util::string lowercase(const util::string &);
     util::string tidy_whitespace(const util::string &);
-    util::string sprintf(const char *, ...);
-    util::string sprintf(const char *, va_list);
-    std::vector<util::string> split(const util::string &, const char d = ' ');
-    util::string vec2str(const std::vector<util::string> &, const char d = ' ');
-
-
+    util::string sprintf(const gchar *, ...);
+    util::string sprintf(const gchar *, va_list);
+    std::vector<util::string> split(const util::string &,
+                                    const util::string::value_type d = ' ');
+    util::string stringify(const std::vector<util::string> &,
+                           const util::string::value_type d = ' ');
 }
 
 #endif

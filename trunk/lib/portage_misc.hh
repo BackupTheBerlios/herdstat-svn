@@ -41,9 +41,9 @@ namespace portage
     {
         public:
             categories_T()
-                : file_T(std::string(portage::portdir()) + "/profiles/categories")
+                : file_T(util::path_T(portage::portdir()) + "/profiles/categories")
             { this->init(); }
-            categories_T(const std::string &p) : file_T(p + "/profiles/categories")
+            categories_T(const util::path_T &p) : file_T(p + "/profiles/categories")
             { this->init(); }
 
             void init()

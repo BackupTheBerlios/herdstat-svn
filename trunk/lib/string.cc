@@ -30,14 +30,12 @@
 #include <vector>
 #include <cstdarg>
 #include <cstring>
+#include <glib/gprintf.h>
 #include <glibmm/unicode.h>
 
 #include "string.hh"
 
-/*
- * Given a string, convert all characters to lowercase
- */
-
+/*****************************************************************************/
 util::string
 util::lowercase(const util::string &s)
 {
@@ -46,19 +44,14 @@ util::lowercase(const util::string &s)
 
     util::string result;
     for (util::string::const_iterator i = s.begin() ; i != s.end() ; ++i)
-    {
         result.push_back(Glib::Unicode::tolower(*i));
-    }
     
     return result;
 }
-
-/*
- * Given a string, tidy whitespace.
- */
-
+/*****************************************************************************/
 bool
-bothspaces(gunichar c1, gunichar c2)
+bothspaces(util::string::value_type c1,
+           util::string::value_type c2)
 {
     return Glib::Unicode::isspace(c1) and
            Glib::Unicode::isspace(c2);
@@ -73,7 +66,8 @@ util::tidy_whitespace(const util::string &s)
     util::string result;
 
     /* collapse whitespace */
-    std::unique_copy(s.begin(), s.end(), std::back_inserter(result), bothspaces);
+    std::unique_copy(s.begin(), s.end(), std::back_inserter(result),
+        bothspaces);
 
     /* remove any leading whitespace */
     util::string::size_type pos = result.find_first_not_of(" \t\n");
@@ -93,54 +87,29 @@ util::tidy_whitespace(const util::string &s)
 	
     return result2;
 }
-
-/*
- * Return a string formatted with printf-like format specifier
- */
+/*****************************************************************************/
 util::string
-util::sprintf(const char *str, ...)
+util::sprintf(const gchar *fmt, ...)
 {
     va_list v;
-    va_start(v, str);
-    util::string s(util::sprintf(str, v));
+    va_start(v, fmt);
+    util::string s(util::sprintf(fmt, v));
     va_end(v);
     return s;
 }
-
-/*
- * Overloaded sprintf that takes a string and va_list
- */
+/*****************************************************************************/
 util::string
-util::sprintf(const char *str, va_list v)
+util::sprintf(const gchar *fmt, va_list v)
 {
-#ifdef HAVE_VASPRINTF
-    char *buf;
-    vasprintf(&buf, str, v);
-#else
-    char buf[4096] = { 0 };
-# ifdef HAVE_VSNPRINTF
-    vsnprintf(buf, sizeof(buf), str, v);
-# else
-    vsprintf(buf, str, v);
-# endif
-#endif
-
+    gchar *buf;
+    g_vasprintf(&buf, fmt, v);
     util::string s(buf);
-
-#ifdef HAVE_VASPRINTF
     free(buf);
-#endif
-
     return s;
 }
-
-/*
- * Given a string and a delimiter, split the string,
- * returning all the substrings in a vector
- */
-
+/*****************************************************************************/
 std::vector<util::string>
-util::split(const util::string &str, const char delim)
+util::split(const util::string &str, const util::string::value_type delim)
 {
     std::vector<util::string> vec;
     util::string::size_type pos, lpos = 0;
@@ -163,15 +132,10 @@ util::split(const util::string &str, const char delim)
     }
     return vec;
 }
-
-/*
- * Convert the given vector to one string
- * consisting of the elements delimited by
- * the specified delimiter.
- */
-
+/*****************************************************************************/
 util::string
-util::vec2str(const std::vector<util::string> &v, const char delim)
+util::stringify(const std::vector<util::string> &v,
+                const util::string::value_type delim)
 {
     util::string result;
 
@@ -181,9 +145,9 @@ util::vec2str(const std::vector<util::string> &v, const char delim)
     
     return result;
 }
-
+/*****************************************************************************/
 std::vector<util::string>
-util::string::split(const char delim) const
+util::string::split(const util::string::value_type delim) const
 {
     std::vector<util::string> vec;
     size_type pos, lpos = 0;
@@ -205,5 +169,6 @@ util::string::split(const char delim) const
     }
     return vec;
 }
+/*****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

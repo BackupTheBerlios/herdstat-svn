@@ -35,9 +35,9 @@ _herdstat() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -V --version -p --package -d --dev -H --herdsxml
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
-        -f --fetch -c --count -n --nocolor --no-herd -m --metadata
+        -F --fetch -c --count -n --nocolor --no-herd -m --metadata
         --with-herd -w --which --versions --no-overlay -r --regex
-        -E --extended"
+        -E --extended -f --find"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -57,7 +57,7 @@ _herdstat() {
         --with-herd)
             COMPREPLY=( $(compgen -W "$(_complete_herd) no-herd" -- ${cur}))
             ;;
-        -m|--metadata|-w|--which|--versions)
+        -m|--metadata|-w|--which|--versions|-f|--find)
             local words p=$(_portdir)
             
             [[ -d ${p} ]] || return 0
@@ -65,15 +65,19 @@ _herdstat() {
             if [[ ${cur} == */* ]] ; then
                 words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
             elif [[ ${cur} == "" ]] ; then
-                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
-                # --metadata can complete on categories only (no / suffix)
-                [[ ${prev} == ?(-)-m?(etadata) ]] && \
+                if [[ ${prev} == ?(-)-m?(etadata) ]] ; then
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
                     words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
+                elif [[ ${prev} == ?(-)-w?(hich) ]] ; then
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
+                fi
             else
-                words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur)"
-                # --metadata can complete on categories only (no / suffix)
-                [[ ${prev} == ?(-)-m?(etadata) ]] && \
+                if [[ ${prev} == ?(-)-m?(etadata) ]] ; then
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
                     words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
+                elif [[ ${prev} == ?(-)-w?(hich) ]] ; then
+                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
+                fi
             fi
 
             local i n=0
@@ -96,7 +100,7 @@ _herdstat() {
             fi
             ;;
 	*)
-	    local x dev=0 pkg=0 meta=0 which=0
+            local x dev=0 pkg=0 meta=0 which=0 find=0
 	    for x in ${COMP_WORDS[@]} ; do
                 [[ ${x} == -* ]] || continue
 
@@ -117,6 +121,10 @@ _herdstat() {
                      [[ ${x} == "--versions" ]] ; then
                     which=1
                 fi
+
+                if [[ ${x} == *f* && ${x} != "--fetch" ]] ; then
+                    find=1
+                fi
 	    done
 
 	    if [[ ${dev} -eq 1 && ${pkg} -eq 1 ]] ; then
@@ -125,7 +133,7 @@ _herdstat() {
 		    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts} all" -- ${cur}) )
             elif [[ ${pkg} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "$(_complete_herd) ${opts}" -- ${cur}) )
-            elif [[ ${meta} -eq 1 || ${which} -eq 1 ]] ; then
+            elif [[ ${meta} -eq 1 || ${which} -eq 1 ]] || [[ ${find} -eq 1 ]] ; then
                 local words p=$(_portdir)
             
                 [[ -d ${p} ]] || return 0
@@ -133,15 +141,19 @@ _herdstat() {
                 if [[ ${cur} == */* ]] ; then
                     words=$(builtin cd ${p}; compgen -X "*metadata.xml" -G "${cur}*")
                 elif [[ ${cur} == "" ]] ; then
-                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
-                    # --metadata can complete on categories only (no / suffix)
-                    [[ ${meta} -eq 1 ]] && \
+                    if [[ ${meta} -eq 1 ]] ; then
+                        words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
                         words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
+                    elif [[ ${which} -eq 1 ]] ; then
+                        words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
+                fi
                 else
-                    words="$(builtin cd ${p} ; compgen -S '/' -G "*-*" -- $cur)"
-                    # --metadata can complete on categories only (no / suffix)
-                    [[ ${meta} -eq 1 ]] && \
+                    if [[ ${meta} -eq 1 ]] ; then
+                        words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
                         words="${words} $(builtin cd ${p} ; compgen -G "*-*")"
+                    elif [[ ${which} -eq 1 ]] ; then
+                        words="$(builtin cd ${p} ; compgen -S '/' -G "*-*")"
+                    fi
                 fi
                 
                 local i n=0

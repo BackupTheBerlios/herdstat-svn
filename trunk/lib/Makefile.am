@@ -8,6 +8,7 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     progress.hh \
 		     file.hh file.cc \
 		     vars.hh vars.cc \
+		     cache.hh \
 		     portage_exceptions.hh \
 		     portage_misc.hh portage_misc.cc \
 		     portage_config.hh portage_config.cc \

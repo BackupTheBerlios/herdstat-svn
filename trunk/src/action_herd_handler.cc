@@ -24,15 +24,9 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
 #include <memory>
 #include <algorithm>
-#include <cstdlib>
-#include <cerrno>
-#include <unistd.h>
 
 #include "common.hh"
 #include "herds_xml.hh"

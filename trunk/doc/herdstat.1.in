@@ -71,6 +71,9 @@ Display full path to ebuild for the specified package(s).
 .B "     \-\-versions"
 Display versions of the specified package(s).
 .TP
+.B "\-f, \-\-find"
+Display full package name (in categor/package form) for the specified packages.
+.TP
 .B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
 for an alternative way of setting the herds.xml location.
@@ -79,7 +82,7 @@ for an alternative way of setting the herds.xml location.
 Send output to the specified file instead of stdout.  \fI<file>\fR can also be
 either stdout (default if -o is not specified) or stderr. This option implies --quiet.
 .TP
-.B "\-f, \-\-fetch"
+.B "\-F, \-\-fetch"
 Force a fetch of herds.xml.  This is only valid if a) you didn't set a herds.xml
 location with -H or $HERDS, or b) the location you did set is a URL supported by
 wget.  If no non-option arguments are specified, @PACKAGE@ will simply fetch

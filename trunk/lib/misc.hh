@@ -28,6 +28,7 @@
 #endif
 
 #include <map>
+#include <glib/gtypes.h>
 #include "string.hh"
 
 enum color_name_T
@@ -48,7 +49,7 @@ enum color_name_T
 
 namespace util
 {
-    void debug(const char *, ...);
+    void debug(const gchar *, ...);
     bool md5check(const util::string &, const util::string &);
     util::string getcwd();
     util::string get_user_from_email(const util::string &);
