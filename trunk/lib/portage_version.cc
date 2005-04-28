@@ -49,6 +49,7 @@
 #include <cstdlib>
 #include <climits>
 #include <cassert>
+#include <glibmm/unicode.h>
 
 #include "string.hh"
 #include "portage_misc.hh"
@@ -130,7 +131,9 @@ portage::version_suffix_T::get_suffix(const util::string &s)
     util::string result(s);
     util::string::size_type pos = result.rfind("-r");
     if (pos != util::string::npos)
+    {
         result = result.substr(0, pos);
+    }
 
     if ((pos = result.rfind('_')) != util::string::npos)
     {
@@ -147,7 +150,7 @@ portage::version_suffix_T::get_suffix(const util::string &s)
         /* valid suffix? */
         if (std::find(this->_suffixes.begin(), this->_suffixes.end(),
             this->_suffix) == this->_suffixes.end())
-            throw portage::bad_version_suffix_E(this->_suffix);
+            this->_suffix.clear();
     }
 }
 
@@ -230,6 +233,7 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 void
 portage::version_nosuffix_T::init(const util::string &PV)
 {
+    /* strip suffix */
     util::string::size_type pos = PV.find('_');
     if (pos != util::string::npos)
         this->_version = PV.substr(0, pos);
@@ -363,8 +367,12 @@ portage::version_string_T::split()
     assert(not this->_verstr.empty());
 
     /* append -r0 if necessary */
-    if ((pos = this->_verstr.rfind("-r")) == util::string::npos)
+    pos = this->_verstr.rfind("-r");
+    if ((pos == util::string::npos) or (((pos+2) <= this->_verstr.size()) and
+        not Glib::Unicode::isdigit(this->_verstr.at(pos+2))))
+    {
         this->_verstr.append("-r0");
+    }
 
     parts = this->_verstr.split('-');
 
