@@ -30,10 +30,10 @@
 #include "formatter.hh"
 
 /** static members **********************************************************/
-formatter_T::attrs_T formatter_T::attr;
-std::vector<util::string> formatter_T::buffer;
+formatter_T::attrs_type  formatter_T::attr;
+formatter_T::buffer_type formatter_T::buffer;
 /****************************************************************************/
-formatter_T::attrs_T::attrs_T()
+formatter_T::attrs_type::attrs_type()
 {
     colors = quiet = false;
     maxtotal = 78;
@@ -62,6 +62,7 @@ formatter_T::set_attrs()
      * for the increase in string length.           */
     if (attr.colors)
     {
+        color_type color;
         attr.no_color = color[none];
         attr.maxclabel = attr.maxlabel
                        + attr.label_color.length()
@@ -280,9 +281,25 @@ formatter_T::append(const util::string &label, const util::string &data)
 void
 formatter_T::flush(std::ostream &stream)
 {
-    std::remove_copy(buffer.begin(), buffer.end(),
-        std::ostream_iterator<util::string>(stream, "\n"),
-        "supercalifragilisticexpialidocious"); // :)
+//    std::remove_copy(buffer.begin(), buffer.end(),
+//        std::ostream_iterator<util::string>(stream, "\n"),
+//        "supercalifragilisticexpialidocious");
+
+    buffer_type::iterator i;
+    for (i = this->buffer.begin() ; i != this->buffer.end() ; ++i)
+    {
+        try
+        {
+            stream << *i << std::endl;
+        }
+        catch (const Glib::ConvertError &e)
+        {
+            stream
+                << "pfft. glib found a utf8 char and puked (gnome bug 301935)."
+                << std::endl;
+            continue;
+        }
+    }
 }
 /****************************************************************************/
 

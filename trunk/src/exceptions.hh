@@ -79,6 +79,8 @@ class herdstat_va_base_E                : public herdstat_msg_base_E
         virtual const char *what() const throw() { return str; }
 };
 
+class herdstat_glib_E                   : public Glib::Error { };
+
 /* command line handling exceptions */
 class args_E                            : public herdstat_base_E { };
 class args_usage_E                      : public args_E { };

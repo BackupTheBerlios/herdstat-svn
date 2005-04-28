@@ -132,7 +132,9 @@ util::split(const util::string &str, const util::string::value_type delim)
     }
     return vec;
 }
-/*****************************************************************************/
+/*****************************************************************************
+ * Convert a vector of string to one string.                                 *
+ *****************************************************************************/
 util::string
 util::stringify(const std::vector<util::string> &v,
                 const util::string::value_type delim)
@@ -142,6 +144,11 @@ util::stringify(const std::vector<util::string> &v,
     std::vector<util::string>::const_iterator i;
     for (i = v.begin() ; i != v.end() ; ++i)
         result += *i + delim;
+
+    /* remove the extra delim */
+    util::string::size_type pos = result.rfind(delim);
+    if (pos != util::string::npos)
+        result = result.substr(0, pos);
     
     return result;
 }

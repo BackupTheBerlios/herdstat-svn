@@ -3,6 +3,7 @@ ChangeLog for herdstat
 2005-04-28 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Remove *printf checks since we now use g_vasprintf().
+	Update version (1.1.0_rc2).
 	* lib/misc.cc, lib/misc.hh, lib/string.cc, lib/string.hh,
 	lib/regex.cc, lib/regex.hh, lib/vars.cc, lib/vars.hh: Finished
 	s/std::string/util::string/ transition.
@@ -20,6 +21,7 @@ ChangeLog for herdstat
 	* lib/string.cc, lib/string.hh: Use g_vasprintf() instead of
 	vasprintf.
 	* doc/herdstat.1.in, bashcomp, src/herdstat.cc: Added --find.
+	* src/formatter.cc, src/formatter.hh: Tidy.
 
 2005-04-27 Aaron Walker <ka0ttic@gentoo.org>
 

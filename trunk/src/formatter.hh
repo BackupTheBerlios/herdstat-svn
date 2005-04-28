@@ -34,55 +34,18 @@
 
 class formatter_T
 {
-    private:
-        /* format attributes */
-        struct attrs_T
-        {
-            attrs_T();
-
-            bool colors;
-            bool quiet;
-
-            util::string quiet_delim;
-
-            util::string label_color;
-            util::string data_color;
-            util::string highlight_color;
-            util::string no_color;
-
-            util::string::size_type maxtotal;
-            util::string::size_type maxlabel;
-            util::string::size_type maxdata;
-            
-            util::string::size_type maxctotal;
-            util::string::size_type maxclabel;
-            util::string::size_type maxcdata;
-
-            std::vector<util::string> highlights;
-        };
-
-        util::string highlight(const std::vector<util::string> &);
-        void append(const util::string &, const util::string &);
-        void append(const util::string &, const std::vector<util::string> &);
-
-        static std::vector<util::string> buffer;
-        static attrs_T attr;
-        util::color_map_T color;
-
     public:
         typedef std::size_t size_type;
+        typedef std::vector<util::string> buffer_type;
+        typedef util::color_map_T color_type;
 
         formatter_T() { }
 
         void operator() (const util::string &l, const util::string &d)
-        {
-            append(l, d);
-        }
+        { append(l, d); }
 
         void operator() (const util::string &l, const std::vector<util::string> &d)
-        {
-            append(l, d);
-        }
+        { append(l, d); }
 
         void endl() { buffer.push_back(""); }
         void flush(std::ostream &);
@@ -121,6 +84,39 @@ class formatter_T
         util::string &highlightcolor() { return attr.highlight_color; }
 
         void add_highlight(util::string s) { attr.highlights.push_back(s); }
+
+    private:
+        /* format attributes */
+        struct attrs_type
+        {
+            attrs_type();
+
+            bool colors;
+            bool quiet;
+
+            util::string quiet_delim;
+            util::string label_color;
+            util::string data_color;
+            util::string highlight_color;
+            util::string no_color;
+
+            util::string::size_type maxtotal;
+            util::string::size_type maxlabel;
+            util::string::size_type maxdata;
+            
+            util::string::size_type maxctotal;
+            util::string::size_type maxclabel;
+            util::string::size_type maxcdata;
+
+            std::vector<util::string> highlights;
+        };
+
+        util::string highlight(const std::vector<util::string> &);
+        void append(const util::string &, const util::string &);
+        void append(const util::string &, const std::vector<util::string> &);
+
+        static buffer_type buffer;
+        static attrs_type attr;
 };
 
 #endif

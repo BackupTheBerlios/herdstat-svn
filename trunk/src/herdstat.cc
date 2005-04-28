@@ -490,23 +490,6 @@ main(int argc, char **argv)
 	    delete outstream;
 
     }
-    catch (const Glib::ConvertError &e)
-    {
-	std::cerr << e.what() << std::endl;
-	std::cerr
-	    << "There is currently a bug in glibmm that causes an exception"
-	    << std::endl
-	    << "to be thrown when trying to display a UTF-8 character.  Until"
-	    << std::endl
-	    << "it is fixed, this message will be displayed.  Sorry for the inconvenience."
-	    << std::endl;
-	return EXIT_FAILURE;
-    }
-    catch (const Glib::Error &e)
-    {
-	std::cerr << e.what() << std::endl;
-	return EXIT_FAILURE;
-    }
     catch (const XMLParser_E &e)
     {
 	std::cerr << "Error parsing '" << e.file() << "': " << e.error()
@@ -550,6 +533,11 @@ main(int argc, char **argv)
     catch (const args_E)
     {
 	usage();
+	return EXIT_FAILURE;
+    }
+    catch (const herdstat_glib_E &e)
+    {
+	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const herdstat_base_E &e)
