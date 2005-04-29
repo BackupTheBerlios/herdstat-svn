@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-04-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in: Fix typo.
+	* src/overlaydisplay.hh: Tidy.
+
 2005-04-28 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Remove *printf checks since we now use g_vasprintf().

@@ -32,20 +32,19 @@
 #include <sstream>
 #include "common.hh"
 
-typedef std::pair<util::string, std::size_t> OverlayCount;
-
-class OverlaySort
-{
-    public:
-        bool operator() (OverlayCount c1, OverlayCount c2)
-        { return c1.second < c2.second; }
-};
-
 class OverlayDisplay_T
 {
-    private:
-        std::set<OverlayCount, OverlaySort> _oset;
+    typedef util::string string_type;
+    typedef std::size_t size_type;
+    typedef std::pair<string_type, size_type> OverlayCount;
 
+    class OverlaySort
+    {
+        public:
+            bool operator() (OverlayCount c1, OverlayCount c2)
+            { return c1.second < c2.second; }
+    };
+    
     public:
         typedef std::set<OverlayCount, OverlaySort>::iterator iterator;
 
@@ -54,11 +53,8 @@ class OverlayDisplay_T
             if (optget("quiet", bool))
                 return "";
 
-            util::color_map_T color;
-            std::ostringstream os;
-            std::size_t n = 0;
-
             iterator i;
+            std::size_t n = 0;
             for (i = this->_oset.begin() ; i != this->_oset.end()  ; ++i)
             {
                 if (i->first == s)
@@ -70,6 +66,8 @@ class OverlayDisplay_T
 
             assert(n != 0);
 
+            std::ostringstream os;
+            util::color_map_T color;
             os << color[cyan] << "[" << n << "]" << color[none];
             return os.str();
         }
@@ -112,6 +110,9 @@ class OverlayDisplay_T
                 *stream << " " << (*this)[i->first] << " " << i->first
                     << std::endl;
         }
+
+    private:
+        std::set<OverlayCount, OverlaySort> _oset;
 };
 
 #endif
