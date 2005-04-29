@@ -36,6 +36,8 @@ namespace portage
     class config_T : public util::vars_T
     {
         public:
+            typedef util::string string_type;
+
             config_T()
             {
                 /* read default config */
@@ -46,8 +48,8 @@ namespace portage
                 this->close();
             }
 
-            const util::string portdir();
-            const std::vector<util::string> overlays();
+            const string_type portdir();
+            const std::vector<string_type> overlays();
     };
 }
 

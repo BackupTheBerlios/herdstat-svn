@@ -60,8 +60,12 @@ namespace util
 
     class color_map_T
     {
+        public:
+            typedef util::string string_type;
+	    string_type &operator[](color_name_T c) { return this->_cm[c]; }
+
         private:
-            class cmap_T : public std::map<color_name_T, util::string>
+            class cmap_T : public std::map<color_name_T, string_type>
             {
                 public:
                     cmap_T()
@@ -80,9 +84,6 @@ namespace util
             };
 
             static cmap_T _cm;
-
-        public:
-	    util::string &operator[](color_name_T c) { return this->_cm[c]; }
     };
 }
 

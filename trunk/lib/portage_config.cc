@@ -48,7 +48,7 @@ portage::portdir()
  * Determine PORTDIR
  */
 
-const util::string
+const portage::config_T::string_type
 portage::config_T::portdir()
 {
     util::path_T portdir = (*this)["PORTDIR"];
@@ -65,10 +65,10 @@ portage::config_T::portdir()
  * Determine PORTDIR_OVERLAY
  */
 
-const std::vector<util::string>
+const std::vector<portage::config_T::string_type>
 portage::config_T::overlays()
 {
-    util::string overlays = (*this)["PORTDIR_OVERLAY"];
+    string_type overlays = (*this)["PORTDIR_OVERLAY"];
 
     char *result = std::getenv("PORTDIR_OVERLAY");
     if (result)

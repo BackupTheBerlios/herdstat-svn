@@ -56,7 +56,7 @@
 #include "portage_exceptions.hh"
 #include "portage_version.hh"
 
-std::vector<util::string> portage::version_suffix_T::_suffixes;
+portage::version_suffix_T::value_type portage::version_suffix_T::_suffixes;
 
 /*
  * strtoumax wrapper
@@ -110,7 +110,7 @@ strtoul(const std::string &str)
  ********************/
 
 void
-portage::version_suffix_T::init(const util::string &s)
+portage::version_suffix_T::init(const string_type &s)
 {
     /* valid suffixes (in order) */
     if (this->_suffixes.empty())
@@ -126,22 +126,22 @@ portage::version_suffix_T::init(const util::string &s)
 }
 
 void
-portage::version_suffix_T::get_suffix(const util::string &s)
+portage::version_suffix_T::get_suffix(const string_type &s)
 {
-    util::string result(s);
-    util::string::size_type pos = result.rfind("-r");
-    if (pos != util::string::npos)
+    string_type result(s);
+    string_type::size_type pos = result.rfind("-r");
+    if (pos != string_type::npos)
     {
         result = result.substr(0, pos);
     }
 
-    if ((pos = result.rfind('_')) != util::string::npos)
+    if ((pos = result.rfind('_')) != string_type::npos)
     {
         this->_suffix = result.substr(pos + 1);
         
         /* chop any trailing suffix version */
         pos = this->_suffix.find_first_of("0123456789");
-        if (pos != util::string::npos)
+        if (pos != string_type::npos)
         {
             this->_suffix_ver = this->_suffix.substr(pos);
             this->_suffix = this->_suffix.substr(0, pos);
@@ -157,7 +157,7 @@ portage::version_suffix_T::get_suffix(const util::string &s)
 bool
 portage::version_suffix_T::operator< (version_suffix_T &that)
 {
-    std::vector<util::string>::iterator ti, si;
+    value_type::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
         this->suffix());
@@ -197,7 +197,7 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
 bool
 portage::version_suffix_T::operator== (version_suffix_T &that)
 {
-    std::vector<util::string>::iterator ti, si;
+    value_type::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
         this->suffix());
@@ -231,11 +231,11 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
  **********************/
 
 void
-portage::version_nosuffix_T::init(const util::string &PV)
+portage::version_nosuffix_T::init(const string_type &PV)
 {
     /* strip suffix */
-    util::string::size_type pos = PV.find('_');
-    if (pos != util::string::npos)
+    string_type::size_type pos = PV.find('_');
+    if (pos != string_type::npos)
         this->_version = PV.substr(0, pos);
     else
         this->_version = PV;
@@ -250,16 +250,16 @@ portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
     if (this->_version == that._version)
         return false;
 
-    std::vector<util::string> thisparts = this->_version.split('.');
-    std::vector<util::string> thatparts = that._version.split('.');
-    std::vector<util::string>::size_type stoppos =
-        std::min<std::vector<util::string>::size_type>(thisparts.size(),
+    std::vector<string_type> thisparts = this->_version.split('.');
+    std::vector<string_type> thatparts = that._version.split('.');
+    std::vector<string_type>::size_type stoppos =
+        std::min<std::vector<string_type>::size_type>(thisparts.size(),
                                                        thatparts.size());
 
     /* TODO: if thisparts.size() and thatpart.size() == 1, convert to long
      * and compare */
 
-    std::vector<util::string>::iterator thisiter, thatiter;
+    std::vector<string_type>::iterator thisiter, thatiter;
     for (thisiter = thisparts.begin(), thatiter = thatparts.begin() ;
          stoppos != 0 ; ++thisiter, ++thatiter, --stoppos)
     {
@@ -273,7 +273,7 @@ portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
         {
             /* 1 == 01 ? they're the same in comparison speak but totally
              * not the same in version string speak */
-            if (*thisiter == (util::string("0") + *thatiter))
+            if (*thisiter == (string_type("0") + *thatiter))
                 same = true;
             else
                 continue;
@@ -304,7 +304,7 @@ portage::version_nosuffix_T::operator== (version_nosuffix_T &that)
 void
 portage::version_string_T::init()
 {
-    this->split();
+    this->parse();
     this->_suffix.assign(this->_v["PVR"]);
     this->_version.assign(this->_v["PV"]);
 }
@@ -313,12 +313,12 @@ portage::version_string_T::init()
  * Display full version string.
  */
 
-const util::string
+const portage::version_string_T::string_type
 portage::version_string_T::operator() () const
 {
     /* chop -r0 if necessary */
-    util::string::size_type pos = this->_verstr.rfind("-r0");
-    if (pos != util::string::npos)
+    string_type::size_type pos = this->_verstr.rfind("-r0");
+    if (pos != string_type::npos)
         return this->_verstr.substr(0, pos);
 
     return this->_verstr;
@@ -358,17 +358,17 @@ portage::version_string_T::operator== (version_string_T &that)
  */
 
 void
-portage::version_string_T::split()
+portage::version_string_T::parse()
 {
-    util::string::size_type pos;
-    std::vector<util::string> parts, comps;
-    std::vector<util::string>::iterator i;
+    string_type::size_type pos;
+    std::vector<string_type> parts, comps;
+    std::vector<string_type>::iterator i;
 
     assert(not this->_verstr.empty());
 
     /* append -r0 if necessary */
     pos = this->_verstr.rfind("-r");
-    if ((pos == util::string::npos) or (((pos+2) <= this->_verstr.size()) and
+    if ((pos == string_type::npos) or (((pos+2) <= this->_verstr.size()) and
         not Glib::Unicode::isdigit(this->_verstr.at(pos+2))))
     {
         this->_verstr.append("-r0");
@@ -380,7 +380,7 @@ portage::version_string_T::split()
     if (parts.size() > 3)
     {
         /* reconstruct ${PN} */
-        util::string PN = parts.front();
+        string_type PN = parts.front();
         parts.erase(parts.begin());
 
         while (parts.size() >= 3)
@@ -420,7 +420,7 @@ portage::versions_T::assign(const util::path_T &path)
 }
 
 portage::versions_T::iterator
-portage::versions_T::find(const util::string &path)
+portage::versions_T::find(const string_type &path)
 {
     portage::version_string_T *v = new portage::version_string_T(path);
     portage::versions_T::iterator i = this->_vs.find(v);

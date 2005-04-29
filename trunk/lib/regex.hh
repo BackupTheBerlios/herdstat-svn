@@ -43,29 +43,32 @@ namespace util
 {
     class regex_T
     {
-        private:
-            void cleanup();
-
-            util::string _str;  /* regular expression string */
-            bool    _compiled;  /* has this->_regex been compiled? */
-            int     _cflags,    /* cflags, see regcomp(3) */
-                    _eflags;    /* eflags, see regexec(3) */
-            regex_t _regex;     /* our regex structure, see regex.h(P) */
-
         public:
+            typedef util::string string_type;
+            typedef regex_t regex_type;
+
             regex_T() : _compiled(false), _cflags(0), _eflags(0) { }
-            regex_T(const util::string &r, int c = 0, int e = 0)
+            regex_T(const string_type &r, int c = 0, int e = 0)
                 : _str(r), _compiled(false), _cflags(c), _eflags(e)
             { this->assign(r, c, e); }
             ~regex_T() { if (this->_compiled) this->cleanup(); }
 
-            void assign(const util::string &, int c = 0, int e = 0);
-            bool operator== (const util::string &cmp);
-            bool operator!= (const util::string &cmd)
+            void assign(const string_type &, int c = 0, int e = 0);
+            bool operator== (const string_type &cmp);
+            bool operator!= (const string_type &cmd)
             { return not (*this == cmd); }
-            const util::string &operator()() const { return this->_str; }
+            const string_type &operator()() const { return this->_str; }
 
             bool empty() const { return this->_str.empty(); }
+
+        private:
+            void cleanup();
+
+            string_type _str;       /* regular expression string */
+            bool        _compiled;  /* has this->_regex been compiled? */
+            int         _cflags,    /* cflags, see regcomp(3) */
+                        _eflags;    /* eflags, see regexec(3) */
+            regex_type  _regex;     /* our regex structure, see regex.h(P) */
     };
 }
 

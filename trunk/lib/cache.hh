@@ -34,27 +34,29 @@ namespace util
 {
     class cache_T
     {
-        protected:
-            const util::string _file;
-            std::vector<util::string> _cache;
-
         public:
-            typedef std::vector<util::string>::iterator iterator;
-            typedef std::vector<util::string>::size_type size_type;
+            typedef util::file_T file_type;
+            typedef util::string string_type;
+            typedef std::vector<string_type> value_type;
+            typedef value_type::iterator iterator;
+            typedef value_type::const_iterator const_iterator;
+            typedef value_type::size_type size_type;
 
-            cache_T(const util::string &f, size_type reserve = 0) : _file(f)
+            cache_T(const string_type &f, size_type reserve = 0) : _file(f)
             {
                 if (reserve != 0)
-                    _cache.reserve(reserve);
+                    this->_cache.reserve(reserve);
             }
 
             virtual ~cache_T() { }
 
             /* vector subset */
-            iterator begin() { return _cache.begin(); }
-            iterator end() { return _cache.end(); }
-            size_type size() const { return _cache.size(); }
-            void clear() { _cache.clear(); }
+            iterator begin() { return this->_cache.begin(); }
+            const_iterator begin() const { return this->_cache.begin(); }
+            iterator end() { return this->_cache.end(); }
+            const_iterator end() const { return this->_cache.end(); }
+            size_type size() const { return this->_cache.size(); }
+            void clear() { this->_cache.clear(); }
 
             virtual void init()
             {
@@ -70,22 +72,26 @@ namespace util
             /* read cache from disk */
             void read()
             {
-                util::file_T f(_file);
+                file_type f(this->_file);
                 f.open();
-                f.read(&_cache);
+                f.read(&(this->_cache));
             }
 
             /* write cache to disk */
             void write() const
             {
-                util::file_T f(_file);
+                file_type f(this->_file);
                 f.open(std::ios::out);
-                f.write(_cache);
+                f.write(this->_cache);
             }
 
             /* pure virtuals */
             virtual bool valid() const = 0;
             virtual void fill() = 0;
+
+        protected:
+            const string_type _file;
+            value_type _cache;
     };
 }
 

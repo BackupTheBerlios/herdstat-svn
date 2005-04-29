@@ -27,6 +27,8 @@
 # include "config.h"
 #endif
 
+#include <cstdio>
+
 namespace util
 {
     class progress_T

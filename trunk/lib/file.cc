@@ -29,7 +29,8 @@
 #include <cstring>
 #include <cassert>
 
-#include "util.hh"
+#include "file.hh"
+#include "util_exceptions.hh"
 
 /*****************************************************************************
  * file_T                                                                    *

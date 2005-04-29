@@ -90,18 +90,6 @@ namespace util
     /* generic file object */
     class fileobject_T
     {
-        protected:
-            void stat()
-            {
-                this->_exists = ( ::stat(this->_path.c_str(),
-                    &this->_sbuf) == 0 ? true : false );
-            }
-
-            path_T _path;        /* path object */
-            struct stat _sbuf;   /* stat structure */
-            type_T _type;
-            bool _exists;
-
         public:
             typedef off_t size_type;
             typedef time_t time_type;
@@ -140,24 +128,35 @@ namespace util
             virtual void open() { }
             virtual void read() { }
             virtual void close() { }
+
+        protected:
+            void stat()
+            {
+                this->_exists = ( ::stat(this->_path.c_str(),
+                    &this->_sbuf) == 0 ? true : false );
+            }
+
+            path_T _path;        /* path object */
+            struct stat _sbuf;   /* stat structure */
+            type_T _type;
+            bool _exists;
     };
 
     /* represents a regular file */
     class file_T : public fileobject_T
     {
-        protected:
-            std::fstream *stream;
-            std::vector<util::string> _contents;
-
         public:
-            typedef std::vector<util::string>::iterator iterator;
-            typedef std::vector<util::string>::const_iterator const_iterator;
-            typedef std::vector<util::string>::size_type size_type;
+            typedef util::string string_type;
+            typedef std::fstream stream_type;
+            typedef std::vector<string_type> value_type;
+            typedef value_type::iterator iterator;
+            typedef value_type::const_iterator const_iterator;
+            typedef value_type::size_type size_type;
 
             file_T() : fileobject_T(FTYPE_FILE), stream(NULL) { }
             file_T(const path_T &path)
                 : fileobject_T(path, FTYPE_FILE), stream(NULL) { }
-            file_T(const path_T &path, std::fstream *s)
+            file_T(const path_T &path, stream_type *s)
                 : fileobject_T(path, FTYPE_FILE), stream(NULL) { }
             virtual ~file_T() { }
 
@@ -166,12 +165,12 @@ namespace util
             iterator end() { return this->_contents.end(); }
             const_iterator end() const { return this->_contents.end(); }
             size_type bufsize() const { return this->_contents.size(); }
-            void push_back(const util::string &s)
+            void push_back(const string_type &s)
             { this->_contents.push_back(s); }
 
             virtual void open()
             { this->open(this->_path.c_str(), DEFAULT_MODE); }
-            virtual void open(const char *n,
+            virtual void open(const char *,
                 std::ios_base::openmode mode = DEFAULT_MODE);
             virtual void open(std::ios_base::openmode mode)
             { this->open(this->_path.c_str(), mode); }
@@ -179,28 +178,28 @@ namespace util
             virtual void close();
 
             virtual void read() { this->read(&(this->_contents)); }
-            virtual void read(std::vector<util::string> *);
+            virtual void read(value_type *);
 
             virtual void write() { this->display(*(this->stream)); }
-            virtual void write(const std::vector<util::string> &v)
+            virtual void write(const value_type &v)
             { this->_contents = v; this->write(); }
 
             virtual void display(std::ostream &);
+
+        protected:
+            stream_type *stream;
+            value_type _contents;
     };
 
     /* generic directory object */
     template <class C>
     class base_dir_T : public fileobject_T
     {
-        protected:
-            bool _recurse;
-            DIR *_dir;
-            std::vector<C> _contents;
-
         public:
-            typedef typename std::vector<C>::iterator iterator;
-            typedef typename std::vector<C>::const_iterator const_iterator;
-            typedef typename std::vector<C>::size_type size_type;
+            typedef typename std::vector<C> value_type;
+            typedef typename value_type::iterator iterator;
+            typedef typename value_type::const_iterator const_iterator;
+            typedef typename value_type::size_type size_type;
 
             base_dir_T(const path_T &path, bool r = false)
                 : fileobject_T(path, FTYPE_DIR), _recurse(r), _dir(NULL)
@@ -227,6 +226,11 @@ namespace util
             virtual void close();
             virtual void display(std::ostream &);
             virtual void read() = 0;
+
+        protected:
+            bool _recurse;
+            DIR *_dir;
+            value_type _contents;
     };
 
     /* represents a fileobject_T container (aka a directory).

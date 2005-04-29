@@ -53,39 +53,39 @@ util::vars_T::read()
         this->open();
 
     std::string s;
-    util::string::size_type pos;
+    string_type::size_type pos;
 
     while (std::getline(*(this->stream), s))
     {
-        util::string line(s);
+        string_type line(s);
         pos = line.find_first_not_of(" \t");
-        if (pos != util::string::npos)
+        if (pos != string_type::npos)
             line.erase(0, pos);
 
         if (line.length() < 1 or line[0] == '#')
             continue;
 
         pos = line.find('=');
-        if (pos != util::string::npos)
+        if (pos != string_type::npos)
         {
-            util::string key = line.substr(0, pos);
-            util::string val = line.substr(pos + 1);
+            string_type key = line.substr(0, pos);
+            string_type val = line.substr(pos + 1);
 
             /* handle leading/trailing whitespace */
-            if (util::string::npos != (pos = key.find_first_not_of(" \t")))
+            if (string_type::npos != (pos = key.find_first_not_of(" \t")))
                 key.erase(0, pos);
-            if (util::string::npos != (pos = val.find_first_not_of(" \t")))
+            if (string_type::npos != (pos = val.find_first_not_of(" \t")))
                 val.erase(0, pos);
-            if (util::string::npos != (pos = key.find_last_not_of(" \t")))
+            if (string_type::npos != (pos = key.find_last_not_of(" \t")))
                 key.erase(++pos);
-            if (util::string::npos != (pos = val.find_last_not_of(" \t")))
+            if (string_type::npos != (pos = val.find_last_not_of(" \t")))
                 val.erase(++pos);
  
             /* handle quotes */
-            if (util::string::npos != (pos = val.find_first_of("'\"")))
+            if (string_type::npos != (pos = val.find_first_of("'\"")))
             {
                 val.erase(pos, pos + 1);
-                if (util::string::npos != (pos = val.find_last_of("'\"")))
+                if (string_type::npos != (pos = val.find_last_of("'\"")))
                     val.erase(pos, pos + 1);
             }
  
@@ -118,22 +118,22 @@ util::vars_T::read()
  */
 
 void
-util::vars_T::subst(util::string &value)
+util::vars_T::subst(string_type &value)
 {
 
-    std::vector<util::string> vars;
-    std::vector<util::string>::iterator v;
-    util::string::size_type lpos = 0;
+    std::vector<string_type> vars;
+    std::vector<string_type>::iterator v;
+    string_type::size_type lpos = 0;
 
     /* find variables that need substituting */
     while (true)
     {
-        util::string::size_type begin = value.find("${", lpos);
-        if (begin == util::string::npos)
+        string_type::size_type begin = value.find("${", lpos);
+        if (begin == string_type::npos)
             break;
 
-        util::string::size_type end = value.find("}", begin);
-        if (end == util::string::npos)
+        string_type::size_type end = value.find("}", begin);
+        if (end == string_type::npos)
             break;
 
         /* save it */
@@ -146,11 +146,11 @@ util::vars_T::subst(util::string &value)
     /* for each variable we found */
     for (v = vars.begin() ; v != vars.end() ; ++v)
     {
-        util::string subst;
-        util::string var("${"+(*v)+"}");
+        string_type subst;
+        string_type var("${"+(*v)+"}");
 
-        util::string::size_type pos = value.find(var);
-        if (pos == util::string::npos)
+        string_type::size_type pos = value.find(var);
+        if (pos == string_type::npos)
             continue;
 
         /* is that variable defined? */
@@ -158,7 +158,7 @@ util::vars_T::subst(util::string &value)
         if (x != this->end())
             subst = x->second;
 
-        if (subst.find("${") != util::string::npos)
+        if (subst.find("${") != string_type::npos)
         {
             ++(this->_depth);
             this->subst(subst);

@@ -37,18 +37,12 @@ namespace util
 {
     class vars_T : public util::file_T
     {
-        private:
-            void subst(util::string &);
-
-            unsigned short _depth;  /* subst() recursion depth */
-            bool _ebuild;           /* are we an ebuild? */
-            std::map<util::string, util::string> _keys; /* var map */
-
         public:
-            typedef std::map<util::string, util::string>::size_type size_type;
-            typedef std::map<util::string, util::string>::iterator iterator;
-            typedef std::map<util::string, util::string>::const_iterator
-                                                        const_iterator;
+            typedef util::file_T::string_type string_type;
+            typedef std::map<string_type, string_type> value_type;
+            typedef value_type::size_type size_type;
+            typedef value_type::iterator iterator;
+            typedef value_type::const_iterator const_iterator;
 
             vars_T() : _depth(0) { }
             vars_T(const util::path_T &path) : util::file_T(path), _depth(0)
@@ -58,22 +52,29 @@ namespace util
             }
 
             /* map subset */
-            size_type count(const util::string &s)
+            size_type count(const string_type &s)
             { return this->_keys.count(s); }
             iterator begin() { return this->_keys.begin(); }
             const_iterator begin() const { return this->_keys.begin(); }
             iterator end() { return this->_keys.end(); }
             const_iterator end() const { return this->_keys.end(); }
-            iterator find(const util::string &s) { return this->_keys.find(s); }
-            const_iterator find(const util::string &s) const
+            iterator find(const string_type &s) { return this->_keys.find(s); }
+            const_iterator find(const string_type &s) const
             { return this->_keys.find(s); }
             void clear() { this->_keys.clear(); }
             bool empty() const { return (this->size() == 0); }
-            util::string &operator[] (const util::string &s)
+            util::string &operator[] (const string_type &s)
             { return this->_keys[s]; }
 
             virtual void read();
             virtual void read(const util::path_T &);
+
+        private:
+            void subst(string_type &);
+
+            unsigned short _depth;  /* subst() recursion depth */
+            bool _ebuild;           /* are we an ebuild? */
+            value_type _keys;       /* var map */
     };
 }
 
