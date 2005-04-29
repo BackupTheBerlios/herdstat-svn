@@ -72,7 +72,7 @@ Display full path to ebuild for the specified package(s).
 Display versions of the specified package(s).
 .TP
 .B "\-f, \-\-find"
-Display full package name (in categor/package form) for the specified packages.
+Display full package name (in category/package form) for the specified packages.
 .TP
 .B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
