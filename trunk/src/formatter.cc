@@ -41,9 +41,9 @@ formatter_T::attrs_type::attrs_type()
     maxdata  = 58;
 }
 /****************************************************************************
- * Finalize the attributes ; calculate increase in string length
- * because of the colors, etc. This is called once by the caller
- * after the attrs have been set.
+ * Finalize the attributes ; calculate increase in string length            *
+ * because of the colors, etc. This is called once by the caller            *
+ * after the attrs have been set.                                           *
  ****************************************************************************/
 void
 formatter_T::set_attrs()
@@ -81,15 +81,15 @@ formatter_T::set_attrs()
     }
 }
 /****************************************************************************
- * Given a vector of data, see if any of the elements
- * match words that should be highlighted.  Return the
- * string, highlighted or not.
+ * Given a vector of data, see if any of the elements                       *
+ * match words that should be highlighted.  Return the                      *
+ * string, highlighted or not.                                              *
  ****************************************************************************/
-util::string
-formatter_T::highlight(const std::vector<util::string> &data)
+formatter_T::string_type
+formatter_T::highlight(const std::vector<string_type> &data)
 {
-    util::string s;
-    std::vector<util::string>::const_iterator i;
+    string_type s;
+    std::vector<string_type>::const_iterator i;
 
     if (not colors())
         attr.highlight_color.clear();
@@ -107,8 +107,8 @@ formatter_T::highlight(const std::vector<util::string> &data)
 }
 /****************************************************************************/
 void
-formatter_T::append(const util::string &label,
-                    const std::vector<util::string> &data)
+formatter_T::append(const string_type &label,
+                    const std::vector<string_type> &data)
 {
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
@@ -123,13 +123,13 @@ formatter_T::append(const util::string &label,
         append(label, util::stringify(data));
 }
 /****************************************************************************
- * Append text to the output buffer.  Smartly handle lines that are bigger
- * than maxcol (new line and indent), and make sure it all aligns nicely.
+ * Append text to the output buffer.  Smartly handle lines that are bigger  *
+ * than maxcol (new line and indent), and make sure it all aligns nicely.   *
  ****************************************************************************/
 void
-formatter_T::append(const util::string &label, const util::string &data)
+formatter_T::append(const string_type &label, const string_type &data)
 {
-    util::string cur;
+    string_type cur;
 
     /* don't display the label (or indent) if the quiet attr is set */
     if (not quiet())
@@ -159,7 +159,7 @@ formatter_T::append(const util::string &label, const util::string &data)
         else
         {
             size_type maxlen =
-                (cur.find("\033") == util::string::npos ?
+                (cur.find("\033") == string_type::npos ?
                 attr.maxtotal : attr.maxctotal);
 
             if ((cur.length() + data.length()) < maxlen)
@@ -170,17 +170,17 @@ formatter_T::append(const util::string &label, const util::string &data)
             else
             {
                 /* line's full, so find a location where we can truncate */
-                util::string::size_type pos = data.rfind(" ", attr.maxdata);
-                if (pos == util::string::npos)
+                string_type::size_type pos = data.rfind(" ", attr.maxdata);
+                if (pos == string_type::npos)
                     cur += highlight(data.split());
                 else
-                    cur += highlight(util::string(data.substr(0, pos)).split());
+                    cur += highlight(string_type(data.substr(0, pos)).split());
 
                 debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
                 cur.clear();
 
-                if (pos == util::string::npos)
+                if (pos == string_type::npos)
                     return;
 
                 /* indent */
@@ -190,12 +190,12 @@ formatter_T::append(const util::string &label, const util::string &data)
                 debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
-                std::vector<util::string> leftovers = util::string(data.substr(pos)).split();
+                std::vector<string_type> leftovers = string_type(data.substr(pos)).split();
 
-                std::vector<util::string>::iterator i;
+                std::vector<string_type>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
                 {
-                    util::string::size_type oldlen = 0;
+                    string_type::size_type oldlen = 0;
                     bool highlight_found = false;
 
                     /* should the current word be highlighted? */
@@ -210,13 +210,13 @@ formatter_T::append(const util::string &label, const util::string &data)
                             attr.no_color.length();
                     }
 
-                    util::string::size_type curlen;
+                    string_type::size_type curlen;
 
                     /*
                      * Does cur contain a previously highlighted word? If so,
                      * we need to compensate for the color lengths.
                      */
-                    if ((cur.find("\033") != util::string::npos))
+                    if ((cur.find("\033") != string_type::npos))
                     {
                         curlen = cur.length() - attr.highlight_color.length() -
                             attr.no_color.length();
@@ -302,7 +302,7 @@ formatter_T::flush(std::ostream &stream)
 #else /* UNICODE */
 
     std::remove_copy(buffer.begin(), buffer.end(),
-        std::ostream_iterator<util::string>(stream, "\n"),
+        std::ostream_iterator<string_type>(stream, "\n"),
         "supercalifragilisticexpialidocious");
 
 #endif /* UNICODE */

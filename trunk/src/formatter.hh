@@ -36,54 +36,55 @@ class formatter_T
 {
     public:
         typedef std::size_t size_type;
-        typedef std::vector<util::string> buffer_type;
+        typedef util::string string_type;
+        typedef std::vector<string_type> buffer_type;
         typedef util::color_map_T color_type;
 
         formatter_T() { }
 
-        void operator() (const util::string &l, const util::string &d)
+        void operator() (const string_type &l, const string_type &d)
         { append(l, d); }
 
-        void operator() (const util::string &l, const std::vector<util::string> &d)
+        void operator() (const string_type &l, const std::vector<string_type> &d)
         { append(l, d); }
 
         void endl() { buffer.push_back(""); }
         void flush(std::ostream &);
-        const util::string &peek() const { return buffer.back(); }
-        std::vector<util::string>::size_type size() const { return buffer.size(); }
+        const string_type &peek() const { return buffer.back(); }
+        buffer_type::size_type size() const { return buffer.size(); }
 
         void set_attrs();
 
         /* attribute member functions */
-        void set_maxtotal(size_type s) { attr.maxtotal = s; }
-        size_type maxtotal() { return attr.maxtotal; }
+        void set_maxtotal(const size_type &s) { attr.maxtotal = s; }
+        const size_type &maxtotal() const { return attr.maxtotal; }
             
-        void set_maxlabel(size_type s) { attr.maxlabel = s; }
-        size_type maxlabel() { return attr.maxlabel; }
+        void set_maxlabel(const size_type &s) { attr.maxlabel = s; }
+        const size_type &maxlabel() const { return attr.maxlabel; }
 
-        void set_maxdata(size_type s) { attr.maxdata = s; }
-        size_type maxdata() { return attr.maxdata; }
+        void set_maxdata(const size_type &s) { attr.maxdata = s; }
+        const size_type &maxdata() const { return attr.maxdata; }
 
-        void set_colors(bool value) { attr.colors = value; }
-        bool colors() { return attr.colors; }
+        void set_colors(const bool &value) { attr.colors = value; }
+        const bool &colors() const { return attr.colors; }
 
-        void set_quiet(bool value, const util::string delim = "\n")
+        void set_quiet(const bool &value, const string_type &delim = "\n")
         {
             attr.quiet = value;
             attr.quiet_delim = delim;
         }
-        bool quiet() { return attr.quiet; }
+        const bool &quiet() const { return attr.quiet; }
 
-        void set_labelcolor(util::string &s) { attr.label_color = s; }
-        util::string &labelcolor() { return attr.label_color; }
+        void set_labelcolor(const string_type &s) { attr.label_color = s; }
+        const string_type &labelcolor() const { return attr.label_color; }
 
-        void set_datacolor(util::string &s) { attr.data_color = s; }
-        util::string &datacolor() { return attr.data_color; }
+        void set_datacolor(const string_type &s) { attr.data_color = s; }
+        const string_type &datacolor() const { return attr.data_color; }
 
-        void set_highlightcolor(util::string &s) { attr.highlight_color = s; }
-        util::string &highlightcolor() { return attr.highlight_color; }
+        void set_highlightcolor(const string_type &s) { attr.highlight_color = s; }
+        const string_type &highlightcolor() const { return attr.highlight_color; }
 
-        void add_highlight(util::string s) { attr.highlights.push_back(s); }
+        void add_highlight(const string_type &s) { attr.highlights.push_back(s); }
 
     private:
         /* format attributes */
@@ -94,26 +95,26 @@ class formatter_T
             bool colors;
             bool quiet;
 
-            util::string quiet_delim;
-            util::string label_color;
-            util::string data_color;
-            util::string highlight_color;
-            util::string no_color;
+            string_type quiet_delim;
+            string_type label_color;
+            string_type data_color;
+            string_type highlight_color;
+            string_type no_color;
 
-            util::string::size_type maxtotal;
-            util::string::size_type maxlabel;
-            util::string::size_type maxdata;
+            string_type::size_type maxtotal;
+            string_type::size_type maxlabel;
+            string_type::size_type maxdata;
             
-            util::string::size_type maxctotal;
-            util::string::size_type maxclabel;
-            util::string::size_type maxcdata;
+            string_type::size_type maxctotal;
+            string_type::size_type maxclabel;
+            string_type::size_type maxcdata;
 
-            std::vector<util::string> highlights;
+            std::vector<string_type> highlights;
         };
 
-        util::string highlight(const std::vector<util::string> &);
-        void append(const util::string &, const util::string &);
-        void append(const util::string &, const std::vector<util::string> &);
+        string_type highlight(const std::vector<string_type> &);
+        void append(const string_type &, const string_type &);
+        void append(const string_type &, const std::vector<string_type> &);
 
         static buffer_type buffer;
         static attrs_type attr;
