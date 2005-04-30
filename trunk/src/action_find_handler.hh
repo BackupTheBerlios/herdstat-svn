@@ -33,7 +33,7 @@ class action_find_handler_T : public action_handler_T
 {
     public:
         virtual ~action_find_handler_T() { }
-        virtual int operator() (std::vector<util::string> &);
+        virtual int operator() (opts_type &);
 };
 
 #endif

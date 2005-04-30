@@ -28,11 +28,17 @@
 #endif
 
 #include <vector>
-#include <glib/gtypes.h>
-#include <glibmm/ustring.h>
+
+#ifdef UNICODE
+# include <glib/gtypes.h>
+# include <glibmm/ustring.h>
+#else /* UNICODE */
+# include <string>
+#endif /* UNICODE */
 
 namespace util
 {
+#ifdef UNICODE
     class string : public Glib::ustring
     {
         public:
@@ -41,6 +47,15 @@ namespace util
             string(const std::string &n) : Glib::ustring(n) { }
             string(const Glib::ustring &n) : Glib::ustring(n) { }
             string(const string &n) : Glib::ustring(n) { }
+#else /* UNICODE */
+    class string : public std::string
+    {
+        public:
+            explicit string() : std::string() { }
+            string(const char *n) : std::string(n) { }
+            string(const std::string &n) : std::string(n) { }
+            string(const string &n) : std::string(n) { }
+#endif /* UNICODE */
             virtual ~string() { }
 
             virtual std::vector<util::string>
@@ -49,8 +64,15 @@ namespace util
 
     util::string lowercase(const util::string &);
     util::string tidy_whitespace(const util::string &);
+
+#ifdef UNICODE
     util::string sprintf(const gchar *, ...);
     util::string sprintf(const gchar *, va_list);
+#else /* UNICODE */
+    util::string sprintf(const char *, ...);
+    util::string sprintf(const char *, va_list);
+#endif /* UNICODE */
+
     std::vector<util::string> split(const util::string &,
                                     const util::string::value_type d = ' ');
     util::string stringify(const std::vector<util::string> &,

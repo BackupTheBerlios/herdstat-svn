@@ -21,6 +21,7 @@
  */
 
 #include <iostream>
+#include <vector>
 #include <cstdlib>
 #include <cstddef>
 #include <cstdarg>
@@ -28,8 +29,11 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include <glib/gtypes.h>
-#include <glibmm.h>
+
+#ifdef UNICODE
+# include <glib/gtypes.h>
+# include <glibmm.h>
+#endif /* UNICODE */
 
 #include "options.hh"
 #include "util.hh"
@@ -42,7 +46,13 @@
 # include "config.h"
 #endif
 
+#ifdef UNICODE
 void debug_msg(const gchar *, ...);
+#else /* UNICODE */
+void debug_msg(const char *, ...);
+#endif /* UNICODE */
+
+typedef std::vector<util::string> opts_type;
 
 #endif
 

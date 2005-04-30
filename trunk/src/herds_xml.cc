@@ -26,7 +26,7 @@
 
 #include "herds_xml.hh"
 
-const util::string herds_xml_T::_default =
+const herds_xml_T::string_type herds_xml_T::_default =
     "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 
 void
@@ -50,9 +50,6 @@ herds_xml_T::init()
 
     if (this->_fetchonly)
         return;
-
-    if (not this->_path.exists())
-        throw bad_fileobject_E(this->_path);
 
     this->parse();
 }
@@ -128,20 +125,6 @@ herds_xml_T::fetch()
         else
             std::cerr << std::endl;
     }
-}
-
-void
-herds_xml_T::parse()
-{
-    XMLParser_T parser(&(*(this->_handler)));
-
-    if (optget("timer", bool))
-        this->_timer.start();
-
-    parser.parse(this->_path);
-
-    if (optget("timer", bool))
-        this->_timer.stop();
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -39,15 +39,17 @@
 class herd_T  : public std::map<util::string, dev_attrs_T * >
 {
     public:
-        herd_T() { }
-        herd_T(const util::string &n) : name(n) { }
+        typedef util::string string_type;
 
-        std::vector<util::string> keys();
+        herd_T() { }
+        herd_T(const string_type &n) : name(n) { }
+
+        std::vector<key_type> keys();
         void display(std::ostream &);
 
-        util::string name;
-        util::string desc;
-        util::string mail;
+        string_type name;
+        string_type desc;
+        string_type mail;
 };
 
 /*
@@ -57,8 +59,10 @@ class herd_T  : public std::map<util::string, dev_attrs_T * >
 class herds_T : public std::map<util::string, herd_T * >
 {
     public:
+        typedef util::string string_type;
+
         void display(std::ostream &);
-        bool exists(const util::string &s)
+        bool exists(const key_type &s)
         {
             return (this->find(s) != this->end());
         }

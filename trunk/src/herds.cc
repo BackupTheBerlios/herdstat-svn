@@ -35,10 +35,10 @@
  * Return a vector of all keys
  */
 
-std::vector<util::string>
+std::vector<herd_T::key_type>
 herd_T::keys()
 {
-    std::vector<util::string> v;
+    std::vector<key_type> v;
     for (iterator i = this->begin() ; i != this->end() ; ++i)
         v.push_back(i->first);
     return v;
@@ -53,9 +53,9 @@ herd_T::display(std::ostream &stream)
 {
     formatter_T out;
     util::color_map_T color;
-    util::string user = util::current_user();
-    std::vector<util::string> devs = this->keys();
-    std::vector<util::string>::iterator i;
+    string_type user = util::current_user();
+    std::vector<key_type> devs = this->keys();
+    std::vector<key_type>::iterator i;
 
     /* display header */
     if (not optget("quiet", bool))
@@ -115,7 +115,7 @@ herds_T::display(std::ostream &stream)
     util::color_map_T color;
     formatter_T out;
 
-    std::vector<util::string> hvec;
+    std::vector<string_type> hvec;
 
     if (optget("verbose", bool) and not optget("quiet", bool))
         out(util::sprintf("Herds(%d)", this->size()), "");

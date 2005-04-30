@@ -37,7 +37,7 @@
  */
 
 int
-action_dev_handler_T::operator() (std::vector<util::string> &devs)
+action_dev_handler_T::operator() (opts_type &devs)
 {
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
@@ -55,7 +55,7 @@ action_dev_handler_T::operator() (std::vector<util::string> &devs)
     output.set_attrs();
 
     herds_xml_T herds_xml;
-    herds_T::iterator h;
+    herds_xml_T::herds_type::iterator h;
 
     /* all target? */
     if (devs[0] == "all")
@@ -64,11 +64,11 @@ action_dev_handler_T::operator() (std::vector<util::string> &devs)
          * treat ALL developers in herds.xml as a single herd
          */
 
-        herd_T all_devs;
+        herds_xml_T::herd_type all_devs;
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
             /* for each developer in the herd... */
-            herd_T::iterator d;
+            herds_xml_T::herd_type::iterator d;
             for (d = h->second->begin() ; d != h->second->end() ; ++d)
             {
                 /* if the developer is not already in our list, add it */
@@ -94,7 +94,7 @@ action_dev_handler_T::operator() (std::vector<util::string> &devs)
     else if (regex)
     {
         util::regex_T regexp;
-        util::string re(devs.front());
+        util::regex_T::string_type re(devs.front());
         devs.clear();
 
         if (optget("eregex", bool))
@@ -104,8 +104,8 @@ action_dev_handler_T::operator() (std::vector<util::string> &devs)
 
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
-            herd_T::iterator d;
-            util::string herd = h->first;
+            herds_xml_T::herd_type::iterator d;
+            herds_xml_T::string_type herd = h->first;
 
             for (d = herds_xml[herd]->begin() ; 
                  d != herds_xml[herd]->end() ; ++d)
@@ -126,23 +126,22 @@ action_dev_handler_T::operator() (std::vector<util::string> &devs)
         devs.erase(std::unique(devs.begin(), devs.end()), devs.end());
     }
 
-    std::vector<util::string>::size_type size = 0;
-
     /* for each specified dev... */
-    std::vector<util::string>::iterator dev;
-    std::vector<util::string>::size_type n = 1;
+    opts_type::iterator dev;
+    opts_type::size_type n = 1, size = 0;
     for (dev = devs.begin() ; dev != devs.end() ; ++dev, ++n)
     {
         util::string name;
-        std::vector<util::string> herds;
+        opts_type herds;
 
         /* for each herd in herds.xml... */
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
-            util::string herd = h->first;
+            opts_type::value_type herd = h->first;
             
             /* is the dev in the current herd? */
-            herd_T::iterator d = herds_xml[herd]->find(*dev + "@gentoo.org");
+            herds_xml_T::herd_type::iterator d =
+                herds_xml[herd]->find(*dev + "@gentoo.org");
             if (d != herds_xml[herd]->end())
             {
                 herds.push_back(herd);
@@ -176,7 +175,7 @@ action_dev_handler_T::operator() (std::vector<util::string> &devs)
                 output(util::sprintf("Herds(%d)", herds.size()), "");
 
                 std::vector<util::string>::iterator i;
-                herds_T::size_type nh = 1;
+                herds_xml_T::herds_type::size_type nh = 1;
                 for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
                 {
                     /* display herd */

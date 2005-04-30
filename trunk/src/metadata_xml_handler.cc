@@ -30,9 +30,9 @@
 #include "devs.hh"
 #include "metadata_xml_handler.hh"
 
-void
-MetadataXMLHandler_T::on_start_element(const Glib::ustring &name,
-                                       const AttributeList &attrs)
+MetadataXMLHandler_T::return_type
+MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
+                                    const attrs_type &attrs)
 {
     if (name == "herd")
         in_herd = true;
@@ -48,28 +48,37 @@ MetadataXMLHandler_T::on_start_element(const Glib::ustring &name,
     {
         util::string locale = optget("locale", util::string);
 
-        AttributeList::const_iterator pos;
+        attrs_type::const_iterator pos;
         util::string value;
         for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
         {
+#ifdef USE_LIBXMLPP
             if (pos->name == "lang")
                 value = pos->value;
+#else /* USE_LIBXMLPP */
+            if (pos->first == "lang")
+                value = pos->second;
+#endif /* USE_LIBXMLPP */
         }
 
         if (not value.empty())
         {
             if (value == locale.substr(0,2))
                 in_longdesc = true;
-            else if (locale == "C" and value == "en")
+            else if ((locale == "C" or locale == "POSIX") and value == "en")
                 in_longdesc = true;
         }
         else
             in_longdesc = true;
     }
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
 }
 
-void
-MetadataXMLHandler_T::on_end_element(const Glib::ustring &name)
+MetadataXMLHandler_T::return_type
+MetadataXMLHandler_T::END_ELEMENT(const string_type &name)
 {
     if (name == "herd")
         in_herd = false;
@@ -83,10 +92,14 @@ MetadataXMLHandler_T::on_end_element(const Glib::ustring &name)
         in_desc = false;
     else if (name == "longdescription")
         in_longdesc = false;
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
 }
 
-void
-MetadataXMLHandler_T::on_characters(const Glib::ustring &str)
+MetadataXMLHandler_T::return_type
+MetadataXMLHandler_T::CHARACTERS(const string_type &str)
 {
     /* <herd> */
     if (in_herd)
@@ -95,8 +108,8 @@ MetadataXMLHandler_T::on_characters(const Glib::ustring &str)
     /* <maintainer><email> */
     else if (in_email)
     {
-        cur_dev = (str.find('@') == Glib::ustring::npos ? str + "@gentoo.org" : str);
-        devs[cur_dev] = new dev_attrs_T();
+        cur_dev = (str.find('@') == string_type::npos ? str + "@gentoo.org" : str);
+        devs[cur_dev] = new dev_type();
     }
 
     /* <maintainer><name> */
@@ -109,12 +122,16 @@ MetadataXMLHandler_T::on_characters(const Glib::ustring &str)
 
     /* <longdescription> */
     else if (in_longdesc)
-        longdesc =str;
+        longdesc = str;
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
 }
 
 MetadataXMLHandler_T::~MetadataXMLHandler_T()
 {
-    herd_T::iterator i;
+    herd_type::iterator i;
     for (i = devs.begin() ; i != devs.end() ; ++i)
         delete i->second;
 }

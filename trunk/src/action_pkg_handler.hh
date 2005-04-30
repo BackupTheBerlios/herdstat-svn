@@ -33,7 +33,7 @@ class action_pkg_handler_T : public action_handler_T
 {
     public:
         virtual ~action_pkg_handler_T() { }
-	virtual int operator() (std::vector<util::string> &);
+	virtual int operator() (opts_type &);
 };
 
 #endif

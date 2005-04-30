@@ -28,7 +28,9 @@
 #endif
 
 #include <map>
-#include <glib/gtypes.h>
+#ifdef UNICODE
+# include <glib/gtypes.h>
+#endif /* UNICODE */
 #include "string.hh"
 
 enum color_name_T
@@ -49,7 +51,12 @@ enum color_name_T
 
 namespace util
 {
+#ifdef UNICODE
     void debug(const gchar *, ...);
+#else /* UNICODE */
+    void debug(const char *, ...);
+#endif /* UNICODE */
+
     bool md5check(const util::string &, const util::string &);
     util::string getcwd();
     util::string get_user_from_email(const util::string &);

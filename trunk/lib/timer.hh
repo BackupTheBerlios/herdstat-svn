@@ -27,18 +27,17 @@
 # include "config.h"
 #endif
 
-#include <cstdlib>
+#include <cstddef>
 #include <sys/time.h>
 
 namespace util
 {
     class timer_T
     {
-        private:
-	    struct timeval _begin, _end;
-	    long _ms;
-
         public:
+            typedef long size_type;
+            typedef struct timeval time_type;
+
             void start()
 	    {
 	        this->_ms = 0;
@@ -53,7 +52,11 @@ namespace util
 	        this->_ms += (this->_end.tv_usec - this->_begin.tv_usec) / 1000;
 	    }
 
-            long elapsed() const { return this->_ms; }
+            size_type elapsed() const { return this->_ms; }
+
+        private:
+	    time_type _begin, _end;
+	    size_type _ms;
     };
 }
 

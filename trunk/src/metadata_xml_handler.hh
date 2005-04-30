@@ -36,26 +36,11 @@
 
 class MetadataXMLHandler_T : public XMLHandler_T
 {
-    private:
-        /* internal state variables */
-        bool in_herd;
-        bool in_maintainer;
-        bool in_email;
-        bool in_name;
-        bool in_desc;
-        bool in_longdesc;
-        bool found_lang;
-
-        util::string cur_dev;
-
-    protected:
-        /* callbacks */
-        virtual void on_start_element(const Glib::ustring &,
-                                      const AttributeList &);
-        virtual void on_end_element(const Glib::ustring &);
-        virtual void on_characters(const Glib::ustring &);
-
     public:
+        typedef std::vector<util::string> herds_type;
+        typedef herd_T herd_type;
+        typedef dev_attrs_T dev_type;
+
         MetadataXMLHandler_T()
         {
             in_herd = 
@@ -67,9 +52,27 @@ class MetadataXMLHandler_T : public XMLHandler_T
         }
         virtual ~MetadataXMLHandler_T();
 
-        std::vector<util::string> herds;
-        herd_T devs;
+        herds_type herds;
+        herd_type devs;
         util::string longdesc;
+
+    protected:
+        /* callbacks */
+        virtual return_type
+        START_ELEMENT(const string_type &, const attrs_type &);
+        virtual return_type END_ELEMENT(const string_type &);
+        virtual return_type CHARACTERS(const string_type &);
+
+    private:
+        /* internal state variables */
+        bool in_herd;
+        bool in_maintainer;
+        bool in_email;
+        bool in_name;
+        bool in_desc;
+        bool in_longdesc;
+
+        string_type cur_dev;
 };
 
 #endif

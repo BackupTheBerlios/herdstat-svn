@@ -37,7 +37,7 @@
  */
 
 int
-action_stats_handler_T::operator() (std::vector<util::string> &null)
+action_stats_handler_T::operator() (opts_type &null)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
 
@@ -48,13 +48,13 @@ action_stats_handler_T::operator() (std::vector<util::string> &null)
     output.set_attrs();
 
     herds_xml_T herds_xml;
-    herds_T::iterator h;
-    herd_T::iterator d;
+    herds_xml_T::herds_type::iterator h;
+    herds_xml_T::herd_type::iterator d;
 
     float nherds = 0, ndevs = 0;
     std::vector<util::string> most_herds, least_herds, most_devs, least_devs;
     unsigned short biggest_dev = 0, smallest_dev = 1;
-    herd_T::size_type biggest_herd = 0, smallest_herd = 0;
+    herds_xml_T::herd_type::size_type biggest_herd = 0, smallest_herd = 0;
     std::map<util::string, unsigned short> herds_per_dev;
 
     /* for each herd in herds.xml... */
@@ -106,6 +106,7 @@ action_stats_handler_T::operator() (std::vector<util::string> &null)
             least_herds.push_back(util::get_user_from_email(i->first));
     }
 
+    /* display it all */
     output("Total herds", util::sprintf("%d", herds_xml.size()));
     output("Total devs", util::sprintf("%d", herds_per_dev.size()));
     output("Avg devs/herd", util::sprintf("%.2f",

@@ -27,58 +27,57 @@
 # include "config.h"
 #endif
 
-#include <memory>
-#include "common.hh"
-#include "herds.hh"
+#include "xml.hh"
 #include "herds_xml_handler.hh"
 
 #define HERDS_XML_FETCH_LOCATION    LOCALSTATEDIR"/herds.xml"
 #define HERDS_XML_EXPIRE            86400
 
 /*
- * Represents a herds.xml.
+ * Represents a herds.xml instance.
  */
 
-class herds_xml_T
+class herds_xml_T : public xml_T<HerdsXMLHandler_T>
 {
-    private:
-        void init();
-        void fetch();
-        void parse();
-
-        const bool _fetchonly;
-        util::path_T _path;
-        static const util::string _default;
-        const std::auto_ptr<HerdsXMLHandler_T> _handler;
-        util::timer_T _timer;
-
     public:
-        typedef herds_T::iterator iterator;
-        typedef herds_T::const_iterator const_iterator;
-        typedef herds_T::size_type size_type;
+        typedef handler_type::herds_type herds_type;
+        typedef handler_type::herd_type  herd_type;
+        typedef handler_type::dev_type   dev_type;
+        typedef herds_type::string_type string_type;
+        typedef herds_type::iterator iterator;
+        typedef herds_type::const_iterator const_iterator;
+        typedef herds_type::size_type size_type;
 
-        herds_xml_T(bool f = false) : _fetchonly(f), _path(_default),
-            _handler(new HerdsXMLHandler_T())
-        { this->init(); }
+        herds_xml_T(bool f = false)
+            : xml_T<handler_type>(), _fetchonly(f) { this->init(); }
+        virtual ~herds_xml_T() { }
 
-        /* herds_T subset */
+        /* herd_type subset */
         iterator begin() { return this->_handler->herds.begin(); }
         const_iterator begin() const { return this->_handler->herds.begin(); }
         iterator end() { return this->_handler->herds.end(); }
         const_iterator end() const { return this->_handler->herds.end(); }
-        iterator find(const util::string &s)
+        iterator find(const string_type &s)
         { return this->_handler->herds.find(s); }
-        const_iterator find(const util::string &s) const
+        const_iterator find(const string_type &s) const
         { return this->_handler->herds.find(s); }
-        herd_T * &operator[] (const util::string &s)
+        herd_type * &operator[] (const string_type &s)
         { return this->_handler->herds[s]; }
         size_type size() const { return this->_handler->herds.size(); }
 
-        herds_T &herds() const { return this->_handler->herds; }
-        bool exists(const util::string &h) const
+        herds_type &herds() const { return this->_handler->herds; }
+        bool exists(const string_type &h) const
         { return this->find(h) != this->end(); }
         void display(std::ostream &s)
         { return this->_handler->herds.display(s); }
+
+    protected:
+        virtual void init();
+
+    private:
+        void fetch();
+        const bool _fetchonly;
+        static const string_type _default;
 };
 
 #endif

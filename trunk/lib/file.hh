@@ -70,7 +70,9 @@ namespace util
             explicit path_T() : util::string() { }
             path_T(const char *n) : util::string(n) { }
             path_T(const std::string &n) : util::string(n) { }
+#ifdef UNICODE
             path_T(const Glib::ustring &n) : util::string(n) { }
+#endif
             path_T(const path_T &n) : util::string(n) { }
 
             const path_T basename() const { return util::basename(*this); }

@@ -32,7 +32,7 @@
 #include "action_versions_handler.hh"
 
 int
-action_versions_handler_T::operator() (std::vector<util::string> &opts)
+action_versions_handler_T::operator() (opts_type &opts)
 {
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
@@ -126,7 +126,7 @@ action_versions_handler_T::operator() (std::vector<util::string> &opts)
 
     }
 
-    std::vector<util::string>::iterator i;
+    opts_type::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
         matches.insert(std::make_pair("", *i));
 

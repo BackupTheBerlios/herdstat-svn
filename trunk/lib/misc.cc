@@ -39,7 +39,11 @@
 util::color_map_T::cmap_T util::color_map_T::_cm;
 /****************************************************************************/
 void
+#ifdef UNICODE
 util::debug(const gchar *fmt, ...)
+#else /* UNICODE */
+util::debug(const char *fmt, ...)
+#endif /* UNICODE */
 {
 #ifdef DEBUG
     va_list v;

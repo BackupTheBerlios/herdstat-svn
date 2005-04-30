@@ -29,12 +29,11 @@
 #include <algorithm>
 #include <iterator>
 #include <map>
-#include <memory>
 
 #include "common.hh"
 #include "metadatas.hh"
 #include "herds_xml.hh"
-#include "metadata_xml_handler.hh"
+#include "metadata_xml.hh"
 #include "formatter.hh"
 #include "action_pkg_handler.hh"
 
@@ -45,11 +44,13 @@
  */
 
 util::string
-dev_name(herds_T &herds_xml, util::string &dev)
+dev_name(herds_xml_T::herds_type &herds_xml, util::string &dev)
 {
-    for (herds_T::iterator h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+    herds_xml_T::herds_type::iterator h;
+    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
     {
-        herd_T::iterator d = herds_xml[h->first]->find(dev + "@gentoo.org");
+        herds_xml_T::herd_type::iterator d =
+            herds_xml[h->first]->find(dev + "@gentoo.org");
         if (d != herds_xml[h->first]->end())
             return d->second->name;
     }
@@ -64,18 +65,18 @@ dev_name(herds_T &herds_xml, util::string &dev)
  */
 
 int
-action_pkg_handler_T::operator() (std::vector<util::string> &opts)
+action_pkg_handler_T::operator() (opts_type &opts)
 {
     util::color_map_T color;
-    util::timer_T t;
     util::progress_T progress;
     std::map<util::string, util::string>::size_type size = 0;
     std::vector<util::string> not_found;
-    std::vector<util::string>::iterator i;
+    opts_type::iterator i;
 
     portage::config_T config(optget("portage.config", portage::config_T));
     const util::string portdir(config.portdir());
     std::ostream *stream = optget("outstream", std::ostream *);
+    util::timer_T::size_type elapsed = 0;
 
     /* this code takes long enough as it is... no need for
      * a zillion calls to optget inside loops */
@@ -126,11 +127,11 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
     }
 
     /* for each specified herd/dev... */
-    std::vector<util::string>::size_type n = 1;
+    opts_type::size_type n = 1;
     for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
         util::regex_T regexp;
-        dev_attrs_T attr;
+        herds_xml_T::dev_type attr;
         std::map<util::string, util::string> pkgs;
 
         if (regex and eregex)
@@ -138,14 +139,14 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
         else if (regex)
             regexp.assign(*i, REG_ICASE);
 
-        if (timer)
-            t.start();
-
         /* for each metadata.xml... */
         metadatas_T::iterator m;
         for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
         {
             bool found = false;
+            metadata_xml_T::herd_type devs;
+            metadata_xml_T::herds_type herds;
+            metadata_xml_T::string_type longdesc;
 
             if (status)
                 ++progress;
@@ -156,32 +157,34 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
             if (not util::is_file(*m))
                 continue;
 
-            std::auto_ptr<MetadataXMLHandler_T>
-                handler(new MetadataXMLHandler_T());
-            XMLParser_T parser(&(*handler));
-
-            /* parse it */
-            parser.parse(*m);
+            /* parse metadata.xml */
+            {
+                metadata_xml_T metadata(*m);
+                devs     = metadata.devs();
+                herds    = metadata.herds();
+                longdesc = metadata.longdesc();
+                elapsed += metadata.elapsed();
+            }
 
             if (dev)
             {
                 const util::string herd = optget("with-herd", util::string);
-                herd_T::iterator d;
+                metadata_xml_T::herd_type::iterator d;
 
                 if (regex)
                 {
                     /* search metadata.xml for all devs matching regex */
-                    for (d = handler->devs.begin() ;
-                         d != handler->devs.end() ; ++d)
+                    for (d = devs.begin() ;
+                         d != devs.end() ; ++d)
                     {
                         if (regexp == util::get_user_from_email(d->first))
                         {
                             /* matches regex and --with-herd? */
                             if (not herd.empty())
                             {
-                                if (std::find(handler->herds.begin(),
-                                              handler->herds.end(),
-                                              herd) != handler->herds.end())
+                                if (std::find(herds.begin(),
+                                              herds.end(),
+                                              herd) != herds.end())
                                 {
                                     found = true;
                                 }
@@ -200,15 +203,15 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
                 else
                 {
                     /* search the metadata for our dev */
-                    d = handler->devs.find(*i + "@gentoo.org");
-                    if (d == handler->devs.end())
+                    d = devs.find(*i + "@gentoo.org");
+                    if (d == devs.end())
                         continue;
                     else
                     {
                         if (not herd.empty())
                         {
-                            if (std::find(handler->herds.begin(),
-                                handler->herds.end(), herd) != handler->herds.end())
+                            if (std::find(herds.begin(),
+                                herds.end(), herd) != herds.end())
                             {
                                 found = true;
                             }
@@ -231,9 +234,9 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
                 if (regex)
                 {
                     /* search metadata.xml for all herds matching regex */
-                    std::vector<util::string>::iterator h;
-                    for (h = handler->herds.begin() ;
-                         h != handler->herds.end()  ; ++h)
+                    metadata_xml_T::herds_type::iterator h;
+                    for (h = herds.begin() ;
+                         h != herds.end()  ; ++h)
                     {
                         if (regexp == *h)
                         {
@@ -248,8 +251,8 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
                 else
                 {
                     /* search the metadata.xml for our herd */
-                    if (std::find(handler->herds.begin(),
-                        handler->herds.end(), *i) == handler->herds.end())
+                    if (std::find(herds.begin(),
+                        herds.end(), *i) == herds.end())
                         continue;
                     else
                         found = true;
@@ -264,12 +267,9 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
 
             debug_msg("Match found in %s.", m->c_str());
 
-            pkgs[cat_and_pkg] = handler->longdesc;
+            pkgs[cat_and_pkg] = longdesc;
         }
         
-        if (timer)
-            t.stop();
-
         if (pkgs.empty())
         {
             /* only display error if opts.size() == 1 */
@@ -407,13 +407,13 @@ action_pkg_handler_T::operator() (std::vector<util::string> &opts)
 
     if (timer)
     {
-        *stream << std::endl << "Took " << t.elapsed() << "ms to parse "
+        *stream << std::endl << "Took " << elapsed << "ms to parse "
             << metadatas.size() << " metadata.xml's ("
             << std::setprecision(4)
-            << (static_cast<float>(t.elapsed()) / metadatas.size())
+            << (static_cast<float>(elapsed) / metadatas.size())
             << " ms/metadata.xml)." << std::endl;
     }
-    else if (verbose and not quiet)
+  else if (verbose and not quiet)
     {
         *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;

@@ -2,7 +2,7 @@
 # $Id: configure.ac 246 2005-04-26 12:03:53Z ka0ttic $
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.0_rc2], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.0_rc3], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 foreign dist-bzip2 no-dist-gzip])
@@ -54,9 +54,6 @@ AC_CHECK_HEADERS(getopt.h)
 dnl Optional functions
 AC_CHECK_FUNCS(strtoumax getopt_long)
 
-PKG_CHECK_MODULES(GLIBMM, glibmm-2.4 >= 2.4)
-PKG_CHECK_MODULES(LIBXMLPP, libxml++-2.6 >= 2.6)
-
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     [case "${enableval}" in
         yes)    debug=true
@@ -66,6 +63,23 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
         no)     debug=false ;;
         *)      AC_MSG_ERROR(--enable-debug accepts yes or no only) ;;
     esac], [debug=false])
+
+AC_ARG_ENABLE(unicode, [ --enable-unicode   enable Unicode support [on]],
+    [case "${enableval}" in
+	yes)	unicode=true  ;;
+	no)	unicode=false ;;
+	*)	AC_MSG_ERROR(--enable-unicode accepts yes or no only) ;;
+    esac], [unicode=true])
+
+if test x$unicode = "xtrue"; then
+    AC_DEFINE_UNQUOTED(UNICODE, 1, [Enable Unicode support])
+    PKG_CHECK_MODULES(GLIBMM, glibmm-2.4 >= 2.4)
+    PKG_CHECK_MODULES(LIBXMLPP, libxml++-2.6 >= 2.6)
+else
+    AC_CHECK_FUNCS(vasprintf,,
+	[AC_MSG_ERROR(vasprintf is required)])
+    PKG_CHECK_MODULES(XMLWRAPP, xmlwrapp >= 0.5.0)
+fi
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile

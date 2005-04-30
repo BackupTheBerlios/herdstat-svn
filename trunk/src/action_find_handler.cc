@@ -31,7 +31,7 @@
 #include "action_find_handler.hh"
 
 int
-action_find_handler_T::operator() (std::vector<util::string> &opts)
+action_find_handler_T::operator() (opts_type &opts)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
     portage::config_T config(optget("portage.config", portage::config_T));
@@ -55,7 +55,7 @@ action_find_handler_T::operator() (std::vector<util::string> &opts)
     else if (regex)
     {
         util::regex_T regexp;
-        util::string re(opts.front());
+        util::regex_T::string_type re(opts.front());
 
         if (optget("eregex", bool))
             regexp.assign(re, REG_EXTENDED|REG_ICASE);
@@ -72,7 +72,7 @@ action_find_handler_T::operator() (std::vector<util::string> &opts)
     }
     else
     {
-        std::vector<util::string>::iterator i;
+        opts_type::iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
             matches.insert(std::make_pair("", *i));
     }

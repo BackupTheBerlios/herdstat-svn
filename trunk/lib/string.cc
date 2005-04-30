@@ -24,14 +24,18 @@
 # include "config.h"
 #endif
 
-#include <locale>
 #include <algorithm>
 #include <iterator>
 #include <vector>
 #include <cstdarg>
 #include <cstring>
-#include <glib/gprintf.h>
-#include <glibmm/unicode.h>
+
+#ifdef UNICODE
+# include <glib/gprintf.h>
+# include <glibmm/unicode.h>
+#else /* UNICODE */
+# include <locale>
+#endif /* UNICODE */
 
 #include "string.hh"
 
@@ -42,9 +46,15 @@ util::lowercase(const util::string &s)
     if (s.empty())
 	return "";
 
+#ifdef UNICODE
     util::string result;
     for (util::string::const_iterator i = s.begin() ; i != s.end() ; ++i)
         result.push_back(Glib::Unicode::tolower(*i));
+#else /* UNICODE */
+    util::string result(s);
+    for (util::string::iterator i = result.begin() ; i != result.end() ; ++i)
+        *i = std::tolower(*i, std::locale(""));
+#endif /* UNICODE */
     
     return result;
 }
@@ -53,8 +63,13 @@ bool
 bothspaces(util::string::value_type c1,
            util::string::value_type c2)
 {
+#ifdef UNICODE
     return Glib::Unicode::isspace(c1) and
            Glib::Unicode::isspace(c2);
+#else /* UNICODE */
+    std::locale loc("");
+    return std::isspace(c1, loc) and std::isspace(c2, loc);
+#endif /* UNICODE */
 }
 
 util::string
@@ -89,7 +104,11 @@ util::tidy_whitespace(const util::string &s)
 }
 /*****************************************************************************/
 util::string
+#ifdef UNICODE
 util::sprintf(const gchar *fmt, ...)
+#else /* UNICODE */
+util::sprintf(const char *fmt, ...)
+#endif /* UNICODE */
 {
     va_list v;
     va_start(v, fmt);
@@ -99,10 +118,18 @@ util::sprintf(const gchar *fmt, ...)
 }
 /*****************************************************************************/
 util::string
+#ifdef UNICODE
 util::sprintf(const gchar *fmt, va_list v)
 {
     gchar *buf;
     g_vasprintf(&buf, fmt, v);
+#else /* UNICODE */
+util::sprintf(const char *fmt, va_list v)
+{
+    char *buf;
+    vasprintf(&buf, fmt, v);
+#endif /* UNICODE */
+    
     util::string s(buf);
     free(buf);
     return s;

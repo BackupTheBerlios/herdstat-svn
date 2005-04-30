@@ -10,7 +10,9 @@ herdstat_SOURCES = common.hh common.cc \
 		   xmlparser.hh \
 		   herds_xml_handler.hh herds_xml_handler.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
+		   xml.hh \
 		   herds_xml.hh herds_xml.cc \
+		   metadata_xml.hh \
 		   formatter.hh formatter.cc \
 		   metadatas.hh metadatas.cc \
 		   overlaydisplay.hh \
@@ -28,8 +30,8 @@ herdstat_SOURCES = common.hh common.cc \
 herdstat_LDADD = ../lib/libutil.la
 
 INCLUDES = -I../lib
-LIBS = @LIBS@ @LIBXMLPP_LIBS@
-AM_CXXFLAGS = -pedantic -ansi -Wall @LIBXMLPP_CFLAGS@
+LIBS = @LIBS@ @LIBXMLPP_LIBS@ @XMLWRAPP_LIBS@
+AM_CXXFLAGS = -pedantic -ansi -Wall @LIBXMLPP_CFLAGS@ @XMLWRAPP_CFLAGS@
 
 MAINTAINERCLEANFILES = Makefile.in *~
 

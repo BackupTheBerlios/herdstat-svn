@@ -26,17 +26,14 @@
 
 #include <ostream>
 #include <map>
-#include <memory>
 #include <utility>
 #include <algorithm>
 #include <iterator>
 
 #include "common.hh"
-#include "herds.hh"
 #include "formatter.hh"
-#include "xmlparser.hh"
 #include "overlaydisplay.hh"
-#include "metadata_xml_handler.hh"
+#include "metadata_xml.hh"
 #include "action_meta_handler.hh"
 
 /*
@@ -45,11 +42,12 @@
  */
 
 int
-action_meta_handler_T::operator() (std::vector<util::string> &opts)
+action_meta_handler_T::operator() (opts_type &opts)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool quiet = optget("quiet", bool);
     const bool regex = optget("regex", bool);
+    const bool overlay = optget("overlay", bool);
     portage::config_T config(optget("portage.config", portage::config_T));
     std::multimap<util::string, util::string> matches;
 
@@ -132,7 +130,7 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
     else if (regex)
     {
         util::regex_T regexp;
-        util::string re(opts.front());
+        util::regex_T::string_type re(opts.front());
         opts.clear();
 
         if (optget("eregex", bool))
@@ -140,9 +138,7 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
         else
             regexp.assign(re, REG_ICASE);
 
-        matches = portage::find_package_regex(config, regexp,
-                                              optget("overlay", bool));
-
+        matches = portage::find_package_regex(config, regexp, overlay);
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '" << re << "'."
@@ -151,14 +147,9 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
         }
     }
 
-    std::vector<util::string>::iterator i;
+    opts_type::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i)
-    {
-        if (not portdir.empty())
-            matches.insert(std::make_pair(portdir, *i));
-        else
-            matches.insert(std::make_pair("", *i));
-    }
+        matches.insert(std::make_pair(portdir, *i));
 
     /* for each specified package/category... */
     std::multimap<util::string, util::string>::iterator m;
@@ -166,8 +157,8 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         bool cat = false;
-        herd_T devs;
-        std::vector<util::string> herds;
+        metadata_xml_T::herd_type  devs;
+        metadata_xml_T::herds_type herds;
         util::string longdesc, package, metadata;
 
         try
@@ -184,7 +175,7 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
             else
             {
                 std::pair<util::string, util::string> p =
-                    portage::find_package(config, m->second, optget("overlay", bool));
+                    portage::find_package(config, m->second, overlay);
                 portdir = p.first;
                 package = p.second;
             }
@@ -247,15 +238,10 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
 
             /* parse it */
             {
-                std::auto_ptr<MetadataXMLHandler_T>
-                    handler(new MetadataXMLHandler_T());
-                XMLParser_T parser(&(*handler));
-
-                parser.parse(metadata);
-
-                herds = handler->herds;
-                devs = handler->devs;
-                longdesc = handler->longdesc;
+                metadata_xml_T meta(metadata);
+                herds    = meta.herds();
+                devs     = meta.devs();
+                longdesc = meta.longdesc();
             }
 
             /* herds */
@@ -280,8 +266,9 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
             
                 if (devs.size() > 1)
                 {
-                    std::vector<util::string> dev_keys(devs.keys());
-                    std::vector<util::string>::iterator d;
+                    std::vector<metadata_xml_T::herd_type::key_type>
+                        dev_keys(devs.keys());
+                    std::vector<metadata_xml_T::herd_type::key_type>::iterator d;
                     for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
                         output("", *d);
                 }
@@ -308,6 +295,7 @@ action_meta_handler_T::operator() (std::vector<util::string> &opts)
 
                 if (not ebuild_vars["HOMEPAGE"].empty())
                 {
+                    /* it's possible to have more than one HOMEPAGE */
                     std::vector<util::string> parts =
                         util::split(ebuild_vars["HOMEPAGE"]);
 

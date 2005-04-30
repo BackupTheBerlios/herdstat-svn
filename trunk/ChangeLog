@@ -1,5 +1,26 @@
 ChangeLog for herdstat
 
+2005-04-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/xmlparser.hh, src/herds_xml_handler.cc,
+	src/herds_xml_handler.hh, src/metadata_xml_handler.cc,
+	src/metadata_xml_handler.hh: Updated parser interface to be easily
+	changeable in the case we ever change the parser lib again.
+	* src/xml.hh: Added generic xml_T type to represent any XML file.
+	This is now the sole user of our XMLParser_T interface, in addition to
+	util::timer_T and std::auto_ptr<content_handler>.
+	* src/herds_xml.cc, src/herds_xml.hh: Updated to inherit from xml_T.
+	* src/metadata_xml.hh: Added metadata_xml_T, which is the herds_xml_T
+	equivelent for a metadata.xml file.  Inherits from the new xml_T.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_meta_handler.cc, src/action_pkg_handler.cc:  Updated to use
+	{herds,metadata}_xml_T::herds_type so that herd_T/herds_T, etc is
+	opaque.  The action handlers need not know about it explicitly.
+	* lib/string.cc, lib/string.hh, lib/misc.cc, lib/misc.hh,
+	lib/portage_version.cc, src/formatter.cc, src/common.cc,
+	src/common.hh, src/herdstat.cc, configure.ac: Added --enable-unicode
+	option.  If disabled, use xmlwrapp.
+
 2005-04-29 Aaron Walker <ka0ttic@gentoo.org>
 
 	* doc/herdstat.1.in: Fix typo.

@@ -36,6 +36,28 @@
 
 class HerdsXMLHandler_T : public XMLHandler_T
 {
+    public:
+        typedef herds_T herds_type;
+        typedef herd_T  herd_type;
+        typedef dev_attrs_T dev_type;
+
+        HerdsXMLHandler_T()
+        {
+            in_herd = in_herd_name = in_herd_email = in_herd_desc =
+            in_maintainer = in_maintainer_name = in_maintainer_email =
+            in_maintainer_role = false;
+        }
+        virtual ~HerdsXMLHandler_T();
+
+        herds_type herds;
+
+    protected:
+        /* callbacks */
+        virtual return_type
+        START_ELEMENT(const string_type &, const attrs_type &);
+        virtual return_type END_ELEMENT(const string_type &);
+        virtual return_type CHARACTERS(const string_type &);
+
     private:
         /* internal state variables */
         bool in_herd;
@@ -47,26 +69,8 @@ class HerdsXMLHandler_T : public XMLHandler_T
         bool in_maintainer_email;
         bool in_maintainer_role;
 
-        util::string cur_herd;
-        util::string cur_dev;
-
-    protected:
-        /* callbacks */
-        virtual void on_start_element(const Glib::ustring &,
-                                      const AttributeList &);
-        virtual void on_end_element(const Glib::ustring &);
-        virtual void on_characters(const Glib::ustring &);
-
-    public:
-        HerdsXMLHandler_T()
-        {
-            in_herd = in_herd_name = in_herd_email = in_herd_desc =
-            in_maintainer = in_maintainer_name = in_maintainer_email =
-            in_maintainer_role = false;
-        }
-        virtual ~HerdsXMLHandler_T();
-
-        herds_T herds;
+        string_type cur_herd;
+        string_type cur_dev;
 };
 
 #endif

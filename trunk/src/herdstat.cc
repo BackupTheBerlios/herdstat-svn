@@ -28,7 +28,10 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include <glibmm/error.h>
+
+#ifdef UNICODE
+# include <glibmm/error.h>
+#endif /* UNICODE */
 
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
@@ -116,12 +119,13 @@ help()
 	<< " -m, --metadata         Look up metadata by package/category." << std::endl
 	<< " -w, --which            Look up full path to ebuild for specified packages." << std::endl
 	<< " -f, --find             Look up category/package for the specified packages." << std::endl
-	<< "     --versions	    Look up versions of specified packages." << std::endl
+	<< "     --versions         Look up versions of specified packages." << std::endl
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
 	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
 	<< " -N, --no-overlay       Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
-	<< " -r, --regex	    Display results matching the specified regular expression." << std::endl
+	<< " -r, --regex            Display results matching the specified regular" << std::endl
+	<< "                        expression." << std::endl
 	<< " -E, --extended         Use extended regular expressions. Implies --regex." << std::endl
 	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
 	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
@@ -144,6 +148,8 @@ help()
 	<< " -d, --dev              1 or more developers." << std::endl
 	<< " -m, --metadata         1 or more categories/packages." << std::endl
 	<< " -w, --which            1 or more packages." << std::endl
+	<< " -f, --find             1 or more packages." << std::endl
+	<< "     --versions         1 or more packages." << std::endl
 	<< std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl
@@ -184,6 +190,7 @@ help()
 	<< " -d              1 or more developers." << std::endl
 	<< " -m              1 or more categories/packages." << std::endl
 	<< " -w              1 or more packages." << std::endl
+	<< " -f              1 or more packages." << std::endl
 	<< std::endl
 	<< "Both the default action and the -d action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both -d and -p are specified," << std::endl
@@ -199,7 +206,7 @@ help()
 }
 
 int
-handle_opts(int argc, char **argv, std::vector<util::string> *args)
+handle_opts(int argc, char **argv, opts_type *args)
 {
     int key, opt_index = 0;
 
@@ -366,7 +373,7 @@ main(int argc, char **argv)
 
     try
     { 
-	std::vector<util::string> nonopt_args;
+	opts_type nonopt_args;
 
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
@@ -535,11 +542,13 @@ main(int argc, char **argv)
 	usage();
 	return EXIT_FAILURE;
     }
+#ifdef UNICODE
     catch (const herdstat_glib_E &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
+#endif /* UNICODE */
     catch (const herdstat_base_E &e)
     {
 	std::cerr << "Unhandled exception: " << e.what() << std::endl;

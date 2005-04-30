@@ -28,7 +28,7 @@
 #include "action_which_handler.hh"
 
 int
-action_which_handler_T::operator() (std::vector<util::string> &opts)
+action_which_handler_T::operator() (opts_type &opts)
 {
     util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
@@ -71,7 +71,7 @@ action_which_handler_T::operator() (std::vector<util::string> &opts)
     }
     else
     {
-        std::vector<util::string>::iterator i;
+        opts_type::iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
             matches.insert(std::make_pair("", *i));
     }

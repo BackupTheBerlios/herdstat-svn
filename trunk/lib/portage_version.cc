@@ -49,7 +49,12 @@
 #include <cstdlib>
 #include <climits>
 #include <cassert>
-#include <glibmm/unicode.h>
+
+#ifdef UNICODE
+# include <glibmm/unicode.h>
+#else /* UNICODE */
+# include <locale>
+#endif /* UNICODE */
 
 #include "string.hh"
 #include "portage_misc.hh"
@@ -368,8 +373,15 @@ portage::version_string_T::parse()
 
     /* append -r0 if necessary */
     pos = this->_verstr.rfind("-r");
+
+#ifdef UNICODE
     if ((pos == string_type::npos) or (((pos+2) <= this->_verstr.size()) and
         not Glib::Unicode::isdigit(this->_verstr.at(pos+2))))
+#else /* UNICODE */
+    if ((pos == string_type::npos) or (((pos+2) <= this->_verstr.size()) and
+        not std::isdigit(this->_verstr.at(pos+2), std::locale(""))))
+#endif /* UNICODE */
+
     {
         this->_verstr.append("-r0");
     }

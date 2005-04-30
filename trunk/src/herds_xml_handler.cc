@@ -27,9 +27,9 @@
 #include "common.hh"
 #include "herds_xml_handler.hh"
 
-void
-HerdsXMLHandler_T::on_start_element(const Glib::ustring &name,
-                                    const AttributeList &attr)
+HerdsXMLHandler_T::return_type
+HerdsXMLHandler_T::START_ELEMENT(const string_type &name,
+                                 const attrs_type &attr)
 {
     if (name == "herd")
         in_herd = true;
@@ -47,10 +47,14 @@ HerdsXMLHandler_T::on_start_element(const Glib::ustring &name,
         in_maintainer_name = true;
     else if (name == "role")
         in_maintainer_role = true;
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
 }
 
-void
-HerdsXMLHandler_T::on_end_element(const Glib::ustring &name)
+HerdsXMLHandler_T::return_type
+HerdsXMLHandler_T::END_ELEMENT(const string_type &name)
 {
     if (name == "herd")
         in_herd = false;
@@ -68,16 +72,20 @@ HerdsXMLHandler_T::on_end_element(const Glib::ustring &name)
         in_maintainer_name = false;
     else if (name == "role")
         in_maintainer_role = false;
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
 }
 
-void
-HerdsXMLHandler_T::on_characters(const Glib::ustring &str)
+HerdsXMLHandler_T::return_type
+HerdsXMLHandler_T::CHARACTERS(const string_type &str)
 {
     /* <herd><name> */
     if (in_herd_name)
     {
         cur_herd = str;
-        herds[str] = new herd_T(str);
+        herds[str] = new herd_type(str);
     }
 
     /* <herd><description> */
@@ -89,7 +97,7 @@ HerdsXMLHandler_T::on_characters(const Glib::ustring &str)
     {
         /* append @gentoo.org if needed */
         herds[cur_herd]->mail =
-            (str.find('@') == Glib::ustring::npos ? str + "@gentoo.org" : str);
+            (str.find('@') == string_type::npos ? str + "@gentoo.org" : str);
     }
 
     /* <maintainer><email> */
@@ -98,15 +106,15 @@ HerdsXMLHandler_T::on_characters(const Glib::ustring &str)
         cur_dev = util::lowercase(str);
 
         /* append @gentoo.org if needed */
-        if (str.find('@') == Glib::ustring::npos)
+        if (str.find('@') == string_type::npos)
             cur_dev.append("@gentoo.org");
-        herds[cur_herd]->insert(std::make_pair(cur_dev, new dev_attrs_T()));
+        herds[cur_herd]->insert(std::make_pair(cur_dev, new dev_type()));
     }
 
     /* <maintainer><name> */
     else if (in_maintainer_name)
     {
-        herd_T::iterator i = herds[cur_herd]->find(cur_dev);
+        herd_type::iterator i = herds[cur_herd]->find(cur_dev);
         if (i != herds[cur_herd]->end())
             i->second->name = str;
 
@@ -117,17 +125,21 @@ HerdsXMLHandler_T::on_characters(const Glib::ustring &str)
     /* <maintainer><role> */
     else if (in_maintainer_role)
     {
-        herd_T::iterator i = herds[cur_herd]->find(cur_dev);
+        herd_type::iterator i = herds[cur_herd]->find(cur_dev);
         if (i != herds[cur_herd]->end())
             i->second->role = str;
     }
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
 }
 
 HerdsXMLHandler_T::~HerdsXMLHandler_T()
 {
-    for (herds_T::iterator i = herds.begin() ; i != herds.end() ; ++i)
+    for (herds_type::iterator i = herds.begin() ; i != herds.end() ; ++i)
     {
-        herd_T::iterator h;
+        herd_type::iterator h;
         for (h = i->second->begin() ; h != i->second->end() ; ++h)
             delete h->second;
         delete i->second;

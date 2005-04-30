@@ -39,7 +39,7 @@
  */
 
 int
-action_herd_handler_T::operator() (std::vector<util::string> &herds)
+action_herd_handler_T::operator() (opts_type &herds)
 {
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool regex = optget("regex", bool);
@@ -93,11 +93,11 @@ action_herd_handler_T::operator() (std::vector<util::string> &herds)
         }
     }
 
-    herd_T::size_type size = 0;
+    herds_xml_T::herd_type::size_type size = 0;
 
     /* for each specified herd... */
-    std::vector<util::string>::iterator herd;
-    std::vector<util::string>::size_type n = 1;
+    opts_type::iterator herd;
+    opts_type::size_type n = 1;
     for (herd = herds.begin() ; herd != herds.end() ; ++herd, ++n)
     {
         /* does the herd exist? */

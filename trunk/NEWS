@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.0_rc3:
+    New features:
+     - Added a --enable-unicode option.  We use glibmm/libxml++ if enabled,
+       xmlwrapp if disabled.
+
 1.1.0_rc2:
     New features:
      - Added --regex and --extended for only displaying results that match

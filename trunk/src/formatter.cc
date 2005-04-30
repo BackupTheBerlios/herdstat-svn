@@ -281,9 +281,7 @@ formatter_T::append(const util::string &label, const util::string &data)
 void
 formatter_T::flush(std::ostream &stream)
 {
-//    std::remove_copy(buffer.begin(), buffer.end(),
-//        std::ostream_iterator<util::string>(stream, "\n"),
-//        "supercalifragilisticexpialidocious");
+#ifdef UNICODE
 
     buffer_type::iterator i;
     for (i = this->buffer.begin() ; i != this->buffer.end() ; ++i)
@@ -300,6 +298,14 @@ formatter_T::flush(std::ostream &stream)
             continue;
         }
     }
+
+#else /* UNICODE */
+
+    std::remove_copy(buffer.begin(), buffer.end(),
+        std::ostream_iterator<util::string>(stream, "\n"),
+        "supercalifragilisticexpialidocious");
+
+#endif /* UNICODE */
 }
 /****************************************************************************/
 
