@@ -158,13 +158,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 continue;
 
             /* parse metadata.xml */
-            {
-                metadata_xml_T metadata(*m);
-                devs     = metadata.devs();
-                herds    = metadata.herds();
-                longdesc = metadata.longdesc();
-                elapsed += metadata.elapsed();
-            }
+            metadata_xml_T metadata(*m);
+            elapsed += metadata.elapsed();
 
             if (dev)
             {
@@ -174,16 +169,17 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 if (regex)
                 {
                     /* search metadata.xml for all devs matching regex */
-                    for (d = devs.begin() ;
-                         d != devs.end() ; ++d)
+                    for (d = metadata.devs().begin() ;
+                         d != metadata.devs().end() ; ++d)
                     {
                         if (regexp == util::get_user_from_email(d->first))
                         {
                             /* matches regex and --with-herd? */
                             if (not herd.empty())
                             {
-                                if (std::find(herds.begin(), herds.end(),
-                                        herd) != herds.end())
+                                if (std::find(metadata.herds().begin(),
+                                        metadata.herds().end(),
+                                        herd) != metadata.herds().end())
                                     found = true;
                             }
                             else
@@ -200,15 +196,15 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 else
                 {
                     /* search the metadata for our dev */
-                    d = devs.find(*i + "@gentoo.org");
-                    if (d == devs.end())
+                    d = metadata.devs().find(*i + "@gentoo.org");
+                    if (d == metadata.devs().end())
                         continue;
                     else
                     {
                         if (not herd.empty())
                         {
-                            if (std::find(herds.begin(),
-                                herds.end(), herd) != herds.end())
+                            if (std::find(metadata.herds().begin(),
+                                metadata.herds().end(), herd) != metadata.herds().end())
                             {
                                 found = true;
                             }
@@ -232,8 +228,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 {
                     /* search metadata.xml for all herds matching regex */
                     metadata_xml_T::herds_type::iterator h;
-                    for (h = herds.begin() ;
-                         h != herds.end()  ; ++h)
+                    for (h = metadata.herds().begin() ;
+                         h != metadata.herds().end()  ; ++h)
                     {
                         if (regexp == *h)
                         {
@@ -248,8 +244,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 else
                 {
                     /* search the metadata.xml for our herd */
-                    if (std::find(herds.begin(),
-                        herds.end(), *i) == herds.end())
+                    if (std::find(metadata.herds().begin(),
+                        metadata.herds().end(), *i) == metadata.herds().end())
                         continue;
                     else
                         found = true;
