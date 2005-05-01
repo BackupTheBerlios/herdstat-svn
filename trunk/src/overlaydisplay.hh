@@ -37,6 +37,7 @@ class OverlayDisplay_T
     typedef util::string string_type;
     typedef std::size_t size_type;
     typedef std::pair<string_type, size_type> OverlayCount;
+    typedef util::color_map_T color_type;
 
     class OverlaySort
     {
@@ -48,13 +49,13 @@ class OverlayDisplay_T
     public:
         typedef std::set<OverlayCount, OverlaySort>::iterator iterator;
 
-        const util::string operator[] (const util::string &s) const
+        const string_type operator[] (const util::string &s) const
         {
             if (optget("quiet", bool))
                 return "";
 
             iterator i;
-            std::size_t n = 0;
+            size_type n = 0;
             for (i = this->_oset.begin() ; i != this->_oset.end()  ; ++i)
             {
                 if (i->first == s)
@@ -67,7 +68,7 @@ class OverlayDisplay_T
             assert(n != 0);
 
             std::ostringstream os;
-            util::color_map_T color;
+            color_type color;
             os << color[cyan] << "[" << n << "]" << color[none];
             return os.str();
         }

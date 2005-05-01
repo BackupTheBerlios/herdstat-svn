@@ -182,12 +182,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
                             /* matches regex and --with-herd? */
                             if (not herd.empty())
                             {
-                                if (std::find(herds.begin(),
-                                              herds.end(),
-                                              herd) != herds.end())
-                                {
+                                if (std::find(herds.begin(), herds.end(),
+                                        herd) != herds.end())
                                     found = true;
-                                }
                             }
                             else
                                 found = true;
@@ -225,8 +222,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 {
                     std::copy(d->second->begin(), d->second->end(),
                         attr.begin());
-                    attr.name = dev_name(herds_xml.herds(), *i);
-                    attr.role = d->second->role;
+                    attr.name.assign(dev_name(herds_xml.herds(), *i));
+                    attr.role.assign(d->second->role);
                 }
             }
             else

@@ -45,6 +45,8 @@ herds_xml_T::init()
     else if ((stat(HERDS_XML_FETCH_LOCATION, &s) == 0) and
             ((time(NULL) - s.st_mtime) < HERDS_XML_EXPIRE) and (s.st_size > 0))
         this->_path = util::path_T(HERDS_XML_FETCH_LOCATION);
+    else
+        this->_path = this->_default;
 
     this->fetch();
 
