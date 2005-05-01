@@ -41,13 +41,15 @@ class xml_T
     public:
         typedef H handler_type;
         typedef util::path_T string_type;
+        typedef util::timer_T timer_type;
+        typedef std::auto_ptr<handler_type> pointer_type;
 
-        xml_T() : _handler(new H()) { }
-        xml_T(const string_type &path)
-            : _path(path), _handler(new H()) { this->init(); }
+        xml_T() : _handler(new handler_type()) { }
+        xml_T(const string_type &p) : _path(p), _handler(new handler_type())
+        { this->init(); }
         virtual ~xml_T() { }
 
-        util::timer_T::size_type elapsed() const
+        timer_type::size_type elapsed() const
         { return this->_timer.elapsed(); }   
 
     protected:
@@ -68,9 +70,9 @@ class xml_T
             this->_timer.stop();
         }
 
-        string_type _path;                  /* path to XML file */
-        util::timer_T _timer;               /* timer object */
-        const std::auto_ptr<H> _handler;    /* content handler */
+        string_type _path;              /* path to XML file */
+        timer_type  _timer;             /* timer object */
+        const pointer_type _handler;    /* content handler */
 };
 
 #endif
