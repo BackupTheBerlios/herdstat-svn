@@ -1,5 +1,9 @@
 ChangeLog for herdstat
 
+2005-05-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/file.cc: Throw a bad_fileobject_E exception if open() fails.
+
 2005-04-30 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/xmlparser.hh, src/herds_xml_handler.cc,

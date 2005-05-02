@@ -53,6 +53,9 @@ util::file_T::open(const char *n, std::ios_base::openmode mode)
     }
     else
         this->stream = new std::fstream(n, mode);
+
+    if (not this->stream->is_open())
+        throw util::bad_fileobject_E(n);
 }
 /*****************************************************************************/
 void
@@ -84,10 +87,12 @@ util::file_T::display(std::ostream &stream)
 void
 util::file_T::close()
 {
-    assert(this->stream);
-    this->stream->close();
-    delete this->stream;
-    this->stream = NULL;
+    if (this->stream)
+    {
+        this->stream->close();
+        delete this->stream;
+        this->stream = NULL;
+    }
 }
 /*****************************************************************************
  * base_dir_T                                                                *
