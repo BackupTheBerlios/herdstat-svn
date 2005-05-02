@@ -62,8 +62,7 @@ displays package information. Otherwise, displays herd information.
 .B "\-m, \-\-metadata"
 Display information for the specified package(s)/categories. A package name
 can be the name only (no category) only if there's not another package with the
-same name.  In that case you must specify the category.  On a small note, this
-option does not recognize most boolean flags (verbose, quiet, etc).
+same name.  In that case you must specify the category.
 .TP
 .B "\-w, \-\-which"
 Display full path to ebuild for the specified package(s).
