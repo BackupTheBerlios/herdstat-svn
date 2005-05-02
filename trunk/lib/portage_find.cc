@@ -31,22 +31,9 @@
 #include "portage_config.hh"
 #include "portage_find.hh"
 
-const util::path_T
-portage::ebuild_which(portage::config_T &config,
-                      const util::string &pkg,
-                      bool overlays)
-{
-    util::string portdir, package;
-    portage::versions_T versions;
-
-    std::pair<util::string, util::string> p =
-        portage::find_package(config, pkg, overlays);
-    portdir = p.first;
-    package = p.second;
-
-    return portage::ebuild_which(portdir, package);
-}
-
+/*****************************************************************************
+ * Search the specified portdir for the latest ebuild of the specified pkg.  *
+ *****************************************************************************/
 const util::path_T
 portage::ebuild_which(const util::string &portdir, const util::string &pkg)
 {
@@ -74,7 +61,23 @@ portage::ebuild_which(const util::string &portdir, const util::string &pkg)
 
     return versions.back()->ebuild();
 }
-
+/*****************************************************************************
+ * Overloaded ebuild_which() that takes a portage::config_T object and       *
+ * searches overlays if overlays is true.                                    *
+ *****************************************************************************/
+const util::path_T
+portage::ebuild_which(portage::config_T &config,
+                      const util::string &pkg,
+                      bool overlays)
+{
+    std::pair<util::string, util::string> p =
+        portage::find_package(config, pkg, overlays);
+    return portage::ebuild_which(p.first, p.second);
+}
+/*****************************************************************************
+ * Search the specified portdir for the specified package (either just in    *
+ * package form or category/package form).                                   *
+ *****************************************************************************/
 const util::string
 portage::find_package_in(const util::string &portdir, const util::string &pkg)
 {
@@ -111,12 +114,10 @@ portage::find_package_in(const util::string &portdir, const util::string &pkg)
 
     return pkgs.front();
 }
-
-/*
- * Given a portdir and a regular expression object,
- * search for all packages matching the regular expression.
- */
-
+/*****************************************************************************
+ * Given a portdir and a regular expression object,                          *
+ * search for all packages matching the regular expression.                  *
+ *****************************************************************************/
 std::vector<util::string>
 portage::find_package_regex_in(const util::string &portdir, util::regex_T &regex)
 {
@@ -146,13 +147,11 @@ portage::find_package_regex_in(const util::string &portdir, util::regex_T &regex
 
     return matches;
 }
-
-/*
- * Given a vector of overlays, call find_package_in()
- * for each one, searching for the package.  This function
- * is used soley by find_package().
- */
-
+/*****************************************************************************
+ * Given a vector of overlays, call find_package_in() for each one,          *
+ * searching for the package.  This function is used soley by                *
+ * find_package().                                                           *
+ *****************************************************************************/
 static std::pair<util::string, util::string>
 search_overlays(const std::vector<util::string> &overlays,
                 const util::string &pkg)
@@ -176,7 +175,10 @@ search_overlays(const std::vector<util::string> &overlays,
 
     return p;
 }
-
+/*****************************************************************************
+ * Call find_package_in() for the real portdir, and call search_overlays()   *
+ * to search all the overlays if do_overlays == true.                        *
+ *****************************************************************************/
 std::pair<util::string, util::string>
 portage::find_package(portage::config_T &config,
                       const util::string &pkg,
@@ -221,7 +223,9 @@ portage::find_package(portage::config_T &config,
 
     return p;
 }
-
+/*****************************************************************************
+ * Regular expression version of search_overlays().                          *
+ *****************************************************************************/
 static std::multimap<util::string, util::string>
 search_overlays_regex(const std::vector<util::string> &overlays,
                       util::regex_T &regex)
@@ -247,7 +251,10 @@ search_overlays_regex(const std::vector<util::string> &overlays,
 
     return matches;
 }
-
+/*****************************************************************************
+ * Regular expression version of find_package() that takes a regex instead   *
+ * a package string.
+ *****************************************************************************/
 std::multimap<util::string, util::string>
 portage::find_package_regex(portage::config_T &config,
                             util::regex_T &regex,
