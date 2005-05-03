@@ -67,10 +67,7 @@ herd_T::display(std::ostream &stream)
             out("Email", mail);
 
         if (not desc.empty())
-        {
-            out("Description", desc);
-            debug_msg("Description(%s): '%s'", name.c_str(), desc.c_str());
-        }
+            out("Description", util::tidy_whitespace(desc));
 
         if (optget("verbose", bool))
             out(util::sprintf("Developers(%d)", this->size()), "");
