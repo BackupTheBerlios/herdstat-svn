@@ -63,6 +63,8 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
         { return this->_handler->herds.find(s); }
         herd_type * &operator[] (const string_type &s)
         { return this->_handler->herds[s]; }
+        herd_type * &operator[] (const string_type &s) const
+        { return this->_handler->herds[s]; }
         size_type size() const { return this->_handler->herds.size(); }
 
         herds_type &herds() const { return this->_handler->herds; }
