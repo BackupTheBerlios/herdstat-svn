@@ -59,7 +59,7 @@ util::file_T::open(const char *n, std::ios_base::openmode mode)
 }
 /*****************************************************************************/
 void
-util::file_T::read(std::vector<util::string> *v)
+util::file_T::read(value_type *v)
 {
     assert(this->stream);
     assert(this->stream->is_open());
@@ -72,7 +72,7 @@ util::file_T::read(std::vector<util::string> *v)
 void
 util::file_T::display(std::ostream &stream)
 {
-    std::vector<util::string>::iterator i;
+    value_type::iterator i;
     for (i = this->_contents.begin() ; i != this->_contents.end() ; ++i)
         stream << *i << std::endl;
 
@@ -290,8 +290,10 @@ util::copy_file(const util::path_T &from, const util::path_T &to)
     if (util::is_file(to) and (unlink(to.c_str()) != 0))
 	throw util::bad_fileobject_E(to);
 
-    std::auto_ptr<std::ifstream> ffrom(new std::ifstream(from.c_str()));
-    std::auto_ptr<std::ofstream> fto(new std::ofstream(to.c_str()));
+    const std::auto_ptr<std::ifstream>
+        ffrom(new std::ifstream(from.c_str()));
+    const std::auto_ptr<std::ofstream>
+        fto(new std::ofstream(to.c_str()));
 
     if (not (*ffrom))
 	throw util::bad_fileobject_E(from);

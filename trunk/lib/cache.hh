@@ -70,7 +70,7 @@ namespace util
             }
 
             /* read cache from disk */
-            void read()
+            virtual void read()
             {
                 file_type f(this->_file);
                 f.open();
@@ -78,7 +78,7 @@ namespace util
             }
 
             /* write cache to disk */
-            void write() const
+            virtual void write() const
             {
                 file_type f(this->_file);
                 f.open(std::ios::out);

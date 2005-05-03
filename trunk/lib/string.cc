@@ -39,7 +39,9 @@
 
 #include "string.hh"
 
-/*****************************************************************************/
+/*****************************************************************************
+ * Convert the given string to all lowercase.                                *
+ *****************************************************************************/
 util::string
 util::lowercase(const util::string &s)
 {
@@ -58,7 +60,10 @@ util::lowercase(const util::string &s)
     
     return result;
 }
-/*****************************************************************************/
+/*****************************************************************************
+ * Clean up the whitespace of the given string (collapse whitespace, remove  *
+ * trailing/leading whitespace, and convert any \n's to spaces).             *
+ *****************************************************************************/
 bool
 bothspaces(util::string::value_type c1,
            util::string::value_type c2)

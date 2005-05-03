@@ -148,9 +148,9 @@ namespace util
     class file_T : public fileobject_T
     {
         public:
-            typedef util::string string_type;
             typedef std::fstream stream_type;
-            typedef std::vector<string_type> value_type;
+            typedef std::vector<util::string> value_type;
+            typedef value_type::value_type string_type;
             typedef value_type::iterator iterator;
             typedef value_type::const_iterator const_iterator;
             typedef value_type::size_type size_type;
