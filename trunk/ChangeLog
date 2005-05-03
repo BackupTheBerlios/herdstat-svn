@@ -1,5 +1,25 @@
 ChangeLog for herdstat
 
+2005-05-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_dev_handler.cc, src/action_pkg_handler.cc,
+	src/action_meta_handler.cc: Tidy up.  Broke up operator() into smaller
+	static functions to make it easier to read/maintain.
+	* src/action_dev_handler.cc, src/action_pkg_handler.cc,
+	src/action_stats_handler.cc: Display elapsed parsing time of
+	herds.xml if --timer.
+	* lib/misc.cc, lib/string.cc, lib/cache.hh, lib/file.cc, lib/file.hh:
+	Tidy.
+	* src/herds_xml.hh: Added const version of operator[] so we can
+	use const herds_xml_T objects (there's not really a reason to ever
+	have a non-const instantiation).
+	* src/herds.cc: Run herd description through util::tidy_whitespace()
+	before displaying.
+	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc: Modified
+	on_characters() callback to append "@gentoo.org" if the domain is not
+	gentoo.org (usually caused by a typo).  Otherwise, the dev shows up as
+	not existing in herds.xml since we search for 'dev + @gentoo.org'.
+
 2005-05-02 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/file.cc: Throw a bad_fileobject_E exception if open() fails.

@@ -3,8 +3,20 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.0_rc3:
     New features:
-     - Added a --enable-unicode option.  We use glibmm/libxml++ if enabled,
-       xmlwrapp if disabled.
+     - Added a --enable-unicode configure option.  We use glibmm/libxml++ if
+       enabled, xmlwrapp if disabled.
+
+    Bug fixes:
+     - Check to ensure that a file open() succeeded, displaying an error
+       message otherwise (instead of a nasty failed assertion).
+     - --timer on herds.xml parsing actions now works again.
+     - Fixed long-time bug where whitespace in the herd description wasn't
+       tidy'd, therefore causing funky output for herd descriptions with
+       newlines and weird whitespace.
+     - Fixed --with-herd that I broke when making it work with --regex.
+     - Fixed bug where developers who typo their email address (specifically
+       zhen@gento.org) show up as not existing in herds.xml (since we search
+       for 'dev + @gentoo.org').
 
 1.1.0_rc2:
     New features:

@@ -36,6 +36,174 @@
 #include "metadata_xml.hh"
 #include "action_meta_handler.hh"
 
+struct mdata
+{
+    bool cat;
+    util::string metadata;
+    util::string portdir;
+    util::string real_portdir;
+    util::string package;
+};
+
+static void
+display_metadata(const mdata &data)
+{
+    formatter_T output;
+    util::color_map_T color;
+    metadata_xml_T::herd_type  devs;
+    metadata_xml_T::herds_type herds;
+    util::string longdesc;
+
+    const bool quiet = optget("quiet", bool);
+
+    /* does the metadata.xml exist? */
+    if (util::is_file(data.metadata))
+    {
+        util::vars_T ebuild_vars;
+
+        /* parse it */
+        {
+            const metadata_xml_T meta(data.metadata);
+            herds    = meta.herds();
+            devs     = meta.devs();
+            longdesc = meta.longdesc();
+        }
+
+        /* herds */
+        if (not data.cat and (herds.empty() or (herds.front() == "no-herd")))
+            output("Herds(0)", "none");
+        else if (not herds.empty())
+            output(util::sprintf("Herds(%d)", herds.size()), herds);
+
+        /* devs */
+        if (quiet)
+        {
+            if (devs.size() >= 1)
+                output("", devs.keys());
+            else if (not data.cat)
+                output("", "none");
+        }
+        else
+        {
+            if (devs.size() >= 1)
+                output(util::sprintf("Maintainers(%d)", devs.size()),
+                    devs.keys().front());
+            
+            if (devs.size() > 1)
+            {
+                std::vector<metadata_xml_T::herd_type::key_type>
+                    dev_keys(devs.keys());
+                std::vector<metadata_xml_T::herd_type::key_type>::iterator d;
+                for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
+                    output("", *d);
+            }
+            else if (not data.cat and devs.empty())
+                output("Maintainers(0)", "none");
+        }
+
+        if (not data.cat)
+        {
+            util::string ebuild;
+            try
+            {
+                ebuild = portage::ebuild_which(data.portdir, data.package);
+            }
+            catch (const portage::nonexistent_pkg_E)
+            {
+                ebuild = portage::ebuild_which(data.real_portdir, data.package);
+            }
+                
+            ebuild_vars.read(ebuild);
+
+            if (quiet and ebuild_vars["HOMEPAGE"].empty())
+                ebuild_vars["HOMEPAGE"] = "none";
+
+            if (not ebuild_vars["HOMEPAGE"].empty())
+            {
+                /* it's possible to have more than one HOMEPAGE */
+                std::vector<util::string> parts =
+                    util::split(ebuild_vars["HOMEPAGE"]);
+
+                if (parts.size() >= 1)
+                    output("Homepage", parts.front());
+
+                if (parts.size() > 1)
+                {
+                    std::vector<util::string>::iterator h;
+                    for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
+                        output("", *h);
+                }
+            }
+        }
+
+        /* long description */
+        if (longdesc.empty())
+        {
+            if (not data.cat)
+            {
+                if (ebuild_vars["DESCRIPTION"].empty())
+                    ebuild_vars["DESCRIPTION"] = "none";
+                    
+                output("Description", ebuild_vars["DESCRIPTION"]);
+            }
+            else
+                output("Description", "none");
+        }
+        else
+            output("Description", util::tidy_whitespace(longdesc));
+    }
+
+    /* package or category exists, but metadata.xml doesn't */
+    else
+    {
+        if (quiet)
+            output("", "No metadata.xml");
+        else
+            output("", color[red] + "No metadata.xml." + color[none]);
+            
+        /* at least show ebuild DESCRIPTION and HOMEPAGE */
+        if (not data.cat)
+        {
+            util::string ebuild;
+            try
+            {
+                ebuild = portage::ebuild_which(data.portdir, data.package);
+            }
+            catch (const portage::nonexistent_pkg_E)
+            {
+                ebuild = portage::ebuild_which(data.real_portdir, data.package);
+            }
+                
+            util::vars_T ebuild_vars(ebuild);
+
+            if (quiet and ebuild_vars["HOMEPAGE"].empty())
+                ebuild_vars["HOMEPAGE"] = "none";
+
+            if (not ebuild_vars["HOMEPAGE"].empty())
+            {
+                std::vector<util::string> parts =
+                    util::split(ebuild_vars["HOMEPAGE"]);
+
+                if (parts.size() >= 1)
+                    output("Homepage", parts.front());
+
+                if (parts.size() > 1)
+                {
+                    std::vector<util::string>::iterator h;
+                    for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
+                        output("", *h);
+                }
+            }
+
+            if (quiet and ebuild_vars["DESCRIPTION"].empty())
+                ebuild_vars["DESCRIPTION"] = "none";
+
+            if (not ebuild_vars["DESCRIPTION"].empty())
+                output("Description", ebuild_vars["DESCRIPTION"]);
+        }
+    }
+}
+
 /*
  * Given a vector of overlays, search them
  * for the specified package, returning a pair<overlay,package>.
@@ -156,28 +324,27 @@ action_meta_handler_T::operator() (opts_type &opts)
     std::multimap<util::string, util::string>::size_type n = 1;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
-        bool cat = false;
-        metadata_xml_T::herd_type  devs;
-        metadata_xml_T::herds_type herds;
-        util::string longdesc, package, metadata;
+        mdata data;
+        data.portdir = portdir;
+        data.real_portdir = real_portdir;
 
         try
         {
             /* The only reason portdir should be set already is if
              * opts == 0 and portdir is set to $PWD */
             if (pwd)
-                package = portage::find_package_in(portdir, m->second);
+                data.package = portage::find_package_in(data.portdir, m->second);
             else if (regex and not m->first.empty())
             {
-                portdir = m->first;
-                package = m->second;
+                data.portdir = m->first;
+                data.package = m->second;
             }
             else
             {
                 std::pair<util::string, util::string> p =
                     portage::find_package(config, m->second, overlay);
-                portdir = p.first;
-                package = p.second;
+                data.portdir = p.first;
+                data.package = p.second;
             }
         }
         catch (const portage::ambiguous_pkg_E &e)
@@ -210,173 +377,27 @@ action_meta_handler_T::operator() (opts_type &opts)
                 continue;
         }
 
-        metadata = portdir + "/" + package + "/metadata.xml";
+        data.metadata = data.portdir + "/" + data.package + "/metadata.xml";
 
         /* are we in an overlay? */
-        if (portdir != real_portdir and not pwd)
-            od.insert(portdir);
+        if (data.portdir != data.real_portdir and not pwd)
+            od.insert(data.portdir);
 
         /* if no '/' exists, assume it's a category */
-        cat = (package.find('/') == util::string::npos);
+        data.cat = (data.package.find('/') == util::string::npos);
 
         if (n != 1)
             output.endl();
 
-        if (portdir == real_portdir or pwd)
-            output(cat ? "Category" : "Package", package);
+        if (data.portdir == data.real_portdir or pwd)
+            output(data.cat ? "Category" : "Package", data.package);
 
         /* it's in an overlay, so show a little thinggy to mark it as such */
         else
-            output(cat ? "Category" : "Package", package + od[portdir]);
+            output(data.cat ? "Category" : "Package",
+                data.package + od[data.portdir]);
 
-        assert(not metadata.empty());
-
-        /* does the metadata.xml exist? */
-        if (util::is_file(metadata))
-        {
-            util::vars_T ebuild_vars;
-
-            /* parse it */
-            {
-                metadata_xml_T meta(metadata);
-                herds    = meta.herds();
-                devs     = meta.devs();
-                longdesc = meta.longdesc();
-            }
-
-            /* herds */
-            if (not cat and (herds.empty() or (herds.front() == "no-herd")))
-                output("Herds(0)", "none");
-            else if (not herds.empty())
-                output(util::sprintf("Herds(%d)", herds.size()), herds);
-
-            /* devs */
-            if (quiet)
-            {
-                if (devs.size() >= 1)
-                    output("", devs.keys());
-                else if (not cat)
-                    output("", "none");
-            }
-            else
-            {
-                if (devs.size() >= 1)
-                    output(util::sprintf("Maintainers(%d)", devs.size()),
-                        devs.keys().front());
-            
-                if (devs.size() > 1)
-                {
-                    std::vector<metadata_xml_T::herd_type::key_type>
-                        dev_keys(devs.keys());
-                    std::vector<metadata_xml_T::herd_type::key_type>::iterator d;
-                    for (d = ( dev_keys.begin() + 1 ); d != dev_keys.end() ; ++d)
-                        output("", *d);
-                }
-                else if (not cat and devs.empty())
-                    output("Maintainers(0)", "none");
-            }
-
-            if (not cat)
-            {
-                util::string ebuild;
-                try
-                {
-                    ebuild = portage::ebuild_which(portdir, package);
-                }
-                catch (const portage::nonexistent_pkg_E)
-                {
-                    ebuild = portage::ebuild_which(real_portdir, package);
-                }
-                
-                ebuild_vars.read(ebuild);
-
-                if (quiet and ebuild_vars["HOMEPAGE"].empty())
-                    ebuild_vars["HOMEPAGE"] = "none";
-
-                if (not ebuild_vars["HOMEPAGE"].empty())
-                {
-                    /* it's possible to have more than one HOMEPAGE */
-                    std::vector<util::string> parts =
-                        util::split(ebuild_vars["HOMEPAGE"]);
-
-                    if (parts.size() >= 1)
-                        output("Homepage", parts.front());
-
-                    if (parts.size() > 1)
-                    {
-                        std::vector<util::string>::iterator h;
-                        for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
-                            output("", *h);
-                    }
-                }
-            }
-
-            /* long description */
-            if (longdesc.empty())
-            {
-                if (not cat)
-                {
-                    if (ebuild_vars["DESCRIPTION"].empty())
-                        ebuild_vars["DESCRIPTION"] = "none";
-                    
-                    output("Description", ebuild_vars["DESCRIPTION"]);
-                }
-                else
-                    output("Description", "none");
-            }
-            else
-                output("Description", util::tidy_whitespace(longdesc));
-        }
-
-        /* package or category exists, but metadata.xml doesn't */
-        else
-        {
-            if (quiet)
-                output("", "No metadata.xml");
-            else
-                output("", color[red] + "No metadata.xml." + color[none]);
-            
-            /* at least show ebuild DESCRIPTION and HOMEPAGE */
-            if (not cat)
-            {
-                util::string ebuild;
-                try
-                {
-                    ebuild = portage::ebuild_which(portdir, package);
-                }
-                catch (const portage::nonexistent_pkg_E)
-                {
-                    ebuild = portage::ebuild_which(real_portdir, package);
-                }
-                
-                util::vars_T ebuild_vars(ebuild);
-
-                if (quiet and ebuild_vars["HOMEPAGE"].empty())
-                    ebuild_vars["HOMEPAGE"] = "none";
-
-                if (not ebuild_vars["HOMEPAGE"].empty())
-                {
-                    std::vector<util::string> parts =
-                        util::split(ebuild_vars["HOMEPAGE"]);
-
-                    if (parts.size() >= 1)
-                        output("Homepage", parts.front());
-
-                    if (parts.size() > 1)
-                    {
-                        std::vector<util::string>::iterator h;
-                        for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
-                            output("", *h);
-                    }
-                }
-
-                if (quiet and ebuild_vars["DESCRIPTION"].empty())
-                    ebuild_vars["DESCRIPTION"] = "none";
-
-                if (not ebuild_vars["DESCRIPTION"].empty())
-                    output("Description", ebuild_vars["DESCRIPTION"]);
-            }
-        }
+        display_metadata(data);
     }
 
     output.flush(*stream);

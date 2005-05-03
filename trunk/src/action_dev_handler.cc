@@ -32,6 +32,80 @@
 #include "action_dev_handler.hh"
 
 /*
+ * Display data for the specified developer.
+ */
+
+static opts_type::size_type
+display_developer(const util::string &dev,
+                  const herds_xml_T &herds_xml)
+{
+    formatter_T output;
+    util::color_map_T color;
+    util::string name;
+    opts_type herds;
+
+    /* for each herd in herds.xml... */
+    herds_xml_T::herds_type::const_iterator h;
+    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+    {
+        opts_type::value_type herd = h->first;
+            
+        /* is the dev in the current herd? */
+        herds_xml_T::herd_type::iterator d =
+            herds_xml[herd]->find(dev + "@gentoo.org");
+        if (d != herds_xml[herd]->end())
+        {
+            herds.push_back(herd);
+            if (not d->second->name.empty())
+                name = d->second->name;
+        }
+    }
+
+    /* was the dev in any of the herds? */
+    if (herds.empty())
+        throw dev_E();
+
+    if (not optget("quiet", bool))
+    {
+        if (name.empty())
+            output("Developer", dev);
+        else
+            output("Developer", name + " (" + dev + ")");
+        
+        output("Email", dev + "@gentoo.org");
+    }
+
+    if (optget("verbose", bool) and not optget("quiet", bool))
+    {
+        output(util::sprintf("Herds(%d)", herds.size()), "");
+
+        opts_type::iterator i;
+        herds_xml_T::herds_type::size_type nh = 1;
+        for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
+        {
+            /* display herd */
+            if (optget("color", bool))
+                output("", color[blue] + (*i) + color[none]);
+            else
+                output("", *i);
+                        
+            /* display herd info */
+            if (not herds_xml[*i]->mail.empty())
+                output("", herds_xml[*i]->mail);
+            if (not herds_xml[*i]->desc.empty())
+                output("", herds_xml[*i]->desc);
+
+            if (nh != herds.size())
+                output.endl();
+        }
+    }
+    else if (not optget("count", bool))
+        output(util::sprintf("Herds(%d)", herds.size()), herds);
+
+    return herds.size();
+}
+
+/*
  * Given a list of developers, display all herds that
  * each developer belongs to.
  */
@@ -39,7 +113,6 @@
 int
 action_dev_handler_T::operator() (opts_type &devs)
 {
-    util::color_map_T color;
     std::ostream *stream = optget("outstream", std::ostream *);
     const bool regex = optget("regex", bool);
     
@@ -54,15 +127,13 @@ action_dev_handler_T::operator() (opts_type &devs)
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
 
-    herds_xml_T herds_xml;
-    herds_xml_T::herds_type::iterator h;
+    const herds_xml_T herds_xml;
+    herds_xml_T::const_iterator h;
 
     /* all target? */
     if (devs[0] == "all")
     {
-        /*
-         * treat ALL developers in herds.xml as a single herd
-         */
+        /* treat ALL developers in herds.xml as a single herd */
 
         herds_xml_T::herd_type all_devs;
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
@@ -129,73 +200,21 @@ action_dev_handler_T::operator() (opts_type &devs)
     /* for each specified dev... */
     opts_type::iterator dev;
     opts_type::size_type n = 1, size = 0;
-    for (dev = devs.begin() ; dev != devs.end() ; ++dev, ++n)
+    for (dev = devs.begin() ; dev != devs.end() ;  ++dev, ++n)
     {
-        util::string name;
-        opts_type herds;
-
-        /* for each herd in herds.xml... */
-        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        try
         {
-            opts_type::value_type herd = h->first;
-            
-            /* is the dev in the current herd? */
-            herds_xml_T::herd_type::iterator d =
-                herds_xml[herd]->find(*dev + "@gentoo.org");
-            if (d != herds_xml[herd]->end())
-            {
-                herds.push_back(herd);
-                if (not d->second->name.empty())
-                    name = d->second->name;
-            }
+            size += display_developer(*dev, herds_xml);
         }
-
-        size += herds.size();
-
-        /* was the dev in any of the herds? */
-        if (herds.empty())
+        catch (const dev_E)
         {
             std::cerr << "Developer '" << *dev << "' doesn't seem to "
                 << "belong to any herds." << std::endl;
 
             if (devs.size() == 1)
-                throw dev_E();
-        }
-        else
-        {
-            if (not optget("quiet", bool))
-            {
-                output("Developer",
-                    (name.empty() ? *dev : name + " (" + (*dev) + ")"));
-                output("Email", *dev + "@gentoo.org");
-            }
-
-            if (optget("verbose", bool) and not optget("quiet", bool))
-            {
-                output(util::sprintf("Herds(%d)", herds.size()), "");
-
-                std::vector<util::string>::iterator i;
-                herds_xml_T::herds_type::size_type nh = 1;
-                for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
-                {
-                    /* display herd */
-                    if (optget("color", bool))
-                        output("", color[blue] + (*i) + color[none]);
-                    else
-                        output("", *i);
-                        
-                    /* display herd info */
-                    if (not herds_xml[*i]->mail.empty())
-                        output("", herds_xml[*i]->mail);
-                    if (not herds_xml[*i]->desc.empty())
-                        output("", herds_xml[*i]->desc);
-
-                    if (nh != herds.size())
-                        output.endl();
-                }
-            }
-            else if (not optget("count", bool))
-                output(util::sprintf("Herds(%d)", herds.size()), herds);
+                return EXIT_FAILURE;
+            else
+                continue;
         }
 
         /* skip a line if we're not displaying the last one */
@@ -204,9 +223,17 @@ action_dev_handler_T::operator() (opts_type &devs)
     }
 
     if (optget("count", bool))
+    {
         output("", util::sprintf("%d", size));
+        return EXIT_SUCCESS;
+    }
 
     output.flush(*stream);
+
+    if (optget("timer", bool))
+        *stream << std::endl << "Took " << herds_xml.elapsed()
+            << "ms to parse herds.xml." << std::endl;
+
     return EXIT_SUCCESS;
 }
 

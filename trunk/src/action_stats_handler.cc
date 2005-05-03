@@ -47,8 +47,8 @@ action_stats_handler_T::operator() (opts_type &null)
     output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
     output.set_attrs();
 
-    herds_xml_T herds_xml;
-    herds_xml_T::herds_type::iterator h;
+    const herds_xml_T herds_xml;
+    herds_xml_T::const_iterator h;
     herds_xml_T::herd_type::iterator d;
 
     float nherds = 0, ndevs = 0;
@@ -123,6 +123,12 @@ action_stats_handler_T::operator() (opts_type &null)
         least_herds);
 
     output.flush(*stream);
+
+    if (optget("timer", bool))
+    {
+        *stream << std::endl << "Took " << herds_xml.elapsed()
+            << "ms to parse herds.xml." << std::endl;
+    }
 
     return EXIT_SUCCESS;
 }

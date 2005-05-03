@@ -37,16 +37,25 @@
 #include "formatter.hh"
 #include "action_pkg_handler.hh"
 
+class package_list : public std::map<util::string, util::string>
+{
+    public:
+        package_list(const opts_type::value_type &n) : name(n) { }
+
+        herds_xml_T::dev_type attr;
+        opts_type::value_type name;
+};
+
 /*
  * Search herds.xml for the specified developer.
  * Return the developer's name if found or an empty
  * string otherwise.
  */
 
-util::string
-dev_name(herds_xml_T::herds_type &herds_xml, util::string &dev)
+static util::string
+dev_name(const herds_xml_T &herds_xml, const util::string &dev)
 {
-    herds_xml_T::herds_type::iterator h;
+    herds_xml_T::const_iterator h;
     for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
     {
         herds_xml_T::herd_type::iterator d =
@@ -58,6 +67,247 @@ dev_name(herds_xml_T::herds_type &herds_xml, util::string &dev)
     return "";
 }
 
+static util::timer_T::size_type
+get_package_list(package_list &list,
+                 const metadatas_T &metadatas,
+                 const herds_xml_T &herds_xml,
+                 const util::string &portdir,
+                 util::progress_T &progress)
+{
+    util::timer_T::size_type elapsed = 0;
+    util::regex_T regexp;
+
+    const bool dev = optget("dev", bool);
+    const bool regex = optget("regex", bool);
+    const bool status = not optget("quiet", bool) and
+                        not optget("debug", bool);
+
+    if (regex and optget("eregex", bool))
+        regexp.assign(list.name, REG_EXTENDED|REG_ICASE);
+    else if (regex)
+        regexp.assign(list.name, REG_ICASE);
+
+    /* for every metadata.xml in the tree... */
+    metadatas_T::const_iterator m;
+    for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
+    {
+        bool found = false;
+        metadata_xml_T::herd_type devs;
+        metadata_xml_T::herds_type herds;
+        metadata_xml_T::string_type longdesc;
+
+        if (status)
+            ++progress;
+
+        /* unfortunately, we still have to do a sanity check in the event
+         * that the user has sync'd, a metadata.xml has been removed, and
+             * the cache not yet updated ; otherwise we'll get a parser error */
+        if (not util::is_file(*m))
+            continue;
+
+        /* parse metadata.xml */
+        const metadata_xml_T metadata(*m);
+        elapsed += metadata.elapsed();
+
+        if (dev)
+        {
+            const util::string herd = optget("with-herd", util::string);
+            metadata_xml_T::herd_type::iterator d;
+
+            if (regex)
+            {
+                /* search metadata.xml for all devs matching regex */
+                for (d = metadata.devs().begin() ;
+                     d != metadata.devs().end() ; ++d)
+                {
+                    if (regexp == util::get_user_from_email(d->first))
+                    {
+                        /* matches regex and --with-herd? */
+                        if (not herd.empty())
+                        {
+                            if (std::find(metadata.herds().begin(),
+                                    metadata.herds().end(),
+                                    herd) != metadata.herds().end())
+                                found = true;
+                        }
+                        else
+                            found = true;
+
+                        if (found)
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                /* search the metadata for our dev */
+                debug_msg("searching metadata for '%s'", (list.name + "@gentoo.org").c_str());
+
+                d = metadata.devs().find(list.name + "@gentoo.org");
+                if (d == metadata.devs().end())
+                {
+                    debug_msg("not found");
+                    continue;
+                }
+                else
+                {
+                    debug_msg("found. checking metadata for herd '%s'", herd.c_str());
+                    if (not herd.empty())
+                    {
+                        if (std::find(metadata.herds().begin(),
+                            metadata.herds().end(), herd) != metadata.herds().end())
+                        {
+                            found = true;
+                        }
+                        else
+                            debug_msg("but not found...");
+                    }
+                    else
+                        found = true;
+                }
+            }
+
+            if (found)
+            {
+                std::copy(d->second->begin(), d->second->end(),
+                    list.attr.begin());
+                list.attr.name = dev_name(herds_xml, list.name);
+                list.attr.role = d->second->role;
+            }
+        }
+        else
+        {
+            if (regex)
+            {
+                /* search metadata.xml for all herds matching regex */
+                metadata_xml_T::herds_type::iterator h;
+                for (h = metadata.herds().begin() ;
+                    h != metadata.herds().end()  ; ++h)
+                {
+                    if (regexp == *h)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                /* search the metadata.xml for our herd */
+                if (std::find(metadata.herds().begin(), metadata.herds().end(),
+                    list.name) == metadata.herds().end())
+                    continue;
+                else
+                    found = true;
+            }
+        }
+
+        if (not found)
+            continue;
+
+        /* get category/package from absolute path */
+        util::string package = m->substr(portdir.size() + 1);
+        util::string::size_type pos = package.find("/metadata.xml");
+        if (pos != util::string::npos)
+            package = package.substr(0, pos);
+
+        debug_msg("Match found in %s.", m->c_str());
+
+        list[package] = longdesc;
+    }
+
+    return elapsed;
+}
+
+static void
+display_package_list(package_list &list, const herds_xml_T &herds_xml)
+{
+    formatter_T output;
+    util::color_map_T color;
+
+    const bool dev = optget("dev", bool);
+    const bool count = optget("count", bool);
+    const bool quiet = optget("quiet", bool);
+    const bool verbose = optget("verbose", bool);
+    const bool regex = optget("regex", bool);
+
+    if (not quiet)
+    {
+        if (regex)
+            output("Regex", list.name);
+        else if (dev)
+        {
+            if (list.attr.name.empty())
+                output("Developer", list.name);
+            else
+                output("Developer",
+                    list.attr.name + " (" + list.name + ")");
+
+            output("Email", list.name + "@gentoo.org");
+        }
+        else
+        {
+            output("Herd", list.name);
+            if (not herds_xml[list.name]->mail.empty())
+                output("Email", herds_xml[list.name]->mail);
+            if (not herds_xml[list.name]->desc.empty())
+                output("Description",
+                    util::tidy_whitespace(herds_xml[list.name]->desc));
+        }
+
+        if (list.empty())
+            output("Packages(0)", "none");
+        /* display first package on same line */
+        else if (verbose)
+            output(util::sprintf("Packages(%d)", list.size()),
+                color[blue] + list.begin()->first + color[none]);
+        else
+            output(util::sprintf("Packages(%d)", list.size()),
+                list.begin()->first);
+    }
+    else if (not list.empty() and not count)
+        output("", list.begin()->first);
+
+    /* display the category/package */
+    package_list::iterator p =
+        ( list.empty() ? list.begin() : ++(list.begin()) );
+    package_list::size_type pn = 1;
+    for ( ; p != list.end() ; ++p, ++pn)
+    {
+        util::string longdesc;
+            
+        if (not p->second.empty())
+            longdesc = util::tidy_whitespace(p->second);
+
+        if ((verbose and not quiet) and not longdesc.empty())
+        {
+            if (output.size() > 1 and output.peek() != "")
+                output.endl();
+
+            if (optget("color", bool))
+                output("", color[blue] + p->first + color[none]);
+            else
+                output("", p->first);
+
+            output("", longdesc);
+            debug_msg("longdesc(%s): '%s'", p->first.c_str(),
+                longdesc.c_str());
+
+            if (pn != list.size())
+                output.endl();
+        }
+        else if (verbose and not quiet)
+        {
+            if (optget("color", bool))
+                output("", color[blue] + p->first + color[none]);
+            else
+                output("", p->first);
+        }
+        else if (not count)
+            output("", p->first);
+    }
+}
+
 /*
  * Given a list of herds/devs, determine all packages belonging
  * to each herd/dev. For reliability reasons, every metadata.xml
@@ -67,11 +317,9 @@ dev_name(herds_xml_T::herds_type &herds_xml, util::string &dev)
 int
 action_pkg_handler_T::operator() (opts_type &opts)
 {
-    util::color_map_T color;
     util::progress_T progress;
     std::map<util::string, util::string>::size_type size = 0;
     std::vector<util::string> not_found;
-    opts_type::iterator i;
 
     portage::config_T config(optget("portage.config", portage::config_T));
     const util::string portdir(config.portdir());
@@ -81,14 +329,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
     /* this code takes long enough as it is... no need for
      * a zillion calls to optget inside loops */
     const bool quiet = optget("quiet", bool);
-    const bool verbose = optget("verbose", bool);
-    const bool timer = optget("timer", bool);
     const bool count = optget("count", bool);
-    const bool debug = optget("debug", bool);
     const bool dev = optget("dev", bool);
-    const bool regex = optget("regex", bool);
-    const bool eregex = optget("eregex", bool);
-    const bool status = not quiet and not debug;
+    const bool status = not quiet and not optget("debug", bool);
 
     /* set format attributes */
     formatter_T output;
@@ -104,7 +347,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
         return EXIT_FAILURE;
     }
     /* only 1 regex allowed at a time */
-    else if (regex and opts.size() > 1)
+    else if (optget("regex", bool) and opts.size() > 1)
     {
         std::cerr << "You may only specify one regular expression."
             << std::endl;
@@ -115,10 +358,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (not util::is_dir(portdir))
 	throw bad_fileobject_E(portdir);
 
-    herds_xml_T herds_xml;
+    const herds_xml_T herds_xml;
 
     /* our list of metadata.xml's */
-    metadatas_T metadatas(portdir);
+    const metadatas_T metadatas(portdir);
 
     if (status)
     {
@@ -128,142 +371,15 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     /* for each specified herd/dev... */
     opts_type::size_type n = 1;
+    opts_type::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
-        util::regex_T regexp;
-        herds_xml_T::dev_type attr;
-        std::map<util::string, util::string> pkgs;
+        package_list list(*i);
 
-        if (regex and eregex)
-            regexp.assign(*i, REG_EXTENDED|REG_ICASE);
-        else if (regex)
-            regexp.assign(*i, REG_ICASE);
+        elapsed += get_package_list(list, metadatas,
+                        herds_xml, portdir, progress);
 
-        /* for each metadata.xml... */
-        metadatas_T::iterator m;
-        for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
-        {
-            bool found = false;
-            metadata_xml_T::herd_type devs;
-            metadata_xml_T::herds_type herds;
-            metadata_xml_T::string_type longdesc;
-
-            if (status)
-                ++progress;
-
-            /* unfortunately, we still have to do a sanity check in the event
-             * that the user has sync'd, a metadata.xml has been removed, and
-             * the cache not yet updated ; otherwise we'll get a parser error */
-            if (not util::is_file(*m))
-                continue;
-
-            /* parse metadata.xml */
-            metadata_xml_T metadata(*m);
-            elapsed += metadata.elapsed();
-
-            if (dev)
-            {
-                const util::string herd = optget("with-herd", util::string);
-                metadata_xml_T::herd_type::iterator d;
-
-                if (regex)
-                {
-                    /* search metadata.xml for all devs matching regex */
-                    for (d = metadata.devs().begin() ;
-                         d != metadata.devs().end() ; ++d)
-                    {
-                        if (regexp == util::get_user_from_email(d->first))
-                        {
-                            /* matches regex and --with-herd? */
-                            if (not herd.empty())
-                            {
-                                if (std::find(metadata.herds().begin(),
-                                        metadata.herds().end(),
-                                        herd) != metadata.herds().end())
-                                    found = true;
-                            }
-                            else
-                                found = true;
-
-                            if (found)
-                                break;
-                        }
-                    }
-
-                    if (not found)
-                        continue;
-                }
-                else
-                {
-                    /* search the metadata for our dev */
-                    d = metadata.devs().find(*i + "@gentoo.org");
-                    if (d == metadata.devs().end())
-                        continue;
-                    else
-                    {
-                        if (not herd.empty())
-                        {
-                            if (std::find(metadata.herds().begin(),
-                                metadata.herds().end(), herd) != metadata.herds().end())
-                            {
-                                found = true;
-                            }
-                        }
-                        else
-                            found = true;
-                    }
-                }
-
-                if (found)
-                {
-                    std::copy(d->second->begin(), d->second->end(),
-                        attr.begin());
-                    attr.name.assign(dev_name(herds_xml.herds(), *i));
-                    attr.role.assign(d->second->role);
-                }
-            }
-            else
-            {
-                if (regex)
-                {
-                    /* search metadata.xml for all herds matching regex */
-                    metadata_xml_T::herds_type::iterator h;
-                    for (h = metadata.herds().begin() ;
-                         h != metadata.herds().end()  ; ++h)
-                    {
-                        if (regexp == *h)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (not found)
-                        continue;
-                }
-                else
-                {
-                    /* search the metadata.xml for our herd */
-                    if (std::find(metadata.herds().begin(),
-                        metadata.herds().end(), *i) == metadata.herds().end())
-                        continue;
-                    else
-                        found = true;
-                }
-            }
-
-            /* get category/package from absolute path */
-            util::string cat_and_pkg = m->substr(portdir.size() + 1);
-            util::string::size_type pos = cat_and_pkg.find("/metadata.xml");
-            if (pos != util::string::npos)
-                cat_and_pkg = cat_and_pkg.substr(0, pos);
-
-            debug_msg("Match found in %s.", m->c_str());
-
-            pkgs[cat_and_pkg] = longdesc;
-        }
-        
-        if (pkgs.empty())
+        if (list.empty())
         {
             /* only display error if opts.size() == 1 */
             if (opts.size() == 1)
@@ -292,89 +408,16 @@ action_pkg_handler_T::operator() (opts_type &opts)
             continue;
         }
 
-        size += pkgs.size();
+        size += list.size();
 
         if ((n == 1) and status)
             output.endl();
 
-        if (not quiet)
-        {
-            if (regex)
-                output("Regex", *i);
-            else if (dev)
-            {
-                if (attr.name.empty())
-                    output("Developer", *i);
-                else
-                    output("Developer",
-                        attr.name + " (" + (*i) + ")");
-
-                output("Email", *i + "@gentoo.org");
-            }
-            else
-            {
-                output("Herd", *i);
-                if (not herds_xml[*i]->mail.empty())
-                    output("Email", herds_xml[*i]->mail);
-                if (not herds_xml[*i]->desc.empty())
-                    output("Description", util::tidy_whitespace(herds_xml[*i]->desc));
-            }
-
-            if (pkgs.empty())
-                output("Packages(0)", "none");
-            /* display first package on same line */
-            else if (verbose)
-                output(util::sprintf("Packages(%d)", pkgs.size()),
-                    color[blue] + pkgs.begin()->first + color[none]);
-            else
-                output(util::sprintf("Packages(%d)", pkgs.size()),
-                    pkgs.begin()->first);
-        }
-        else if (not pkgs.empty() and not count)
-            output("", pkgs.begin()->first);
-
-        /* display the category/package */
-        std::map<util::string, util::string>::iterator p =
-            ( pkgs.empty() ? pkgs.begin() : ++(pkgs.begin()) );
-        std::map<util::string, util::string>::size_type pn = 1;
-        for ( ; p != pkgs.end() ; ++p, ++pn)
-        {
-            util::string longdesc;
-            
-            if (not p->second.empty())
-                longdesc = util::tidy_whitespace(p->second);
-
-            if ((verbose and not quiet) and not longdesc.empty())
-            {
-                if (output.size() > 1 and output.peek() != "")
-                    output.endl();
-
-                if (optget("color", bool))
-                    output("", color[blue] + p->first + color[none]);
-                else
-                    output("", p->first);
-
-                output("", longdesc);
-                debug_msg("longdesc(%s): '%s'", p->first.c_str(),
-                    longdesc.c_str());
-
-                if (pn != pkgs.size())
-                    output.endl();
-            }
-            else if (verbose and not quiet)
-            {
-                if (optget("color", bool))
-                    output("", color[blue] + p->first + color[none]);
-                else
-                    output("", p->first);
-            }
-            else if (not count)
-                output("", p->first);
-        }
+        display_package_list(list, herds_xml);
 
         /* only skip a line if we're not on the last one */
         if (not count and n != opts.size())
-            if (not quiet or (quiet and pkgs.size() > 0))
+            if (not quiet or (quiet and list.size() > 0))
                 output.endl();
     }
 
@@ -398,15 +441,17 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (not not_found.empty())
         std::cerr << std::endl;
 
-    if (timer)
+    if (optget("timer", bool))
     {
         *stream << std::endl << "Took " << elapsed << "ms to parse "
             << metadatas.size() << " metadata.xml's ("
             << std::setprecision(4)
             << (static_cast<float>(elapsed) / metadatas.size())
-            << " ms/metadata.xml)." << std::endl;
+            << " ms/metadata.xml)." << std::endl
+            << "Took " << herds_xml.elapsed() << "ms to parse herds.xml."
+            << std::endl;
     }
-  else if (verbose and not quiet)
+    else if (optget("verbose", bool) and not quiet)
     {
         *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
