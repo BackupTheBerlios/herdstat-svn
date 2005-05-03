@@ -96,18 +96,27 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
     else if (in_herd_email)
     {
         /* append @gentoo.org if needed */
-        herds[cur_herd]->mail =
-            (str.find('@') == string_type::npos ? str + "@gentoo.org" : str);
+        string_type::size_type pos = str.find('@');
+        if (pos == string_type::npos)
+            herds[cur_herd]->mail = str + "@gentoo.org";
+        else if (str.substr(pos) != "@gentoo.org")
+            herds[cur_herd]->mail = str.substr(0, pos) + "@gentoo.org";
+        else
+            herds[cur_herd]->mail = str;
     }
 
     /* <maintainer><email> */
     else if (in_maintainer_email)
     {
-        cur_dev = util::lowercase(str);
-
         /* append @gentoo.org if needed */
-        if (str.find('@') == string_type::npos)
-            cur_dev.append("@gentoo.org");
+        string_type::size_type pos = str.find('@');
+        if (pos == string_type::npos)
+            cur_dev = util::lowercase(str) + "@gentoo.org";
+        else if (str.substr(pos) != "@gentoo.org")
+            cur_dev = util::lowercase(str.substr(0,pos)) + "@gentoo.org";
+        else
+            cur_dev = util::lowercase(str);
+
         herds[cur_herd]->insert(std::make_pair(cur_dev, new dev_type()));
     }
 
@@ -117,9 +126,6 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
         herd_type::iterator i = herds[cur_herd]->find(cur_dev);
         if (i != herds[cur_herd]->end())
             i->second->name = str;
-
-        if (cur_dev == "flameeyes@gentoo.org")
-        debug_msg("dev = '%s', maintainer name = '%s'", cur_dev.c_str(), str.c_str());
     }
 
     /* <maintainer><role> */

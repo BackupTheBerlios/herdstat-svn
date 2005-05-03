@@ -108,7 +108,14 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
     /* <maintainer><email> */
     else if (in_email)
     {
-        cur_dev = (str.find('@') == string_type::npos ? str + "@gentoo.org" : str);
+        string_type::size_type pos = str.find('@');
+        if (pos == string_type::npos)
+            cur_dev = util::lowercase(str) + "@gentoo.org";
+        else if (str.substr(pos) != "@gentoo.org")
+            cur_dev = util::lowercase(str.substr(0, pos)) + "@gentoo.org";
+        else
+            cur_dev = util::lowercase(str);
+
         devs[cur_dev] = new dev_type();
     }
 
