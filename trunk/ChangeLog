@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-05-03 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Update version (1.1.0_rc3).
 	* src/action_dev_handler.cc, src/action_pkg_handler.cc,
 	src/action_meta_handler.cc: Tidy up.  Broke up operator() into smaller
 	static functions to make it easier to read/maintain.
