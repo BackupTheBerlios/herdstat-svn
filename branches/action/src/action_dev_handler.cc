@@ -35,12 +35,9 @@
  * Display data for the specified developer.
  */
 
-static opts_type::size_type
-display_developer(const util::string &dev,
-                  const herds_xml_T &herds_xml)
+void
+action_dev_handler_T::display(const util::string &dev)
 {
-    formatter_T output;
-    util::color_map_T color;
     util::string name;
     opts_type herds;
 
@@ -102,7 +99,7 @@ display_developer(const util::string &dev,
     else if (not optget("count", bool))
         output(util::sprintf("Herds(%d)", herds.size()), herds);
 
-    return herds.size();
+    size += herds.size();
 }
 
 /*
@@ -184,12 +181,12 @@ action_dev_handler_T::operator() (opts_type &devs)
 
     /* for each specified dev... */
     opts_type::iterator dev;
-    opts_type::size_type n = 1, size = 0;
+    opts_type::size_type n = 1;
     for (dev = devs.begin() ; dev != devs.end() ;  ++dev, ++n)
     {
         try
         {
-            size += display_developer(*dev, herds_xml);
+            display(*dev);
         }
         catch (const dev_E)
         {
