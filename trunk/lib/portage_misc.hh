@@ -27,8 +27,13 @@
 # include "config.h"
 #endif
 
+#include <set>
 #include "file.hh"
+#include "util_exceptions.hh"
 #include "portage_config.hh"
+
+#define CATEGORIES "/profiles/categories"
+#define CATEGORIES_USER "/etc/portage/categories"
 
 namespace portage
 {
@@ -37,27 +42,38 @@ namespace portage
     bool is_ebuild(const util::path_T &);
 
     /* represents a list of package categories */
-    class categories_T : public util::file_T
+    class categories_T
     {
         public:
-            categories_T()
-                : file_T(util::path_T(portage::portdir()) + "/profiles/categories")
+            typedef std::set<util::string> value_type;
+            typedef value_type::iterator iterator;
+            typedef value_type::const_iterator const_iterator;
+            typedef value_type::size_type size_type;
+
+            categories_T(bool validate = false)
+                : _portdir(portage::portdir()), _validate(validate)
             { this->init(); }
-            categories_T(const util::path_T &p) : file_T(p + "/profiles/categories")
+            categories_T(const util::path_T &p, bool validate = false)
+                : _portdir(p), _validate(validate)
             { this->init(); }
 
-            void init()
-            {
-                this->open();
-                this->read();
+            /* set subset */
+            iterator begin() { return this->_s.begin(); }
+            const_iterator begin() const { return this->_s.begin(); }
+            iterator end() { return this->_s.end(); }
+            const_iterator end() const { return this->_s.end(); }
+            bool find(const value_type::key_type &k) const
+            { return (this->_s.find(k) != this->_s.end()); }
+            size_type size() const { return this->_s.size(); }
+            void clear() { return this->_s.clear(); }
 
-                /* remove 'virtual' ... */
-                if (this->_contents.size() > 0 and
-                    this->_contents.back() == "virtual")
-                    this->_contents.erase(this->_contents.end());
-            }
+        private:
+            void init();
 
-            size_type size() const { return this->_contents.size(); }
+            const util::path_T _portdir;
+            bool _validate;
+            static value_type _s;
+            static bool _init;
     };
 }
 

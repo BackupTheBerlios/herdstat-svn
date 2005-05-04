@@ -28,6 +28,9 @@
 #include "file.hh"
 #include "portage_misc.hh"
 
+bool portage::categories_T::_init = false;
+portage::categories_T::value_type portage::categories_T::_s;
+
 /*****************************************************************************
  * Current working directory a package directory?                            *
  *****************************************************************************/
@@ -63,6 +66,49 @@ portage::is_ebuild(const util::path_T &path)
 {
     return ( (path.length() > 7) and
              (path.substr(path.length() - 7) == ".ebuild") );
+}
+/*****************************************************************************/
+void
+portage::categories_T::init()
+{
+    if (this->_init)
+        return;
+
+    /* read categories from real PORTDIR */
+    std::string line;
+    {
+        const std::auto_ptr<std::ifstream>
+            f(new std::ifstream((this->_portdir + CATEGORIES).c_str()));
+        if (not (*f))
+            throw util::bad_fileobject_E(this->_portdir + CATEGORIES);
+
+        while (std::getline(*f, line))
+        {
+            /* virtual isn't a real category */
+            if (line == "virtual")
+                continue;
+
+            /* choke if validate mode is enabled */
+            if (this->_validate and 
+                not util::is_dir(this->_portdir + "/" + line))
+                throw util::bad_fileobject_E(this->_portdir + "/" + line);
+
+            this->_s.insert(line);
+        }
+    }
+
+    /* read user category file */
+    if (util::is_file(CATEGORIES_USER))
+    {
+        const std::auto_ptr<std::ifstream> f(new std::ifstream(CATEGORIES_USER));
+        if (not (*f))
+            throw util::bad_fileobject_E(CATEGORIES_USER);
+
+        while (std::getline(*f, line))
+            this->_s.insert(line);
+    }
+
+    this->_init = true;
 }
 /*****************************************************************************/
 
