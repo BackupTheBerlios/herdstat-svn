@@ -45,13 +45,14 @@ namespace portage
     find_package_in(const util::string &, const util::string &);
     /*************************************************************************/    
     std::vector<util::string>
-    find_package_regex_in(const util::string &, util::regex_T &);
+    find_package_regex_in(const util::string &, const util::regex_T &);
     /*************************************************************************/
     std::pair<util::string, util::string>
     find_package(portage::config_T &, const util::string &, bool overlays = true);
     /*************************************************************************/
     std::multimap<util::string, util::string>
-    find_package_regex(portage::config_T &, util::regex_T &, bool overlays = true);
+    find_package_regex(portage::config_T &, const util::regex_T &,
+        bool overlays = true);
     /*************************************************************************/
 }
 

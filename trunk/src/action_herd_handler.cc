@@ -127,9 +127,17 @@ action_herd_handler_T::operator() (opts_type &herds)
     }
 
     if (optget("count", bool))
+    {
         output("", util::sprintf("%d", size));
+        return EXIT_SUCCESS;
+    }
 
     output.flush(*stream);
+
+    if (optget("timer", bool))
+        *stream << std::endl << "Took " << herds_xml.elapsed()
+            << "ms to parse herds.xml." << std::endl;
+
     return EXIT_SUCCESS;
 }
 

@@ -38,7 +38,7 @@
 void
 util::file_T::open(const char *n, std::ios_base::openmode mode)
 {
-    if (this->_path.empty())
+    if (this->_path != n)
     {
         this->_path = n;
         this->stat();

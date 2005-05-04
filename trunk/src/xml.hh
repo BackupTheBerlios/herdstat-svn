@@ -64,7 +64,7 @@ class xml_T
         virtual void parse() { this->parse(this->_path); }
         virtual void parse(const string_type &p)
         {
-            XMLParser_T parser(&(*(this->_handler)));
+            XMLParser_T parser(this->_handler.get());
             this->_timer.start();
             parser.parse(p);
             this->_timer.stop();

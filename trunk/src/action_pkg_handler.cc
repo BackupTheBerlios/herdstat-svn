@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <map>
 
@@ -66,6 +67,20 @@ dev_name(const herds_xml_T &herds_xml, const util::string &dev)
 
     return "";
 }
+
+/*
+ * binary predicate for searching metadata for
+ * a regular expression via find_if().
+ */
+
+static bool
+doesMatch(util::string s, util::regex_T *r) { return *r == s; }
+
+/*
+ * Loop through every metadata.xml in the tree,
+ * searching for packages that match our search 
+ * criteria.
+ */
 
 static util::timer_T::size_type
 get_package_list(package_list &list,
@@ -177,29 +192,12 @@ get_package_list(package_list &list,
         }
         else
         {
-            if (regex)
-            {
-                /* search metadata.xml for all herds matching regex */
-                metadata_xml_T::herds_type::iterator h;
-                for (h = metadata.herds().begin() ;
-                    h != metadata.herds().end()  ; ++h)
-                {
-                    if (regexp == *h)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                /* search the metadata.xml for our herd */
-                if (std::find(metadata.herds().begin(), metadata.herds().end(),
-                    list.name) == metadata.herds().end())
-                    continue;
-                else
-                    found = true;
-            }
+            found = ( regex ?
+                        std::find_if(metadata.herds().begin(),
+                            metadata.herds().end(), std::bind2nd(
+                            std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end() :
+                        std::find(metadata.herds().begin(), metadata.herds().end(),
+                            list.name) != metadata.herds().end() );
         }
 
         if (not found)

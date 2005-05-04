@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.0_rc4:
+    Bug fixes:
+     - /etc/portage/categories is now taken into consideration when generating
+       the category list.
+
 1.1.0_rc3:
     New features:
      - Added a --enable-unicode configure option.  We use glibmm/libxml++ if
