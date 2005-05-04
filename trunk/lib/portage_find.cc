@@ -45,8 +45,8 @@ portage::ebuild_which(const util::string &portdir, const util::string &pkg)
 
     if (util::is_dir(portdir + "/" + package))
     {
-        util::dir_T pkgdir(portdir + "/" + package);
-        util::dir_T::iterator d;
+        const util::dir_T pkgdir(portdir + "/" + package);
+        util::dir_T::const_iterator d;
         for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
         {
             if (not portage::is_ebuild(*d))
@@ -98,8 +98,8 @@ portage::find_package_in(const util::string &portdir, const util::string &pkg)
         if (not util::is_dir(portdir + "/" + (*c)))
             continue;
 
-        util::dir_T category(portdir + "/" + (*c));
-        util::dir_T::iterator d;
+        const util::dir_T category(portdir + "/" + (*c));
+        util::dir_T::const_iterator d;
 
         /* for each package in the category */
         for (d = category.begin() ; d != category.end() ; ++d)
@@ -119,7 +119,8 @@ portage::find_package_in(const util::string &portdir, const util::string &pkg)
  * search for all packages matching the regular expression.                  *
  *****************************************************************************/
 std::vector<util::string>
-portage::find_package_regex_in(const util::string &portdir, util::regex_T &regex)
+portage::find_package_regex_in(const util::string &portdir,
+                               const util::regex_T &regex)
 {
     std::vector<util::string> matches;
     const portage::categories_T categories;
@@ -228,7 +229,7 @@ portage::find_package(portage::config_T &config,
  *****************************************************************************/
 static std::multimap<util::string, util::string>
 search_overlays_regex(const std::vector<util::string> &overlays,
-                      util::regex_T &regex)
+                      const util::regex_T &regex)
 {
     std::vector<util::string> result;
     std::vector<util::string>::iterator r;
@@ -253,11 +254,11 @@ search_overlays_regex(const std::vector<util::string> &overlays,
 }
 /*****************************************************************************
  * Regular expression version of find_package() that takes a regex instead   *
- * a package string.
+ * a package string.                                                         *
  *****************************************************************************/
 std::multimap<util::string, util::string>
 portage::find_package_regex(portage::config_T &config,
-                            util::regex_T &regex,
+                            const util::regex_T &regex,
                             bool do_overlays)
 {
     util::string portdir(config.portdir());

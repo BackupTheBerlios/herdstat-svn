@@ -423,8 +423,8 @@ portage::version_string_T::parse()
 void
 portage::versions_T::assign(const util::path_T &path)
 {
-    util::dir_T pkgdir(path);
-    util::dir_T::iterator d;
+    const util::dir_T pkgdir(path);
+    util::dir_T::const_iterator d;
     
     for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
         if (portage::is_ebuild(*d))

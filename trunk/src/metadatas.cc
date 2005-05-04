@@ -81,7 +81,7 @@ metadatas_T::valid() const
 void
 metadatas_T::fill()
 {
-    portage::categories_T categories(portdir);
+    const portage::categories_T categories(portdir);
     util::progress_T progress;
     util::timer_T t;
     bool status = not optget("quiet", bool) and not optget("debug", bool);
@@ -98,17 +98,17 @@ metadatas_T::fill()
         t.start();
 
     /* for each category */
-    portage::categories_T::iterator cat;
+    portage::categories_T::const_iterator cat;
     for (cat = categories.begin() ; cat != categories.end() ; ++cat)
     {
-        const util::string path(portdir + "/" + (*cat));
+        const util::path_T path(portdir + "/" + (*cat));
         debug_msg("searching %s", path.c_str());
 
         if (status)
             ++progress;
 
-        util::dir_T category(path);
-        util::dir_T::iterator d;
+        const util::dir_T category(path);
+        util::dir_T::const_iterator d;
 
         /* for each directory in this category */
         for (d = category.begin() ; d != category.end() ; ++d)
