@@ -6,6 +6,9 @@
     <note priority="veryhigh" time="1115201336">
         Clean up action_pkg_handler.cc:get_package_list().
     </note>
+    <note priority="veryhigh" time="1115211379">
+        instead of class package_list and a bunch of static funcs, use members and member funcs (doh)
+    </note>
     <note priority="high" time="1114230397">
         Add a --qa option that enables XML validation and does other checks (fails if a category exists in the category file but not in the tree, fex)
     </note>

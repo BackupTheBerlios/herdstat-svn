@@ -38,6 +38,12 @@
 #include "formatter.hh"
 #include "action_pkg_handler.hh"
 
+/*
+ * package_list POD type
+ * mainly used for passing data from operator()
+ * to our static helper functions.
+ */
+
 class package_list : public std::map<util::string, util::string>
 {
     public:
@@ -159,14 +165,8 @@ get_package_list(package_list &list,
                 debug_msg("searching metadata for '%s'", (list.name + "@gentoo.org").c_str());
 
                 d = metadata.devs().find(list.name + "@gentoo.org");
-                if (d == metadata.devs().end())
+                if (d != metadata.devs().end())
                 {
-                    debug_msg("not found");
-                    continue;
-                }
-                else
-                {
-                    debug_msg("found. checking metadata for herd '%s'", herd.c_str());
                     if (not herd.empty())
                     {
                         if (std::find(metadata.herds().begin(),
@@ -174,8 +174,6 @@ get_package_list(package_list &list,
                         {
                             found = true;
                         }
-                        else
-                            debug_msg("but not found...");
                     }
                     else
                         found = true;
@@ -192,12 +190,17 @@ get_package_list(package_list &list,
         }
         else
         {
-            found = ( regex ?
-                        std::find_if(metadata.herds().begin(),
-                            metadata.herds().end(), std::bind2nd(
-                            std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end() :
-                        std::find(metadata.herds().begin(), metadata.herds().end(),
-                            list.name) != metadata.herds().end() );
+            found = (
+                regex ?
+                    /* yes */
+                    std::find_if(metadata.herds().begin(),
+                        metadata.herds().end(), std::bind2nd(
+                        std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end() :
+
+                    /* no */
+                    std::find(metadata.herds().begin(), metadata.herds().end(),
+                        list.name) != metadata.herds().end()
+            );
         }
 
         if (not found)
