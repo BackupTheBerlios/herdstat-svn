@@ -79,11 +79,12 @@ namespace util
         private:
             const char *_str;
             int _err;
-            regex_t *_re;
+            const regex_t *_re;
 
         public:
             bad_regex_E() : _str(NULL), _err(0), _re(NULL) { }
-            bad_regex_E(int e, regex_t *re) : _str(NULL), _err(e), _re(re) { }
+            bad_regex_E(int e, const regex_t *re)
+                : _str(NULL), _err(e), _re(re) { }
             bad_regex_E(const util::string &s) : _str(s.c_str()), _err(0),
                                                 _re(NULL) { }
             virtual const char *what() const throw()
