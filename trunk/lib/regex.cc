@@ -37,9 +37,9 @@
 
 /*****************************************************************************/
 bool
-util::regex_T::operator== (const string_type &cmp)
+util::regex_T::operator== (const string_type &cmp) const
 {
-    assert(this->_compiled = true);
+    assert(this->_compiled);
 
     int rv = regexec(&(this->_regex), cmp.c_str(), 0, NULL, this->_eflags);
     if (rv == REG_ESPACE)
