@@ -62,7 +62,7 @@ action_dev_handler_T::display(const util::string &dev)
     if (herds.empty())
         throw dev_E();
 
-    if (not optget("quiet", bool))
+    if (quiet)
     {
         if (name.empty())
             output("Developer", dev);
@@ -72,7 +72,7 @@ action_dev_handler_T::display(const util::string &dev)
         output("Email", dev + "@gentoo.org");
     }
 
-    if (optget("verbose", bool) and not optget("quiet", bool))
+    if (verbose and not quiet)
     {
         output(util::sprintf("Herds(%d)", herds.size()), "");
 
@@ -96,7 +96,7 @@ action_dev_handler_T::display(const util::string &dev)
                 output.endl();
         }
     }
-    else if (not optget("count", bool))
+    else if (not count)
         output(util::sprintf("Herds(%d)", herds.size()), herds);
 
     size += herds.size();
@@ -114,7 +114,7 @@ action_dev_handler_T::operator() (opts_type &devs)
 
     /* set format attributes */
     output.set_maxlabel(all ? 16 : 12);
-    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
+    output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 
     /* all target? */
@@ -137,6 +137,7 @@ action_dev_handler_T::operator() (opts_type &devs)
 
         all_devs.display(*stream);
         size = all_devs.size();
+        flush();
         return EXIT_SUCCESS;
     }
     else if (regex and devs.size() > 1)

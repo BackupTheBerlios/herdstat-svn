@@ -6,7 +6,17 @@ ChangeLog for herdstat
 	portage::categories_T.  Now supports /etc/portage/categories.
 	* lib/portage_find.cc, lib/portage_version.cc, src/metadatas.cc: Use
 	const dir_T/dir_T::const_iterator.
-	* src/action_herd_handler.cc: Display timer info if --timer.
+	* src/action_handler.hh: Added two action_handler_T derivatives that
+	contain common setups (one using a formatter, one that parses
+	herds.xml, etc).
+	* src/action_herd_handler.cc, src/action_herd_handler.hh: Derive from
+	action_herds_xml_handler_T.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Derive from
+	action_herds_xml_handler_T. Converted static helper funcs to members
+	search() and display().
+	* src/action_dev_handler.cc, src/action_dev_handler.hh: Derive from
+	action_herds_xml_handler_T.  Converted static display_developer() to
+	member func display().
 
 2005-05-03 Aaron Walker <ka0ttic@gentoo.org>
 
