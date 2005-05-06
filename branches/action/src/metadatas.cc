@@ -81,11 +81,11 @@ metadatas_T::valid() const
 void
 metadatas_T::fill()
 {
-    const portage::categories_T categories(portdir);
+    const portage::categories_T categories(portdir, optget("qa", bool));
     util::progress_T progress;
     util::timer_T t;
-    bool status = not optget("quiet", bool) and not optget("debug", bool);
-    bool timer  = optget("timer", bool);
+    const bool status = not optget("quiet", bool) and not optget("debug", bool);
+    const bool timer  = optget("timer", bool);
 
     if (status)
     {
@@ -106,6 +106,9 @@ metadatas_T::fill()
 
         if (status)
             ++progress;
+
+        if (not util::is_dir(path))
+            continue;
 
         const util::dir_T category(path);
         util::dir_T::const_iterator d;

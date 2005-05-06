@@ -46,10 +46,11 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         class package_list : public std::map<util::string, util::string>
         {
             public:
-                package_list(const opts_type::value_type &n) : name(n) { }
+                package_list(const opts_type::value_type &n)
+                    : info(n), name(n) { }
 
-            herds_xml_T::dev_type attr;
-            opts_type::value_type name;
+                herds_xml_T::devinfo_T info;
+                util::string name;
         };
 
         void search(package_list *);

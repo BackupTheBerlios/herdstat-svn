@@ -299,6 +299,8 @@ formatter_T::flush(std::ostream &stream)
         }
     }
 
+    this->buffer.clear();
+
 #else /* UNICODE */
 
     std::remove_copy(buffer.begin(), buffer.end(),

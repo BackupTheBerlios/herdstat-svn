@@ -69,7 +69,10 @@ class OverlayDisplay_T
 
             std::ostringstream os;
             color_type color;
-            os << color[cyan] << "[" << n << "]" << color[none];
+            if (optget("color", bool))
+                os << color[cyan] << "[" << n << "]" << color[none];
+            else
+                os << "[" << n << "]";
             return os.str();
         }
 

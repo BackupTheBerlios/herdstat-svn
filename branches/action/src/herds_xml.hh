@@ -49,7 +49,8 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
         typedef herds_type::size_type size_type;
 
         herds_xml_T(bool f = false)
-            : xml_T<handler_type>(), _fetchonly(f) { this->init(); }
+            : xml_T<handler_type>(optget("qa", bool)), _fetchonly(f)
+        { this->init(); }
         virtual ~herds_xml_T() { }
 
         /* herd_type subset */
@@ -67,11 +68,22 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
         { return this->_handler->herds[s]; }
         size_type size() const { return this->_handler->herds.size(); }
 
+        /* interface */
         herds_type &herds() const { return this->_handler->herds; }
         bool exists(const string_type &h) const
         { return this->find(h) != this->end(); }
         void display(std::ostream &s)
         { return this->_handler->herds.display(s); }
+
+        struct devinfo_T
+        {
+            devinfo_T(const util::string &u) : user(u) { }
+            opts_type herds;
+            util::string name;
+            util::string user;
+        };
+
+        const devinfo_T get_dev_info(const string_type &) const;
 
     protected:
         virtual void init();

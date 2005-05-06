@@ -1,5 +1,35 @@
 ChangeLog for herdstat
 
+2005-05-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herds_xml.cc, src/herds_xml.hh: Added a devinfo_T structure for
+	storing herds devs belong to, name, etc.  Added get_dev_info() member
+	that returns a devinfo_T object.
+	* src/metadata_xml.hh: Added member functions dev_exists and
+	herd_exists for quickly checking whether the dev/herd exists in the
+	metadata.xml.
+	* src/action_dev_handler.cc: Modified display() to use
+	herd_xml_T::get_dev_info().
+	* src/action_meta_handler.cc: display_metadata() is now a member
+	function, display().  Added meta structure for passing data between
+	operator() and display().
+	* src/action_meta_handler.cc, src/action_versions_handler.cc: Move
+	OverlayDisplay_T instantiation from class declaration to operator() as
+	it's destructor won't be called otherwise (and hence the overlays
+	won't be displayed).
+	* src/action_pkg_handler.cc: Removed static dev_name() and updated to
+	use herds_xml_T::get_dev_info() instead.  Cleaned up 'found' logic as
+	well.
+	* src/action_find_handler.cc, src/action_versions_handler.cc,
+	src/action_which_handler.cc: Add missing flush() call to operator() so
+	that --count works as expected.
+	* src/action_which_handler.cc: Added missing continue's in both of the
+	catch clauses; fixes an obvious bug.
+	* src/formatter.cc: clear internal buffer after flushing to outstream.
+	* src/overlaydisplay.hh: Fixed bug where colors are still displayed
+	even if --nocolor is specified.
+	* src/options.cc, src/herdstat.cc: Added --qa option.
+
 2005-05-04 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_misc.cc, lib/portage_misc.hh: Rewrote

@@ -44,8 +44,10 @@ class xml_T
         typedef util::timer_T timer_type;
         typedef std::auto_ptr<handler_type> pointer_type;
 
-        xml_T() : _handler(new handler_type()) { }
-        xml_T(const string_type &p) : _path(p), _handler(new handler_type())
+        xml_T(bool validate = false)
+            : _handler(new handler_type()), _validate(validate) { }
+        xml_T(const string_type &p, bool validate = false)
+            : _path(p), _handler(new handler_type()), _validate(validate)
         { this->init(); }
         virtual ~xml_T() { }
 
@@ -64,7 +66,7 @@ class xml_T
         virtual void parse() { this->parse(this->_path); }
         virtual void parse(const string_type &p)
         {
-            XMLParser_T parser(this->_handler.get());
+            XMLParser_T parser(this->_handler.get(), this->_validate);
             this->_timer.start();
             parser.parse(p);
             this->_timer.stop();
@@ -73,6 +75,7 @@ class xml_T
         string_type _path;              /* path to XML file */
         timer_type  _timer;             /* timer object */
         const pointer_type _handler;    /* content handler */
+        const bool _validate;           /* validate XML? */
 };
 
 #endif

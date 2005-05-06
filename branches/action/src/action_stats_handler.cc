@@ -116,6 +116,7 @@ action_stats_handler_T::operator() (opts_type &null)
     output(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
         least_herds);
 
+    count = false;
     flush();
     return EXIT_SUCCESS;
 }

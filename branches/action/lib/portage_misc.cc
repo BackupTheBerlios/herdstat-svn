@@ -26,6 +26,7 @@
 
 #include "misc.hh"
 #include "file.hh"
+#include "portage_exceptions.hh"
 #include "portage_misc.hh"
 
 bool portage::categories_T::_init = false;
@@ -82,6 +83,7 @@ portage::categories_T::init()
         if (not (*f))
             throw util::bad_fileobject_E(this->_portdir + CATEGORIES);
 
+        std::size_t n = 0;
         while (std::getline(*f, line))
         {
             /* virtual isn't a real category */
@@ -89,9 +91,15 @@ portage::categories_T::init()
                 continue;
 
             /* choke if validate mode is enabled */
-            if (this->_validate and 
+            if (this->_validate and ++n and 
                 not util::is_dir(this->_portdir + "/" + line))
-                throw util::bad_fileobject_E(this->_portdir + "/" + line);
+            {
+                std::cerr << "QA Violation: " << this->_portdir
+                    << CATEGORIES << ":" << n << std::endl
+                    << "category '" << line << "' is listed but does not exist."
+                    << std::endl;
+                throw portage::qa_E();
+            }
 
             this->_s.insert(line);
         }

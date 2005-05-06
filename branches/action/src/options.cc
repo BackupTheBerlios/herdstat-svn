@@ -32,7 +32,7 @@
 
 options_T::option_map_T options_T::optmap;
 
-#define insert_opt(k,v) insert(std::make_pair(k, new option_type_T(v)))
+#define insopt(k,v) insert(std::make_pair(k, new option_type_T(v)))
 
 /*
  * Set default options here.
@@ -42,33 +42,33 @@ options_T::option_map_T options_T::optmap;
 void
 options_T::option_map_T::set_defaults()
 {
-    insert_opt("verbose", false);
-    insert_opt("quiet", false);
-    insert_opt("debug", false);
-    insert_opt("timer", false);
-    insert_opt("all", false);
-    insert_opt("fetch", false);
-    insert_opt("dev", false);
-    insert_opt("count", false);
-    insert_opt("color", true);
-    insert_opt("overlay", true);
-    insert_opt("eregex", false);
-    insert_opt("regex", false);
+    insopt("verbose", false);
+    insopt("quiet", false);
+    insopt("debug", false);
+    insopt("timer", false);
+    insopt("all", false);
+    insopt("fetch", false);
+    insopt("dev", false);
+    insopt("count", false);
+    insopt("color", true);
+    insopt("overlay", true);
+    insopt("eregex", false);
+    insopt("regex", false);
+    insopt("qa", false);
 
-    insert_opt("maxcol", static_cast<std::size_t>(78));
+    insopt("maxcol", static_cast<std::size_t>(78));
 
-    insert_opt("herds.xml", util::string(""));
-    insert_opt("with-herd", util::string(""));
-    insert_opt("outfile", util::string("stdout"));
-    insert_opt("outstream", &std::cout);
+    insopt("herds.xml", util::string(""));
+    insopt("with-herd", util::string(""));
+    insopt("outfile", util::string("stdout"));
+    insopt("outstream", &std::cout);
 
-    insert_opt("action",
+    insopt("action",
         static_cast<options_action_T>(action_unspecified));
 
-    insert_opt("locale", util::string(std::locale::classic().name()));
+    insopt("locale", util::string(std::locale::classic().name()));
 
-    /* portage options */
-    insert_opt("portage.config", portage::config_T());
+    insopt("portage.config", portage::config_T());
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -84,7 +84,7 @@ action_which_handler_T::operator() (opts_type &opts)
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
-            std::cerr << e.name()
+            std::cerr << std::endl << e.name()
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
             
@@ -99,6 +99,8 @@ action_which_handler_T::operator() (opts_type &opts)
 
             if (matches.size() == 1)
                 return EXIT_FAILURE;
+
+            continue;
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
@@ -106,6 +108,8 @@ action_which_handler_T::operator() (opts_type &opts)
 
             if (matches.size() == 1)
                 return EXIT_FAILURE;
+
+            continue;
         }
 
         try
@@ -119,9 +123,13 @@ action_which_handler_T::operator() (opts_type &opts)
             ebuild = portage::ebuild_which(portdir, p.second);
         }
 
-        *stream << ebuild << std::endl;
+        if (not count)
+            *stream << ebuild << std::endl;
     }
 
+    size = matches.size();
+
+    flush();
     return EXIT_SUCCESS;
 }
 

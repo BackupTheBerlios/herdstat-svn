@@ -32,40 +32,22 @@
 #include <map>
 
 #include "common.hh"
-#include "metadatas.hh"
 #include "herds_xml.hh"
 #include "metadata_xml.hh"
-#include "formatter.hh"
 #include "action_pkg_handler.hh"
 
 /*
- * Search herds.xml for the specified developer.
- * Return the developer's name if found or an empty
- * string otherwise.
- */
-
-static util::string
-dev_name(const herds_xml_T &herds_xml, const util::string &dev)
-{
-    herds_xml_T::const_iterator h;
-    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
-    {
-        herds_xml_T::herd_type::iterator d =
-            herds_xml[h->first]->find(dev + "@gentoo.org");
-        if (d != herds_xml[h->first]->end())
-            return d->second->name;
-    }
-
-    return "";
-}
-
-/*
- * binary predicate for searching metadata for
+ * binary predicates for searching metadata for
  * a regular expression via find_if().
  */
 
 static bool
 doesMatch(util::string s, util::regex_T *r) { return *r == s; }
+
+static bool
+doesHerdMatch(metadata_xml_T::herd_type::value_type m,
+              util::regex_T *r)
+{ return *r == util::get_user_from_email(m.first); }
 
 /*
  * Loop through every metadata.xml in the tree,
@@ -76,10 +58,8 @@ doesMatch(util::string s, util::regex_T *r) { return *r == s; }
 void
 action_pkg_handler_T::search(package_list *list)
 {
-    if (regex and eregex)
-        regexp.assign(list->name, REG_EXTENDED|REG_ICASE);
-    else if (regex)
-        regexp.assign(list->name, REG_ICASE);
+    if (regex)
+        regexp.assign(list->name, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
     /* for every metadata.xml in the tree... */
     metadatas_T::const_iterator m;
@@ -95,7 +75,7 @@ action_pkg_handler_T::search(package_list *list)
 
         /* unfortunately, we still have to do a sanity check in the event
          * that the user has sync'd, a metadata.xml has been removed, and
-             * the cache not yet updated ; otherwise we'll get a parser error */
+         * the cache not yet updated ; otherwise we'll get a parser error */
         if (not util::is_file(*m))
             continue;
 
@@ -103,61 +83,39 @@ action_pkg_handler_T::search(package_list *list)
         const metadata_xml_T metadata(*m);
         elapsed += metadata.elapsed();
 
+        /* 
+         * determine whether the package matches our search criteria
+         */
+
         if (dev)
         {
-            const util::string herd = optget("with-herd", util::string);
+            const util::string herd(optget("with-herd", util::string));
             metadata_xml_T::herd_type::iterator d;
 
             if (regex)
             {
                 /* search metadata.xml for all devs matching regex */
-                for (d = metadata.devs().begin() ;
-                     d != metadata.devs().end() ; ++d)
+                if (std::find_if(metadata.devs().begin(),
+                    metadata.devs().end(), std::bind2nd(
+                    std::ptr_fun(doesHerdMatch), &regexp)) != metadata.devs().end())
                 {
-                    if (regexp == util::get_user_from_email(d->first))
-                    {
-                        /* matches regex and --with-herd? */
-                        if (not herd.empty())
-                        {
-                            if (std::find(metadata.herds().begin(),
-                                    metadata.herds().end(),
-                                    herd) != metadata.herds().end())
-                                found = true;
-                        }
-                        else
-                            found = true;
-
-                        if (found)
-                            break;
-                    }
+                    /* check --with-herd */
+                    if (herd.empty() or metadata.herd_exists(herd))
+                        found = true;
                 }
             }
             else
             {
                 /* search the metadata for our dev */
-                d = metadata.devs().find(list->name + "@gentoo.org");
-                if (d != metadata.devs().end())
+                if (metadata.dev_exists(list->name) and
+                    (herd.empty() or metadata.herd_exists(herd)))
                 {
-                    if (not herd.empty())
-                    {
-                        if (std::find(metadata.herds().begin(),
-                            metadata.herds().end(), herd) != metadata.herds().end())
-                        {
-                            found = true;
-                        }
-                    }
-                    else
-                        found = true;
+                    found = true;
                 }
             }
 
             if (found)
-            {
-                std::copy(d->second->begin(), d->second->end(),
-                    list->attr.begin());
-                list->attr.name = dev_name(herds_xml, list->name);
-                list->attr.role = d->second->role;
-            }
+                list->info = herds_xml.get_dev_info(list->name);
         }
         else
         {
@@ -169,8 +127,7 @@ action_pkg_handler_T::search(package_list *list)
                         std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end() :
 
                     /* no */
-                    std::find(metadata.herds().begin(), metadata.herds().end(),
-                        list->name) != metadata.herds().end()
+                    metadata.herd_exists(list->name)
             );
         }
 
@@ -198,11 +155,11 @@ action_pkg_handler_T::display(package_list &list)
             output("Regex", list.name);
         else if (dev)
         {
-            if (list.attr.name.empty())
+            if (list.info.name.empty())
                 output("Developer", list.name);
             else
                 output("Developer",
-                    list.attr.name + " (" + list.name + ")");
+                    list.info.name + " (" + list.name + ")");
 
             output("Email", list.name + "@gentoo.org");
         }

@@ -30,7 +30,6 @@
 
 #include "common.hh"
 #include "herds_xml.hh"
-#include "formatter.hh"
 #include "action_herd_handler.hh"
 
 /*

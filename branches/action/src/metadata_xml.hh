@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
 #include "xml.hh"
 #include "metadata_xml_handler.hh"
 
@@ -49,13 +50,30 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
         typedef herd_type::const_iterator   const_herd_iterator;
         typedef herd_type::size_type        herd_size_type;
 
-        metadata_xml_T(const string_type &s) : xml_T<handler_type>(s) { }
+        metadata_xml_T(const string_type &s)
+            : xml_T<handler_type>(s, optget("qa", bool)) { }
         virtual ~metadata_xml_T() { }
 
         /* handler_type access functions */
         herds_type  &herds()    const { return this->_handler->herds; }
         herd_type   &devs()     const { return this->_handler->devs;  }
         string_type &longdesc() const { return this->_handler->longdesc; }
+
+        bool dev_exists(const herd_type::key_type &d) const
+        {
+            herd_type::key_type dev(d);
+            if (d.find('@') == herd_type::key_type::npos)
+                dev.append("@gentoo.org");
+            return this->_handler->devs.find(dev) != this->_handler->devs.end();
+        }
+
+        bool herd_exists(const herds_type::value_type &h) const
+        {
+            return std::find(
+                    this->_handler->herds.begin(),
+                    this->_handler->herds.end(),
+                    h) != this->_handler->herds.end();
+        }
 };
 
 #endif

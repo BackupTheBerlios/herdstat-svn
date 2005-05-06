@@ -42,6 +42,7 @@ class action_handler_T
         action_handler_T() : stream(optget("outstream", std::ostream *)),
                              config(optget("portage.config", portage::config_T)),
                              portdir(config.portdir()),
+                             size(0),
                              quiet(optget("quiet", bool)),
                              verbose(optget("verbose", bool)),
                              regex(optget("regex", bool)),
@@ -51,10 +52,12 @@ class action_handler_T
                              timer(optget("timer", bool)),
                              count(optget("count", bool))  { }
 
-        virtual ~action_handler_T() { if (count) *stream << size << std::endl; }
+        virtual ~action_handler_T() { }
         virtual int operator() (opts_type &) { return EXIT_FAILURE; }
 
     protected:
+        virtual void flush() { if (count) *stream << size << std::endl; }
+
         std::ostream *stream;               /* output stream */
         util::regex_T regexp;               /* regular expression */
         util::color_map_T color;            /* color map */
@@ -79,10 +82,14 @@ class action_fancy_handler_T : public action_handler_T
         virtual ~action_fancy_handler_T() { }
 
     protected:
-        virtual void flush() { output.flush(*stream); }
+        virtual void flush()
+        {
+            output.flush(*stream);
+            action_handler_T::flush();            
+        }
 
         formatter_T output;                 /* output formatter */
-        const bool maxcol;
+        const std::size_t maxcol;           /* columns of current terminal */
 };
 
 /*

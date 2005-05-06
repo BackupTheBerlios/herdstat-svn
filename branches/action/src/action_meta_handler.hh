@@ -39,7 +39,16 @@ class action_meta_handler_T : public action_fancy_handler_T
         virtual int operator() (opts_type &);
 
     private:
-        OverlayDisplay_T od;
+        struct meta
+        {
+            bool cat;                   /* category? */
+            util::string metadata,      /* path to metadata.xml */
+                         portdir,       /* PORTDIR */
+                         package;       /* package name */
+        };
+
+        void display(const meta &data);
+
         const bool overlay;
 };
 

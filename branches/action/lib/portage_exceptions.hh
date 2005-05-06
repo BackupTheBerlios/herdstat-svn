@@ -89,6 +89,21 @@ namespace portage
                         " doesn't seem to exist.").c_str();
             }
     };
+
+    class qa_E : public util::base_E { };
+
+    class qa_errno_E : public util::errno_E
+    {
+        public:
+            qa_errno_E() { }
+            qa_errno_E(const char *msg) : util::errno_E(msg) { }
+            qa_errno_E(const util::string &msg) : util::errno_E(msg) { }
+            virtual const char *what() const throw()
+            {
+                return util::sprintf("QA Violation: %s",
+                    util::errno_E::what()).c_str();
+            }
+    };
 }
 
 #endif

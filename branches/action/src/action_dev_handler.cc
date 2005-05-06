@@ -28,7 +28,6 @@
 
 #include "common.hh"
 #include "herds_xml.hh"
-#include "formatter.hh"
 #include "action_dev_handler.hh"
 
 /*
@@ -38,47 +37,29 @@
 void
 action_dev_handler_T::display(const util::string &dev)
 {
-    util::string name;
-    opts_type herds;
-
-    /* for each herd in herds.xml... */
-    herds_xml_T::herds_type::const_iterator h;
-    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
-    {
-        opts_type::value_type herd = h->first;
-            
-        /* is the dev in the current herd? */
-        herds_xml_T::herd_type::iterator d =
-            herds_xml[herd]->find(dev + "@gentoo.org");
-        if (d != herds_xml[herd]->end())
-        {
-            herds.push_back(herd);
-            if (not d->second->name.empty())
-                name = d->second->name;
-        }
-    }
+    herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
 
     /* was the dev in any of the herds? */
-    if (herds.empty())
+    if (info.herds.empty())
         throw dev_E();
 
-    if (quiet)
+    if (not quiet)
     {
-        if (name.empty())
+        if (info.name.empty())
             output("Developer", dev);
         else
-            output("Developer", name + " (" + dev + ")");
+            output("Developer", info.name + " (" + dev + ")");
         
         output("Email", dev + "@gentoo.org");
     }
 
     if (verbose and not quiet)
     {
-        output(util::sprintf("Herds(%d)", herds.size()), "");
+        output(util::sprintf("Herds(%d)", info.herds.size()), "");
 
         opts_type::iterator i;
         herds_xml_T::herds_type::size_type nh = 1;
-        for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
+        for (i = info.herds.begin() ; i != info.herds.end() ; ++i, ++nh)
         {
             /* display herd */
             if (optget("color", bool))
@@ -92,14 +73,14 @@ action_dev_handler_T::display(const util::string &dev)
             if (not herds_xml[*i]->desc.empty())
                 output("", herds_xml[*i]->desc);
 
-            if (nh != herds.size())
+            if (nh != info.herds.size())
                 output.endl();
         }
     }
     else if (not count)
-        output(util::sprintf("Herds(%d)", herds.size()), herds);
+        output(util::sprintf("Herds(%d)", info.herds.size()), info.herds);
 
-    size += herds.size();
+    size += info.herds.size();
 }
 
 /*
@@ -121,7 +102,6 @@ action_dev_handler_T::operator() (opts_type &devs)
     if (all)
     {
         /* treat ALL developers in herds.xml as a single herd */
-
         herds_xml_T::herd_type all_devs;
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
@@ -151,11 +131,10 @@ action_dev_handler_T::operator() (opts_type &devs)
         util::regex_T::string_type re(devs.front());
         devs.clear();
 
-        if (eregex)
-            regexp.assign(re, REG_EXTENDED|REG_ICASE);
-        else
-            regexp.assign(re, REG_ICASE);
+        regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
+        /* loop through herds searching for devs who's username
+         * matches the regular expression */
         for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
         {
             herds_xml_T::herd_type::iterator d;

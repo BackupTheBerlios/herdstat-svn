@@ -34,11 +34,10 @@
 int
 action_versions_handler_T::operator() (opts_type &opts)
 {
+    OverlayDisplay_T od;
     std::multimap<util::string, util::string> matches;
-    const util::string real_portdir(config.portdir());
     util::string dir;
     bool pwd = false;
-    OverlayDisplay_T od;
 
     output.set_maxlabel(8);
     output.set_maxdata(maxcol - output.maxlabel());
@@ -103,7 +102,7 @@ action_versions_handler_T::operator() (opts_type &opts)
         util::regex_T::string_type re(opts.front());
         opts.clear();
         
-        if (optget("eregex", bool))
+        if (eregex)
             regexp.assign(re, REG_EXTENDED|REG_ICASE);
         else
             regexp.assign(re, REG_ICASE);
@@ -141,7 +140,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             else
             {
                 std::pair<util::string, util::string> p =
-                    portage::find_package(config, m->second, optget("overlay", bool));
+                    portage::find_package(config, m->second, overlay);
                 dir = p.first;
                 package = p.second;
             }
@@ -156,7 +155,9 @@ action_versions_handler_T::operator() (opts_type &opts)
             if (versions.empty())
                 versions.assign(portdir + "/" + package);
 
-            if (not optget("quiet", bool))
+            size += versions.size();
+
+            if (not quiet)
             {
                 if (dir == portdir or pwd)
                     output("Package", package);
@@ -166,15 +167,18 @@ action_versions_handler_T::operator() (opts_type &opts)
                 output.endl();
             }
 
-            portage::versions_T::iterator v;
-            for (v = versions.begin() ; v != versions.end() ; ++v)
+            if (not count)
             {
-                util::string s((*(*v))["PVR"]);
-                util::string::size_type pos = s.rfind("-r0");
-                if (pos != util::string::npos)
-                    s = s.substr(0, pos);
+                portage::versions_T::iterator v;
+                for (v = versions.begin() ; v != versions.end() ; ++v)
+                {
+                    util::string s((*(*v))["PVR"]);
+                    util::string::size_type pos = s.rfind("-r0");
+                    if (pos != util::string::npos)
+                        s = s.substr(0, pos);
 
-                output("", s);
+                    output("", s);
+                }
             }
 
             if (n != matches.size())

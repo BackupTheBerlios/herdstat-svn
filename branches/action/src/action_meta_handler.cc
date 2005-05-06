@@ -24,37 +24,21 @@
 # include "config.h"
 #endif
 
-#include <ostream>
 #include <map>
 #include <utility>
 #include <algorithm>
 #include <iterator>
 
 #include "common.hh"
-#include "formatter.hh"
-#include "overlaydisplay.hh"
 #include "metadata_xml.hh"
 #include "action_meta_handler.hh"
 
-struct mdata
+void
+action_meta_handler_T::display(const meta &data)
 {
-    bool cat;
-    util::string metadata;
-    util::string portdir;
-    util::string real_portdir;
-    util::string package;
-};
-
-static void
-display_metadata(const mdata &data)
-{
-    formatter_T output;
-    util::color_map_T color;
     metadata_xml_T::herd_type  devs;
     metadata_xml_T::herds_type herds;
     util::string longdesc;
-
-    const bool quiet = optget("quiet", bool);
 
     /* does the metadata.xml exist? */
     if (util::is_file(data.metadata))
@@ -63,10 +47,10 @@ display_metadata(const mdata &data)
 
         /* parse it */
         {
-            const metadata_xml_T meta(data.metadata);
-            herds    = meta.herds();
-            devs     = meta.devs();
-            longdesc = meta.longdesc();
+            const metadata_xml_T m(data.metadata);
+            herds    = m.herds();
+            devs     = m.devs();
+            longdesc = m.longdesc();
         }
 
         /* herds */
@@ -110,7 +94,7 @@ display_metadata(const mdata &data)
             }
             catch (const portage::nonexistent_pkg_E)
             {
-                ebuild = portage::ebuild_which(data.real_portdir, data.package);
+                ebuild = portage::ebuild_which(portdir, data.package);
             }
                 
             ebuild_vars.read(ebuild);
@@ -156,7 +140,7 @@ display_metadata(const mdata &data)
     /* package or category exists, but metadata.xml doesn't */
     else
     {
-        if (quiet)
+        if (quiet or not optget("color", bool))
             output("", "No metadata.xml");
         else
             output("", color[red] + "No metadata.xml." + color[none]);
@@ -171,7 +155,7 @@ display_metadata(const mdata &data)
             }
             catch (const portage::nonexistent_pkg_E)
             {
-                ebuild = portage::ebuild_which(data.real_portdir, data.package);
+                ebuild = portage::ebuild_which(portdir, data.package);
             }
                 
             util::vars_T ebuild_vars(ebuild);
@@ -212,6 +196,7 @@ display_metadata(const mdata &data)
 int
 action_meta_handler_T::operator() (opts_type &opts)
 {
+    OverlayDisplay_T od;
     std::multimap<util::string, util::string> matches;
 
     bool pwd = false;
@@ -223,8 +208,7 @@ action_meta_handler_T::operator() (opts_type &opts)
     output.set_attrs();
 
     /* we dont care about these */
-    optset("verbose", bool, false);
-    optset("timer", bool, false);
+    count = false;
 
     if (all)
     {
@@ -291,10 +275,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         util::regex_T::string_type re(opts.front());
         opts.clear();
 
-        if (optget("eregex", bool))
-            regexp.assign(re, REG_EXTENDED|REG_ICASE);
-        else
-            regexp.assign(re, REG_ICASE);
+        regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
         matches = portage::find_package_regex(config, regexp, overlay);
         if (matches.empty())
@@ -314,9 +295,8 @@ action_meta_handler_T::operator() (opts_type &opts)
     std::multimap<util::string, util::string>::size_type n = 1;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
-        mdata data;
+        meta data;
         data.portdir = dir;
-        data.real_portdir = portdir;
 
         try
         {
@@ -370,7 +350,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         data.metadata = data.portdir + "/" + data.package + "/metadata.xml";
 
         /* are we in an overlay? */
-        if (data.portdir != data.real_portdir and not pwd)
+        if (data.portdir != portdir and not pwd)
             od.insert(data.portdir);
 
         /* if no '/' exists, assume it's a category */
@@ -379,7 +359,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         if (n != 1)
             output.endl();
 
-        if (data.portdir == data.real_portdir or pwd)
+        if (data.portdir == portdir or pwd)
             output(data.cat ? "Category" : "Package", data.package);
 
         /* it's in an overlay, so show a little thinggy to mark it as such */
@@ -387,7 +367,7 @@ action_meta_handler_T::operator() (opts_type &opts)
             output(data.cat ? "Category" : "Package",
                 data.package + od[data.portdir]);
 
-        display_metadata(data);
+        display(data);
     }
 
     flush();

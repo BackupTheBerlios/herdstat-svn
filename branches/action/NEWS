@@ -5,6 +5,10 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
     Bug fixes:
      - /etc/portage/categories is now taken into consideration when generating
        the category list.
+     - --find, --which, and --versions now respect --count.
+     - Fixed the colors that get displayed in --metadata --nocolor or
+       --versions --nocolor.
+     - Fixed bug in --which caused by a missing continue statement.
 
 1.1.0_rc3:
     New features:
