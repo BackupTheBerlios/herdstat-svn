@@ -30,7 +30,6 @@
 
 #include "common.hh"
 #include "herds_xml.hh"
-#include "formatter.hh"
 #include "action_herd_handler.hh"
 
 /*
@@ -41,31 +40,17 @@
 int
 action_herd_handler_T::operator() (opts_type &herds)
 {
-    std::ostream *stream = optget("outstream", std::ostream *);
-    const bool regex = optget("regex", bool);
-
     /* set format attributes */
-    formatter_T output;
-
-    if (optget("all", bool))
-        output.set_maxlabel(11);
-    else
-        output.set_maxlabel(15);
-
-    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
+    output.set_maxlabel(all ? 11 : 15);
+    output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 
-    herds_xml_T herds_xml;
-
     /* was the all target specified? */
-    if (optget("all", bool))
+    if (all)
     {
         herds_xml.display(*stream);
-        
-        if (optget("count", bool))
-            output("", util::sprintf("%d", herds_xml.size()));
-
-        output.flush(*stream);
+        size = herds_xml.size();
+        flush();
         return EXIT_SUCCESS;
     }
     else if (regex and herds.size() > 1)
@@ -76,9 +61,7 @@ action_herd_handler_T::operator() (opts_type &herds)
     }
     else if (regex)
     {
-        util::regex_T regexp;
-
-        if (optget("eregex", bool))
+        if (eregex)
             regexp.assign(herds.front(), REG_EXTENDED|REG_ICASE);
         else
             regexp.assign(herds.front(), REG_ICASE);
@@ -92,8 +75,6 @@ action_herd_handler_T::operator() (opts_type &herds)
                 herds.push_back(h->first);
         }
     }
-
-    herds_xml_T::herd_type::size_type size = 0;
 
     /* for each specified herd... */
     opts_type::iterator herd;
@@ -122,22 +103,11 @@ action_herd_handler_T::operator() (opts_type &herds)
         size += herds_xml[*herd]->size();
 
         /* only skip a line if we're not displaying the last one */
-        if (not optget("count", bool) and n != herds.size())
+        if (not count and n != herds.size())
             output.endl();
     }
 
-    if (optget("count", bool))
-    {
-        output("", util::sprintf("%d", size));
-        return EXIT_SUCCESS;
-    }
-
-    output.flush(*stream);
-
-    if (optget("timer", bool))
-        *stream << std::endl << "Took " << herds_xml.elapsed()
-            << "ms to parse herds.xml." << std::endl;
-
+    flush();
     return EXIT_SUCCESS;
 }
 

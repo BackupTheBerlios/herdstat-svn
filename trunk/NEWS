@@ -2,9 +2,21 @@ This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.0_rc4:
+    New features:
+     - Added a --qa option.  If specified, herdstat will complain loudly if a
+       QA-related problem is encountered (a category in
+       $PORTDIR/profiles/categories doesn't exist or an XML validation error,
+       for example).
+
     Bug fixes:
      - /etc/portage/categories is now taken into consideration when generating
        the category list.
+     - --find, --which, and --versions now respect --count.
+     - Fixed the colors that get displayed in --metadata --nocolor or
+       --versions --nocolor.
+     - Fixed bug in --which caused by a missing continue statement.
+     - Fixed bug in --package when two args are specified (one which doesn't
+       exist), a newline was not displayed after the progress display.
 
 1.1.0_rc3:
     New features:

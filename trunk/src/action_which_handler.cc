@@ -30,15 +30,9 @@
 int
 action_which_handler_T::operator() (opts_type &opts)
 {
-    util::color_map_T color;
-    std::ostream *stream = optget("outstream", std::ostream *);
-    portage::config_T config(optget("portage.config", portage::config_T));
-    const util::string real_portdir(config.portdir());
-    const bool regex = optget("regex", bool);
-    const bool overlay = optget("overlay", bool);
     std::multimap<util::string, util::string> matches;
 
-    if (optget("all", bool))
+    if (all)
     {
         std::cerr << "which action handler does not support the 'all' target."
             << std::endl;
@@ -52,11 +46,10 @@ action_which_handler_T::operator() (opts_type &opts)
     }
     else if (regex)
     {
-        util::regex_T regexp;
-        util::string re(opts.front());
+        util::regex_T::string_type re(opts.front());
         opts.clear();
 
-        if (optget("eregex", bool))
+        if (eregex)
             regexp.assign(re, REG_EXTENDED|REG_ICASE);
         else
             regexp.assign(re, REG_ICASE);
@@ -91,7 +84,7 @@ action_which_handler_T::operator() (opts_type &opts)
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
-            std::cerr << e.name()
+            std::cerr << std::endl << e.name()
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
             
@@ -106,6 +99,8 @@ action_which_handler_T::operator() (opts_type &opts)
 
             if (matches.size() == 1)
                 return EXIT_FAILURE;
+
+            continue;
         }
         catch (const portage::nonexistent_pkg_E &e)
         {
@@ -113,20 +108,28 @@ action_which_handler_T::operator() (opts_type &opts)
 
             if (matches.size() == 1)
                 return EXIT_FAILURE;
+
+            continue;
         }
 
         try
         {
+            /* try p.first (may be an overlay) first */
             ebuild = portage::ebuild_which(p.first, p.second);
         }
         catch (const portage::nonexistent_pkg_E)
         {
-            ebuild = portage::ebuild_which(real_portdir, p.second);
+            /* nope, so use real PORTDIR */
+            ebuild = portage::ebuild_which(portdir, p.second);
         }
 
-        *stream << ebuild << std::endl;
+        if (not count)
+            *stream << ebuild << std::endl;
     }
 
+    size = matches.size();
+
+    flush();
     return EXIT_SUCCESS;
 }
 

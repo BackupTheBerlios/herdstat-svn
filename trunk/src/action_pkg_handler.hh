@@ -27,13 +27,39 @@
 # include "config.h"
 #endif
 
+#include <map>
+#include "herds_xml.hh"
+#include "metadatas.hh"
 #include "action_handler.hh"
 
-class action_pkg_handler_T : public action_handler_T
+class action_pkg_handler_T : public action_herds_xml_handler_T
 {
     public:
+        action_pkg_handler_T() : action_herds_xml_handler_T(),
+                                 elapsed(0),
+                                 dev(optget("dev", bool)),
+                                 status(not quiet and not debug) { }
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
+
+    private:
+        class package_list : public std::map<util::string, util::string>
+        {
+            public:
+                package_list(const opts_type::value_type &n)
+                    : info(n), name(n) { }
+
+                herds_xml_T::devinfo_T info;
+                util::string name;
+        };
+
+        void search(package_list *);
+        void display(package_list &);
+
+        metadatas_T metadatas;
+        util::progress_T  progress;
+        util::timer_T::size_type elapsed;
+        const bool dev, status;
 };
 
 #endif

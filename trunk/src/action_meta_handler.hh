@@ -27,13 +27,29 @@
 # include "config.h"
 #endif
 
+#include "overlaydisplay.hh"
 #include "action_handler.hh"
 
-class action_meta_handler_T : public action_handler_T
+class action_meta_handler_T : public action_fancy_handler_T
 {
     public:
+        action_meta_handler_T() : action_fancy_handler_T(),
+                                  overlay(optget("overlay", bool)) { }
         virtual ~action_meta_handler_T() { }
         virtual int operator() (opts_type &);
+
+    private:
+        struct meta
+        {
+            bool cat;                   /* category? */
+            util::string metadata,      /* path to metadata.xml */
+                         portdir,       /* PORTDIR */
+                         package;       /* package name */
+        };
+
+        void display(const meta &data);
+
+        const bool overlay;
 };
 
 #endif

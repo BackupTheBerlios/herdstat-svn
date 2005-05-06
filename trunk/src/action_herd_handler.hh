@@ -29,7 +29,7 @@
 
 #include "action_handler.hh"
 
-class action_herd_handler_T : public action_handler_T
+class action_herd_handler_T : public action_herds_xml_handler_T
 {
     public:
         virtual ~action_herd_handler_T() { }

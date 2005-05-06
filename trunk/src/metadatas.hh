@@ -49,12 +49,15 @@
 class metadatas_T : public util::cache_T
 {
     private:
-        const util::string portdir;
+        util::string portdir;
 
     public:
+        metadatas_T() : util::cache_T(CACHE, METADATA_RESERVE) { }
         metadatas_T(const util::string &p)
-            : cache_T(CACHE, METADATA_RESERVE), portdir(p)
+            : util::cache_T(CACHE, METADATA_RESERVE), portdir(p)
         { init(); }
+
+        void set_portdir(const util::string &p) { portdir = p; init(); }
 
         virtual bool valid() const;
         virtual void fill();

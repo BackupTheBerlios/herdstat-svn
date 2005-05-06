@@ -34,23 +34,17 @@
 int
 action_versions_handler_T::operator() (opts_type &opts)
 {
-    util::color_map_T color;
-    std::ostream *stream = optget("outstream", std::ostream *);
-    const bool regex = optget("regex", bool);
-    std::multimap<util::string, util::string> matches;
-    portage::config_T config(optget("portage.config", portage::config_T));
-    const util::string real_portdir(config.portdir());
-    util::string portdir;
-    bool pwd = false;
     OverlayDisplay_T od;
+    std::multimap<util::string, util::string> matches;
+    util::string dir;
+    bool pwd = false;
 
-    formatter_T output;
     output.set_maxlabel(8);
-    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
-    output.set_quiet(optget("quiet", bool));
+    output.set_maxdata(maxcol - output.maxlabel());
+    output.set_quiet(quiet);
     output.set_attrs();
 
-    if (optget("all", bool))
+    if (all)
     {
         std::cerr << "Versions action handler does not support the 'all' target."
             << std::endl;
@@ -92,10 +86,10 @@ action_versions_handler_T::operator() (opts_type &opts)
         /* now assign portdir to our path, treating the leftovers as the
          * category or category/package */
         pwd = true;
-        portdir = path;
+        dir = path;
         opts.push_back(leftover);
         
-        debug_msg("set portdir to '%s'", portdir.c_str());
+        debug_msg("set portdir to '%s'", dir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
     }
     else if (regex and opts.size() > 1)
@@ -105,17 +99,15 @@ action_versions_handler_T::operator() (opts_type &opts)
     }
     else if (regex)
     {
-        util::regex_T regexp;
-        util::string re(opts.front());
+        util::regex_T::string_type re(opts.front());
         opts.clear();
         
-        if (optget("eregex", bool))
+        if (eregex)
             regexp.assign(re, REG_EXTENDED|REG_ICASE);
         else
             regexp.assign(re, REG_ICASE);
         
-        matches = portage::find_package_regex(config, regexp,
-            optget("overlay", bool));
+        matches = portage::find_package_regex(config, regexp, overlay);
         
         if (matches.empty())
         {
@@ -139,49 +131,54 @@ action_versions_handler_T::operator() (opts_type &opts)
         try
         {
             if (pwd)
-                package = portage::find_package_in(portdir, m->second);
+                package = portage::find_package_in(dir, m->second);
             else if (regex and not m->first.empty())
             {
-                portdir = m->first;
+                dir = m->first;
                 package = m->second;
             }
             else
             {
                 std::pair<util::string, util::string> p =
-                    portage::find_package(config, m->second, optget("overlay", bool));
-                portdir = p.first;
+                    portage::find_package(config, m->second, overlay);
+                dir = p.first;
                 package = p.second;
             }
 
-            if (portdir != real_portdir and not pwd)
-                od.insert(portdir);
+            if (dir != portdir and not pwd)
+                od.insert(dir);
 
-            portage::versions_T versions(portdir + "/" + package);
+            portage::versions_T versions(dir + "/" + package);
 
             /* versions would be empty if the directory exists, but no
              * ebuilds are there - in this case, use real PORTDIR. */
             if (versions.empty())
-                versions.assign(real_portdir + "/" + package);
+                versions.assign(portdir + "/" + package);
 
-            if (not optget("quiet", bool))
+            size += versions.size();
+
+            if (not quiet)
             {
-                if (portdir == real_portdir or pwd)
+                if (dir == portdir or pwd)
                     output("Package", package);
                 else
-                    output("Package", package + od[portdir]);
+                    output("Package", package + od[dir]);
 
                 output.endl();
             }
 
-            portage::versions_T::iterator v;
-            for (v = versions.begin() ; v != versions.end() ; ++v)
+            if (not count)
             {
-                util::string s((*(*v))["PVR"]);
-                util::string::size_type pos = s.rfind("-r0");
-                if (pos != util::string::npos)
-                    s = s.substr(0, pos);
+                portage::versions_T::iterator v;
+                for (v = versions.begin() ; v != versions.end() ; ++v)
+                {
+                    util::string s((*(*v))["PVR"]);
+                    util::string::size_type pos = s.rfind("-r0");
+                    if (pos != util::string::npos)
+                        s = s.substr(0, pos);
 
-                output("", s);
+                    output("", s);
+                }
             }
 
             if (n != matches.size())
@@ -196,7 +193,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             std::vector<util::string>::const_iterator x;
             for (x = e.packages.begin() ; x != e.packages.end() ; ++x)
             {
-                if (optget("quiet", bool) or not optget("color", bool))
+                if (quiet or not optget("color", bool))
                     std::cerr << *x << std::endl;
                 else
                     std::cerr << color[green] << *x << color[none] << std::endl;
@@ -214,8 +211,7 @@ action_versions_handler_T::operator() (opts_type &opts)
         }
     }
 
-    output.flush(*stream);
-
+    flush();
     return EXIT_SUCCESS;
 }
 

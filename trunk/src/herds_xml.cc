@@ -129,4 +129,29 @@ herds_xml_T::fetch()
     }
 }
 
+/*
+ * Given a developer username, return a filled devinfo_T object.
+ */
+
+const herds_xml_T::devinfo_T
+herds_xml_T::get_dev_info(const string_type &dev) const
+{
+    devinfo_T info(dev);
+
+    for (const_iterator h = this->begin() ; h != this->end() ; ++h)
+    {
+        herd_type::iterator d =
+            this->_handler->herds[h->first]->find(dev+"@gentoo.org");
+        if (d != this->_handler->herds[h->first]->end())
+        {
+            info.herds.push_back(h->first);
+
+            if (not d->second->name.empty())
+                info.name = d->second->name;
+        }
+    }
+
+    return info;
+}
+
 /* vim: set tw=80 sw=4 et : */

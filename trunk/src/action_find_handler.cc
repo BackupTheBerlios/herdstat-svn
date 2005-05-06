@@ -33,14 +33,10 @@
 int
 action_find_handler_T::operator() (opts_type &opts)
 {
-    std::ostream *stream = optget("outstream", std::ostream *);
-    portage::config_T config(optget("portage.config", portage::config_T));
-    const bool regex = optget("regex", bool);
-    const bool overlay = optget("overlay", bool);
     std::multimap<util::string, util::string> matches;
     std::vector<util::string> results;
 
-    if (optget("all", bool))
+    if (all)
     {
         std::cerr << "find handler does not support the 'all' target."
             << std::endl;
@@ -54,19 +50,14 @@ action_find_handler_T::operator() (opts_type &opts)
     }
     else if (regex)
     {
-        util::regex_T regexp;
-        util::regex_T::string_type re(opts.front());
-
-        if (optget("eregex", bool))
-            regexp.assign(re, REG_EXTENDED|REG_ICASE);
-        else
-            regexp.assign(re, REG_ICASE);
+        regexp.assign(opts.front(), eregex ? REG_EXTENDED|REG_ICASE : 
+                                             REG_ICASE);
 
         matches = portage::find_package_regex(config, regexp, overlay);
         if (matches.empty())
         {
-            std::cerr << "Failed to find any packages matching '" << re << "'."
-                << std::endl;
+            std::cerr << "Failed to find any packages matching '"
+                << opts.front() << "'." << std::endl;
             return EXIT_FAILURE;
         }
     }
@@ -91,9 +82,9 @@ action_find_handler_T::operator() (opts_type &opts)
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
-            std::vector<util::string>::const_iterator i;
-            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
-                *stream << *i << std::endl;
+            /* ambiguous still matches */
+            std::copy(e.packages.begin(), e.packages.end(),
+                std::back_inserter(results));
 
             continue;
         }
@@ -110,17 +101,17 @@ action_find_handler_T::operator() (opts_type &opts)
         results.push_back(p.second);
     }
 
-    std::sort(results.begin(), results.end());
-    results.erase(std::unique(results.begin(), results.end()), results.end());
-
-    if (optget("count", bool))
-        *stream << results.size() << std::endl;
-    else
+    if (not count)
     {
+        std::sort(results.begin(), results.end());
+        results.erase(std::unique(results.begin(), results.end()),
+            results.end());
         std::copy(results.begin(), results.end(), 
             std::ostream_iterator<util::string>(*stream, "\n"));
     }
 
+    size = results.size();
+    flush();
     return EXIT_SUCCESS;
 }
 

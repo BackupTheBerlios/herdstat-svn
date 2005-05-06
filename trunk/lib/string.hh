@@ -62,6 +62,14 @@ namespace util
             split(const util::string::value_type delim = ' ') const;
     };
 
+#ifdef UNICODE
+    gunichar tolower(const gunichar);
+    gunichar toupper(const gunichar);
+#else /* UNICODE */
+    char tolower(const char);
+    char toupper(const char);
+#endif /* UNICODE */
+
     util::string lowercase(const util::string &);
     util::string tidy_whitespace(const util::string &);
 

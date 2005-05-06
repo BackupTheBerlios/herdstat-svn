@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_dev_handler.hh
+ * herdstat -- src/metadata_xml.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,25 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_DEV_HANDLER_HH
-#define HAVE_ACTION_DEV_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include <algorithm>
+#include "metadata_xml.hh"
 
-class action_dev_handler_T : public action_herds_xml_handler_T
+/*
+ * Does the specified developer exist in this metadata.xml?
+ */
+
+bool
+metadata_xml_T::dev_exists(const herd_type::key_type &dev) const
 {
-    public:
-        virtual ~action_dev_handler_T() { }
-        virtual int operator() (opts_type &);
+    herd_type::key_type d(dev);
+    if (dev.find('@') == herd_type::key_type::npos)
+        d.append("@gentoo.org");
+    return this->_handler->devs.find(d) != this->_handler->devs.end();
+}
 
-    private:
-        void display(const util::string &);
-};
+/*
+ * Does the specified herd exist in this metadata.xml?
+ */
 
-#endif
+bool
+metadata_xml_T::herd_exists(const herds_type::value_type &herd) const
+{
+    return std::find(this->_handler->herds.begin(),
+        this->_handler->herds.end(), herd) != this->_handler->herds.end();
+}
 
 /* vim: set tw=80 sw=4 et : */

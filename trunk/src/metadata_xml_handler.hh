@@ -48,13 +48,15 @@ class MetadataXMLHandler_T : public XMLHandler_T
             in_email =
             in_name =
             in_desc =
-            in_longdesc = false;
+            in_longdesc = 
+            is_category = false;
         }
         virtual ~MetadataXMLHandler_T();
 
         herds_type herds;
         herd_type devs;
         util::string longdesc;
+        bool is_category;
 
     protected:
         /* callbacks */

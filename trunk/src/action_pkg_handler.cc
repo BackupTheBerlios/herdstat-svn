@@ -32,55 +32,22 @@
 #include <map>
 
 #include "common.hh"
-#include "metadatas.hh"
 #include "herds_xml.hh"
 #include "metadata_xml.hh"
-#include "formatter.hh"
 #include "action_pkg_handler.hh"
 
 /*
- * package_list POD type
- * mainly used for passing data from operator()
- * to our static helper functions.
- */
-
-class package_list : public std::map<util::string, util::string>
-{
-    public:
-        package_list(const opts_type::value_type &n) : name(n) { }
-
-        herds_xml_T::dev_type attr;
-        opts_type::value_type name;
-};
-
-/*
- * Search herds.xml for the specified developer.
- * Return the developer's name if found or an empty
- * string otherwise.
- */
-
-static util::string
-dev_name(const herds_xml_T &herds_xml, const util::string &dev)
-{
-    herds_xml_T::const_iterator h;
-    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
-    {
-        herds_xml_T::herd_type::iterator d =
-            herds_xml[h->first]->find(dev + "@gentoo.org");
-        if (d != herds_xml[h->first]->end())
-            return d->second->name;
-    }
-
-    return "";
-}
-
-/*
- * binary predicate for searching metadata for
+ * binary predicates for searching metadata for
  * a regular expression via find_if().
  */
 
 static bool
 doesMatch(util::string s, util::regex_T *r) { return *r == s; }
+
+static bool
+doesHerdMatch(metadata_xml_T::herd_type::value_type m,
+              util::regex_T *r)
+{ return *r == util::get_user_from_email(m.first); }
 
 /*
  * Loop through every metadata.xml in the tree,
@@ -88,25 +55,11 @@ doesMatch(util::string s, util::regex_T *r) { return *r == s; }
  * criteria.
  */
 
-static util::timer_T::size_type
-get_package_list(package_list &list,
-                 const metadatas_T &metadatas,
-                 const herds_xml_T &herds_xml,
-                 const util::string &portdir,
-                 util::progress_T &progress)
+void
+action_pkg_handler_T::search(package_list *list)
 {
-    util::timer_T::size_type elapsed = 0;
-    util::regex_T regexp;
-
-    const bool dev = optget("dev", bool);
-    const bool regex = optget("regex", bool);
-    const bool status = not optget("quiet", bool) and
-                        not optget("debug", bool);
-
-    if (regex and optget("eregex", bool))
-        regexp.assign(list.name, REG_EXTENDED|REG_ICASE);
-    else if (regex)
-        regexp.assign(list.name, REG_ICASE);
+    if (regex)
+        regexp.assign(list->name, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
     /* for every metadata.xml in the tree... */
     metadatas_T::const_iterator m;
@@ -122,7 +75,7 @@ get_package_list(package_list &list,
 
         /* unfortunately, we still have to do a sanity check in the event
          * that the user has sync'd, a metadata.xml has been removed, and
-             * the cache not yet updated ; otherwise we'll get a parser error */
+         * the cache not yet updated ; otherwise we'll get a parser error */
         if (not util::is_file(*m))
             continue;
 
@@ -130,63 +83,39 @@ get_package_list(package_list &list,
         const metadata_xml_T metadata(*m);
         elapsed += metadata.elapsed();
 
+        /* 
+         * determine whether the package matches our search criteria
+         */
+
         if (dev)
         {
-            const util::string herd = optget("with-herd", util::string);
+            const util::string herd(optget("with-herd", util::string));
             metadata_xml_T::herd_type::iterator d;
 
             if (regex)
             {
                 /* search metadata.xml for all devs matching regex */
-                for (d = metadata.devs().begin() ;
-                     d != metadata.devs().end() ; ++d)
+                if (std::find_if(metadata.devs().begin(),
+                    metadata.devs().end(), std::bind2nd(
+                    std::ptr_fun(doesHerdMatch), &regexp)) != metadata.devs().end())
                 {
-                    if (regexp == util::get_user_from_email(d->first))
-                    {
-                        /* matches regex and --with-herd? */
-                        if (not herd.empty())
-                        {
-                            if (std::find(metadata.herds().begin(),
-                                    metadata.herds().end(),
-                                    herd) != metadata.herds().end())
-                                found = true;
-                        }
-                        else
-                            found = true;
-
-                        if (found)
-                            break;
-                    }
+                    /* check --with-herd */
+                    if (herd.empty() or metadata.herd_exists(herd))
+                        found = true;
                 }
             }
             else
             {
                 /* search the metadata for our dev */
-                debug_msg("searching metadata for '%s'", (list.name + "@gentoo.org").c_str());
-
-                d = metadata.devs().find(list.name + "@gentoo.org");
-                if (d != metadata.devs().end())
+                if (metadata.dev_exists(list->name) and
+                    (herd.empty() or metadata.herd_exists(herd)))
                 {
-                    if (not herd.empty())
-                    {
-                        if (std::find(metadata.herds().begin(),
-                            metadata.herds().end(), herd) != metadata.herds().end())
-                        {
-                            found = true;
-                        }
-                    }
-                    else
-                        found = true;
+                    found = true;
                 }
             }
 
             if (found)
-            {
-                std::copy(d->second->begin(), d->second->end(),
-                    list.attr.begin());
-                list.attr.name = dev_name(herds_xml, list.name);
-                list.attr.role = d->second->role;
-            }
+                list->info = herds_xml.get_dev_info(list->name);
         }
         else
         {
@@ -198,8 +127,7 @@ get_package_list(package_list &list,
                         std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end() :
 
                     /* no */
-                    std::find(metadata.herds().begin(), metadata.herds().end(),
-                        list.name) != metadata.herds().end()
+                    metadata.herd_exists(list->name)
             );
         }
 
@@ -214,35 +142,24 @@ get_package_list(package_list &list,
 
         debug_msg("Match found in %s.", m->c_str());
 
-        list[package] = longdesc;
+        (*list)[package] = longdesc;
     }
-
-    return elapsed;
 }
 
-static void
-display_package_list(package_list &list, const herds_xml_T &herds_xml)
+void
+action_pkg_handler_T::display(package_list &list)
 {
-    formatter_T output;
-    util::color_map_T color;
-
-    const bool dev = optget("dev", bool);
-    const bool count = optget("count", bool);
-    const bool quiet = optget("quiet", bool);
-    const bool verbose = optget("verbose", bool);
-    const bool regex = optget("regex", bool);
-
     if (not quiet)
     {
         if (regex)
             output("Regex", list.name);
         else if (dev)
         {
-            if (list.attr.name.empty())
+            if (list.info.name.empty())
                 output("Developer", list.name);
             else
                 output("Developer",
-                    list.attr.name + " (" + list.name + ")");
+                    list.info.name + " (" + list.name + ")");
 
             output("Email", list.name + "@gentoo.org");
         }
@@ -270,8 +187,8 @@ display_package_list(package_list &list, const herds_xml_T &herds_xml)
         output("", list.begin()->first);
 
     /* display the category/package */
-    package_list::iterator p =
-        ( list.empty() ? list.begin() : ++(list.begin()) );
+    package_list::iterator p = list.begin();
+    if (not list.empty()) ++p;
     package_list::size_type pn = 1;
     for ( ; p != list.end() ; ++p, ++pn)
     {
@@ -318,37 +235,24 @@ display_package_list(package_list &list, const herds_xml_T &herds_xml)
 int
 action_pkg_handler_T::operator() (opts_type &opts)
 {
-    util::progress_T progress;
-    std::map<util::string, util::string>::size_type size = 0;
-    std::vector<util::string> not_found;
+    opts_type not_found;
 
-    portage::config_T config(optget("portage.config", portage::config_T));
-    const util::string portdir(config.portdir());
-    std::ostream *stream = optget("outstream", std::ostream *);
-    util::timer_T::size_type elapsed = 0;
-
-    /* this code takes long enough as it is... no need for
-     * a zillion calls to optget inside loops */
-    const bool quiet = optget("quiet", bool);
-    const bool count = optget("count", bool);
-    const bool dev = optget("dev", bool);
-    const bool status = not quiet and not optget("debug", bool);
+    metadatas.set_portdir(portdir);
 
     /* set format attributes */
-    formatter_T output;
     output.set_maxlabel(16);
-    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
+    output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 
     /* action_pkg_handler doesn't support the all target */
-    if (optget("all", bool))
+    if (all)
     {
         std::cerr << "Package action handler does not support the 'all' target."
             << std::endl;
         return EXIT_FAILURE;
     }
     /* only 1 regex allowed at a time */
-    else if (optget("regex", bool) and opts.size() > 1)
+    else if (regex and opts.size() > 1)
     {
         std::cerr << "You may only specify one regular expression."
             << std::endl;
@@ -358,11 +262,6 @@ action_pkg_handler_T::operator() (opts_type &opts)
     /* check PORTDIR */
     if (not util::is_dir(portdir))
 	throw bad_fileobject_E(portdir);
-
-    const herds_xml_T herds_xml;
-
-    /* our list of metadata.xml's */
-    const metadatas_T metadatas(portdir);
 
     if (status)
     {
@@ -377,8 +276,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
     {
         package_list list(*i);
 
-        elapsed += get_package_list(list, metadatas,
-                        herds_xml, portdir, progress);
+        search(&list);
+
+        if ((n == 1) and status)
+            output.endl();
 
         if (list.empty())
         {
@@ -387,18 +288,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
             {
                 if (not quiet)
                 {
-                    if (dev)
-                    {
-                        std::cerr << std::endl
-                            << "Failed to find developer '" << *i
-                            << "' in any metadata.xml's." << std::endl;
-                    }
-                    else
-                    {
-                        std::cerr << std::endl
-                            << "Failed to find herd '" << *i
-                            << "' in any metadata.xml's." << std::endl;
-                    }
+                    std::cerr << std::endl
+                        << "Failed to find "
+                        << (dev ? "developer '" : "herd '")
+                        << *i << "' in any metadata.xml's." << std::endl;
                 }
 
                 return EXIT_FAILURE;
@@ -411,10 +304,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
         size += list.size();
 
-        if ((n == 1) and status)
-            output.endl();
-
-        display_package_list(list, herds_xml);
+        display(list);
 
         /* only skip a line if we're not on the last one */
         if (not count and n != opts.size())
@@ -423,20 +313,19 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     if (count)
+    {
         output("", util::sprintf("%d", size));
+        count = false; /* otherwise flush() will display size again */
+    }
 
     output.flush(*stream);
 
     for (i = not_found.begin() ; i != not_found.end() ; ++i)
     {
-        if (dev)
-            std::cerr << std::endl
-                << "Failed to find developer '" << *i <<
-                "' in any metadata.xml's.";
-        else
-            std::cerr << std::endl
-                << "Failed to find herd '" << *i <<
-                "' in any metadata.xml's.";
+        std::cerr << std::endl
+            << "Failed to find "
+            << (dev ? "developer '" : "herd '")
+            << *i << "' in any metadata.xml's." << std::endl;
     }
 
     if (not not_found.empty())
@@ -452,12 +341,13 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << "Took " << herds_xml.elapsed() << "ms to parse herds.xml."
             << std::endl;
     }
-    else if (optget("verbose", bool) and not quiet)
+    else if (verbose and not quiet)
     {
         *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
 
+    flush();
     return EXIT_SUCCESS;
 }
 

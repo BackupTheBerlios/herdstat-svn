@@ -40,6 +40,34 @@
 #include "string.hh"
 
 /*****************************************************************************
+ * Convert the given character to (lower|upper)case                          *
+ *****************************************************************************/
+#ifdef UNICODE
+gunichar
+util::tolower(const gunichar c)
+{
+    return Glib::Unicode::tolower(c);
+}
+
+gunichar
+util::toupper(const gunichar c)
+{
+    return Glib::Unicode::toupper(c);
+}
+#else /* UNICODE */
+char
+util::tolower(const char c)
+{
+    return std::tolower(c, std::locale(""));
+}
+
+char
+util::toupper(const char c)
+{
+    return std::toupper(c, std::locale(""));
+}
+#endif /* UNICODE */
+/*****************************************************************************
  * Convert the given string to all lowercase.                                *
  *****************************************************************************/
 util::string
@@ -48,15 +76,9 @@ util::lowercase(const util::string &s)
     if (s.empty())
 	return "";
 
-#ifdef UNICODE
     util::string result;
     for (util::string::const_iterator i = s.begin() ; i != s.end() ; ++i)
-        result.push_back(Glib::Unicode::tolower(*i));
-#else /* UNICODE */
-    util::string result(s);
-    for (util::string::iterator i = result.begin() ; i != result.end() ; ++i)
-        *i = std::tolower(*i, std::locale(""));
-#endif /* UNICODE */
+        result.push_back(util::tolower(*i));
     
     return result;
 }

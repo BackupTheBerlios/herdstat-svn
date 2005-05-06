@@ -37,7 +37,7 @@ _herdstat() {
 	-v --verbose -q --quiet -D --debug -t --timer -o --outfile
         -F --fetch -c --count -n --nocolor --no-herd -m --metadata
         --with-herd -w --which --versions --no-overlay -r --regex
-        -E --extended -f --find"
+        -E --extended -f --find --qa"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )

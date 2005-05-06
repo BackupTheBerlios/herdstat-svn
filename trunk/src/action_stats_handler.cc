@@ -28,8 +28,6 @@
 #include <algorithm>
 
 #include "common.hh"
-#include "formatter.hh"
-#include "herds_xml.hh"
 #include "action_stats_handler.hh"
 
 /*
@@ -39,15 +37,11 @@
 int
 action_stats_handler_T::operator() (opts_type &null)
 {
-    std::ostream *stream = optget("outstream", std::ostream *);
-
     /* set format attributes */
-    formatter_T output;
     output.set_maxlabel(35);
-    output.set_maxdata(optget("maxcol", std::size_t) - output.maxlabel());
+    output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 
-    const herds_xml_T herds_xml;
     herds_xml_T::const_iterator h;
     herds_xml_T::herd_type::iterator d;
 
@@ -122,14 +116,8 @@ action_stats_handler_T::operator() (opts_type &null)
     output(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
         least_herds);
 
-    output.flush(*stream);
-
-    if (optget("timer", bool))
-    {
-        *stream << std::endl << "Took " << herds_xml.elapsed()
-            << "ms to parse herds.xml." << std::endl;
-    }
-
+    count = false;
+    flush();
     return EXIT_SUCCESS;
 }
 

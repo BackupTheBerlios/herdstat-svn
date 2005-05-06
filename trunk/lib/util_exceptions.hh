@@ -39,6 +39,7 @@
 namespace util
 {
     class base_E                                : public std::exception { };
+
     class msg_base_E                            : public base_E
     {
         protected:
@@ -49,6 +50,32 @@ namespace util
             msg_base_E(const char *msg) : str(msg) { }
             msg_base_E(const util::string &msg) : str(msg.c_str()) { }
             virtual const char *what() const throw() { return this->str; }
+    };
+
+    class va_msg_base_E                         : public msg_base_E
+    {
+        protected:
+            const char *str;
+            va_list v;
+
+        public:
+            va_msg_base_E() { }
+            va_msg_base_E(const char *msg, va_list v)
+                : str(util::sprintf(msg, v).c_str()) { }
+            va_msg_base_E(const util::string &msg, va_list v)
+                : str(util::sprintf(msg.c_str(), v).c_str()) { }
+            va_msg_base_E(const char *msg, ...)
+            {
+                va_start(v, msg);
+                str = util::sprintf(msg, v).c_str();
+                va_end(v);
+            }
+            va_msg_base_E(const util::string &msg, ...)
+            {
+                va_start(v, msg.c_str());
+                str = util::sprintf(msg.c_str(), v).c_str();
+                va_end(v);
+            }
     };
 
     class errno_E                               : public msg_base_E

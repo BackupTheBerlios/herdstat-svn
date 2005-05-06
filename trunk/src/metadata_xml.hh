@@ -49,13 +49,18 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
         typedef herd_type::const_iterator   const_herd_iterator;
         typedef herd_type::size_type        herd_size_type;
 
-        metadata_xml_T(const string_type &s) : xml_T<handler_type>(s) { }
+        metadata_xml_T(const string_type &s)
+            : xml_T<handler_type>(s, optget("qa", bool)) { }
         virtual ~metadata_xml_T() { }
 
         /* handler_type access functions */
         herds_type  &herds()    const { return this->_handler->herds; }
         herd_type   &devs()     const { return this->_handler->devs;  }
         string_type &longdesc() const { return this->_handler->longdesc; }
+
+        bool is_category() const { return this->_handler->is_category; }
+        bool dev_exists(const herd_type::key_type &d) const;
+        bool herd_exists(const herds_type::value_type &h) const;
 };
 
 #endif

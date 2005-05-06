@@ -12,7 +12,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
 		   xml.hh \
 		   herds_xml.hh herds_xml.cc \
-		   metadata_xml.hh \
+		   metadata_xml.hh metadata_xml.cc \
 		   formatter.hh formatter.cc \
 		   metadatas.hh metadatas.cc \
 		   overlaydisplay.hh \

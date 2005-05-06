@@ -84,6 +84,7 @@ static struct option long_opts[] =
     {"no-overlay",  no_argument,	0,  'N'},
     {"regex",	    no_argument,	0,  'r'},
     {"extended",    no_argument,	0,  'E'},
+    {"qa",	    no_argument,	0,  '\a'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -132,15 +133,14 @@ help()
 	<< "                        instead of stdout." << std::endl
 	<< " -F, --fetch            Force a fetch of herds.xml." << std::endl
 	<< " -v, --verbose          Display verbose output." << std::endl
-	<< " -q, --quiet            Don't display labels and fancy colors. Use this"
-	<< std::endl
-	<< "                        option to pipe herdstat output to other programs"
-	<< std::endl
+	<< " -q, --quiet            Don't display labels and fancy colors. Use this" << std::endl
+	<< "                        option to pipe herdstat output to other programs" << std::endl
 	<< " -D, --debug            Display debugging messages." << std::endl
 	<< " -t, --timer            Display elapsed time of XML parsing." << std::endl
 	<< " -c, --count            Display the number of items instead of the" << std::endl
 	<< "                        items themself." << std::endl
 	<< " -n, --nocolor          Don't display colored output." << std::endl
+	<< "     --qa               Choke loudly if a QA-related problem occurs." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action         1 or more herds." << std::endl
@@ -308,6 +308,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --quiet */
 	    case 'q':
 		optset("quiet", bool, true);
+		optset("color", bool, false);
 		break;
 	    /* --count */
 	    case 'c':
@@ -332,6 +333,10 @@ handle_opts(int argc, char **argv, opts_type *args)
 		if (optget("outfile", util::string) == "stdout")
 		    optset("timer", bool, true);
 		break;
+	    /* --qa */
+	    case '\a':
+		optset("qa", bool, true);
+		break;
 	    /* --version */
 	    case 'V':
 		throw args_version_E();
@@ -354,10 +359,14 @@ handle_opts(int argc, char **argv, opts_type *args)
 	while (optind < argc)
 	    args->push_back(argv[optind++]);
     }
-    else if ((optget("action", options_action_T) != action_unspecified) and
-	    (optget("action", options_action_T) != action_meta) and
-	    (optget("action", options_action_T) != action_versions))
-	throw args_usage_E();
+    else
+    {
+	options_action_T action = optget("action", options_action_T);
+	if (action != action_unspecified and
+	    action != action_meta and
+	    action != action_versions)
+	    throw args_usage_E();
+    }
 
     return 0;
 }
@@ -391,7 +400,7 @@ main(int argc, char **argv)
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output */
 	std::sort(nonopt_args.begin(), nonopt_args.end());
-	std::vector<util::string>::iterator pos =
+	opts_type::iterator pos =
 	    std::unique(nonopt_args.begin(), nonopt_args.end());
 	if (pos != nonopt_args.end())
 	    nonopt_args.erase(pos);
@@ -504,9 +513,9 @@ main(int argc, char **argv)
 	return EXIT_FAILURE;
     }
     catch (const fetch_E)
-    {
-	return EXIT_FAILURE;
-    }
+    { return EXIT_FAILURE; }
+    catch (const portage::qa_E)
+    { return EXIT_FAILURE; }
     catch (const util::base_E &e)
     {
 	std::cerr << e.what() << std::endl;

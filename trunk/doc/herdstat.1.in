@@ -86,6 +86,11 @@ Force a fetch of herds.xml.  This is only valid if a) you didn't set a herds.xml
 location with -H or $HERDS, or b) the location you did set is a URL supported by
 wget.  If no non-option arguments are specified, @PACKAGE@ will simply fetch
 herds.xml and exit.
+.TP
+.B "     \-\-qa"
+Complain loudly if a QA-related problem occurs (rather than just ignoring it).
+For example, if --qa is specified and a category is listed in ${PORTDIR}/profiles/categories
+that does not exist, @PACKAGE@ will fail with an error message.
 .SH "NON-OPTION ARGUMENTS"
 Unless you specify --version or --help, at least one non-option argument is
 required.  The non-option arguments depend on the action:
@@ -143,6 +148,8 @@ Display the default herd output for all herds that the developer vapier is in.
 Display every package that belongs to a herd that ka0ttic is a member of.
 .IP "\fB$ @PACKAGE@ -wr app-vim.*-syntax\fR"
 Display the path to the latest ebuild for every vim syntax package.
+.IP "\fB$ @PACKAGE@ -frc ^dev-libs\fR"
+Display the number of packages in the dev-libs category.
 .SH ENVIRONMENT
 .TP
 .B HERDS

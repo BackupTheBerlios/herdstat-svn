@@ -34,6 +34,8 @@ MetadataXMLHandler_T::return_type
 MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
                                     const attrs_type &attrs)
 {
+    if (name == "catmetadata")
+        is_category = true;
     if (name == "herd")
         in_herd = true;
     else if (name == "maintainer")
