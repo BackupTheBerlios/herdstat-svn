@@ -40,6 +40,9 @@
 int
 action_herd_handler_T::operator() (opts_type &herds)
 {
+    herds_xml.fetch();
+    herds_xml.parse();
+
     /* set format attributes */
     output.set_maxlabel(all ? 11 : 15);
     output.set_maxdata(maxcol - output.maxlabel());

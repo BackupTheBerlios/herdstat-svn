@@ -17,6 +17,10 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
      - Fixed bug in --which caused by a missing continue statement.
      - Fixed bug in --package when two args are specified (one which doesn't
        exist), a newline was not displayed after the progress display.
+     - Fixed bug in --package when --nocolor is specified, the first package is
+       in color.
+     - Fixed bug in --package when --verbose is specified, the package's
+       longdescription was not displayed properly.
 
 1.1.0_rc3:
     New features:

@@ -48,8 +48,8 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
         typedef herds_type::const_iterator const_iterator;
         typedef herds_type::size_type size_type;
 
-        herds_xml_T(bool f = false)
-            : xml_T<handler_type>(optget("qa", bool)), _fetchonly(f)
+        herds_xml_T()
+            : xml_T<handler_type>(optget("qa", bool)), _fetched(false)
         { this->init(); }
         virtual ~herds_xml_T() { }
 
@@ -85,12 +85,13 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
 
         const devinfo_T get_dev_info(const string_type &) const;
 
+        void fetch();
+
     protected:
         virtual void init();
 
     private:
-        void fetch();
-        const bool _fetchonly;
+        bool _fetched;
         static const string_type _default;
 };
 

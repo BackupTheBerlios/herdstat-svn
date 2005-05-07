@@ -36,7 +36,7 @@ MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
 {
     if (name == "catmetadata")
         is_category = true;
-    if (name == "herd")
+    else if (name == "herd")
         in_herd = true;
     else if (name == "maintainer")
         in_maintainer = true;
@@ -110,13 +110,10 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
     /* <maintainer><email> */
     else if (in_email)
     {
-        string_type::size_type pos = str.find('@');
-        if (pos == string_type::npos)
-            cur_dev = util::lowercase(str) + "@gentoo.org";
-        else if (str.substr(pos) != "@gentoo.org")
-            cur_dev = util::lowercase(str.substr(0, pos)) + "@gentoo.org";
-        else
-            cur_dev = util::lowercase(str);
+        cur_dev = util::lowercase(str);
+
+        if (str.find('@') == string_type::npos)
+            cur_dev += "@gentoo.org";
 
         devs[cur_dev] = new dev_type();
     }

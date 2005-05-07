@@ -1,5 +1,20 @@
 ChangeLog for herdstat
 
+2005-05-07 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metadata_xml_handler.cc: Don't append if @gentoo.org if the
+	domain is not @gentoo.org to maintainer email.
+	* src/action_pkg_handler.cc: Fixed a couple bugs; one where the first
+	package would still be displayed in color if --nocolor was specified.
+	The second one involved the longdesc not being displayed when
+	--verbose is used.
+	* src/herds_xml.cc, src/herds_xml.hh: Don't call fetch() and parse()
+	from init() and have callers call it manually.  Otherwise, it'll be
+	fetched/parsed on each action_herds_xml_handler_T instantiation.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc, src/action_stats_handler.cc: Update to call
+	herds_xml_T::{fetch,parse}() at the beginning of operator().
+
 2005-05-06 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/metadata_xml.cc: Moved herd_exists and dev_exists bodies here.

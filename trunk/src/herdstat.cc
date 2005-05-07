@@ -140,7 +140,7 @@ help()
 	<< " -c, --count            Display the number of items instead of the" << std::endl
 	<< "                        items themself." << std::endl
 	<< " -n, --nocolor          Don't display colored output." << std::endl
-	<< "     --qa               Choke loudly if a QA-related problem occurs." << std::endl
+	<< "     --qa               Complain loudly if a QA-related problem occurs." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action         1 or more herds." << std::endl
@@ -420,7 +420,8 @@ main(int argc, char **argv)
 	    if (not optget("quiet", bool))
 		optset("verbose", bool, true);
 
-	    herds_xml_T herdsxml(true);
+	    herds_xml_T herds_xml;
+	    herds_xml.fetch();
 	    return EXIT_SUCCESS;
 	}
 

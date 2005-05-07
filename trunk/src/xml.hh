@@ -54,15 +54,6 @@ class xml_T
         timer_type::size_type elapsed() const
         { return this->_timer.elapsed(); }   
 
-    protected:
-        virtual void init()
-        {
-            if (not this->_path.exists())
-                throw bad_fileobject_E(this->_path);
-
-            this->parse(this->_path);
-        }
-
         virtual void parse() { this->parse(this->_path); }
         virtual void parse(const string_type &p)
         {
@@ -70,6 +61,15 @@ class xml_T
             this->_timer.start();
             parser.parse(p);
             this->_timer.stop();
+        }
+
+    protected:
+        virtual void init()
+        {
+            if (not this->_path.exists())
+                throw bad_fileobject_E(this->_path);
+
+            this->parse(this->_path);
         }
 
         string_type _path;              /* path to XML file */

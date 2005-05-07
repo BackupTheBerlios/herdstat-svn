@@ -37,6 +37,9 @@
 int
 action_stats_handler_T::operator() (opts_type &null)
 {
+    herds_xml.fetch();
+    herds_xml.parse();
+
     /* set format attributes */
     output.set_maxlabel(35);
     output.set_maxdata(maxcol - output.maxlabel());

@@ -47,18 +47,14 @@ herds_xml_T::init()
         this->_path = util::path_T(HERDS_XML_FETCH_LOCATION);
     else
         this->_path = this->_default;
-
-    this->fetch();
-
-    if (this->_fetchonly)
-        return;
-
-    this->parse();
 }
 
 void
 herds_xml_T::fetch()
 {
+    if (this->_fetched)
+        return;
+
     struct stat s;
     try
     {
@@ -127,6 +123,8 @@ herds_xml_T::fetch()
         else
             std::cerr << std::endl;
     }
+
+    this->_fetched = true;
 }
 
 /*

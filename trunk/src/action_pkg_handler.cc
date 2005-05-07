@@ -66,9 +66,6 @@ action_pkg_handler_T::search(package_list *list)
     for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
     {
         bool found = false;
-        metadata_xml_T::herd_type devs;
-        metadata_xml_T::herds_type herds;
-        metadata_xml_T::string_type longdesc;
 
         if (status)
             ++progress;
@@ -142,7 +139,7 @@ action_pkg_handler_T::search(package_list *list)
 
         debug_msg("Match found in %s.", m->c_str());
 
-        (*list)[package] = longdesc;
+        (*list)[package] = metadata.longdesc();
     }
 }
 
@@ -176,7 +173,7 @@ action_pkg_handler_T::display(package_list &list)
         if (list.empty())
             output("Packages(0)", "none");
         /* display first package on same line */
-        else if (verbose)
+        else if (verbose and optget("color", bool))
             output(util::sprintf("Packages(%d)", list.size()),
                 color[blue] + list.begin()->first + color[none]);
         else
@@ -238,6 +235,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
     opts_type not_found;
 
     metadatas.set_portdir(portdir);
+
+    herds_xml.fetch();
+    herds_xml.parse();
 
     /* set format attributes */
     output.set_maxlabel(16);
