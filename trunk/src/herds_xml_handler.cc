@@ -29,9 +29,9 @@
 #include "xml.hh"
 #include "herds_xml_handler.hh"
 
-/* any path's found inside <maintainingproject> will be appended
- * to this if we need to fetch it */
-static const util::string mpBaseURL("http://www.gentoo.org");
+/* any path's found inside <maintainingproject> will be sprintf'd
+ * into this if we need to fetch it */
+static const util::string mpBaseURL("http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain");
 
 /*
  * XML handler for XML file listed in
@@ -223,7 +223,9 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             ((time(NULL) - s.st_mtime) > 592200) or
             (s.st_size == 0))
         {
-            if ((util::fetch(mpBaseURL+str, path) != 0) or
+            util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
+            debug_msg("%s", url.c_str());
+            if ((util::fetch(url, path) != 0) or
                ((stat(path.c_str(), &s) == 0) and s.st_size == 0))
             {
                 unlink(path.c_str());
