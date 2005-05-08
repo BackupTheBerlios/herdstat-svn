@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>
+#include <cstdarg>
 #include <sys/types.h>
 #include <regex.h>
 

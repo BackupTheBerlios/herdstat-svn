@@ -51,6 +51,8 @@ class xml_T
         { this->init(); }
         virtual ~xml_T() { }
 
+        handler_type *handler() const { return this->_handler.get(); }
+
         timer_type::size_type elapsed() const
         { return this->_timer.elapsed(); }   
 

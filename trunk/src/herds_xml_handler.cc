@@ -24,12 +24,110 @@
 # include "config.h"
 #endif
 
+#include <ctime>
 #include "common.hh"
+#include "xml.hh"
 #include "herds_xml_handler.hh"
+
+/* any path's found inside <maintainingproject> will be appended
+ * to this if we need to fetch it */
+static const util::string mpBaseURL("http://www.gentoo.org");
+
+/*
+ * XML handler for XML file listed in
+ * <maintainingproject> elements.
+ */
+
+class mpXMLHandler_T : public XMLHandler_T
+{
+    public:
+        typedef herd_T herd_type;
+        typedef dev_attrs_T dev_type;
+
+        mpXMLHandler_T() : in_dev(false) { }
+        virtual ~mpXMLHandler_T();
+
+        herd_type devs;
+
+    protected:
+        virtual return_type
+        START_ELEMENT(const string_type &, const attrs_type &);
+        virtual return_type END_ELEMENT(const string_type &);
+        virtual return_type CHARACTERS(const string_type &);
+
+    private:
+        bool in_dev;
+        string_type cur_role;
+};
+
+mpXMLHandler_T::return_type
+mpXMLHandler_T::START_ELEMENT(const string_type &name,
+                              const attrs_type &attrs)
+{
+    if (name == "dev")
+    {
+        in_dev = true;
+        attrs_type::const_iterator pos;
+        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
+        {
+#ifdef USE_LIBXMLPP
+            if (pos->name == "role")
+                cur_role = pos->value;
+#else /* USE_LIBXMLPP */
+            if (pos->first == "role")
+                cur_role = pos->second;
+#endif /* USE_LIBXMLPP */
+        }
+
+    }
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
+}
+
+mpXMLHandler_T::return_type
+mpXMLHandler_T::END_ELEMENT(const string_type &name)
+{
+    if (name == "dev")
+        in_dev = false;
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
+}
+
+mpXMLHandler_T::return_type
+mpXMLHandler_T::CHARACTERS(const string_type &str)
+{
+    if (in_dev)
+    {
+        string_type s(util::lowercase(str));
+
+        if (str.find('@') == string_type::npos)
+            s += "@gentoo.org";
+
+        std::pair<herd_type::iterator, bool> p =
+            devs.insert(std::make_pair(s, new dev_type()));
+        if (p.second)
+            p.first->second->role = cur_role;
+    }
+
+#ifdef USE_XMLWRAPP
+    return true;
+#endif
+}
+
+mpXMLHandler_T::~mpXMLHandler_T()
+{
+    herd_type::iterator i;
+    for (i = devs.begin() ; i != devs.end() ; ++i)
+        delete i->second;
+}
 
 HerdsXMLHandler_T::return_type
 HerdsXMLHandler_T::START_ELEMENT(const string_type &name,
-                                 const attrs_type &attr)
+                                 const attrs_type &attrs)
 {
     if (name == "herd")
         in_herd = true;
@@ -47,6 +145,8 @@ HerdsXMLHandler_T::START_ELEMENT(const string_type &name,
         in_maintainer_name = true;
     else if (name == "role")
         in_maintainer_role = true;
+    else if (name == "maintainingproject")
+        in_maintaining_project = true;
 
 #ifdef USE_XMLWRAPP
     return true;
@@ -72,6 +172,8 @@ HerdsXMLHandler_T::END_ELEMENT(const string_type &name)
         in_maintainer_name = false;
     else if (name == "role")
         in_maintainer_role = false;
+    else if (name == "maintainingproject")
+        in_maintaining_project = false;
 
 #ifdef USE_XMLWRAPP
     return true;
@@ -103,6 +205,52 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             herds[cur_herd]->mail = str.substr(0, pos) + "@gentoo.org";
         else
             herds[cur_herd]->mail = str;
+    }
+
+    /* <herd><maintainingproject> */
+    else if (in_maintaining_project)
+    {
+        /* 
+         * special case - for <maintainingproject> we must fetch
+         * the listed XML, parse it, and then fill the developer
+         * container.
+         */
+
+        util::string path(util::string(LOCALSTATEDIR)+"/"+cur_herd+".xml");
+        struct stat s;
+
+        if ((stat(path.c_str(), &s) != 0) or 
+            ((time(NULL) - s.st_mtime) > 592200) or
+            (s.st_size == 0))
+        {
+            if ((util::fetch(mpBaseURL+str, path) != 0) or
+               ((stat(path.c_str(), &s) == 0) and s.st_size == 0))
+            {
+                unlink(path.c_str());
+#ifdef USE_LIBXMLPP
+                return;
+#else
+                return true;
+#endif
+            }
+        }
+        
+        assert(util::is_file(path));
+        
+        xml_T<mpXMLHandler_T> xml(path);
+        mpXMLHandler_T *handler = xml.handler();
+
+        mpXMLHandler_T::herd_type::iterator i;
+        for (i = handler->devs.begin() ; i != handler->devs.end() ; ++i)
+        {
+            std::pair<herd_type::iterator, bool> p =
+                herds[cur_herd]->insert(std::make_pair(i->first, new dev_type()));
+
+            if (p.second)
+                p.first->second->role = i->second->role;
+
+            debug_msg("p.second = %d\ncur_role = %s", p.second, i->second->role.c_str());
+        }
     }
 
     /* <maintainer><email> */

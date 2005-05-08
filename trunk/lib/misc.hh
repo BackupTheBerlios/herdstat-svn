@@ -62,8 +62,8 @@ namespace util
     util::string get_user_from_email(const util::string &);
     util::string current_user();
     util::string::size_type getcols();
-    int fetch(const util::string &, const util::string &, bool);
-    int fetch(const char *, const char *, bool);
+    int fetch(const util::string &, const util::string &, bool v = false);
+    int fetch(const char *, const char *, bool v = false);
 
     class color_map_T
     {

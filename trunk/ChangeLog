@@ -1,5 +1,22 @@
 ChangeLog for herdstat
 
+2005-05-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in: A few small changes to the description. Added
+	another example.
+	* src/action_stats_handler.cc: Initial value of smallest_herd should
+	be 1.
+	* src/xml.hh: Added handler() member func for returning a pointer to
+	the _handler member for use by users who don't want to create a
+	sub-class of xml_T.
+	* src/herds_xml_handler.cc, src/herds_xml_handler.hh: Added
+	mpXMLHandler_T XML handler class for parsing XML files listed in
+	herds.xml <maintainingproject> elements.  HerdsXMLHandler_T will now
+	parse said file for developer information, then fill the herds member
+	like it normally would.
+	* lib/misc.hh: Updated fetch() prototypes so third arg (verbose)
+	defaults to false.
+
 2005-05-07 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/metadata_xml_handler.cc: Don't append if @gentoo.org if the

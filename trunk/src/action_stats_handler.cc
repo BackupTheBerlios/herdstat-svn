@@ -51,7 +51,7 @@ action_stats_handler_T::operator() (opts_type &null)
     float nherds = 0, ndevs = 0;
     std::vector<util::string> most_herds, least_herds, most_devs, least_devs;
     unsigned short biggest_dev = 0, smallest_dev = 1;
-    herds_xml_T::herd_type::size_type biggest_herd = 0, smallest_herd = 0;
+    herds_xml_T::herd_type::size_type biggest_herd = 0, smallest_herd = 1;
     std::map<util::string, unsigned short> herds_per_dev;
 
     /* for each herd in herds.xml... */

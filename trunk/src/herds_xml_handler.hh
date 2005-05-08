@@ -45,7 +45,7 @@ class HerdsXMLHandler_T : public XMLHandler_T
         {
             in_herd = in_herd_name = in_herd_email = in_herd_desc =
             in_maintainer = in_maintainer_name = in_maintainer_email =
-            in_maintainer_role = false;
+            in_maintainer_role = in_maintaining_project = false;
         }
         virtual ~HerdsXMLHandler_T();
 
@@ -68,9 +68,11 @@ class HerdsXMLHandler_T : public XMLHandler_T
         bool in_maintainer_name;
         bool in_maintainer_email;
         bool in_maintainer_role;
+        bool in_maintaining_project;
 
         string_type cur_herd;
         string_type cur_dev;
+        string_type cur_role;
 };
 
 #endif

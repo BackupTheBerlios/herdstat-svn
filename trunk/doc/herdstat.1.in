@@ -1,13 +1,13 @@
 .\" $Id$
 .TH "@PACKAGE@" 1 "Mar 2005" "@VERSION@"
 .SH NAME
-\fB@PACKAGE@\fR \- Display package/developer information for Gentoo herds.
+\fB@PACKAGE@\fR \- A multi-purpose query tool for Gentoo-specific information.
 .SH SYNOPSIS
 .B "@PACKAGE@ "
 [ \fIoptions\fR ] [ \fI args \fR ]
 .SH DESCRIPTION
-\fB@PACKAGE@\fR is a utility that parses Gentoo's herds.xml and displays developer
-and/or package statistics.
+\fB@PACKAGE@\fR is a multi-purpose query tool capable of things such as displaying
+herd/developer information and displaying category/package metadata.
 .SH OPTIONS
 .TP
 .B "\-h, \-\-help"
@@ -67,7 +67,7 @@ same name.  In that case you must specify the category.
 .B "\-w, \-\-which"
 Display full path to ebuild for the specified package(s).
 .TP
-.B "     \-\-versions"
+.B "\-\-versions"
 Display versions of the specified package(s).
 .TP
 .B "\-f, \-\-find"
@@ -87,7 +87,7 @@ location with -H or $HERDS, or b) the location you did set is a URL supported by
 wget.  If no non-option arguments are specified, @PACKAGE@ will simply fetch
 herds.xml and exit.
 .TP
-.B "     \-\-qa"
+.B "\-\-qa"
 Complain loudly if a QA-related problem occurs (rather than just ignoring it).
 For example, if --qa is specified and a category is listed in ${PORTDIR}/profiles/categories
 that does not exist, @PACKAGE@ will fail with an error message.
@@ -150,6 +150,8 @@ Display every package that belongs to a herd that ka0ttic is a member of.
 Display the path to the latest ebuild for every vim syntax package.
 .IP "\fB$ @PACKAGE@ -frc ^dev-libs\fR"
 Display the number of packages in the dev-libs category.
+.IP "\fB$ emerge $(@PACKAGE@ -fr <regex>)\fR"
+emerge all packages matching <regex>.
 .SH ENVIRONMENT
 .TP
 .B HERDS
