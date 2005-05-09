@@ -7,6 +7,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        QA-related problem is encountered (a category in
        $PORTDIR/profiles/categories doesn't exist or an XML validation error,
        for example).
+     - Regex searches are now a bit faster if a literal category is used (only
+       that category will be searched).
 
     Bug fixes:
      - /etc/portage/categories is now taken into consideration when generating

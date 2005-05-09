@@ -126,10 +126,34 @@ portage::find_package_regex_in(const util::string &portdir,
     const portage::categories_T categories;
     portage::categories_T::const_iterator c;
 
+    /* if it looks like a category was specified, and no
+     * regex-like metacharacters are present, only search
+     * the category */
+    bool knowncat = false, onlyonce = false;
+    util::string cat;
+    util::string::size_type pos = regex().find('/');
+    if (pos != util::string::npos)
+    {
+        cat = regex().substr(0, pos);
+        if (not cat.empty())
+        {
+            knowncat = ((cat.find_first_of("`~!@#$%^&*()+=[]{}<>,.;:'\"") ==
+                    util::string::npos) and (util::is_dir(portdir+"/"+cat)));
+        }
+    }
+
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
         if (not util::is_dir(portdir + "/" + (*c)))
             continue;
+
+        if (knowncat)
+        {
+            if (*c == cat)
+                onlyonce = true;
+            else
+                continue;
+        }
 
         const util::dir_T category(portdir + "/" + (*c));
         util::dir_T::const_iterator d;
@@ -144,6 +168,9 @@ portage::find_package_regex_in(const util::string &portdir,
             if ((regex == base) or (regex == (*c + "/" + base)))
                 matches.push_back(*c + "/" + base);
         }
+
+        if (onlyonce)
+            break;
     }
 
     return matches;

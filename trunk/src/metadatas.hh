@@ -37,7 +37,7 @@
 /* rough number of metadata.xml's in the tree, updated from time to
  * time as it grows. Used for initial vector size so that a ton of
  * re-allocations can be prevented */
-#define METADATA_RESERVE    8400
+#define METADATA_RESERVE    8450
 #define DEFAULT_EXPIRE      86400
 
 /*

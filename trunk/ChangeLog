@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-05-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.0_rc4).
+	* lib/portage_find.cc: in find_package_regex_in, if it looks like a
+	category was specified, and it exists, dont bother looking in the
+	other categories.
+
 2005-05-08 Aaron Walker <ka0ttic@gentoo.org>
 
 	* doc/herdstat.1.in: A few small changes to the description. Added
