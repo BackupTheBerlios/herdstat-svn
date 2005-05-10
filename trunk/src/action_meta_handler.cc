@@ -329,9 +329,9 @@ action_meta_handler_T::operator() (opts_type &opts)
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
                 if (quiet or not optget("color", bool))
-                    std::cerr << m->second << std::endl;
+                    std::cerr << *i << std::endl;
                 else
-                    std::cerr << color[green] << m->second << color[none] << std::endl;
+                    std::cerr << color[green] << *i << color[none] << std::endl;
             }
 
             if (matches.size() == 1)

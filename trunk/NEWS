@@ -7,11 +7,13 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        that we can time how long portage searches take.
 
     Bug fixes:
-     - Found major bug in --which where a wrong path would be returned if the
+     - Fixed major bug in --which where a wrong path would be returned if the
        queried package exists in an overlay, but a newer version exists in
        PORTDIR.
-     - Fix bug in <maintainingproject> XML file fetching (failed fetch
+     - Fixed bug in <maintainingproject> XML file fetching (failed fetch
        truncated pre-existing copy).
+     - Fixed bug when ambiguous package is encountered in the metadata action
+       handler (didn't display the most important part, the category).
 
 1.1.0_rc4:
     New features:

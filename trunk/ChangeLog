@@ -32,8 +32,10 @@ ChangeLog for herdstat
 	declaration from operator() since the base class now defines it.
 	Modified all portage::find*/portage::ebuild_which calls (that matter)
 	to pass the search_timer timer_T object.
-	* src/herds_xml_handler.cc: Fix bug in <maintainingproject> XML file
+	* src/herds_xml_handler.cc: Fixed bug in <maintainingproject> XML file
 	fetching (pre-existing copy gets truncated if fetching fails).
+	* src/action_meta_handler.cc: Fixed bug when ambiguous packages are
+	encountered (didn't display category).
 
 2005-05-09 Aaron Walker <ka0ttic@gentoo.org>
 
