@@ -48,8 +48,8 @@ namespace portage
                 this->close();
             }
 
-            const string_type portdir();
-            const std::vector<string_type> overlays();
+            const string_type portdir() const;
+            const std::vector<string_type> overlays() const;
     };
 }
 

@@ -49,7 +49,7 @@ portage::portdir()
  */
 
 const portage::config_T::string_type
-portage::config_T::portdir()
+portage::config_T::portdir() const
 {
     util::path_T portdir = (*this)["PORTDIR"];
 
@@ -66,7 +66,7 @@ portage::config_T::portdir()
  */
 
 const std::vector<portage::config_T::string_type>
-portage::config_T::overlays()
+portage::config_T::overlays() const
 {
     string_type overlays = (*this)["PORTDIR_OVERLAY"];
 
