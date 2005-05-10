@@ -29,16 +29,11 @@
 
 #include "action_handler.hh"
 
-class action_which_handler_T : public action_handler_T
+class action_which_handler_T : public action_portage_find_handler_T
 {
     public:
-        action_which_handler_T() : action_handler_T(),
-                                   overlay(optget("overlay", bool)) { }
         virtual ~action_which_handler_T() { }
         virtual int operator() (opts_type &);
-
-    private:
-        const bool overlay;
 };
 
 #endif

@@ -35,7 +35,6 @@ int
 action_versions_handler_T::operator() (opts_type &opts)
 {
     OverlayDisplay_T od;
-    std::multimap<util::string, util::string> matches;
     util::string dir;
     bool pwd = false;
 
@@ -107,7 +106,8 @@ action_versions_handler_T::operator() (opts_type &opts)
         else
             regexp.assign(re, REG_ICASE);
         
-        matches = portage::find_package_regex(config, regexp, overlay);
+        matches = portage::find_package_regex(config, regexp,
+                    overlay, &search_timer);
         
         if (matches.empty())
         {
@@ -131,7 +131,8 @@ action_versions_handler_T::operator() (opts_type &opts)
         try
         {
             if (pwd)
-                package = portage::find_package_in(dir, m->second);
+                package = portage::find_package_in(dir,
+                            m->second, &search_timer);
             else if (regex and not m->first.empty())
             {
                 dir = m->first;
@@ -140,7 +141,8 @@ action_versions_handler_T::operator() (opts_type &opts)
             else
             {
                 std::pair<util::string, util::string> p =
-                    portage::find_package(config, m->second, overlay);
+                    portage::find_package(config, m->second,
+                    overlay, &search_timer);
                 dir = p.first;
                 package = p.second;
             }

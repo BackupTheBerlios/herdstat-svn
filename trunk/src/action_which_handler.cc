@@ -30,8 +30,6 @@
 int
 action_which_handler_T::operator() (opts_type &opts)
 {
-    std::multimap<util::string, util::string> matches;
-
     if (all)
     {
         std::cerr << "which action handler does not support the 'all' target."
@@ -54,7 +52,18 @@ action_which_handler_T::operator() (opts_type &opts)
         else
             regexp.assign(re, REG_ICASE);
 
-        matches = portage::find_package_regex(config, regexp, overlay);
+        matches = portage::find_package_regex(config, regexp,
+                    overlay, &search_timer);
+
+        if (debug)
+        {
+            *stream << "matches:" << std::endl;
+            std::multimap<util::string, util::string>::iterator i;
+            for (i = matches.begin() ; i != matches.end() ; ++i)
+                *stream << "m->first = " << i->first << " m->second = " << i->second
+                    << std::endl;
+        }
+
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '" << re << "'."
@@ -80,7 +89,8 @@ action_which_handler_T::operator() (opts_type &opts)
             if (regex)
                 p = *m;
             else
-                p = portage::find_package(config, m->second, overlay);
+                p = portage::find_package(config, m->second,
+                    overlay, &search_timer);
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
@@ -112,16 +122,18 @@ action_which_handler_T::operator() (opts_type &opts)
             continue;
         }
 
-        try
-        {
-            /* try p.first (may be an overlay) first */
-            ebuild = portage::ebuild_which(p.first, p.second);
-        }
-        catch (const portage::nonexistent_pkg_E)
-        {
-            /* nope, so use real PORTDIR */
-            ebuild = portage::ebuild_which(portdir, p.second);
-        }
+//        try
+//        {
+//            /* try p.first (may be an overlay) first */
+//            ebuild = portage::ebuild_which(p.first, p.second);
+//        }
+//        catch (const portage::nonexistent_pkg_E)
+//        {
+//            /* nope, so use real PORTDIR */
+//            ebuild = portage::ebuild_which(portdir, p.second);
+//        }
+
+        ebuild = portage::ebuild_which(config, p.second, overlay, NULL);
 
         if (not count)
             *stream << ebuild << std::endl;

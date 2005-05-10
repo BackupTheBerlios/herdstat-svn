@@ -30,11 +30,9 @@
 #include "overlaydisplay.hh"
 #include "action_handler.hh"
 
-class action_meta_handler_T : public action_fancy_handler_T
+class action_meta_handler_T : public action_portage_find_handler_T
 {
     public:
-        action_meta_handler_T() : action_fancy_handler_T(),
-                                  overlay(optget("overlay", bool)) { }
         virtual ~action_meta_handler_T() { }
         virtual int operator() (opts_type &);
 
@@ -48,8 +46,6 @@ class action_meta_handler_T : public action_fancy_handler_T
         };
 
         void display(const meta &data);
-
-        const bool overlay;
 };
 
 #endif

@@ -1,5 +1,40 @@
 ChangeLog for herdstat
 
+2005-05-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/timer.hh: improved timer_T so that it can be stopped/started an
+	arbitrary number of times.  Added is_running() member function for
+	determining whether the timer is currently running or not (duh).
+	* lib/portage_config.cc, lib/portage_config.hh: Added an operator[]()
+	const hack (since std::map doesn't provide one) so that we can declare
+	const config_T objects.
+	* lib/portage_version.cc, lib/portage_version.hh: Added clear() member
+	function which does the obvious. We now make assign() call clear()
+	like it does for standard containers.  Added an append() member
+	function which does the same thing as assign() but doesn't clear()
+	first.  Added new constructor that takes a vector of paths, then loops
+	through the vector calling append() for each vector element.
+	* lib/portage_find.cc, lib/portage_find.hh: Added optional timer_T
+	pointer argument to all functions (defaults to NULL) so that we can
+	time how long package searches take.  Also modified all functions that
+	take a config_T to take a const config_T. Also fixed major bug with
+	ebuild_which (didn't return correct path if a package was in an
+	overlay but a newer version existed in portage).
+	* src/action_handler.hh: Added action_portage_find_handler_T base
+	class for all action handler's that use one of the
+	portage::find_package functions.  Moved matches multimap and timer_T
+	object here and added a flush() to display the timer results.
+	* src/action_find_handler.cc, src/action_find_handler.hh,
+	src/action_meta_handler.cc, src/action_meta_handler.hh,
+	src/action_versions_handler.cc, src/action_versions_handler.hh,
+	src/action_which_handler.cc, src/action_which_handler.hh: Updated to
+	derive from action_portage_find_handler_T.  Removed matches multimap
+	declaration from operator() since the base class now defines it.
+	Modified all portage::find*/portage::ebuild_which calls (that matter)
+	to pass the search_timer timer_T object.
+	* src/herds_xml_handler.cc: Fix bug in <maintainingproject> XML file
+	fetching (pre-existing copy gets truncated if fetching fails).
+
 2005-05-09 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.0_rc4).

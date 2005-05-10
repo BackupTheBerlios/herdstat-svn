@@ -197,7 +197,6 @@ int
 action_meta_handler_T::operator() (opts_type &opts)
 {
     OverlayDisplay_T od;
-    std::multimap<util::string, util::string> matches;
 
     bool pwd = false;
     util::string dir;
@@ -277,7 +276,8 @@ action_meta_handler_T::operator() (opts_type &opts)
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-        matches = portage::find_package_regex(config, regexp, overlay);
+        matches = portage::find_package_regex(config,
+                    regexp, overlay, &search_timer);
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '" << re << "'."
@@ -303,7 +303,8 @@ action_meta_handler_T::operator() (opts_type &opts)
             /* The only reason portdir should be set already is if
              * opts == 0 and portdir is set to $PWD */
             if (pwd)
-                data.package = portage::find_package_in(data.portdir, m->second);
+                data.package = portage::find_package_in(data.portdir,
+                                m->second, &search_timer);
             else if (regex and not m->first.empty())
             {
                 data.portdir = m->first;
@@ -312,7 +313,8 @@ action_meta_handler_T::operator() (opts_type &opts)
             else
             {
                 std::pair<util::string, util::string> p =
-                    portage::find_package(config, m->second, overlay);
+                    portage::find_package(config, m->second,
+                    overlay, &search_timer);
                 data.portdir = p.first;
                 data.package = p.second;
             }
