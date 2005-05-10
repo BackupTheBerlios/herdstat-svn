@@ -99,7 +99,6 @@ class action_fancy_handler_T : public action_handler_T
 class action_herds_xml_handler_T : public action_fancy_handler_T
 {
     public:
-        action_herds_xml_handler_T() : action_fancy_handler_T() { }
         virtual ~action_herds_xml_handler_T() { }
 
     protected:
@@ -107,12 +106,38 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
         {
             action_fancy_handler_T::flush();
 
-            if (timer)
+            if (timer and not count)
                 *stream << std::endl << "Took " << herds_xml.elapsed()
                     << "ms to parse herds.xml." << std::endl;
         }
 
         herds_xml_T herds_xml;
+};
+
+/*
+ * fancy and searches portage
+ */
+
+class action_portage_find_handler_T : public action_fancy_handler_T
+{
+    public:
+        action_portage_find_handler_T() : action_fancy_handler_T(),
+                                          overlay(optget("overlay", bool)) { }
+        virtual ~action_portage_find_handler_T() { }
+
+    protected:
+        virtual void flush()
+        {
+            action_fancy_handler_T::flush();
+
+            if (timer and not count)
+                *stream << std::endl << "Took " << search_timer.elapsed()
+                    << "ms to perform search." << std::endl;
+        }
+
+        std::multimap<util::string, util::string> matches;
+        util::timer_T search_timer;
+        const bool overlay;
 };
 
 #endif
