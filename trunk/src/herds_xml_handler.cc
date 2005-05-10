@@ -218,15 +218,33 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
 
         util::string path(util::string(LOCALSTATEDIR)+"/"+cur_herd+".xml");
         struct stat s;
+        int rv = stat(path.c_str(), &s);
 
-        if ((stat(path.c_str(), &s) != 0) or 
-            ((time(NULL) - s.st_mtime) > 592200) or
-            (s.st_size == 0))
+        try
         {
-            util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
-            debug_msg("%s", url.c_str());
-            if ((util::fetch(url, path) != 0) or
-               ((stat(path.c_str(), &s) == 0) and s.st_size == 0))
+            if ((rv != 0) or ((time(NULL) - s.st_mtime) > 592200) or
+                (s.st_size == 0))
+            {
+                if (rv == 0)
+                    util::copy_file(path, path+".bak");
+
+                util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
+                if (util::fetch(url, path) != 0)
+                    throw fetch_E();
+
+                if ((stat(path.c_str(), &s) != 0) or (s.st_size == 0))
+                    throw fetch_E();
+
+                unlink((path+".bak").c_str());
+            }
+        }
+        catch (const fetch_E)
+        {
+            /* restore back-up copy if it exists and use it */
+            if (util::is_file(path+".bak"))
+                util::move_file(path+".bak", path);
+
+            if ((stat(path.c_str(), &s) != 0) or (s.st_size == 0))
             {
                 unlink(path.c_str());
 #ifdef USE_LIBXMLPP
@@ -236,7 +254,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
 #endif
             }
         }
-        
+
         assert(util::is_file(path));
         
         xml_T<mpXMLHandler_T> xml(path);
