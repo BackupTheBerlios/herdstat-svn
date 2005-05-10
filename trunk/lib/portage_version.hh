@@ -40,60 +40,6 @@
 
 namespace portage
 {
-    /* Represents a version suffix (_alpha, _beta, etc) */
-    class version_suffix_T
-    {
-        public:
-            typedef util::string string_type;
-            typedef std::vector<string_type> value_type;
-
-            version_suffix_T() { }
-            version_suffix_T(const char *pvr) { this->init(pvr); }
-            version_suffix_T(const string_type &pvr) { this->init(pvr); }
-
-            const string_type &suffix() const { return this->_suffix; }
-            const string_type &version() const { return this->_suffix_ver; }
-
-            void assign(const string_type &pvr) { this->init(pvr); }
-
-            bool operator< (version_suffix_T &);
-            bool operator> (version_suffix_T &s) { return not (*this < s); }
-            bool operator==(version_suffix_T &);
-            bool operator!=(version_suffix_T &s) { return not (*this == s); }
-
-        protected:
-            void init(const string_type &);
-            void get_suffix(const string_type &);
-
-            static value_type _suffixes; /* valid suffixes */
-            string_type _suffix;        /* suffix */
-            string_type _suffix_ver;    /* suffix version */
-    };
-
-    /* represents ${PV} minus the suffix */
-    class version_nosuffix_T
-    {
-        public:
-            typedef util::string string_type;
-
-            version_nosuffix_T() { }
-            version_nosuffix_T(const char *pv) { this->init(pv); }
-            version_nosuffix_T(const string_type &pv) { this->init(pv); }
-
-            const string_type &operator() () const { return this->_version; }
-
-            void assign(const string_type &pv) { this->init(pv); }
-
-            bool operator< (version_nosuffix_T &);
-            bool operator> (version_nosuffix_T &s) { return !(*this < s); }
-            bool operator==(version_nosuffix_T &);
-            bool operator!=(version_nosuffix_T &s) { return !(*this == s); }
-
-        protected:
-            void init(const string_type &);
-            string_type _version;
-    };
-
     /* Represents a single version string */
     class version_string_T
     {
@@ -107,8 +53,8 @@ namespace portage
                 _verstr(util::chop_fileext(path.basename()))
             { this->init(); }
 
-            const portage::version_suffix_T &suffix() const
-            { return this->_suffix; }
+//            const suffix_T &suffix() const
+//            { return this->_suffix; }
 
             const string_type operator() () const;
             const string_type &version() const { return this->_version(); }
@@ -132,22 +78,74 @@ namespace portage
             { return this->_v.find(s); }
 
         protected:
+            /* Represents a version suffix (_alpha, _beta, etc) */
+            class suffix_T
+            {
+                public:
+                    suffix_T() { }
+                    suffix_T(const char *pvr) { this->init(pvr); }
+                    suffix_T(const string_type &pvr) { this->init(pvr); }
+
+                    const string_type &suffix() const { return this->_suffix; }
+                    const string_type &version() const
+                    { return this->_suffix_ver; }
+
+                    void assign(const string_type &pvr) { this->init(pvr); }
+
+                    bool operator< (suffix_T &);
+                    bool operator> (suffix_T &s) { return not (*this < s); }
+                    bool operator==(suffix_T &);
+                    bool operator!=(suffix_T &s) { return not (*this == s); }
+
+                protected:
+                    void init(const string_type &);
+                    void get_suffix(const string_type &);
+
+                    static std::vector<string_type>
+                                _suffixes;      /* valid suffixes */
+                    string_type _suffix;        /* suffix */
+                    string_type _suffix_ver;    /* suffix version */
+            };
+
+            /* represents ${PV} minus the suffix */
+            class nosuffix_T
+            {
+                public:
+                    nosuffix_T() { }
+                    nosuffix_T(const char *pv) { this->init(pv); }
+                    nosuffix_T(const string_type &pv) { this->init(pv); }
+
+                    const string_type &operator() () const
+                    { return this->_version; }
+
+                    void assign(const string_type &pv) { this->init(pv); }
+
+                    bool operator< (nosuffix_T &);
+                    bool operator> (nosuffix_T &s) { return !(*this < s); }
+                    bool operator==(nosuffix_T &);
+                    bool operator!=(nosuffix_T &s) { return !(*this == s); }
+
+                protected:
+                    void init(const string_type &);
+                    string_type _version;
+            };
+
             void init();
             void parse();
 
             const util::path_T _ebuild;             /* abs path of ebuild */
             string_type _verstr;                    /* full version string */
             value_type  _v;                         /* version component map */
-            portage::version_suffix_T _suffix;      /* version suffix object */
-            portage::version_nosuffix_T _version;   /* version minus suffix */
+            suffix_T _suffix;                       /* version suffix object */
+            nosuffix_T _version;                    /* version minus suffix */
     };
 
     /* version_string_T sorting criterion */
     class version_sort_T
     {
         public:
-            bool operator() (portage::version_string_T *v1,
-                             portage::version_string_T *v2)
+            bool operator() (version_string_T *v1,
+                             version_string_T *v2)
             { return *v1 < *v2; }
     };
 
@@ -159,12 +157,11 @@ namespace portage
     class versions_T
     {
         public:
-            typedef std::set<portage::version_string_T *,
-                             portage::version_sort_T> value_type;
+            typedef std::set<version_string_T *, version_sort_T> value_type;
             typedef value_type::iterator iterator;
             typedef value_type::const_iterator const_iterator;
             typedef value_type::size_type size_type;
-            typedef portage::version_string_T::string_type string_type;
+            typedef version_string_T::string_type string_type;
 
             versions_T() { }
             versions_T(const util::path_T &path) { this->assign(path); }
@@ -181,8 +178,8 @@ namespace portage
             bool empty() const { return this->_vs.size() == 0; }
             void clear() { this->_vs.clear(); }
 
-            portage::version_string_T *front() { return *(++this->begin()); }
-            portage::version_string_T *back() { return *(--this->end()); }
+            version_string_T *front() { return *(++this->begin()); }
+            version_string_T *back() { return *(--this->end()); }
 
             virtual bool insert(const util::path_T &);
             virtual void assign(const util::path_T &);

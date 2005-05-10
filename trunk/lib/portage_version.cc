@@ -61,13 +61,13 @@
 #include "portage_exceptions.hh"
 #include "portage_version.hh"
 
-portage::version_suffix_T::value_type portage::version_suffix_T::_suffixes;
+std::vector<util::string> portage::version_string_T::suffix_T::_suffixes;
 
-/*
- * strtoumax wrapper
- */
-
-uintmax_t
+/*****************************************************************************
+ * strtoumax wrapper                                                         *
+ * TODO: put in string.cc?                                                   *
+ *****************************************************************************/
+static uintmax_t
 strtouint(const std::string &str)
 {
 #ifdef HAVE_STRTOUMAX
@@ -89,12 +89,11 @@ strtouint(const std::string &str)
 #endif /* HAVE_STRTOUMAX */
     return std::atoi(str.c_str());
 }
-
-/*
- * strtoul wrapper
- */
-
-unsigned long
+/*****************************************************************************
+ * strtoul wrapper                                                           *
+ * TODO: put in string.cc?                                                   *
+ *****************************************************************************/
+static unsigned long
 strtoul(const std::string &str)
 {
     unsigned long result = 0;
@@ -109,13 +108,11 @@ strtoul(const std::string &str)
 
     return result;
 }
-
-/********************
- * version_suffix_T *
- ********************/
-
+/*****************************************************************************
+ * version_suffix_T                                                          *
+ *****************************************************************************/
 void
-portage::version_suffix_T::init(const string_type &s)
+portage::version_string_T::suffix_T::init(const string_type &s)
 {
     /* valid suffixes (in order) */
     if (this->_suffixes.empty())
@@ -129,16 +126,16 @@ portage::version_suffix_T::init(const string_type &s)
 
     this->get_suffix(s);
 }
-
+/*****************************************************************************
+ * Given ${PVR}, retrieve the suffix and suffix version.                     *
+ *****************************************************************************/
 void
-portage::version_suffix_T::get_suffix(const string_type &s)
+portage::version_string_T::suffix_T::get_suffix(const string_type &s)
 {
     string_type result(s);
     string_type::size_type pos = result.rfind("-r");
     if (pos != string_type::npos)
-    {
         result = result.substr(0, pos);
-    }
 
     if ((pos = result.rfind('_')) != string_type::npos)
     {
@@ -158,11 +155,13 @@ portage::version_suffix_T::get_suffix(const string_type &s)
             this->_suffix.clear();
     }
 }
-
+/*****************************************************************************
+ * Is this suffix less than that suffix?                                     *
+ *****************************************************************************/
 bool
-portage::version_suffix_T::operator< (version_suffix_T &that)
+portage::version_string_T::suffix_T::operator< (suffix_T &that)
 {
-    value_type::iterator ti, si;
+    std::vector<string_type>::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
         this->suffix());
@@ -198,11 +197,13 @@ portage::version_suffix_T::operator< (version_suffix_T &that)
 
     return false;
 }
-
+/*****************************************************************************
+ * Is this suffix equal to that suffix?                                      *
+ *****************************************************************************/
 bool
-portage::version_suffix_T::operator== (version_suffix_T &that)
+portage::version_string_T::suffix_T::operator== (suffix_T &that)
 {
-    value_type::iterator ti, si;
+    std::vector<string_type>::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
         this->suffix());
@@ -230,13 +231,11 @@ portage::version_suffix_T::operator== (version_suffix_T &that)
 
     return true;
 }
-
-/**********************
- * version_nosuffix_T *
- **********************/
-
+/*****************************************************************************
+ * version_nosuffix_T                                                        *
+ *****************************************************************************/
 void
-portage::version_nosuffix_T::init(const string_type &PV)
+portage::version_string_T::nosuffix_T::init(const string_type &PV)
 {
     /* strip suffix */
     string_type::size_type pos = PV.find('_');
@@ -245,9 +244,11 @@ portage::version_nosuffix_T::init(const string_type &PV)
     else
         this->_version = PV;
 }
-
+/*****************************************************************************
+ * Is this version (minus suffix) less that that version (minus suffix)?     *
+ *****************************************************************************/
 bool
-portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
+portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
 {
     bool differ = false;
     bool result = false;
@@ -276,8 +277,8 @@ portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
         bool same = false;
         if (thisver == thatver)
         {
-            /* 1 == 01 ? they're the same in comparison speak but totally
-             * not the same in version string speak */
+            /* 1 == 01 ? they're the same in comparison speak but 
+             * absolutely not the same in version string speak */
             if (*thisiter == (string_type("0") + *thatiter))
                 same = true;
             else
@@ -294,18 +295,18 @@ portage::version_nosuffix_T::operator< (version_nosuffix_T &that)
 
     return result;
 }
-
+/*****************************************************************************
+ * Is this version (minus suffix) equal to that version (minus suffix)?      *
+ *****************************************************************************/
 bool
-portage::version_nosuffix_T::operator== (version_nosuffix_T &that)
+portage::version_string_T::nosuffix_T::operator== (nosuffix_T &that)
 {
     /* string comparison should be sufficient for == */
     return this->_version == that._version;
 }
-
-/********************
- * version_string_T *
- ********************/
-
+/*****************************************************************************
+ * version_string_T                                                          *
+ *****************************************************************************/
 void
 portage::version_string_T::init()
 {
@@ -313,11 +314,9 @@ portage::version_string_T::init()
     this->_suffix.assign(this->_v["PVR"]);
     this->_version.assign(this->_v["PV"]);
 }
-
-/*
- * Display full version string.
- */
-
+/*****************************************************************************
+ * Display full version string (as portage would).                           *
+ *****************************************************************************/
 const portage::version_string_T::string_type
 portage::version_string_T::operator() () const
 {
@@ -328,7 +327,9 @@ portage::version_string_T::operator() () const
 
     return this->_verstr;
 }
-
+/*****************************************************************************
+ * Is this version less than that version?                                   *
+ *****************************************************************************/
 bool
 portage::version_string_T::operator< (version_string_T &that)
 {
@@ -348,7 +349,9 @@ portage::version_string_T::operator< (version_string_T &that)
 
     return false;
 }
-
+/*****************************************************************************
+ * Is this version equal to that version?                                    *
+ *****************************************************************************/
 bool
 portage::version_string_T::operator== (version_string_T &that)
 {
@@ -356,12 +359,10 @@ portage::version_string_T::operator== (version_string_T &that)
              (this->_suffix == that._suffix) and
              (this->_v["PR"] == that["PR"]) );
 }
-
-/*
- * Split full version string into components P, PV, PN, etc
- * and save each one in our internal map.
- */
-
+/*****************************************************************************
+ * Split full version string into components ${P}, ${PV}, ${PN}, etc and     *
+ * save each one in our internal map.                                        *
+ *****************************************************************************/
 void
 portage::version_string_T::parse()
 {
@@ -415,18 +416,19 @@ portage::version_string_T::parse()
     this->_v["PVR"] = this->_v["PV"] + "-" + this->_v["PR"];
     this->_v["PF"]  = this->_v["PN"] + "-" + this->_v["PVR"];
 }
-
-/*****************
- * versions_T    *
- *****************/
-
+/*****************************************************************************
+ * versions_T                                                                *
+ *****************************************************************************/
 portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
 {
     std::vector<util::path_T>::const_iterator i;
     for (i = paths.begin() ; i != paths.end() ; ++i)
         this->append(*i);
 }
-
+/*****************************************************************************
+ * Given a path to a package directory, insert a new version_string_T for    *
+ * each ebuild found.  clear()'s container first.                            *
+ *****************************************************************************/
 void
 portage::versions_T::assign(const util::path_T &path)
 {
@@ -439,7 +441,9 @@ portage::versions_T::assign(const util::path_T &path)
         if (portage::is_ebuild(*d))
             assert(this->insert(*d));
 }
-
+/*****************************************************************************
+ * Same as assign() but does not call clear().                               *
+ *****************************************************************************/
 void
 portage::versions_T::append(const util::path_T &path)
 {
@@ -450,20 +454,24 @@ portage::versions_T::append(const util::path_T &path)
         if (portage::is_ebuild(*d))
             assert(this->insert(*d));
 }
-
+/*****************************************************************************
+ * find wrapper                                                              *
+ *****************************************************************************/
 portage::versions_T::iterator
 portage::versions_T::find(const string_type &path)
 {
-    portage::version_string_T *v = new portage::version_string_T(path);
-    portage::versions_T::iterator i = this->_vs.find(v);
+    version_string_T *v = new version_string_T(path);
+    versions_T::iterator i = this->_vs.find(v);
     delete v;
     return i;
 }
-
+/*****************************************************************************
+ * insert wrapper                                                            *
+ *****************************************************************************/
 bool
 portage::versions_T::insert(const util::path_T &path)
 {
-    portage::version_string_T *v = new portage::version_string_T(path);
+    version_string_T *v = new version_string_T(path);
 
 //    std::cout << "versions_T::insert ===> trying to insert "
 //        << (*v)() << std::endl;
@@ -478,11 +486,14 @@ portage::versions_T::insert(const util::path_T &path)
 
     return p.second;
 }
-
+/*****************************************************************************
+ * clean up                                                                  *
+ *****************************************************************************/
 portage::versions_T::~versions_T()
 {
     for (iterator i = this->_vs.begin() ; i != this->_vs.end() ; ++i)
         delete *i;
 }
+/*****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

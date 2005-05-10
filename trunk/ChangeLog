@@ -13,7 +13,10 @@ ChangeLog for herdstat
 	like it does for standard containers.  Added an append() member
 	function which does the same thing as assign() but doesn't clear()
 	first.  Added new constructor that takes a vector of paths, then loops
-	through the vector calling append() for each vector element.
+	through the vector calling append() for each vector element. Tidy up
+	version code.  Move version_suffix_T and version_nosuffix_T to
+	version_string_T::suffix_T and version_string_T::nosuffix_T
+	respectively.
 	* lib/portage_find.cc, lib/portage_find.hh: Added optional timer_T
 	pointer argument to all functions (defaults to NULL) so that we can
 	time how long package searches take.  Also modified all functions that
