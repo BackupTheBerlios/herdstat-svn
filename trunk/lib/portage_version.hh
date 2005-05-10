@@ -168,6 +168,7 @@ namespace portage
 
             versions_T() { }
             versions_T(const util::path_T &path) { this->assign(path); }
+            versions_T(const std::vector<util::path_T> &);
             virtual ~versions_T();
 
             /* small set subset */
@@ -177,13 +178,15 @@ namespace portage
             const_iterator end() const { return this->_vs.end(); }
             iterator find(const string_type &);
             size_type size() const { return this->_vs.size(); }
-            bool empty() const { return this->size() == 0; }
+            bool empty() const { return this->_vs.size() == 0; }
+            void clear() { this->_vs.clear(); }
 
             portage::version_string_T *front() { return *(++this->begin()); }
             portage::version_string_T *back() { return *(--this->end()); }
 
             virtual bool insert(const util::path_T &);
             virtual void assign(const util::path_T &);
+            virtual void append(const util::path_T &);
 
         protected:
             value_type _vs;

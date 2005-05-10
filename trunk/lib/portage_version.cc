@@ -420,8 +420,28 @@ portage::version_string_T::parse()
  * versions_T    *
  *****************/
 
+portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
+{
+    std::vector<util::path_T>::const_iterator i;
+    for (i = paths.begin() ; i != paths.end() ; ++i)
+        this->append(*i);
+}
+
 void
 portage::versions_T::assign(const util::path_T &path)
+{
+    this->_vs.clear();
+
+    const util::dir_T pkgdir(path);
+    util::dir_T::const_iterator d;
+    
+    for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+        if (portage::is_ebuild(*d))
+            assert(this->insert(*d));
+}
+
+void
+portage::versions_T::append(const util::path_T &path)
 {
     const util::dir_T pkgdir(path);
     util::dir_T::const_iterator d;
