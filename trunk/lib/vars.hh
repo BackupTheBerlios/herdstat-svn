@@ -63,7 +63,16 @@ namespace util
             { return this->_keys.find(s); }
             void clear() { this->_keys.clear(); }
             bool empty() const { return (this->size() == 0); }
-            util::string &operator[] (const string_type &s)
+
+            /* work around the fact that std::map doesn't have a
+             * operator[]() const */
+            util::string operator[] (const string_type &s) const
+            {
+                const_iterator i = this->find(s);
+                return (i == this->end() ? "" : i->second);
+            }
+
+            util::string operator[] (const string_type &s)
             { return this->_keys[s]; }
 
             virtual void read();
