@@ -46,7 +46,7 @@ portage::ebuild_which(const util::string &portdir, const util::string &pkg,
 
     /* find category if missing */
     if (pkg.find('/') == util::string::npos)
-        package = find_package_in(portdir, pkg);
+        package = find_package_in(portdir, pkg, timer);
 
     if (util::is_dir(portdir + "/" + package))
         versions.assign(portdir + "/" + package);
