@@ -38,25 +38,34 @@ namespace util
             typedef long size_type;
             typedef struct timeval time_type;
 
+            timer_T() : _elapsed(0), _running(false) { }
+
             void start()
 	    {
-	        this->_ms = 0;
 	        gettimeofday(&(this->_begin), NULL);
+                this->_running = true;
 	    }
 
 	    void stop()
 	    {
 	        gettimeofday(&(this->_end), NULL);
-	        this->_ms = this->_end.tv_sec - this->_begin.tv_sec;
-	        this->_ms *= 1000;
-	        this->_ms += (this->_end.tv_usec - this->_begin.tv_usec) / 1000;
+                size_type tmp(this->_elapsed);
+	        this->_elapsed = this->_end.tv_sec - this->_begin.tv_sec;
+	        this->_elapsed *= 1000;
+	        this->_elapsed +=
+                    (this->_end.tv_usec - this->_begin.tv_usec) / 1000;
+                this->_elapsed += tmp;
+                this->_running = false;
 	    }
 
-            size_type elapsed() const { return this->_ms; }
+            bool is_running() const { return this->_running; }
+            size_type elapsed() const { return this->_elapsed; }
+            void clear() { this->_elapsed = 0; }
 
         private:
 	    time_type _begin, _end;
-	    size_type _ms;
+	    size_type _elapsed;
+            bool _running;
     };
 }
 
