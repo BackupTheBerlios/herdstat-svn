@@ -24,12 +24,15 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
 #include "common.hh"
 #include "action_which_handler.hh"
 
 int
 action_which_handler_T::operator() (opts_type &opts)
 {
+    std::multimap<util::string, util::string>::iterator m;
+
     if (all)
     {
         std::cerr << "which action handler does not support the 'all' target."
@@ -55,12 +58,19 @@ action_which_handler_T::operator() (opts_type &opts)
         matches = portage::find_package_regex(config, regexp,
                     overlay, &search_timer);
 
+        for (m = matches.begin() ; m != matches.end() ; ++m)
+        {
+            if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
+                opts.push_back(m->second);
+            else
+                matches.erase(m);
+        }
+
         if (debug)
         {
             *stream << "matches:" << std::endl;
-            std::multimap<util::string, util::string>::iterator i;
-            for (i = matches.begin() ; i != matches.end() ; ++i)
-                *stream << "m->first = " << i->first << " m->second = " << i->second
+            for (m = matches.begin() ; m != matches.end() ; ++m)
+                *stream << "portdir = " << m->first << " package = " << m->second
                     << std::endl;
         }
 
@@ -78,7 +88,6 @@ action_which_handler_T::operator() (opts_type &opts)
             matches.insert(std::make_pair("", *i));
     }
 
-    std::multimap<util::string, util::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
         util::string ebuild;

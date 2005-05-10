@@ -36,6 +36,8 @@ ChangeLog for herdstat
 	fetching (pre-existing copy gets truncated if fetching fails).
 	* src/action_meta_handler.cc: Fixed bug when ambiguous packages are
 	encountered (didn't display category).
+	* src/action_which_handler.cc: Remove matches that have the same
+	package name.
 
 2005-05-09 Aaron Walker <ka0ttic@gentoo.org>
 
