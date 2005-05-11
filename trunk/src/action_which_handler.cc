@@ -58,27 +58,19 @@ action_which_handler_T::operator() (opts_type &opts)
         matches = portage::find_package_regex(config, regexp,
                     overlay, &search_timer);
 
+        if (matches.empty())
+        {
+            std::cerr << "Failed to find any packages matching '" << re << "'."
+                << std::endl;
+            return EXIT_FAILURE;
+        }
+
         for (m = matches.begin() ; m != matches.end() ; ++m)
         {
             if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
                 opts.push_back(m->second);
             else
                 matches.erase(m);
-        }
-
-        if (debug)
-        {
-            *stream << "matches:" << std::endl;
-            for (m = matches.begin() ; m != matches.end() ; ++m)
-                *stream << "portdir = " << m->first << " package = " << m->second
-                    << std::endl;
-        }
-
-        if (matches.empty())
-        {
-            std::cerr << "Failed to find any packages matching '" << re << "'."
-                << std::endl;
-            return EXIT_FAILURE;
         }
     }
     else
@@ -103,7 +95,7 @@ action_which_handler_T::operator() (opts_type &opts)
         }
         catch (const portage::ambiguous_pkg_E &e)
         {
-            std::cerr << std::endl << e.name()
+            std::cerr << e.name()
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
             
