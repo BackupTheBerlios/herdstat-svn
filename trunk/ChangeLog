@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-05-11 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Update version (1.1.0_rc5).
 	* lib/version-test.cc, lib/Makefile.am: Updated version-test to work
 	again (haven't used it since the util::string move).
 	* lib/file.hh: Use static_cast to ensure the '/' literal in
