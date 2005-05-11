@@ -226,9 +226,11 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --dev */
 	    case 'd':
 		if (optget("action", options_action_T) != action_unspecified and
-		    optget("action", options_action_T) != action_pkg)
+		    optget("action", options_action_T) != action_pkg and
+		    optget("action", options_action_T) != action_meta)
 		    throw args_one_action_only_E();
-		if (optget("action", options_action_T) == action_pkg)
+		if (optget("action", options_action_T) == action_pkg or
+		    optget("action", options_action_T) == action_meta)
 		    optset("dev", bool, true);
 		else
 		    optset("action", options_action_T, action_dev);
@@ -236,17 +238,27 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --package */
 	    case 'p':
 		if (optget("action", options_action_T) != action_unspecified and
-		    optget("action", options_action_T) != action_dev)
+		    optget("action", options_action_T) != action_dev and
+		    optget("action", options_action_T) != action_meta)
 		    throw args_one_action_only_E();
 		if (optget("action", options_action_T) == action_dev)
 		    optset("dev", bool, true);
+		if (optget("action", options_action_T) == action_meta)
+		    optset("meta", bool, true);
 		optset("action", options_action_T, action_pkg);
 		break;
 	    /* --metadata */
 	    case 'm':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (optget("action", options_action_T) != action_unspecified and
+		    optget("action", options_action_T) != action_pkg and
+		    optget("action", options_action_T) != action_dev)
 		    throw args_one_action_only_E();
-		optset("action", options_action_T, action_meta);
+
+		if (optget("action", options_action_T) == action_pkg or
+		    optget("action", options_action_T) == action_dev)
+		    optset("meta", bool, true);
+		else
+		    optset("action", options_action_T, action_meta);
 		break;
 	    /* --which */
 	    case 'w':

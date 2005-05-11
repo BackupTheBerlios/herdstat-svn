@@ -278,6 +278,7 @@ action_meta_handler_T::operator() (opts_type &opts)
 
         matches = portage::find_package_regex(config,
                     regexp, overlay, &search_timer);
+
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '" << re << "'."
@@ -285,14 +286,16 @@ action_meta_handler_T::operator() (opts_type &opts)
             return EXIT_FAILURE;
         }
     }
-
-    opts_type::iterator i;
-    for (i = opts.begin() ; i != opts.end() ; ++i)
-        matches.insert(std::make_pair(dir, *i));
+    else
+    {
+        opts_type::iterator i;
+        for (i = opts.begin() ; i != opts.end() ; ++i)
+            matches.insert(std::make_pair(dir, *i));
+    }
 
     /* for each specified package/category... */
-    std::multimap<util::string, util::string>::iterator m;
     std::multimap<util::string, util::string>::size_type n = 1;
+    std::multimap<util::string, util::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         meta data;
@@ -356,6 +359,8 @@ action_meta_handler_T::operator() (opts_type &opts)
             od.insert(data.portdir);
 
         /* if no '/' exists, assume it's a category */
+        /* FIXME: metadata_xml_handler_T should determine this
+         * by checking for <catmetadata>. */
         data.cat = (data.package.find('/') == util::string::npos);
 
         if (n != 1)

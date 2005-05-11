@@ -5,6 +5,11 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
     New features:
      - Action handlers that involve searching portage now respect --timer so
        that we can time how long portage searches take.
+     - You can now specify --metadata along with --package or --package --dev.
+       Prior to this, you had to do 'herdstat -m $(herdstat -pq <herd>)'. This
+       has a nice side-effect of being able to use things like --with-herd and
+       only show metadata for packages belonging to a certain developer with a
+       certain herd.
 
     Bug fixes:
      - Fixed major bug in --which where a wrong path would be returned if the
@@ -14,6 +19,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        truncated pre-existing copy).
      - Fixed bug when ambiguous package is encountered in the metadata action
        handler (didn't display the most important part, the category).
+     - Fixed bug in version sorting code that caused versions with extra
+       characters (openssl-0.9.7g fex) to not be sorted properly.
 
 1.1.0_rc4:
     New features:

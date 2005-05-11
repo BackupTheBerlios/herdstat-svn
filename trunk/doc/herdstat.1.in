@@ -53,7 +53,8 @@ Display results matching the specified regular expression.
 Use extended regular expressions.  Implies --regex.
 .TP
 .B "\-p, \-\-package"
-Display package information for the specified herd(s) or developer(s).
+Display package information for the specified herd(s) or developer(s).  If --metadata
+is specified, show the metadata for each package in the list instead of the list itself.
 .TP
 .B "\-d, \-\-dev"
 Display information for the specified developer(s).  If --package is specified,
@@ -62,7 +63,8 @@ displays package information. Otherwise, displays herd information.
 .B "\-m, \-\-metadata"
 Display information for the specified package(s)/categories. A package name
 can be the name only (no category) only if there's not another package with the
-same name.  In that case you must specify the category.
+same name.  In that case you must specify the category.  May also be specified
+along with --package or --package --dev to display the metadata for their results.
 .TP
 .B "\-w, \-\-which"
 Display full path to ebuild for the specified package(s).
@@ -152,6 +154,9 @@ Display the path to the latest ebuild for every vim syntax package.
 Display the number of packages in the dev-libs category.
 .IP "\fB$ emerge $(@PACKAGE@ -fr <regex>)\fR"
 emerge all packages matching <regex>.
+.IP "\fB$ @PACKAGE@ -pdm --with-herd shell-tools ka0ttic\fR"
+Display the metadata for all packages belonging to the shell-tools herd that
+ka0ttic maintains.
 .SH ENVIRONMENT
 .TP
 .B HERDS

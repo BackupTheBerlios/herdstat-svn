@@ -1,5 +1,24 @@
 ChangeLog for herdstat
 
+2005-05-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/version-test.cc, lib/Makefile.am: Updated version-test to work
+	again (haven't used it since the util::string move).
+	* lib/file.hh: Use static_cast to ensure the '/' literal in
+	util::path_T::split() argument is of the correct type (required for
+	version_test to compile).
+	* lib/portage_version.cc, lib/portage_version.hh: Fixed bug in version
+	sorting code. Versions with extra characters after the version (for
+	example libevent-1.0c or openssl-0.9.7g) were sorted incorrectly.  We
+	now seach for non-digits (and non '.') and compare them separately.
+	* src/options.cc: Added 'meta' option.
+	* src/herdstat.cc: Allow --metadata to be specified with -p or -pd.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Display
+	metadata for each package in package list instead of the package list
+	itself if --metadata is specified.
+	* src/action_which_handler.cc: Fix small formatting issue when
+	ambiguous packages are encountered.
+
 2005-05-10 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/timer.hh: improved timer_T so that it can be stopped/started an

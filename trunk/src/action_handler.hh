@@ -66,8 +66,8 @@ class action_handler_T
         std::size_t size;                   /* number of results */
 
         const bool quiet, verbose, regex, eregex,
-                   all, debug, timer;
-        bool count;
+                   all, debug;
+        bool timer, count;
 };
 
 /* 

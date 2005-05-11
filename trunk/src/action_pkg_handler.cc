@@ -34,6 +34,7 @@
 #include "common.hh"
 #include "herds_xml.hh"
 #include "metadata_xml.hh"
+#include "action_meta_handler.hh"
 #include "action_pkg_handler.hh"
 
 /*
@@ -232,7 +233,7 @@ action_pkg_handler_T::display(package_list &list)
 int
 action_pkg_handler_T::operator() (opts_type &opts)
 {
-    opts_type not_found;
+    opts_type not_found, packages;
 
     metadatas.set_portdir(portdir);
 
@@ -304,18 +305,47 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
         size += list.size();
 
-        display(list);
+        /* was --metadata also specified? if so, construct the package
+         * list.  When we're all done, the list will be passed to
+         * action_meta_handler_T::operator(). */
+        if (meta and not count)
+        {
+            /* we're only interested in the package names */
+            package_list::iterator p;
+            for (p = list.begin() ; p != list.end() ; ++p)
+                packages.push_back(p->first);
+        }
+        else
+        {
+            display(list);
 
-        /* only skip a line if we're not on the last one */
-        if (not count and n != opts.size())
-            if (not quiet or (quiet and list.size() > 0))
-                output.endl();
+            /* only skip a line if we're not on the last one */
+            if (not count and n != opts.size())
+                if (not quiet or (quiet and list.size() > 0))
+                    output.endl();
+        }
     }
 
     if (count)
     {
         output("", util::sprintf("%d", size));
         count = false; /* otherwise flush() will display size again */
+    }
+    else if (meta)
+    {
+        /* disable stuff we've handled already */
+        optset("regex", bool, false);
+        optset("eregex", bool, false);
+        optset("timer", bool, false);
+
+        /* get rid of any package dupes */
+        std::sort(packages.begin(), packages.end());
+        packages.erase(std::unique(packages.begin(), packages.end()),
+            packages.end());
+
+        /* ...and pass it to the metadata handler */
+        action_meta_handler_T mhandler;
+        mhandler(packages);
     }
 
     output.flush(*stream);
@@ -331,7 +361,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (not not_found.empty())
         std::cerr << std::endl;
 
-    if (optget("timer", bool))
+    if (timer)
     {
         *stream << std::endl << "Took " << elapsed << "ms to parse "
             << metadatas.size() << " metadata.xml's ("
@@ -346,6 +376,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
         *stream << std::endl
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
+
+    /* we handler timer here */
+    timer = false;
 
     flush();
     return EXIT_SUCCESS;

@@ -55,6 +55,7 @@ options_T::option_map_T::set_defaults()
     insopt("eregex", false);
     insopt("regex", false);
     insopt("qa", false);
+    insopt("meta", false);
 
     insopt("maxcol", static_cast<std::size_t>(78));
 

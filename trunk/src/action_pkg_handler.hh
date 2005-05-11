@@ -38,6 +38,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         action_pkg_handler_T() : action_herds_xml_handler_T(),
                                  elapsed(0),
                                  dev(optget("dev", bool)),
+                                 meta(optget("meta", bool)),
                                  status(not quiet and not debug) { }
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
@@ -59,7 +60,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         metadatas_T metadatas;
         util::progress_T  progress;
         util::timer_T::size_type elapsed;
-        const bool dev, status;
+        const bool dev, meta, status;
 };
 
 #endif
