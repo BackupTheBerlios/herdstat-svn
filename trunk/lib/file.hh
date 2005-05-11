@@ -79,7 +79,8 @@ namespace util
             const path_T dirname() const { return util::dirname(*this); }
 
             /* same as util::string::split but with a diff default delim */
-            virtual std::vector<util::string> split(const char delim = '/')
+            virtual std::vector<util::string>
+                split(const util::string::value_type delim = static_cast<util::string::value_type>('/'))
             { return util::string::split(delim); }
 
             bool exists() const
