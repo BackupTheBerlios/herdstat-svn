@@ -56,6 +56,7 @@
 # include <locale>
 #endif /* UNICODE */
 
+#include "misc.hh"
 #include "string.hh"
 #include "portage_misc.hh"
 #include "portage_exceptions.hh"
@@ -154,6 +155,9 @@ portage::version_string_T::suffix_T::get_suffix(const string_type &s)
             this->_suffix) == this->_suffixes.end())
             this->_suffix.clear();
     }
+
+//    util::debug("suffix == '%s' suffix version == '%s'",
+//            _suffix.c_str(), _suffix_ver.c_str());
 }
 /*****************************************************************************
  * Is this suffix less than that suffix?                                     *
@@ -235,14 +239,22 @@ portage::version_string_T::suffix_T::operator== (suffix_T &that)
  * version_nosuffix_T                                                        *
  *****************************************************************************/
 void
-portage::version_string_T::nosuffix_T::init(const string_type &PV)
+portage::version_string_T::nosuffix_T::init(const string_type &s)
 {
+    string_type PV(s);
+
     /* strip suffix */
-    string_type::size_type pos = PV.find('_');
-    if (pos != string_type::npos)
-        this->_version = PV.substr(0, pos);
-    else
-        this->_version = PV;
+    string_type::size_type pos;
+    if ((pos = PV.find('_')) != string_type::npos)
+        PV = PV.substr(0, pos);
+
+    if ((pos = PV.find_first_not_of("0123456789.")) != string_type::npos)
+    {
+        this->_extra = PV.substr(pos);
+        PV = PV.substr(0, pos);
+    }
+
+    this->_version = PV;
 }
 /*****************************************************************************
  * Is this version (minus suffix) less that that version (minus suffix)?     *
@@ -253,8 +265,11 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
     bool differ = false;
     bool result = false;
 
-    if (this->_version == that._version)
+    /* string comparison should be sufficient for == */
+    if (*this == that)
         return false;
+    else if (this->_version == that._version)
+        return this->_extra < that._extra;
 
     std::vector<string_type> thisparts = this->_version.split('.');
     std::vector<string_type> thatparts = that._version.split('.');
@@ -302,7 +317,8 @@ bool
 portage::version_string_T::nosuffix_T::operator== (nosuffix_T &that)
 {
     /* string comparison should be sufficient for == */
-    return this->_version == that._version;
+    return ((this->_version == that._version) and
+            (this->_extra   == that._extra));
 }
 /*****************************************************************************
  * version_string_T                                                          *

@@ -128,6 +128,7 @@ namespace portage
                 protected:
                     void init(const string_type &);
                     string_type _version;
+                    string_type _extra;
             };
 
             void init();
