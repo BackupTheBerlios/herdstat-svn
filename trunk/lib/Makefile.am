@@ -21,9 +21,8 @@ CLEANFILES = version-test
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 
 version-test: $(noinst_LTLIBRARIES) version-test.cc
-	$(CXX) $(AM_CXXFLAGS) -ggdb3 -c version-test.cc
-	$(CXX) $(AM_CXXFLAGS) -o version-test version-test.o .libs/libutil.a \
-		-Wl,--rpath -Wl,/usr/lib/gcc-lib/i686-pc-linux-gnu/3.3.5
+	$(CXX) $(AM_CXXFLAGS) -ggdb3 -I.. -c version-test.cc
+	$(CXX) $(AM_CXXFLAGS) -o version-test version-test.o .libs/libutil.a $(LIBS)
 
 srchtml:
 	for x in $(libutil_la_SOURCES) ; do \

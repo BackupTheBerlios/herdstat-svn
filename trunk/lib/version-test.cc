@@ -20,9 +20,7 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "config.h"
 
 #include <utility>
 #include <iostream>
@@ -44,12 +42,12 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    const std::string portdir = portage::portdir();
+    const util::string portdir = portage::portdir();
 
-    std::string package;
+    util::string package;
     try
     {
-        package = portage::find_package(portdir, argv[1]);
+        package = portage::find_package_in(portdir, argv[1]);
     }
     catch (const portage::ambiguous_pkg_E &e)
     {
@@ -57,7 +55,7 @@ int main(int argc, char **argv)
             << " is ambiguous. Possible matches are:"
             << std::endl << std::endl;
 
-        std::vector<std::string>::const_iterator i;
+        std::vector<util::string>::const_iterator i;
         for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             std::cerr << *i << std::endl;
         return EXIT_FAILURE;
@@ -68,18 +66,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    portage::versions_T versions;
-    util::dir_T pkgdir(portdir + "/" + package);
-    util::dir_T::iterator d;
-    for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
-    {
-        std::string::size_type pos = d->rfind(".ebuild");
-        if (pos == std::string::npos)
-            continue;
-
-        assert(versions.insert(*d));
-    }
-
+    portage::versions_T versions(portdir+"/"+package);
     portage::versions_T::iterator v;
     for (v = versions.begin() ; v != versions.end() ; ++v)
     {
