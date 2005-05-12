@@ -37,7 +37,7 @@ namespace util
 	    float cur, step;
 
 	public:
-	    progress_T() : cur(0) { }
+	    progress_T() : cur(0), step(0) { }
 	    void start(unsigned m)
 	    {
 		this->step = 100.0 / m;

@@ -55,8 +55,8 @@ namespace util
 
             void assign(const string_type &, int c = 0, int e = 0);
             bool operator== (const string_type &cmp) const;
-            bool operator!= (const string_type &cmd) const
-            { return not (*this == cmd); }
+            bool operator!= (const string_type &cmp) const
+            { return not (*this == cmp); }
             const string_type &operator()() const { return this->_str; }
 
             bool empty() const { return this->_str.empty(); }

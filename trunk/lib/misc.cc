@@ -205,5 +205,27 @@ util::fetch(const char *url, const char *file, bool verbose)
     return std::system(cmd.c_str());
 }
 /****************************************************************************/
+template <typename T, typename U>
+const std::vector<T>
+util::map<T,U>::keys() const
+{
+    std::vector<T> v;
+    typename map<T,U>::iterator i;
+    for (i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->first);
+    return v;
+}
+/****************************************************************************/
+template <typename T, typename U>
+const std::vector<U>
+util::map<T,U>::values() const
+{
+    std::vector<U> v;
+    typename map<T,U>::iterator i;
+    for (i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->second);
+    return v;
+}
+/****************************************************************************/
 
 /* vim: set tw=80 sw=4 et : */

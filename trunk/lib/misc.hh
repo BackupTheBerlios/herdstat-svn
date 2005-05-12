@@ -92,6 +92,14 @@ namespace util
 
             static cmap_T _cm;
     };
+
+    template <typename T, typename U>
+    class map : public std::map<T,U>
+    {
+        public:
+            const std::vector<T> keys() const;
+            const std::vector<U> values() const;
+    };
 }
 
 #endif
