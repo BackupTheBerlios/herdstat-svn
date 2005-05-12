@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-05-12 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, doc/examples.txt, doc/default.css,
+	doc/Makefile.am: Moved EXAMPLES section of manual page to it's own
+	file, as it was starting to get quite large.  Stole Makefile.am
+	snippet and default.css from eclectic, so credit to ciaranm for those.
+	* src/misc.cc, src/misc.hh: Added util::map which at present provides
+	keys() and values() member functions.
+	* src/regex.hh: Fix typo.
+	* lib/progress.hh: Initialize 'step' member to 0.
+
 2005-05-11 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.0_rc5).

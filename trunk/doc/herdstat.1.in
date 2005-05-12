@@ -113,50 +113,7 @@ Display metadata information for the specified package(s).
 .TP
 If no options (non-option or not) are specified, @PACKAGE@ will display a summary of herds.xml statistics.  If --dev and --package are both specified, @PACKAGE@ will display all packages maintained by the specified developer.
 .SH EXAMPLES
-.IP "\fB$ @PACKAGE@ netmon x11\fR"
-Display all developers in the netmon and x11 herds.
-.IP "\fB$ @PACKAGE@ -m app-vim\fR"
-Display metadata information for the app-vim category.
-.IP "\fB$ @PACKAGE@ -m rkhunter\fR"
-Display metadata information for the rkhunter package.
-.IP "\fB$ @PACKAGE@ -mr ^xmms\fR"
-Display metadata information for all packages whose name begin with xmms.
-.IP "\fB$ @PACKAGE@ -mr ^app-vim\fR"
-Display metadata information for all packages matching ^app-vim.  Needless to say,
-this will match all packages in the app-vim category.
-.IP "\fB$ @PACKAGE@ -p netmon\fR"
-Display all packages in the netmon herd.
-.IP "\fB$ @PACKAGE@ -d ka0ttic\fR"
-Display all herds that the developer ka0ttic is in.
-.IP "\fB$ @PACKAGE@ -dp ka0ttic\fR"
-Display all packages ka0ttic maintains.
-.IP "\fB$ @PACKAGE@ -dp ka0ttic --with-herd cron\fR"
-Display all packages ka0ttic maintains that belong to the cron herd.
-.IP "\fB$ @PACKAGE@ -dpr ^kl\fR"
-Display all packages that developers, whose nick match ^kl, maintain.
-.IP "\fB$ @PACKAGE@ -pc base-system\fR"
-Display the number of packages in the base-system herd.
-.IP "\fB$ @PACKAGE@ -dpc ka0ttic\fR"
-Display the number of packages maintained by ka0ttic.
-.IP "\fB$ @PACKAGE@ -o ~/x11-devs.txt x11\fR"
-Send the output of '@PACKAGE@ x11' to ~/x11-devs.txt.
-.IP "\fB$ @PACKAGE@ all\fR"
-Display all herds.
-.IP "\fB$ for x in $(@PACKAGE@ -pq cron); do ... ; done\fR" 
-Perform an action on every package in the cron herd.
-.IP "\fB$ @PACKAGE@ $(@PACKAGE@ -dq vapier)\fR"
-Display the default herd output for all herds that the developer vapier is in.
-.IP "\fB$ @PACKAGE@ -pq $(@PACKAGE@ -dq ka0ttic)\fR"
-Display every package that belongs to a herd that ka0ttic is a member of.
-.IP "\fB$ @PACKAGE@ -wr app-vim.*-syntax\fR"
-Display the path to the latest ebuild for every vim syntax package.
-.IP "\fB$ @PACKAGE@ -frc ^dev-libs\fR"
-Display the number of packages in the dev-libs category.
-.IP "\fB$ emerge $(@PACKAGE@ -fr <regex>)\fR"
-emerge all packages matching <regex>.
-.IP "\fB$ @PACKAGE@ -pdm --with-herd shell-tools ka0ttic\fR"
-Display the metadata for all packages belonging to the shell-tools herd that
-ka0ttic maintains.
+See the examples.txt file that is distributed with @PACKAGE@.
 .SH ENVIRONMENT
 .TP
 .B HERDS
