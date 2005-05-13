@@ -73,7 +73,11 @@ namespace util
             }
             va_msg_base_E(const util::string &msg, ...)
             {
+#ifdef HAVE_GCC4
+                va_start(v, msg);
+#else
                 va_start(v, msg.c_str());
+#endif /* HAVE_GCC4 */
                 str = util::sprintf(msg.c_str(), v).c_str();
                 va_end(v);
             }

@@ -1,5 +1,14 @@
 ChangeLog for herdstat
 
+2005-05-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added gcc version check and define HAVE_GCC4 if using
+	gcc-4.
+	* lib/util_exceptions.hh, src/exceptions.hh: Use correct form of
+	va_start if HAVE_GCC4.
+	* src/action_meta_handler.cc: Fixed bug that caused 'herdstat -m' with
+	no non-options to break.
+
 2005-05-12 Aaron Walker <ka0ttic@gentoo.org>
 
 	* doc/herdstat.1.in, doc/examples.txt, doc/default.css,
