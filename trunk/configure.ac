@@ -26,6 +26,13 @@ AC_PROG_MAKE_SET
 # SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
 AC_SUBST(SED)
 
+AC_MSG_CHECKING([gcc version])
+gccver=`${CC} -dumpversion | cut -f1 -d.`
+AC_MSG_RESULT([$gccver])
+if test x$gccver = "x4" ; then
+    AC_DEFINE_UNQUOTED(HAVE_GCC4, 1, [GCC Version 4])
+fi
+
 dnl Required headers
 AC_HEADER_STDC
 AC_HEADER_TIME(,
