@@ -286,12 +286,10 @@ action_meta_handler_T::operator() (opts_type &opts)
             return EXIT_FAILURE;
         }
     }
-    else
-    {
-        opts_type::iterator i;
-        for (i = opts.begin() ; i != opts.end() ; ++i)
-            matches.insert(std::make_pair(dir, *i));
-    }
+        
+    opts_type::iterator i;
+    for (i = opts.begin() ; i != opts.end() ; ++i)
+        matches.insert(std::make_pair(dir, *i));
 
     /* for each specified package/category... */
     std::multimap<util::string, util::string>::size_type n = 1;
