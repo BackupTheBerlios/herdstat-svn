@@ -18,12 +18,16 @@ AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
-AC_DISABLE_SHARED
-AC_PROG_LIBTOOL
-AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_PROG_INSTALL
 
-# SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
+AC_DISABLE_SHARED
+dnl hack to disable damn f77 libtool checks (stolen from sandbox's configure.in)
+m4_undefine([AC_PROG_F77])
+m4_defun([AC_PROG_F77],[])
+AC_PROG_LIBTOOL
+
+dnl SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
 AC_SUBST(SED)
 
 AC_MSG_CHECKING([gcc version])
