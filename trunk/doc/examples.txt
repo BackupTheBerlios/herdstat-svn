@@ -33,6 +33,11 @@ Display all packages that dragonheart maintains that are in the crypto herd: ::
 
     $ herdstat -pd dragonheart --with-herd crypto
 
+Display all packages that dragonheart maintains that don't belong to a herd
+(ie. "no-herd"): ::
+
+    $ herdstat -pd dragonheart --no-herd
+
 Display the metadata for the herdstat package: ::
 
     $ herdstat -m herdstat
@@ -88,5 +93,10 @@ Display the path to the latest ebuild for all vim syntax packages: ::
 Display every package that belongs to a herd that ka0ttic is a member of: ::
 
     $ herdstat -pq $(herdstat -dq ka0ttic)
+
+Display every package in the shell-tools herd that does not have an explicit
+maintainer: ::
+
+    $ herdstat -p shell-tools --no-maintainer
 
 .. vim: set ft=glep tw=80 sw=4 et spell spelllang=en : ..

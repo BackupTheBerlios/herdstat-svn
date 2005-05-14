@@ -43,6 +43,13 @@ belonging to the specified herd.
 .B "\-\-no-herd"
 Shorthand for --with-herd=no-herd.
 .TP
+.B "\-\-with-maintainer \fI<dev>\fR"
+When used in conjunction with --package, only display those packages
+that are maintained by the specified developer.
+.TP
+.B "\-\-no-maintainer"
+Shorthand for --with-maintainer=none.
+.TP
 .B "\-N, \-\-no-overlay"
 Don't search overlay(s) in PORTDIR_OVERLAY.
 .TP

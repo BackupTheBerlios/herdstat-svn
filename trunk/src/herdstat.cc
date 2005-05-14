@@ -64,6 +64,8 @@ static struct option long_opts[] =
     {"nocolor",	    no_argument,	0,  'n'},
     {"no-herd",	    no_argument,	0,  '\n'},
     {"with-herd",   required_argument,	0,  '\v'},
+    {"no-maintainer", no_argument,	0,  '\r'},
+    {"with-maintainer", required_argument,0,'\t'},
     /* force a fetch of herds.xml */
     {"fetch",	    no_argument,	0,  'F'},
     /* time how long it takes for XML parsing */
@@ -124,6 +126,10 @@ help()
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
 	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
+	<< "     --with-maintainer <dev>" << std::endl
+	<< "                        When used in conjunction with --package, display" << std::endl
+	<< "                        all packages that the specified developer maintains." << std::endl
+	<< "     --no-maintainer    Shorthand for --with-maintainer=none" << std::endl
 	<< " -N, --no-overlay       Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
 	<< " -r, --regex            Display results matching the specified regular" << std::endl
 	<< "                        expression." << std::endl
@@ -308,6 +314,14 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --with-herd */
 	    case '\v':
 		optset("with-herd", util::string, optarg);
+		break;
+	    /* --no-maintainer */
+	    case '\r':
+		optset("with-maintainer", util::string, "none");
+		break;
+	    /* --with-maintainer */
+	    case '\t':
+		optset("with-maintainer", util::string, optarg);
 		break;
 	    /* --fetch */
 	    case 'F':

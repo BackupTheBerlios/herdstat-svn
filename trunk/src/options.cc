@@ -61,6 +61,7 @@ options_T::option_map_T::set_defaults()
 
     insopt("herds.xml", util::string(""));
     insopt("with-herd", util::string(""));
+    insopt("with-maintainer", util::string(""));
     insopt("outfile", util::string("stdout"));
     insopt("outstream", &std::cout);
 

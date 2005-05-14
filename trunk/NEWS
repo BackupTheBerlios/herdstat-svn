@@ -4,6 +4,12 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 1.1.0_rc6:
     Moved EXAMPLES section of manual page to it's own file, doc/examples.txt.
 
+    New features:
+     - Added --with-maintainer and --no-maintainer options that act just like
+       their herd counterpart (but of course only with --package) for doing
+       reverse lookups.  Makes it easy to find packages in a herd that aren't
+       explicitly maintained.
+
     Bug fixes:
      - Fixed broken 'herdstat -m' inside package directories.
 

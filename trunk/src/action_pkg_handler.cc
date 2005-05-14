@@ -32,10 +32,35 @@
 #include <map>
 
 #include "common.hh"
-#include "herds_xml.hh"
-#include "metadata_xml.hh"
 #include "action_meta_handler.hh"
 #include "action_pkg_handler.hh"
+
+/*
+ * Show search failure message.
+ */
+
+void
+action_pkg_handler_T::error(const util::string &criteria) const
+{
+    std::cerr << std::endl
+        << "Failed to find any packages maintained by '"
+        << criteria << "'";
+
+    if ((dev and with_herd.empty()) or (not dev and with_dev.empty()))
+    {
+        std::cerr << "." << std::endl;
+        return;
+    }
+    
+    std::cerr << " with ";
+
+    if (dev)
+        std::cerr << "herd '" << with_herd;
+    else
+        std::cerr << "developer '" << with_dev;
+    
+    std::cerr << "'." << std::endl;
+}
 
 /*
  * binary predicates for searching metadata for
@@ -49,6 +74,50 @@ static bool
 doesHerdMatch(metadata_xml_T::herd_type::value_type m,
               util::regex_T *r)
 { return *r == util::get_user_from_email(m.first); }
+
+/*
+ * Determine whether or not the metadata.xml matches our
+ * search criteria.
+ */
+
+bool
+action_pkg_handler_T::is_found(const metadata_xml_T &metadata,
+                               const util::string &criteria)
+{
+    util::string with(dev ? with_herd : with_dev);
+
+    if (dev)
+    {
+        if ((regex and (std::find_if(metadata.devs().begin(),
+            metadata.devs().end(), std::bind2nd(
+            std::ptr_fun(doesHerdMatch), &regexp)) != metadata.devs().end()) and
+            (with.empty() or metadata.herd_exists(with))) or
+            (not regex and metadata.dev_exists(criteria) and
+            (with.empty() or metadata.herd_exists(with))))
+            return true;
+    }
+    else
+    {
+        if ((regex and std::find_if(metadata.herds().begin(),
+            metadata.herds().end(), std::bind2nd(
+            std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end()) or
+            (not regex and metadata.herd_exists(criteria)))
+        {
+            if (with.empty())
+                return true;
+            else
+            {
+                if ((with == "none") and metadata.devs().empty())
+                    return true;
+                else if (metadata.dev_exists(with) or
+                         metadata.dev_exists(with+"@gentoo.org"))
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
 
 /*
  * Loop through every metadata.xml in the tree,
@@ -66,8 +135,6 @@ action_pkg_handler_T::search(package_list *list)
     metadatas_T::const_iterator m;
     for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
     {
-        bool found = false;
-
         if (status)
             ++progress;
 
@@ -85,52 +152,11 @@ action_pkg_handler_T::search(package_list *list)
          * determine whether the package matches our search criteria
          */
 
-        if (dev)
-        {
-            const util::string herd(optget("with-herd", util::string));
-            metadata_xml_T::herd_type::iterator d;
-
-            if (regex)
-            {
-                /* search metadata.xml for all devs matching regex */
-                if (std::find_if(metadata.devs().begin(),
-                    metadata.devs().end(), std::bind2nd(
-                    std::ptr_fun(doesHerdMatch), &regexp)) != metadata.devs().end())
-                {
-                    /* check --with-herd */
-                    if (herd.empty() or metadata.herd_exists(herd))
-                        found = true;
-                }
-            }
-            else
-            {
-                /* search the metadata for our dev */
-                if (metadata.dev_exists(list->name) and
-                    (herd.empty() or metadata.herd_exists(herd)))
-                {
-                    found = true;
-                }
-            }
-
-            if (found)
-                list->info = herds_xml.get_dev_info(list->name);
-        }
-        else
-        {
-            found = (
-                regex ?
-                    /* yes */
-                    std::find_if(metadata.herds().begin(),
-                        metadata.herds().end(), std::bind2nd(
-                        std::ptr_fun(doesMatch), &regexp)) != metadata.herds().end() :
-
-                    /* no */
-                    metadata.herd_exists(list->name)
-            );
-        }
-
-        if (not found)
+        if (not is_found(metadata, list->name))
             continue;
+
+        if (dev)
+            list->info = herds_xml.get_dev_info(list->name);
 
         /* get category/package from absolute path */
         util::string package = m->substr(portdir.size() + 1);
@@ -140,6 +166,7 @@ action_pkg_handler_T::search(package_list *list)
 
         debug_msg("Match found in %s.", m->c_str());
 
+        /* store it */
         (*list)[package] = metadata.longdesc();
     }
 }
@@ -288,12 +315,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             if (opts.size() == 1)
             {
                 if (not quiet)
-                {
-                    std::cerr << std::endl
-                        << "Failed to find "
-                        << (dev ? "developer '" : "herd '")
-                        << *i << "' in any metadata.xml's." << std::endl;
-                }
+                    error(*i);
 
                 return EXIT_FAILURE;
             }
@@ -351,12 +373,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     output.flush(*stream);
 
     for (i = not_found.begin() ; i != not_found.end() ; ++i)
-    {
-        std::cerr << std::endl
-            << "Failed to find "
-            << (dev ? "developer '" : "herd '")
-            << *i << "' in any metadata.xml's." << std::endl;
-    }
+        error(*i);
 
     if (not not_found.empty())
         std::cerr << std::endl;

@@ -1,5 +1,14 @@
 ChangeLog for herdstat
 
+2005-05-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc, src/options.cc, doc/herdstat.1.in, bashcomp: Added
+	--with-maintainer and --no-maintainer.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Added support
+	for --with-maintainer.  Move search error messages to it's own
+	function, error().  Also moved the search found determination code to
+	it's own member func, is_found().
+
 2005-05-13 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Added gcc version check and define HAVE_GCC4 if using

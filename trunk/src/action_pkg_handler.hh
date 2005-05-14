@@ -29,6 +29,7 @@
 
 #include <map>
 #include "herds_xml.hh"
+#include "metadata_xml.hh"
 #include "metadatas.hh"
 #include "action_handler.hh"
 
@@ -39,7 +40,9 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
                                  elapsed(0),
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
-                                 status(not quiet and not debug) { }
+                                 status(not quiet and not debug),
+                                 with_herd(optget("with-herd", util::string)),
+                                 with_dev(optget("with-maintainer", util::string)) { }
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
 
@@ -56,11 +59,14 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 
         void search(package_list *);
         void display(package_list &);
+        void error(const util::string &) const;
+        bool is_found(const metadata_xml_T &, const util::string &);
 
         metadatas_T metadatas;
         util::progress_T  progress;
         util::timer_T::size_type elapsed;
         const bool dev, meta, status;
+        const util::string with_herd, with_dev;
 };
 
 #endif
