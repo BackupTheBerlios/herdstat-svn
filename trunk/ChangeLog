@@ -1,5 +1,9 @@
 ChangeLog for herdstat
 
+2005-05-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.0_rc6).
+
 2005-05-14 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/herdstat.cc, src/options.cc, doc/herdstat.1.in, bashcomp: Added
