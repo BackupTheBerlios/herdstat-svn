@@ -82,6 +82,7 @@ AC_ARG_ENABLE(unicode, [ --enable-unicode   enable Unicode support [on]],
 	*)	AC_MSG_ERROR(--enable-unicode accepts yes or no only) ;;
     esac], [unicode=true])
 
+PKG_PROG_PKG_CONFIG
 if test x$unicode = "xtrue"; then
     AC_DEFINE_UNQUOTED(UNICODE, 1, [Enable Unicode support])
     PKG_CHECK_MODULES(GLIBMM, glibmm-2.4 >= 2.4)
