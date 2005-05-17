@@ -42,24 +42,28 @@ namespace util
     class string : public Glib::ustring
     {
         public:
-            explicit string() : Glib::ustring() { }
-            string(const char *n) : Glib::ustring(n) { }
-            string(const std::string &n) : Glib::ustring(n) { }
-            string(const Glib::ustring &n) : Glib::ustring(n) { }
-            string(const string &n) : Glib::ustring(n) { }
+            typedef Glib::ustring base_type;
 #else /* UNICODE */
     class string : public std::string
     {
         public:
-            explicit string() : std::string() { }
-            string(const char *n) : std::string(n) { }
-            string(const std::string &n) : std::string(n) { }
-            string(const string &n) : std::string(n) { }
+            typedef std::string base_type;
 #endif /* UNICODE */
+            explicit string() : base_type() { }
+            string(const char *n) : base_type(n) { }
+            string(const base_type &n) : base_type(n) { }
+#ifdef UNICODE
+            string(const std::string &n) : base_type(n) { }
+#endif
+            string(const string &n) : base_type(n) { }
+
             virtual ~string() { }
 
+            string substr(size_type i = 0, size_type n = npos) const
+            { return base_type::substr(i, n); }
+
             virtual std::vector<util::string>
-            split(const util::string::value_type delim = ' ') const;
+            split(const value_type delim = ' ') const;
     };
 
 #ifdef UNICODE
