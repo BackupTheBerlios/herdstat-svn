@@ -58,7 +58,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         };
 
         void search(package_list *);
-        void display(package_list &);
+        void display(const package_list &);
         void error(const util::string &) const;
         bool is_found(const metadata_xml_T &, const util::string &);
 

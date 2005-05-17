@@ -172,7 +172,7 @@ action_pkg_handler_T::search(package_list *list)
 }
 
 void
-action_pkg_handler_T::display(package_list &list)
+action_pkg_handler_T::display(const package_list &list)
 {
     if (not quiet)
     {
@@ -212,7 +212,7 @@ action_pkg_handler_T::display(package_list &list)
         output("", list.begin()->first);
 
     /* display the category/package */
-    package_list::iterator p = list.begin();
+    package_list::const_iterator p = list.begin();
     if (not list.empty()) ++p;
     package_list::size_type pn = 1;
     for ( ; p != list.end() ; ++p, ++pn)

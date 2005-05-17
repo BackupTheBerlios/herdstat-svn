@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-05-17 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/Makefile.am, lib/Makefile.am: Use libtool --silent.
+	* lib/string.hh: Added string::substr() as Glib::ustring::substr()
+	returns a Glib::ustring.
+	* src/formatter.cc: util::string instantiation is no longer needed
+	when calling util::string::split() now that substr returns a
+	util::string.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: display()
+	argument need not be non-const.
+
 2005-05-16 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Explicitly call PKG_PROG_PKG_CONFIG.  Gentoo bug

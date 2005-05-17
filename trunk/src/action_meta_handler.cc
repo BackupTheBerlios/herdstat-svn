@@ -36,14 +36,13 @@
 void
 action_meta_handler_T::display(const meta &data)
 {
-    metadata_xml_T::herd_type  devs;
-    metadata_xml_T::herds_type herds;
-    util::string longdesc;
-
     /* does the metadata.xml exist? */
     if (util::is_file(data.metadata))
     {
         util::vars_T ebuild_vars;
+        metadata_xml_T::herd_type  devs;
+        metadata_xml_T::herds_type herds;
+        util::string longdesc;
 
         /* parse it */
         {

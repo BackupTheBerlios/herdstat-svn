@@ -174,7 +174,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                 if (pos == string_type::npos)
                     cur += highlight(data.split());
                 else
-                    cur += highlight(string_type(data.substr(0, pos)).split());
+                    cur += highlight(data.substr(0, pos).split());
 
                 debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
@@ -190,7 +190,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                 debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
-                std::vector<string_type> leftovers = string_type(data.substr(pos)).split();
+                std::vector<string_type> leftovers = data.substr(pos).split();
 
                 std::vector<string_type>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
