@@ -17,6 +17,7 @@ libutil_la_SOURCES = util_exceptions.hh \
 
 LIBS = @LIBS@ @GLIBMM_LIBS@
 AM_CXXFLAGS = -pedantic -ansi -Wall -Wno-long-long @GLIBMM_CFLAGS@
+LIBTOOL = @LIBTOOL@ --silent
 CLEANFILES = version-test
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 
