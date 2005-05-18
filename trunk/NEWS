@@ -1,6 +1,12 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.0:
+    Use libtool --silent for less verbose compile output.
+
+    Bug fixes:
+     - Added explicit pkg-config check for Gentoo bug 92788.
+
 1.1.0_rc6:
     Moved EXAMPLES section of manual page to it's own file, doc/examples.txt.
 
