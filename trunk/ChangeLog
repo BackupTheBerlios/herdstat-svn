@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-05-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac, lib/Makefile.am, src/Makefile.am: set LIBTOOL in
+	configure.in and AC_SUBST rather than setting it in each Makefile.am.
+
 2005-05-18 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.0 final).

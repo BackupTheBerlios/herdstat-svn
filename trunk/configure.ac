@@ -27,6 +27,9 @@ m4_undefine([AC_PROG_F77])
 m4_defun([AC_PROG_F77],[])
 AC_PROG_LIBTOOL
 
+LIBTOOL="${LIBTOOL} --silent"
+AC_SUBST(LIBTOOL)
+
 dnl SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
 AC_SUBST(SED)
 
