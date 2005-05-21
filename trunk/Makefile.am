@@ -15,7 +15,7 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 EXTRA_DIST = autogen.sh .todo bashcomp
 
 srchtml:
-	test -d ${PWD}/html || mkdir ${PWD}/html ; \
+	@test -d ${PWD}/html || mkdir ${PWD}/html ; \
 	for x in lib src ; do \
 		if test -d ${PWD}/html/$${x} ; then \
 			rm -fr ${PWD}/html/$${x}/* ; \

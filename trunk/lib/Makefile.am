@@ -26,7 +26,5 @@ version-test: $(noinst_LTLIBRARIES) version-test.cc
 	$(CXX) $(AM_CXXFLAGS) -o version-test version-test.o .libs/libutil.a $(LIBS)
 
 srchtml:
-	for x in $(libutil_la_SOURCES) ; do \
-		source-highlight -c ../src.css -s cpp -f html -t4 -n -i $${x} \
-			-o ../html/lib/$${x}.html ; \
-	done
+	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i *.{cc,hh} \
+		--output-dir=../html/lib
