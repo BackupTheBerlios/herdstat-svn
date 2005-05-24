@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/devaway.hh
+ * herdstat -- src/action_away_handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,43 +20,24 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_DEVAWAY_HH
-#define HAVE_DEVAWAY_HH 1
+#ifndef HAVE_ACTION_AWAY_HANDLER_HH
+#define HAVE_ACTION_AWAY_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <map>
-#include "common.hh"
-#include "parsable.hh"
+#include "devaway.hh"
+#include "action_handler.hh"
 
-#define DEVAWAY_LOCAL      LOCALSTATEDIR"/devaway.html"
-
-/*
- * Represents a list of developers who are away, and their
- * corresponding away message.
- */
-
-class devaway_T : public parsable_T
+class action_away_handler_T : public action_fancy_handler_T
 {
     public:
-        typedef std::map<util::string, util::string> value_type;
-        typedef value_type::iterator iterator;
-        typedef value_type::const_iterator const_iterator;
-        typedef value_type::size_type size_type;
+        virtual ~action_away_handler_T() { }
+        virtual int operator() (opts_type &);
 
-        devaway_T() : parsable_T(DEVAWAY_LOCAL) { }
-
-        const string_type operator[] (const string_type &s)
-        { return this->_away[s]; }
-
-    protected:
-        virtual void init();
-        virtual void fetch();
-        virtual void parse(const string_type & = "");
-
-        value_type _away;
+    private:
+        devaway_T devaway;
 };
 
 #endif

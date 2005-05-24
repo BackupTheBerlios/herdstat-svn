@@ -52,11 +52,12 @@ class xml_T : public parsable_T
 
         handler_type *handler() const { return this->_handler.get(); }
 
-        virtual void parse(const string_type &p)
+        virtual void parse(const string_type &p = "")
         {
+            const util::string file(p.empty() ? this->_path : p);
             XMLParser_T parser(this->_handler.get(), this->_validate);
             this->_timer.start();
-            parser.parse(p);
+            parser.parse(file);
             this->_timer.stop();
         }
 
@@ -66,7 +67,7 @@ class xml_T : public parsable_T
             if (not this->_path.exists())
                 throw bad_fileobject_E(this->_path);
 
-            this->parse(this->_path);
+            this->parse();
         }
 
         const pointer_type _handler;    /* content handler */

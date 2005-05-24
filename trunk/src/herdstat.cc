@@ -49,8 +49,9 @@
 #include "action_stats_handler.hh"
 #include "action_which_handler.hh"
 #include "action_versions_handler.hh"
+#include "action_away_handler.hh"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErf";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfa";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -81,6 +82,7 @@ static struct option long_opts[] =
     {"which",	    no_argument,	0,  'w'},
     {"versions",    no_argument,	0,  '\b'},
     {"find",	    no_argument,	0,  'f'},
+    {"away",	    no_argument,	0,  'a'},
     /* specify a file to write the output to */
     {"outfile",	    required_argument,	0,  'o'},
     {"no-overlay",  no_argument,	0,  'N'},
@@ -122,6 +124,7 @@ help()
 	<< " -m, --metadata         Look up metadata by package/category." << std::endl
 	<< " -w, --which            Look up full path to ebuild for specified packages." << std::endl
 	<< " -f, --find             Look up category/package for the specified packages." << std::endl
+	<< " -a, --away		    Look up away information for the specified developers." << std::endl
 	<< "     --versions         Look up versions of specified packages." << std::endl
 	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
 	<< "                        display all packages that belong to the specified herd." << std::endl
@@ -171,6 +174,7 @@ help()
 	<< " -d              Look up herds by developer." << std::endl
 	<< " -m              Look up metadata by package/category." << std::endl
 	<< " -f              Look up category/package of the specified packages." << std::endl
+	<< " -a              Look up away information for the specified developers." << std::endl
 	<< " -w              Look up full path to ebuild for specified packages." << std::endl
 	<< " -N              Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
 	<< " -r              Display results matching the specified regular expression." << std::endl
@@ -284,6 +288,13 @@ handle_opts(int argc, char **argv, opts_type *args)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_versions);
 		break;
+	    /* --away */
+	    case 'a':
+		if (optget("action", options_action_T) != action_unspecified)
+		    throw args_one_action_only_E();
+		optset("action", options_action_T, action_away);
+		break;
+	    /* --no-overlay */
 	    case 'N':
 		optset("overlay", bool, false);
 		break;
@@ -387,10 +398,12 @@ handle_opts(int argc, char **argv, opts_type *args)
     }
     else
     {
+	/* actions that are allowed to have 0 non-option args */
 	options_action_T action = optget("action", options_action_T);
 	if (action != action_unspecified and
 	    action != action_meta and
-	    action != action_versions)
+	    action != action_versions and
+	    action != action_away)
 	    throw args_usage_E();
     }
 
@@ -510,6 +523,7 @@ main(int argc, char **argv)
 	handlers[action_which]    = new action_which_handler_T();
 	handlers[action_versions] = new action_versions_handler_T();
 	handlers[action_find]     = new action_find_handler_T();
+	handlers[action_away]     = new action_away_handler_T();
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];

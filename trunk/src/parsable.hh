@@ -37,18 +37,19 @@ class parsable_T
         typedef util::path_T string_type;
         typedef util::timer_T timer_type;
 
+        parsable_T() { }
         parsable_T(const string_type &p) : _path(p) { }
         virtual ~parsable_T() { }
 
-        string_type &path() const { return this->_path; }
+        virtual void parse(const string_type & = "") = 0;
+
+        string_type &path() { return this->_path; }
         timer_type::size_type elapsed() const
         { return this->_timer.elapsed(); }
 
     protected:
-        virtual void init() { }
+        virtual void init() = 0;
         virtual void fetch() { }
-        virtual void parse() { this->parse(this->_path); }
-        virtual void parse(const string_type &) = 0;
 
         string_type _path;              /* path to XML file */
         timer_type  _timer;             /* timer object */

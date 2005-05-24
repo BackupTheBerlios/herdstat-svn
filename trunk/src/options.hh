@@ -44,7 +44,8 @@ enum options_action_T
     action_stats,
     action_which,
     action_versions,
-    action_find
+    action_find,
+    action_away
 };
 
 /*
