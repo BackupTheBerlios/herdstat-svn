@@ -37,6 +37,10 @@ AM_CXXFLAGS = -pedantic -ansi -Wall @LIBXMLPP_CFLAGS@ @XMLWRAPP_CFLAGS@
 
 MAINTAINERCLEANFILES = Makefile.in *~
 
-srchtml:
-	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i *.{cc,hh} \
-		--output-dir=../html/src
+srchtml: $(foreach f, $(annodir_SOURCES), $(f).html)
+%.cc.html: %.cc
+	@echo Generating $@
+	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i $? -o ../html/src/$@
+%.hh.html: %.hh
+	@echo Generating $@
+	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i $? -o ../html/src/$@
