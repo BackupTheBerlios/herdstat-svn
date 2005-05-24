@@ -29,14 +29,13 @@
 
 #define DEVAWAY_REMOTE      "http://dev.gentoo.org/devaway/"
 #define DEVAWAY_EXPIRE      86400
+#define DEVAWAY_USER_TOKEN "<tr><td>"
+#define DEVAWAY_MSG_TOKEN   "</td><td>"
 
 void
 devaway_T::init()
 {
-    debug_msg("devaway_T::init()");
-
     struct stat s;
-
     if ((stat(DEVAWAY_LOCAL, &s) != 0) or
        ((time(NULL) - s.st_mtime) > DEVAWAY_EXPIRE) or (s.st_size == 0))
         this->_path.assign(DEVAWAY_REMOTE);
@@ -94,44 +93,50 @@ devaway_T::parse(const string_type &path)
         throw util::bad_fileobject_E(this->_path);
 
     std::string s;
-    util::string::size_type pos;
+    util::string::size_type beginpos, endpos;
     while (std::getline(*f, s))
     {
-        util::string line(s);
+        util::string line(s), dev, awaymsg;
 
         /* strip leading whitespace */
-        if ((pos = line.find_first_not_of(" \t")) != util::string::npos)
-            line.erase(0, pos);
+        beginpos = line.find_first_not_of(" \t");
+        if (beginpos != util::string::npos)
+            line.erase(0, beginpos);
 
         if (line.length() < 1)
             continue;
 
-        util::string dev, awaymsg;
-        if ((pos = line.find_first_of("<tr><td>")) != util::string::npos)
-        {
-            if (line.length() < 8)
-                continue;
-
-            line = line.substr(pos+8);
-
-            if ((pos = line.find('<')) == util::string::npos)
-                continue;
-
-            dev.assign(line.substr(0, pos));
-            
-            if ((pos = line.rfind('>')) == util::string::npos)
-                continue;
-
-            awaymsg.assign(line.substr(pos+1));
-
-            debug_msg("line = '%s'", line.c_str());
-            debug_msg("dev  = '%s'", dev.c_str());
-            debug_msg("away = '%s'", awaymsg.c_str());
-        }
-        else
+        beginpos = line.find(DEVAWAY_USER_TOKEN);
+        if (beginpos == util::string::npos)
             continue;
 
-        debug_msg("away[%s] = '%s'", dev.c_str(), awaymsg.c_str());
+        endpos = line.find('<', beginpos);
+        if (endpos == util::string::npos)
+            continue;
+
+        dev = line.substr(beginpos+std::strlen(DEVAWAY_USER_TOKEN));
+        beginpos = dev.find('<');
+        if (beginpos == util::string::npos)
+            continue;
+
+        dev = dev.substr(0, beginpos);
+        debug_msg("dev = '%s'", dev.c_str());
+
+        beginpos = line.find(DEVAWAY_MSG_TOKEN);
+        if (beginpos == util::string::npos)
+            continue;
+
+        if (line.length() < std::strlen(DEVAWAY_MSG_TOKEN))
+            continue;
+
+        awaymsg = line.substr(beginpos + std::strlen(DEVAWAY_MSG_TOKEN));
+        if (awaymsg == "</td></tr>")
+            continue;
+        debug_msg("msg = '%s'", awaymsg.c_str());
+
+        while ((beginpos = awaymsg.find("&lt;")) != util::string::npos)
+            awaymsg.replace(beginpos, 4, "<");
+
         this->_away[dev] = awaymsg;
     }
 }

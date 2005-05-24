@@ -30,8 +30,12 @@
 void
 action_away_handler_T::display(const util::string &dev)
 {
+    if (devaway.find(dev) == devaway.end())
+        throw dev_E();
+
     if (quiet)
-        *stream << dev << " - " << devaway[dev] << std::endl;
+        *stream << dev << " - " << util::tidy_whitespace(devaway[dev])
+            << std::endl;
     else
     {
         herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
@@ -55,18 +59,30 @@ action_away_handler_T::operator() (opts_type &opts)
     devaway.fetch();
     devaway.parse();
 
-    output.set_maxlabel(opts.empty() ? 20 : 13);
+    output.set_maxlabel(all ? 20 : 13);
     output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 
-    if (opts.empty())
+    if (all)
     {
-        output(util::sprintf("Away Developers(%s)", devaway.size()), "");
+        output(util::sprintf("Away Developers(%d)", devaway.size()), "");
         for (d = devaway.begin() ; d != devaway.end() ; ++d)
         {
-            output("", color[blue] + d->first + color[none]);
-            output("", util::tidy_whitespace(d->second));
-            output.endl();
+            if (quiet)
+            {
+                *stream << d->first << " - " << util::tidy_whitespace(d->second)
+                    << std::endl;
+            }
+            else
+            {
+                if (optget("color", bool))
+                    output("", color[blue] + d->first + color[none]);
+                else
+                    output("", d->first);
+
+                output("", util::tidy_whitespace(d->second));
+                output.endl();
+            }
         }
 
         size = devaway.size();
@@ -106,7 +122,7 @@ action_away_handler_T::operator() (opts_type &opts)
 
     opts_type::iterator i;
     opts_type::size_type n = 1;
-    for (i = opts.begin() ; i != opts.end() ; ++i)
+    for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
         try
         {

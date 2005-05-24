@@ -1,5 +1,15 @@
 ChangeLog for herdstat
 
+2005-05-24 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/parsable.hh: Added new base class for parsable things.
+	* src/xml.hh: Inherit from parsable_T.
+	* src/devaway.cc, src/devaway.hh: Added new devaway_T class that
+	represents a devaway list.
+	* src/herdstat.cc, src/action_away_handler.cc,
+	src/action_away_handler.hh: Added new action handler for --away.
+	* bashcomp, doc/herdstat.1.in: Added --away.
+
 2005-05-19 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac, lib/Makefile.am, src/Makefile.am: set LIBTOOL in

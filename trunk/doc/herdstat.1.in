@@ -82,6 +82,9 @@ Display versions of the specified package(s).
 .B "\-f, \-\-find"
 Display full package name (in category/package form) for the specified packages.
 .TP
+.B "\-a, \-\-away"
+Display away information for the specified developer(s).
+.TP
 .B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
 for an alternative way of setting the herds.xml location.

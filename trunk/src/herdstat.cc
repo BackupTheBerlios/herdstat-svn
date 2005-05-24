@@ -158,6 +158,7 @@ help()
 	<< " -m, --metadata         1 or more categories/packages." << std::endl
 	<< " -w, --which            1 or more packages." << std::endl
 	<< " -f, --find             1 or more packages." << std::endl
+	<< " -a, --away             1 or more developers." << std::endl
 	<< "     --versions         1 or more packages." << std::endl
 	<< std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
@@ -402,8 +403,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 	options_action_T action = optget("action", options_action_T);
 	if (action != action_unspecified and
 	    action != action_meta and
-	    action != action_versions and
-	    action != action_away)
+	    action != action_versions)
 	    throw args_usage_E();
     }
 
@@ -427,10 +427,9 @@ main(int argc, char **argv)
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw args_E();
 
-	if (nonopt_args.empty() and
+	if (nonopt_args.empty() and not optget("fetch", bool) and
 	    optget("action", options_action_T) != action_meta and
-	    optget("action", options_action_T) != action_versions and
-	    not optget("fetch", bool))
+	    optget("action", options_action_T) != action_versions)
 	{
 	    optset("action", options_action_T, action_stats);
 	    optset("quiet", bool, false);
