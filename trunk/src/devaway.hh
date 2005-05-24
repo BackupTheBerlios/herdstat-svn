@@ -48,8 +48,21 @@ class devaway_T : public parsable_T
 
         devaway_T() : parsable_T(DEVAWAY_LOCAL) { }
 
+        /* value_type subset */
+        iterator begin() { return this->_away.begin(); }
+        const_iterator begin() const { return this->_away.begin(); }
+        iterator end() { return this->_away.end(); }
+        const_iterator end() const { return this->_away.end(); }
+        iterator find(const value_type::key_type &key)
+        { return this->_away.find(key); }
+        iterator find(const value_type::key_type &key) const
+        { return this->_away.find(key); }
+
         const string_type operator[] (const string_type &s)
         { return this->_away[s]; }
+
+        size_type size() const { return this->_away.size(); }
+        bool empty() const { return this->_away.size() == 0; }
 
     protected:
         virtual void init();

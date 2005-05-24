@@ -19,6 +19,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   metadatas.hh metadatas.cc \
 		   overlaydisplay.hh \
 		   action_handler.hh \
+		   action_away_handler.hh action_away_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
 		   action_herd_handler.hh action_herd_handler.cc \
 		   action_find_handler.hh action_find_handler.cc \

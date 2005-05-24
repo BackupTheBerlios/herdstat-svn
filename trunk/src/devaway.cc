@@ -37,10 +37,7 @@ devaway_T::init()
 
     if ((stat(DEVAWAY_LOCAL, &s) != 0) or
        ((time(NULL) - s.st_mtime) > DEVAWAY_EXPIRE) or (s.st_size == 0))
-        this->fetch();
-
-    assert(util::is_file(this->_path));
-    this->parse();
+        this->path.assign(DEVAWAY_REMOTE);
 }
 
 void
@@ -50,6 +47,9 @@ devaway_T::fetch()
 
     try
     {
+        if (this->path.find("http://") == util::path_T::npos)
+            return;
+
         if (util::is_file(DEVAWAY_LOCAL))
             util::copy_file(DEVAWAY_LOCAL, DEVAWAY_LOCAL".bak");
 
@@ -70,6 +70,9 @@ devaway_T::fetch()
             throw;
         }
     }
+
+    this->_path.assign(DEVAWAY_LOCAL);
+    assert(util::is_file(this->_path));
 }
 
 void

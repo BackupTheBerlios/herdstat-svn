@@ -154,7 +154,7 @@ action_dev_handler_T::operator() (opts_type &devs)
         if (devs.empty())
         {
             std::cerr << "Failed to find any developers matching '" << re
-                << std::endl;
+                << "'." << std::endl;
             return EXIT_FAILURE;
         }
 
