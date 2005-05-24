@@ -27,6 +27,24 @@
 #include <algorithm>
 #include "action_away_handler.hh"
 
+void
+action_away_handler_T::display(const util::string &dev)
+{
+    herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
+
+    if (not quiet)
+    {
+        if (info.name.empty())
+            output("Developer", dev);
+        else
+            output("Developer", info.name + " (" + dev + ")");
+
+        output("Email", dev + "@gentoo.org");
+    }
+
+    size += 1;
+}
+
 int
 action_away_handler_T::operator() (opts_type &opts)
 {
@@ -47,8 +65,16 @@ action_away_handler_T::operator() (opts_type &opts)
             output("", util::tidy_whitespace(d->second));
             output.endl();
         }
+
+        size = devaway.size();
+        flush();
+        return EXIT_SUCCESS;
     }
-    else if (regex and opts.size() > 1)
+        
+    herds_xml.fetch();
+    herds_xml.parse();
+
+    if (regex and opts.size() > 1)
     {
         std::cerr << "You may only specify one regular expression."
             << std::endl;
@@ -79,9 +105,24 @@ action_away_handler_T::operator() (opts_type &opts)
     opts_type::size_type n = 1;
     for (i = opts.begin() ; i != opts.end() ; ++i)
     {
+        try
+        {
+            display(*i);
+        }
+        catch (const dev_E)
+        {
+            std::cerr << "Developer '" << *i << "' either doesn't exist or "
+                << "is not currently away." << std::endl;
 
+            if (opts.size() == 1)
+                return EXIT_FAILURE;
+        }
+
+        if (not count and n != opts.size())
+            output.endl();
     }
 
+    flush();
     return EXIT_SUCCESS;
 }
 

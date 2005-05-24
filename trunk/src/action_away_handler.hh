@@ -30,13 +30,15 @@
 #include "devaway.hh"
 #include "action_handler.hh"
 
-class action_away_handler_T : public action_fancy_handler_T
+class action_away_handler_T : public action_herds_xml_handler_T
 {
     public:
         virtual ~action_away_handler_T() { }
         virtual int operator() (opts_type &);
 
     private:
+        void display(const util::string &);
+
         devaway_T devaway;
 };
 
