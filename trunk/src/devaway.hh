@@ -46,7 +46,7 @@ class devaway_T : public parsable_T
         typedef value_type::const_iterator const_iterator;
         typedef value_type::size_type size_type;
 
-        devaway_T() : parsable_T(DEVAWAY_LOCAL) { }
+        devaway_T() : parsable_T(DEVAWAY_LOCAL) { this->init(); }
 
         /* value_type subset */
         iterator begin() { return this->_away.begin(); }
@@ -55,7 +55,7 @@ class devaway_T : public parsable_T
         const_iterator end() const { return this->_away.end(); }
         iterator find(const value_type::key_type &key)
         { return this->_away.find(key); }
-        iterator find(const value_type::key_type &key) const
+        const_iterator find(const value_type::key_type &key) const
         { return this->_away.find(key); }
 
         const string_type operator[] (const string_type &s)
@@ -64,10 +64,11 @@ class devaway_T : public parsable_T
         size_type size() const { return this->_away.size(); }
         bool empty() const { return this->_away.size() == 0; }
 
-    protected:
-        virtual void init();
         virtual void fetch();
         virtual void parse(const string_type & = "");
+
+    protected:
+        virtual void init();
 
         value_type _away;
 };

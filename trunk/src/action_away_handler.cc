@@ -30,16 +30,19 @@
 void
 action_away_handler_T::display(const util::string &dev)
 {
-    herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
-
-    if (not quiet)
+    if (quiet)
+        *stream << dev << " - " << devaway[dev] << std::endl;
+    else
     {
+        herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
+
         if (info.name.empty())
             output("Developer", dev);
         else
             output("Developer", info.name + " (" + dev + ")");
 
         output("Email", dev + "@gentoo.org");
+        output("Away Message", util::tidy_whitespace(devaway[dev]));
     }
 
     size += 1;
@@ -52,7 +55,7 @@ action_away_handler_T::operator() (opts_type &opts)
     devaway.fetch();
     devaway.parse();
 
-    output.set_maxlabel(opts.empty() ? 16 : 12);
+    output.set_maxlabel(opts.empty() ? 20 : 13);
     output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 

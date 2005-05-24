@@ -33,11 +33,13 @@
 void
 devaway_T::init()
 {
+    debug_msg("devaway_T::init()");
+
     struct stat s;
 
     if ((stat(DEVAWAY_LOCAL, &s) != 0) or
        ((time(NULL) - s.st_mtime) > DEVAWAY_EXPIRE) or (s.st_size == 0))
-        this->path.assign(DEVAWAY_REMOTE);
+        this->_path.assign(DEVAWAY_REMOTE);
 }
 
 void
@@ -47,22 +49,29 @@ devaway_T::fetch()
 
     try
     {
-        if (this->path.find("http://") == util::path_T::npos)
+        if (this->_path.find("http://") == util::path_T::npos)
             return;
+
+        debug_msg("fetching '%s'", DEVAWAY_REMOTE);
 
         if (util::is_file(DEVAWAY_LOCAL))
             util::copy_file(DEVAWAY_LOCAL, DEVAWAY_LOCAL".bak");
 
         if ((util::fetch(DEVAWAY_REMOTE, DEVAWAY_LOCAL) != 0) or
-            (stat(DEVAWAY_LOCAL, &s) != 0) or (s.st_size > 0))
+            (stat(DEVAWAY_LOCAL, &s) != 0) or (s.st_size == 0))
             throw fetch_E();
+
+        debug_msg("fetching succeeded");
 
         unlink(DEVAWAY_LOCAL".bak");
     }
     catch (const fetch_E &e)
     {
         if (util::is_file(DEVAWAY_LOCAL".bak"))
+        {
             util::move_file(DEVAWAY_LOCAL".bak", DEVAWAY_LOCAL);
+            debug_msg("fetching failed, using backup copy");
+        }
         else
         {
             std::cerr << "Failed to fetch " << DEVAWAY_REMOTE << "."
@@ -85,34 +94,44 @@ devaway_T::parse(const string_type &path)
         throw util::bad_fileobject_E(this->_path);
 
     std::string s;
-    util::string::size_type startpos, endpos;
+    util::string::size_type pos;
     while (std::getline(*f, s))
     {
         util::string line(s);
 
         /* strip leading whitespace */
-        if ((startpos = line.find_first_not_of(" \t")) != util::string::npos)
-            line.erase(0, startpos);
-        /* strip trailing whitespace */
-        if ((startpos = line.find_last_of(" \t")) != util::string::npos)
-            line.erase(startpos);
+        if ((pos = line.find_first_not_of(" \t")) != util::string::npos)
+            line.erase(0, pos);
 
         if (line.length() < 1)
             continue;
 
         util::string dev, awaymsg;
-        if ((startpos = line.find_first_of("<tr><td>")) != util::string::npos)
+        if ((pos = line.find_first_of("<tr><td>")) != util::string::npos)
         {
-            endpos = line.find_first_of("</td><td>");
-            if (endpos == util::string::npos)
+            if (line.length() < 8)
                 continue;
+
+            line = line.substr(pos+8);
+
+            if ((pos = line.find('<')) == util::string::npos)
+                continue;
+
+            dev.assign(line.substr(0, pos));
             
-            dev.assign(line.substr(startpos, endpos));
-            awaymsg.assign(line.substr(endpos + 9));
+            if ((pos = line.rfind('>')) == util::string::npos)
+                continue;
+
+            awaymsg.assign(line.substr(pos+1));
+
+            debug_msg("line = '%s'", line.c_str());
+            debug_msg("dev  = '%s'", dev.c_str());
+            debug_msg("away = '%s'", awaymsg.c_str());
         }
         else
             continue;
 
+        debug_msg("away[%s] = '%s'", dev.c_str(), awaymsg.c_str());
         this->_away[dev] = awaymsg;
     }
 }
