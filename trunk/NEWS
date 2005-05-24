@@ -1,6 +1,10 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_alpha1:
+    New features:
+     - Added --away option for viewing devaway information.
+
 1.1.0:
     Use libtool --silent for less verbose compile output.
 
