@@ -29,6 +29,7 @@
 
 #include <memory>
 #include "common.hh"
+#include "parsable.hh"
 #include "xmlparser.hh"
 
 /*
@@ -36,27 +37,21 @@
  */
 
 template <class H>
-class xml_T
+class xml_T : public parsable_T
 {
     public:
         typedef H handler_type;
-        typedef util::path_T string_type;
-        typedef util::timer_T timer_type;
         typedef std::auto_ptr<handler_type> pointer_type;
 
         xml_T(bool validate = false)
-            : _handler(new handler_type()), _validate(validate) { }
+            : parsable_T(), _handler(new handler_type()), _validate(validate) { }
         xml_T(const string_type &p, bool validate = false)
-            : _path(p), _handler(new handler_type()), _validate(validate)
+            : parsable_T(p), _handler(new handler_type()), _validate(validate)
         { this->init(); }
         virtual ~xml_T() { }
 
         handler_type *handler() const { return this->_handler.get(); }
 
-        timer_type::size_type elapsed() const
-        { return this->_timer.elapsed(); }   
-
-        virtual void parse() { this->parse(this->_path); }
         virtual void parse(const string_type &p)
         {
             XMLParser_T parser(this->_handler.get(), this->_validate);
@@ -74,8 +69,6 @@ class xml_T
             this->parse(this->_path);
         }
 
-        string_type _path;              /* path to XML file */
-        timer_type  _timer;             /* timer object */
         const pointer_type _handler;    /* content handler */
         const bool _validate;           /* validate XML? */
 };

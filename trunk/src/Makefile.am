@@ -10,7 +10,9 @@ herdstat_SOURCES = common.hh common.cc \
 		   xmlparser.hh \
 		   herds_xml_handler.hh herds_xml_handler.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
+		   parsable.hh \
 		   xml.hh \
+		   devaway.hh devaway.cc \
 		   herds_xml.hh herds_xml.cc \
 		   metadata_xml.hh metadata_xml.cc \
 		   formatter.hh formatter.cc \
