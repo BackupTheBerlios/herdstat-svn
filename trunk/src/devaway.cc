@@ -72,11 +72,11 @@ devaway_T::fetch()
             debug_msg("fetching failed, using backup copy");
         }
         else
-        {
             std::cerr << "Failed to fetch " << DEVAWAY_REMOTE << "."
                 << std::endl;
-            throw;
-        }
+
+        if (stat(DEVAWAY_LOCAL, &s) == 0 and s.st_size == 0)
+            unlink(DEVAWAY_LOCAL);
     }
 
     this->_path.assign(DEVAWAY_LOCAL);
@@ -137,8 +137,23 @@ devaway_T::parse(const string_type &path)
         while ((beginpos = awaymsg.find("&lt;")) != util::string::npos)
             awaymsg.replace(beginpos, 4, "<");
 
-        this->_away[dev] = awaymsg;
+        (*this)[dev] = awaymsg;
     }
+}
+
+const std::vector<devaway_T::key_type>
+devaway_T::keys() const
+{
+    std::vector<key_type> v;
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
+    {
+        v.push_back(i->first);
+
+        if (i->first.find('@') == key_type::npos)
+            v.push_back(i->first + "@gentoo.org");
+    }
+
+    return v;
 }
 
 /* vim: set tw=80 sw=4 et : */

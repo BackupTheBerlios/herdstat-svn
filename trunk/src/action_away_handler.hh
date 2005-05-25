@@ -27,7 +27,6 @@
 # include "config.h"
 #endif
 
-#include "devaway.hh"
 #include "action_handler.hh"
 
 class action_away_handler_T : public action_herds_xml_handler_T
@@ -38,8 +37,6 @@ class action_away_handler_T : public action_herds_xml_handler_T
 
     private:
         void display(const util::string &);
-
-        devaway_T devaway;
 };
 
 #endif

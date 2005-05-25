@@ -95,10 +95,13 @@ action_dev_handler_T::operator() (opts_type &devs)
 
     herds_xml.fetch();
     herds_xml.parse();
+    devaway.fetch();
+    devaway.parse();
 
     /* set format attributes */
     output.set_maxlabel(all ? 16 : 12);
     output.set_maxdata(maxcol - output.maxlabel());
+    output.set_devaway(devaway.keys());
     output.set_attrs();
 
     /* all target? */

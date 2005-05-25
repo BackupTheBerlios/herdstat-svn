@@ -3,7 +3,9 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.1_alpha1:
     New features:
-     - Added --away option for viewing devaway information.
+     - Added --away option for viewing devaway information.  Also, now
+       whenever a developer name who is currently away occurs in the output,
+       it will me marked with an asterisk.
 
 1.1.0:
     Use libtool --silent for less verbose compile output.

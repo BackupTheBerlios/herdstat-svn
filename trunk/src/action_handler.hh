@@ -29,6 +29,7 @@
 
 #include <ostream>
 #include "common.hh"
+#include "devaway.hh"
 #include "herds_xml.hh"
 #include "formatter.hh"
 
@@ -106,12 +107,18 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
         {
             action_fancy_handler_T::flush();
 
+            if (output.marked_away() and not count)
+                *stream << std::endl << output.devaway_color()
+                    << "*" << color[none] << " Currently away"
+                    << std::endl;
+
             if (timer and not count)
                 *stream << std::endl << "Took " << herds_xml.elapsed()
                     << "ms to parse herds.xml." << std::endl;
         }
 
         herds_xml_T herds_xml;
+        devaway_T   devaway;
 };
 
 /*

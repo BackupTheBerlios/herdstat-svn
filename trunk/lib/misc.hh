@@ -97,8 +97,9 @@ namespace util
     class map : public std::map<T,U>
     {
         public:
-            const std::vector<T> keys() const;
-            const std::vector<U> values() const;
+            virtual ~map() { }
+            virtual const std::vector<T> keys() const;
+            virtual const std::vector<U> values() const;
     };
 }
 

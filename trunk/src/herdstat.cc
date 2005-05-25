@@ -505,6 +505,7 @@ main(int argc, char **argv)
 	output.set_quiet(optget("quiet", bool));
 	output.set_labelcolor(color[green]);
 	output.set_highlightcolor(color[yellow]);
+	output.set_devaway_color(color[red]);
 	output.add_highlight(util::current_user());
 	output.add_highlight(util::get_user_from_email(util::current_user()));
 

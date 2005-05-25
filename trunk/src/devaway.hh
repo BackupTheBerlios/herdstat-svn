@@ -38,39 +38,19 @@
  * corresponding away message.
  */
 
-class devaway_T : public parsable_T
+class devaway_T : public std::map<util::string, util::string>,
+                  public parsable_T
 {
     public:
-        typedef std::map<util::string, util::string> value_type;
-        typedef value_type::iterator iterator;
-        typedef value_type::const_iterator const_iterator;
-        typedef value_type::size_type size_type;
-
         devaway_T() : parsable_T(DEVAWAY_LOCAL) { this->init(); }
-
-        /* value_type subset */
-        iterator begin() { return this->_away.begin(); }
-        const_iterator begin() const { return this->_away.begin(); }
-        iterator end() { return this->_away.end(); }
-        const_iterator end() const { return this->_away.end(); }
-        iterator find(const value_type::key_type &key)
-        { return this->_away.find(key); }
-        const_iterator find(const value_type::key_type &key) const
-        { return this->_away.find(key); }
-
-        const string_type operator[] (const string_type &s)
-        { return this->_away[s]; }
-
-        size_type size() const { return this->_away.size(); }
-        bool empty() const { return this->_away.size() == 0; }
 
         virtual void fetch();
         virtual void parse(const string_type & = "");
 
+        virtual const std::vector<key_type> keys() const;
+
     protected:
         virtual void init();
-
-        value_type _away;
 };
 
 #endif

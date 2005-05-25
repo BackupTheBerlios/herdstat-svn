@@ -56,6 +56,8 @@ class formatter_T
         void set_attrs();
 
         /* attribute member functions */
+        const bool &marked_away() const { return attr.marked_away; }
+
         void set_maxtotal(const size_type &s) { attr.maxtotal = s; }
         const size_type &maxtotal() const { return attr.maxtotal; }
             
@@ -84,7 +86,12 @@ class formatter_T
         void set_highlightcolor(const string_type &s) { attr.highlight_color = s; }
         const string_type &highlightcolor() const { return attr.highlight_color; }
 
+        void set_devaway_color(const string_type &s) { attr.devaway_color = s; }
+        const string_type &devaway_color() const { return attr.devaway_color; }
+
         void add_highlight(const string_type &s) { attr.highlights.push_back(s); }
+        void set_devaway(const std::vector<string_type> &v)
+        { attr.devaway = v; }
 
     private:
         /* format attributes */
@@ -94,11 +101,13 @@ class formatter_T
 
             bool colors;
             bool quiet;
+            bool marked_away;
 
             string_type quiet_delim;
             string_type label_color;
             string_type data_color;
             string_type highlight_color;
+            string_type devaway_color;
             string_type no_color;
 
             string_type::size_type maxtotal;
@@ -110,6 +119,7 @@ class formatter_T
             string_type::size_type maxcdata;
 
             std::vector<string_type> highlights;
+            std::vector<string_type> devaway;
         };
 
         string_type highlight(const std::vector<string_type> &);

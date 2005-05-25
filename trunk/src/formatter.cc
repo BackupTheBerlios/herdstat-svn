@@ -35,7 +35,7 @@ formatter_T::buffer_type formatter_T::buffer;
 /****************************************************************************/
 formatter_T::attrs_type::attrs_type()
 {
-    colors = quiet = false;
+    colors = quiet = marked_away = false;
     maxtotal = 78;
     maxlabel = 20;
     maxdata  = 58;
@@ -75,6 +75,7 @@ formatter_T::set_attrs()
         attr.label_color.clear();
         attr.data_color.clear();
         attr.highlight_color.clear();
+        attr.devaway_color.clear();
         attr.maxclabel = attr.maxlabel;
         attr.maxcdata  = attr.maxdata;
         attr.maxctotal = attr.maxtotal;
@@ -92,13 +93,25 @@ formatter_T::highlight(const std::vector<string_type> &data)
     std::vector<string_type>::const_iterator i;
 
     if (not colors())
+    {
         attr.highlight_color.clear();
+        attr.devaway_color.clear();
+    }
 
     for (i = data.begin() ; i != data.end() ; ++i)
     {
+        /* search highlights */
         if (std::find(attr.highlights.begin(),
             attr.highlights.end(), *i) != attr.highlights.end())
             s += attr.highlight_color + (*i) + attr.no_color + " ";
+        /* search devaway */
+        else if (std::find(attr.devaway.begin(),
+            attr.devaway.end(), *i) != attr.devaway.end())
+        {
+            debug_msg("marking '%s' as away", i->c_str());
+            attr.marked_away = true;
+            s += (*i) + attr.devaway_color + "*" + attr.no_color + " ";
+        }
         else
             s += *i + " ";
     }
@@ -196,7 +209,8 @@ formatter_T::append(const string_type &label, const string_type &data)
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
                 {
                     string_type::size_type oldlen = 0;
-                    bool highlight_found = false;
+                    bool highlight_found = false,
+                         marked_away = false;
 
                     /* should the current word be highlighted? */
                     if (std::find(attr.highlights.begin(),
@@ -210,36 +224,50 @@ formatter_T::append(const string_type &label, const string_type &data)
                             attr.no_color.length();
                     }
 
-                    string_type::size_type curlen;
+                    if (std::find(attr.devaway.begin(),
+                        attr.devaway.end(), *i) != attr.devaway.end())
+                    {
+                        marked_away = true;
+                        oldlen = attr.maxtotal;
+                        attr.maxtotal = oldlen + attr.devaway_color.length() +
+                            attr.no_color.length();
+                    }
+
+                    string_type::size_type curlen = cur.length();
 
                     /*
                      * Does cur contain a previously highlighted word? If so,
                      * we need to compensate for the color lengths.
                      */
-                    if ((cur.find("\033") != string_type::npos))
+                    if (cur.find("\033") != string_type::npos)
                     {
-                        curlen = cur.length() - attr.highlight_color.length() -
-                            attr.no_color.length();
+                        string_type::size_type lpos = 0;
+                        while (true)
+                        {
+                            if ((pos = cur.find("\033", lpos)) == string_type::npos)
+                                break;
 
-                        debug_msg("found color in cur; setting curlen to %d",
-                            curlen);
+                            curlen -= attr.highlight_color.length() -
+                                attr.no_color.length();
+
+                            lpos = ++pos;
+                        }
                     }
 
                     /* compensate for current highlight? */
-                    else if (highlight_found)
+                    if (highlight_found)
                     {
-                        curlen = cur.length() + attr.highlight_color.length() +
+                        curlen += attr.highlight_color.length() +
                             attr.no_color.length();
 
                         debug_msg("highlighted '%s'; setting curlen to %d",
                             i->c_str(), curlen);
                     }
 
-                    /* don't compensate */
-                    else
+                    if (marked_away)
                     {
-                        curlen = cur.length();
-                        debug_msg("no highlight; setting curlen to %d", curlen);
+                        curlen += attr.devaway_color.length() +
+                            attr.no_color.length() + 1;
                     }
 
                     /* does it fit on the current line? */
@@ -260,7 +288,12 @@ formatter_T::append(const string_type &label, const string_type &data)
 
                         /* restore saved maxtotal */
                         attr.maxtotal = oldlen;
-                    }   
+                    }
+                    else if (marked_away)
+                    {
+                        cur += (*i) + attr.devaway_color + "*" + attr.no_color + " ";
+                        attr.maxtotal = oldlen;
+                    }
                     else
                         cur += *i + " ";
                 }

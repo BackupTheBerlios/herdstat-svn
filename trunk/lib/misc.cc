@@ -198,9 +198,9 @@ util::fetch(const char *url, const char *file, bool verbose)
     util::string cmd;
     
     if (verbose)
-	cmd = util::sprintf("%s -r -T5 -O %s '%s'", WGET, file, url);
+	cmd = util::sprintf("%s -r -T3 -O %s '%s'", WGET, file, url);
     else
-	cmd = util::sprintf("%s -rq -T5 -O %s '%s'", WGET, file, url);
+	cmd = util::sprintf("%s -rq -T3 -O %s '%s'", WGET, file, url);
 
     return std::system(cmd.c_str());
 }

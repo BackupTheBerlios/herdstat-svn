@@ -25,10 +25,10 @@ version-test: $(noinst_LTLIBRARIES) version-test.cc
 	$(CXX) $(AM_CXXFLAGS) -ggdb3 -I.. -c version-test.cc
 	$(CXX) $(AM_CXXFLAGS) -o version-test version-test.o .libs/libutil.a $(LIBS)
 
-srchtml: $(foreach f, $(annodir_SOURCES), $(f).html)
+srchtml: $(foreach f, $(libutil_la_SOURCES), $(f).html)
 %.cc.html: %.cc
 	@echo Generating $@
-	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i $? -o ../html/src/$@
+	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i $? -o ../html/lib/$@
 %.hh.html: %.hh
 	@echo Generating $@
-	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i $? -o ../html/src/$@
+	@source-highlight -c ../src.css -s cpp -f html -t4 -n -i $? -o ../html/lib/$@

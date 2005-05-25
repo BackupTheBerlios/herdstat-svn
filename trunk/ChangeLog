@@ -1,5 +1,19 @@
 ChangeLog for herdstat
 
+2005-05-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_handler.hh: Added devaway_T instance to
+	action_herds_xml_handler_T base class.  Display little key if a dev
+	displayed is in the devaway list in flush().
+	* src/devaway.cc, src/devaway.hh: Inherit straight from std::map
+	instead of having it as a member.
+	* src/formatter.cc, src/formatter.hh: Added support for highlighting
+	developers who are in the devaway list.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_stats_handler.cc: Added devaway_T support, so that
+	formatter_T will mark devs who occur in output who are in the devaway
+	list.
+
 2005-05-24 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/parsable.hh: Added new base class for parsable things.

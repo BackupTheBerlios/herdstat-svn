@@ -52,7 +52,7 @@ _herdstat() {
 	-H|--herdsxml|-o|--outfile)
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
 	    ;;
-	-a|--all|-d|--dev)
+	-a|--away|-d|--dev)
 	    COMPREPLY=( $(compgen -W "$(_complete_dev) ${opts} all" -- ${cur}) )
 	    ;;
         --with-herd)
@@ -109,8 +109,11 @@ _herdstat() {
                 [[ ${x} == -* ]] || continue
 
                 # dev
-		if [[ ${x} == *d* && ${x} != "--debug" ]] ; then
-		    dev=1
+                if [[ ${x} != "--debug" && ${x} != "--metadata" ]] && \
+                    [[ ${x} != "--package" && ${x} != "--no-overlay" ]] && \
+                    [[ ${x} != *maintainer* ]]
+                then
+                    [[ ${x} == *d* || ${x} == *a* ]] && dev=1
                 fi
 
                 # package
