@@ -42,7 +42,8 @@ class devaway_T : public std::map<util::string, util::string>,
                   public parsable_T
 {
     public:
-        devaway_T() : parsable_T(DEVAWAY_LOCAL) { this->init(); }
+        devaway_T(bool x = false) : parsable_T(DEVAWAY_LOCAL)
+        { this->init(); if (x) { this->fetch(); this->parse(); } }
 
         virtual void fetch();
         virtual void parse(const string_type & = "");
