@@ -1,0 +1,142 @@
+.\" $Id$
+.TH "@PACKAGE@" 1 "Mar 2005" "@VERSION@"
+.SH NAME
+\fB@PACKAGE@\fR \- A multi-purpose query tool for Gentoo-specific information.
+.SH SYNOPSIS
+.B "@PACKAGE@ "
+[ \fIoptions\fR ] [ \fI args \fR ]
+.SH DESCRIPTION
+\fB@PACKAGE@\fR is a multi-purpose query tool capable of things such as displaying
+herd/developer information and displaying category/package metadata.
+.SH OPTIONS
+.TP
+.B "\-h, \-\-help"
+Display usage information.
+.TP
+.B "\-V, \-\-version"
+Display version information.
+.TP
+.B "\-n, \-\-nocolor"
+Don't display colored output.
+.TP
+.B "\-v, \-\-verbose"
+Display verbose output.
+.TP
+.B "\-q, \-\-quiet"
+Don't display labels and fancy colors.  Use this option to pipe @PACKAGE@
+output to other programs.
+.TP
+.B "\-D, \-\-debug"
+Display debugging messages.
+.TP
+.B "\-t, \-\-timer"
+Display elapsed time of XML parsing.  Automatically enabled if --debug
+is specified.
+.TP
+.B "\-c, \-\-count"
+Display the number of items instead of the items themselves.
+.TP
+.B "\-\-with-herd \fI<herd>\fR"
+When used in conjunction with --package --dev, only display those packages
+belonging to the specified herd.
+.TP
+.B "\-\-no-herd"
+Shorthand for --with-herd=no-herd.
+.TP
+.B "\-\-with-maintainer \fI<dev>\fR"
+When used in conjunction with --package, only display those packages
+that are maintained by the specified developer.
+.TP
+.B "\-\-no-maintainer"
+Shorthand for --with-maintainer=none.
+.TP
+.B "\-N, \-\-no-overlay"
+Don't search overlay(s) in PORTDIR_OVERLAY.
+.TP
+.B "\-r, \-\-regex"
+Display results matching the specified regular expression.
+.TP
+.B "\-E, \-\-extended"
+Use extended regular expressions.  Implies --regex.
+.TP
+.B "\-p, \-\-package"
+Display package information for the specified herd(s) or developer(s).  If --metadata
+is specified, show the metadata for each package in the list instead of the list itself.
+.TP
+.B "\-d, \-\-dev"
+Display information for the specified developer(s).  If --package is specified,
+displays package information. Otherwise, displays herd information.
+.TP
+.B "\-m, \-\-metadata"
+Display information for the specified package(s)/categories. A package name
+can be the name only (no category) only if there's not another package with the
+same name.  In that case you must specify the category.  May also be specified
+along with --package or --package --dev to display the metadata for their results.
+.TP
+.B "\-w, \-\-which"
+Display full path to ebuild for the specified package(s).
+.TP
+.B "\-\-versions"
+Display versions of the specified package(s).
+.TP
+.B "\-f, \-\-find"
+Display full package name (in category/package form) for the specified packages.
+.TP
+.B "\-a, \-\-away"
+Display away information for the specified developer(s).
+.TP
+.B "\-H, \-\-herdsxml \fI<file>\fR"
+Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
+for an alternative way of setting the herds.xml location.
+.TP
+.B "\-o, \-\-outfile \fI<file>\fR"
+Send output to the specified file instead of stdout.  \fI<file>\fR can also be
+either stdout (default if -o is not specified) or stderr. This option implies --quiet.
+.TP
+.B "\-F, \-\-fetch"
+Force a fetch of herds.xml.  This is only valid if a) you didn't set a herds.xml
+location with -H or $HERDS, or b) the location you did set is a URL supported by
+wget.  If no non-option arguments are specified, @PACKAGE@ will simply fetch
+herds.xml and exit.
+.TP
+.B "\-\-qa"
+Complain loudly if a QA-related problem occurs (rather than just ignoring it).
+For example, if --qa is specified and a category is listed in ${PORTDIR}/profiles/categories
+that does not exist, @PACKAGE@ will fail with an error message.
+.SH "NON-OPTION ARGUMENTS"
+Unless you specify --version or --help, at least one non-option argument is
+required.  The non-option arguments depend on the action:
+.TP
+.B "default action" "\fI< all > [ herd(s) ]\fR"
+Display developer information for the specified herd(s). If 'all' is specified,
+all herds will be displayed.
+.TP
+.B "\-d, \-\-dev" "\fI< all > [ dev(s) ]\fR"
+Display herd information for the specified developer(s). If 'all' is specified,
+all developers will be displayed.
+.TP
+.B "\-p, \-\-package" "\fI[ herd(s)/developer(s) ]\fR"
+Display package information for the specified herd(s) or developer(s).
+.TP
+.B "\-m, \-\-metadata" "\fI[ package(s)/categories ]\fR"
+Display metadata information for the specified package(s).
+.TP
+If no options (non-option or not) are specified, @PACKAGE@ will display a summary of herds.xml statistics.  If --dev and --package are both specified, @PACKAGE@ will display all packages maintained by the specified developer.
+.SH EXAMPLES
+See the examples.txt file that is distributed with @PACKAGE@.
+.SH ENVIRONMENT
+.TP
+.B HERDS
+Location of herds.xml.
+.TP
+.B PORTDIR
+Location of your portage tree.
+.TP
+.B ECHANGELOG_USER
+If set (correctly), your developer nick will be highlighted if it occurs
+in any of the output.
+.SH AUTHORS
+Aaron Walker <ka0ttic@gentoo.org>
+.SH "REPORTING BUGS"
+Please report bugs via http://bugs.gentoo.org/
+.\" vim: set ft=nroff :
