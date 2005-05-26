@@ -1,5 +1,15 @@
 ChangeLog for herdstat
 
+2005-05-26 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/devaway.hh: Make constructor have a bool arg that defaults to
+	false. If true, then call fetch/parse member functions.
+	* src/action_handler.hh: Have action_fancy_handler_T use a devaway_T
+	object instead of action_herds_xml_handler_T.  This way it's available
+	to action_meta_handler_T for use.
+	* src/action_meta_handler.cc: Use our newly inherited devaway_T object
+	so any away maintainers are marked as such.
+
 2005-05-25 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/action_handler.hh: Added devaway_T instance to

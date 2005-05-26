@@ -87,8 +87,14 @@ class action_fancy_handler_T : public action_handler_T
         {
             output.flush(*stream);
             action_handler_T::flush();            
+
+            if (output.marked_away() and not count)
+                *stream << std::endl << output.devaway_color()
+                    << "*" << color[none] << " Currently away"
+                    << std::endl;
         }
 
+        devaway_T devaway;
         formatter_T output;                 /* output formatter */
         const std::size_t maxcol;           /* columns of current terminal */
 };
@@ -107,18 +113,12 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
         {
             action_fancy_handler_T::flush();
 
-            if (output.marked_away() and not count)
-                *stream << std::endl << output.devaway_color()
-                    << "*" << color[none] << " Currently away"
-                    << std::endl;
-
             if (timer and not count)
                 *stream << std::endl << "Took " << herds_xml.elapsed()
                     << "ms to parse herds.xml." << std::endl;
         }
 
         herds_xml_T herds_xml;
-        devaway_T   devaway;
 };
 
 /*
