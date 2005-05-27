@@ -24,20 +24,32 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
+#include <functional>
+
 #include <libxml++/libxml++.h>
+
 #include "pkgcache_xml_handler.hh"
 #include "pkgcache.hh"
 
+/* max number of queries to cache.
+ * TODO: good candidate for an configuration file
+ * option if we ever need one. */
+#define PKGCACHE_MAX        1000
+
+/* amount of time (in seconds) a cached query
+ * object is considered valid */
 #define PKGCACHE_EXPIRE     592200  /* one week */
 
 void
 pkgQuery_T::dump(std::ostream &stream) const
 {
-    stream << "query string: " << this->query << std::endl
-        << "query id: " << this->id << std::endl
-        << "query with: " << this->with << std::endl
-        << "query type: " << this->type << std::endl
-        << "query date: " << this->date << std::endl;
+    stream
+        << "query string: " << this->query  << std::endl
+        << "query id: "     << this->id     << std::endl
+        << "query with: "   << this->with   << std::endl
+        << "query type: "   << this->type   << std::endl
+        << "query date: "   << this->date   << std::endl;
         
     for (const_iterator p = this->begin() ; p != this->end() ; ++p)
         stream << "\t" << p->first << std::endl; 
@@ -59,6 +71,11 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
             (this->type  == that.type));
 }
 
+/*
+ * Add a pkgQuery_T object to the cache, removing
+ * an expired pkgQuery_T object if it exists.
+ */
+
 void
 pkgCache_T::operator() (pkgQuery_T *q)
 {
@@ -76,8 +93,12 @@ pkgCache_T::operator() (pkgQuery_T *q)
     this->push_back(q);
 }
 
+/*
+ * Load our cache from disk to memory.
+ */
+
 void
-pkgCache_T::read()
+pkgCache_T::load()
 {
     if (not util::is_file(PKGCACHE))
         return;
@@ -91,16 +112,53 @@ pkgCache_T::read()
         this->push_back(new pkgQuery_T(*(*i)));
 }
 
-void
-pkgCache_T::write() const
+static bool
+is_greater(pkgQuery_T *q1, pkgQuery_T *q2)
 {
+    return q1->date < q2->date;
+}
+
+void
+pkgCache_T::cleanse()
+{
+    debug_msg("this->size() > PKGCACHE_MAX(%d), so trimming oldest queries.",
+        PKGCACHE_MAX);
+
+    /* sort by date */
+    std::stable_sort(this->begin(), this->end(), is_greater);
+
+    /* while > PKGCACHE_MAX, erase the first (oldest) query */
+    while (this->size() > PKGCACHE_MAX)
+        this->erase(this->begin());
+}
+
+void
+pkgCache_T::dump(std::ostream *stream)
+{
+    /* stream should only be non-NULL for debugging purposes */
+    if (stream)
+    {
+        *stream << std::endl << "Package cache (size: " << this->size()
+            << ")" << std::endl;
+
+        for (iterator i = this->begin() ; i != this->end() ; ++i)
+            (*i)->dump(*stream);
+
+        return;
+    }
+
+    /* trim if needed */
+    if (this->size() > PKGCACHE_MAX)
+        this->cleanse();
+
+    /* generate XML */
     try
     {
         xmlpp::Document doc;
         xmlpp::Element *root = doc.create_root_node("queries");
 
         /* for each query */
-        const_iterator i;
+        iterator i;
         size_type n = 1;
         for (i = this->begin() ; i != this->end() ; ++i, ++n)
         {
@@ -162,18 +220,8 @@ pkgCache_T::write() const
     }
 }
 
-void
-pkgCache_T::dump(std::ostream &stream) const
-{
-    stream << std::endl << "Package cache (size: " << this->size()
-        << ")" << std::endl;
-
-    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
-        (*i)->dump(stream);
-}
-
 /*
- * Is the specified query object expired?
+ * Has the specified pkgQuery_T object expired?
  */
 
 bool
@@ -181,6 +229,10 @@ pkgCache_T::is_expired(const pkgQuery_T &q) const
 {
     return ((std::time(NULL) - q.date) > PKGCACHE_EXPIRE);
 }
+
+/*
+ * Find a pkgQuery_T object.
+ */
 
 static bool
 isEqual(pkgQuery_T *q1, pkgQuery_T *q2)
@@ -194,6 +246,10 @@ pkgCache_T::find(const pkgQuery_T &q)
     return std::find_if(this->begin(), this->end(),
         std::bind2nd(std::ptr_fun(isEqual), &q));
 }
+
+/*
+ * Tidy up.
+ */
 
 pkgCache_T::~pkgCache_T()
 {

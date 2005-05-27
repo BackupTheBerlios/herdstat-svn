@@ -58,7 +58,7 @@ class pkgQuery_T : public std::map<util::string, util::string>
 
 /*
  * Represents a cache of package query
- * results (produced by action_pkg_handler_T).
+ * results (produced by action_pkg_handler_T::search()).
  */
 
 class pkgCache_T : public std::vector<pkgQuery_T * >
@@ -67,12 +67,12 @@ class pkgCache_T : public std::vector<pkgQuery_T * >
         ~pkgCache_T();
 
         void operator() (pkgQuery_T *);
-        void read();
-        void write() const;
-        void dump(std::ostream &) const;
+        void load();
+        void dump(std::ostream * = NULL);
+        void cleanse();
+        iterator find(const pkgQuery_T &);
         bool is_expired(pkgQuery_T *q) const { return this->is_expired(*q); }
         bool is_expired(const pkgQuery_T &) const;
-        iterator find(const pkgQuery_T &);
 };
 
 #endif

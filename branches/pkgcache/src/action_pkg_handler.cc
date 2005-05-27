@@ -265,12 +265,12 @@ action_pkg_handler_T::operator() (opts_type &opts)
     util::string query;
     opts_type not_found, packages, cached;
 
-    pkgcache.read();
+    pkgcache.load();
 
     if (debug)
     {
         *stream << "pkgcache dump after read()" << std::endl;
-        pkgcache.dump(*stream);
+        pkgcache.dump(stream);
     }
 
     herds_xml.fetch();
@@ -428,7 +428,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     if (cached.size() != opts.size())
-        pkgcache.write();
+        pkgcache.dump();
 
     /* we handler timer here */
     timer = false;
@@ -438,7 +438,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (debug)
     {
         *stream << "pkgcache dump after write()" << std::endl;
-        pkgcache.dump(*stream);
+        pkgcache.dump(stream);
     }
 
     return EXIT_SUCCESS;
