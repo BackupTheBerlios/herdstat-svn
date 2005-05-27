@@ -37,14 +37,14 @@
 class pkgCacheXMLHandler_T : public XMLHandler_T
 {
     public:
-        typedef std::map<util::string, pkgQuery_T * > value_type;
+        typedef std::vector<pkgQuery_T * > value_type;
         typedef value_type::iterator iterator;
         typedef value_type::size_type size_type;
 
         pkgCacheXMLHandler_T()
         {
-            in_query = in_date = in_results = in_pkg =
-            in_search = in_pkg = in_pkgname = in_pkglongdesc = false;
+            in_query = in_string = in_with = in_type = in_date =
+            in_results = in_pkg = in_pkgname = in_pkglongdesc = false;
         }
 
         virtual ~pkgCacheXMLHandler_T();
@@ -60,10 +60,10 @@ class pkgCacheXMLHandler_T : public XMLHandler_T
 
     private:
         /* internal state variables */
-        bool in_query, in_search, in_date, in_results, in_pkg, in_pkgname,
-             in_pkglongdesc;
+        bool in_query, in_string, in_with, in_type, in_date, in_results,
+             in_pkg, in_pkgname, in_pkglongdesc;
         int cur_query_id;
-        util::string cur_query, cur_pkg;
+        util::string cur_pkg;
 };
 
 #endif

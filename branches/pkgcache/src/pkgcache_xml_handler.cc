@@ -47,8 +47,12 @@ pkgCacheXMLHandler_T::START_ELEMENT(const string_type &name,
 
         in_query = true;
     }
-    else if (name == "search")
-        in_search = true;
+    else if (name == "string")
+        in_string = true;
+    else if (name == "with")
+        in_with = true;
+    else if (name == "type")
+        in_type = true;
     else if (name == "date")
         in_date = true;
     else if (name == "results")
@@ -70,8 +74,12 @@ pkgCacheXMLHandler_T::END_ELEMENT(const string_type &name)
 {
     if (name == "query")
         in_query = false;
-    else if (name == "search")
-        in_search = false;
+    else if (name == "string")
+        in_string = false;
+    else if (name == "with")
+        in_with = false;
+    else if (name == "type")
+        in_type = false;
     else if (name == "date")
         in_date = false;
     else if (name == "results")
@@ -91,19 +99,26 @@ pkgCacheXMLHandler_T::END_ELEMENT(const string_type &name)
 pkgCacheXMLHandler_T::return_type
 pkgCacheXMLHandler_T::CHARACTERS(const string_type &text)
 {
-    if (in_search)
+    if (in_string)
     {
-        cur_query.assign(text);
-        pkgQuery_T *query = new pkgQuery_T(cur_query);
+        pkgQuery_T *query = new pkgQuery_T(text);
         query->id = cur_query_id;
-        queries[cur_query] = query;
+        queries.push_back(query);
     }
+    else if (in_with)
+        queries.back()->with = text;
+    else if (in_type)
+        queries.back()->type =
+            (text == "dev" ? QUERYTYPE_DEV : QUERYTYPE_HERD);
     else if (in_date)
-        queries[cur_query]->date = std::strtol(text.c_str(), NULL, 10);
+        queries.back()->date = std::strtol(text.c_str(), NULL, 10);
     else if (in_pkgname)
+    {
         cur_pkg.assign(text);
+        (*queries.back())[cur_pkg] = "";
+    }
     else if (in_pkglongdesc)
-        (*queries[cur_query])[cur_pkg] = text;
+        (*queries.back())[cur_pkg] = text;
 
 #ifdef USE_XMLWRAPP
     return true;
@@ -114,7 +129,7 @@ pkgCacheXMLHandler_T::~pkgCacheXMLHandler_T()
 {
     value_type::iterator i;
     for (i = queries.begin() ; i != queries.end() ; ++i)
-        delete i->second;
+        delete *i;
 }
 
 /* vim: set tw=80 sw=4 et : */

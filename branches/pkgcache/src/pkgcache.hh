@@ -36,17 +36,24 @@
 /*
  * Container for package query data.
  */
+enum query_type { QUERYTYPE_DEV, QUERYTYPE_HERD };
 
 class pkgQuery_T : public std::map<util::string, util::string>
 {
     public:
-        pkgQuery_T(const opts_type::value_type &n)
-            : info(n), query(n) { }
+        pkgQuery_T(const util::string &n, const util::string &w = "",
+            bool dev = false) : info(n), query(n), with(w), id(0),
+                                type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD) { }
 
-        herds_xml_T::devinfo_T info;
-        util::string query;
-        int id;
-        std::time_t date;
+        void dump(std::ostream &) const;
+        bool operator== (const pkgQuery_T &) const;
+
+        herds_xml_T::devinfo_T info;    /* developer info (if type == dev) */
+        util::string query;             /* query string */
+        util::string with;              /* --with-{herd,maintainer} */
+        int id;                         /* query id */
+        std::time_t date;               /* query date */
+        query_type type;                /* query type */
 };
 
 /*
@@ -54,24 +61,18 @@ class pkgQuery_T : public std::map<util::string, util::string>
  * results (produced by action_pkg_handler_T).
  */
 
-//class pkgCache_T : public util::cache_T<std::vector<pkgQuery_T> >
-class pkgCache_T : public std::vector<pkgQuery_T>
+class pkgCache_T : public std::vector<pkgQuery_T * >
 {
     public:
-//        pkgCache_T() : util::cache_T<value_type>(PKGCACHE) { }
-        virtual ~pkgCache_T() { }
+        ~pkgCache_T();
 
-//        void push_back(const pkgQuery_T &query)
-//        { this->_cache.push_back(query); }
-        iterator find(const util::string &);
-
-//        virtual void init() { }
-        virtual bool valid() const { return util::is_file(PKGCACHE); }
-        virtual void read();
-        virtual void write() const;
-//        virtual void fill() { }
-
-        bool exists(const util::string &);
+        void operator() (pkgQuery_T *);
+        void read();
+        void write() const;
+        void dump(std::ostream &) const;
+        bool is_expired(pkgQuery_T *q) const { return this->is_expired(*q); }
+        bool is_expired(const pkgQuery_T &) const;
+        iterator find(const pkgQuery_T &);
 };
 
 #endif

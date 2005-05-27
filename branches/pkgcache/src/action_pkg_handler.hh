@@ -42,8 +42,8 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
-                                 with_herd(optget("with-herd", util::string)),
-                                 with_dev(optget("with-maintainer", util::string)) { }
+                                 with(dev ? optget("with-herd", util::string) :
+                                            optget("with-maintainer", util::string)) { }
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
 
@@ -58,7 +58,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         util::progress_T  progress;
         util::timer_T::size_type elapsed;
         const bool dev, meta, status;
-        const util::string with_herd, with_dev;
+        const util::string with;
 };
 
 #endif

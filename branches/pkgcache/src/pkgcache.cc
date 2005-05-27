@@ -31,14 +31,64 @@
 #define PKGCACHE_EXPIRE     592200  /* one week */
 
 void
+pkgQuery_T::dump(std::ostream &stream) const
+{
+    stream << "query string: " << this->query << std::endl
+        << "query id: " << this->id << std::endl
+        << "query with: " << this->with << std::endl
+        << "query type: " << this->type << std::endl
+        << "query date: " << this->date << std::endl;
+        
+    for (const_iterator p = this->begin() ; p != this->end() ; ++p)
+        stream << "\t" << p->first << std::endl; 
+}
+
+bool
+pkgQuery_T::operator== (const pkgQuery_T &that) const
+{
+    debug_msg("pkgQuery_T::operator==");
+    debug_msg("%s == %s ? %d", this->query.c_str(), that.query.c_str(),
+            (this->query == that.query));
+    debug_msg("%s == %s ? %d", this->with.c_str(), that.with.c_str(),
+            (this->with == that.with));
+    debug_msg("%d == %d ? %d", this->type, that.type,
+            (this->type == that.type));
+
+    return ((this->query == that.query) and
+            (this->with  == that.with) and
+            (this->type  == that.type));
+}
+
+void
+pkgCache_T::operator() (pkgQuery_T *q)
+{
+    /* remove old cached query if it exists */
+    iterator i = this->find(*q);
+    if (i != this->end())
+    {
+        debug_msg("old query exists for '%s', so removing it",
+            q->query.c_str());
+        delete *i;
+        this->erase(i);
+    }
+
+    q->id = this->size() + 1;
+    this->push_back(q);
+}
+
+void
 pkgCache_T::read()
 {
-    xml_T<pkgCacheXMLHandler_T> pkgcache_xml(PKGCACHE);
-    pkgCacheXMLHandler_T *handler = pkgcache_xml.handler();
+    if (not util::is_file(PKGCACHE))
+        return;
 
+    xml_T<pkgCacheXMLHandler_T> pkgcache_xml;
+    pkgcache_xml.parse(PKGCACHE);
+
+    pkgCacheXMLHandler_T *handler = pkgcache_xml.handler();
     pkgCacheXMLHandler_T::value_type::iterator i;
     for (i = handler->queries.begin() ; i != handler->queries.end() ; ++i)
-        this->push_back(*(i->second));
+        this->push_back(new pkgQuery_T(*(*i)));
 }
 
 void
@@ -49,28 +99,43 @@ pkgCache_T::write() const
         xmlpp::Document doc;
         xmlpp::Element *root = doc.create_root_node("queries");
 
+        /* for each query */
         const_iterator i;
         size_type n = 1;
         for (i = this->begin() ; i != this->end() ; ++i, ++n)
         {
+            pkgQuery_T *q = *i;
+
             /* <query id="n"> */
             xmlpp::Element *query_node = root->add_child("query");
-            query_node->set_attribute("id", util::sprintf("%d", n));
+            query_node->set_attribute("id", util::sprintf("%d", q->id));
 
-            /* <search> */
-            xmlpp::Element *search_node = query_node->add_child("search");
-            search_node->set_child_text(i->query);
+            /* <criteria> */
+            xmlpp::Element *criteria_node = query_node->add_child("criteria");
+
+            /* <string> */
+            xmlpp::Element *query_string_node = criteria_node->add_child("string");
+            query_string_node->set_child_text(q->query);
+
+            /* <with> */
+            xmlpp::Element *with_string_node = criteria_node->add_child("with");
+            with_string_node->set_child_text(q->with);
+
+            /* <type> */
+            xmlpp::Element *type_node = criteria_node->add_child("type");
+            type_node->set_child_text(q->type == QUERYTYPE_DEV ? "dev":"herd");
 
             /* <date> */
             xmlpp::Element *date_node = query_node->add_child("date");
             date_node->set_child_text(util::sprintf("%lu",
-                static_cast<unsigned long>(i->date)));
+                static_cast<unsigned long>(q->date)));
 
             /* <results> */
             xmlpp::Element *results_node = query_node->add_child("results");
         
-            value_type::const_iterator p;
-            for (p = i->begin() ; p != i->end() ; ++p)
+            /* for each package in query results */
+            pkgQuery_T::const_iterator p;
+            for (p = q->begin() ; p != q->end() ; ++p)
             {
                 /* <pkg> */
                 xmlpp::Element *pkg_node = results_node->add_child("pkg");
@@ -80,8 +145,12 @@ pkgCache_T::write() const
                 pkg_name_node->set_child_text(p->first);
 
                 /* <longdesc> */
-                xmlpp::Element *pkg_longdesc_node = pkg_node->add_child("longdesc");
-                pkg_longdesc_node->set_child_text(p->second);
+                if (not p->second.empty())
+                {
+                    xmlpp::Element *pkg_longdesc_node =
+                        pkg_node->add_child("longdesc");
+                    pkg_longdesc_node->set_child_text(p->second);
+                }
             }
         }
 
@@ -93,40 +162,43 @@ pkgCache_T::write() const
     }
 }
 
-pkgCache_T::iterator
-pkgCache_T::find (const util::string &query)
+void
+pkgCache_T::dump(std::ostream &stream) const
 {
-    iterator i;
-    for (i = this->begin() ; i != this->end() ; ++i)
-    {
-        if (query == i->query)
-            return i;
-    }
-    
-    return this->end();
+    stream << std::endl << "Package cache (size: " << this->size()
+        << ")" << std::endl;
+
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
+        (*i)->dump(stream);
 }
 
 /*
- * Check if the query exists in the cache
- * and hasn't expired.
+ * Is the specified query object expired?
  */
 
 bool
-pkgCache_T::exists(const util::string &query)
+pkgCache_T::is_expired(const pkgQuery_T &q) const
 {
-    bool found = false;
+    return ((std::time(NULL) - q.date) > PKGCACHE_EXPIRE);
+}
 
-    iterator i;
-    for (i = this->begin() ; i != this->end() ; ++i)
-    {
-        if (query == i->query/* and TODO: time is less than 1 week */)
-        {
-            found = true;
-            break;
-        }
-    }
+static bool
+isEqual(pkgQuery_T *q1, pkgQuery_T *q2)
+{
+    return (*q1 == *q2);
+}
 
-    return found;
+pkgCache_T::iterator
+pkgCache_T::find(const pkgQuery_T &q)
+{
+    return std::find_if(this->begin(), this->end(),
+        std::bind2nd(std::ptr_fun(isEqual), &q));
+}
+
+pkgCache_T::~pkgCache_T()
+{
+    for (iterator i = this->begin() ; i != this->end() ; ++i)
+        delete *i;
 }
 
 /* vim: set tw=80 sw=4 et : */
