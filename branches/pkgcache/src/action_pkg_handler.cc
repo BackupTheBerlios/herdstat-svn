@@ -25,7 +25,6 @@
 #endif
 
 #include <iomanip>
-#include <fstream>
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -265,11 +264,12 @@ action_pkg_handler_T::operator() (opts_type &opts)
     util::string query;
     opts_type not_found, packages, cached;
 
+    /* load our cache */
     pkgcache.load();
 
     if (debug)
     {
-        *stream << "pkgcache dump after read()" << std::endl;
+        *stream << "pkgcache dump after load()" << std::endl;
         pkgcache.dump(stream);
     }
 
@@ -306,9 +306,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
         opts_type::iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
         {
-            pkgQuery_T query(*i, with, dev);
-
-            pkgCache_T::iterator pc = pkgcache.find(query);
+            pkgCache_T::iterator pc = pkgcache.find(pkgQuery_T(*i, with, dev));
             if (pc != pkgcache.end() and not pkgcache.is_expired(*pc))
             {
                 debug_msg("found '%s' in cache", i->c_str());
@@ -344,12 +342,16 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
         if (query.empty())
         {
+            /* cache the query */
+            pkgcache(new pkgQuery_T(query));
+
             /* only display error if opts.size() == 1 */
             if (opts.size() == 1)
             {
                 if (not quiet)
                     error(*i);
 
+                pkgcache.dump();
                 return EXIT_FAILURE;
             }
 
