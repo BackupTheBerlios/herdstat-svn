@@ -27,7 +27,11 @@
 #include <algorithm>
 #include <functional>
 
-#include <libxml++/libxml++.h>
+#ifdef USE_LIBXMLPP
+# include <libxml++/libxml++.h>
+#else
+# include <xmlwrapp/xmlwrapp.h>
+#endif /* USE_LIBXMLPP */
 
 #include "pkgcache_xml_handler.hh"
 #include "pkgcache.hh"
@@ -112,6 +116,10 @@ pkgCache_T::load()
         this->push_back(new pkgQuery_T(*(*i)));
 }
 
+/*
+ * Clean out old queries until size() == PKGCACHE_MAX
+ */
+
 static bool
 is_greater(pkgQuery_T *q1, pkgQuery_T *q2)
 {
@@ -131,6 +139,10 @@ pkgCache_T::cleanse()
     while (this->size() > PKGCACHE_MAX)
         this->erase(this->begin());
 }
+
+/*
+ * Dump our cache to disk.
+ */
 
 void
 pkgCache_T::dump(std::ostream *stream)
@@ -154,8 +166,14 @@ pkgCache_T::dump(std::ostream *stream)
     /* generate XML */
     try
     {
+#ifdef USE_LIBXMLPP
         xmlpp::Document doc;
         xmlpp::Element *root = doc.create_root_node("queries");
+#else
+        xml::init init;
+        xml::document doc("queries");
+        xml::node &root = doc.get_root_node();
+#endif /* USE_LIBXMLPP */
 
         /* for each query */
         iterator i;
@@ -164,6 +182,7 @@ pkgCache_T::dump(std::ostream *stream)
         {
             pkgQuery_T *q = *i;
 
+#ifdef USE_LIBXMLPP
             /* <query id="n"> */
             xmlpp::Element *query_node = root->add_child("query");
             query_node->set_attribute("id", util::sprintf("%d", q->id));
@@ -190,11 +209,32 @@ pkgCache_T::dump(std::ostream *stream)
 
             /* <results> */
             xmlpp::Element *results_node = query_node->add_child("results");
-        
+
+#else
+
+            xml::node::iterator it = root.insert(root.begin(), xml::node("query"));
+            it->get_attributes().insert("id", util::sprintf("%d", q->id).c_str());
+
+            xml::node cri_node("criteria");
+            cri_node.push_back(xml::node("string", q->query.c_str()));
+            cri_node.push_back(xml::node("with", q->with.c_str()));
+            cri_node.push_back(xml::node("type", q->type == QUERYTYPE_DEV? "dev":"herd"));
+            it->push_back(cri_node);
+
+            it = root.begin();
+            it->push_back(xml::node("date", util::sprintf("%lu",
+                static_cast<unsigned long>(q->date)).c_str()));
+
+            xml::node results("results");
+
+#endif /* USE_LIBXMLPP */
+
             /* for each package in query results */
             pkgQuery_T::const_iterator p;
             for (p = q->begin() ; p != q->end() ; ++p)
             {
+
+#ifdef USE_LIBXMLPP
                 /* <pkg> */
                 xmlpp::Element *pkg_node = results_node->add_child("pkg");
 
@@ -209,12 +249,48 @@ pkgCache_T::dump(std::ostream *stream)
                         pkg_node->add_child("longdesc");
                     pkg_longdesc_node->set_child_text(p->second);
                 }
+
+#else
+
+                xml::node pkg("pkg");
+                pkg.push_back(xml::node("name", p->first.c_str()));
+                
+                if (not p->second.empty())
+                    pkg.push_back(xml::node("longdesc", p->second.c_str()));
+
+                results.push_back(pkg);
+
+#endif /* USE_LIBXMLPP */
             }
+
+#ifdef USE_XMLWRAPP
+            it->push_back(results);
+#endif /* USE_XMLWRAPP */
+
         }
 
+#ifdef USE_LIBXMLPP
+# ifdef DEBUG
         doc.write_to_file_formatted(PKGCACHE, "UTF-8");
+# else
+        doc.write_to_file(PKGCACHE, "UTF-8");
+# endif /* DEBUG */
+#else
+//# ifdef DEBUG
+//        doc.save_to_file(PKGCACHE, 0);
+//# else /* DEBUG */
+//        if (this->size() > (PKGCACHE_MAX * 0.75))
+//            doc.save_to_file(PKGCACHE, 9);
+//        else
+           doc.save_to_file(PKGCACHE, 0);
+//# endif /* DEBUG */
+#endif /* USE_LIBXMLPP */
     }
+#ifdef USE_LIBXMLPP
     catch (const xmlpp::exception &e)
+#else
+    catch (const std::exception &e)
+#endif /* USE_LIBXMLPP */
     {
         throw XMLWriter_E(PKGCACHE, e.what());
     }
