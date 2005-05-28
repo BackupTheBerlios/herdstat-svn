@@ -165,8 +165,10 @@ action_pkg_handler_T::search(pkgQuery_T *q)
         (*q)[package] = metadata.longdesc();
     }
 
+
     /* cache query object */
     pkgcache(new pkgQuery_T(*q));
+    matches[q->query] = new pkgQuery_T(*q);
 }
 
 /*
@@ -239,6 +241,8 @@ action_pkg_handler_T::search(const opts_type &opts)
 void
 action_pkg_handler_T::display(pkgQuery_T *q)
 {
+    assert(q);
+
     if (not quiet)
     {
         if (regex)
@@ -412,8 +416,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
      * erasing them from opts as they're found. */
     if (not pkgcache.empty())
     {
+        opts_type tmp(opts);
+
         opts_type::iterator i;
-        for (i = opts.begin() ; i != opts.end() ; ++i)
+        for (i = tmp.begin() ; i != tmp.end() ; ++i)
         {
             pkgCache_T::iterator p = pkgcache.find(pkgQuery_T(*i, with, dev));
             if (p != pkgcache.end() and not pkgcache.is_expired(*p))
@@ -425,6 +431,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
             }
             else if (p == pkgcache.end() and not with.empty())
             {
+                debug_msg("found wider-scoped '%s' query", i->c_str());
+
                 /* see if a wider-scoped query has been cached.  if so, use it
                  * to get a narrowed down list of metadata.xml's to parse. */
                 pkgCache_T::iterator pc = pkgcache.find(pkgQuery_T(*i, "", dev));
@@ -454,7 +462,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
         progress.start(metadatas.size());
     }
 
-    search(opts);
+    if (not opts.empty())
+        search(opts);
+
     display();
 
     if (count)

@@ -86,7 +86,15 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
 //    debug_msg("%d == %d ? %d", this->type, that.type,
 //            (this->type == that.type));
 
-    return ((this->query == that.query) and
+            /* reverse lookup */
+    return ((this->query == that.with) and
+            (this->with  == that.query) and
+            (this->type  != that.type))
+        
+            or
+            
+            /* normal lookup */
+            ((this->query == that.query) and
             (this->with  == that.with) and
             (this->type  == that.type));
 }
