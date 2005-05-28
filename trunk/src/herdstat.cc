@@ -553,6 +553,12 @@ main(int argc, char **argv)
 	    << std::endl;
 	return EXIT_FAILURE;
     }
+    catch (const XMLWriter_E &e)
+    {
+	std::cerr << "Error writing '" << e.file() << "': " << e.error()
+	    << std::endl;
+	return EXIT_FAILURE;
+    }
     catch (const fetch_E)
     { return EXIT_FAILURE; }
     catch (const portage::qa_E)

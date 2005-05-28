@@ -1,5 +1,14 @@
 ChangeLog for herdstat
 
+2005-05-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgcache.cc, src/pkgcache.hh, src/pkgcache_xml_handler.cc,
+	src/pkgcache_xml_handler.hh, src/common.hh, src/formatter.cc,
+	src/action_pkg_handler.cc, src/action_pkg_handler.hh, src/herdstat.cc,
+	src/xmlparser.hh, src/exceptions.hh, src/metadatas.hh,
+	src/herds_xml_handler.cc, src/Makefile.am, lib/cache.hh: Merged
+	pkgcache branch.
+
 2005-05-26 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/devaway.hh: Make constructor have a bool arg that defaults to

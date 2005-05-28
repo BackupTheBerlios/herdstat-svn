@@ -32,21 +32,23 @@
 
 namespace util
 {
+    /*
+     * Represents a cache of data on disk.  The template argument
+     * is the data type the cache will be stored in during run-time.
+     */
+
+    template <class C>
     class cache_T
     {
         public:
             typedef util::file_T file_type;
             typedef util::string string_type;
-            typedef std::vector<string_type> value_type;
-            typedef value_type::iterator iterator;
-            typedef value_type::const_iterator const_iterator;
-            typedef value_type::size_type size_type;
+            typedef C value_type;
+            typedef typename value_type::iterator iterator;
+            typedef typename value_type::const_iterator const_iterator;
+            typedef typename value_type::size_type size_type;
 
-            cache_T(const string_type &f, size_type reserve = 0) : _file(f)
-            {
-                if (reserve != 0)
-                    this->_cache.reserve(reserve);
-            }
+            cache_T(const string_type &f) : _file(f) { }
 
             virtual ~cache_T() { }
 
@@ -57,6 +59,7 @@ namespace util
             const_iterator end() const { return this->_cache.end(); }
             size_type size() const { return this->_cache.size(); }
             void clear() { this->_cache.clear(); }
+            bool empty() const { return this->_cache.size() == 0; }
 
             virtual void init()
             {

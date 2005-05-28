@@ -46,21 +46,22 @@
  * are excluded).
  */
 
-class metadatas_T : public util::cache_T
+class metadatas_T : public util::cache_T<std::vector<util::string> >
 {
-    private:
-        util::string portdir;
-
     public:
-        metadatas_T() : util::cache_T(CACHE, METADATA_RESERVE) { }
+        metadatas_T()
+            : util::cache_T<value_type>(CACHE) { }
         metadatas_T(const util::string &p)
-            : util::cache_T(CACHE, METADATA_RESERVE), portdir(p)
-        { init(); }
+            : util::cache_T<value_type>(CACHE), portdir(p)
+        { this->_cache.reserve(METADATA_RESERVE); this->init(); }
 
-        void set_portdir(const util::string &p) { portdir = p; init(); }
+        void get(const util::string &p) { this->portdir = p; this->init(); }
 
         virtual bool valid() const;
         virtual void fill();
+
+    private:
+        util::string portdir;
 };
 
 #endif

@@ -166,6 +166,24 @@ class format_E                          : public herdstat_va_base_E
         }
 };
 
+class XMLWriter_E                       : public herdstat_base_E
+{
+    public:
+        typedef util::string string_type;
+
+        XMLWriter_E() { }
+        XMLWriter_E(const string_type &f, const string_type &e)
+            : _file(f), _error(e) { }
+        virtual ~XMLWriter_E() throw() { }
+
+        virtual const string_type &file() const { return _file; }
+        virtual const string_type &error() const { return _error; }
+
+    protected:
+        string_type _file;
+        string_type _error;
+};
+
 #endif
 
 /* vim: set tw=80 sw=4 et : */

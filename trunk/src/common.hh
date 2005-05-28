@@ -30,11 +30,6 @@
 #include <cstdio>
 #include <cstring>
 
-#ifdef UNICODE
-# include <glib/gtypes.h>
-# include <glibmm.h>
-#endif /* UNICODE */
-
 #include "options.hh"
 #include "util.hh"
 #include "exceptions.hh"
@@ -47,8 +42,12 @@
 #endif
 
 #ifdef UNICODE
+# include <glib/gtypes.h>
+# include <glibmm.h>
+# define USE_LIBXMLPP
 void debug_msg(const gchar *, ...);
 #else /* UNICODE */
+#define USE_XMLWRAPP
 void debug_msg(const char *, ...);
 #endif /* UNICODE */
 

@@ -269,7 +269,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             if (p.second)
                 p.first->second->role = i->second->role;
 
-            debug_msg("p.second = %d\ncur_role = %s", p.second, i->second->role.c_str());
+//            debug_msg("p.second = %d\ncur_role = %s", p.second, i->second->role.c_str());
         }
     }
 

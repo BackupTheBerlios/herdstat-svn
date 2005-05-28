@@ -25,7 +25,6 @@
 #endif
 
 #include <iomanip>
-#include <fstream>
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -46,20 +45,14 @@ action_pkg_handler_T::error(const util::string &criteria) const
         << "Failed to find any packages maintained by '"
         << criteria << "'";
 
-    if ((dev and with_herd.empty()) or (not dev and with_dev.empty()))
+    if (with.empty())
     {
         std::cerr << "." << std::endl;
         return;
     }
     
-    std::cerr << " with ";
-
-    if (dev)
-        std::cerr << "herd '" << with_herd;
-    else
-        std::cerr << "developer '" << with_dev;
-    
-    std::cerr << "'." << std::endl;
+    std::cerr << " with " << (dev? "herd":"developer") << " '"
+        << with << "'." << std::endl;
 }
 
 /*
@@ -84,8 +77,6 @@ bool
 action_pkg_handler_T::is_found(const metadata_xml_T &metadata,
                                const util::string &criteria)
 {
-    util::string with(dev ? with_herd : with_dev);
-
     if (dev)
     {
         if ((regex and (std::find_if(metadata.devs().begin(),
@@ -126,10 +117,11 @@ action_pkg_handler_T::is_found(const metadata_xml_T &metadata,
  */
 
 void
-action_pkg_handler_T::search(package_list *list)
+action_pkg_handler_T::search(pkgQuery_T *q)
 {
     if (regex)
-        regexp.assign(list->name, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
+        regexp.assign(q->query,
+            eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
     /* for every metadata.xml in the tree... */
     metadatas_T::const_iterator m;
@@ -148,15 +140,21 @@ action_pkg_handler_T::search(package_list *list)
         const metadata_xml_T metadata(*m);
         elapsed += metadata.elapsed();
 
+        q->date = std::time(NULL);
+        q->with = with;
+
         /* 
          * determine whether the package matches our search criteria
          */
 
-        if (not is_found(metadata, list->name))
+        if (not is_found(metadata, q->query))
             continue;
 
         if (dev)
-            list->info = herds_xml.get_dev_info(list->name);
+        {
+            q->type = QUERYTYPE_DEV;
+            q->info = herds_xml.get_dev_info(q->query);
+        }
 
         /* get category/package from absolute path */
         util::string package = m->substr(portdir.size() + 1);
@@ -167,55 +165,58 @@ action_pkg_handler_T::search(package_list *list)
         debug_msg("Match found in %s.", m->c_str());
 
         /* store it */
-        (*list)[package] = metadata.longdesc();
+        (*q)[package] = metadata.longdesc();
     }
+
+    /* cache query object */
+    pkgcache(new pkgQuery_T(*q));
 }
 
 void
-action_pkg_handler_T::display(const package_list &list)
+action_pkg_handler_T::display(const pkgQuery_T &query)
 {
     if (not quiet)
     {
         if (regex)
-            output("Regex", list.name);
+            output("Regex", query.query);
         else if (dev)
         {
-            if (list.info.name.empty())
-                output("Developer", list.name);
+            if (query.info.name.empty())
+                output("Developer", query.query);
             else
                 output("Developer",
-                    list.info.name + " (" + list.name + ")");
+                    query.info.name + " (" + query.query + ")");
 
-            output("Email", list.name + "@gentoo.org");
+            output("Email", query.query + "@gentoo.org");
         }
         else
         {
-            output("Herd", list.name);
-            if (not herds_xml[list.name]->mail.empty())
-                output("Email", herds_xml[list.name]->mail);
-            if (not herds_xml[list.name]->desc.empty())
+            output("Herd", query.query);
+            if (not herds_xml[query.query]->mail.empty())
+                output("Email", herds_xml[query.query]->mail);
+            if (not herds_xml[query.query]->desc.empty())
                 output("Description",
-                    util::tidy_whitespace(herds_xml[list.name]->desc));
+                    util::tidy_whitespace(herds_xml[query.query]->desc));
         }
 
-        if (list.empty())
+        if (query.empty())
             output("Packages(0)", "none");
         /* display first package on same line */
         else if (verbose and optget("color", bool))
-            output(util::sprintf("Packages(%d)", list.size()),
-                color[blue] + list.begin()->first + color[none]);
+            output(util::sprintf("Packages(%d)", query.size()),
+                color[blue] + query.begin()->first + color[none]);
         else
-            output(util::sprintf("Packages(%d)", list.size()),
-                list.begin()->first);
+            output(util::sprintf("Packages(%d)", query.size()),
+                query.begin()->first);
     }
-    else if (not list.empty() and not count)
-        output("", list.begin()->first);
+    else if (not query.empty() and not count)
+        output("", query.begin()->first);
 
     /* display the category/package */
-    package_list::const_iterator p = list.begin();
-    if (not list.empty()) ++p;
-    package_list::size_type pn = 1;
-    for ( ; p != list.end() ; ++p, ++pn)
+    pkgQuery_T::const_iterator p = query.begin();
+    if (not query.empty()) ++p;
+    pkgQuery_T::size_type pn = 1;
+    for ( ; p != query.end() ; ++p, ++pn)
     {
         util::string longdesc;
             
@@ -236,7 +237,7 @@ action_pkg_handler_T::display(const package_list &list)
             debug_msg("longdesc(%s): '%s'", p->first.c_str(),
                 longdesc.c_str());
 
-            if (pn != list.size())
+            if (pn != query.size())
                 output.endl();
         }
         else if (verbose and not quiet)
@@ -260,9 +261,17 @@ action_pkg_handler_T::display(const package_list &list)
 int
 action_pkg_handler_T::operator() (opts_type &opts)
 {
-    opts_type not_found, packages;
+    util::string query;
+    opts_type not_found, packages, cached;
 
-    metadatas.set_portdir(portdir);
+    /* load our cache */
+    pkgcache.load();
+
+    if (debug)
+    {
+        *stream << "pkgcache dump after load()" << std::endl;
+        pkgcache.dump(stream);
+    }
 
     herds_xml.fetch();
     herds_xml.parse();
@@ -291,10 +300,28 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (not util::is_dir(portdir))
 	throw bad_fileobject_E(portdir);
 
-    if (status)
+    /* loop through opts seeing if any have been cached */
+    if (not pkgcache.empty())
+    {
+        opts_type::iterator i;
+        for (i = opts.begin() ; i != opts.end() ; ++i)
+        {
+            pkgCache_T::iterator pc = pkgcache.find(pkgQuery_T(*i, with, dev));
+            if (pc != pkgcache.end() and not pkgcache.is_expired(*pc))
+            {
+                debug_msg("found '%s' in cache", i->c_str());
+                cached.push_back(*i);
+            }
+        }
+    }
+
+    if (cached.size() != opts.size())
+        metadatas.get(portdir);
+
+    if (status and (cached.size() != opts.size()))
     {
         *stream << "Parsing metadata.xml's: ";
-        progress.start(opts.size() * metadatas.size());
+        progress.start((opts.size() - cached.size()) * metadatas.size());
     }
 
     /* for each specified herd/dev... */
@@ -302,21 +329,29 @@ action_pkg_handler_T::operator() (opts_type &opts)
     opts_type::iterator i;
     for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
     {
-        package_list list(*i);
+        pkgQuery_T query(*i, with, dev);
+        
+        pkgCache_T::iterator pc = pkgcache.find(query);
+        if (pc != pkgcache.end() and not pkgcache.is_expired(*pc))
+            query = *(*pc);
+        else
+            search(&query);
 
-        search(&list);
-
-        if ((n == 1) and status)
+        if ((n == 1) and status and (cached.size() != opts.size()))
             output.endl();
 
-        if (list.empty())
+        if (query.empty())
         {
+            /* cache the query */
+            pkgcache(new pkgQuery_T(query));
+
             /* only display error if opts.size() == 1 */
             if (opts.size() == 1)
             {
                 if (not quiet)
                     error(*i);
 
+                pkgcache.dump();
                 return EXIT_FAILURE;
             }
 
@@ -325,7 +360,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             continue;
         }
 
-        size += list.size();
+        size += query.size();
 
         /* was --metadata also specified? if so, construct the package
          * list.  When we're all done, the list will be passed to
@@ -333,17 +368,17 @@ action_pkg_handler_T::operator() (opts_type &opts)
         if (meta and not count)
         {
             /* we're only interested in the package names */
-            package_list::iterator p;
-            for (p = list.begin() ; p != list.end() ; ++p)
+            pkgQuery_T::iterator p;
+            for (p = query.begin() ; p != query.end() ; ++p)
                 packages.push_back(p->first);
         }
         else
         {
-            display(list);
+            display(query);
 
             /* only skip a line if we're not on the last one */
             if (not count and n != opts.size())
-                if (not quiet or (quiet and list.size() > 0))
+                if (not quiet or (quiet and query.size() > 0))
                     output.endl();
         }
     }
@@ -394,10 +429,20 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
 
+    if (cached.size() != opts.size())
+        pkgcache.dump();
+
     /* we handler timer here */
     timer = false;
 
     flush();
+
+    if (debug)
+    {
+        *stream << "pkgcache dump after write()" << std::endl;
+        pkgcache.dump(stream);
+    }
+
     return EXIT_SUCCESS;
 }
 

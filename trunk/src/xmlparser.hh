@@ -27,13 +27,9 @@
 # include "config.h"
 #endif
 
-#ifdef UNICODE
-# define USE_LIBXMLPP
-#else /* UNICODE */
-# define USE_XMLWRAPP
-#endif /* UNICODE */
-
 #include <istream>
+
+#include "common.hh"
 
 #ifdef USE_LIBXMLPP
 # include <libxml++/libxml++.h>
@@ -41,8 +37,6 @@
 # include <xmlwrapp/init.h>
 # include <xmlwrapp/event_parser.h>
 #endif /* USE_LIBXMLPP */
-
-#include "common.hh"
 
 /* callback names - XML parser implementation-dependant */
 #ifdef USE_LIBXMLPP

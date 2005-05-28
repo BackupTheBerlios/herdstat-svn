@@ -31,6 +31,7 @@
 #include "herds_xml.hh"
 #include "metadata_xml.hh"
 #include "metadatas.hh"
+#include "pkgcache.hh"
 #include "action_handler.hh"
 
 class action_pkg_handler_T : public action_herds_xml_handler_T
@@ -41,32 +42,23 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
-                                 with_herd(optget("with-herd", util::string)),
-                                 with_dev(optget("with-maintainer", util::string)) { }
+                                 with(dev ? optget("with-herd", util::string) :
+                                            optget("with-maintainer", util::string)) { }
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
 
     private:
-        class package_list : public std::map<util::string, util::string>
-        {
-            public:
-                package_list(const opts_type::value_type &n)
-                    : info(n), name(n) { }
-
-                herds_xml_T::devinfo_T info;
-                util::string name;
-        };
-
-        void search(package_list *);
-        void display(const package_list &);
+        void search(pkgQuery_T *);
+        void display(const pkgQuery_T &);
         void error(const util::string &) const;
         bool is_found(const metadata_xml_T &, const util::string &);
 
         metadatas_T metadatas;
+        pkgCache_T  pkgcache;
         util::progress_T  progress;
         util::timer_T::size_type elapsed;
         const bool dev, meta, status;
-        const util::string with_herd, with_dev;
+        const util::string with;
 };
 
 #endif
