@@ -194,7 +194,7 @@ action_pkg_handler_T::search(const opts_type &opts)
         elapsed += metadata.elapsed();
 
         /* for each specified herd/dev */
-        opts_type::iterator i;
+        opts_type::const_iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
         {
             if (regex)
@@ -212,9 +212,9 @@ action_pkg_handler_T::search(const opts_type &opts)
                 package = package.substr(0, pos);
 
             /* we've already inserted at least one package */
-            std::map<util::string, pkgQuery_T * >::iterator pos;
-            if ((pos = matches.find(*i)) != matches.end())
-                (*(pos->second))[package] = metadata.longdesc();
+            std::map<util::string, pkgQuery_T * >::iterator mpos;
+            if ((mpos = matches.find(*i)) != matches.end())
+                (*(mpos->second))[package] = metadata.longdesc();
             /* nope, so create a new query object */
             else
             {
@@ -301,7 +301,7 @@ action_pkg_handler_T::display(pkgQuery_T *q)
             debug_msg("longdesc(%s): '%s'", p->first.c_str(),
                 longdesc.c_str());
 
-            if (pn != query.size())
+            if (pn != q->size())
                 output.endl();
         }
         else if (verbose and not quiet)
@@ -319,7 +319,7 @@ action_pkg_handler_T::display(pkgQuery_T *q)
 void
 action_pkg_handler_T::display()
 {
-    int n = 1;
+    opts_type::size_type n = 1;
     std::map<util::string, pkgQuery_T * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
@@ -328,7 +328,7 @@ action_pkg_handler_T::display()
             if (matches.size() == 1)
             {
                 if (not quiet)
-                    error(*i);
+                    error(m->first);
 
                 pkgcache.dump();
                 throw action_E();
@@ -350,7 +350,7 @@ action_pkg_handler_T::display()
         {
             /* we're only interested in the package names */
             pkgQuery_T::iterator p;
-            for (p = query.begin() ; p != query.end() ; ++p)
+            for (p = m->second->begin() ; p != m->second->end() ; ++p)
                 packages.push_back(p->first);
         }
         else
