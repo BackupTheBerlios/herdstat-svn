@@ -119,6 +119,13 @@ pkgCache_T::operator() (pkgQuery_T *q)
     iterator i = this->find(*q);
     if (i != this->end())
     {
+        /* dont cache it if it hasn't expired and size is equal */
+        if (not is_expired(*i) and (q->size() == (*i)->size()))
+        {
+            delete q;
+            return;
+        }
+
         debug_msg("old query exists for '%s', so removing it",
             q->query.c_str());
         delete *i;

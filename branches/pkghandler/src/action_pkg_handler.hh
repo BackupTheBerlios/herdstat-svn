@@ -38,7 +38,8 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 {
     public:
         action_pkg_handler_T() : action_herds_xml_handler_T(),
-                                 elapsed(0),
+                                 pkgcache(portdir),
+                                 elapsed(0), optsize(0),
                                  at_least_one_not_cached(false),
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
@@ -50,11 +51,17 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 	virtual int operator() (opts_type &);
 
     private:
+        void search(const opts_type &);
         void search(pkgQuery_T *);
-        void display(const pkgQuery_T &);
+        void display();
+        void display(pkgQuery_T *);
         void error(const util::string &) const;
+        bool metadata_matches(const metadata_xml_T &, pkgQuery_T *);
         bool is_found(const metadata_xml_T &, const util::string &);
 
+        std::map<opts_type::value_type, pkgQuery_T * > matches;
+        opts_type not_found, packages;
+        opts_type::size_type optsize;
         metadatas_T metadatas;
         pkgCache_T  pkgcache;
         util::progress_T  progress;
