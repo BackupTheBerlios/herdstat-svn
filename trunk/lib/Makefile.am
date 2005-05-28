@@ -15,6 +15,10 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     portage_version.hh portage_version.cc \
 		     portage_find.hh portage_find.cc
 
+if HAVE_LIBZ
+libutil_la_SOURCES += zlib.hh zlib.cc
+endif
+
 LIBS = @LIBS@ @GLIBMM_LIBS@
 AM_CXXFLAGS = -pedantic -ansi -Wall -Wno-long-long @GLIBMM_CFLAGS@
 

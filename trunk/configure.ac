@@ -68,6 +68,20 @@ AC_CHECK_HEADERS(getopt.h)
 dnl Optional functions
 AC_CHECK_FUNCS(strtoumax getopt_long)
 
+dnl zlib
+AC_MSG_CHECKING([whether to include zlib support])
+AC_ARG_WITH(zlib,
+    AS_HELP_STRING([--without-zlib], [disable zlib support]),
+    ac_zlib=$withval,
+    ac_zlib=yes)
+
+if test x$ac_zlib = xno ; then
+    AC_MSG_RESULT(no)
+else
+    AC_MSG_RESULT(yes)
+    AC_CHECK_LIB(z, compress)
+fi
+
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     [case "${enableval}" in
         yes)    debug=true
