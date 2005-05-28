@@ -39,8 +39,13 @@ main(int argc, char **argv)
     out.add_highlight(util::current_user());
 
     pkgCache_T pkgcache;
-    pkgcache.load();
-    pkgcache.dump(&std::cout);
+
+    if (not pkgcache.empty())
+    {
+        pkgcache.load();
+        pkgcache.dump(&std::cout);
+    }
+    
     return EXIT_SUCCESS;
 }
 
