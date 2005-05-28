@@ -1,5 +1,34 @@
 ChangeLog for herdstat
 
+2005-05-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added zlib checks. Can be disabled via --without-zlib.
+	* lib/zlib.cc, lib/zlib.hh: Added a simple zlib wrapper class, zlib_T.
+	* src/pkgcache.cc, src/pkgcache.hh: Make use of zlib_T if HAVE_LIBZ is
+	defined, (de)compressing the cache when we read/write to disk.
+	* src/formatter.cc: Modified highlight() to remove any ANSI colors
+	before searching the devaway list.  Otherwise, std::find() will always
+	fail if the current word has colors.
+	* src/options.cc, src/herdstat.cc, bashcomp, doc/herdstat.1.in: Added
+	--nopkgcache option for disabling cache lookups (queries are still
+	cached, however).
+	* src/metadatas.hh: Added set() member for manually setting a
+	metadatas_T object to a certain list of metadatas.
+	* src/action_pkg_handler.cc: If a cache lookup fails,
+	--with-{herd,maintainer} is specified, and a previously cached query
+	that is equivelent to the query (minus the --with of course), use the
+	cached object to get a list of possibles.  For example, if a cached
+	query of cron herd packages exists but one doesnt exists for cron herd
+	packages with maintainer ka0ttic, use the cached cron packages to
+	deduce those maintained by ka0ttic.
+	* src/metadata_xml_handler.cc: Run herd names through
+	util::lowercase() before saving.
+	* src/action_handler.hh: Fixed small bug that caused the away footnote
+	to be displayed twice when running --package --metadata.
+	* src/Makefile.am, src/pkgcache-dump.cc: Added a simple utility,
+	pkgcache-dump, used for debugging purposes.  It is only
+	built/installed if --enable-debug is passed to configure.
+
 2005-05-27 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/pkgcache.cc, src/pkgcache.hh, src/pkgcache_xml_handler.cc,

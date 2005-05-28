@@ -31,8 +31,6 @@
 #include "common.hh"
 #include "herds_xml.hh"
 
-#define PKGCACHE    LOCALSTATEDIR"/pkgcache.xml"
-
 /*
  * Container for package query data.
  */
@@ -47,6 +45,7 @@ class pkgQuery_T : public std::map<util::string, util::string>
 
         void dump(std::ostream &) const;
         bool operator== (const pkgQuery_T &) const;
+        const std::vector<util::string> make_list(const util::string &) const;
 
         herds_xml_T::devinfo_T info;    /* developer info (if type == dev) */
         util::string query;             /* query string */
@@ -69,10 +68,15 @@ class pkgCache_T : public std::vector<pkgQuery_T * >
         void operator() (pkgQuery_T *);
         void load();
         void dump(std::ostream * = NULL);
-        void cleanse();
+
         iterator find(const pkgQuery_T &);
         bool is_expired(pkgQuery_T *q) const { return this->is_expired(*q); }
         bool is_expired(const pkgQuery_T &) const;
+
+    protected:
+        void compress();
+        void decompress();
+        void cleanse();
 };
 
 #endif

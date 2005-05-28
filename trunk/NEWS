@@ -1,12 +1,14 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
-1.1.1_alpha1:
+1.1.1_rc1:
     New features:
      - Added --away option for viewing devaway information.  Also, now
        whenever a developer name who is currently away occurs in the output,
        it will me marked with an asterisk.
-     - Caching of 'herdstat -p' queries now takes place.
+     - 'herdstat -p' now caches it's results so that subsequent queries do not
+       require parsing every single metadata.xml.  A --nopkgcache option was
+       added to prevent cache lookup (the query is still cached, however).
 
 1.1.0:
     Use libtool --silent for less verbose compile output.

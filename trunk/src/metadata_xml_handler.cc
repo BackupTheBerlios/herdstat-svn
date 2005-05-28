@@ -105,7 +105,7 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
 {
     /* <herd> */
     if (in_herd)
-        herds.push_back(str);
+        herds.push_back(util::lowercase(str));
 
     /* <maintainer><email> */
     else if (in_email)

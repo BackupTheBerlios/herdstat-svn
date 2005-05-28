@@ -56,6 +56,7 @@ class formatter_T
         void set_attrs();
 
         /* attribute member functions */
+        void set_marked_away(const bool &value) { attr.marked_away = value; }
         const bool &marked_away() const { return attr.marked_away; }
 
         void set_maxtotal(const size_type &s) { attr.maxtotal = s; }

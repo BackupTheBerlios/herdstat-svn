@@ -62,8 +62,13 @@ namespace util
     util::string get_user_from_email(const util::string &);
     util::string current_user();
     util::string::size_type getcols();
-    int fetch(const util::string &, const util::string &, bool v = false);
-    int fetch(const char *, const char *, bool v = false);
+    const util::string format_date(const std::time_t &,
+        const char * = "%a %b %d %T %Z %Y");
+    const util::string format_date(const util::string &,
+        const char * = "%a %b %d %T %Z %Y");
+    int fetch(const util::string &, const util::string &,
+            bool = false, bool = false);
+    int fetch(const char *, const char *, bool = false, bool = false);
 
     class color_map_T
     {

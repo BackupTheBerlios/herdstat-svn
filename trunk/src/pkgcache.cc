@@ -33,6 +33,10 @@
 # include <xmlwrapp/xmlwrapp.h>
 #endif /* USE_LIBXMLPP */
 
+#ifdef DEBUG
+#include "formatter.hh"
+#endif /* DEBUG */
+
 #include "pkgcache_xml_handler.hh"
 #include "pkgcache.hh"
 
@@ -45,34 +49,62 @@
  * object is considered valid */
 #define PKGCACHE_EXPIRE     592200  /* one week */
 
+#define PKGCACHE    LOCALSTATEDIR"/pkgcache.xml"
+
+#ifdef HAVE_LIBZ
+# define PKGCACHE_ZL    PKGCACHE".zl"
+#endif
+
 void
 pkgQuery_T::dump(std::ostream &stream) const
 {
-    stream
-        << "query string: " << this->query  << std::endl
-        << "query id: "     << this->id     << std::endl
-        << "query with: "   << this->with   << std::endl
-        << "query type: "   << this->type   << std::endl
-        << "query date: "   << this->date   << std::endl;
-        
+    formatter_T out;
+    out.set_maxlabel(16);
+    out.set_maxdata(optget("maxcol", std::size_t) - out.maxlabel());
+    out.set_attrs();
+    
+    out("Query string", this->query);
+    out("Query with", this->with);
+    out("Query type", (this->type == QUERYTYPE_DEV ? "dev":"herd"));
+    out("Query date", util::format_date(this->date, "%s") + " ("
+        + util::format_date(this->date) + ")");
+
     for (const_iterator p = this->begin() ; p != this->end() ; ++p)
-        stream << "\t" << p->first << std::endl; 
+        out("", p->first);
+
+    out.flush(stream);
 }
 
 bool
 pkgQuery_T::operator== (const pkgQuery_T &that) const
 {
-    debug_msg("pkgQuery_T::operator==");
-    debug_msg("%s == %s ? %d", this->query.c_str(), that.query.c_str(),
-            (this->query == that.query));
-    debug_msg("%s == %s ? %d", this->with.c_str(), that.with.c_str(),
-            (this->with == that.with));
-    debug_msg("%d == %d ? %d", this->type, that.type,
-            (this->type == that.type));
+//    debug_msg("pkgQuery_T::operator==");
+//    debug_msg("%s == %s ? %d", this->query.c_str(), that.query.c_str(),
+//            (this->query == that.query));
+//    debug_msg("%s == %s ? %d", this->with.c_str(), that.with.c_str(),
+//            (this->with == that.with));
+//    debug_msg("%d == %d ? %d", this->type, that.type,
+//            (this->type == that.type));
 
     return ((this->query == that.query) and
             (this->with  == that.with) and
             (this->type  == that.type));
+}
+
+/*
+ * For each package we contain, return a vector
+ * of paths to each metadata.xml.
+ */
+
+const std::vector<util::string>
+pkgQuery_T::make_list(const util::string &portdir) const
+{
+    std::vector<util::string> v;
+
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(portdir + "/" + i->first + "/metadata.xml");
+
+    return v;
 }
 
 /*
@@ -97,6 +129,55 @@ pkgCache_T::operator() (pkgQuery_T *q)
     this->push_back(q);
 }
 
+void
+pkgCache_T::compress()
+{
+#ifdef HAVE_LIBZ
+
+    if (util::is_file(PKGCACHE))
+    {
+        /* save previously existing */
+        if (util::is_file(PKGCACHE_ZL))
+            util::move_file(PKGCACHE_ZL, PKGCACHE_ZL".bak");
+
+        /* compress */
+        util::zlib_T zlib;
+        if (zlib.compress(PKGCACHE, PKGCACHE_ZL) == Z_OK)
+        {
+            unlink(PKGCACHE);
+            unlink(PKGCACHE_ZL".bak");
+        }
+        else
+            util::move_file(PKGCACHE_ZL".bak", PKGCACHE_ZL);
+    }
+
+#endif /* HAVE_LIBZ */
+}
+
+void
+pkgCache_T::decompress()
+{
+#ifdef HAVE_LIBZ
+
+    if (util::is_file(PKGCACHE_ZL))
+    {
+        if (util::is_file(PKGCACHE))
+            util::move_file(PKGCACHE, PKGCACHE".bak");
+
+        /* uncompress */
+        util::zlib_T zlib;
+        if (zlib.decompress(PKGCACHE_ZL, PKGCACHE) == Z_OK)
+        {
+            unlink(PKGCACHE_ZL);
+            unlink(PKGCACHE".bak");
+        }
+        else
+            util::move_file(PKGCACHE".bak", PKGCACHE);
+    }
+
+#endif /* HAVE_LIBZ */
+}
+
 /*
  * Load our cache from disk to memory.
  */
@@ -104,6 +185,10 @@ pkgCache_T::operator() (pkgQuery_T *q)
 void
 pkgCache_T::load()
 {
+#ifdef HAVE_LIBZ
+    this->decompress();
+#endif /* HAVE_LIBZ */
+
     if (not util::is_file(PKGCACHE))
         return;
 
@@ -114,6 +199,10 @@ pkgCache_T::load()
     pkgCacheXMLHandler_T::value_type::iterator i;
     for (i = handler->queries.begin() ; i != handler->queries.end() ; ++i)
         this->push_back(new pkgQuery_T(*(*i)));
+
+#ifdef HAVE_LIBZ
+    this->compress();
+#endif /* HAVE_LIBZ */
 }
 
 /*
@@ -150,11 +239,14 @@ pkgCache_T::dump(std::ostream *stream)
     /* stream should only be non-NULL for debugging purposes */
     if (stream)
     {
-        *stream << std::endl << "Package cache (size: " << this->size()
+        *stream << "Package cache (size: " << this->size()
             << ")" << std::endl;
 
         for (iterator i = this->begin() ; i != this->end() ; ++i)
+        {
             (*i)->dump(*stream);
+            *stream << std::endl;
+        }
 
         return;
     }
@@ -270,20 +362,9 @@ pkgCache_T::dump(std::ostream *stream)
         }
 
 #ifdef USE_LIBXMLPP
-# ifdef DEBUG
-        doc.write_to_file_formatted(PKGCACHE, "UTF-8");
-# else
         doc.write_to_file(PKGCACHE, "UTF-8");
-# endif /* DEBUG */
-#else
-//# ifdef DEBUG
-//        doc.save_to_file(PKGCACHE, 0);
-//# else /* DEBUG */
-//        if (this->size() > (PKGCACHE_MAX * 0.75))
-//            doc.save_to_file(PKGCACHE, 9);
-//        else
-           doc.save_to_file(PKGCACHE, 0);
-//# endif /* DEBUG */
+#else /* USE_LIBXMLPP */
+        doc.save_to_file(PKGCACHE, 0);
 #endif /* USE_LIBXMLPP */
     }
 #ifdef USE_LIBXMLPP
@@ -294,6 +375,11 @@ pkgCache_T::dump(std::ostream *stream)
     {
         throw XMLWriter_E(PKGCACHE, e.what());
     }
+
+#ifdef HAVE_LIBZ
+    this->compress();
+#endif
+
 }
 
 /*

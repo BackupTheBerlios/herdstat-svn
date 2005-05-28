@@ -89,9 +89,15 @@ class action_fancy_handler_T : public action_handler_T
             action_handler_T::flush();            
 
             if (output.marked_away() and not count)
+            {
                 *stream << std::endl << output.devaway_color()
                     << "*" << color[none] << " Currently away"
                     << std::endl;
+
+                /* set false so the above isn't displayed more than once
+                 * in cases where more than one action handler is run */
+                output.set_marked_away(false);
+            }
         }
 
         devaway_T devaway;

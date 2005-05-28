@@ -8,16 +8,17 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     progress.hh \
 		     file.hh file.cc \
 		     vars.hh vars.cc \
-		     cache.hh \
-		     portage_exceptions.hh \
-		     portage_misc.hh portage_misc.cc \
-		     portage_config.hh portage_config.cc \
-		     portage_version.hh portage_version.cc \
-		     portage_find.hh portage_find.cc
+		     cache.hh
 
 if HAVE_LIBZ
 libutil_la_SOURCES += zlib.hh zlib.cc
 endif
+
+libutil_la_SOURCES += portage_exceptions.hh \
+		      portage_misc.hh portage_misc.cc \
+		      portage_config.hh portage_config.cc \
+		      portage_version.hh portage_version.cc \
+		      portage_find.hh portage_find.cc
 
 LIBS = @LIBS@ @GLIBMM_LIBS@
 AM_CXXFLAGS = -pedantic -ansi -Wall -Wno-long-long @GLIBMM_CFLAGS@

@@ -24,7 +24,6 @@
 # include "config.h"
 #endif
 
-#include <fstream>
 #include <utility>
 #include <algorithm>
 

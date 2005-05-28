@@ -26,6 +26,10 @@
 
 #ifdef HAVE_LIBZ
 
+#include <cstdio>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "zlib.hh"
 
 int
@@ -36,12 +40,20 @@ util::zlib_T::compress(const util::string &in, const util::string &out, int leve
     this->avail_out = buflen;
     this->next_out = outbuf;
 
-    this->fin = fopen(in.c_str(), "rb");
-    this->fout = fopen(out.c_str(), "wb");
+    this->fin = std::fopen(in.c_str(), "rb");
+    if (not this->fin)
+        throw bad_fileobject_E(in);
 
-    struct stat s;
-    fstat(std::fileno(fin), &s);
-    this->len = s.st_size;
+    this->fout = std::fopen(out.c_str(), "wb");
+    if (not this->fout)
+        throw bad_fileobject_E(out);
+
+    {
+        struct stat s;
+        if (fstat(fileno(this->fin), &s) != 0)
+            throw bad_fileobject_E(in);
+        this->len = s.st_size;
+    }
 
     deflateInit(this, level);
 
@@ -55,8 +67,6 @@ util::zlib_T::compress(const util::string &in, const util::string &out, int leve
 
         if (this->err != Z_OK)
             break;
-
-        this->progress(this->percent());
     }
 
     while (true)
@@ -66,22 +76,112 @@ util::zlib_T::compress(const util::string &in, const util::string &out, int leve
             break;
     }
 
-    this->progress(this->percent());
     deflateEnd(this);
 
     if (this->err != Z_OK and this->err != Z_STREAM_END)
-        this->status("Zlib error");
+        throw zlib_E();
     else
-    {
-        this->status("Success");
         this->err = Z_OK;
-    }
 
-    std::fclose(this->fin);
-    std::fclose(this->fout);
+    if (this->fin)
+        std::fclose(fin);
+    if (this->fout)
+        std::fclose(fout);
     this->fin = this->fout = NULL;
 
     return this->err;
+}
+
+int
+util::zlib_T::decompress(const util::string &in, const util::string &out)
+{
+    this->err = Z_OK;
+    this->avail_in = 0;
+    this->avail_out = buflen;
+    this->next_out = outbuf;
+
+    this->fin = std::fopen(in.c_str(), "rb");
+    if (not this->fin)
+        throw bad_fileobject_E(in);
+
+    this->fout = std::fopen(out.c_str(), "wb");
+    if (not this->fout)
+        throw bad_fileobject_E(out);
+
+    {
+        struct stat s;
+        if (fstat(fileno(this->fin), &s) != 0)
+            throw bad_fileobject_E(in);
+        this->len = s.st_size;
+    }
+
+    inflateInit(this);
+
+    while (true)
+    {
+        if (not this->load())
+            break;
+
+        this->err = inflate(this, Z_NO_FLUSH);
+        this->flush();
+
+        if (this->err != Z_OK)
+            break;
+    }
+
+    while (true)
+    {
+        this->err = inflate(this, Z_FINISH);
+        if (not this->flush() or (this->err != Z_OK))
+            break;
+    }
+
+    inflateEnd(this);
+
+    if (this->err != Z_OK and this->err != Z_STREAM_END)
+        throw zlib_E();
+    else
+        this->err = Z_OK;
+
+    if (this->fin)
+        std::fclose(fin);
+    if (this->fout)
+        std::fclose(fout);
+    this->fin = this->fout = NULL;
+
+    return this->err;
+}
+
+int
+util::zlib_T::load()
+{
+    if (this->avail_in == 0)
+    {
+        this->next_in = inbuf;
+        this->avail_in = std::fread(this->inbuf, 1, buflen, this->fin);
+    }
+
+    return this->avail_in;
+}
+
+int
+util::zlib_T::flush()
+{
+    unsigned count = this->buflen - this->avail_out;
+
+    if (count)
+    {
+        if (std::fwrite(this->outbuf, 1, count, this->fout) != count)
+        {
+            this->err = Z_ERRNO;
+            return 0;
+        }
+
+        this->next_out = this->outbuf;
+        this->avail_out = buflen;
+    }
+
+    return count;
 }
 
 #endif /* HAVE_LIBZ */

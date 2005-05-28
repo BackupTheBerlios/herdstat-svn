@@ -99,4 +99,12 @@ maintainer: ::
 
     $ herdstat -p shell-tools --no-maintainer
 
+Display devaway information for g2boojum: ::
+
+    $ herdstat -a g2boojum
+
+Display devaway information for all developers: ::
+
+    $ herdstat -a all
+
 .. vim: set ft=glep tw=80 sw=4 et spell spelllang=en : ..

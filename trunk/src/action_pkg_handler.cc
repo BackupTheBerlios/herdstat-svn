@@ -123,11 +123,11 @@ action_pkg_handler_T::search(pkgQuery_T *q)
         regexp.assign(q->query,
             eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-    /* for every metadata.xml in the tree... */
+    /* for each metadata.xml... */
     metadatas_T::const_iterator m;
     for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
     {
-        if (status)
+        if (status and at_least_one_not_cached)
             ++progress;
 
         /* unfortunately, we still have to do a sanity check in the event
@@ -265,13 +265,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
     opts_type not_found, packages, cached;
 
     /* load our cache */
-    pkgcache.load();
-
-    if (debug)
-    {
-        *stream << "pkgcache dump after load()" << std::endl;
-        pkgcache.dump(stream);
-    }
+    if (use_cache)
+        pkgcache.load();
 
     herds_xml.fetch();
     herds_xml.parse();
@@ -312,13 +307,33 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 debug_msg("found '%s' in cache", i->c_str());
                 cached.push_back(*i);
             }
+            else if (pc == pkgcache.end() and not with.empty())
+            {
+                /* search for the same query with an empty 'with'.
+                 * if it exists and is valid, we only need to parse
+                 * those metadata.xml's to get the results. */
+                pkgCache_T::iterator ppc =
+                    pkgcache.find(pkgQuery_T(*i, "", dev));
+                if (ppc != pkgcache.end() and not pkgcache.is_expired(*ppc))
+                {
+                    const std::vector<util::string> m
+                        ((*ppc)->make_list(portdir));
+                    metadatas.set(m);
+
+                    pkgQuery_T q(*i, with, dev);
+                    search(&q);
+                    cached.push_back(*i);
+                }
+            }
         }
     }
 
-    if (cached.size() != opts.size())
+    at_least_one_not_cached = (cached.size() != opts.size());
+
+    if (at_least_one_not_cached)
         metadatas.get(portdir);
 
-    if (status and (cached.size() != opts.size()))
+    if (status and at_least_one_not_cached)
     {
         *stream << "Parsing metadata.xml's: ";
         progress.start((opts.size() - cached.size()) * metadatas.size());
@@ -429,20 +444,13 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
 
-    if (cached.size() != opts.size())
+    if (at_least_one_not_cached)
         pkgcache.dump();
 
     /* we handler timer here */
     timer = false;
 
     flush();
-
-    if (debug)
-    {
-        *stream << "pkgcache dump after write()" << std::endl;
-        pkgcache.dump(stream);
-    }
-
     return EXIT_SUCCESS;
 }
 

@@ -25,6 +25,7 @@
 #endif
 
 #include <algorithm>
+#include <functional>
 #include <iterator>
 
 #include "formatter.hh"
@@ -104,16 +105,41 @@ formatter_T::highlight(const std::vector<string_type> &data)
         if (std::find(attr.highlights.begin(),
             attr.highlights.end(), *i) != attr.highlights.end())
             s += attr.highlight_color + (*i) + attr.no_color + " ";
-        /* search devaway */
-        else if (std::find(attr.devaway.begin(),
-            attr.devaway.end(), *i) != attr.devaway.end())
-        {
-            debug_msg("marking '%s' as away", i->c_str());
-            attr.marked_away = true;
-            s += (*i) + attr.devaway_color + "*" + attr.no_color + " ";
-        }
         else
-            s += *i + " ";
+        {
+            string_type tmp(*i);
+
+            /* loop removing any ANSI colors, so we can search
+             * the devway vector */
+            if (tmp.find("\033") != string_type::npos)
+            {
+                string_type::size_type pos, lpos = 0;
+                while (true)
+                {
+                    if ((pos = tmp.find("\033", lpos)) == string_type::npos)
+                        break;
+
+                    string_type::size_type mpos;
+                    if ((mpos = tmp.find('m', pos)) == string_type::npos)
+                        break;
+
+                    tmp.erase(pos, mpos+1);
+
+                    lpos = ++pos;
+                }
+            }
+                    
+            /* search devaway */
+            if (std::find(attr.devaway.begin(),
+                attr.devaway.end(), tmp) != attr.devaway.end())
+            {
+                debug_msg("marking '%s' as away", i->c_str());
+                attr.marked_away = true;
+                s += (*i) + attr.devaway_color + "*" + attr.no_color + " ";
+            }
+            else
+                s += (*i) + " ";
+        }
     }
 
     return s;

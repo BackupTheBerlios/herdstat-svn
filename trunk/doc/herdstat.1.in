@@ -53,6 +53,10 @@ Shorthand for --with-maintainer=none.
 .B "\-N, \-\-no-overlay"
 Don't search overlay(s) in PORTDIR_OVERLAY.
 .TP
+.B "\-\-nopkgcache"
+When used in conjunction with --package, don't use cached query results even
+if it exists.
+.TP
 .B "\-r, \-\-regex"
 Display results matching the specified regular expression.
 .TP

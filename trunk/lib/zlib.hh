@@ -33,6 +33,7 @@
 #include <zlib.h>
 
 #include "string.hh"
+#include "util_exceptions.hh"
 
 /*
  * Simple zlib wrapper
@@ -40,17 +41,23 @@
 
 namespace util
 {
+    class zlib_E : public base_E { };
+
     class zlib_T : public z_stream
     {
         public:
-            zlib_T() : zalloc(NULL), zfree(NULL), opaque(NULL),
-                       fin(NULL), fout(NULL) { }
+            zlib_T() : fin(NULL), fout(NULL)
+            {
+                zalloc = NULL;
+                zfree  = NULL;
+                opaque = NULL;
+            }
 
-            int compress(const util::string &, const util::string &, int = 6);
+            int compress(const util::string &, const util::string &,
+                int = Z_DEFAULT_COMPRESSION);
             int decompress(const util::string &, const util::string &);
 
         protected:
-            int percent();
             int load();
             int flush();
 

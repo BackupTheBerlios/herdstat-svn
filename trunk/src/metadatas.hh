@@ -37,7 +37,7 @@
 /* rough number of metadata.xml's in the tree, updated from time to
  * time as it grows. Used for initial vector size so that a ton of
  * re-allocations can be prevented */
-#define METADATA_RESERVE    8450
+#define METADATA_RESERVE    8550
 #define DEFAULT_EXPIRE      86400
 
 /*
@@ -55,6 +55,7 @@ class metadatas_T : public util::cache_T<std::vector<util::string> >
             : util::cache_T<value_type>(CACHE), portdir(p)
         { this->_cache.reserve(METADATA_RESERVE); this->init(); }
 
+        void set(const value_type &v) { this->_cache = v; }
         void get(const util::string &p) { this->portdir = p; this->init(); }
 
         virtual bool valid() const;

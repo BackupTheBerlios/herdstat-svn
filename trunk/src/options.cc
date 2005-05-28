@@ -56,6 +56,7 @@ options_T::option_map_T::set_defaults()
     insopt("regex", false);
     insopt("qa", false);
     insopt("meta", false);
+    insopt("pkgcache", true);
 
     insopt("maxcol", static_cast<std::size_t>(78));
 
