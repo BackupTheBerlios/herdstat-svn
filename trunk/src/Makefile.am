@@ -35,8 +35,8 @@ herdstat_SOURCES = common.hh common.cc \
 herdstat_LDADD = ../lib/libutil.la
 
 if DEBUG
-bin_PROGRAMS += pkgcache-dump
-pkgcache_dump_SOURCES = common.hh common.cc \
+bin_PROGRAMS += pkgcachectl
+pkgcachectl_SOURCES = common.hh common.cc \
 			exceptions.hh \
 			options.hh options.cc \
 			formatter.hh formatter.cc \
@@ -45,8 +45,8 @@ pkgcache_dump_SOURCES = common.hh common.cc \
 			pkgcache_xml_handler.hh pkgcache_xml_handler.cc \
 			parsable.hh \
 			xml.hh \
-			pkgcache-dump.cc
-pkgcache_dump_LDADD = ../lib/libutil.la
+			pkgcachectl.cc
+pkgcachectl_LDADD = ../lib/libutil.la
 endif
 
 INCLUDES = -I../lib

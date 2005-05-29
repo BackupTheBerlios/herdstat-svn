@@ -1,6 +1,18 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc2:
+    Rewrote large portions of the package handler (--package) to fix a major
+    design flaw.
+
+    New features:
+     - Both --with-herd and --with-maintainer options are now interpreted as
+       regular expressions, increasing the flexibility you have.
+
+    Bug fixes:
+     - Fixed missing include that caused compilation failure if both libxmlpp
+       xmlwrapp aren't installed.
+
 1.1.1_rc1:
     New features:
      - Added --away option for viewing devaway information.  Also, now
