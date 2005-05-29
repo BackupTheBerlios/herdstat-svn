@@ -52,7 +52,7 @@ action_pkg_handler_T::error(const util::string &criteria) const
     }
     
     std::cerr << " with " << (dev? "herd":"developer") << " '"
-        << with << "'." << std::endl;
+        << with() << "'." << std::endl;
 }
 
 /*
@@ -98,10 +98,10 @@ action_pkg_handler_T::metadata_matches(const metadata_xml_T &metadata,
                 return true;
             else
             {
-                if ((with == "none") and metadata.devs().empty())
+                if ((with() == "none") and metadata.devs().empty())
                     return true;
                 else if (metadata.dev_exists(with) or
-                         metadata.dev_exists(with+"@gentoo.org"))
+                         metadata.dev_exists(with()+"@gentoo.org"))
                     return true;
             }
         }
@@ -138,7 +138,7 @@ action_pkg_handler_T::search(pkgQuery_T *q)
         elapsed += metadata.elapsed();
 
         q->date = std::time(NULL);
-        q->with = with;
+        q->with = with();
 
         /* 
          * determine whether the package matches our search criteria
@@ -199,28 +199,34 @@ action_pkg_handler_T::search(const opts_type &opts)
         opts_type::const_iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
         {
+            bool matched = false;
+
             if (regex)
                 regexp.assign(*i, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-            if (not metadata_matches(metadata, *i))
-                continue;
+            if (metadata_matches(metadata, *i))
+                matched = true;
 
             debug_msg("Match found in %s.", m->c_str());
 
             /* get category/package from absolute path */
-            util::string package = m->substr(portdir.size() + 1);
-            util::string::size_type pos = package.find("/metadata.xml");
-            if (pos != util::string::npos)
-                package = package.substr(0, pos);
+            util::string package;
+            if (matched)
+            {
+                package = m->substr(portdir.size() + 1);
+                util::string::size_type pos = package.find("/metadata.xml");
+                if (pos != util::string::npos)
+                    package = package.substr(0, pos);
+            }
 
             /* we've already inserted at least one package */
             std::map<util::string, pkgQuery_T * >::iterator mpos;
-            if ((mpos = matches.find(*i)) != matches.end())
+            if (matched and (mpos = matches.find(*i)) != matches.end())
                 (*(mpos->second))[package] = metadata.longdesc();
             /* nope, so create a new query object */
-            else
+            else if (matched)
             {
-                pkgQuery_T *q = new pkgQuery_T(*i, with, dev);
+                pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
                 q->date = std::time(NULL);
             
                 if (dev)
@@ -228,6 +234,13 @@ action_pkg_handler_T::search(const opts_type &opts)
 
                 (*q)[package] = metadata.longdesc();
                 matches[*i] = q;
+            }
+            /* didn't match */
+            else
+            {
+                pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
+                q->date = std::time(NULL);
+                matches[*i] = new pkgQuery_T(*i);
             }
         }
     }
@@ -335,6 +348,7 @@ action_pkg_handler_T::display()
                     error(m->first);
 
                 pkgcache.dump();
+                cleanup();
                 throw action_E();
             }
 
@@ -412,6 +426,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
     output.set_maxdata(maxcol - output.maxlabel());
     output.set_attrs();
 
+    /* setup with regex */
+    with.assign(dev? optget("with-herd", util::string) :
+                     optget("with-maintainer", util::string), REG_ICASE);
+
     /* load our map with any previously cached queries,
      * erasing them from opts as they're found. */
     if (not pkgcache.empty())
@@ -421,12 +439,18 @@ action_pkg_handler_T::operator() (opts_type &opts)
         opts_type::iterator i;
         for (i = tmp.begin() ; i != tmp.end() ; ++i)
         {
-            pkgCache_T::iterator p = pkgcache.find(pkgQuery_T(*i, with, dev));
+            pkgCache_T::iterator p = pkgcache.find(pkgQuery_T(*i, with(), dev));
             if (p != pkgcache.end() and not pkgcache.is_expired(*p))
             {
                 /* exists and hasn't expired */
                 debug_msg("found '%s' in cache", i->c_str());
-                matches[*i] = new pkgQuery_T(*(*p));
+
+                pkgQuery_T *q = new pkgQuery_T(*(*p));
+                /* reset query and with strings */
+                q->query = *i; q->with = with();
+
+                /* goes straight into the results map */
+                matches[*i] = q;
                 opts.erase(i);
             }
             else if (p == pkgcache.end() and not with.empty())
@@ -441,7 +465,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
                     std::vector<util::string> mlist((*pc)->make_list(portdir));
                     metadatas.set(mlist);
 
-                    pkgQuery_T q(*i, with, dev);
+                    pkgQuery_T q(*i, with(), dev);
                     search(&q);
                     opts.erase(i);
                 }
