@@ -199,48 +199,46 @@ action_pkg_handler_T::search(const opts_type &opts)
         opts_type::const_iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
         {
-            bool matched = false;
-
             if (regex)
                 regexp.assign(*i, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
             if (metadata_matches(metadata, *i))
-                matched = true;
-
-            debug_msg("Match found in %s.", m->c_str());
-
-            /* get category/package from absolute path */
-            util::string package;
-            if (matched)
             {
-                package = m->substr(portdir.size() + 1);
+                debug_msg("Match found in %s.", m->c_str());
+
+                /* get category/package from absolute path */
+                util::string package = m->substr(portdir.size() + 1);
                 util::string::size_type pos = package.find("/metadata.xml");
                 if (pos != util::string::npos)
                     package = package.substr(0, pos);
-            }
 
-            /* we've already inserted at least one package */
-            std::map<util::string, pkgQuery_T * >::iterator mpos;
-            if (matched and (mpos = matches.find(*i)) != matches.end())
-                (*(mpos->second))[package] = metadata.longdesc();
-            /* nope, so create a new query object */
-            else if (matched)
-            {
-                pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
-                q->date = std::time(NULL);
+                /* we've already inserted at least one package */
+                std::map<util::string, pkgQuery_T * >::iterator mpos;
+                if ((mpos = matches.find(*i)) != matches.end())
+                    (*(mpos->second))[package] = metadata.longdesc();
+                /* nope, so create a new query object */
+                else
+                {
+                    pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
+                    q->date = std::time(NULL);
             
-                if (dev)
-                    q->info = herds_xml.get_dev_info(*i);
+                    if (dev)
+                        q->info = herds_xml.get_dev_info(*i);
 
-                (*q)[package] = metadata.longdesc();
-                matches[*i] = q;
+                    (*q)[package] = metadata.longdesc();
+                    matches[*i] = q;
+                }
             }
             /* didn't match */
             else
             {
-                pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
-                q->date = std::time(NULL);
-                matches[*i] = new pkgQuery_T(*i);
+                std::map<util::string, pkgQuery_T * >::iterator mpos;
+                if ((mpos = matches.find(*i)) == matches.end())
+                {
+                    pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
+                    q->date = std::time(NULL);
+                    matches[*i] = q;
+                }
             }
         }
     }

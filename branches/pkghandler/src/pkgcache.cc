@@ -27,6 +27,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "common.hh"
+
 #ifdef USE_LIBXMLPP
 # include <libxml++/libxml++.h>
 #else
