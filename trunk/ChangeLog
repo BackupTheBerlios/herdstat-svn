@@ -2,7 +2,7 @@ ChangeLog for herdstat
 
 2005-05-29 Aaron Walker <ka0ttic@gentoo.org>
 
-	* configure.ac: Update version (1.1.0_rc2).
+	* configure.ac: Updated version (1.1.0_rc2).
 	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Rewrote most
 	of the package handler, due to a huge design flaw.  It would
 	previously parse every metadata.xml PER non-option arg, so if you
@@ -14,7 +14,8 @@ ChangeLog for herdstat
 	* src/metadata_xml_handler.cc, src/metadata_xml_handler.hh: Added
 	overloaded dev_exists and herds_exists member functions that take a
 	regex_T.
-	* src/pkgcachectl.cc: s/pkgcache-dump/pkgcachectl/
+	* src/pkgcachectl.cc: s/pkgcache-dump/pkgcachectl/. Also, added a few
+	command line opts.  It's now able to --dump, --clear, and --summary.
 
 2005-05-28 Aaron Walker <ka0ttic@gentoo.org>
 

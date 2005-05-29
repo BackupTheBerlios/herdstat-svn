@@ -213,7 +213,7 @@ pkgCache_T::load()
 }
 
 /*
- * Clean out old queries until size() == PKGCACHE_MAX
+ * Sort queries oldest to newest.
  */
 
 static bool
@@ -223,13 +223,23 @@ is_greater(pkgQuery_T *q1, pkgQuery_T *q2)
 }
 
 void
+pkgCache_T::sort_oldest_to_newest()
+{
+    /* sort by date */
+    std::stable_sort(this->begin(), this->end(), is_greater);
+}
+
+/*
+ * Clean out old queries until size() == PKGCACHE_MAX
+ */
+
+void
 pkgCache_T::cleanse()
 {
     debug_msg("this->size() > PKGCACHE_MAX(%d), so trimming oldest queries.",
         PKGCACHE_MAX);
 
-    /* sort by date */
-    std::stable_sort(this->begin(), this->end(), is_greater);
+    this->sort_oldest_to_newest();
 
     /* while > PKGCACHE_MAX, erase the first (oldest) query */
     while (this->size() > PKGCACHE_MAX)
