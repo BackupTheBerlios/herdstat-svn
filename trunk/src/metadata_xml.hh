@@ -59,8 +59,10 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
         string_type &longdesc() const { return this->_handler->longdesc; }
 
         bool is_category() const { return this->_handler->is_category; }
-        bool dev_exists(const herd_type::key_type &d) const;
-        bool herd_exists(const herds_type::value_type &h) const;
+        bool dev_exists(const herd_type::key_type &) const;
+        bool dev_exists(const util::regex_T &) const;
+        bool herd_exists(const herds_type::value_type &) const;
+        bool herd_exists(const util::regex_T &) const;
 };
 
 #endif

@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-05-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_pkg_handler.cc: Rewrote most of the package handler, due
+	to a huge design flaw.  It would previously parse every metadata.xml
+	PER non-option arg, so if you specified two non-opt args, it would
+	parse every metadata.xml twice.
+
 2005-05-28 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Added zlib checks. Can be disabled via --without-zlib.

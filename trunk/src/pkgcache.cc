@@ -27,6 +27,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "common.hh"
+
 #ifdef USE_LIBXMLPP
 # include <libxml++/libxml++.h>
 #else
@@ -78,17 +80,17 @@ pkgQuery_T::dump(std::ostream &stream) const
 bool
 pkgQuery_T::operator== (const pkgQuery_T &that) const
 {
-//    debug_msg("pkgQuery_T::operator==");
-//    debug_msg("%s == %s ? %d", this->query.c_str(), that.query.c_str(),
-//            (this->query == that.query));
-//    debug_msg("%s == %s ? %d", this->with.c_str(), that.with.c_str(),
-//            (this->with == that.with));
-//    debug_msg("%d == %d ? %d", this->type, that.type,
-//            (this->type == that.type));
+    return  /* normal lookup */
+            ((this->query == that.query) and
+             (this->with  == that.with) and
+             (this->type  == that.type))
 
-    return ((this->query == that.query) and
-            (this->with  == that.with) and
-            (this->type  == that.type));
+            or
+            
+            /* reverse lookup */
+            ((this->query == that.with) and
+             (this->with  == that.query) and
+             (this->type  != that.type));
 }
 
 /*
@@ -100,10 +102,8 @@ const std::vector<util::string>
 pkgQuery_T::make_list(const util::string &portdir) const
 {
     std::vector<util::string> v;
-
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)
         v.push_back(portdir + "/" + i->first + "/metadata.xml");
-
     return v;
 }
 
@@ -119,6 +119,13 @@ pkgCache_T::operator() (pkgQuery_T *q)
     iterator i = this->find(*q);
     if (i != this->end())
     {
+        /* dont cache it if it hasn't expired and size is equal */
+        if (not is_expired(*i) and (q->size() == (*i)->size()))
+        {
+            delete q;
+            return;
+        }
+
         debug_msg("old query exists for '%s', so removing it",
             q->query.c_str());
         delete *i;

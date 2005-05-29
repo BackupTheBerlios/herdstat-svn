@@ -38,30 +38,35 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 {
     public:
         action_pkg_handler_T() : action_herds_xml_handler_T(),
-                                 elapsed(0),
+                                 optsize(0), elapsed(0),
                                  at_least_one_not_cached(false),
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
-                                 use_cache(optget("pkgcache", bool)),
-                                 with(dev ? optget("with-herd", util::string) :
-                                            optget("with-maintainer", util::string)) { }
+                                 use_cache(optget("pkgcache", bool)){ }
+
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
 
     private:
+        void search(const opts_type &);
         void search(pkgQuery_T *);
-        void display(const pkgQuery_T &);
+        void display();
+        void display(pkgQuery_T *);
         void error(const util::string &) const;
-        bool is_found(const metadata_xml_T &, const util::string &);
+        void cleanup();
+        bool metadata_matches(const metadata_xml_T &, const util::string &);
 
+        std::map<opts_type::value_type, pkgQuery_T * > matches;
+        opts_type not_found, packages;
+        opts_type::size_type optsize;
         metadatas_T metadatas;
         pkgCache_T  pkgcache;
         util::progress_T  progress;
         util::timer_T::size_type elapsed;
         bool at_least_one_not_cached;
         const bool dev, meta, status, use_cache;
-        const util::string with;
+        util::regex_T with;
 };
 
 #endif
