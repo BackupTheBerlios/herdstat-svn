@@ -40,6 +40,19 @@ metadata_xml_T::dev_exists(const herd_type::key_type &dev) const
     return this->_handler->devs.find(d) != this->_handler->devs.end();
 }
 
+bool
+metadata_xml_T::dev_exists(const util::regex_T &regex) const
+{
+    handler_type::herd_type::iterator i;
+    for (i = this->_handler->devs.begin() ; i != this->_handler->devs.end() ; ++i)
+    {
+        if (regex == i->first)
+            return true;
+    }
+
+    return false;
+}
+
 /*
  * Does the specified herd exist in this metadata.xml?
  */
@@ -49,6 +62,19 @@ metadata_xml_T::herd_exists(const herds_type::value_type &herd) const
 {
     return std::find(this->_handler->herds.begin(),
         this->_handler->herds.end(), herd) != this->_handler->herds.end();
+}
+
+bool
+metadata_xml_T::herd_exists(const util::regex_T &regex) const
+{
+    handler_type::herds_type::iterator i;
+    for (i = this->_handler->herds.begin() ; i != this->_handler->herds.end() ; ++i)
+    {
+        if (regex == *i)
+            return true;
+    }
+
+    return false;
 }
 
 /* vim: set tw=80 sw=4 et : */
