@@ -427,6 +427,24 @@ pkgCache_T::find(const pkgQuery_T &q)
 }
 
 /*
+ * Return a vector of query names in the cache.
+ */
+
+std::vector<util::string>
+pkgCache_T::queries() const
+{
+    std::vector<util::string> v;
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
+    {
+        util::string s((*i)->query);
+        if (not (*i)->with.empty())
+            s.append(util::string("/") + (*i)->with);
+        v.push_back(s);
+    }
+    return v;
+}
+
+/*
  * Tidy up.
  */
 

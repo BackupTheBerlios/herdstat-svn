@@ -119,7 +119,7 @@ doaction(pkgCache_T &pkgcache, const util::string &action)
     else if (action == "summary")
     {
         formatter_T out;
-        out.set_maxlabel(14);
+        out.set_maxlabel(15);
         out.set_maxdata(optget("maxcol", std::size_t) - out.maxlabel());
         out.set_attrs();
 
@@ -133,6 +133,8 @@ doaction(pkgCache_T &pkgcache, const util::string &action)
             out("Newest query", util::format_date(pkgcache.back()->date, "%s")
                 + " (" + util::format_date(pkgcache.back()->date) + ")");
         }
+
+        out("Query strings", pkgcache.queries());
     }
     else
         throw args_E();

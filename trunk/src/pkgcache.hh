@@ -73,6 +73,7 @@ class pkgCache_T : public std::vector<pkgQuery_T * >
         bool is_expired(pkgQuery_T *q) const { return this->is_expired(*q); }
         bool is_expired(const pkgQuery_T &) const;
         void sort_oldest_to_newest();
+        std::vector<util::string> queries() const;
 
     protected:
         void compress();
