@@ -43,7 +43,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
-                                 use_cache(optget("pkgcache", bool) and
+                                 cache_is_valid(optget("pkgcache", bool) and
                                           (metacache.valid())) { }
 
         virtual ~action_pkg_handler_T() { }
@@ -66,7 +66,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 //        pkgCache_T  pkgcache;
         util::progress_T  progress;
         util::timer_T::size_type elapsed;
-        const bool dev, meta, status, use_cache;
+        const bool dev, meta, status, cache_is_valid;
         util::regex_T with;
 };
 

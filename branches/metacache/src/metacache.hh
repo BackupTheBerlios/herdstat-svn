@@ -41,6 +41,7 @@ struct metadata_T
     metadata_T(const string_type &pa, const string_type &pk = "",
         bool c = false) : path(pa), pkg(pk), is_category(c) { }
 
+    bool operator== (const string_type &);
     void dump(const std::ostream &);
 
     string_type path, pkg longdesc;

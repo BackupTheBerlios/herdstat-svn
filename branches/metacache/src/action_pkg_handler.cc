@@ -185,16 +185,6 @@ action_pkg_handler_T::search(const opts_type &opts)
         if (status)
             ++progress;
 
-        /* unfortunately, we still have to do a sanity check in the event
-         * that the user has sync'd, a metadata.xml has been removed, and
-         * the cache not yet updated ; otherwise we'll get a parser error */
-        if (not util::is_file(*m))
-            continue;
-
-        /* parse metadata.xml */
-        const metadata_xml_T metadata(*m);
-        elapsed += metadata.elapsed();
-
         /* for each specified herd/dev */
         opts_type::const_iterator i;
         for (i = opts.begin() ; i != opts.end() ; ++i)
@@ -202,7 +192,7 @@ action_pkg_handler_T::search(const opts_type &opts)
             if (regex)
                 regexp.assign(*i, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-            if (metadata_matches(metadata, *i))
+            if (metadata_matches(*m, *i))
             {
                 debug_msg("Match found in %s.", m->c_str());
 
@@ -242,11 +232,6 @@ action_pkg_handler_T::search(const opts_type &opts)
             }
         }
     }
-
-    /* cache results */
-    std::map<util::string, pkgQuery_T * >::iterator i;
-    for (i = matches.begin() ; i != matches.end() ; ++i)
-        pkgcache(new pkgQuery_T(*(i->second)));
 }
 
 void
@@ -414,8 +399,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
 	throw bad_fileobject_E(portdir);
 
     /* load previously cached results */
-    if (use_cache)
+    if (cache_is_valid)
         metacache.load();
+    else
+        metacache.fill();
 
     /* fetch/parse herds.xml for info lookup */
     herds_xml.fetch();
@@ -433,15 +420,11 @@ action_pkg_handler_T::operator() (opts_type &opts)
     /* show pretty progress thinggy */
     if (status and not use_cache)
     {
-        *stream << "Parsing metadata.xml's: ";
+        *stream << "Searching metadata.xml's: ";
         progress.start(metadatas.size());
     }
 
-    if (use_cache)
-        lookup(opts);
-    else
-        search(opts);
-
+    search(opts);
     display();
 
     if (count)
