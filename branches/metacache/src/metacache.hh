@@ -32,15 +32,20 @@
 
 struct metadata_T
 {
+    typedef util::string string_type;
+    typedef std::vector<string_type> herds_type;
+    typedef herd_T herd_type;
+    typedef dev_attrs_T dev_type;
+
     metadata_T() : is_category(false) { }
-    metadata_T(const util::string &pa, const util::string &pk = "",
+    metadata_T(const string_type &pa, const string_type &pk = "",
         bool c = false) : path(pa), pkg(pk), is_category(c) { }
 
     void dump(const std::ostream &);
 
-    util::string path, pkg longdesc;
-    std::vector<util::string> herds;
-    herd_T devs;
+    string_type path, pkg longdesc;
+    herds_type herds;
+    herd_type devs;
     bool is_category;
 };
 
@@ -58,6 +63,9 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
         virtual void fill();
         virtual void load();
         virtual void dump();
+
+        void compress();
+        void decompress();
 
     private:
         util::string _portdir;

@@ -179,7 +179,7 @@ void
 action_pkg_handler_T::search(const opts_type &opts)
 {
     /* for each metadata.xml */
-    metadatas_T::const_iterator m;
+    metacache_T::const_iterator m;
     for (m = metadatas.begin() ; m != metadatas.end() ; ++m)
     {
         if (status)
@@ -345,7 +345,9 @@ action_pkg_handler_T::display()
                 if (not quiet)
                     error(m->first);
 
-                pkgcache.dump();
+                if (not use_cache)
+                    metacache.dump();
+
                 cleanup();
                 throw action_E();
             }
@@ -354,7 +356,7 @@ action_pkg_handler_T::display()
             continue;
         }
 
-        if ((n == 1) and status and at_least_one_not_cached)
+        if ((n == 1) and status and not use_cache)
             output.endl();
 
         size += m->second->size();
@@ -413,7 +415,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     /* load previously cached results */
     if (use_cache)
-        pkgcache.load();
+        metacache.load();
 
     /* fetch/parse herds.xml for info lookup */
     herds_xml.fetch();
@@ -428,63 +430,16 @@ action_pkg_handler_T::operator() (opts_type &opts)
     with.assign(dev? optget("with-herd", util::string) :
                      optget("with-maintainer", util::string), REG_ICASE);
 
-    /* load our map with any previously cached queries,
-     * erasing them from opts as they're found. */
-    if (not pkgcache.empty())
-    {
-        opts_type tmp(opts);
-
-        opts_type::iterator i;
-        for (i = tmp.begin() ; i != tmp.end() ; ++i)
-        {
-            pkgCache_T::iterator p = pkgcache.find(pkgQuery_T(*i, with(), dev));
-            if (p != pkgcache.end() and not pkgcache.is_expired(*p))
-            {
-                /* exists and hasn't expired */
-                debug_msg("found '%s' in cache", i->c_str());
-
-                pkgQuery_T *q = new pkgQuery_T(*(*p));
-                /* reset query and with strings */
-                q->query = *i; q->with = with();
-
-                /* goes straight into the results map */
-                matches[*i] = q;
-                opts.erase(i);
-            }
-            else if (p == pkgcache.end() and not with.empty())
-            {
-                debug_msg("found wider-scoped '%s' query", i->c_str());
-
-                /* see if a wider-scoped query has been cached.  if so, use it
-                 * to get a narrowed down list of metadata.xml's to parse. */
-                pkgCache_T::iterator pc = pkgcache.find(pkgQuery_T(*i, "", dev));
-                if (pc != pkgcache.end() and not pkgcache.is_expired(*pc))
-                {
-                    std::vector<util::string> mlist((*pc)->make_list(portdir));
-                    metadatas.set(mlist);
-
-                    pkgQuery_T q(*i, with(), dev);
-                    search(&q);
-                    opts.erase(i);
-                }
-            }
-        }
-    }
-
-    at_least_one_not_cached = (not opts.empty());
-
-    /* get metadata.xml list */
-    if (at_least_one_not_cached)
-        metadatas.get(portdir);
-
     /* show pretty progress thinggy */
-    if (status and at_least_one_not_cached)
+    if (status and not use_cache)
     {
         *stream << "Parsing metadata.xml's: ";
         progress.start(metadatas.size());
     }
 
-    if (not opts.empty())
+    if (use_cache)
+        lookup(opts);
+    else
         search(opts);
 
     display();
@@ -536,8 +491,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << "Parsed " << metadatas.size() << " metadata.xml's." << std::endl;
     }
 
-    if (at_least_one_not_cached)
-        pkgcache.dump();
+    if (not use_cache)
+        metacache.dump();
 
     /* we handler timer here */
     timer = false;

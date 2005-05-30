@@ -175,7 +175,7 @@ metadata_T
 metacache_T::parse_metadata(const util::path_T &path)
 {
     const metadata_xml_T metadata(path);
-    MetadataXMLHandler_T *handler = metadata.handler();
+//    MetadataXMLHandler_T *handler = metadata.handler();
 
     /* TODO: just move metadata_T to metadata_xml_handler.hh?
      * and then just do a straight assignment */
@@ -188,15 +188,181 @@ metacache_T::parse_metadata(const util::path_T &path)
 }
 
 void
+metacache_T::compress()
+{
+#ifdef HAVE_LIBZ
+
+    if (util::is_file(METACACHE_UNCOMPRESSED))
+    {
+        if (util::is_file(METACACHE_COMPRESSED))
+            util::move_file(METACACHE_COMPRESSED, METACACHE_COMPRESSED".bak");
+
+        /* compress */
+        util::zlib_T zlib;
+        if (zlib.compress(METACACHE_UNCOMPRESSED, METACACHE_COMPRESSED) == Z_OK)
+        {
+            unlink(METACACHE_UNCOMPRESSED);
+            unlink(METACACHE_COMPRESSED".bak");
+        }
+        else
+            util::move_file(METACACHE_COMPRESSED".bak", METACACHE_COMPRESSED);
+    }
+
+#endif /* HAVE_LIBZ */
+}
+
+void
+metacache_T::decompress()
+{
+#ifdef HAVE_LIBZ
+
+    if (util::is_file(METACACHE_COMPRESSED))
+    {
+        if (util::is_file(METACACHE_UNCOMPRESSED))
+            util::move_file(METACACHE_UNCOMPRESSED, METACACHE_UNCOMPRESSED".bak");
+
+        /* decompress */
+        util::zlib_T zlib;
+        if (zlib.decompress(METACACHE_COMPRESSED, METACACHE_UNCOMPRESSED) == Z_OK)
+        {
+            unlink(METACACHE_COMPRESSED);
+            unlink(METACACHE_UNCOMPRESSED".bak");
+        }
+        else
+            util::move_file(METACACHE_UNCOMPRESSED".bak", METACACHE_UNCOMPRESSED);
+    }
+
+#endif /* HAVE_LIBZ */
+}
+
+void
 metacache_T::load()
 {
+#ifdef HAVE_LIBZ
+    this->decompress();
+#endif /* HAVE_LIBZ */
 
+    if (not util::is_file(METACACHE_UNCOMPRESSED))
+        return;
+
+    xml_T<metacacheXMLHandler_T> metacache_xml;
+    metacache_xml.parse(METACACHE_UNCOMPRESSED);
+
+    metacacheXMLHandler_T *handler = metacache_xml.handler();
+    std::copy(handler->metadatas.begin(), handler->metadatas.end(),
+        std::back_inserter(*this));
+
+#ifdef HAVE_LIBZ
+    this->compress();
+#endif /* HAVE_LIBZ */
 }
 
 void
 metacache_T::dump()
 {
+    try
+    {
+#ifdef USE_LIBXMLPP
+        xmlpp::Document doc;
+        xmlpp::Element *root = doc.create_root_node("metadatas");
+#else /* USE_LIBXMLPP */
+        xml::init init;
+        xml::document doc("metadatas");
+        xml::node &root = doc.get_root_node();
+#endif /* USE_LIBXMLPP */
 
+        size_type n = 1;
+        for (iterator i = this->begin() ; i != this->end() ; ++i)
+        {
+            metadata_T meta = *i;
+
+#ifdef USE_LIBXMLPP
+            xmlpp::Element *meta_node = root->add_child("metadata");
+            meta_node->set_attribute("name", meta.pkg);
+
+            xmlpp::Element *toplevel = meta_node->add_child
+                (meta.is_category? "catmetadata" : "pkgmetadata");
+#else /* USE_LIBXMLPP */
+            xml::node::iterator it = root.insert(root.begin(),
+                xml::node("metadata"));
+            it->get_attributes().insert("name", meta.pkg);
+
+            xml::node toplevel(meta.is_category? "catmetadata" : "pkgmetadata");
+#endif /* USE_LIBXMLPP */
+
+            metadata_T::herds_type::iterator h;
+            for (h = meta.herds.begin() ; h != meta.herds.end() ; ++h)
+            {
+#ifdef USE_LIBXMLPP
+                xmlpp::Element *herd_node = toplevel->add_child("herd");
+                herd_node->set_child_text(*h);
+#else /* USE_LIBXMLPP */
+                toplevel.push_back(xml::node("herd", *h));
+#endif /* USE_LIBXMLPP */
+            }
+
+            metadata_T::herd_type::iterator d;
+            for (d = meta.devs.begin() ; d != meta.devs.end() ; ++d)
+            {
+                string_type estr(i->first);
+                if (estr.find('@') == string_type::npos)
+                    estr.append("@gentoo.org");
+
+#ifdef USE_LIBXMLPP
+                xmlpp::Element *dev_node = toplevel->add_child("maintainer");
+
+                xmlpp::Element *email = dev_node->add_child("email");
+                email->set_child_text(estr);
+
+                if (not i->second->name.empty())
+                {
+                    xmlpp::Element *name = dev_node->add_child("name");
+                    name->set_child_text(i->second->name);
+                }
+#else /* USE_LIBXMLPP */
+                xml::node devnode("maintainer");
+                devnode.push_back("email", estr);
+                
+                if (not i->second->name.empty())
+                    devnode.push_back("name", i->second->name);
+
+                toplevel.push_back(devnode);
+#endif /* USE_LIBXMLPP */
+            }
+
+            if (not meta.longdesc.empty())
+            {
+#ifdef USE_LIBXMLPP
+                xmlpp::Element *longdesc = toplevel->add_child("longdesc");
+                longdesc->set_child_text(meta.longdesc);
+#else /* USE_LIBXMLPP */
+                toplevel.push_back("longdesc", meta.longdesc);
+#endif /* USE_LIBXMLPP */
+            }
+
+#ifdef USE_XMLWRAPP
+            it->push_back(toplevel);
+#endif /* USE_XMLWRAPP */
+        }
+
+#ifdef USE_LIBXMLPP
+        doc.write_to_file(METACACHE_UNCOMPRESSED, "UTF-8");
+#else /* USE_LIBXMLPP */
+        doc.save_to_file(METACACHE_UNCOMPRESSED, 0);
+#endif /* USE_LIBXMLPP */
+    }
+#ifdef USE_LIBXMLPP
+    catch (const xmlpp::exception &e)
+#else /* USE_LIBXMLPP */
+    catch (const std::exception &e)
+#endif /* USE_LIBXMLPP */
+    {
+        throw XMLWriter_E(METACACHE_UNCOMPRESSED, e.what());
+    }
+
+#ifdef HAVE_LIBZ
+    this->compress();
+#endif /* HAVE_LIBZ */
 }
 
 /* vim: set tw=80 sw=4 et : */

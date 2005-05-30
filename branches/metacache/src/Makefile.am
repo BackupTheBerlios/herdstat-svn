@@ -18,6 +18,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   herds_xml.hh herds_xml.cc \
 		   metadata_xml.hh metadata_xml.cc \
 		   formatter.hh formatter.cc \
+		   metacache.hh metacache.cc \
 		   metadatas.hh metadatas.cc \
 		   overlaydisplay.hh \
 		   action_handler.hh \
