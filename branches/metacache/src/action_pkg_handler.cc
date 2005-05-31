@@ -139,31 +139,29 @@ action_pkg_handler_T::search(const opts_type &opts)
                 /* nope, so create a new query object */
                 else
                 {
-                    pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
-                    q->date = std::time(NULL);
-            
-                    if (dev)
-                        q->info = herds_xml.get_dev_info(*i);
+                    matches[*i] = new pkgQuery_T(*i, with(), dev);
+                    matches[*i]->date = std::time(NULL);
+                    (*(matches[*i]))[m->pkg] = m->longdesc;
 
-                    (*q)[m->pkg] = m->longdesc;
-                    matches[*i] = q;
+                    if (dev)
+                        matches[*i]->info = herds_xml.get_dev_info(*i);
                 }
             }
             /* didn't match */
-            else
+            else if (matches.find(*i) == matches.end())
             {
-                std::map<util::string, pkgQuery_T * >::iterator mpos;
-                if ((mpos = matches.find(*i)) == matches.end())
-                {
-                    pkgQuery_T *q = new pkgQuery_T(*i, with(), dev);
-                    q->date = std::time(NULL);
-                    if (dev)
-                        q->info = herds_xml.get_dev_info(*i);
-                    matches[*i] = q;
-                }
+                matches[*i] = new pkgQuery_T(*i, with(), dev);
+                matches[*i]->date = std::time(NULL);
+
+                if (dev)
+                    matches[*i]->info = herds_xml.get_dev_info(*i);
             }
         }
     }
+
+    std::map<util::string, pkgQuery_T * >::iterator p;
+    for (p = matches.begin() ; p != matches.end() ; ++p)
+        querycache(*(p->second));
 }
 
 /*
@@ -332,7 +330,33 @@ action_pkg_handler_T::operator() (opts_type &opts)
 	throw util::bad_fileobject_E(portdir);
 
     /* load previously cached results */
-    if (cache_is_valid)
+    querycache.load();
+
+    /* search previously cached results for current queries
+     * and insert into our matches map if found */
+    if (not querycache.empty())
+    {
+        opts_type tmp(opts);
+        opts_type::iterator i;
+        for (i = tmp.begin() ; i != tmp.end() ; ++i)
+        {
+            querycache_T::iterator qi =
+                querycache.find(pkgQuery_T(*i, with(), dev));
+            if (qi != querycache.end() and not querycache.is_expired(*qi))
+            {
+                debug_msg("found '%s' in query cache", i->c_str());
+
+                matches[*i] = new pkgQuery_T(*qi);
+                matches[*i]->query = *i;
+                matches[*i]->with  = with();
+                opts.erase(i);
+            }
+        }
+    }
+
+    at_least_one_not_cached = (not opts.empty());
+
+    if (cache_is_valid and at_least_one_not_cached)
     {
         try
         {
@@ -343,7 +367,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             return EXIT_FAILURE;
         }
     }
-    else
+    else if (at_least_one_not_cached)
     {
         /* fill cache and dump to disk */
         metacache.fill();
@@ -414,6 +438,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
         *stream << std::endl
             << "Parsed " << metacache.size() << " metadata.xml's." << std::endl;
     }
+
+    querycache.dump();
 
     /* we handler timer here */
     timer = false;

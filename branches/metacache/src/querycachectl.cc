@@ -102,14 +102,14 @@ handle_opts(int argc, char **argv, util::string *action)
 }
 
 static void
-doaction(pkgCache_T &querycache, const util::string &action)
+doaction(querycache_T &querycache, const util::string &action)
 {
     if (action == "dump")
     {
         if (querycache.empty())
-            std::cerr << "Package cache is empty." << std::endl;
+            std::cerr << "Package query cache is empty." << std::endl;
         else
-            querycache.dump(&std::cout);
+            querycache.dump(std::cout);
     }
     else if (action == "clear")
     {
@@ -128,10 +128,10 @@ doaction(pkgCache_T &querycache, const util::string &action)
         if (querycache.size() > 1)
         {
             querycache.sort_oldest_to_newest();
-            out("Oldest query", util::format_date(querycache.front()->date, "%s")
-                + " (" + util::format_date(querycache.front()->date) + ")");
-            out("Newest query", util::format_date(querycache.back()->date, "%s")
-                + " (" + util::format_date(querycache.back()->date) + ")");
+            out("Oldest query", util::format_date(querycache.front().date, "%s")
+                + " (" + util::format_date(querycache.front().date) + ")");
+            out("Newest query", util::format_date(querycache.back().date, "%s")
+                + " (" + util::format_date(querycache.back().date) + ")");
         }
 
         out("Query strings", querycache.queries());
@@ -157,7 +157,7 @@ main(int argc, char **argv)
         if (handle_opts(argc, argv, &action) != 0)
             throw args_E();
 
-        pkgCache_T querycache;
+        querycache_T querycache;
         querycache.load();
 
         doaction(querycache, action);

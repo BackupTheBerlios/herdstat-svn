@@ -35,6 +35,22 @@ herdstat_SOURCES = common.hh common.cc \
 
 herdstat_LDADD = ../lib/libutil.la
 
+if DEBUG
+bin_PROGRAMS += querycachectl
+querycachectl_SOURCES = common.hh common.cc \
+			exceptions.hh \
+			options.hh options.cc \
+			formatter.hh formatter.cc \
+			pkgquery.hh pkgquery.cc \
+			querycache.hh querycache.cc \
+			xmlparser.hh \
+			querycache_xml_handler.hh querycache_xml_handler.cc \
+			parsable.hh \
+			xml.hh \
+			querycachectl.cc
+querycachectl_LDADD = ../lib/libutil.la
+endif
+
 INCLUDES = -I../lib
 LIBS = @LIBS@ @LIBXMLPP_LIBS@ @XMLWRAPP_LIBS@
 AM_CXXFLAGS = -pedantic -ansi -Wall @LIBXMLPP_CFLAGS@ @XMLWRAPP_CFLAGS@

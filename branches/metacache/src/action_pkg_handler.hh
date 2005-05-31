@@ -32,6 +32,7 @@
 #include "metadata_xml.hh"
 #include "metacache.hh"
 #include "pkgquery.hh"
+#include "querycache.hh"
 #include "action_handler.hh"
 
 class action_pkg_handler_T : public action_herds_xml_handler_T
@@ -44,7 +45,8 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
                                  cache_is_valid(optget("metacache", bool) and
-                                          (metacache.valid())) { }
+                                          (metacache.valid())),
+                                 at_least_one_not_cached(false) { }
 
         virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
@@ -60,9 +62,11 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         std::map<opts_type::value_type, pkgQuery_T * > matches;
         opts_type not_found, packages;
         metacache_T metacache;
+        querycache_T querycache;
         opts_type::size_type optsize;
         util::timer_T::size_type elapsed;
         const bool dev, meta, status, cache_is_valid;
+        bool at_least_one_not_cached;
         util::regex_T with;
 };
 

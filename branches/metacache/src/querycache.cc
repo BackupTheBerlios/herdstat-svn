@@ -49,13 +49,21 @@
 
 #define QUERYCACHE          LOCALSTATEDIR"/querycache.xml"
 
+querycache_T::querycache_T() : util::cache_T<value_type>(QUERYCACHE) { }
+
+bool
+querycache_T::valid() const
+{
+    return util::is_file(QUERYCACHE);
+}
+
 /*
  * Add a pkgQuery_T object to the cache, removing
  * an expired pkgQuery_T object if it exists.
  */
 
 void
-queryCache_T::operator() (const pkgQuery_T &q)
+querycache_T::operator() (const pkgQuery_T &q)
 {
     /* remove old cached query if it exists */
     iterator i = this->find(q);
@@ -78,18 +86,17 @@ queryCache_T::operator() (const pkgQuery_T &q)
  */
 
 void
-queryCache_T::load()
+querycache_T::load()
 {
     if (not util::is_file(QUERYCACHE))
         return;
 
-    xml_T<queryCacheXMLHandler_T> querycache_xml;
+    xml_T<querycacheXMLHandler_T> querycache_xml;
     querycache_xml.parse(QUERYCACHE);
 
-    queryCacheXMLHandler_T *handler = querycache_xml.handler();
-    queryCacheXMLHandler_T::value_type::iterator i;
-    for (i = handler->queries.begin() ; i != handler->queries.end() ; ++i)
-        this->_cache.push_back(pkgQuery_T(*(*i)));
+    std::copy(querycache_xml.handler()->queries.begin(),
+        querycache_xml.handler()->queries.end(),
+        std::back_inserter(this->_cache));
 }
 
 /*
@@ -103,33 +110,33 @@ is_greater(pkgQuery_T q1, pkgQuery_T q2)
 }
 
 void
-queryCache_T::sort_oldest_to_newest()
+querycache_T::sort_oldest_to_newest()
 {
     /* sort by date */
     std::stable_sort(this->begin(), this->end(), is_greater);
 }
 
 /*
- * Clean out old queries until size() == QUERYCACHE_MAX
+ * Clean out old queries until size() == querycache_MAX
  */
 
 void
-queryCache_T::cleanse()
+querycache_T::cleanse()
 {
-    debug_msg("this->size() > QUERYCACHE_MAX(%d), so trimming oldest queries.",
+    debug_msg("this->size() > querycache_MAX(%d), so trimming oldest queries.",
         QUERYCACHE_MAX);
 
     this->sort_oldest_to_newest();
 
-    /* while > QUERYCACHE_MAX, erase the first (oldest) query */
+    /* while > querycache_MAX, erase the first (oldest) query */
     while (this->size() > QUERYCACHE_MAX)
         this->_cache.erase(this->begin());
 }
 
 void
-queryCache_T::dump(std::ostream &stream)
+querycache_T::dump(std::ostream &stream)
 {
-    stream << "Package cache (size: " << this->size()
+    stream << "Query cache (size: " << this->size()
         << ")" << std::endl;
 
     for (iterator i = this->begin() ; i != this->end() ; ++i)
@@ -144,7 +151,7 @@ queryCache_T::dump(std::ostream &stream)
  */
 
 void
-queryCache_T::dump()
+querycache_T::dump()
 {
     /* trim if needed */
     if (this->size() > QUERYCACHE_MAX)
@@ -280,7 +287,7 @@ queryCache_T::dump()
  */
 
 bool
-queryCache_T::is_expired(const pkgQuery_T &q) const
+querycache_T::is_expired(const pkgQuery_T &q) const
 {
     return ((std::time(NULL) - q.date) > QUERYCACHE_EXPIRE);
 }
@@ -295,8 +302,8 @@ queryCache_T::is_expired(const pkgQuery_T &q) const
 //    return (*q1 == *q2);
 //}
 
-queryCache_T::iterator
-queryCache_T::find(const pkgQuery_T &q)
+querycache_T::iterator
+querycache_T::find(const pkgQuery_T &q)
 {
 //    return std::find_if(this->begin(), this->end(),
 //        std::bind2nd(std::ptr_fun(isEqual), &q));
@@ -308,7 +315,7 @@ queryCache_T::find(const pkgQuery_T &q)
  */
 
 std::vector<util::string>
-queryCache_T::queries() const
+querycache_T::queries() const
 {
     std::vector<util::string> v;
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)
@@ -325,10 +332,10 @@ queryCache_T::queries() const
  * Tidy up.
  */
 
-//queryCache_T::~queryCache_T()
-//{
+querycache_T::~querycache_T()
+{
 //    for (iterator i = this->begin() ; i != this->end() ; ++i)
 //        delete *i;
-//}
+}
 
 /* vim: set tw=80 sw=4 et : */

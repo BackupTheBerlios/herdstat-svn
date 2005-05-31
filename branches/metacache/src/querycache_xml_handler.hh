@@ -34,20 +34,20 @@
  * Content Handler for our internal querycache.xml
  */
 
-class queryCacheXMLHandler_T : public XMLHandler_T
+class querycacheXMLHandler_T : public XMLHandler_T
 {
     public:
-        typedef std::vector<pkgQuery_T * > value_type;
+        typedef std::vector<pkgQuery_T> value_type;
         typedef value_type::iterator iterator;
         typedef value_type::size_type size_type;
 
-        queryCacheXMLHandler_T()
+        querycacheXMLHandler_T()
         {
             in_query = in_string = in_with = in_type = in_date =
             in_results = in_pkg = in_pkgname = in_pkglongdesc = false;
         }
 
-        virtual ~queryCacheXMLHandler_T();
+        virtual ~querycacheXMLHandler_T();
 
         value_type queries;
 

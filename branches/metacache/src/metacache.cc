@@ -195,11 +195,11 @@ metacache_T::fill()
             elapsed.elapsed(), this->size());
     }
 
-    if (status)
-    {
-        *(optget("outstream", std::ostream *)) << " (total "
-            << this->size() << ")" << std::endl;
-    }
+//    if (status)
+//    {
+//        *(optget("outstream", std::ostream *)) << " (total "
+//            << this->size() << ")" << std::endl;
+//    }
 }
 
 /*
