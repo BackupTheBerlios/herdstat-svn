@@ -272,7 +272,8 @@ action_pkg_handler_T::display()
             continue;
         }
 
-        if ((n == 1) and status and not cache_is_valid)
+        if ((n == 1) and status and not cache_is_valid and
+            not at_least_one_not_cached)
             output.endl();
 
         size += m->second->size();
