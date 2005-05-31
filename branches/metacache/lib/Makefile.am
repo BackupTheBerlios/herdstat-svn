@@ -10,9 +10,9 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     vars.hh vars.cc \
 		     cache.hh
 
-if HAVE_LIBZ
-libutil_la_SOURCES += zlib.hh zlib.cc
-endif
+# if HAVE_LIBZ
+# libutil_la_SOURCES += zlib.hh zlib.cc
+# endif
 
 libutil_la_SOURCES += portage_exceptions.hh \
 		      portage_misc.hh portage_misc.cc \

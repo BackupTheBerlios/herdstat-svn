@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/progress.hh
+ * herdstat -- src/querycache.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,50 +20,43 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PROGRESS_HH
-#define HAVE_PROGRESS_HH 1
+#ifndef HAVE_QUERYCACHE_HH
+#define HAVE_QUERYCACHE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <cstdio>
+#include <map>
+#include "common.hh"
+#include "pkgquery.hh"
+#include "herds_xml.hh"
 
-namespace util
+/*
+ * Represents a cache of package query
+ * results (produced by action_pkg_handler_T::search()).
+ */
+
+class queryCache_T : public util::cache_T<std::vector<pkgQuery_T> >
 {
-    class progress_T
-    {
-	private:
-	    float cur, step;
+    public:
+        ~queryCache_T();
 
-	public:
-	    progress_T() : cur(0), step(0) { }
-            ~progress_T()
-            {
-                /* sometimes we're one off and it ends at 99% */
-                while (this->cur < 100.0)
-                    ++(*this);
-            }
+        void operator() (const pkgQuery_T &);
+        virtual bool valid() const;
+        virtual void load();
+        virtual void dump();
+        void dump(std::ostream &);
 
-	    void start(unsigned m)
-	    {
-		this->step = 100.0 / m;
-		std::printf("  0%%");
-	    }
+        iterator find(const pkgQuery_T &);
+//        bool is_expired(pkgQuery_T *q) const { return this->is_expired(*q); }
+        bool is_expired(const pkgQuery_T &) const;
+        void sort_oldest_to_newest();
+        std::vector<util::string> queries() const;
 
-	    void operator++ ()
-	    {
-		int inc = static_cast<int>(this->cur += this->step);
-		if (inc < 10)
-		    std::printf("\b\b%.1d%%", inc);
-		else if (inc < 100)
-		    std::printf("\b\b\b%.2d%%", inc);
-		else
-		    std::printf("\b\b\b\b%.3d%%", inc);
-		std::fflush(stdout);
-	    }
-    };
-}
+    protected:
+        void cleanse();
+};
 
 #endif
 

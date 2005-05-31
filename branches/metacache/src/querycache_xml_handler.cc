@@ -1,6 +1,6 @@
 /*
- * herdstat -- src/pkgcache_xml_handler.cc
- * $Id: pkgcache_xml_handler.cc 359 2005-05-27 11:20:56Z ka0ttic $
+ * herdstat -- src/querycache_xml_handler.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,29 +24,14 @@
 # include "config.h"
 #endif
 
-#include "pkgcache_xml_handler.hh"
+#include "querycache_xml_handler.hh"
 
-pkgCacheXMLHandler_T::return_type
-pkgCacheXMLHandler_T::START_ELEMENT(const string_type &name,
+queryCacheXMLHandler_T::return_type
+queryCacheXMLHandler_T::START_ELEMENT(const string_type &name,
                                     const attrs_type &attrs)
 {
     if (name == "query")
-    {
-        attrs_type::const_iterator pos;
-
-        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
-        {
-#ifdef USE_LIBXMLPP
-            if (pos->name == "id")
-                cur_query_id = std::atoi(pos->value.c_str());
-#else /* USE_LIBXMLPP */
-            if (pos->first == "id")
-                cur_query_id = std::atoi(pos->second.c_str());
-#endif /* USE_LIBXMLPP */
-        }
-
         in_query = true;
-    }
     else if (name == "string")
         in_string = true;
     else if (name == "with")
@@ -69,8 +54,8 @@ pkgCacheXMLHandler_T::START_ELEMENT(const string_type &name,
 #endif
 }
 
-pkgCacheXMLHandler_T::return_type
-pkgCacheXMLHandler_T::END_ELEMENT(const string_type &name)
+queryCacheXMLHandler_T::return_type
+queryCacheXMLHandler_T::END_ELEMENT(const string_type &name)
 {
     if (name == "query")
         in_query = false;
@@ -96,15 +81,11 @@ pkgCacheXMLHandler_T::END_ELEMENT(const string_type &name)
 #endif
 }
 
-pkgCacheXMLHandler_T::return_type
-pkgCacheXMLHandler_T::CHARACTERS(const string_type &text)
+queryCacheXMLHandler_T::return_type
+queryCacheXMLHandler_T::CHARACTERS(const string_type &text)
 {
     if (in_string)
-    {
-        pkgQuery_T *query = new pkgQuery_T(text);
-        query->id = cur_query_id;
-        queries.push_back(query);
-    }
+        queries.push_back(new pkgQuery_T(text));
     else if (in_with)
         queries.back()->with = text;
     else if (in_type)
@@ -125,7 +106,7 @@ pkgCacheXMLHandler_T::CHARACTERS(const string_type &text)
 #endif
 }
 
-pkgCacheXMLHandler_T::~pkgCacheXMLHandler_T()
+queryCacheXMLHandler_T::~queryCacheXMLHandler_T()
 {
     value_type::iterator i;
     for (i = queries.begin() ; i != queries.end() ; ++i)

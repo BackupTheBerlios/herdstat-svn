@@ -184,6 +184,8 @@ class XMLWriter_E                       : public herdstat_base_E
         string_type _error;
 };
 
+class metacache_parse_E                 : public herdstat_base_E { };
+
 #endif
 
 /* vim: set tw=80 sw=4 et : */

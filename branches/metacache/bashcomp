@@ -38,7 +38,7 @@ _herdstat() {
         -F --fetch -c --count -n --nocolor --no-herd -m --metadata
         --with-herd -w --which --versions --no-overlay -r --regex
         -E --extended -f --find --qa --with-maintainer --no-maintainer
-        -a --away --nopkgcache"
+        -a --away --nometacache"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -111,7 +111,7 @@ _herdstat() {
                 # dev
                 if [[ ${x} != "--debug" && ${x} != "--metadata" ]] && \
                     [[ ${x} != "--package" && ${x} != "--no-overlay" ]] && \
-                    [[ ${x} != *maintainer* && ${x} != "--nopkgcache" ]]
+                    [[ ${x} != *maintainer* && ${x} != "--nometacache" ]]
                 then
                     [[ ${x} == *d* || ${x} == *a* ]] && dev=1
                 fi
@@ -121,7 +121,8 @@ _herdstat() {
 
                 # metadata
                 if [[ ${x} != "--herdsxml" && ${x} != --with-* ]] && \
-                    [[ ${x} == *m* && ${x} != "--timer" ]]
+                    [[ ${x} != "--timer" && ${x} != "--nometacache" ]] && \
+                    [[ ${x} == *m* ]]
                 then
                     meta=1
                 elif [[ ${x} == *w* && ${x} != --with-* ]] || \

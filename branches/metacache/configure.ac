@@ -2,7 +2,7 @@
 # $Id: configure.ac 246 2005-04-26 12:03:53Z ka0ttic $
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.1_rc2], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.1_rc3], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 dist-bzip2 no-dist-gzip])
@@ -69,20 +69,20 @@ dnl Optional functions
 AC_CHECK_FUNCS(strtoumax getopt_long)
 
 dnl zlib
-AC_MSG_CHECKING([whether to include zlib support])
-AC_ARG_WITH(zlib,
-    AS_HELP_STRING([--without-zlib], [disable zlib support]),
-    ac_zlib=$withval,
-    ac_zlib=yes)
+#AC_MSG_CHECKING([whether to include zlib support])
+#AC_ARG_WITH(zlib,
+#    AS_HELP_STRING([--without-zlib], [disable zlib support]),
+#    ac_zlib=$withval,
+#    ac_zlib=yes)
 
-AM_CONDITIONAL(HAVE_LIBZ, test x$ac_zlib = xyes)
+#AM_CONDITIONAL(HAVE_LIBZ, test x$ac_zlib = xyes)
 
-if test x$ac_zlib = xno ; then
-    AC_MSG_RESULT(no)
-else
-    AC_MSG_RESULT(yes)
-    AC_CHECK_LIB(z, compress)
-fi
+#if test x$ac_zlib = xno ; then
+#    AC_MSG_RESULT(no)
+#else
+#    AC_MSG_RESULT(yes)
+#    AC_CHECK_LIB(z, compress)
+#fi
 
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     [case "${enableval}" in

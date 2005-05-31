@@ -30,24 +30,38 @@
 #include "common.hh"
 #include "herds.hh"
 
-struct metadata_T
+class metadata_T
 {
-    typedef util::string string_type;
-    typedef std::vector<string_type> herds_type;
-    typedef herd_T herd_type;
-    typedef dev_attrs_T dev_type;
+    public:
+        typedef util::string string_type;
+        typedef std::vector<string_type> herds_type;
+        typedef std::vector<string_type> herd_type;
+        typedef dev_attrs_T dev_type;
 
-    metadata_T() : is_category(false) { }
-    metadata_T(const string_type &pa, const string_type &pk = "",
-        bool c = false) : path(pa), pkg(pk), is_category(c) { }
+        metadata_T() : is_category(false) { }
+        metadata_T(const string_type &pd, const string_type &pa,
+            const string_type &pk = "", bool c = false)
+            : path(pa), pkg(pk), is_category(c), _portdir(pd)
+        { 
+            if (this->pkg.empty())
+                get_pkg_from_path();
+        }
 
-    bool operator== (const string_type &);
-    void dump(const std::ostream &);
+        bool dev_exists(const herd_type::value_type &) const;
+        bool dev_exists(const util::regex_T &) const;
+        bool herd_exists(const herds_type::value_type &) const;
+        bool herd_exists(const util::regex_T &) const;
 
-    string_type path, pkg longdesc;
-    herds_type herds;
-    herd_type devs;
-    bool is_category;
+        void dump(const std::ostream &);
+
+        string_type path, pkg, longdesc;
+        herds_type herds;
+        herd_type devs;
+        bool is_category;
+
+    private:
+        void get_pkg_from_path();
+        string_type _portdir;
 };
 
 /*
@@ -57,7 +71,6 @@ struct metadata_T
 class metacache_T : public util::cache_T<std::vector<metadata_T> >
 {
     public:
-        metacache_T();
         metacache_T(const util::string &portdir);
 
         virtual bool valid() const;
@@ -67,8 +80,10 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
 
         void compress();
         void decompress();
+        metadata_T parse_metadata(const util::path_T &);
 
     private:
+        void push_back(const metadata_T &m) { this->_cache.push_back(m); }
         util::string _portdir;
 };
 

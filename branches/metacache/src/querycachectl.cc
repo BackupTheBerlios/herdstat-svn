@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/pkgcachectl.cc
+ * herdstat -- src/querycachectl.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -26,7 +26,7 @@
 
 #include "common.hh"
 #include "formatter.hh"
-#include "pkgcache.hh"
+#include "querycache.hh"
 
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
@@ -49,7 +49,7 @@ static void version() { std::cout << PACKAGE << "-" << VERSION << std::endl; }
 static void usage()
 {
     std::cout
-        << "usage: pkgcachectl [action]" << std::endl
+        << "usage: querycachectl [action]" << std::endl
         << " -V, --version         Display version of herdstat this was shipped with." << std::endl
         << " -d, --dump            Dump package cache to stdout." << std::endl
         << " -c, --clear           Clear package cache." << std::endl
@@ -102,19 +102,19 @@ handle_opts(int argc, char **argv, util::string *action)
 }
 
 static void
-doaction(pkgCache_T &pkgcache, const util::string &action)
+doaction(pkgCache_T &querycache, const util::string &action)
 {
     if (action == "dump")
     {
-        if (pkgcache.empty())
+        if (querycache.empty())
             std::cerr << "Package cache is empty." << std::endl;
         else
-            pkgcache.dump(&std::cout);
+            querycache.dump(&std::cout);
     }
     else if (action == "clear")
     {
-        pkgcache.clear();
-        pkgcache.dump();
+        querycache.clear();
+        querycache.dump();
     }
     else if (action == "summary")
     {
@@ -123,18 +123,18 @@ doaction(pkgCache_T &pkgcache, const util::string &action)
         out.set_maxdata(optget("maxcol", std::size_t) - out.maxlabel());
         out.set_attrs();
 
-        out("Size", util::sprintf("%d", pkgcache.size()));
+        out("Size", util::sprintf("%d", querycache.size()));
 
-        if (pkgcache.size() > 1)
+        if (querycache.size() > 1)
         {
-            pkgcache.sort_oldest_to_newest();
-            out("Oldest query", util::format_date(pkgcache.front()->date, "%s")
-                + " (" + util::format_date(pkgcache.front()->date) + ")");
-            out("Newest query", util::format_date(pkgcache.back()->date, "%s")
-                + " (" + util::format_date(pkgcache.back()->date) + ")");
+            querycache.sort_oldest_to_newest();
+            out("Oldest query", util::format_date(querycache.front()->date, "%s")
+                + " (" + util::format_date(querycache.front()->date) + ")");
+            out("Newest query", util::format_date(querycache.back()->date, "%s")
+                + " (" + util::format_date(querycache.back()->date) + ")");
         }
 
-        out("Query strings", pkgcache.queries());
+        out("Query strings", querycache.queries());
     }
     else
         throw args_E();
@@ -157,10 +157,10 @@ main(int argc, char **argv)
         if (handle_opts(argc, argv, &action) != 0)
             throw args_E();
 
-        pkgCache_T pkgcache;
-        pkgcache.load();
+        pkgCache_T querycache;
+        querycache.load();
 
-        doaction(pkgcache, action);
+        doaction(querycache, action);
         out.flush(std::cout);
     }
     catch (const args_version_E)

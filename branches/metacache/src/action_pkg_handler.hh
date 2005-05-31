@@ -30,20 +30,20 @@
 #include <map>
 #include "herds_xml.hh"
 #include "metadata_xml.hh"
-//#include "metadatas.hh"
-#include "pkgcache.hh"
 #include "metacache.hh"
+#include "pkgquery.hh"
 #include "action_handler.hh"
 
 class action_pkg_handler_T : public action_herds_xml_handler_T
 {
     public:
         action_pkg_handler_T() : action_herds_xml_handler_T(),
+                                 metacache(portdir),
                                  optsize(0), elapsed(0),
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
-                                 cache_is_valid(optget("pkgcache", bool) and
+                                 cache_is_valid(optget("metacache", bool) and
                                           (metacache.valid())) { }
 
         virtual ~action_pkg_handler_T() { }
@@ -51,20 +51,16 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 
     private:
         void search(const opts_type &);
-        void search(pkgQuery_T *);
         void display();
         void display(pkgQuery_T *);
         void error(const util::string &) const;
         void cleanup();
-        bool metadata_matches(const metadata_xml_T &, const util::string &);
+        bool metadata_matches(const metadata_T &, const util::string &);
 
         std::map<opts_type::value_type, pkgQuery_T * > matches;
         opts_type not_found, packages;
-        opts_type::size_type optsize;
         metacache_T metacache;
-//        metadatas_T metadatas;
-//        pkgCache_T  pkgcache;
-        util::progress_T  progress;
+        opts_type::size_type optsize;
         util::timer_T::size_type elapsed;
         const bool dev, meta, status, cache_is_valid;
         util::regex_T with;

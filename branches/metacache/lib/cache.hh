@@ -48,7 +48,7 @@ namespace util
             typedef typename value_type::const_iterator const_iterator;
             typedef typename value_type::size_type size_type;
 
-            cache_T(const string_type &f) : _file(f) { }
+            cache_T(const string_type &p) : _path(p) { }
 
             virtual ~cache_T() { }
 
@@ -64,36 +64,23 @@ namespace util
             virtual void init()
             {
                 if (this->valid())
-                    this->read();
+                    this->load();
                 else
                 {
                     this->fill();
-                    this->write();
+                    this->dump();
                 }
             }
 
-            /* read cache from disk */
-            virtual void read()
-            {
-                file_type f(this->_file);
-                f.open();
-                f.read(&(this->_cache));
-            }
-
-            /* write cache to disk */
-            virtual void write() const
-            {
-                file_type f(this->_file);
-                f.open(std::ios::out);
-                f.write(this->_cache);
-            }
+            virtual void fill() { }
 
             /* pure virtuals */
             virtual bool valid() const = 0;
-            virtual void fill() = 0;
+            virtual void load() = 0;
+            virtual void dump() = 0;
 
         protected:
-            const string_type _file;
+            const string_type _path;
             value_type _cache;
     };
 }
