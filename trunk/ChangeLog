@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-06-01 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.1_rc3).
 	* lib/portage_find.cc: Fixed bug in find_package_in() that caused a
 	search to fail if a pkg dir exists in an overlay but there's no
 	ebuild.

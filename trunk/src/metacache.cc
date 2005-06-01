@@ -151,48 +151,51 @@ void
 metacache_T::fill()
 {
     const portage::categories_T categories(this->_portdir, optget("qa", bool));
-    util::progress_T progress;
     util::timer_T elapsed;
     const bool status = not optget("quiet", bool) and not optget("debug", bool);
     const bool timer = optget("timer", bool);
 
-    if (status)
     {
-        *(optget("outstream", std::ostream *))
-            << "Generating metadata.xml cache: ";
-        progress.start(categories.size());
-    }
-
-    if (timer)
-        elapsed.start();
-
-    /* for each category */
-    portage::categories_T::const_iterator c;
-    for (c = categories.begin() ; c != categories.end() ; ++c)
-    {
-        const util::path_T path(this->_portdir + "/" + (*c));
-        debug_msg("traversing %s...", path.c_str());
-
+        util::progress_T progress;
+    
         if (status)
-            ++progress;
+        {
+            *(optget("outstream", std::ostream *))
+                << "Generating metadata.xml cache: ";
+            progress.start(categories.size());
+        }
 
-        if (not util::is_dir(path))
-            continue;
+        if (timer)
+            elapsed.start();
 
-        const util::dir_T category(path);
-        util::dir_T::const_iterator d;
+        /* for each category */
+        portage::categories_T::const_iterator c;
+        for (c = categories.begin() ; c != categories.end() ; ++c)
+        {
+            const util::path_T path(this->_portdir + "/" + (*c));
+            debug_msg("traversing %s...", path.c_str());
 
-        /* for each directory in this category */
-        for (d = category.begin() ; d != category.end() ; ++d)
-            if (util::is_file(*d + "/metadata.xml"))
-                this->push_back(this->parse_metadata(*d + "/metadata.xml"));
-    }
+            if (status)
+                ++progress;
 
-    if (timer)
-    {
-        elapsed.stop();
-        debug_msg("Took %ldms to process %d metadata.xml's.",
-            elapsed.elapsed(), this->size());
+            if (not util::is_dir(path))
+                continue;
+
+            const util::dir_T category(path);
+            util::dir_T::const_iterator d;
+
+            /* for each directory in this category */
+            for (d = category.begin() ; d != category.end() ; ++d)
+                if (util::is_file(*d + "/metadata.xml"))
+                    this->push_back(this->parse_metadata(*d + "/metadata.xml"));
+        }
+
+        if (timer)
+        {
+            elapsed.stop();
+            debug_msg("Took %ldms to process %d metadata.xml's.",
+                elapsed.elapsed(), this->size());
+        }
     }
 
     if (status)
