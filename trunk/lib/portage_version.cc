@@ -286,6 +286,8 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
     {
         /* loop until the version components differ */
 
+        /* TODO: use std::mismatch() ?? */
+
         uintmax_t thisver = strtouint(*thisiter);
         uintmax_t thatver = strtouint(*thatiter);
 

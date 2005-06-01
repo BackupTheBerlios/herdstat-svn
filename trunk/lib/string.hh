@@ -89,6 +89,9 @@ namespace util
                                     const util::string::value_type d = ' ');
     util::string stringify(const std::vector<util::string> &,
                            const util::string::value_type d = ' ');
+
+    util::string htmlify(const util::string &);
+    util::string unhtmlify(const util::string &);
 }
 
 #endif

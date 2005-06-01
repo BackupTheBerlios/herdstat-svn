@@ -7,9 +7,11 @@ herdstat_SOURCES = common.hh common.cc \
 		   options.hh options.cc \
 		   devs.hh \
 		   herds.hh herds.cc \
-		   pkgcache.hh pkgcache.cc \
+		   pkgquery.hh pkgquery.cc \
+		   metacache.hh metacache.cc \
+		   querycache.hh querycache.cc \
 		   xmlparser.hh \
-		   pkgcache_xml_handler.hh pkgcache_xml_handler.cc \
+		   querycache_xml_handler.hh querycache_xml_handler.cc \
 		   herds_xml_handler.hh herds_xml_handler.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
 		   parsable.hh \
@@ -18,7 +20,6 @@ herdstat_SOURCES = common.hh common.cc \
 		   herds_xml.hh herds_xml.cc \
 		   metadata_xml.hh metadata_xml.cc \
 		   formatter.hh formatter.cc \
-		   metadatas.hh metadatas.cc \
 		   overlaydisplay.hh \
 		   action_handler.hh \
 		   action_away_handler.hh action_away_handler.cc \
@@ -35,18 +36,19 @@ herdstat_SOURCES = common.hh common.cc \
 herdstat_LDADD = ../lib/libutil.la
 
 if DEBUG
-bin_PROGRAMS += pkgcachectl
-pkgcachectl_SOURCES = common.hh common.cc \
+bin_PROGRAMS += querycachectl
+querycachectl_SOURCES = common.hh common.cc \
 			exceptions.hh \
 			options.hh options.cc \
 			formatter.hh formatter.cc \
-			pkgcache.hh pkgcache.cc \
+			pkgquery.hh pkgquery.cc \
+			querycache.hh querycache.cc \
 			xmlparser.hh \
-			pkgcache_xml_handler.hh pkgcache_xml_handler.cc \
+			querycache_xml_handler.hh querycache_xml_handler.cc \
 			parsable.hh \
 			xml.hh \
-			pkgcachectl.cc
-pkgcachectl_LDADD = ../lib/libutil.la
+			querycachectl.cc
+querycachectl_LDADD = ../lib/libutil.la
 endif
 
 INCLUDES = -I../lib

@@ -38,6 +38,13 @@ namespace util
 
 	public:
 	    progress_T() : cur(0), step(0) { }
+            ~progress_T()
+            {
+                /* sometimes we're one off and it ends at 99% */
+                while (this->cur < 100.0)
+                    ++(*this);
+            }
+
 	    void start(unsigned m)
 	    {
 		this->step = 100.0 / m;

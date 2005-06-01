@@ -89,7 +89,7 @@ static struct option long_opts[] =
     {"regex",	    no_argument,	0,  'r'},
     {"extended",    no_argument,	0,  'E'},
     {"qa",	    no_argument,	0,  '\a'},
-    {"nopkgcache",  no_argument,	0,  '\f'},
+    {"nometacache",  no_argument,	0,  '\f'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -135,7 +135,7 @@ help()
 	<< "                        all packages that the specified developer maintains." << std::endl
 	<< "     --no-maintainer    Shorthand for --with-maintainer=none" << std::endl
 	<< " -N, --no-overlay       Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
-	<< "     --nopkgcache       When used in conjunction with --package, don't use any" << std::endl
+	<< "     --nometacache      When used in conjunction with --package, don't use any" << std::endl
 	<< "                        cached query results." << std::endl
 	<< " -r, --regex            Display results matching the specified regular" << std::endl
 	<< "                        expression." << std::endl
@@ -338,9 +338,9 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    case '\t':
 		optset("with-maintainer", util::string, optarg);
 		break;
-	    /* --nopkgcache */
+	    /* --noquerycache */
 	    case '\f':
-		optset("pkgcache", bool, false);
+		optset("metacache", bool, false);
 		break;
 	    /* --fetch */
 	    case 'F':

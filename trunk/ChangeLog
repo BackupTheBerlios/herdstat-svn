@@ -1,5 +1,32 @@
 ChangeLog for herdstat
 
+2005-06-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_find.cc: Fixed bug in find_package_in() that caused a
+	search to fail if a pkg dir exists in an overlay but there's no
+	ebuild.
+	* lib/string.cc, lib/string.hh: Added htmlify() and unhtmlify() for
+	lovely things like "&gt;", etc.
+	* src/devaway.cc: Run away message through util::unhtmlify() before
+	saving.  Fixes lv's &lt;jedi mind trick and any future ones.  Also
+	added _fetched member to guarantee devaway is only fetched once.
+	* src/querycache.cc, src/querycache.hh, src/querycache_xml_handler.cc,
+	src/querycache_xml_handler.hh, src/querycachectl.cc: Bring back
+	pkgcache from the dead, as we still have a need for it.  Renamed
+	querycache_T.  Updated format of querycache.xml to make more sense.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Updated to use
+	devaway_T.
+
+2005-05-31 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgquery.cc, src/pkgquery.hh: Moved pkgQuery_T to it's own
+	source files.
+	* src/metacache.cc, src/metacache.hh: Added metacache_T which
+	obsoletes metadatas_T.  We now parse all the metadata data instead of
+	just the metadata list.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Updated to use
+	metacache_T.
+
 2005-05-29 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.0_rc2).

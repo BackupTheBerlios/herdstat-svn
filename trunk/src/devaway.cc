@@ -44,6 +44,9 @@ devaway_T::init()
 void
 devaway_T::fetch()
 {
+    if (this->_fetched)
+        return;
+
     struct stat s;
 
     try
@@ -81,6 +84,7 @@ devaway_T::fetch()
 
     this->_path.assign(DEVAWAY_LOCAL);
     assert(util::is_file(this->_path));
+    this->_fetched = true;
 }
 
 void
@@ -132,12 +136,12 @@ devaway_T::parse(const string_type &path)
         awaymsg = line.substr(beginpos + std::strlen(DEVAWAY_MSG_TOKEN));
         if (awaymsg == "</td></tr>")
             continue;
+
         debug_msg("msg = '%s'", awaymsg.c_str());
 
-        while ((beginpos = awaymsg.find("&lt;")) != util::string::npos)
-            awaymsg.replace(beginpos, 4, "<");
+        (*this)[dev] = util::unhtmlify(awaymsg);
 
-        (*this)[dev] = awaymsg;
+        debug_msg("unhtmlified: '%s'", (*this)[dev].c_str());
     }
 }
 

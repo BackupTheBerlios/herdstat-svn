@@ -104,10 +104,11 @@ portage::find_package_in(const util::string &portdir, const util::string &pkg,
     if (timer and not timer->is_running())
         timer->start();
 
-    /* if category/package was specified, just check for existence */
+    /* if category/package was specified, just check and
+     * make sure it's a valid package directory */
     if (pkg.find('/') != util::string::npos)
     {
-        if (util::is_dir(portdir + "/" + pkg))
+        if (portage::is_pkg_dir(portdir + "/" + pkg))
         {
             if (timer) timer->stop();
             return pkg;

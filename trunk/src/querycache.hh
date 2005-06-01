@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/devaway.hh
+ * herdstat -- src/querycache.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_DEVAWAY_HH
-#define HAVE_DEVAWAY_HH 1
+#ifndef HAVE_QUERYCACHE_HH
+#define HAVE_QUERYCACHE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -29,32 +29,37 @@
 
 #include <map>
 #include "common.hh"
-#include "parsable.hh"
-
-#define DEVAWAY_LOCAL      LOCALSTATEDIR"/devaway.html"
+#include "pkgquery.hh"
+#include "herds_xml.hh"
 
 /*
- * Represents a list of developers who are away, and their
- * corresponding away message.
+ * Represents a cache of package query
+ * results (produced by action_pkg_handler_T::search()).
  */
 
-class devaway_T : public std::map<util::string, util::string>,
-                  public parsable_T
+class querycache_T : public util::cache_T<std::vector<pkgQuery_T> >
 {
     public:
-        devaway_T(bool x = false) : parsable_T(DEVAWAY_LOCAL), _fetched(false)
-        { this->init(); if (x) { this->fetch(); this->parse(); } }
+        querycache_T();
+        ~querycache_T();
 
-        virtual void fetch();
-        virtual void parse(const string_type & = "");
+        void operator() (const pkgQuery_T &);
+        virtual bool valid() const;
+        virtual void load();
+        virtual void dump();
+        void dump(std::ostream &);
 
-        virtual const std::vector<key_type> keys() const;
+        iterator find(const pkgQuery_T &);
+        pkgQuery_T &front() { return this->_cache.front(); }
+        pkgQuery_T &back() { return this->_cache.back(); }
+        void push_back(const pkgQuery_T &q) { this->_cache.push_back(q); }
+
+        bool is_expired(const pkgQuery_T &) const;
+        void sort_oldest_to_newest();
+        std::vector<util::string> queries() const;
 
     protected:
-        virtual void init();
-
-    private:
-        bool _fetched;
+        void purge_old();
 };
 
 #endif

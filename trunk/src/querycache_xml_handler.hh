@@ -1,6 +1,6 @@
 /*
- * herdstat -- src/pkgcache_xml_handler.hh
- * $Id: pkgcache_xml_handler.hh 359 2005-05-27 11:20:56Z ka0ttic $
+ * herdstat -- src/querycache_xml_handler.hh
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -20,34 +20,34 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PKGCACHE_XML_HANDLER_HH
-#define HAVE_PKGCACHE_XML_HANDLER_HH 1
+#ifndef HAVE_QUERYCACHE_XML_HANDLER_HH
+#define HAVE_QUERYCACHE_XML_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "xmlparser.hh"
-#include "pkgcache.hh"
+#include "querycache.hh"
 
 /*
- * Content Handler for our internal pkgcache.xml
+ * Content Handler for our internal querycache.xml
  */
 
-class pkgCacheXMLHandler_T : public XMLHandler_T
+class querycacheXMLHandler_T : public XMLHandler_T
 {
     public:
-        typedef std::vector<pkgQuery_T * > value_type;
+        typedef std::vector<pkgQuery_T> value_type;
         typedef value_type::iterator iterator;
         typedef value_type::size_type size_type;
 
-        pkgCacheXMLHandler_T()
+        querycacheXMLHandler_T()
         {
-            in_query = in_string = in_with = in_type = in_date =
-            in_results = in_pkg = in_pkgname = in_pkglongdesc = false;
+            in_query = in_string = in_with = in_type =
+            in_results = in_pkg = false;
         }
 
-        virtual ~pkgCacheXMLHandler_T();
+        virtual ~querycacheXMLHandler_T();
 
         value_type queries;
 
@@ -60,10 +60,8 @@ class pkgCacheXMLHandler_T : public XMLHandler_T
 
     private:
         /* internal state variables */
-        bool in_query, in_string, in_with, in_type, in_date, in_results,
-             in_pkg, in_pkgname, in_pkglongdesc;
-        int cur_query_id;
-        util::string cur_pkg;
+        bool in_query, in_string, in_with, in_type, in_results, in_pkg;
+        util::string cur_pkg, cur_date;
 };
 
 #endif

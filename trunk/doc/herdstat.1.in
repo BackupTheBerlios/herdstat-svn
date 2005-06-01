@@ -36,16 +36,16 @@ is specified.
 .B "\-c, \-\-count"
 Display the number of items instead of the items themselves.
 .TP
-.B "\-\-with-herd \fI<herd>\fR"
+.B "\-\-with-herd \fI<regex>\fR"
 When used in conjunction with --package --dev, only display those packages
-belonging to the specified herd.
+belonging to a herd that matches the specified regular expression.
 .TP
 .B "\-\-no-herd"
 Shorthand for --with-herd=no-herd.
 .TP
-.B "\-\-with-maintainer \fI<dev>\fR"
+.B "\-\-with-maintainer \fI<regex>\fR"
 When used in conjunction with --package, only display those packages
-that are maintained by the specified developer.
+that are maintained by developers matching the specified regular expression.
 .TP
 .B "\-\-no-maintainer"
 Shorthand for --with-maintainer=none.
@@ -53,7 +53,7 @@ Shorthand for --with-maintainer=none.
 .B "\-N, \-\-no-overlay"
 Don't search overlay(s) in PORTDIR_OVERLAY.
 .TP
-.B "\-\-nopkgcache"
+.B "\-\-nometacache"
 When used in conjunction with --package, don't use cached query results even
 if it exists.
 .TP

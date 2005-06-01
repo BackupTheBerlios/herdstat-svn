@@ -1,6 +1,6 @@
 /*
- * herdstat -- src/pkgcache_xml_handler.cc
- * $Id: pkgcache_xml_handler.cc 359 2005-05-27 11:20:56Z ka0ttic $
+ * herdstat -- src/querycache_xml_handler.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,54 +24,68 @@
 # include "config.h"
 #endif
 
-#include "pkgcache_xml_handler.hh"
+#include "querycache_xml_handler.hh"
 
-pkgCacheXMLHandler_T::return_type
-pkgCacheXMLHandler_T::START_ELEMENT(const string_type &name,
+querycacheXMLHandler_T::return_type
+querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
                                     const attrs_type &attrs)
 {
+//    debug_msg("entering <%s>", name.c_str());
+
     if (name == "query")
     {
-        attrs_type::const_iterator pos;
+        in_query = true;
 
+        attrs_type::const_iterator pos;
         for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
         {
 #ifdef USE_LIBXMLPP
-            if (pos->name == "id")
-                cur_query_id = std::atoi(pos->value.c_str());
+            if (pos->name == "date")
+                cur_date = pos->value;
 #else /* USE_LIBXMLPP */
-            if (pos->first == "id")
-                cur_query_id = std::atoi(pos->second.c_str());
+            if (pos->first == "date")
+                cur_date = pos->second;
+#endif /* USE_LIBXMLPP */
+        }
+    }
+    else if (name == "string" and in_query)
+        in_string = true;
+    else if (name == "with" and in_query)
+        in_with = true;
+    else if (name == "type" and in_query)
+        in_type = true;
+    else if (name == "results" and in_query)
+        in_results = true;
+    else if (name == "pkg" and in_results)
+    {
+        in_pkg = true;
+
+        attrs_type::const_iterator pos;
+        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
+        {
+#ifdef USE_LIBXMLPP
+            if (pos->name == "name")
+                cur_pkg = pos->value;
+#else /* USE_LIBXMLPP */
+            if (pos->first == "name")
+                cur_pkg = pos->second;
 #endif /* USE_LIBXMLPP */
         }
 
-        in_query = true;
+        (queries.back())[cur_pkg] = "";
+//        debug_msg("in <pkg name='%s'>", cur_pkg.c_str());
     }
-    else if (name == "string")
-        in_string = true;
-    else if (name == "with")
-        in_with = true;
-    else if (name == "type")
-        in_type = true;
-    else if (name == "date")
-        in_date = true;
-    else if (name == "results")
-        in_results = true;
-    else if (name == "pkg" and in_results)
-        in_pkg = true;
-    else if (name == "name" and in_pkg)
-        in_pkgname = true;
-    else if (name == "longdesc" and in_pkg)
-        in_pkglongdesc = true;
 
 #ifdef USE_XMLWRAPP
     return true;
 #endif
 }
 
-pkgCacheXMLHandler_T::return_type
-pkgCacheXMLHandler_T::END_ELEMENT(const string_type &name)
+querycacheXMLHandler_T::return_type
+querycacheXMLHandler_T::END_ELEMENT(const string_type &name)
 {
+//    debug_msg("leaving <%s>", name.c_str());
+
     if (name == "query")
         in_query = false;
     else if (name == "string")
@@ -80,56 +94,43 @@ pkgCacheXMLHandler_T::END_ELEMENT(const string_type &name)
         in_with = false;
     else if (name == "type")
         in_type = false;
-    else if (name == "date")
-        in_date = false;
     else if (name == "results")
         in_results = false;
     else if (name == "pkg")
         in_pkg = false;
-    else if (name == "name")
-        in_pkgname = false;
-    else if (name == "longdesc")
-        in_pkglongdesc = false;
 
 #ifdef USE_XMLWRAPP
     return true;
 #endif
 }
 
-pkgCacheXMLHandler_T::return_type
-pkgCacheXMLHandler_T::CHARACTERS(const string_type &text)
+querycacheXMLHandler_T::return_type
+querycacheXMLHandler_T::CHARACTERS(const string_type &text)
 {
     if (in_string)
     {
-        pkgQuery_T *query = new pkgQuery_T(text);
-        query->id = cur_query_id;
-        queries.push_back(query);
+        queries.push_back(pkgQuery_T(text));
+        queries.back().date = std::strtol(cur_date.c_str(), NULL, 10);
+        debug_msg("date == '%lu'", queries.back().date);
     }
     else if (in_with)
-        queries.back()->with = text;
+        queries.back().with = text;
     else if (in_type)
-        queries.back()->type =
+        queries.back().type =
             (text == "dev" ? QUERYTYPE_DEV : QUERYTYPE_HERD);
-    else if (in_date)
-        queries.back()->date = std::strtol(text.c_str(), NULL, 10);
-    else if (in_pkgname)
-    {
-        cur_pkg.assign(text);
-        (*queries.back())[cur_pkg] = "";
-    }
-    else if (in_pkglongdesc)
-        (*queries.back())[cur_pkg] = text;
+    else if (in_pkg)
+        (queries.back())[cur_pkg] = text;
 
 #ifdef USE_XMLWRAPP
     return true;
 #endif
 }
 
-pkgCacheXMLHandler_T::~pkgCacheXMLHandler_T()
+querycacheXMLHandler_T::~querycacheXMLHandler_T()
 {
-    value_type::iterator i;
-    for (i = queries.begin() ; i != queries.end() ; ++i)
-        delete *i;
+//    value_type::iterator i;
+//    for (i = queries.begin() ; i != queries.end() ; ++i)
+//        delete *i;
 }
 
 /* vim: set tw=80 sw=4 et : */

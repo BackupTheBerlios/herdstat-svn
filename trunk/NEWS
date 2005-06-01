@@ -1,6 +1,19 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc3:
+    New features:
+     - Full metadata caching now takes place (in addition to the query results
+       caching) instead of just caching the list of metadata.xml's.  Subsequent
+       lookup is of course much faster (and even faster if the query results
+       are also cached).  The --nopkgcache option has been replaced by 
+       --nometacache.
+
+    Bug fixes:
+     - Fixed bug in ebuild_which() that caused 'herdstat -w <package>' to not
+       find a package if the package directory exists in an overlay but no
+       ebuild exists.
+
 1.1.1_rc2:
     Rewrote large portions of the package handler (--package) to fix a major
     design flaw.

@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <map>
 #include <cstdarg>
 #include <cstring>
 
@@ -94,8 +95,14 @@ bothspaces(util::string::value_type c1,
     return Glib::Unicode::isspace(c1) and
            Glib::Unicode::isspace(c2);
 #else /* UNICODE */
-    std::locale loc("");
-    return std::isspace(c1, loc) and std::isspace(c2, loc);
+
+/* NOTE: ideally we should use the below commented out code,
+ * however, it is EXTREMELY FSCKING SLOW. */
+
+//    std::locale loc("");
+//    return std::isspace(c1, loc) and std::isspace(c2, loc);
+
+    return std::isspace(c1) and std::isspace(c2);
 #endif /* UNICODE */
 }
 
@@ -160,6 +167,69 @@ util::sprintf(const char *fmt, va_list v)
     util::string s(buf);
     free(buf);
     return s;
+}
+/*****************************************************************************
+ * HTMLify the given string (replace any occurrences of &,>,<)               *
+ *****************************************************************************/
+util::string
+util::htmlify(const util::string &str)
+{
+    util::string result(str);
+    std::map<util::string, util::string> sr;
+    std::map<util::string, util::string>::iterator i;
+    sr["&"] = "&amp;";
+    sr[">"] = "&gt;";
+    sr["<"] = "&lt;";
+
+    for (i = sr.begin() ; i != sr.end() ; ++i)
+    {
+	util::string::size_type pos, lpos = 0;
+	while (true)
+	{
+	    pos = result.find(i->first, lpos);
+	    if (pos == util::string::npos)
+		break;
+
+	    if (result.substr(pos, pos + i->second.length()) == i->second)
+		result.replace(pos, i->first.length(), i->second, 0,
+		    i->second.length());
+
+	    lpos = ++pos;
+	}
+    }
+
+    return result;
+}
+/*****************************************************************************
+ * unHTMLify the given string (replace occurrences of &amp;,&gt;,&;lt;       *
+ *****************************************************************************/
+util::string
+util::unhtmlify(const util::string &str)
+{
+    util::string result(str);
+    std::map<util::string, util::string> sr;
+    std::map<util::string, util::string>::iterator i;
+    sr["&amp;"] = "&";
+    sr["&gt;"] = ">";
+    sr["&lt;"] = "<";
+
+    for (i = sr.begin() ; i != sr.end() ; ++i)
+    {
+	util::string::size_type pos, lpos = 0;
+	while (true)
+	{
+	    pos = result.find(i->first, lpos);
+	    if (pos == util::string::npos)
+		break;
+
+	    result.replace(pos, i->first.length(), i->second,
+		0, i->second.length());
+
+	    lpos = ++pos;
+	}
+    }
+
+    return result;
 }
 /*****************************************************************************/
 std::vector<util::string>
