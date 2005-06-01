@@ -41,7 +41,7 @@
 /* max number of queries to cache.
  * TODO: good candidate for an configuration file
  * option if we ever need one. */
-#define QUERYCACHE_MAX      1000
+#define QUERYCACHE_MAX      100
 
 /* amount of time (in seconds) a cached query
  * object is considered valid */
@@ -121,7 +121,7 @@ querycache_T::sort_oldest_to_newest()
  */
 
 void
-querycache_T::cleanse()
+querycache_T::purge_old()
 {
     debug_msg("this->size() > querycache_MAX(%d), so trimming oldest queries.",
         QUERYCACHE_MAX);
@@ -155,7 +155,7 @@ querycache_T::dump()
 {
     /* trim if needed */
     if (this->size() > QUERYCACHE_MAX)
-        this->cleanse();
+        this->purge_old();
 
     /* generate XML */
     try
@@ -163,10 +163,15 @@ querycache_T::dump()
 #ifdef USE_LIBXMLPP
         xmlpp::Document doc;
         xmlpp::Element *root = doc.create_root_node("queries");
+        root->set_attribute("total", util::sprintf("%d", this->size()));
 #else
         xml::init init;
         xml::document doc("queries");
+        doc.set_encoding("UTF-8");
+
         xml::node &root = doc.get_root_node();
+        root.get_attributes().insert("total",
+            util::sprintf("%d", this->size()).c_str());
 #endif /* USE_LIBXMLPP */
 
         /* for each query */
@@ -179,6 +184,8 @@ querycache_T::dump()
 #ifdef USE_LIBXMLPP
             /* <query id="n"> */
             xmlpp::Element *query_node = root->add_child("query");
+            query_node->set_attribute("date",
+                util::sprintf("%lu", static_cast<unsigned long>(q.date)));
 
             /* <criteria> */
             xmlpp::Element *criteria_node = query_node->add_child("criteria");
@@ -195,17 +202,18 @@ querycache_T::dump()
             xmlpp::Element *type_node = criteria_node->add_child("type");
             type_node->set_child_text(q.type == QUERYTYPE_DEV ? "dev":"herd");
 
-            /* <date> */
-            xmlpp::Element *date_node = query_node->add_child("date");
-            date_node->set_child_text(util::sprintf("%lu",
-                static_cast<unsigned long>(q.date)));
-
             /* <results> */
             xmlpp::Element *results_node = query_node->add_child("results");
+            results_node->set_attribute("total",
+                util::sprintf("%d", q.size()));
 
 #else
 
-            xml::node::iterator it = root.insert(root.begin(), xml::node("query"));
+            xml::node query("query");
+            query.get_attributes().insert("date",
+                util::sprintf("%lu", static_cast<unsigned long>(q.date)).c_str());
+
+            xml::node::iterator it = root.insert(root.begin(), query);
 
             xml::node cri_node("criteria");
             cri_node.push_back(xml::node("string", q.query.c_str()));
@@ -214,10 +222,9 @@ querycache_T::dump()
             it->push_back(cri_node);
 
             it = root.begin();
-            it->push_back(xml::node("date", util::sprintf("%lu",
-                static_cast<unsigned long>(q.date)).c_str()));
-
             xml::node results("results");
+            results.get_attributes().insert("total",
+                util::sprintf("%d", q.size()).c_str());
 
 #endif /* USE_LIBXMLPP */
 
@@ -227,29 +234,16 @@ querycache_T::dump()
             {
 
 #ifdef USE_LIBXMLPP
+
                 /* <pkg> */
                 xmlpp::Element *pkg_node = results_node->add_child("pkg");
-
-                /* <name> */
-                xmlpp::Element *pkg_name_node = pkg_node->add_child("name");
-                pkg_name_node->set_child_text(p->first);
-
-                /* <longdesc> */
-                if (not p->second.empty())
-                {
-                    xmlpp::Element *pkg_longdesc_node =
-                        pkg_node->add_child("longdesc");
-                    pkg_longdesc_node->set_child_text(p->second);
-                }
+                pkg_node->set_attribute("name", p->first);
+                pkg_node->set_child_text(p->second);
 
 #else
 
-                xml::node pkg("pkg");
-                pkg.push_back(xml::node("name", p->first.c_str()));
-                
-                if (not p->second.empty())
-                    pkg.push_back(xml::node("longdesc", p->second.c_str()));
-
+                xml::node pkg("pkg", p->second.c_str());
+                pkg.get_attributes().insert("name", p->first.c_str());
                 results.push_back(pkg);
 
 #endif /* USE_LIBXMLPP */
@@ -262,7 +256,7 @@ querycache_T::dump()
         }
 
 #ifdef USE_LIBXMLPP
-        doc.write_to_file_formatted(QUERYCACHE, "UTF-8");
+        doc.write_to_file(QUERYCACHE, "UTF-8");
 #else /* USE_LIBXMLPP */
         doc.save_to_file(QUERYCACHE, 0);
 #endif /* USE_LIBXMLPP */

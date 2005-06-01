@@ -38,8 +38,8 @@ pkgQuery_T::dump(std::ostream &stream) const
     out("Query string", this->query);
     out("Query with", this->with);
     out("Query type", (this->type == QUERYTYPE_DEV ? "dev":"herd"));
-    out("Query date", util::format_date(this->date, "%s") + " ("
-        + util::format_date(this->date) + ")");
+    out("Query date", util::sprintf("%lu", static_cast<unsigned long>(this->date))
+        + " (" + util::format_date(this->date) + ")");
 
     for (const_iterator p = this->begin() ; p != this->end() ; ++p)
         out("", p->first);
@@ -50,6 +50,14 @@ pkgQuery_T::dump(std::ostream &stream) const
 bool
 pkgQuery_T::operator== (const pkgQuery_T &that) const
 {
+    debug_msg("pkgQuery_T::operator==");
+    debug_msg("this->query(%s) == that.query(%s) ? %d",
+        this->query.c_str(), that.query.c_str(), (this->query == that.query));
+    debug_msg("this->with(%s) == that.with(%s) ? %d",
+        this->with.c_str(), that.with.c_str(), (this->with == that.with));
+    debug_msg("this->type(%d) == that.type(%d) ? %d",
+        this->type, that.type, (this->type == that.type));
+
     return  /* normal lookup */
             ((this->query == that.query) and
              (this->with  == that.with) and

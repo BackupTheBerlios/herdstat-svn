@@ -272,9 +272,9 @@ action_pkg_handler_T::display()
             continue;
         }
 
-        if ((n == 1) and status and not cache_is_valid and
-            not at_least_one_not_cached)
-            output.endl();
+//        if ((n == 1) and status and not cache_is_valid and
+//            not at_least_one_not_cached)
+//            output.endl();
 
         size += m->second->size();
 
@@ -330,6 +330,18 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (not util::is_dir(portdir))
 	throw util::bad_fileobject_E(portdir);
 
+    /* fetch/parse herds.xml for info lookup */
+    herds_xml.fetch();
+    herds_xml.parse();
+
+    /* fetch/parse devaway for marking away devs */
+    devaway.fetch();
+    devaway.parse();
+
+    /* setup with regex */
+    with.assign(dev? optget("with-herd", util::string) :
+                     optget("with-maintainer", util::string), REG_ICASE);
+
     /* load previously cached results */
     querycache.load();
 
@@ -350,6 +362,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 matches[*i] = new pkgQuery_T(*qi);
                 matches[*i]->query = *i;
                 matches[*i]->with  = with();
+
+                if (dev)
+                    matches[*i]->info = herds_xml.get_dev_info(*i);
+
                 opts.erase(i);
             }
         }
@@ -377,20 +393,15 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     debug_msg("metacache.size() == %d", metacache.size());
 
-    /* fetch/parse herds.xml for info lookup */
-    herds_xml.fetch();
-    herds_xml.parse();
-
     /* set format attributes */
     output.set_maxlabel(16);
     output.set_maxdata(maxcol - output.maxlabel());
+    output.set_devaway(devaway.keys());
     output.set_attrs();
 
-    /* setup with regex */
-    with.assign(dev? optget("with-herd", util::string) :
-                     optget("with-maintainer", util::string), REG_ICASE);
+    if (not opts.empty())
+        search(opts);
 
-    search(opts);
     display();
 
     if (count)

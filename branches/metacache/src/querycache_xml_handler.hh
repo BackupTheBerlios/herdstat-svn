@@ -43,8 +43,8 @@ class querycacheXMLHandler_T : public XMLHandler_T
 
         querycacheXMLHandler_T()
         {
-            in_query = in_string = in_with = in_type = in_date =
-            in_results = in_pkg = in_pkgname = in_pkglongdesc = false;
+            in_query = in_string = in_with = in_type =
+            in_results = in_pkg = false;
         }
 
         virtual ~querycacheXMLHandler_T();
@@ -60,10 +60,8 @@ class querycacheXMLHandler_T : public XMLHandler_T
 
     private:
         /* internal state variables */
-        bool in_query, in_string, in_with, in_type, in_date, in_results,
-             in_pkg, in_pkgname, in_pkglongdesc;
-        int cur_query_id;
-        util::string cur_pkg;
+        bool in_query, in_string, in_with, in_type, in_results, in_pkg;
+        util::string cur_pkg, cur_date;
 };
 
 #endif

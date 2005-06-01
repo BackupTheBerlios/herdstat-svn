@@ -38,6 +38,11 @@ Display all packages that dragonheart maintains that don't belong to a herd
 
     $ herdstat -pd dragonheart --no-herd
 
+Display all packages that ka0ttic maintains that belong to a herd matching the
+regular expression "^c": ::
+
+    $ herdstat -pd ka0ttic --with-herd ^c
+
 Display the metadata for the herdstat package: ::
 
     $ herdstat -m herdstat

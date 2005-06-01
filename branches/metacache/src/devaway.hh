@@ -42,7 +42,7 @@ class devaway_T : public std::map<util::string, util::string>,
                   public parsable_T
 {
     public:
-        devaway_T(bool x = false) : parsable_T(DEVAWAY_LOCAL)
+        devaway_T(bool x = false) : parsable_T(DEVAWAY_LOCAL), _fetched(false)
         { this->init(); if (x) { this->fetch(); this->parse(); } }
 
         virtual void fetch();
@@ -52,6 +52,9 @@ class devaway_T : public std::map<util::string, util::string>,
 
     protected:
         virtual void init();
+
+    private:
+        bool _fetched;
 };
 
 #endif

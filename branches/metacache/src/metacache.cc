@@ -28,7 +28,7 @@
 #include "metacache.hh"
 
 #define METACACHE               LOCALSTATEDIR"/metacache"
-#define METACACHE_EXPIRE        592200      /* one week */
+#define METACACHE_EXPIRE        259200 /* 3 days */
 #define METACACHE_RESERVE       8600
 #define LASTSYNC                LOCALSTATEDIR"/lastsync"
 
@@ -195,11 +195,8 @@ metacache_T::fill()
             elapsed.elapsed(), this->size());
     }
 
-//    if (status)
-//    {
-//        *(optget("outstream", std::ostream *)) << " (total "
-//            << this->size() << ")" << std::endl;
-//    }
+    if (status)
+        *(optget("outstream", std::ostream *)) << std::endl;
 }
 
 /*
@@ -250,13 +247,34 @@ metacache_T::load()
                 this->_portdir + "/" + i->first + "/metadata.xml");
 
             std::vector<util::string> parts = i->second.split(':');
-            if (parts.empty() or parts.size() > 2)
+            if (parts.empty())
                 throw metacache_parse_E();
 
-            meta.herds = parts.front().split(',');
-            
-            if (parts.size() > 1)
-                meta.devs  = parts.back().split(',');
+            util::string herds = parts.front();
+            parts.erase(parts.begin());
+            meta.herds = herds.split(',');
+
+            if (not parts.empty())
+            {
+                util::string devs  = parts.front();
+                parts.erase(parts.begin());
+                if (not devs.empty())
+                    meta.devs = devs.split(',');
+            }
+
+            if (not parts.empty())
+            {
+                util::string longdesc = parts.front();
+                parts.erase(parts.begin());
+
+                while (not parts.empty())
+                {
+                    longdesc += ":" + parts.front();
+                    parts.erase(parts.begin());
+                }
+
+                meta.longdesc = longdesc;
+            }
 
             this->push_back(meta);
         }
@@ -290,7 +308,7 @@ metacache_T::dump()
     {
         /*
          * format is the form of:
-         *   cat/pkg=herd1,herd2:dev1,dev2
+         *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
         util::string herds_string;
@@ -310,8 +328,32 @@ metacache_T::dump()
             devs_string.erase(devs_string.length() - 1);
         
         *f << i->pkg << "=" << herds_string << ":" << devs_string
-            << std::endl;
+            << ":";
+
+        if (i->longdesc.empty())
+            *f << std::endl;
+        else
+        {
+#ifdef UNICODE
+            try
+            {
+                *f << util::tidy_whitespace(i->longdesc) << std::endl;
+            }
+            catch (const Glib::ConvertError)
+            {
+                *f << std::endl;
+            }
+#else /* UNICODE */
+            *f << util::tidy_whitespace(i->longdesc) << std::endl;
+#endif /* UNICODE */
+        }
     }
+}
+
+void
+metacache_T::dump_xml()
+{
+    /* TODO: write me. */
 }
 
 /* vim: set tw=80 sw=4 et : */

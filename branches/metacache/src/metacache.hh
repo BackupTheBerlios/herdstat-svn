@@ -77,9 +77,8 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
         virtual void fill();
         virtual void load();
         virtual void dump();
+        void dump_xml();
 
-        void compress();
-        void decompress();
         metadata_T parse_metadata(const util::path_T &);
 
     private:
