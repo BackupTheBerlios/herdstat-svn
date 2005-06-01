@@ -41,8 +41,17 @@ pkgQuery_T::dump(std::ostream &stream) const
     out("Query date", util::sprintf("%lu", static_cast<unsigned long>(this->date))
         + " (" + util::format_date(this->date) + ")");
 
-    for (const_iterator p = this->begin() ; p != this->end() ; ++p)
-        out("", p->first);
+    if (not this->empty())
+        out(util::sprintf("Results(%d)", this->size()),
+            this->begin()->first);
+
+    if (this->size() > 1)
+    {
+        const_iterator p = this->begin();
+        ++p;
+        for ( ; p != this->end() ; ++p)
+            out("", p->first);
+    }
 
     out.flush(stream);
 }
@@ -69,6 +78,19 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
             ((this->query == that.with) and
              (this->with  == that.query) and
              (this->type  != that.type));
+}
+
+/*
+ * Return a vector of the packages we contain.
+ */
+
+std::vector<util::string>
+pkgQuery_T::pkgs() const
+{
+    std::vector<util::string> v;
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->first);
+    return v;
 }
 
 /* vim: set tw=80 sw=4 et : */

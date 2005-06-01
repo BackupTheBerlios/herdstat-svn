@@ -46,6 +46,7 @@ class pkgQuery_T : public std::map<util::string, util::string>
 
         void dump(std::ostream &) const;
         bool operator== (const pkgQuery_T &) const;
+        std::vector<util::string> pkgs() const;
 
         herds_xml_T::devinfo_T info;
         util::string query, with;

@@ -111,7 +111,39 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
 }
 
 /*
- * Search metadata cache for specified criteria.
+ * Search a subset of the metadata cache for packages
+ * matching the specified query criteria.
+ */
+
+void
+action_pkg_handler_T::search(pkgQuery_T &q)
+{
+    if (regex)
+        regexp.assign(q.query,
+            eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
+
+    /* for each metadata.xml */
+    metacache_T::iterator m;
+    for (m = metacache.begin() ; m != metacache.end() ; ++m)
+    {
+        if (not metadata_matches(*m, q.query))
+            continue;
+
+        q.date = std::time(NULL);
+        q.with = with();
+
+        if (dev)
+            q.info = herds_xml.get_dev_info(q.query);
+
+        q[m->pkg] = m->longdesc;
+    }
+
+    querycache(q);
+    matches[q.query] = new pkgQuery_T(q);
+}
+
+/*
+ * Search metadata cache for the specified list of items.
  */
 
 void
@@ -353,6 +385,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
         opts_type::iterator i;
         for (i = tmp.begin() ; i != tmp.end() ; ++i)
         {
+            /* does a previously cached query that
+             * matches our criteria exist? */
             querycache_T::iterator qi =
                 querycache.find(pkgQuery_T(*i, with(), dev));
             if (qi != querycache.end() and not querycache.is_expired(*qi))
@@ -367,6 +401,28 @@ action_pkg_handler_T::operator() (opts_type &opts)
                     matches[*i]->info = herds_xml.get_dev_info(*i);
 
                 opts.erase(i);
+            }
+            /* is a wider-scoped query cached? */
+            else if (qi == querycache.end() and not with.empty())
+            {
+                /* If so, use the results to narrow down what we need and
+                 * partially load the metadata cache */
+                qi = querycache.find(pkgQuery_T(*i, "", dev));
+                if (qi != querycache.end() and not querycache.is_expired(*qi))
+                {
+                    try
+                    {
+                        metacache.load(qi->pkgs());
+                    }
+                    catch (const metacache_parse_E)
+                    {
+                        return EXIT_FAILURE;
+                    }
+
+                    pkgQuery_T q(*i, with(), dev);
+                    search(q);
+                    opts.erase(i);
+                }
             }
         }
     }

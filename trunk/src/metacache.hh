@@ -75,7 +75,7 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
 
         virtual bool valid() const;
         virtual void fill();
-        virtual void load();
+        virtual void load(std::vector<util::string> = std::vector<util::string>());
         virtual void dump();
         void dump_xml();
 

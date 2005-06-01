@@ -73,10 +73,10 @@ namespace util
             }
 
             virtual void fill() { }
+            virtual void load() { }
 
             /* pure virtuals */
             virtual bool valid() const = 0;
-            virtual void load() = 0;
             virtual void dump() = 0;
 
         protected:

@@ -41,7 +41,7 @@ class querycache_T : public util::cache_T<std::vector<pkgQuery_T> >
 {
     public:
         querycache_T();
-        ~querycache_T();
+        virtual ~querycache_T() { }
 
         void operator() (const pkgQuery_T &);
         virtual bool valid() const;

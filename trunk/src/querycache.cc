@@ -269,11 +269,6 @@ querycache_T::dump()
     {
         throw XMLWriter_E(QUERYCACHE, e.what());
     }
-
-#ifdef HAVE_LIBZ
-    this->compress();
-#endif
-
 }
 
 /*
@@ -290,17 +285,9 @@ querycache_T::is_expired(const pkgQuery_T &q) const
  * Find a pkgQuery_T object.
  */
 
-//static bool
-//isEqual(pkgQuery_T *q1, pkgQuery_T *q2)
-//{
-//    return (*q1 == *q2);
-//}
-
 querycache_T::iterator
 querycache_T::find(const pkgQuery_T &q)
 {
-//    return std::find_if(this->begin(), this->end(),
-//        std::bind2nd(std::ptr_fun(isEqual), &q));
     return std::find(this->begin(), this->end(), q);
 }
 
@@ -320,16 +307,6 @@ querycache_T::queries() const
         v.push_back(s);
     }
     return v;
-}
-
-/*
- * Tidy up.
- */
-
-querycache_T::~querycache_T()
-{
-//    for (iterator i = this->begin() ; i != this->end() ; ++i)
-//        delete *i;
 }
 
 /* vim: set tw=80 sw=4 et : */

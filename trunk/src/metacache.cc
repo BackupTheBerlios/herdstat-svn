@@ -225,11 +225,12 @@ metacache_T::parse_metadata(const util::path_T &path)
 }
 
 /*
- * Load cache from disk.
+ * Load cache from disk.  If a vector is given, only load lines
+ * whose package is in the vector.
  */
 
 void
-metacache_T::load()
+metacache_T::load(std::vector<util::string> v)
 {
     if (not util::is_file(METACACHE))
         return;
@@ -245,6 +246,14 @@ metacache_T::load()
             /* not a category/package, so skip it */
             if (i->first.find('/') == util::string::npos)
                 continue;
+
+            /* vector specified and not in vector, so skip it */
+            if (not v.empty() and
+                std::find(v.begin(), v.end(), i->first) == v.end())
+            {
+                debug_msg("vector specified but pkg doesnt exist");
+                continue;
+            }
 
             metadata_T meta(this->_portdir,
                 this->_portdir + "/" + i->first + "/metadata.xml");
