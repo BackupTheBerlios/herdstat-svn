@@ -37,10 +37,10 @@
  */
 
 bool
-metadata_T::dev_exists(const herd_type::value_type &dev) const
+metadata_T::dev_exists(const string_type &dev) const
 {
-    herd_type::value_type d(dev);
-    if (dev.find('@') == herd_type::value_type::npos)
+    string_type d(dev);
+    if (dev.find('@') == string_type::npos)
         d.append("@gentoo.org");
     return std::find(this->devs.begin(), this->devs.end(),
             d) != this->devs.end();
@@ -49,7 +49,7 @@ metadata_T::dev_exists(const herd_type::value_type &dev) const
 bool
 metadata_T::dev_exists(const util::regex_T &regex) const
 {
-    herd_type::const_iterator i;
+    value_type::const_iterator i;
     for (i = this->devs.begin() ; i != this->devs.end() ; ++i)
         if (regex == *i)
             return true;
@@ -57,7 +57,7 @@ metadata_T::dev_exists(const util::regex_T &regex) const
 }
 
 bool
-metadata_T::herd_exists(const herds_type::value_type &herd) const
+metadata_T::herd_exists(const string_type &herd) const
 {
     return std::find(this->herds.begin(), this->herds.end(),
             herd) != this->herds.end();
@@ -66,17 +66,11 @@ metadata_T::herd_exists(const herds_type::value_type &herd) const
 bool
 metadata_T::herd_exists(const util::regex_T &regex) const
 {
-    herds_type::const_iterator i;
+    value_type::const_iterator i;
     for (i = this->herds.begin() ; i != this->herds.end() ; ++i)
         if (regex == *i)
             return true;
     return false;
-}
-
-void
-metadata_T::dump(const std::ostream &stream)
-{
-
 }
 
 void
@@ -92,12 +86,6 @@ metadata_T::get_pkg_from_path()
 /*
  * metacache_T
  */
-
-metacache_T::metacache_T(const string_type &p)
-    : util::cache_T<value_type>(METACACHE), _portdir(p)
-{
-    this->_cache.reserve(METACACHE_RESERVE);
-}
 
 /*
  * Is the cache valid?
@@ -150,23 +138,18 @@ metacache_T::valid() const
 void
 metacache_T::fill()
 {
-    const portage::categories_T categories(this->_portdir, optget("qa", bool));
-    util::timer_T elapsed;
     const bool status = not optget("quiet", bool) and not optget("debug", bool);
-    const bool timer = optget("timer", bool);
-
     {
         util::progress_T progress;
-    
+        const portage::categories_T categories(this->_portdir,
+            optget("qa", bool));
+
         if (status)
         {
             *(optget("outstream", std::ostream *))
                 << "Generating metadata.xml cache: ";
             progress.start(categories.size());
         }
-
-        if (timer)
-            elapsed.start();
 
         /* for each category */
         portage::categories_T::const_iterator c;
@@ -186,15 +169,11 @@ metacache_T::fill()
 
             /* for each directory in this category */
             for (d = category.begin() ; d != category.end() ; ++d)
-                if (util::is_file(*d + "/metadata.xml"))
-                    this->push_back(this->parse_metadata(*d + "/metadata.xml"));
-        }
-
-        if (timer)
-        {
-            elapsed.stop();
-            debug_msg("Took %ldms to process %d metadata.xml's.",
-                elapsed.elapsed(), this->size());
+            {
+                util::path_T metadata(*d + "/metadata.xml");
+                if (access(metadata.c_str(), F_OK) == 0)
+                    this->push_back(this->parse(metadata));
+            }
         }
     }
 
@@ -207,7 +186,7 @@ metacache_T::fill()
  */
 
 metadata_T
-metacache_T::parse_metadata(const util::path_T &path)
+metacache_T::parse(const util::path_T &path)
 {
     const metadata_xml_T metadata(path);
 
@@ -235,11 +214,20 @@ metacache_T::load(std::vector<util::string> v)
     if (not util::is_file(METACACHE))
         return;
 
-    util::vars_T cache(METACACHE);
-    this->_portdir = cache["portdir"];
-
     try
     {
+        util::vars_T cache(METACACHE);
+        this->_portdir = cache["portdir"];
+        if (this->_portdir.empty())
+            throw metacache_parse_E();
+
+        if (not v.empty())
+            this->reserve(v.size());
+        else if (not cache["size"].empty())
+            this->reserve(std::atoi(cache["size"].c_str()));
+        else
+            this->reserve(METACACHE_RESERVE);
+
         util::vars_T::iterator i;
         for (i = cache.begin() ; i != cache.end() ; ++i)
         {
@@ -250,42 +238,41 @@ metacache_T::load(std::vector<util::string> v)
             /* vector specified and not in vector, so skip it */
             if (not v.empty() and
                 std::find(v.begin(), v.end(), i->first) == v.end())
-            {
-                debug_msg("vector specified but pkg doesnt exist");
                 continue;
-            }
 
+            util::string str;
             metadata_T meta(this->_portdir,
                 this->_portdir + "/" + i->first + "/metadata.xml");
 
-            std::vector<util::string> parts = i->second.split(':');
+            std::vector<util::string> parts = i->second.split(':', true);
             if (parts.empty())
                 throw metacache_parse_E();
 
-            util::string herds = parts.front();
+            str = parts.front();
             parts.erase(parts.begin());
-            meta.herds = herds.split(',');
+            meta.herds = str.split(',');
 
             if (not parts.empty())
             {
-                util::string devs  = parts.front();
+                str = parts.front();
                 parts.erase(parts.begin());
-                if (not devs.empty())
-                    meta.devs = devs.split(',');
+                if (not str.empty())
+                    meta.devs = str.split(',');
             }
 
+            /* longdesc contains a ':', so reconstruct it */
             if (not parts.empty())
             {
-                util::string longdesc = parts.front();
+                str = parts.front();
                 parts.erase(parts.begin());
 
                 while (not parts.empty())
                 {
-                    longdesc += ":" + parts.front();
+                    str += ":" + parts.front();
                     parts.erase(parts.begin());
                 }
 
-                meta.longdesc = longdesc;
+                meta.longdesc = str;
             }
 
             this->push_back(meta);
@@ -305,67 +292,66 @@ metacache_T::load(std::vector<util::string> v)
 void
 metacache_T::dump()
 {
-    /* TODO: open in binary mode??? */
-    std::auto_ptr<std::ofstream> f(new std::ofstream(METACACHE));
-    if (not (*f))
+    std::ofstream f(METACACHE);
+    if (not f.is_open())
         throw util::bad_fileobject_E(METACACHE);
 
-    *f << "# Automatically generated by " << PACKAGE << "-" << VERSION
+    f << "# Automatically generated by " << PACKAGE << "-" << VERSION
         << std::endl;
-    *f << "portdir=" << this->_portdir << std::endl;
-    *f << "size=" << this->size() << std::endl;
+    f << "portdir=" << this->_portdir << std::endl;
+    f << "size=" << this->size() << std::endl;
 
     /* for each metadata_T object */
-    for (iterator i = this->begin() ; i != this->end() ; ++i)
+    for (iterator ci = this->begin() ; ci != this->end() ; ++ci)
     {
         /*
          * format is the form of:
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
-        util::string herds_string;
-        metadata_T::herds_type::iterator h;
-        for (h = i->herds.begin() ; h != i->herds.end() ; ++h)
-            herds_string += (*h) + ",";
+        util::string str;
+        std::size_t n;
+        metadata_T::value_type::iterator mi;
+
+        f << ci->pkg << "=";
+
+        for (mi = ci->herds.begin(), n = 1 ; mi != ci->herds.end() ; ++mi, ++n)
+        {
+            str += (*mi);
+            if (n != ci->herds.size())
+                str += ",";
+        }
+
+        f << str << ":";
         
-        if (not herds_string.empty())
-            herds_string.erase(herds_string.length() - 1);
+        for (mi = ci->devs.begin(), n = 1, str.clear() ; mi != ci->devs.end() ; 
+            ++mi, ++n)
+        {
+            str += (*mi);
+            if (n != ci->devs.size())
+                str += ",";
+        }
 
-        util::string devs_string;
-        metadata_T::herd_type::iterator d;
-        for (d = i->devs.begin() ; d != i->devs.end() ; ++d)
-            devs_string += (*d) + ",";
+        f << str << ":";
 
-        if (not devs_string.empty())
-            devs_string.erase(devs_string.length() - 1);
-        
-        *f << i->pkg << "=" << herds_string << ":" << devs_string
-            << ":";
-
-        if (i->longdesc.empty())
-            *f << std::endl;
+        if (ci->longdesc.empty())
+            f << std::endl;
         else
         {
 #ifdef UNICODE
             try
             {
-                *f << util::tidy_whitespace(i->longdesc) << std::endl;
+                f << util::tidy_whitespace(ci->longdesc) << std::endl;
             }
             catch (const Glib::ConvertError)
             {
-                *f << std::endl;
+                f << std::endl;
             }
 #else /* UNICODE */
-            *f << util::tidy_whitespace(i->longdesc) << std::endl;
+            f << util::tidy_whitespace(ci->longdesc) << std::endl;
 #endif /* UNICODE */
         }
     }
-}
-
-void
-metacache_T::dump_xml()
-{
-    /* TODO: write me. */
 }
 
 /* vim: set tw=80 sw=4 et : */

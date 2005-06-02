@@ -37,22 +37,15 @@
  * results (produced by action_pkg_handler_T::search()).
  */
 
-class querycache_T : public util::cache_T<std::vector<pkgQuery_T> >
+class querycache_T : public std::vector<pkgQuery_T>
 {
     public:
-        querycache_T();
-        virtual ~querycache_T() { }
-
         void operator() (const pkgQuery_T &);
-        virtual bool valid() const;
-        virtual void load();
-        virtual void dump();
+        void load();
+        void dump();
         void dump(std::ostream &);
 
         iterator find(const pkgQuery_T &);
-        pkgQuery_T &front() { return this->_cache.front(); }
-        pkgQuery_T &back() { return this->_cache.back(); }
-        void push_back(const pkgQuery_T &q) { this->_cache.push_back(q); }
 
         bool is_expired(const pkgQuery_T &) const;
         void sort_oldest_to_newest();

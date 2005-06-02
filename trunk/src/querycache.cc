@@ -49,14 +49,6 @@
 
 #define QUERYCACHE          LOCALSTATEDIR"/querycache.xml"
 
-querycache_T::querycache_T() : util::cache_T<value_type>(QUERYCACHE) { }
-
-bool
-querycache_T::valid() const
-{
-    return util::is_file(QUERYCACHE);
-}
-
 /*
  * Add a pkgQuery_T object to the cache, removing
  * an expired pkgQuery_T object if it exists.
@@ -75,10 +67,10 @@ querycache_T::operator() (const pkgQuery_T &q)
 
         debug_msg("old query exists for '%s', so removing it",
             q.query.c_str());
-        this->_cache.erase(i);
+        this->erase(i);
     }
 
-    this->_cache.push_back(q);
+    this->push_back(q);
 }
 
 /*
@@ -93,10 +85,10 @@ querycache_T::load()
 
     xml_T<querycacheXMLHandler_T> querycache_xml;
     querycache_xml.parse(QUERYCACHE);
+    querycacheXMLHandler_T *handler = querycache_xml.handler();
 
-    std::copy(querycache_xml.handler()->queries.begin(),
-        querycache_xml.handler()->queries.end(),
-        std::back_inserter(this->_cache));
+    std::copy(handler->queries.begin(), handler->queries.end(),
+        std::back_inserter(*this));
 }
 
 /*
@@ -130,7 +122,7 @@ querycache_T::purge_old()
 
     /* while > querycache_MAX, erase the first (oldest) query */
     while (this->size() > QUERYCACHE_MAX)
-        this->_cache.erase(this->begin());
+        this->erase(this->begin());
 }
 
 void
@@ -179,58 +171,56 @@ querycache_T::dump()
         size_type n = 1;
         for (i = this->begin() ; i != this->end() ; ++i, ++n)
         {
-            pkgQuery_T q = *i;
-
 #ifdef USE_LIBXMLPP
             /* <query id="n"> */
             xmlpp::Element *query_node = root->add_child("query");
             query_node->set_attribute("date",
-                util::sprintf("%lu", static_cast<unsigned long>(q.date)));
+                util::sprintf("%lu", static_cast<unsigned long>(i->date)));
 
             /* <criteria> */
             xmlpp::Element *criteria_node = query_node->add_child("criteria");
 
             /* <string> */
             xmlpp::Element *query_string_node = criteria_node->add_child("string");
-            query_string_node->set_child_text(q.query);
+            query_string_node->set_child_text(i->query);
 
             /* <with> */
             xmlpp::Element *with_string_node = criteria_node->add_child("with");
-            with_string_node->set_child_text(q.with);
+            with_string_node->set_child_text(i->with);
 
             /* <type> */
             xmlpp::Element *type_node = criteria_node->add_child("type");
-            type_node->set_child_text(q.type == QUERYTYPE_DEV ? "dev":"herd");
+            type_node->set_child_text(i->type == QUERYTYPE_DEV ? "dev":"herd");
 
             /* <results> */
             xmlpp::Element *results_node = query_node->add_child("results");
             results_node->set_attribute("total",
-                util::sprintf("%d", q.size()));
+                util::sprintf("%d", i->size()));
 
 #else
 
             xml::node query("query");
             query.get_attributes().insert("date",
-                util::sprintf("%lu", static_cast<unsigned long>(q.date)).c_str());
+                util::sprintf("%lu", static_cast<unsigned long>(i->date)).c_str());
 
             xml::node::iterator it = root.insert(root.begin(), query);
 
             xml::node cri_node("criteria");
-            cri_node.push_back(xml::node("string", q.query.c_str()));
-            cri_node.push_back(xml::node("with", q.with.c_str()));
-            cri_node.push_back(xml::node("type", q.type == QUERYTYPE_DEV? "dev":"herd"));
+            cri_node.push_back(xml::node("string", i->query.c_str()));
+            cri_node.push_back(xml::node("with", i->with.c_str()));
+            cri_node.push_back(xml::node("type", i->type == QUERYTYPE_DEV? "dev":"herd"));
             it->push_back(cri_node);
 
             it = root.begin();
             xml::node results("results");
             results.get_attributes().insert("total",
-                util::sprintf("%d", q.size()).c_str());
+                util::sprintf("%d", i->size()).c_str());
 
 #endif /* USE_LIBXMLPP */
 
             /* for each package in query results */
             pkgQuery_T::const_iterator p;
-            for (p = q.begin() ; p != q.end() ; ++p)
+            for (p = i->begin() ; p != i->end() ; ++p)
             {
 
 #ifdef USE_LIBXMLPP

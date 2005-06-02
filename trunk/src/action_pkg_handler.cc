@@ -64,8 +64,7 @@ static bool
 doesMatch(util::string s, util::regex_T *r) { return *r == s; }
 
 static bool
-doesHerdMatch(metadata_T::herd_type::value_type m,
-              util::regex_T *r)
+doesHerdMatch(util::string m, util::regex_T *r)
 { return *r == util::get_user_from_email(m); }
 
 /*
@@ -450,12 +449,15 @@ action_pkg_handler_T::operator() (opts_type &opts)
     debug_msg("metacache.size() == %d", metacache.size());
 
     /* set format attributes */
-    output.set_maxlabel(16);
-    output.set_maxdata(maxcol - output.maxlabel());
-    output.set_devaway(devaway.keys());
-    output.set_attrs();
+    if (not meta)
+    {
+        output.set_maxlabel(16);
+        output.set_maxdata(maxcol - output.maxlabel());
+        output.set_devaway(devaway.keys());
+        output.set_attrs();
+    }
 
-    if (not opts.empty())
+    if (at_least_one_not_cached)
         search(opts);
 
     display();

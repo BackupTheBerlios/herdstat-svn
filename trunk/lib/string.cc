@@ -278,7 +278,8 @@ util::stringify(const std::vector<util::string> &v,
 }
 /*****************************************************************************/
 std::vector<util::string>
-util::string::split(const util::string::value_type delim) const
+util::string::split(const util::string::value_type delim,
+                    bool append_empty) const
 {
     std::vector<util::string> vec;
     size_type pos, lpos = 0;
@@ -295,6 +296,8 @@ util::string::split(const util::string::value_type delim) const
 	 * delimiters in a row were encountered) */
 	if (this->substr(lpos, pos - lpos).length() > 0)
 	    vec.push_back(this->substr(lpos, pos - lpos));
+        else if (append_empty)
+            vec.push_back("");
 
 	lpos = ++pos;
     }

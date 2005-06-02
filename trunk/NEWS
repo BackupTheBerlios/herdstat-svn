@@ -1,6 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc4:
+    Bug fixes:
+     - Fixed bug in metacache reading that caused packages with a maintainer
+       but no herd (not even "no-herd") to interpret the developer as a herd
+       (thus producing inaccurate search results).
+     - Fixed bug in -p(d)m output.
+
 1.1.1_rc3:
     New features:
      - Full metadata caching now takes place (in addition to the query results

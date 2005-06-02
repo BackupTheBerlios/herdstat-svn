@@ -111,7 +111,6 @@ querycacheXMLHandler_T::CHARACTERS(const string_type &text)
     {
         queries.push_back(pkgQuery_T(text));
         queries.back().date = std::strtol(cur_date.c_str(), NULL, 10);
-        debug_msg("date == '%lu'", queries.back().date);
     }
     else if (in_with)
         queries.back().with = text;
@@ -124,13 +123,6 @@ querycacheXMLHandler_T::CHARACTERS(const string_type &text)
 #ifdef USE_XMLWRAPP
     return true;
 #endif
-}
-
-querycacheXMLHandler_T::~querycacheXMLHandler_T()
-{
-//    value_type::iterator i;
-//    for (i = queries.begin() ; i != queries.end() ; ++i)
-//        delete *i;
 }
 
 /* vim: set tw=80 sw=4 et : */

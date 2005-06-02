@@ -33,17 +33,17 @@
 class action_stats_handler_T : public action_herds_xml_handler_T
 {
     public:
-        action_stats_handler_T() : action_herds_xml_handler_T(),
-                                   metacache(portdir),
-                                   metastats(metacache.valid()) { }
+//        action_stats_handler_T() : action_herds_xml_handler_T(),
+//                                   metacache(portdir),
+//                                   metastats(metacache.valid()) { }
         virtual ~action_stats_handler_T() { }
         virtual int operator() (opts_type &);
 
     private:
         void show_meta_stats();
 
-        metacache_T metacache;
-        bool metastats;
+//        metacache_T metacache;
+//        bool metastats;
 };
 
 #endif

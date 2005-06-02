@@ -47,7 +47,7 @@ class querycacheXMLHandler_T : public XMLHandler_T
             in_results = in_pkg = false;
         }
 
-        virtual ~querycacheXMLHandler_T();
+        virtual ~querycacheXMLHandler_T() { }
 
         value_type queries;
 

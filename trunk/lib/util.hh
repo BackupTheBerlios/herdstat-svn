@@ -41,7 +41,7 @@
 
 #include "misc.hh"
 #include "file.hh"
-#include "cache.hh"
+//#include "cache.hh"
 #include "vars.hh"
 #include "regex.hh"
 #include "string.hh"

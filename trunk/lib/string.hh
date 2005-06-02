@@ -63,7 +63,7 @@ namespace util
             { return base_type::substr(i, n); }
 
             virtual std::vector<util::string>
-            split(const value_type delim = ' ') const;
+            split(const value_type delim = ' ', bool = false) const;
     };
 
 #ifdef UNICODE
