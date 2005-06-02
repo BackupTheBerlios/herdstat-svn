@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-06-02 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.1_rc4).
 	* lib/string.cc, lib/string.hh: Added a default bool arg to
 	util::string::split() that decides whether or not to push_back() and
 	empty string if two consecutive delimiters are encountered.  This
@@ -14,7 +15,10 @@ ChangeLog for herdstat
 	cleaned up load/dump code a bit, trying to make it a tad faster.
 	* src/action_pkg_handler.cc: Fixed bug if -p and -m are specified at
 	the same time.  Only call formatter_T::set_attrs() if -m isnt
-	specified.
+	specified.  Also, since metacache_T::load() takes forever (since the
+	file's so huge), if a wider-scoped query is found, and the number of
+	packages is less than a certain amount, parse those metadata.xml's.
+	This is much quicker than metacache_T::load().
 
 2005-06-01 Aaron Walker <ka0ttic@gentoo.org>
 

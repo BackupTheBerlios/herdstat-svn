@@ -118,8 +118,6 @@ querycache_T::purge_old()
     debug_msg("this->size() > querycache_MAX(%d), so trimming oldest queries.",
         QUERYCACHE_MAX);
 
-    this->sort_oldest_to_newest();
-
     /* while > querycache_MAX, erase the first (oldest) query */
     while (this->size() > QUERYCACHE_MAX)
         this->erase(this->begin());
@@ -129,7 +127,7 @@ void
 querycache_T::dump(std::ostream &stream)
 {
     stream << "Query cache (size: " << this->size()
-        << ")" << std::endl;
+        << "/" << QUERYCACHE_MAX << ")" << std::endl << std::endl;
 
     for (iterator i = this->begin() ; i != this->end() ; ++i)
     {
@@ -145,6 +143,8 @@ querycache_T::dump(std::ostream &stream)
 void
 querycache_T::dump()
 {
+    this->sort_oldest_to_newest();
+
     /* trim if needed */
     if (this->size() > QUERYCACHE_MAX)
         this->purge_old();

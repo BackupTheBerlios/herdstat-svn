@@ -115,26 +115,24 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
  */
 
 void
-action_pkg_handler_T::search(pkgQuery_T &q)
+action_pkg_handler_T::search(const std::vector<util::string> &pkgs, pkgQuery_T &q)
 {
     if (regex)
         regexp.assign(q.query,
             eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-    /* for each metadata.xml */
-    metacache_T::iterator m;
-    for (m = metacache.begin() ; m != metacache.end() ; ++m)
+    /* for each package in the vector */
+    std::vector<util::string>::const_iterator i;
+    for (i = pkgs.begin() ; i != pkgs.end() ; ++i)
     {
-        if (not metadata_matches(*m, q.query))
+        const util::string path(portdir + "/" + *i + "/metadata.xml");
+        const metadata_xml_T mxml(path);
+        const metadata_T meta(mxml.data(portdir));
+
+        if (not metadata_matches(meta, q.query))
             continue;
 
-        q.date = std::time(NULL);
-        q.with = with();
-
-        if (dev)
-            q.info = herds_xml.get_dev_info(q.query);
-
-        q[m->pkg] = m->longdesc;
+        q[meta.pkg] = meta.longdesc;
     }
 
     querycache(q);
@@ -303,10 +301,6 @@ action_pkg_handler_T::display()
             continue;
         }
 
-//        if ((n == 1) and status and not cache_is_valid and
-//            not at_least_one_not_cached)
-//            output.endl();
-
         size += m->second->size();
 
         /* was --metadata also specified? if so, construct the package
@@ -340,8 +334,6 @@ action_pkg_handler_T::display()
 int
 action_pkg_handler_T::operator() (opts_type &opts)
 {
-    optsize = opts.size();
-
     /* action_pkg_handler doesn't support the all target */
     if (all)
     {
@@ -399,7 +391,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 if (dev)
                     matches[*i]->info = herds_xml.get_dev_info(*i);
 
-                opts.erase(i);
+                opts.erase(std::find(opts.begin(), opts.end(), *i));
             }
             /* is a wider-scoped query cached? */
             else if (qi == querycache.end() and not with.empty())
@@ -409,21 +401,39 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 qi = querycache.find(pkgQuery_T(*i, "", dev));
                 if (qi != querycache.end() and not querycache.is_expired(*qi))
                 {
-                    try
-                    {
-                        metacache.load(qi->pkgs());
-                    }
-                    catch (const metacache_parse_E)
-                    {
-                        return EXIT_FAILURE;
-                    }
+                    /* 
+                     * but only if there's less than a certain amount (since
+                     * we're parsing the individual metadata.xml's).  It's only
+                     * faster than metacache.load() + search(opts) up to a
+                     * certain number. 
+                     */
 
-                    pkgQuery_T q(*i, with(), dev);
-                    search(q);
-                    opts.erase(i);
+                    const std::vector<util::string> pkgs(qi->pkgs());
+                    if (pkgs.size() < 100)
+                    {
+                        debug_msg("pkgs.size() < 100 ; parsing individual metadata.xml's");
+                        
+                        pkgQuery_T q(*i, with(), dev);
+                        q.date = std::time(NULL);
+                        q.with = with();
+                        if (dev) q.info = herds_xml.get_dev_info(*i);
+
+                        search(pkgs, q);
+                        opts.erase(std::find(opts.begin(), opts.end(), *i));
+                    }
+                    else
+                        debug_msg("pkgs.size() >= 100 ; loading metacache");
                 }
             }
         }
+    }
+
+    if (debug)
+    {
+        debug_msg("opts.size() after querycache search = %d", optsize);
+        opts_type::iterator i;
+        for (i = opts.begin() ; i != opts.end() ; ++i)
+            std::cout << *i << std::endl;
     }
 
     at_least_one_not_cached = (not opts.empty());

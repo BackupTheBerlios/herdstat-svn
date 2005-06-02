@@ -28,6 +28,7 @@
 #endif
 
 #include "xml.hh"
+#include "metacache.hh" /* for metadata_T */
 #include "metadata_xml_handler.hh"
 
 /*
@@ -57,6 +58,7 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
         herds_type  &herds()    const { return this->_handler->herds; }
         herd_type   &devs()     const { return this->_handler->devs;  }
         string_type &longdesc() const { return this->_handler->longdesc; }
+        metadata_T data(const string_type &) const;
 
         bool is_category() const { return this->_handler->is_category; }
         bool dev_exists(const herd_type::key_type &) const;

@@ -54,7 +54,7 @@ devaway_T::fetch()
         if (this->_path.find("http://") == util::path_T::npos)
             return;
 
-        debug_msg("fetching '%s'", DEVAWAY_REMOTE);
+//        debug_msg("fetching '%s'", DEVAWAY_REMOTE);
 
         if (util::is_file(DEVAWAY_LOCAL))
             util::copy_file(DEVAWAY_LOCAL, DEVAWAY_LOCAL".bak");
@@ -63,7 +63,7 @@ devaway_T::fetch()
             (stat(DEVAWAY_LOCAL, &s) != 0) or (s.st_size == 0))
             throw fetch_E();
 
-        debug_msg("fetching succeeded");
+//        debug_msg("fetching succeeded");
 
         unlink(DEVAWAY_LOCAL".bak");
     }
@@ -72,7 +72,7 @@ devaway_T::fetch()
         if (util::is_file(DEVAWAY_LOCAL".bak"))
         {
             util::move_file(DEVAWAY_LOCAL".bak", DEVAWAY_LOCAL);
-            debug_msg("fetching failed, using backup copy");
+//            debug_msg("fetching failed, using backup copy");
         }
         else
             std::cerr << "Failed to fetch " << DEVAWAY_REMOTE << "."
@@ -124,7 +124,7 @@ devaway_T::parse(const string_type &path)
             continue;
 
         dev = dev.substr(0, beginpos);
-        debug_msg("dev = '%s'", dev.c_str());
+//        debug_msg("dev = '%s'", dev.c_str());
 
         beginpos = line.find(DEVAWAY_MSG_TOKEN);
         if (beginpos == util::string::npos)
@@ -137,11 +137,11 @@ devaway_T::parse(const string_type &path)
         if (awaymsg == "</td></tr>")
             continue;
 
-        debug_msg("msg = '%s'", awaymsg.c_str());
+//        debug_msg("msg = '%s'", awaymsg.c_str());
 
         (*this)[dev] = util::unhtmlify(awaymsg);
 
-        debug_msg("unhtmlified: '%s'", (*this)[dev].c_str());
+//        debug_msg("unhtmlified: '%s'", (*this)[dev].c_str());
     }
 }
 

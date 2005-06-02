@@ -133,7 +133,7 @@ formatter_T::highlight(const std::vector<string_type> &data)
             if (std::find(attr.devaway.begin(),
                 attr.devaway.end(), tmp) != attr.devaway.end())
             {
-                debug_msg("marking '%s' as away", i->c_str());
+//                debug_msg("marking '%s' as away", i->c_str());
                 attr.marked_away = true;
                 s += (*i) + attr.devaway_color + "*" + attr.no_color + " ";
             }
@@ -191,7 +191,7 @@ formatter_T::append(const string_type &label, const string_type &data)
 
     if (not data.empty())
     {
-        debug_msg("data = '%s'", data.c_str());
+//        debug_msg("data = '%s'", data.c_str());
 
         if (quiet())
             append(label, data.split());
@@ -204,7 +204,7 @@ formatter_T::append(const string_type &label, const string_type &data)
             if ((cur.length() + data.length()) < maxlen)
             {
                 cur += highlight(data.split());
-                debug_msg("it all fits on one line");
+//                debug_msg("it all fits on one line");
             }
             else
             {
@@ -215,7 +215,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                 else
                     cur += highlight(data.substr(0, pos).split());
 
-                debug_msg("pushing back '%s'", cur.c_str());
+//                debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
                 cur.clear();
 
@@ -226,7 +226,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                 while (cur.length() < attr.maxlabel)
                     cur.append(" ");
 
-                debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
+//                debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
                 std::vector<string_type> leftovers = data.substr(pos).split();
@@ -286,8 +286,8 @@ formatter_T::append(const string_type &label, const string_type &data)
                         curlen += attr.highlight_color.length() +
                             attr.no_color.length();
 
-                        debug_msg("highlighted '%s'; setting curlen to %d",
-                            i->c_str(), curlen);
+//                        debug_msg("highlighted '%s'; setting curlen to %d",
+//                            i->c_str(), curlen);
                     }
 
                     if (marked_away)
@@ -299,7 +299,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                     /* does it fit on the current line? */
                     if ((curlen + i->length()) > attr.maxtotal)
                     {
-                        debug_msg("pushing back '%s'", cur.c_str());
+//                        debug_msg("pushing back '%s'", cur.c_str());
                         buffer.push_back(cur);
                         cur.clear();
 
@@ -329,7 +329,7 @@ formatter_T::append(const string_type &label, const string_type &data)
 
     if (cur.length() > 0)
     {
-        debug_msg("pushing back '%s'", cur.c_str());
+//        debug_msg("pushing back '%s'", cur.c_str());
         buffer.push_back(cur);
     }
 }

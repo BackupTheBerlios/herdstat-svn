@@ -77,4 +77,18 @@ metadata_xml_T::herd_exists(const util::regex_T &regex) const
     return false;
 }
 
+metadata_T
+metadata_xml_T::data(const string_type &portdir) const
+{
+    metadata_T meta(portdir, this->_path);
+    meta.herds = this->_handler->herds;
+    meta.longdesc = this->_handler->longdesc;
+
+    herd_type::const_iterator d;
+    for (d = this->_handler->devs.begin() ; d != this->_handler->devs.end() ; ++d)
+        meta.devs.push_back(d->first);
+
+    return meta;
+}
+
 /* vim: set tw=80 sw=4 et : */
