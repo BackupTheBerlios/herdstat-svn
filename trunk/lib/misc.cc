@@ -199,13 +199,13 @@ util::fetch(const char *url, const char *file, bool verbose, bool timestamp)
     util::string cmd;
     
     if (verbose and timestamp)
-	cmd = util::sprintf("%s -r -N -t3 -T3 -O %s '%s'", WGET, file, url);
+	cmd = util::sprintf("%s -r -N -t3 -T15 -O %s '%s'", WGET, file, url);
     else if (verbose)
-        cmd = util::sprintf("%s -r -t3 -T3 -O %s '%s'", WGET, file, url);
+        cmd = util::sprintf("%s -r -t3 -T15 -O %s '%s'", WGET, file, url);
     else if (timestamp)
-        cmd = util::sprintf("%s -rq -N -t3 -T3 -O %s '%s'", WGET, file, url);
+        cmd = util::sprintf("%s -rq -N -t3 -T15 -O %s '%s'", WGET, file, url);
     else
-	cmd = util::sprintf("%s -rq -t3 -T3 -O %s '%s'", WGET, file, url);
+	cmd = util::sprintf("%s -rq -t3 -T15 -O %s '%s'", WGET, file, url);
 
 //    util::debug("executing '%s'", cmd.c_str());
 

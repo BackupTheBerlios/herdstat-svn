@@ -17,6 +17,8 @@ ChangeLog for herdstat
 	* src/action_meta_handler.cc: Moved most of display() to
 	metadata_T::display().  The only remaining code is for cases where the
 	metadata doesn't exist.
+	* lib/misc.cc: Increase timeout in wget command for slower
+	connections.
 
 2005-06-02 Aaron Walker <ka0ttic@gentoo.org>
 
