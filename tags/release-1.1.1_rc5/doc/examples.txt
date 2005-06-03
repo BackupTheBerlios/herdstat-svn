@@ -1,0 +1,115 @@
+Herdstat Examples
+=================
+
+Display all herds: ::
+
+    $ herdstat all
+
+Display all developers (in herds.xml): ::
+
+    $ herdstat -d all
+
+Display all developers that maintain the x11 and netmon herds: ::
+
+    $ herdstat x11 netmon
+
+Display all herds that ka0ttic helps maintains: ::
+
+    $ herdstat -d ka0ttic
+
+Display all packages in the crypto herd: ::
+
+    $ herdstat -p crypto
+
+Display all packages dragonheart maintains: ::
+
+    $ herdstat -pd dragonheart
+
+Display only the number of packages dragonheart maintains: ::
+
+    $ herdstat -pdc dragonheart
+
+Display all packages that dragonheart maintains that are in the crypto herd: ::
+
+    $ herdstat -pd dragonheart --with-herd crypto
+
+Display all packages that dragonheart maintains that don't belong to a herd
+(ie. "no-herd"): ::
+
+    $ herdstat -pd dragonheart --no-herd
+
+Display all packages that ka0ttic maintains that belong to a herd matching the
+regular expression "^c": ::
+
+    $ herdstat -pd ka0ttic --with-herd ^c
+
+Display the metadata for the herdstat package: ::
+
+    $ herdstat -m herdstat
+
+Display the metadata for the app-vim category: ::
+
+    $ herdstat -m app-vim
+
+Display the metadata for all packages matching <regex>: ::
+
+    $ herdstat -mr <regex>
+
+Same as previous example, but ignore anything in ``PORTDIR_OVERLAY``: ::
+
+    $ herdstat -mr <regex> --no-overlay
+
+Display the metadata for all packages in the crypto herd: ::
+
+    $ herdstat -pm crypto
+
+Display the metadata for all packages dragonheart maintains: ::
+
+    $ herdstat -pdm dragonheart
+
+Display herd information for all herds matching the regular expression '^s': ::
+
+    $ herdstat -r ^s
+
+Find the full category/package for the 'mozilla' package: ::
+
+    $ herdstat -f mozilla
+
+Find all the packages with 'mozilla' in the name: ::
+
+    $ herdstat -fr mozilla
+
+Display the number of packages in the dev-libs category: ::
+
+    $ herdstat -frc dev-libs
+
+Install all packages matching <regex> ::
+
+    $ emerge $(herdstat -fr <regex>)
+
+Display the path to the latest ebuild for the gcc package: ::
+
+    $ herdstat -w gcc
+
+Display the path to the latest ebuild for all vim syntax packages: ::
+
+    $ herdstat -wr app-vim/.*-syntax
+
+Display every package that belongs to a herd that ka0ttic is a member of: ::
+
+    $ herdstat -pq $(herdstat -dq ka0ttic)
+
+Display every package in the shell-tools herd that does not have an explicit
+maintainer: ::
+
+    $ herdstat -p shell-tools --no-maintainer
+
+Display devaway information for g2boojum: ::
+
+    $ herdstat -a g2boojum
+
+Display devaway information for all developers: ::
+
+    $ herdstat -a all
+
+.. vim: set ft=glep tw=80 sw=4 et spell spelllang=en : ..
