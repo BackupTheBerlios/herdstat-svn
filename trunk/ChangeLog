@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-06-03 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.1_rc5).
 	* src/herdstat.cc, src/options.cc, src/action_fetch_handler.cc,
 	src/action_fetch_handler.hh: Added action_fetch_handler_T so that
 	--fetch works as expected and fetches anything needed for offline use.
