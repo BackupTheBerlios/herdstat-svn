@@ -50,6 +50,7 @@
 #include "action_which_handler.hh"
 #include "action_versions_handler.hh"
 #include "action_away_handler.hh"
+#include "action_fetch_handler.hh"
 
 static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfa";
 
@@ -298,6 +299,12 @@ handle_opts(int argc, char **argv, opts_type *args)
 		    throw args_one_action_only_E();
 		optset("action", options_action_T, action_away);
 		break;
+	    /* --fetch */
+	    case 'F':
+		if (optget("action", options_action_T) != action_unspecified)
+		    throw args_one_action_only_E();
+		optset("action", options_action_T, action_fetch);
+		break;
 	    /* --no-overlay */
 	    case 'N':
 		optset("overlay", bool, false);
@@ -341,10 +348,6 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --noquerycache */
 	    case '\f':
 		optset("metacache", bool, false);
-		break;
-	    /* --fetch */
-	    case 'F':
-		optset("fetch", bool, true);
 		break;
 	    /* --verbose */
 	    case 'v':
@@ -410,7 +413,8 @@ handle_opts(int argc, char **argv, opts_type *args)
 	options_action_T action = optget("action", options_action_T);
 	if (action != action_unspecified and
 	    action != action_meta and
-	    action != action_versions)
+	    action != action_versions and
+	    action != action_fetch)
 	    throw args_usage_E();
     }
 
@@ -421,7 +425,6 @@ int
 main(int argc, char **argv)
 {
     options_T options;
-    util::color_map_T color;
 
     /* try to determine current columns, otherwise use default */
     optset("maxcol", std::size_t, util::getcols());
@@ -433,14 +436,6 @@ main(int argc, char **argv)
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw args_E();
-
-	if (nonopt_args.empty() and not optget("fetch", bool) and
-	    optget("action", options_action_T) != action_meta and
-	    optget("action", options_action_T) != action_versions)
-	{
-	    optset("action", options_action_T, action_stats);
-	    optset("quiet", bool, false);
-	}
 
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output */
@@ -457,17 +452,6 @@ main(int argc, char **argv)
 	    optset("all", bool, true);
 	    nonopt_args.clear();
 	    nonopt_args.push_back("all");
-	}
-
-	/* --fetch and no options: fetch herds.xml and exit */
-	if (optget("fetch", bool) and nonopt_args.empty())
-	{
-	    if (not optget("quiet", bool))
-		optset("verbose", bool, true);
-
-	    herds_xml_T herds_xml;
-	    herds_xml.fetch();
-	    return EXIT_SUCCESS;
 	}
 
 	/* setup output stream */
@@ -507,6 +491,7 @@ main(int argc, char **argv)
 	    (std::locale(optget("locale", util::string).c_str()));
 
 	/* set common format attributes */
+	util::color_map_T color;
 	formatter_T output;
 	output.set_colors(optget("color", bool));
 	output.set_quiet(optget("quiet", bool));
@@ -517,7 +502,11 @@ main(int argc, char **argv)
 	output.add_highlight(util::get_user_from_email(util::current_user()));
 
 	/* set default action */
-	if (optget("action", options_action_T) == action_unspecified)
+	if (optget("action", options_action_T) == action_unspecified
+	    and nonopt_args.empty())
+	    optset("action", options_action_T, action_stats);
+	else if (optget("action", options_action_T) == action_unspecified
+	    and not nonopt_args.empty())
 	    optset("action", options_action_T, action_herd);
 
 	/* setup action handlers */
@@ -531,6 +520,7 @@ main(int argc, char **argv)
 	handlers[action_versions] = new action_versions_handler_T();
 	handlers[action_find]     = new action_find_handler_T();
 	handlers[action_away]     = new action_away_handler_T();
+	handlers[action_fetch]    = new action_fetch_handler_T();
 
 	action_handler_T *action_handler =
 	    handlers[optget("action", options_action_T)];
@@ -542,7 +532,7 @@ main(int argc, char **argv)
 		if ((*action_handler)(nonopt_args) != EXIT_SUCCESS)
 		    return EXIT_FAILURE;
 	    }
-	    catch (action_E)
+	    catch (const action_E)
 	    {
 		return EXIT_FAILURE;
 	    }

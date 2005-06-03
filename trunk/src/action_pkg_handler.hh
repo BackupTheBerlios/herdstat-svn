@@ -52,7 +52,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 	virtual int operator() (opts_type &);
 
     private:
-        void search(const std::vector<util::string> &, pkgQuery_T &);
+        void search(const opts_type &, pkgQuery_T &);
         void search(const opts_type &);
         void display();
         void display(pkgQuery_T *);

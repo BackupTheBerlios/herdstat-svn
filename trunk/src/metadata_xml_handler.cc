@@ -35,7 +35,7 @@ MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
                                     const attrs_type &attrs)
 {
     if (name == "catmetadata")
-        is_category = true;
+        data.is_category = true;
     else if (name == "herd")
         in_herd = true;
     else if (name == "maintainer")
@@ -105,7 +105,7 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
 {
     /* <herd> */
     if (in_herd)
-        herds.push_back(util::lowercase(str));
+        data.herds.push_back(util::lowercase(str));
 
     /* <maintainer><email> */
     else if (in_email)
@@ -115,31 +115,24 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
         if (str.find('@') == string_type::npos)
             cur_dev += "@gentoo.org";
 
-        devs[cur_dev] = new dev_type();
+        data.devs[cur_dev] = new dev_type();
     }
 
     /* <maintainer><name> */
     else if (in_name)
-        devs[cur_dev]->name = str;
+        data.devs[cur_dev]->name = str;
 
     /* <maintainer><description> */
     else if (in_desc)
-        devs[cur_dev]->role = str;
+        data.devs[cur_dev]->role = str;
 
     /* <longdescription> */
     else if (in_longdesc)
-        longdesc = str;
+        data.longdesc = str;
 
 #ifdef USE_XMLWRAPP
     return true;
 #endif
-}
-
-MetadataXMLHandler_T::~MetadataXMLHandler_T()
-{
-    herd_type::iterator i;
-    for (i = devs.begin() ; i != devs.end() ; ++i)
-        delete i->second;
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -80,6 +80,9 @@ devaway_T::fetch()
 
         if (stat(DEVAWAY_LOCAL, &s) == 0 and s.st_size == 0)
             unlink(DEVAWAY_LOCAL);
+
+        if (optget("action", options_action_T) == action_fetch)
+            throw;
     }
 
     this->_path.assign(DEVAWAY_LOCAL);

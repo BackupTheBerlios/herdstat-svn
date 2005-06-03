@@ -41,7 +41,7 @@
 void
 action_pkg_handler_T::error(const util::string &criteria) const
 {
-    std::cerr << std::endl
+    std::cerr
         << "Failed to find any packages maintained by '"
         << criteria << "'";
 
@@ -64,8 +64,8 @@ static bool
 doesMatch(util::string s, util::regex_T *r) { return *r == s; }
 
 static bool
-doesHerdMatch(util::string m, util::regex_T *r)
-{ return *r == util::get_user_from_email(m); }
+doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
+{ return *r == util::get_user_from_email(m.first); }
 
 /*
  * Determine whether or not the metadata.xml matches our
@@ -110,32 +110,37 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
 }
 
 /*
- * Search a subset of the metadata cache for packages
- * matching the specified query criteria.
+ * Given a list of packages and a query object, parse their
+ * metadata.xml's searching for ones that match the criteria.
  */
 
 void
-action_pkg_handler_T::search(const std::vector<util::string> &pkgs, pkgQuery_T &q)
+action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
 {
     if (regex)
         regexp.assign(q.query,
             eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
     /* for each package in the vector */
-    std::vector<util::string>::const_iterator i;
+    opts_type::const_iterator i;
     for (i = pkgs.begin() ; i != pkgs.end() ; ++i)
     {
+        /* parse it's metadata.xml */
         const util::string path(portdir + "/" + *i + "/metadata.xml");
         const metadata_xml_T mxml(path);
         const metadata_T meta(mxml.data(portdir));
 
+        /* does it match the criteria? */
         if (not metadata_matches(meta, q.query))
             continue;
 
+        /* yep, so save it */
         q[meta.pkg] = meta.longdesc;
     }
 
+    /* cache it */
     querycache(q);
+    /* save it in results map */
     matches[q.query] = new pkgQuery_T(q);
 }
 
@@ -157,6 +162,7 @@ action_pkg_handler_T::search(const opts_type &opts)
             if (regex)
                 regexp.assign(*i, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
+            /* does it match the criteria? */
             if (metadata_matches(*m, *i))
             {
                 debug_msg("Match found in %s.", m->path.c_str());
@@ -188,6 +194,7 @@ action_pkg_handler_T::search(const opts_type &opts)
         }
     }
 
+    /* cache everything */
     std::map<util::string, pkgQuery_T * >::iterator p;
     for (p = matches.begin() ; p != matches.end() ; ++p)
         querycache(*(p->second));
@@ -279,9 +286,23 @@ action_pkg_handler_T::display(pkgQuery_T *q)
     }
 }
 
+/*
+ * Loop through results map, either displaying an error message
+ * or calling display() for each query object.
+ */
+
 void
 action_pkg_handler_T::display()
 {
+    /* set format attributes */
+    if (not meta)
+    {
+        output.set_maxlabel(16);
+        output.set_maxdata(maxcol - output.maxlabel());
+        output.set_devaway(devaway.keys());
+        output.set_attrs();
+    }
+
     opts_type::size_type n = 1;
     std::map<util::string, pkgQuery_T * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
@@ -408,11 +429,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
                      * certain number. 
                      */
 
-                    const std::vector<util::string> pkgs(qi->pkgs());
+                    const opts_type pkgs(qi->pkgs());
                     if (pkgs.size() < 100)
                     {
-                        debug_msg("pkgs.size() < 100 ; parsing individual metadata.xml's");
-                        
                         pkgQuery_T q(*i, with(), dev);
                         q.date = std::time(NULL);
                         q.with = with();
@@ -421,8 +440,6 @@ action_pkg_handler_T::operator() (opts_type &opts)
                         search(pkgs, q);
                         opts.erase(std::find(opts.begin(), opts.end(), *i));
                     }
-                    else
-                        debug_msg("pkgs.size() >= 100 ; loading metacache");
                 }
             }
         }
@@ -457,15 +474,6 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     debug_msg("metacache.size() == %d", metacache.size());
-
-    /* set format attributes */
-    if (not meta)
-    {
-        output.set_maxlabel(16);
-        output.set_maxdata(maxcol - output.maxlabel());
-        output.set_devaway(devaway.keys());
-        output.set_attrs();
-    }
 
     if (at_least_one_not_cached)
         search(opts);

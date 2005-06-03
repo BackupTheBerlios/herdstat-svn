@@ -45,6 +45,8 @@ action_stats_handler_T::show_meta_stats()
 int
 action_stats_handler_T::operator() (opts_type &null)
 {
+    optset("quiet", bool, false);
+
     herds_xml.fetch();
     herds_xml.parse();
     devaway.fetch();

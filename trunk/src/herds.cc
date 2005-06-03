@@ -30,15 +30,24 @@
 #include "formatter.hh"
 #include "herds.hh"
 
+herd_T &
+herd_T::operator= (const std::vector<util::string> &devs)
+{
+    std::vector<util::string>::const_iterator i;
+    for (i = devs.begin() ; i != devs.end() ; ++i)
+        (*this)[*i] = new dev_attrs_T();
+    return *this;
+}
+
 /*
  * Return a vector of all keys
  */
 
 std::vector<herd_T::key_type>
-herd_T::keys()
+herd_T::keys() const
 {
     std::vector<key_type> v;
-    for (iterator i = this->begin() ; i != this->end() ; ++i)
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
         v.push_back(i->first);
     return v;
 }

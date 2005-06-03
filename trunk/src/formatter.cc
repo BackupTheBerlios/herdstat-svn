@@ -209,7 +209,7 @@ formatter_T::append(const string_type &label, const string_type &data)
             else
             {
                 /* line's full, so find a location where we can truncate */
-                string_type::size_type pos = data.rfind(" ", attr.maxdata);
+                string_type::size_type pos = data.rfind(" ", attr.maxdata-3);
                 if (pos == string_type::npos)
                     cur += highlight(data.split());
                 else

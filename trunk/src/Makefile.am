@@ -8,6 +8,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   devs.hh \
 		   herds.hh herds.cc \
 		   pkgquery.hh pkgquery.cc \
+		   metadata.hh metadata.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
 		   xmlparser.hh \
@@ -18,13 +19,14 @@ herdstat_SOURCES = common.hh common.cc \
 		   xml.hh \
 		   devaway.hh devaway.cc \
 		   herds_xml.hh herds_xml.cc \
-		   metadata_xml.hh metadata_xml.cc \
+		   metadata_xml.hh \
 		   formatter.hh formatter.cc \
 		   overlaydisplay.hh \
 		   action_handler.hh \
 		   action_away_handler.hh action_away_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
 		   action_herd_handler.hh action_herd_handler.cc \
+		   action_fetch_handler.hh action_fetch_handler.cc \
 		   action_find_handler.hh action_find_handler.cc \
 		   action_meta_handler.hh action_meta_handler.cc \
 		   action_pkg_handler.hh action_pkg_handler.cc \

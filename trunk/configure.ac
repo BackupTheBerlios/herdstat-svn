@@ -2,7 +2,7 @@
 # $Id: configure.ac 246 2005-04-26 12:03:53Z ka0ttic $
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.1_rc4], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.1_rc5], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 dist-bzip2 no-dist-gzip])
@@ -20,6 +20,9 @@ AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+
+AC_MSG_CHECKING([devrel wang size])
+AC_MSG_RESULT(huge)
 
 AC_DISABLE_SHARED
 dnl hack to disable damn f77 libtool checks (stolen from sandbox's configure.in)

@@ -58,7 +58,7 @@ herds_xml_T::fetch()
     struct stat s;
     try
     {
-        if (optget("fetch", bool) and
+        if ((optget("action", options_action_T) == action_fetch) and
             (this->_path.find("://") == util::path_T::npos))
             this->_path = util::path_T(_default);
 
@@ -122,6 +122,9 @@ herds_xml_T::fetch()
         }
         else
             std::cerr << std::endl;
+
+        if (optget("action", options_action_T) == action_fetch)
+            throw;
     }
 
     this->_fetched = true;

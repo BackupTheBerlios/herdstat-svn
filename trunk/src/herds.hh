@@ -44,7 +44,8 @@ class herd_T  : public std::map<util::string, dev_attrs_T * >
         herd_T() { }
         herd_T(const string_type &n) : name(n) { }
 
-        std::vector<key_type> keys();
+        herd_T &operator= (const std::vector<util::string> &);
+        std::vector<key_type> keys() const;
         void display(std::ostream &);
 
         string_type name;

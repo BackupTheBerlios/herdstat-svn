@@ -1,5 +1,23 @@
 ChangeLog for herdstat
 
+2005-06-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc, src/options.cc, src/action_fetch_handler.cc,
+	src/action_fetch_handler.hh: Added action_fetch_handler_T so that
+	--fetch works as expected and fetches anything needed for offline use.
+	Currently fetches/parses herds.xml (parsing is required to fetch
+	<maintainingproject> XML's) and fetches devaway.
+	* src/metadata.cc, src/metadata.hh: moved metadata_T to it's own
+	files.  Added a display() member function.
+	* src/metadata_xml_handler.cc, src/metadata_xml_handler.hh,
+	src/metadata_xml.cc, src/metadata_xml.hh: Updated to use metadata_T
+	for holding the actual data.  the *_exists() functions now just call
+	their respective metadata_T functions.  metadata_xml.cc is now empty
+	and has been removed.
+	* src/action_meta_handler.cc: Moved most of display() to
+	metadata_T::display().  The only remaining code is for cases where the
+	metadata doesn't exist.
+
 2005-06-02 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.1_rc4).

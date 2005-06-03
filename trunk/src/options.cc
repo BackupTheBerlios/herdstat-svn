@@ -47,7 +47,6 @@ options_T::option_map_T::set_defaults()
     insopt("debug", false);
     insopt("timer", false);
     insopt("all", false);
-    insopt("fetch", false);
     insopt("dev", false);
     insopt("count", false);
     insopt("color", true);

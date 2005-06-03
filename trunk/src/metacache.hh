@@ -28,36 +28,7 @@
 #endif
 
 #include "common.hh"
-#include "herds.hh"
-
-class metadata_T
-{
-    public:
-        typedef util::string string_type;
-        typedef std::vector<string_type> value_type;
-
-        metadata_T() : is_category(false) { }
-        metadata_T(const string_type &pd, const string_type &pa,
-            const string_type &pk = "", bool c = false)
-            : path(pa), pkg(pk), is_category(c), _portdir(pd)
-        { 
-            if (this->pkg.empty())
-                get_pkg_from_path();
-        }
-
-        bool dev_exists(const string_type &) const;
-        bool dev_exists(const util::regex_T &) const;
-        bool herd_exists(const string_type &) const;
-        bool herd_exists(const util::regex_T &) const;
-
-        string_type path, pkg, longdesc;
-        value_type herds, devs;
-        bool is_category;
-
-    private:
-        void get_pkg_from_path();
-        string_type _portdir;
-};
+#include "metadata.hh"
 
 /*
  * A cache of all metadata.xml's.

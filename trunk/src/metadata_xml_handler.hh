@@ -28,6 +28,7 @@
 #endif
 
 #include "herds.hh"
+#include "metadata.hh"
 #include "xmlparser.hh"
 
 /*
@@ -37,8 +38,6 @@
 class MetadataXMLHandler_T : public XMLHandler_T
 {
     public:
-        typedef std::vector<util::string> herds_type;
-        typedef herd_T herd_type;
         typedef dev_attrs_T dev_type;
 
         MetadataXMLHandler_T()
@@ -48,15 +47,12 @@ class MetadataXMLHandler_T : public XMLHandler_T
             in_email =
             in_name =
             in_desc =
-            in_longdesc = 
-            is_category = false;
+            in_longdesc = false;
         }
-        virtual ~MetadataXMLHandler_T();
 
-        herds_type herds;
-        herd_type devs;
-        util::string longdesc;
-        bool is_category;
+        virtual ~MetadataXMLHandler_T() { }
+
+        metadata_T data;
 
     protected:
         /* callbacks */

@@ -33,61 +33,6 @@
 #define LASTSYNC                LOCALSTATEDIR"/lastsync"
 
 /*
- * metadata_T
- */
-
-bool
-metadata_T::dev_exists(const string_type &dev) const
-{
-    string_type d(dev);
-    if (dev.find('@') == string_type::npos)
-        d.append("@gentoo.org");
-    return std::find(this->devs.begin(), this->devs.end(),
-            d) != this->devs.end();
-}
-
-bool
-metadata_T::dev_exists(const util::regex_T &regex) const
-{
-    value_type::const_iterator i;
-    for (i = this->devs.begin() ; i != this->devs.end() ; ++i)
-        if (regex == *i)
-            return true;
-    return false;
-}
-
-bool
-metadata_T::herd_exists(const string_type &herd) const
-{
-    return std::find(this->herds.begin(), this->herds.end(),
-            herd) != this->herds.end();
-}
-
-bool
-metadata_T::herd_exists(const util::regex_T &regex) const
-{
-    value_type::const_iterator i;
-    for (i = this->herds.begin() ; i != this->herds.end() ; ++i)
-        if (regex == *i)
-            return true;
-    return false;
-}
-
-void
-metadata_T::get_pkg_from_path()
-{
-    assert(not this->path.empty());
-    this->pkg = this->path.substr(this->_portdir.size() + 1);
-    string_type::size_type pos = pkg.find("/metadata.xml");
-    if (pos != string_type::npos)
-        this->pkg = this->pkg.substr(0, pos);
-}
-
-/*
- * metacache_T
- */
-
-/*
  * Is the cache valid?
  */
 
@@ -188,19 +133,8 @@ metacache_T::fill()
 metadata_T
 metacache_T::parse(const util::path_T &path)
 {
-    const metadata_xml_T metadata(path);
-
-    /* TODO: just move metadata_T to metadata_xml_handler.hh?
-     * and then just do a straight assignment */
-    metadata_T meta(this->_portdir, path);
-    meta.herds = metadata.herds();
-    meta.longdesc = metadata.longdesc();
-
-    metadata_xml_T::herd_type::iterator i;
-    for (i = metadata.devs().begin() ; i != metadata.devs().end() ; ++i)
-        meta.devs.push_back(i->first);
-
-    return meta;
+    const metadata_xml_T meta(path);
+    return meta.data(this->_portdir);
 }
 
 /*
@@ -311,23 +245,24 @@ metacache_T::dump()
 
         util::string str;
         std::size_t n;
-        metadata_T::value_type::iterator mi;
 
         f << ci->pkg << "=";
 
-        for (mi = ci->herds.begin(), n = 1 ; mi != ci->herds.end() ; ++mi, ++n)
+        metadata_T::herds_type::iterator h;
+        for (h = ci->herds.begin(), n = 1 ; h != ci->herds.end() ; ++h, ++n)
         {
-            str += (*mi);
+            str += (*h);
             if (n != ci->herds.size())
                 str += ",";
         }
 
         f << str << ":";
         
-        for (mi = ci->devs.begin(), n = 1, str.clear() ; mi != ci->devs.end() ; 
-            ++mi, ++n)
+        metadata_T::herd_type::iterator d;
+        for (d = ci->devs.begin(), n = 1, str.clear() ; d != ci->devs.end() ; 
+            ++d, ++n)
         {
-            str += (*mi);
+            str += d->first;
             if (n != ci->devs.size())
                 str += ",";
         }

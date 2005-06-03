@@ -28,7 +28,6 @@
 #endif
 
 #include "xml.hh"
-#include "metacache.hh" /* for metadata_T */
 #include "metadata_xml_handler.hh"
 
 /*
@@ -38,8 +37,8 @@
 class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
 {
     public:
-        typedef handler_type::herds_type    herds_type;
-        typedef handler_type::herd_type     herd_type;
+        typedef metadata_T::herds_type      herds_type;
+        typedef metadata_T::herd_type       herd_type;
         typedef util::string                string_type;
 
         typedef herds_type::iterator        herds_iterator;
@@ -55,16 +54,28 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
         virtual ~metadata_xml_T() { }
 
         /* handler_type access functions */
-        herds_type  &herds()    const { return this->_handler->herds; }
-        herd_type   &devs()     const { return this->_handler->devs;  }
-        string_type &longdesc() const { return this->_handler->longdesc; }
-        metadata_T data(const string_type &) const;
+        void display(const string_type &p) const
+        { this->data(p).display(); }
+        herds_type  &herds()    const { return this->_handler->data.herds; }
+        herd_type   &devs()     const { return this->_handler->data.devs;  }
+        string_type &longdesc() const { return this->_handler->data.longdesc; }
+        metadata_T  &data(const string_type &portdir) const
+        {
+            this->_handler->data.path = this->_path;
+            this->_handler->data.portdir = portdir;
+            this->_handler->data.get_pkg_from_path();
+            return this->_handler->data;
+        }
 
-        bool is_category() const { return this->_handler->is_category; }
-        bool dev_exists(const herd_type::key_type &) const;
-        bool dev_exists(const util::regex_T &) const;
-        bool herd_exists(const herds_type::value_type &) const;
-        bool herd_exists(const util::regex_T &) const;
+        bool is_category() const { return this->_handler->data.is_category; }
+        bool dev_exists(const herd_type::key_type &dev) const
+        { return this->_handler->data.dev_exists(dev); }
+        bool dev_exists(const util::regex_T &re) const
+        { return this->_handler->data.dev_exists(re); }
+        bool herd_exists(const herds_type::value_type &herd) const
+        { return this->_handler->data.herd_exists(herd); }
+        bool herd_exists(const util::regex_T &re) const
+        { return this->_handler->data.herd_exists(re); }
 };
 
 #endif

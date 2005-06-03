@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_meta_handler.hh
+ * herdstat -- src/action_fetch_handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,24 +20,23 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_META_HANDLER_HH
-#define HAVE_ACTION_META_HANDLER_HH 1
+#ifndef HAVE_ACTION_FETCH_HANDLER_HH
+#define HAVE_ACTION_FETCH_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "metadata.hh"
 #include "action_handler.hh"
 
-class action_meta_handler_T : public action_portage_find_handler_T
+class action_fetch_handler_T : public action_herds_xml_handler_T
 {
     public:
-        virtual ~action_meta_handler_T() { }
+        virtual ~action_fetch_handler_T() { }
         virtual int operator() (opts_type &);
 
-    private:
-        void display(const metadata_T &);
+    protected:
+        virtual void flush() { }
 };
 
 #endif

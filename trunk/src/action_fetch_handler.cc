@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_meta_handler.hh
+ * herdstat -- src/action_fetch_handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,26 +20,27 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_META_HANDLER_HH
-#define HAVE_ACTION_META_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "metadata.hh"
-#include "action_handler.hh"
+#include "action_fetch_handler.hh"
 
-class action_meta_handler_T : public action_portage_find_handler_T
+int
+action_fetch_handler_T::operator() (opts_type &null)
 {
-    public:
-        virtual ~action_meta_handler_T() { }
-        virtual int operator() (opts_type &);
+    try
+    {
+        herds_xml.fetch();
+        herds_xml.parse();
+        devaway.fetch();
+    }
+    catch (const fetch_E)
+    {
+        return EXIT_FAILURE;
+    }
 
-    private:
-        void display(const metadata_T &);
-};
-
-#endif
+    return EXIT_SUCCESS;
+}
 
 /* vim: set tw=80 sw=4 et : */
