@@ -41,6 +41,9 @@
 void
 action_pkg_handler_T::error(const util::string &criteria) const
 {
+    if (quiet)
+        return;
+
     std::cerr
         << "Failed to find any packages maintained by '"
         << criteria << "'";
@@ -309,11 +312,10 @@ action_pkg_handler_T::display()
     {
         if (m->second->empty())
         {
+            --n;
             if (matches.size() == 1)
             {
-                if (not quiet)
-                    error(m->first);
-
+                error(m->first);
                 cleanup();
                 throw action_E();
             }
@@ -337,10 +339,10 @@ action_pkg_handler_T::display()
         else
         {
             display(m->second);
-
+            
             /* only skip a line if we're not on the last one */
-            if (not count and n != optsize)
-                if (not quiet or (quiet and m->second->size() > 0))
+            if (not count and n != matches.size())
+                if (not quiet) //or (quiet and m->second->size() > 0))
                     output.endl();
         }
     }
