@@ -31,6 +31,8 @@ action_fetch_handler_T::operator() (opts_type &null)
 {
     try
     {
+        optset("verbose", bool, true);
+
         herds_xml.fetch();
         herds_xml.parse();
 
