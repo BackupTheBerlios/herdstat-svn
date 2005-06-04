@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include "fetcher.hh"
 #include "herds_xml.hh"
 
 const herds_xml_T::string_type herds_xml_T::_default =
@@ -79,9 +80,7 @@ herds_xml_T::fetch()
                                 HERDS_XML_FETCH_LOCATION".bak");
 
             /* fetch it */
-            if (util::fetch(this->_path, HERDS_XML_FETCH_LOCATION,
-                optget("verbose", bool)) != 0)
-                throw fetch_E();
+            fetcher_T fetch(this->_path, HERDS_XML_FETCH_LOCATION);
 
             /* because we tell wget to clobber the file, if fetching fails
              * for some reason, it'll truncate the old one - make sure the

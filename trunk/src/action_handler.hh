@@ -79,7 +79,8 @@ class action_fancy_handler_T : public action_handler_T
 {
     public:
         action_fancy_handler_T() : action_handler_T(),
-                                   maxcol(optget("maxcol", std::size_t)) { }
+                                   maxcol(optget("maxcol", std::size_t)),
+                                   use_devaway(optget("devaway", bool)) { }
         virtual ~action_fancy_handler_T() { }
 
     protected:
@@ -103,6 +104,7 @@ class action_fancy_handler_T : public action_handler_T
         devaway_T devaway;
         formatter_T output;                 /* output formatter */
         const std::size_t maxcol;           /* columns of current terminal */
+        const bool use_devaway;
 };
 
 /*

@@ -38,6 +38,7 @@
 #endif
 
 #include "common.hh"
+#include "rc.hh"
 #include "herds_xml.hh"
 #include "formatter.hh"
 #include "xmlparser.hh"
@@ -51,6 +52,9 @@
 #include "action_versions_handler.hh"
 #include "action_away_handler.hh"
 #include "action_fetch_handler.hh"
+
+#define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
+#define HERDSTATRC_LOCAL    "/.herdstatrc"
 
 static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfa";
 
@@ -95,13 +99,13 @@ static struct option long_opts[] =
 };
 #endif /* HAVE_GETOPT_LONG */
 
-void
+static void
 version()
 {
     std::cout << PACKAGE << "-" << VERSION << std::endl;
 }
 
-void
+static void
 usage()
 {
     std::cerr
@@ -109,7 +113,7 @@ usage()
 	<< "Use --help to see more detailed usage information." << std::endl;
 }
 
-void
+static void
 help()
 {
     version();
@@ -220,7 +224,7 @@ help()
 	<< "your herds.xml." << std::endl;
 }
 
-int
+static int
 handle_opts(int argc, char **argv, opts_type *args)
 {
     int key, opt_index = 0;
@@ -432,6 +436,9 @@ main(int argc, char **argv)
     try
     { 
 	opts_type nonopt_args;
+	
+	/* handle rc file(s) */
+	{ rc_T rc; }
 
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
@@ -495,11 +502,22 @@ main(int argc, char **argv)
 	formatter_T output;
 	output.set_colors(optget("color", bool));
 	output.set_quiet(optget("quiet", bool));
-	output.set_labelcolor(color[green]);
-	output.set_highlightcolor(color[yellow]);
+	output.set_labelcolor(color[optget("label.color", util::string)]);
+	output.set_highlightcolor(color[optget("highlight.color", util::string)]);
 	output.set_devaway_color(color[red]);
+
+	/* add highlights */
 	output.add_highlight(util::current_user());
 	output.add_highlight(util::get_user_from_email(util::current_user()));
+	
+	/* user-defined highlights */
+	{
+	    const std::vector<util::string> hv(optget("highlights",
+		util::string).split());
+	    std::vector<util::string>::const_iterator i;
+	    for (i = hv.begin() ; i != hv.end() ; ++i)
+		output.add_highlight(*i);
+	}
 
 	/* set default action */
 	if (optget("action", options_action_T) == action_unspecified
@@ -598,6 +616,10 @@ main(int argc, char **argv)
     catch (const args_E)
     {
 	usage();
+	return EXIT_FAILURE;
+    }
+    catch (const rc_E)
+    {
 	return EXIT_FAILURE;
     }
 #ifdef UNICODE

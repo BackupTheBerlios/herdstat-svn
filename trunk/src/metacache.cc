@@ -42,29 +42,37 @@ metacache_T::valid() const
     struct stat s;
     bool valid = false;
 
+    const util::string expire(optget("metacache.expire", util::string));
+
     if (stat(METACACHE, &s) == 0)
     {
-        const util::string path(this->_portdir + "/metadata/timestamp");
-        bool timestamp = util::is_file(path);
-        bool lastsync  = util::is_file(LASTSYNC);
-
-        if (timestamp and lastsync)
+        if (expire == "lastsync")
         {
-            valid = util::md5check(path, LASTSYNC);
+            const util::string path(this->_portdir + "/metadata/timestamp");
+            bool timestamp = util::is_file(path);
+            bool lastsync  = util::is_file(LASTSYNC);
 
-            /* md5's don't match meaning the user has sync'd since last run */
-            if (not valid)
+            if (timestamp and lastsync)
+            {
+                valid = util::md5check(path, LASTSYNC);
+
+                /* md5's don't match meaning the user has sync'd since last run */
+                if (not valid)
+                    util::copy_file(path, LASTSYNC);
+            }
+            else if (lastsync)
+            {
+                unlink(LASTSYNC);
+                valid = ((std::time(NULL) - s.st_mtime) < METACACHE_EXPIRE);
+            }
+            else if (timestamp)
                 util::copy_file(path, LASTSYNC);
+            else
+                valid = ((std::time(NULL) - s.st_mtime) < METACACHE_EXPIRE);
         }
-        else if (lastsync)
-        {
-            unlink(LASTSYNC);
-            valid = ((std::time(NULL) - s.st_mtime) < METACACHE_EXPIRE);
-        }
-        else if (timestamp)
-            util::copy_file(path, LASTSYNC);
         else
-            valid = ((std::time(NULL) - s.st_mtime) < METACACHE_EXPIRE);
+            valid = ((std::time(NULL) - s.st_mtime) <
+                    std::strtol(expire.c_str(), NULL, 10));
 
         /* only valid if size > 0 */
         if (valid)

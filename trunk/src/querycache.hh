@@ -40,6 +40,10 @@
 class querycache_T : public std::vector<pkgQuery_T>
 {
     public:
+        querycache_T() : _max(optget("querycache.max", int)),
+                         _expire(optget("querycache.expire", long))
+        { }
+
         void operator() (const pkgQuery_T &);
         void load();
         void dump();
@@ -53,6 +57,9 @@ class querycache_T : public std::vector<pkgQuery_T>
 
     protected:
         void purge_old();
+
+        int _max;
+        long _expire;
 };
 
 #endif

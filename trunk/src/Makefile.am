@@ -5,7 +5,9 @@ bin_PROGRAMS = herdstat
 herdstat_SOURCES = common.hh common.cc \
 		   exceptions.hh \
 		   options.hh options.cc \
+		   rc.hh rc.cc \
 		   devs.hh \
+		   fetcher.hh fetcher.cc \
 		   herds.hh herds.cc \
 		   pkgquery.hh pkgquery.cc \
 		   metadata.hh metadata.cc \
@@ -42,6 +44,7 @@ bin_PROGRAMS += querycachectl
 querycachectl_SOURCES = common.hh common.cc \
 			exceptions.hh \
 			options.hh options.cc \
+			rc.hh rc.cc \
 			formatter.hh formatter.cc \
 			pkgquery.hh pkgquery.cc \
 			querycache.hh querycache.cc \

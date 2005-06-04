@@ -160,9 +160,12 @@ class options_T
 	static option_map_T optmap;
 
     public:
+        static bool exists(const util::string &id)
+        { return optmap.find(id) != optmap.end(); }
+
 	/* get option with specified name */
 	template<typename T>
-	static const T get(util::string const &id)
+	static const T get(const util::string &id)
 	{
 	    if (not optmap[id])
 		throw invalid_option_E(id);
@@ -171,7 +174,7 @@ class options_T
 
 	/* set specified option name to specified value */
 	template<typename T>
-	static void set(util::string const &id, const T &t)
+	static void set(const util::string &id, const T &t)
 	{
 	    option_map_T::iterator i = optmap.find(id);
 	    if (i != optmap.end())
@@ -193,7 +196,7 @@ class options_T
 		while(s.size() < 20)
 		    s.append(" ");
 		stream << s;
-		(i->second)->dump(stream);
+		i->second->dump(stream);
 		stream << std::endl;
 	    }
 	    stream << "*************************************************" << std::endl;
@@ -201,8 +204,9 @@ class options_T
 	}
 
 	/* real public interface */
-#	define optset(key,type,value) options_T::set<type>(key, value)
-#	define optget(key,type)   options_T::get<type>(key)
+#	define optset(key,type,value)   options_T::set<type>(key, value)
+#	define optget(key,type)         options_T::get<type>(key)
+#       define optexists(key)           options_T::exists(key)
 
 };
 

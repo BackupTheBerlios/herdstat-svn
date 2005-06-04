@@ -1,6 +1,17 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc6:
+    New features:
+     - Added support for config files.  herdstat will first read /etc/herdstatrc
+       if it exists and then $HOME/.herdstatrc if it exists.  See the example
+       config file included.
+     - It is now possible to provide a user-defined list of words that the user
+       wishes to be highlighted if they occur in herdstat output.  Previously,
+       only the user's developer nick was highlighted (assuming the user was a
+       developer of course).  Enable this feature by setting the highlights
+       variable in ~/.herdstatrc to a space-delimited list of words.
+
 1.1.1_rc4:
     Bug fixes:
      - Fixed bug in metacache reading that caused packages with a maintainer

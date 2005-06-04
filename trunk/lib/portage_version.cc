@@ -24,24 +24,6 @@
 # include "config.h"
 #endif
 
-#ifdef HAVE_STDINT_H
-/* It looks like glibc's stdint.h wraps the UINTMAX_MAX define
- * in a #if !defined __cplusplus || defined __STDC_LIMIT_MACROS,
- * so enable it, as we need it to check the return value of strtoumax(). */
-#ifndef __STDC_LIMIT_MACROS
-# define __STDC_LIMIT_MACROS
-#endif /* __STDC_LIMIT_MACROS */
-# include <stdint.h>
-/* don't use strtoumax if UINTMAX_MAX is still unavailable */
-# ifndef UINTMAX_MAX
-#  undef HAVE_STRTOUMAX
-# endif /* UINTMAX_MAX */
-#endif /* HAVE_STDINT_H */
-
-#ifdef HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif /* HAVE_INTTYPES_H */
-
 #include <iostream>
 #include <vector>
 #include <iterator>
@@ -64,51 +46,6 @@
 
 std::vector<util::string> portage::version_string_T::suffix_T::_suffixes;
 
-/*****************************************************************************
- * strtoumax wrapper                                                         *
- * TODO: put in string.cc?                                                   *
- *****************************************************************************/
-static uintmax_t
-strtouint(const std::string &str)
-{
-#ifdef HAVE_STRTOUMAX
-    uintmax_t i = strtoumax(str.c_str(), NULL, 10);
-
-    switch (i)
-    {
-	case 0:
-	    if (str == "0")
-		return 0;
-	    break;
-	case INTMAX_MIN:
-	case INTMAX_MAX:
-	case UINTMAX_MAX:
-	    break;
-	default:
-	    return i;
-    }
-#endif /* HAVE_STRTOUMAX */
-    return std::atoi(str.c_str());
-}
-/*****************************************************************************
- * strtoul wrapper                                                           *
- * TODO: put in string.cc?                                                   *
- *****************************************************************************/
-static unsigned long
-strtoul(const std::string &str)
-{
-    unsigned long result = 0;
-
-    result = std::strtoul(str.c_str(), NULL, 10);
-    if (result == ULONG_MAX)
-        result = 0;
-    
-    /* zero's only valid when str == "0" */
-    if ((result == 0) and (str != "0"))
-        result = std::atol(str.c_str());
-
-    return result;
-}
 /*****************************************************************************
  * version_suffix_T                                                          *
  *****************************************************************************/
@@ -179,7 +116,8 @@ portage::version_string_T::suffix_T::operator< (suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-                return ( strtoul(this->version()) < strtoul(that.version()) );
+                return ( util::strtoul(this->version()) < 
+                         util::strtoul(that.version()) );
             else if (this->version().empty() and that.version().empty())
                 return true;
             else
@@ -221,7 +159,8 @@ portage::version_string_T::suffix_T::operator== (suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-                return ( strtoul(this->version()) == strtoul(that.version()) );
+                return ( util::strtoul(this->version()) ==
+                         util::strtoul(that.version()) );
             else if (this->version().empty() and that.version().empty())
                 return true;
             else
@@ -288,8 +227,8 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
 
         /* TODO: use std::mismatch() ?? */
 
-        uintmax_t thisver = strtouint(*thisiter);
-        uintmax_t thatver = strtouint(*thatiter);
+        uintmax_t thisver = util::strtouint(*thisiter);
+        uintmax_t thatver = util::strtouint(*thatiter);
 
         bool same = false;
         if (thisver == thatver)
@@ -359,8 +298,10 @@ portage::version_string_T::operator< (version_string_T &that)
             return true;
         else if (this->_suffix == that._suffix)
         {
-            uintmax_t thisrev = strtouint(this->_v["PR"].substr(1).c_str());
-            uintmax_t thatrev = strtouint(that["PR"].substr(1).c_str());
+            uintmax_t thisrev =
+                util::strtouint(this->_v["PR"].substr(1).c_str());
+            uintmax_t thatrev =
+                util::strtouint(that["PR"].substr(1).c_str());
             return thisrev <= thatrev;
         }
     }

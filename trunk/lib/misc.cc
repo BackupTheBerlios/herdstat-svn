@@ -38,6 +38,21 @@
 /** static members **********************************************************/
 util::color_map_T::cmap_T util::color_map_T::_cm;
 /****************************************************************************/
+util::color_map_T::string_type &
+util::color_map_T::operator[] (const string_type &color)
+{
+    if (color == "red") return (*this)[red];
+    else if (color == "green") return (*this)[green];
+    else if (color == "blue") return (*this)[blue];
+    else if (color == "yellow") return (*this)[yellow];
+    else if (color == "orange") return (*this)[orange];
+    else if (color == "magenta") return (*this)[magenta];
+    else if (color == "cyan") return (*this)[cyan];
+    else if (color == "black") return (*this)[black];
+    else if (color == "white") return (*this)[white];
+    else return (*this)[none];
+}
+/****************************************************************************/
 void
 #ifdef UNICODE
 util::debug(const gchar *fmt, ...)

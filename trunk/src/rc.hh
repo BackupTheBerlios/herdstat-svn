@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_fetch_handler.cc
+ * herdstat -- src/rc.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,29 +20,29 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef HAVE_RC_HH
+#define HAVE_RC_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_fetch_handler.hh"
+#include "common.hh"
 
-int
-action_fetch_handler_T::operator() (opts_type &null)
+/*
+ * configuration file class
+ */
+
+class rc_T
 {
-    try
-    {
-        herds_xml.fetch();
-        herds_xml.parse();
+    public:
+        rc_T();
 
-        if (use_devaway)
-            devaway.fetch();
-    }
-    catch (const fetch_E)
-    {
-        return EXIT_FAILURE;
-    }
+    private:
+        void set_options();
+        util::vars_T vars;
+};
 
-    return EXIT_SUCCESS;
-}
+#endif
 
 /* vim: set tw=80 sw=4 et : */

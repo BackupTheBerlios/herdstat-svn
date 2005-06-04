@@ -38,16 +38,7 @@
 #include "querycache_xml_handler.hh"
 #include "querycache.hh"
 
-/* max number of queries to cache.
- * TODO: good candidate for an configuration file
- * option if we ever need one. */
-#define QUERYCACHE_MAX      100
-
-/* amount of time (in seconds) a cached query
- * object is considered valid */
-#define QUERYCACHE_EXPIRE   84600
-
-#define QUERYCACHE          LOCALSTATEDIR"/querycache.xml"
+#define QUERYCACHE  LOCALSTATEDIR"/querycache.xml"
 
 /*
  * Add a pkgQuery_T object to the cache, removing
@@ -115,11 +106,11 @@ querycache_T::sort_oldest_to_newest()
 void
 querycache_T::purge_old()
 {
-    debug_msg("this->size() > querycache_MAX(%d), so trimming oldest queries.",
-        QUERYCACHE_MAX);
+    debug_msg("this->size() > querycache_T::_max(%d), so trimming oldest queries.",
+        this->_max);
 
     /* while > querycache_MAX, erase the first (oldest) query */
-    while (this->size() > QUERYCACHE_MAX)
+    while (this->size() > static_cast<size_type>(this->_max))
         this->erase(this->begin());
 }
 
@@ -127,7 +118,7 @@ void
 querycache_T::dump(std::ostream &stream)
 {
     stream << "Query cache (size: " << this->size()
-        << "/" << QUERYCACHE_MAX << ")" << std::endl << std::endl;
+        << "/" << this->_max << ")" << std::endl << std::endl;
 
     for (iterator i = this->begin() ; i != this->end() ; ++i)
     {
@@ -146,7 +137,7 @@ querycache_T::dump()
     this->sort_oldest_to_newest();
 
     /* trim if needed */
-    if (this->size() > QUERYCACHE_MAX)
+    if (this->size() > static_cast<size_type>(this->_max))
         this->purge_old();
 
     /* generate XML */
@@ -268,7 +259,7 @@ querycache_T::dump()
 bool
 querycache_T::is_expired(const pkgQuery_T &q) const
 {
-    return ((std::time(NULL) - q.date) > QUERYCACHE_EXPIRE);
+    return ((std::time(NULL) - q.date) > this->_expire);
 }
 
 /*

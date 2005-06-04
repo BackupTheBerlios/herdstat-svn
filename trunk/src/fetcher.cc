@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_fetch_handler.cc
+ * herdstat -- src/fetcher.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -24,25 +24,30 @@
 # include "config.h"
 #endif
 
-#include "action_fetch_handler.hh"
+#include "fetcher.hh"
 
 int
-action_fetch_handler_T::operator() (opts_type &null)
+fetcher_T::fetch(const util::string &url, const util::string &file)
 {
-    try
-    {
-        herds_xml.fetch();
-        herds_xml.parse();
+    const char *dir = util::dirname(file);
+    if (access(dir, W_OK) != 0)
+        throw util::bad_fileobject_E(dir);
 
-        if (use_devaway)
-            devaway.fetch();
-    }
-    catch (const fetch_E)
-    {
-        return EXIT_FAILURE;
-    }
+    util::string opts(optget("wget.options", util::string));
+    
+    /* try to be somewhat safe and search for occurrences of
+     * ';' and '&&' from wget options just in case... */
+    util::string::size_type pos = opts.find(';');
+    if (pos != util::string::npos)
+        opts = opts.substr(0, pos);
+    if ((pos = opts.find("&&")) != util::string::npos)
+        opts = opts.substr(0, pos);
 
-    return EXIT_SUCCESS;
+    util::string cmd(util::sprintf("%s %s -O %s '%s'", WGET, opts.c_str(),
+        file.c_str(), url.c_str()));
+
+    debug_msg("executing '%s'", cmd.c_str());
+    return std::system(cmd.c_str());
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -56,14 +56,27 @@ options_T::option_map_T::set_defaults()
     insopt("qa", false);
     insopt("meta", false);
     insopt("metacache", true);
+    insopt("querycache", true);
+    insopt("devaway", true);
+
+    insopt("label.color", util::string("green"));
+    insopt("highlight.color", util::string("yellow"));
+
+    insopt("metacache.expire", util::string("lastsync"));
+    insopt("querycache.max", 100);
+    insopt("querycache.expire", static_cast<long>(84600));
+    insopt("wget.options", util::string("-rq -t3 -T15"));
+    insopt("devaway.expire", static_cast<long>(84600));
 
     insopt("maxcol", static_cast<std::size_t>(78));
 
-    insopt("herds.xml", util::string(""));
-    insopt("with-herd", util::string(""));
-    insopt("with-maintainer", util::string(""));
+    insopt("herds.xml", util::string());
+    insopt("with-herd", util::string());
+    insopt("with-maintainer", util::string());
     insopt("outfile", util::string("stdout"));
     insopt("outstream", &std::cout);
+
+    insopt("highlights", util::string());
 
     insopt("action",
         static_cast<options_action_T>(action_unspecified));

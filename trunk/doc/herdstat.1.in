@@ -126,6 +126,11 @@ Display package information for the specified herd(s) or developer(s).
 Display metadata information for the specified package(s).
 .TP
 If no options (non-option or not) are specified, @PACKAGE@ will display a summary of herds.xml statistics.  If --dev and --package are both specified, @PACKAGE@ will display all packages maintained by the specified developer.
+.SH CONFIGURATION
+It is possible to define certain options in a configuration file. @PACKAGE@ will first
+read @SYSCONFDIR@/herdstatrc (if it exists) and then $HOME/.herdstatrc (if it exists).
+Needless to say, options defined in the latter file will override options defined in the
+former.  See the example configuration file included with @PACKAGE@ for more details.
 .SH EXAMPLES
 See the examples.txt file that is distributed with @PACKAGE@.
 .SH ENVIRONMENT

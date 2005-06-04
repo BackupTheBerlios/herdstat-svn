@@ -40,6 +40,67 @@
 
 #include "string.hh"
 
+#ifdef HAVE_STDINT_H
+/* It looks like glibc's stdint.h wraps the UINTMAX_MAX define
+ * in a #if !defined __cplusplus || defined __STDC_LIMIT_MACROS,
+ * so enable it, as we need it to check the return value of strtoumax(). */
+#ifndef __STDC_LIMIT_MACROS
+# define __STDC_LIMIT_MACROS
+#endif /* __STDC_LIMIT_MACROS */
+# include <stdint.h>
+/* don't use strtoumax if UINTMAX_MAX is still unavailable */
+# ifndef UINTMAX_MAX
+#  undef HAVE_STRTOUMAX
+# endif /* UINTMAX_MAX */
+#endif /* HAVE_STDINT_H */
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+
+/*****************************************************************************
+ * strtoumax wrapper                                                         *
+ *****************************************************************************/
+uintmax_t
+util::strtouint(const util::string &str)
+{
+#ifdef HAVE_STRTOUMAX
+    uintmax_t i = strtoumax(str.c_str(), NULL, 10);
+
+    switch (i)
+    {
+	case 0:
+	    if (str == "0")
+		return 0;
+	    break;
+	case INTMAX_MIN:
+	case INTMAX_MAX:
+	case UINTMAX_MAX:
+	    break;
+	default:
+	    return i;
+    }
+#endif /* HAVE_STRTOUMAX */
+    return std::atoi(str.c_str());
+}
+/*****************************************************************************
+ * strtoul wrapper                                                           *
+ *****************************************************************************/
+unsigned long
+util::strtoul(const util::string &str)
+{
+    unsigned long result = 0;
+
+    result = std::strtoul(str.c_str(), NULL, 10);
+    if (result == ULONG_MAX)
+        result = 0;
+    
+    /* zero's only valid when str == "0" */
+    if ((result == 0) and (str != "0"))
+        result = std::atol(str.c_str());
+
+    return result;
+}
 /*****************************************************************************
  * Convert the given character to (lower|upper)case                          *
  *****************************************************************************/

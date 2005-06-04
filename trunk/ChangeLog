@@ -1,5 +1,22 @@
 ChangeLog for herdstat
 
+2005-06-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: define SYSCONFDIR.  Updated version (1.1.1_rc6).
+	* src/Makefile.am, src/fetcher.cc, src/fetcher.hh: Moved fetching code
+	into it's own class, fetcher_T.
+	* src/herdstat.cc, src/metacache.cc, src/querycache.cc,
+	src/options.cc, src/rc.cc, src/rc.hh: Added configuration file support. 
+	herdstat will first read /etc/herdstatrc if it exists and
+	$HOME/.herdstatrc if it exists.  Options defined in the latter will
+	override options defined in the former.
+	* src/devaway.cc, src/herds_xml.cc, src/herds_xml_handler.cc: Updated
+	to use fetcher_T.
+	* lib/portage_version.cc, lib/string.cc, lib/string.hh: Moved strtoul
+	and strtouint wrappers in with rest of string utility functions.
+	* doc/herdstat.1.in: Added CONFIGURATION section.
+	* doc/herdstatrc.example: Added example configuration file.
+
 2005-06-03 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.1_rc5).

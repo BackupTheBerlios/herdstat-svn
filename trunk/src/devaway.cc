@@ -25,6 +25,7 @@
 #endif
 
 #include <memory>
+#include "fetcher.hh"
 #include "devaway.hh"
 
 #define DEVAWAY_REMOTE      "http://dev.gentoo.org/devaway/"
@@ -37,7 +38,8 @@ devaway_T::init()
 {
     struct stat s;
     if ((stat(DEVAWAY_LOCAL, &s) != 0) or
-       ((time(NULL) - s.st_mtime) > DEVAWAY_EXPIRE) or (s.st_size == 0))
+       ((time(NULL) - s.st_mtime) > optget("devaway.expire", long))
+       or (s.st_size == 0))
         this->_path.assign(DEVAWAY_REMOTE);
 }
 
@@ -59,8 +61,9 @@ devaway_T::fetch()
         if (util::is_file(DEVAWAY_LOCAL))
             util::copy_file(DEVAWAY_LOCAL, DEVAWAY_LOCAL".bak");
 
-        if ((util::fetch(DEVAWAY_REMOTE, DEVAWAY_LOCAL, false, true) != 0) or
-            (stat(DEVAWAY_LOCAL, &s) != 0) or (s.st_size == 0))
+        fetcher_T fetch(DEVAWAY_REMOTE, DEVAWAY_LOCAL);
+
+        if ((stat(DEVAWAY_LOCAL, &s) != 0) or (s.st_size == 0))
             throw fetch_E();
 
 //        debug_msg("fetching succeeded");

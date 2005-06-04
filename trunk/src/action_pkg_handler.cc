@@ -302,7 +302,8 @@ action_pkg_handler_T::display()
     {
         output.set_maxlabel(16);
         output.set_maxdata(maxcol - output.maxlabel());
-        output.set_devaway(devaway.keys());
+        if (use_devaway)
+            output.set_devaway(devaway.keys());
         output.set_attrs();
     }
 
@@ -381,15 +382,19 @@ action_pkg_handler_T::operator() (opts_type &opts)
     herds_xml.parse();
 
     /* fetch/parse devaway for marking away devs */
-    devaway.fetch();
-    devaway.parse();
+    if (use_devaway)
+    {
+        devaway.fetch();
+        devaway.parse();
+    }
 
     /* setup with regex */
     with.assign(dev? optget("with-herd", util::string) :
                      optget("with-maintainer", util::string), REG_ICASE);
 
     /* load previously cached results */
-    querycache.load();
+    if (optget("querycache", bool))
+        querycache.load();
 
     /* search previously cached results for current queries
      * and insert into our matches map if found */
@@ -529,7 +534,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << "Parsed " << metacache.size() << " metadata.xml's." << std::endl;
     }
 
-    querycache.dump();
+    if (optget("querycache", bool))
+        querycache.dump();
 
     /* we handler timer here */
     timer = false;

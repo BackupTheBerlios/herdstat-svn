@@ -25,6 +25,7 @@
 #endif
 
 #include "common.hh"
+#include "rc.hh"
 #include "formatter.hh"
 #include "querycache.hh"
 
@@ -153,6 +154,8 @@ main(int argc, char **argv)
     try
     {
         util::string action;
+
+        { rc_T rc; }
 
         if (handle_opts(argc, argv, &action) != 0)
             throw args_E();

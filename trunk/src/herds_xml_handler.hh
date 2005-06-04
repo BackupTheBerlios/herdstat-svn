@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include "fetcher.hh"
 #include "herds.hh"
 #include "xmlparser.hh"
 
@@ -59,6 +60,8 @@ class HerdsXMLHandler_T : public XMLHandler_T
         virtual return_type CHARACTERS(const string_type &);
 
     private:
+        fetcher_T fetch;
+
         /* internal state variables */
         bool in_herd;
         bool in_herd_name;

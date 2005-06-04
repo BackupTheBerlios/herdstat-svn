@@ -1,0 +1,73 @@
+# Example herdstat configuration file
+# $Id$
+
+# Quickstart: place this file in /etc/herdstatrc or $HOME/.herdstatrc
+# and edit to your liking.
+
+# use colors?
+#   value can be one of: yes,no,true,false
+colors=true
+
+# color definitions
+#   value may be one of: red,green,blue,yellow,orange,magenta,cyan,white,black
+#label.color=yellow
+#highlight.color=red
+
+# highlight definitions
+#   value is a space-delimited list of words that should be highlighted if
+#   they occur in herdstat output.  By default, the only things highlighted
+#   is your developer nick (assuming of course that you're a developer).
+#highlights=foo bar baz
+
+# QA mode? validates XML and other QA-related things (fex, a category
+# exists in $PORTDIR/profiles/categories that doesn't actually exist,
+# herdstat will bail instead of ignoring it).
+#   value can be one of: yes,no,true,false
+qa=false
+
+# herds.xml location
+#   value can be a path or URL
+#herdsxml=/path/to/herds.xml
+
+# use devaway?
+#   value can be one of: yes,no,true,false
+use.devaway=true
+
+# when should the devaway information expire?
+#   value can be a number (seconds)
+devaway.expire=86400
+
+# use metadata cache?
+#   value can be one of: yes,no,true,false
+#   The metadata cache is used soley for --package queries.
+use.metacache=true
+
+# when should the metadata cache expire?
+#   value can be either "lastsync" or a number
+#     lastsync - cache is considered expired the first run after an
+#                `emerge --sync`.
+#     number   - cache is considered expired after the specified number
+#                of seconds.
+metacache.expire=lastsync
+
+# use query cache?
+#   value can be one of: yes,no,true,false
+#   The query cache caches results of --package queries.
+use.querycache=true
+
+# maximum number of queries to cache?
+#   value can be a number.
+querycache.max=100
+
+# number of seconds before a previously cached query (in the query cache)
+# is considered expired?
+#   value can be a number (seconds)
+querycache.expire=84600
+
+# Specify any extra options to pass to wget
+#   NOTE: you need to specify two %s's.  The first one is the name of the
+#   path to save the local file as.  The second one is the URL and needs
+#   to be quoted.
+wget.options=-rq -t3 -T10
+
+# vim: set ft=conf :

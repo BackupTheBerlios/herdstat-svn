@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_fetch_handler.cc
+ * herdstat -- src/fetcher.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,29 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef HAVE_FETCHER_HH
+#define HAVE_FETCHER_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_fetch_handler.hh"
+#include "common.hh"
 
-int
-action_fetch_handler_T::operator() (opts_type &null)
+class fetcher_T
 {
-    try
-    {
-        herds_xml.fetch();
-        herds_xml.parse();
+    public:
+        fetcher_T() { }
+        fetcher_T(const util::string &url, const util::string &file)
+        {
+            if (this->fetch(url, file) != EXIT_SUCCESS)
+                throw fetch_E();
+        }
 
-        if (use_devaway)
-            devaway.fetch();
-    }
-    catch (const fetch_E)
-    {
-        return EXIT_FAILURE;
-    }
+        void operator() (const util::string &url, const util::string &file)
+        {
+            if (this->fetch(url, file) != EXIT_SUCCESS)
+                throw fetch_E();
+        }
 
-    return EXIT_SUCCESS;
-}
+    protected:
+        int fetch(const util::string &, const util::string &);
+};
+
+#endif
 
 /* vim: set tw=80 sw=4 et : */

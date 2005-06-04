@@ -75,6 +75,7 @@ namespace util
         public:
             typedef util::string string_type;
 	    string_type &operator[](color_name_T c) { return this->_cm[c]; }
+            string_type &operator[](const string_type &);
 
         private:
             class cmap_T : public std::map<color_name_T, string_type>

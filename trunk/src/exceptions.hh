@@ -95,6 +95,8 @@ class args_help_E                       : public args_E { };
 class args_version_E                    : public args_E { };
 class args_unimplemented_E              : public args_E { };
 
+class rc_E                              : public herdstat_base_E { };
+
 class bad_option_cast_E                 : public herdstat_base_bad_cast_E { };
 
 class invalid_option_E                  : public herdstat_msg_base_E

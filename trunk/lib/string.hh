@@ -66,6 +66,9 @@ namespace util
             split(const value_type delim = ' ', bool = false) const;
     };
 
+    uintmax_t strtouint(const util::string &);
+    unsigned long strtoul(const util::string &);
+
 #ifdef UNICODE
     gunichar tolower(const gunichar);
     gunichar toupper(const gunichar);

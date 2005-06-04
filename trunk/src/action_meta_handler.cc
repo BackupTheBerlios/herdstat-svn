@@ -106,13 +106,17 @@ action_meta_handler_T::operator() (opts_type &opts)
     bool pwd = false;
     util::string dir;
 
-    devaway.fetch();
-    devaway.parse();
+    if (use_devaway)
+    {
+        devaway.fetch();
+        devaway.parse();
+    }
 
     output.set_maxlabel(16);
     output.set_maxdata(maxcol - output.maxlabel());
     output.set_quiet(quiet, " ");
-    output.set_devaway(devaway.keys());
+    if (use_devaway)
+        output.set_devaway(devaway.keys());
     output.set_attrs();
 
     /* we dont care about these */

@@ -26,6 +26,7 @@
 
 #include <ctime>
 #include "common.hh"
+#include "fetcher.hh"
 #include "xml.hh"
 #include "herds_xml_handler.hh"
 
@@ -229,8 +230,8 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
                     util::copy_file(path, path+".bak");
 
                 util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
-                if (util::fetch(url, path) != 0)
-                    throw fetch_E();
+
+                fetch(url, path);
 
                 if ((stat(path.c_str(), &s) != 0) or (s.st_size == 0))
                     throw fetch_E();
