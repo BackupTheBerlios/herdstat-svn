@@ -90,7 +90,11 @@ class formatter_T
         void set_devaway_color(const string_type &s) { attr.devaway_color = s; }
         const string_type &devaway_color() const { return attr.devaway_color; }
 
-        void add_highlight(const string_type &s) { attr.highlights.push_back(s); }
+        void add_highlight(const string_type &s,
+                           const string_type &c = attr.highlight_color)
+        { attr.highlights[s] = c; }
+        void add_highlights(const std::vector<string_type> &);
+
         void set_devaway(const std::vector<string_type> &v)
         { attr.devaway = v; }
 
@@ -119,7 +123,7 @@ class formatter_T
             string_type::size_type maxclabel;
             string_type::size_type maxcdata;
 
-            std::vector<string_type> highlights;
+            std::map<string_type, string_type> highlights;
             std::vector<string_type> devaway;
         };
 
@@ -129,6 +133,7 @@ class formatter_T
 
         static buffer_type buffer;
         static attrs_type attr;
+        static color_type color;
 };
 
 #endif

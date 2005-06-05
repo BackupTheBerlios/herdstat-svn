@@ -511,12 +511,18 @@ main(int argc, char **argv)
 	output.add_highlight(util::get_user_from_email(util::current_user()));
 	
 	/* user-defined highlights */
+//        {
+//            const std::vector<util::string> hv(optget("highlights",
+//                util::string).split());
+//            std::vector<util::string>::const_iterator i;
+//            for (i = hv.begin() ; i != hv.end() ; ++i)
+//                output.add_highlight(*i);
+//        }
+
 	{
 	    const std::vector<util::string> hv(optget("highlights",
 		util::string).split());
-	    std::vector<util::string>::const_iterator i;
-	    for (i = hv.begin() ; i != hv.end() ; ++i)
-		output.add_highlight(*i);
+	    output.add_highlights(hv);
 	}
 
 	/* set default action */
@@ -572,6 +578,11 @@ main(int argc, char **argv)
     {
 	std::cerr << "Error writing '" << e.file() << "': " << e.error()
 	    << std::endl;
+	return EXIT_FAILURE;
+    }
+    catch (const format_E &e)
+    {
+	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const fetch_E)

@@ -33,6 +33,7 @@
 /** static members **********************************************************/
 formatter_T::attrs_type  formatter_T::attr;
 formatter_T::buffer_type formatter_T::buffer;
+formatter_T::color_type formatter_T::color;
 /****************************************************************************/
 formatter_T::attrs_type::attrs_type()
 {
@@ -63,7 +64,6 @@ formatter_T::set_attrs()
      * for the increase in string length.           */
     if (attr.colors)
     {
-        color_type color;
         attr.no_color = color[none];
         attr.maxclabel = attr.maxlabel
                        + attr.label_color.length()
@@ -80,6 +80,25 @@ formatter_T::set_attrs()
         attr.maxclabel = attr.maxlabel;
         attr.maxcdata  = attr.maxdata;
         attr.maxctotal = attr.maxtotal;
+    }
+}
+/****************************************************************************
+ * Given a vector of strings in the format of 'word,color', split each      *
+ * element and insert them into the highlights map.                         *
+ ****************************************************************************/
+void
+formatter_T::add_highlights(const std::vector<string_type> &pairs)
+{
+    std::vector<string_type>::const_iterator i;
+    for (i = pairs.begin() ; i != pairs.end() ; ++i)
+    {
+        std::vector<string_type> parts(i->split(','));
+        if (parts.size() == 1)
+            attr.highlights[parts.front()] = attr.highlight_color;
+        else if (parts.size() == 2)
+            attr.highlights[parts.front()] = color[parts.back()];
+        else
+            throw format_E("Invalid highlight '%s'", i->c_str());
     }
 }
 /****************************************************************************
@@ -101,11 +120,29 @@ formatter_T::highlight(const std::vector<string_type> &data)
 
     for (i = data.begin() ; i != data.end() ; ++i)
     {
+        bool highlight = false;
         /* search highlights */
-        if (std::find(attr.highlights.begin(),
-            attr.highlights.end(), *i) != attr.highlights.end())
-            s += attr.highlight_color + (*i) + attr.no_color + " ";
-        else
+        std::map<string_type, string_type>::iterator h;
+        for (h = attr.highlights.begin() ; h != attr.highlights.end() ; ++h)
+        {
+            string_type::size_type pos = h->first.find("re:");
+            if (pos == string_type::npos and h->first == *i)
+            {
+                highlight = true;
+                s += h->second + (*i) + attr.no_color +  " ";
+            }
+            else if (pos != string_type::npos)
+            {
+                util::regex_T regex(h->first.substr(pos+3));
+                if (regex == *i)
+                {
+                    highlight = true;
+                    s += h->second + (*i) + attr.no_color + " ";
+                }
+            }
+        }
+
+        if (not highlight)
         {
             string_type tmp(*i);
 
@@ -239,15 +276,29 @@ formatter_T::append(const string_type &label, const string_type &data)
                          marked_away = false;
 
                     /* should the current word be highlighted? */
-                    if (std::find(attr.highlights.begin(),
-                        attr.highlights.end(), *i) != attr.highlights.end())
+                    std::map<string_type, string_type>::iterator h;
+                    for (h = attr.highlights.begin() ;
+                         h != attr.highlights.end() ; ++h)
                     {
-                        highlight_found = true;
-
-                        /* adjust maxtotal appropriately */
-                        oldlen = attr.maxtotal;
-                        attr.maxtotal = oldlen + attr.highlight_color.length() +
-                            attr.no_color.length();
+                        string_type::size_type pos = h->first.find("re:");
+                        if (pos == string_type::npos and h->first == *i)
+                        {
+                            highlight_found = true;
+                            oldlen = attr.maxtotal;
+                            attr.maxtotal = oldlen + color[h->second].length() +
+                                attr.no_color.length();
+                        }
+                        else if (pos != string_type::npos)
+                        {
+                            util::regex_T regex(h->first.substr(pos+3));
+                            if (regex == *i)
+                            {
+                                highlight_found = true;
+                                oldlen = attr.maxtotal;
+                                attr.maxtotal = oldlen + color[h->second].length()
+                                    + attr.no_color.length();
+                            }
+                        }
                     }
 
                     if (std::find(attr.devaway.begin(),

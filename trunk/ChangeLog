@@ -1,5 +1,14 @@
 ChangeLog for herdstat
 
+2005-06-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/regex.hh: Added operator=.
+	* src/herdstat.cc, src/formatter.cc, src/formatter.hh:
+	formatter_T::attrs_T::highlights is now a map, so we can allow setting
+	a different color for each word.  Added a plural version of
+	formatter_T::add_highlight() for passing a vector of string in the
+	format of 'word,color', which gets inserted into the highlights map.
+
 2005-06-04 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: define SYSCONFDIR.

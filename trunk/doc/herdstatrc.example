@@ -14,10 +14,12 @@ colors=true
 #highlight.color=red
 
 # highlight definitions
-#   value is a space-delimited list of words that should be highlighted if
-#   they occur in herdstat output.  By default, the only things highlighted
-#   is your developer nick (assuming of course that you're a developer).
-#highlights=foo bar baz
+#   value is a space-delimited list of words in the form of:
+#     word1,color1 word2,color2 re:some_regex,color3
+#   A "re:" prefixed word is interpreted as a regular expression.  A color
+#   may be omitted, in which case the default highlight color (which can
+#   be defined with the "highlight.color" option in this file) is used.
+#highlights=word1 word2,color1 re:regex,color2 word3,color3
 
 # QA mode? validates XML and other QA-related things (fex, a category
 # exists in $PORTDIR/profiles/categories that doesn't actually exist,

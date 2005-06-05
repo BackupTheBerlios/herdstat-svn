@@ -54,6 +54,8 @@ namespace util
             ~regex_T() { if (this->_compiled) this->cleanup(); }
 
             void assign(const string_type &, int c = 0, int e = 0);
+            regex_T &operator= (const string_type &s)
+            { this->assign(s); return *this; }
             bool operator== (const string_type &cmp) const;
             bool operator!= (const string_type &cmp) const
             { return not (*this == cmp); }
