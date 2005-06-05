@@ -129,7 +129,8 @@ formatter_T::highlight(const std::vector<string_type> &data)
             if (pos == string_type::npos and h->first == *i)
             {
                 highlight = true;
-                s += h->second + (*i) + attr.no_color +  " ";
+                if (s.find((*i)+attr.no_color) == string_type::npos)
+                    s += h->second + (*i) + attr.no_color +  " ";
             }
             else if (pos != string_type::npos)
             {
@@ -137,7 +138,8 @@ formatter_T::highlight(const std::vector<string_type> &data)
                 if (regex == *i)
                 {
                     highlight = true;
-                    s += h->second + (*i) + attr.no_color + " ";
+                    if (s.find((*i)+attr.no_color) == string_type::npos)
+                        s += h->second + (*i) + attr.no_color + " ";
                 }
             }
         }
