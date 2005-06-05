@@ -1,0 +1,79 @@
+/*
+ * herdstat -- lib/regex.hh
+ * $Id$
+ * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
+ *
+ * This file is part of herdstat.
+ *
+ * herdstat is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * herdstat is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * herdstat; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 325, Boston, MA  02111-1257  USA
+ */
+
+#ifndef HAVE_REGEX_HH
+#define HAVE_REGEX_HH 1
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <cstddef>
+#include <cassert>
+#include <sys/types.h>
+#include <regex.h>
+#include "string.hh"
+
+/*
+ * POSIX Regular Expressions
+ * Initialize with regular expression
+ * Use operator== to compare a string to the regular expression
+ */
+
+namespace util
+{
+    class regex_T
+    {
+        public:
+            typedef util::string string_type;
+            typedef regex_t regex_type;
+
+            regex_T() : _compiled(false), _cflags(0), _eflags(0) { }
+            regex_T(const string_type &r, int c = 0, int e = 0)
+                : _str(r), _compiled(false), _cflags(c), _eflags(e)
+            { this->assign(r, c, e); }
+            ~regex_T() { if (this->_compiled) this->cleanup(); }
+
+            void assign(const string_type &, int c = 0, int e = 0);
+            regex_T &operator= (const string_type &s)
+            { this->assign(s); return *this; }
+            bool operator== (const string_type &cmp) const;
+            bool operator!= (const string_type &cmp) const
+            { return not (*this == cmp); }
+            const string_type &operator()() const { return this->_str; }
+
+            bool empty() const { return this->_str.empty(); }
+
+        private:
+            void cleanup();
+
+            string_type _str;       /* regular expression string */
+            bool        _compiled;  /* has this->_regex been compiled? */
+            int         _cflags,    /* cflags, see regcomp(3) */
+                        _eflags;    /* eflags, see regexec(3) */
+            regex_type  _regex;     /* our regex structure, see regex.h(P) */
+    };
+}
+
+#endif
+
+/* vim: set tw=80 sw=4 et : */
