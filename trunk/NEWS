@@ -11,6 +11,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        only the user's developer nick was highlighted (assuming the user was a
        developer of course).  Enable this feature by setting the highlights
        variable in ~/.herdstatrc to a space-delimited list of words.
+     - It's now possible to specify --find --metadata to show the metadata info
+       of the find results.
 
 1.1.1_rc4:
     Bug fixes:

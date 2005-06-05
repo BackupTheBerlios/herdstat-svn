@@ -28,12 +28,14 @@
 #include <utility>
 #include <algorithm>
 #include <iterator>
+
+#include "action_meta_handler.hh"
 #include "action_find_handler.hh"
 
 int
 action_find_handler_T::operator() (opts_type &opts)
 {
-    std::vector<util::string> results;
+    opts_type results;
 
     if (all)
     {
@@ -102,13 +104,31 @@ action_find_handler_T::operator() (opts_type &opts)
         results.push_back(p.second);
     }
 
-    if (not count)
+    if (results.size() > 1)
     {
         std::sort(results.begin(), results.end());
         results.erase(std::unique(results.begin(), results.end()),
             results.end());
-        std::copy(results.begin(), results.end(), 
-            std::ostream_iterator<util::string>(*stream, "\n"));
+    }
+
+    if (meta)
+    {
+        /* disable stuff we've already handled */
+        optset("regex", bool, false);
+        optset("eregex", bool, false);
+        
+        action_meta_handler_T mhandler;
+        mhandler(results);
+    }
+    else if (not count)
+    {
+        if (results.size() == 1)
+            *stream << results.front() << std::endl;
+        else
+        {
+            std::copy(results.begin(), results.end(), 
+                std::ostream_iterator<util::string>(*stream, "\n"));
+        }
     }
 
     size = results.size();

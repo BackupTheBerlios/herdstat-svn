@@ -8,6 +8,9 @@ ChangeLog for herdstat
 	a different color for each word.  Added a plural version of
 	formatter_T::add_highlight() for passing a vector of string in the
 	format of 'word,color', which gets inserted into the highlights map.
+	* src/action_find_handler.cc, src/action_find_handler.hh: Updated so
+	that --find --metadata will show metadata of the results of the
+	--find.
 
 2005-06-04 Aaron Walker <ka0ttic@gentoo.org>
 

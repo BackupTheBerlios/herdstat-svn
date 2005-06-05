@@ -270,11 +270,13 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    case 'm':
 		if (optget("action", options_action_T) != action_unspecified and
 		    optget("action", options_action_T) != action_pkg and
-		    optget("action", options_action_T) != action_dev)
+		    optget("action", options_action_T) != action_dev and
+		    optget("action", options_action_T) != action_find)
 		    throw args_one_action_only_E();
 
 		if (optget("action", options_action_T) == action_pkg or
-		    optget("action", options_action_T) == action_dev)
+		    optget("action", options_action_T) == action_dev or
+		    optget("action", options_action_T) == action_find)
 		    optset("meta", bool, true);
 		else
 		    optset("action", options_action_T, action_meta);
@@ -287,8 +289,11 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --find */
 	    case 'f':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (optget("action", options_action_T) != action_unspecified and
+		    optget("action", options_action_T) != action_meta)
 		    throw args_one_action_only_E();
+		if (optget("action", options_action_T) == action_meta)
+		    optset("meta", bool, true);
 		optset("action", options_action_T, action_find);
 		break;
 	    /* --versions */
