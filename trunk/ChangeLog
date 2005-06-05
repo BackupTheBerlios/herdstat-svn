@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-06-05 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.1_rc6).
 	* lib/regex.hh: Added operator=.
 	* src/herdstat.cc, src/formatter.cc, src/formatter.hh:
 	formatter_T::attrs_T::highlights is now a map, so we can allow setting
