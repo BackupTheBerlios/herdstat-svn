@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-06-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.hh: Comment out code referring to blksize_t and blkcount_t
+	since they're a GNUism (causing build to fail on BSD). None of
+	herdstat's code uses it anyways, so there's not really any point in
+	having it.
+
 2005-06-05 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.1_rc6).

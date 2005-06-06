@@ -101,9 +101,11 @@ namespace util
             typedef gid_t gid_type;
             typedef dev_t device_type;
             typedef ino_t inode_type;
+/* FIXME: need to add configure check to determine type of st_blocks and
+ * st_blksize.
             typedef blksize_t blksize_type;
             typedef blkcnt_t blkcnt_type;
-
+ */
             fileobject_T(type_T t) : _type(t) { }
             fileobject_T(const path_T &path, type_T t) : _path(path), _type(t)
             { this->stat(); }
@@ -118,8 +120,8 @@ namespace util
             mode_type mode() const { return this->_sbuf.st_mode; }
             inode_type inode() const { return this->_sbuf.st_ino; }
             device_type device() const { return this->_sbuf.st_dev; }
-            blksize_type blksize() const { return this->_sbuf.st_blksize; }
-            blkcnt_type blkcnt() const { return this->_sbuf.st_blocks; }
+//            blksize_type blksize() const { return this->_sbuf.st_blksize; }
+//            blkcnt_type blkcnt() const { return this->_sbuf.st_blocks; }
 
             path_T &name() { return this->_path; }
             path_T basename() const { return this->_path.basename(); }
