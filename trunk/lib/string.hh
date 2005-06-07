@@ -36,6 +36,10 @@
 # include <string>
 #endif /* UNICODE */
 
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+
 namespace util
 {
 #ifdef UNICODE

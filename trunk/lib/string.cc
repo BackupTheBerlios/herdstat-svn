@@ -54,10 +54,6 @@
 # endif /* UINTMAX_MAX */
 #endif /* HAVE_STDINT_H */
 
-#ifdef HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-
 /*****************************************************************************
  * strtoumax wrapper                                                         *
  *****************************************************************************/

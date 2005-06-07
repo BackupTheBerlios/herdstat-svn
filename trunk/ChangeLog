@@ -25,6 +25,8 @@ ChangeLog for herdstat
 	* src/action_find_handler.cc, src/action_which_handler.cc: Updated to
 	use pkgcache_T.  We can pass a pkgcache_T object to the find_package
 	suite of functions since it ultimately derives from std::vector.
+	* lib/string.hh: Add missing inttypes.h include (for uintmax_t).  For
+	some reason, gcc-3.4.x and gcc-4.x don't fail, while 3.3.x does.
 
 2005-06-06 Aaron Walker <ka0ttic@gentoo.org>
 
