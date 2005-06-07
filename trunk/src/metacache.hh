@@ -28,6 +28,7 @@
 #endif
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "metadata.hh"
 
 /*
@@ -48,6 +49,7 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
 
     private:
         util::string _portdir;
+//        pkgcache_T pkgcache;    /* cache of package names */
 };
 
 #endif

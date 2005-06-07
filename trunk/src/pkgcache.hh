@@ -29,8 +29,6 @@
 
 #include "common.hh"
 
-#define PKGCACHE            LOCALSTATEDIR"/pkgcache"
-
 class pkgcache_T : public util::cache_T<std::vector<util::string> >
 {
     public:

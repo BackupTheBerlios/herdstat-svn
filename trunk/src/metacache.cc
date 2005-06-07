@@ -113,11 +113,6 @@ metacache_T::fill()
         {
             const util::path_T path(this->_portdir + "/" + (*p));
             debug_msg("traversing %s...", path.c_str());
-            if (*p == "xfce-extra/xfmedia")
-            {
-                debug_msg("found xfce-extra/xfmedia");
-
-            }
 
             if (status)
                 ++progress;

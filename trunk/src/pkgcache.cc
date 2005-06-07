@@ -29,11 +29,16 @@
 
 #include "pkgcache.hh"
 
-#define PKGCACHE_EXPIRE     259200 /* 3 days */ 
+#define PKGCACHE                    LOCALSTATEDIR"/pkgcache"
+#define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
 pkgcache_T::pkgcache_T() : util::cache_T<value_type>(PKGCACHE) { }
+
 pkgcache_T::pkgcache_T(const util::string &portdir)
-    : util::cache_T<value_type>(PKGCACHE), _portdir(portdir) { this->init(); }
+    : util::cache_T<value_type>(PKGCACHE), _portdir(portdir)
+{
+    this->init();
+}
 
 /*
  * pkg cache is valid?
@@ -104,29 +109,18 @@ pkgcache_T::fill()
         if (not cat.exists())
             continue;
 
-        util::dir_T category(cat);
-//        debug_msg("traversing %s", cat.c_str());
-
         /* for each directory in category */
+        util::dir_T category(cat);
         util::dir_T::iterator d;
         for (d = category.begin() ; d != category.end() ; ++d)
         {
             std::vector<util::string> parts(d->split());
-            if (not parts.empty())
-            {
+            if (parts.size() >= 2)
+            {                           /* category       /       package */
                 util::string pkg(parts[parts.size()-2] + "/" + parts[parts.size()-1]);
 
-//                if (pkg == "app-misc/beancounter" or pkg == "app-misc/joy2key")
-//                {
-//                    std::cerr << "joy2key" << std::endl;
-//                    debug_msg("found app-misc/joy2key");
-//                }
-
                 if (portage::is_pkg_dir(*d))
-                {
-//                    debug_msg("found package %s", pkg.c_str());
                     this->push_back(pkg);
-                }
             }
         }
     }
