@@ -11,6 +11,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   herds.hh herds.cc \
 		   pkgquery.hh pkgquery.cc \
 		   metadata.hh metadata.cc \
+		   pkgcache.hh pkgcache.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
 		   xmlparser.hh \

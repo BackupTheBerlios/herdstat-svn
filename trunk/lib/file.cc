@@ -28,8 +28,10 @@
 #include <iterator>
 #include <cstring>
 #include <cassert>
+#include <iostream>
 
 #include "file.hh"
+#include "misc.hh"
 #include "util_exceptions.hh"
 
 /*****************************************************************************
@@ -113,10 +115,24 @@ template <class C>
 void
 util::base_dir_T<C>::open()
 {
+    if (this->_opened)
+        return;
+
     assert(not this->_path.empty());
     this->_dir = opendir(this->_path.c_str());
-    if (not this->_dir)
-        throw util::bad_fileobject_E(this->_path);
+
+    try
+    {
+        if (not this->_dir)
+            throw util::bad_fileobject_E(this->_path);
+    }
+    catch (const util::bad_fileobject_E &e)
+    {
+        std::cerr << e.what() << std::endl;
+        throw;
+    }
+
+    this->_opened = true;
 }
 /*****************************************************************************/
 template <class C>

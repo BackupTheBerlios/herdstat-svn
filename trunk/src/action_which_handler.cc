@@ -25,12 +25,14 @@
 #endif
 
 #include <algorithm>
-#include "common.hh"
+
+#include "pkgcache.hh"
 #include "action_which_handler.hh"
 
 int
 action_which_handler_T::operator() (opts_type &opts)
 {
+    pkgcache_T pkgcache;
     std::multimap<util::string, util::string>::iterator m;
 
     if (all)
@@ -55,8 +57,10 @@ action_which_handler_T::operator() (opts_type &opts)
         else
             regexp.assign(re, REG_ICASE);
 
+
+        pkgcache.set_portdir(portdir);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer);
+                    overlay, &search_timer, pkgcache);
 
         if (matches.empty())
         {
@@ -134,7 +138,11 @@ action_which_handler_T::operator() (opts_type &opts)
 //            ebuild = portage::ebuild_which(portdir, p.second);
 //        }
 
-        ebuild = portage::ebuild_which(config, p.second, overlay, NULL);
+        if (regex)
+            ebuild = portage::ebuild_which(config, p.second, overlay, NULL,
+                pkgcache);
+        else
+            ebuild = portage::ebuild_which(config, p.second, overlay, NULL);
 
         if (not count)
             *stream << ebuild << std::endl;

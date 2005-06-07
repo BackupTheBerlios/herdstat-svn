@@ -1,6 +1,23 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc7:
+    New features:
+     - Implemented a cache of all package names.  Besides being able to be
+       used my the metadata cache, it can also be used to speed up --find
+       and --which queries (prevents having to traverse PORTDIR on each run).
+       Initial benchmarks results show about a 2/3 decrease in elapsed time.
+
+    Bug fixes:
+     - Fixed significant bug in directory handling code (present since
+       pre-1.1.0) where closedir() was never called upon object destruction.
+     - Fixed another significant bug in progress_T (thing that displays pretty
+       progress in percentage) that caused an inf loop if destructor is called
+       for an instance when progress_T::start() was not called first (debug
+       mode for example).
+     - Fixed FreeBSD compile failure caused by non-existent blkcount_t and
+       blksize_t stat struct members.
+
 1.1.1_rc6:
     New features:
      - Added support for config files.  herdstat will first read /etc/herdstatrc

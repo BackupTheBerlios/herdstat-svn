@@ -1,7 +1,7 @@
 /*
- * herdstat -- lib/util.hh
+ * herdstat -- src/pkgcache.hh
  * $Id$
- * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
+ * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
  *
@@ -20,42 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_UTIL_HH
-#define HAVE_UTIL_HH 1
+#ifndef HAVE_PKGCACHE_HH
+#define HAVE_PKGCACHE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <fstream>
-#include <map>
-#include <vector>
-#include <cstdarg>
-#include <cstdlib>
-#include <cstddef>
-#include <cstdio>
+#include "common.hh"
 
-#ifndef PATH_MAX
-# define PATH_MAX   4096
+#define PKGCACHE            LOCALSTATEDIR"/pkgcache"
+
+class pkgcache_T : public util::cache_T<std::vector<util::string> >
+{
+    public:
+        pkgcache_T();
+        pkgcache_T(const util::string &portdir);
+
+        virtual bool valid() const;
+        virtual void fill();
+        virtual void load();
+        virtual void dump();
+
+        void set_portdir(const util::string &portdir)
+        { this->_portdir = portdir; this->init(); }
+
+    private:
+        util::string _portdir;
+};
+
 #endif
 
-#include "misc.hh"
-#include "file.hh"
-#include "cache.hh"
-#include "vars.hh"
-#include "regex.hh"
-#include "string.hh"
-#include "timer.hh"
-#include "progress.hh"
-#include "util_exceptions.hh"
-#include "portage_exceptions.hh"
-#include "portage_misc.hh"
-#include "portage_config.hh"
-#include "portage_version.hh"
-#include "portage_find.hh"
-
-#ifdef HAVE_LIBZ
-# include "zlib.hh"
-#endif /* HAVE_LIBZ */
-
-#endif /* HAVE_UTIL_HH */
+/* vim: set tw=80 sw=4 et : */

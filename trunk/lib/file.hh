@@ -207,10 +207,11 @@ namespace util
             typedef typename value_type::size_type size_type;
 
             base_dir_T(const path_T &path, bool r = false)
-                : fileobject_T(path, FTYPE_DIR), _recurse(r), _dir(NULL)
+                : fileobject_T(path, FTYPE_DIR), _recurse(r), _opened(false),
+                  _dir(NULL)
             { this->open(); }
 
-            virtual ~base_dir_T() { }
+            virtual ~base_dir_T() { if (this->_opened) this->close(); }
 
             /* small subset of vector methods */
             iterator begin() { return this->_contents.begin(); }
@@ -233,7 +234,7 @@ namespace util
             virtual void read() = 0;
 
         protected:
-            bool _recurse;
+            bool _recurse, _opened;
             DIR *_dir;
             value_type _contents;
     };

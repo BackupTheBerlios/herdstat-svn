@@ -7,8 +7,8 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     timer.hh \
 		     progress.hh \
 		     file.hh file.cc \
-		     vars.hh vars.cc
-#                      cache.hh
+		     vars.hh vars.cc \
+		     cache.hh
 
 # if HAVE_LIBZ
 # libutil_la_SOURCES += zlib.hh zlib.cc

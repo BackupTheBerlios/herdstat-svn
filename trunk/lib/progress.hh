@@ -33,13 +33,13 @@ namespace util
 {
     class progress_T
     {
-	private:
-	    float cur, step;
-
 	public:
-	    progress_T() : cur(0), step(0) { }
+	    progress_T() : cur(0), step(0), started(false) { }
             ~progress_T()
             {
+                if (not this->started)
+                    return;
+
                 /* sometimes we're one off and it ends at 99% */
                 while (this->cur < 100.0)
                     ++(*this);
@@ -47,12 +47,19 @@ namespace util
 
 	    void start(unsigned m)
 	    {
+                if (this->started)
+                    return;
+
+                this->started = true;
 		this->step = 100.0 / m;
 		std::printf("  0%%");
 	    }
 
 	    void operator++ ()
 	    {
+                if (not this->started)
+                    return;
+
 		int inc = static_cast<int>(this->cur += this->step);
 		if (inc < 10)
 		    std::printf("\b\b%.1d%%", inc);
@@ -61,7 +68,11 @@ namespace util
 		else
 		    std::printf("\b\b\b\b%.3d%%", inc);
 		std::fflush(stdout);
-	    }
+            }
+
+	private:
+	    float cur, step;
+            bool started;
     };
 }
 

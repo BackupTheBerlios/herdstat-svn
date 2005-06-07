@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include "pkgcache.hh"
 #include "action_meta_handler.hh"
 #include "action_find_handler.hh"
 
@@ -36,6 +37,7 @@ int
 action_find_handler_T::operator() (opts_type &opts)
 {
     opts_type results;
+    pkgcache_T pkgcache(portdir);
 
     if (all)
     {
@@ -55,7 +57,7 @@ action_find_handler_T::operator() (opts_type &opts)
                                              REG_ICASE);
 
         matches = portage::find_package_regex(config,
-                    regexp, overlay, &search_timer);
+                    regexp, overlay, &search_timer, pkgcache);
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '"
@@ -81,7 +83,7 @@ action_find_handler_T::operator() (opts_type &opts)
                 p = *m;
             else
                 p = portage::find_package(config, m->second,
-                        overlay, &search_timer);
+                        overlay, &search_timer, pkgcache);
         }
         catch (const portage::ambiguous_pkg_E &e)
         {

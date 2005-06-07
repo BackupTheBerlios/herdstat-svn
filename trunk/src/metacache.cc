@@ -24,13 +24,16 @@
 # include "config.h"
 #endif
 
+#include "pkgcache.hh"
 #include "metadata_xml.hh"
 #include "metacache.hh"
 
 #define METACACHE               LOCALSTATEDIR"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
 #define METACACHE_RESERVE       8600
-#define LASTSYNC                LOCALSTATEDIR"/lastsync"
+
+metacache_T::metacache_T(const util::string &portdir)
+    : util::cache_T<value_type>(METACACHE), _portdir(portdir) { }
 
 /*
  * Is the cache valid?
@@ -94,22 +97,27 @@ metacache_T::fill()
     const bool status = not optget("quiet", bool) and not optget("debug", bool);
     {
         util::progress_T progress;
-        const portage::categories_T categories(this->_portdir,
-            optget("qa", bool));
+        pkgcache_T pkgcache(this->_portdir);
+        debug_msg("pkgcache.size() == %d", pkgcache.size());
 
         if (status)
         {
             *(optget("outstream", std::ostream *))
                 << "Generating metadata.xml cache: ";
-            progress.start(categories.size());
+            progress.start(pkgcache.size());
         }
 
-        /* for each category */
-        portage::categories_T::const_iterator c;
-        for (c = categories.begin() ; c != categories.end() ; ++c)
+        /* for each pkg */
+        pkgcache_T::iterator p;
+        for (p = pkgcache.begin() ; p != pkgcache.end() ; ++p)
         {
-            const util::path_T path(this->_portdir + "/" + (*c));
+            const util::path_T path(this->_portdir + "/" + (*p));
             debug_msg("traversing %s...", path.c_str());
+            if (*p == "xfce-extra/xfmedia")
+            {
+                debug_msg("found xfce-extra/xfmedia");
+
+            }
 
             if (status)
                 ++progress;
@@ -117,16 +125,9 @@ metacache_T::fill()
             if (not util::is_dir(path))
                 continue;
 
-            const util::dir_T category(path);
-            util::dir_T::const_iterator d;
-
-            /* for each directory in this category */
-            for (d = category.begin() ; d != category.end() ; ++d)
-            {
-                util::path_T metadata(*d + "/metadata.xml");
-                if (access(metadata.c_str(), F_OK) == 0)
-                    this->push_back(this->parse(metadata));
-            }
+            util::path_T metadata(path + "/metadata.xml");
+            if (metadata.exists())
+                this->push_back(this->parse(metadata));
         }
     }
 
@@ -151,7 +152,7 @@ metacache_T::parse(const util::path_T &path)
  */
 
 void
-metacache_T::load(std::vector<util::string> v)
+metacache_T::load()
 {
     if (not util::is_file(METACACHE))
         return;
@@ -163,9 +164,7 @@ metacache_T::load(std::vector<util::string> v)
         if (this->_portdir.empty())
             throw metacache_parse_E();
 
-        if (not v.empty())
-            this->reserve(v.size());
-        else if (not cache["size"].empty())
+        if (not cache["size"].empty())
             this->reserve(std::atoi(cache["size"].c_str()));
         else
             this->reserve(METACACHE_RESERVE);
@@ -175,11 +174,6 @@ metacache_T::load(std::vector<util::string> v)
         {
             /* not a category/package, so skip it */
             if (i->first.find('/') == util::string::npos)
-                continue;
-
-            /* vector specified and not in vector, so skip it */
-            if (not v.empty() and
-                std::find(v.begin(), v.end(), i->first) == v.end())
                 continue;
 
             util::string str;

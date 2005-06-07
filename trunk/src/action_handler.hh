@@ -42,7 +42,7 @@ class action_handler_T
     public:
         action_handler_T() : stream(optget("outstream", std::ostream *)),
                              config(optget("portage.config", portage::config_T)),
-                             portdir(config.portdir()),
+                             portdir(optget("portdir", util::string)),
                              size(0),
                              quiet(optget("quiet", bool)),
                              verbose(optget("verbose", bool)),

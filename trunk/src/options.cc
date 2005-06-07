@@ -83,7 +83,9 @@ options_T::option_map_T::set_defaults()
 
     insopt("locale", util::string(std::locale::classic().name()));
 
-    insopt("portage.config", portage::config_T());
+    portage::config_T config;
+    insopt("portage.config", config);
+    insopt("portdir", config.portdir());
 }
 
 /* vim: set tw=80 sw=4 et : */

@@ -1,5 +1,31 @@
 ChangeLog for herdstat
 
+2005-06-07 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.hh: Fixed pretty huge bug in base_dir_T.
+	base_dir_T::close() (which calls closedir()) was not previously called
+	on base_dir_T destruction like it should've been.  This causes "Too
+	many open files" errors if doing an operation on a lot of directories.
+	* lib/progress.hh: Added started member which is set to true if
+	start() is called.  This fixes an infinite loop if ~progress_T is
+	called for a progress_T object that was never started.
+	* lib/cache.hh: Rewrote cache_T.
+	* src/pkgcache.cc, src/pkgcache.hh: Added package list cache.
+	Basically broke out some of the metacache_T::fill() code as we'll need
+	it for caching the package list (which find handler will make use of
+	as well).
+	* src/metacache.cc, src/metacache.hh: Inherit from cache_T again.
+	Also, make use of pkgcache_T instead of directly traversing over
+	portage::categories_T.
+	* lib/portage_find.cc, lib/portage_find.hh: Updated
+	portage::find_package suite of functions to accept a vector of package
+	names (defaults to empty vector).  If empty, then it traverses all
+	categories in PORTDIR (like before). Otherwise, it uses the package
+	list to get the results.
+	* src/action_find_handler.cc, src/action_which_handler.cc: Updated to
+	use pkgcache_T.  We can pass a pkgcache_T object to the find_package
+	suite of functions since it ultimately derives from std::vector.
+
 2005-06-06 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/file.hh: Comment out code referring to blksize_t and blkcount_t

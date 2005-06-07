@@ -599,6 +599,11 @@ main(int argc, char **argv)
 	std::cerr << "Bad regular expression." << std::endl;
 	return EXIT_FAILURE;
     }
+    catch (const util::bad_fileobject_E &e)
+    {
+	std::cerr << e.what() << std::endl;
+	return EXIT_FAILURE;
+    }
     catch (const util::base_E &e)
     {
 	std::cerr << e.what() << std::endl;

@@ -33,34 +33,40 @@
 namespace util
 {
     /*
-     * Represents a cache of data on disk.  The template argument
-     * is the data type the cache will be stored in during run-time.
+     * Abstract interface for a cache of data.  Template argument
+     * is the container type in which the data will be stored.
      */
 
     template <class C>
-    class cache_T
+    class cache_T : public C
     {
         public:
-            typedef util::file_T file_type;
             typedef util::string string_type;
             typedef C value_type;
-            typedef typename value_type::iterator iterator;
-            typedef typename value_type::const_iterator const_iterator;
-            typedef typename value_type::size_type size_type;
+//            typedef typename value_type::iterator iterator;
+//            typedef typename value_type::const_iterator const_iterator;
+//            typedef typename value_type::size_type size_type;
 
             cache_T(const string_type &p) : _path(p) { }
 
             virtual ~cache_T() { }
 
-            /* vector subset */
-            iterator begin() { return this->_cache.begin(); }
-            const_iterator begin() const { return this->_cache.begin(); }
-            iterator end() { return this->_cache.end(); }
-            const_iterator end() const { return this->_cache.end(); }
-            size_type size() const { return this->_cache.size(); }
-            void clear() { this->_cache.clear(); }
-            bool empty() const { return this->_cache.size() == 0; }
+            /* value_type subset */
+//            iterator begin() { return this->begin(); }
+//            const_iterator begin() const { return this->begin(); }
+//            iterator end() { return this->end(); }
+//            const_iterator end() const { return this->end(); }
+//            size_type size() const { return this->size(); }
+//            void clear() { this->clear(); }
+//            bool empty() const { return this->size() == 0; }
 
+            /* main cache interface */
+            virtual bool valid() const = 0;
+            virtual void fill() = 0;
+            virtual void load() = 0;
+            virtual void dump() = 0;
+
+        protected:
             virtual void init()
             {
                 if (this->valid())
@@ -72,16 +78,7 @@ namespace util
                 }
             }
 
-            virtual void fill() { }
-            virtual void load() { }
-
-            /* pure virtuals */
-            virtual bool valid() const = 0;
-            virtual void dump() = 0;
-
-        protected:
             const string_type _path;
-            value_type _cache;
     };
 }
 

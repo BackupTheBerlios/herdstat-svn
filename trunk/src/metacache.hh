@@ -34,15 +34,15 @@
  * A cache of all metadata.xml's.
  */
 
-class metacache_T : public std::vector<metadata_T>
+class metacache_T : public util::cache_T<std::vector<metadata_T> >
 {
     public:
-        metacache_T(const util::string &portdir) : _portdir(portdir) { }
+        metacache_T(const util::string &portdir);
 
-        bool valid() const;
-        void fill();
-        void load(std::vector<util::string> = std::vector<util::string>());
-        void dump();
+        virtual bool valid() const;
+        virtual void fill();
+        virtual void load();
+        virtual void dump();
 
         metadata_T parse(const util::path_T &);
 
