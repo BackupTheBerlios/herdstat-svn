@@ -62,8 +62,6 @@ metacache_T::valid() const
             {
                 util::file_T t(path), l(LASTSYNC);
                 valid = (t == l);
-                debug_msg("timestamp == lastsync ? %d", valid);
-                debug_msg("timestamp != lastsync ? %d", (t != l));
                 if (not valid)
                 {
                     debug_msg("timestamp != lastsync ; replacing lastsync file.");
