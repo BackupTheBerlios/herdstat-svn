@@ -45,19 +45,9 @@ portage::is_pkg_dir(const util::path_T &path)
     if (not util::is_dir(path))
         return false;
 
-    bool ebuild = false, filesdir = false;
+    const util::regex_T regex("\\.ebuild$");
     const util::dir_T dir(path);
-    util::dir_T::const_iterator d;
-
-    for (d = dir.begin() ; d != dir.end() ; ++d)
-    {
-        if (portage::is_ebuild(*d))
-            ebuild = true;
-        else if (d->basename() == "files")
-            filesdir = true;
-    }
-
-    return (ebuild and filesdir);
+    return dir.find(regex) != dir.end();
 }
 /*****************************************************************************
  * Is the given path an ebuild?                                              *
@@ -78,13 +68,12 @@ portage::categories_T::init()
     /* read categories from real PORTDIR */
     std::string line;
     {
-        const std::auto_ptr<std::ifstream>
-            f(new std::ifstream((this->_portdir + CATEGORIES).c_str()));
-        if (not (*f))
+        std::ifstream stream((this->_portdir + CATEGORIES).c_str());
+        if (not stream.is_open())
             throw util::bad_fileobject_E(this->_portdir + CATEGORIES);
 
         std::size_t n = 0;
-        while (std::getline(*f, line))
+        while (std::getline(stream, line))
         {
             /* virtual isn't a real category */
             if (line == "virtual")
@@ -108,11 +97,11 @@ portage::categories_T::init()
     /* read user category file */
     if (util::is_file(CATEGORIES_USER))
     {
-        const std::auto_ptr<std::ifstream> f(new std::ifstream(CATEGORIES_USER));
-        if (not (*f))
+        std::ifstream stream(CATEGORIES_USER);
+        if (not stream.is_open())
             throw util::bad_fileobject_E(CATEGORIES_USER);
 
-        while (std::getline(*f, line))
+        while (std::getline(stream, line))
             this->_s.insert(line);
     }
 

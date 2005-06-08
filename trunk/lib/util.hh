@@ -44,6 +44,7 @@
 #include "cache.hh"
 #include "vars.hh"
 #include "regex.hh"
+#include "glob.hh"
 #include "string.hh"
 #include "timer.hh"
 #include "progress.hh"

@@ -40,8 +40,7 @@ class pkgcache_T : public util::cache_T<std::vector<util::string> >
         virtual void load();
         virtual void dump();
 
-        void set_portdir(const util::string &portdir)
-        { this->_portdir = portdir; this->init(); }
+        void init(const util::string &portdir);
 
     private:
         util::string _portdir;

@@ -59,12 +59,9 @@ action_pkg_handler_T::error(const util::string &criteria) const
 }
 
 /*
- * binary predicates for searching metadata for
+ * binary predicate for searching metadata for
  * a regular expression via find_if().
  */
-
-static bool
-doesMatch(util::string s, util::regex_T *r) { return *r == s; }
 
 static bool
 doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
@@ -92,9 +89,9 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
     else
     {
         if ((regex and std::find_if(metadata.herds.begin(),
-            metadata.herds.end(), std::bind2nd(
-            std::ptr_fun(doesMatch), &regexp)) != metadata.herds.end()) or
-            (not regex and metadata.herd_exists(criteria)))
+            metadata.herds.end(), std::bind1st(util::regexMatch(), &regexp))
+            != metadata.herds.end()) or (not regex and
+            metadata.herd_exists(criteria)))
         {
             if (with.empty())
                 return true;

@@ -2,9 +2,6 @@
     <title>
         Todo list for herdstat
     </title>
-    <note priority="high" time="1117977618">
-        highlights dont show up in herdstat -d all
-    </note>
     <note priority="medium" time="1117984926">
         Add a --keywords flag and action handler.
     </note>

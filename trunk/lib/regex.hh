@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <functional>
 #include <cstddef>
 #include <cassert>
 #include <sys/types.h>
@@ -71,6 +72,16 @@ namespace util
             int         _cflags,    /* cflags, see regcomp(3) */
                         _eflags;    /* eflags, see regexec(3) */
             regex_type  _regex;     /* our regex structure, see regex.h(P) */
+    };
+
+    /* function object for use in standard algorithms */
+    class regexMatch : public std::binary_function<regex_T *, string, bool>
+    {
+        public:
+            bool operator() (regex_T *re, string s) const
+            {
+                return (*re == s);
+            }
     };
 }
 

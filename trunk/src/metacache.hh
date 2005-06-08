@@ -45,11 +45,10 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
         virtual void load();
         virtual void dump();
 
-        metadata_T parse(const util::path_T &);
+        void parse(util::string, util::progress_T *);
 
     private:
         util::string _portdir;
-//        pkgcache_T pkgcache;    /* cache of package names */
 };
 
 #endif

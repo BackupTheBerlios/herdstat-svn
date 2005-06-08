@@ -71,17 +71,23 @@ action_meta_handler_T::display(const metadata_T &meta)
 
             if (not ebuild_vars["HOMEPAGE"].empty())
             {
-                std::vector<util::string> parts = ebuild_vars["HOMEPAGE"].split();
-
-                if (parts.size() >= 1)
-                    output("Homepage", parts.front());
-
-                if (parts.size() > 1)
+                /* it's possible to have more than one HOMEPAGE */
+                if (ebuild_vars["HOMEPAGE"].find("://") != util::string::npos)
                 {
-                    std::vector<util::string>::iterator h;
-                    for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
-                        output("", *h);
+                    std::vector<util::string> parts = ebuild_vars["HOMEPAGE"].split();
+
+                    if (parts.size() >= 1)
+                        output("Homepage", parts.front());
+
+                    if (parts.size() > 1)
+                    {
+                        std::vector<util::string>::iterator h;
+                        for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
+                            output("", *h);
+                    }
                 }
+                else
+                    output("Homepage", ebuild_vars["HOMEPAGE"]);
             }
 
             if (quiet and ebuild_vars["DESCRIPTION"].empty())

@@ -1,5 +1,33 @@
 ChangeLog for herdstat
 
+2005-06-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/Makefile.am, lib/glob.hh: Added glob_T class, an interface for
+	POSIX glob() as well as a patternMatch function object, an interface
+	for fnmatch().
+	* lib/regex.hh: Added regexMatch function object for easily using
+	regex_T objects in standard algorithms.  Also, define _POSIX_C_SOURCE
+	to 200112 if it is undefined (instead of just having an empty define).
+	Fixes yet another FreeBSD build failure (thanks Diego).
+	* lib/file.cc, lib/file.hh: Added dir_T::find(path_T) and
+	dir_T::find(regex_T) for searching directories.  The latter uses the
+	just-added regexMatch functor.  Also added path_T::parent() which
+	returns the basename of dirname.
+	* lib/portage_misc.cc: Updated is_pkg_dir() to use
+	dir_T::find(regex_T).
+	* src/action_pkg_handler.cc: Updated to use regexMatch.
+	* src/metacache.cc, src/pkgcache.cc: Few modifications in an attempt
+	to reduce the amount of time it takes to fill the caches.
+	* src/formatter.cc: Fixed bug where user-defined highlighting failed
+	for instances where formatter_T::operator()(string, vector) is called.
+	* src/metadata.cc: Fixed small bug in metadata_T::display() that
+	caused weirdness for packages who rather than having a valid HOMEPAGE,
+	have space-delimited words explaining there is no HOMEPAGE (unix2dos
+	and dos2unix are examples).
+	* lib/portage_find.cc: Fixed bug in ebuild_which that caused it to
+	fail if the package we're searching for exists in an overlay but not
+	in PORTDIR proper.
+
 2005-06-07 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/file.hh: Fixed pretty huge bug in base_dir_T.

@@ -31,13 +31,6 @@
 #include "metacache.hh"
 #include "action_stats_handler.hh"
 
-void
-action_stats_handler_T::show_meta_stats()
-{
-//    output("Total package metadata.xml's:",
-//        util::sprintf("%d", metacache.size()));
-}
-
 /*
  * Display statistics summary.
  */
@@ -55,9 +48,6 @@ action_stats_handler_T::operator() (opts_type &null)
         devaway.fetch();
         devaway.parse();
     }
-
-//    if (metastats)
-//        metacache.load();
 
     /* set format attributes */
     output.set_maxlabel(35);
@@ -139,9 +129,6 @@ action_stats_handler_T::operator() (opts_type &null)
         most_herds);
     output(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
         least_herds);
-
-//    if (metastats)
-//        show_meta_stats();
 
     count = false;
     flush();

@@ -37,7 +37,14 @@ pkgcache_T::pkgcache_T() : util::cache_T<value_type>(PKGCACHE) { }
 pkgcache_T::pkgcache_T(const util::string &portdir)
     : util::cache_T<value_type>(PKGCACHE), _portdir(portdir)
 {
-    this->init();
+    util::cache_T<value_type>::init();
+}
+
+void
+pkgcache_T::init(const util::string &portdir)
+{
+    this->_portdir.assign(portdir);
+    util::cache_T<value_type>::init();
 }
 
 /*
@@ -98,6 +105,11 @@ pkgcache_T::valid() const
 void
 pkgcache_T::fill()
 {
+    util::timer_T timer;
+
+    if (optget("timer", bool))
+        timer.start();
+
     const portage::categories_T categories(this->_portdir,
         optget("qa", bool));
 
@@ -110,19 +122,16 @@ pkgcache_T::fill()
             continue;
 
         /* for each directory in category */
-        util::dir_T category(cat);
-        util::dir_T::iterator d;
+        const util::dir_T category(cat);
+        util::dir_T::const_iterator d;
         for (d = category.begin() ; d != category.end() ; ++d)
-        {
-            std::vector<util::string> parts(d->split());
-            if (parts.size() >= 2)
-            {                           /* category       /       package */
-                util::string pkg(parts[parts.size()-2] + "/" + parts[parts.size()-1]);
+            this->push_back(util::sprintf("%s/%s", c->c_str(), d->basename()));
+    }
 
-                if (portage::is_pkg_dir(*d))
-                    this->push_back(pkg);
-            }
-        }
+    if (optget("timer", bool))
+    {
+        timer.stop();
+        debug_msg("Took %ldms to fill package cache.", timer.elapsed());
     }
 }
 

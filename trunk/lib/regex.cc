@@ -26,7 +26,7 @@
 
 /* use POSIX regular expressions */
 #ifndef _POSIX_C_SOURCE
-# define _POSIX_C_SOURCE
+# define _POSIX_C_SOURCE    200112
 #endif
 
 #include <sys/types.h>

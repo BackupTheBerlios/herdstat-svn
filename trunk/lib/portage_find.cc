@@ -84,13 +84,31 @@ portage::ebuild_which(const portage::config_T &config,
     const util::string portdir(config.portdir());
     if (p.first != portdir)
     {
-        portage::version_string_T ver1(ebuild_which(portdir, p.second, timer));
-        portage::version_string_T ver2(ebuild_which(p.first, p.second, timer));
+        util::path_T ebuild1, ebuild2;
 
-        if (ver1 > ver2)
-            ebuild = ver1.ebuild();
-        else /* ver1 <= ver2 */
-            ebuild = ver2.ebuild();
+        try
+        {
+            ebuild1 = ebuild_which(portdir, p.second, timer, pkgcache);
+            ebuild2 = ebuild_which(p.first, p.second, timer, pkgcache);
+        }
+        catch (const portage::nonexistent_pkg_E &e)
+        {
+            ebuild2 = ebuild_which(p.first, p.second, timer, pkgcache);
+        }
+
+        if (ebuild1.empty())
+            ebuild = ebuild2;
+        else
+        {
+            /* pick which one is greater */
+            portage::version_string_T ver1(ebuild1);
+            portage::version_string_T ver2(ebuild2);
+
+            if (ver1 > ver2)
+                ebuild = ver1.ebuild();
+            else /* ver1 <= ver2 */
+                ebuild = ver2.ebuild();
+        }
     }
     else
         ebuild = ebuild_which(p.first, p.second, timer);

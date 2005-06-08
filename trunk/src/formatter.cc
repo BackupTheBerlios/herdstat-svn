@@ -268,7 +268,10 @@ formatter_T::append(const string_type &label, const string_type &data)
 //                debug_msg("handling leftovers '%s'", data.substr(pos).c_str());
 
                 /* handle leftovers */
-                std::vector<string_type> leftovers = data.substr(pos).split();
+//                std::vector<string_type> leftovers = data.substr(pos).split();
+
+                std::vector<string_type> leftovers =
+                    highlight(data.substr(pos).split()).split();
 
                 std::vector<string_type>::iterator i;
                 for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
@@ -306,6 +309,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                     if (std::find(attr.devaway.begin(),
                         attr.devaway.end(), *i) != attr.devaway.end())
                     {
+                        attr.marked_away = true;
                         marked_away = true;
                         oldlen = attr.maxtotal;
                         attr.maxtotal = oldlen + attr.devaway_color.length() +

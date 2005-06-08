@@ -38,6 +38,7 @@
 #include <dirent.h>
 
 #include "string.hh"
+#include "regex.hh"
 
 #define DEFAULT_MODE std::ios::in
 
@@ -75,8 +76,12 @@ namespace util
 #endif
             path_T(const path_T &n) : util::string(n) { }
 
-            const path_T basename() const { return util::basename(*this); }
-            const path_T dirname() const { return util::dirname(*this); }
+            const char * basename() const
+            { return util::basename(this->c_str()); }
+            const char * dirname() const
+            { return util::dirname(this->c_str()); }
+            const char * parent() const
+            { return util::basename(this->dirname()); }
 
             /* same as util::string::split but with a diff default delim */
             virtual std::vector<util::string>
@@ -233,6 +238,8 @@ namespace util
             virtual void display(std::ostream &);
             virtual void read() = 0;
 
+            value_type &contents() const { return this->_contents; }
+
         protected:
             bool _recurse, _opened;
             DIR *_dir;
@@ -261,6 +268,11 @@ namespace util
                 : base_dir_T<path_T>(path, r) { this->read(); }
             virtual ~dir_T() { }
             virtual void read();
+
+            virtual iterator find(const path_T &);
+            virtual iterator find(const regex_T &);
+            virtual const_iterator find(const path_T &) const;
+            virtual const_iterator find(const regex_T &) const;
     };
 }
 

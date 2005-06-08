@@ -53,6 +53,10 @@ AC_HEADER_DIRENT(,
     [AC_MSG_ERROR([dirent.h is required])])
 AC_CHECK_HEADERS(regex.h,,
     [AC_MSG_ERROR([regex.h is required])])
+AC_CHECK_HEADERS(glob.h,,
+    [AC_MSG_ERROR([glob.h is required])])
+AC_CHECK_HEADERS(fnmatch.h,,
+    [AC_MSG_ERROR([fnmatch.h is required])])
 
 dnl Required funcs
 AC_FUNC_CLOSEDIR_VOID
@@ -66,6 +70,10 @@ AC_CHECK_FUNCS(regfree,,
     [AC_MSG_ERROR([regfree is required])])
 AC_CHECK_FUNCS(regerror,,
     [AC_MSG_ERROR([regerror is required])])
+AC_CHECK_FUNCS(glob,,
+    [AC_MSG_ERROR([glob is required])])
+AC_CHECK_FUNCS(fnmatch,,
+    [AC_MSG_ERROR([fnmatch is required])])
 
 dnl Optional headers
 AC_CHECK_HEADERS(getopt.h)

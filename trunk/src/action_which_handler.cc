@@ -58,7 +58,7 @@ action_which_handler_T::operator() (opts_type &opts)
             regexp.assign(re, REG_ICASE);
 
 
-        pkgcache.set_portdir(portdir);
+        pkgcache.init(portdir);
         matches = portage::find_package_regex(config, regexp,
                     overlay, &search_timer, pkgcache);
 

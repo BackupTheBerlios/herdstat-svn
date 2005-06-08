@@ -25,6 +25,7 @@
 #endif
 
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <cstring>
 #include <cassert>
@@ -210,6 +211,34 @@ util::dir_T::read()
 
         this->_contents.push_back(this->_path + "/" + d->d_name);
     }
+}
+/*****************************************************************************/
+util::dir_T::iterator
+util::dir_T::find(const util::path_T &base)
+{
+    return std::find(this->_contents.begin(), this->_contents.end(),
+        this->_path + "/" + base);
+}
+/*****************************************************************************/
+util::dir_T::iterator
+util::dir_T::find(const util::regex_T &regex)
+{
+    return std::find_if(this->_contents.begin(), this->_contents.end(),
+        std::bind1st(util::regexMatch(), &regex));
+}
+/*****************************************************************************/
+util::dir_T::const_iterator
+util::dir_T::find(const util::regex_T &regex) const
+{
+    return std::find_if(this->_contents.begin(), this->_contents.end(),
+        std::bind1st(util::regexMatch(), &regex));
+}
+/*****************************************************************************/
+util::dir_T::const_iterator
+util::dir_T::find(const util::path_T &base) const
+{
+    return std::find(this->_contents.begin(), this->_contents.end(),
+        this->_path + "/" + base);
 }
 /*****************************************************************************
  * general purpose file-related functions                                    *
