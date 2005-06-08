@@ -57,7 +57,6 @@ namespace util
     void debug(const char *, ...);
 #endif /* UNICODE */
 
-    bool md5check(const util::string &, const util::string &);
     util::string getcwd();
     util::string get_user_from_email(const util::string &);
     util::string current_user();

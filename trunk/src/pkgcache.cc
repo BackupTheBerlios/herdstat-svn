@@ -69,11 +69,14 @@ pkgcache_T::valid() const
 
             if (timestamp and lastsync)
             {
-                valid = util::md5check(path, LASTSYNC);
-
-                /* md5's don't match meaning the user has sync'd since last run */
+                util::file_T t(path), l(LASTSYNC);
+                valid = (t == l);
                 if (not valid)
+                {
+                    debug_msg("timestamp != lastsync ; replacing lastsync file.");
+                    t.close(); l.close();
                     util::copy_file(path, LASTSYNC);
+                }
             }
             else if (lastsync)
             {

@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-06-08 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.1_rc7).
 	* lib/Makefile.am, lib/glob.hh: Added glob_T class, an interface for
 	POSIX glob() as well as a patternMatch function object, an interface
 	for fnmatch().
@@ -12,7 +13,9 @@ ChangeLog for herdstat
 	* lib/file.cc, lib/file.hh: Added dir_T::find(path_T) and
 	dir_T::find(regex_T) for searching directories.  The latter uses the
 	just-added regexMatch functor.  Also added path_T::parent() which
-	returns the basename of dirname.
+	returns the basename of dirname.  Added file_T::operator== for
+	comparing files.
+	* lib/misc.cc, lib/misc.hh: Removed non-portage md5check().
 	* lib/portage_misc.cc: Updated is_pkg_dir() to use
 	dir_T::find(regex_T).
 	* src/action_pkg_handler.cc: Updated to use regexMatch.

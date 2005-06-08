@@ -30,6 +30,7 @@
 #include <cstring>
 #include <cassert>
 #include <iostream>
+#include <utility>
 
 #include "file.hh"
 #include "misc.hh"
@@ -96,6 +97,19 @@ util::file_T::close()
         delete this->stream;
         this->stream = NULL;
     }
+}
+/*****************************************************************************/
+bool
+util::file_T::operator==(const file_T &that)
+{
+    if (this->_contents.size() != that._contents.size())
+        return false;
+
+    /* is every single element equal? */
+    std::pair<value_type::iterator, value_type::const_iterator> p =
+        std::mismatch(this->_contents.begin(), this->_contents.end(),
+            that._contents.begin());
+    return (p.first != this->_contents.end());
 }
 /*****************************************************************************
  * base_dir_T                                                                *

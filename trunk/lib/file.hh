@@ -196,6 +196,10 @@ namespace util
 
             virtual void display(std::ostream &);
 
+            virtual bool operator==(const file_T &f);
+            virtual bool operator!=(const file_T &f)
+            { return not (*this == f); }
+
         protected:
             stream_type *stream;
             value_type _contents;

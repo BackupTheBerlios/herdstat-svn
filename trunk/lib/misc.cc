@@ -70,41 +70,6 @@ util::debug(const char *fmt, ...)
     va_end(v);
 #endif /* DEBUG */
 }
-/****************************************************************************
- * Compare the md5sum of two files, returning true if they match.           *
- ****************************************************************************/
-bool
-util::md5check(const util::string &file1, const util::string &file2)
-{
-    util::string str1, str2;
-
-    util::string cmd = "md5sum " + file1 + " " + file2;
-    FILE *p = popen(cmd.c_str(), "r");
-    if (p)
-    {
-	char line[PATH_MAX + 40];
-	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
-	    str1 = line;
-	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
-	    str2 = line;
-	pclose(p);
-    }
-
-    if (not str1.empty() and not str2.empty())
-    {
-	util::string::size_type pos;
-
-	if ((pos = str1.find_first_of(" \t")) != util::string::npos)
-	    str1 = str1.substr(0, pos);
-
-	if ((pos = str2.find_first_of(" \t")) != util::string::npos)
-	    str2 = str2.substr(0, pos);
-
-	return (str1 == str2);
-    }
-
-    return false;
-}
 /****************************************************************************/
 util::string
 util::getcwd()

@@ -17,8 +17,6 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        progress in percentage) that caused an inf loop if destructor is called
        for an instance when progress_T::start() was not called first (debug
        mode for example).
-     - Fixed FreeBSD compile failure caused by non-existent blkcount_t and
-       blksize_t struct stat members.
      - Fixed small bug in output formatter that caused user-defined highlights
        to fail to highlight properly in certain instances.
      - Fixed small bug in metadata display that caused weird output for
@@ -28,6 +26,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        line).  The unix2dos and dos2unix packages are examples of this.
      - Fixed bug in --which that caused a lookup to fail if the package exists
        in an overlay but not in PORTDIR proper.
+     - Fixed quite a few bugs that prevented building/using herdstat on
+       FreeBSD (many thanks to Diego (flameeyes) for testing/reporting).
 
 1.1.1_rc6:
     New features:

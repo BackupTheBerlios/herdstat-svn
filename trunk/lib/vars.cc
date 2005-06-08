@@ -30,7 +30,7 @@
 #include "vars.hh"
 #include "util_exceptions.hh"
 #include "portage_version.hh"
-#include "util.hh"
+#include "portage_misc.hh"
 
 void
 util::vars_T::read(const util::path_T &path)
