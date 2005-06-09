@@ -28,8 +28,8 @@
 #endif
 
 #include <ios>
-#include <fstream>
 #include <ostream>
+#include <fstream>
 #include <vector>
 #include <cstdlib>
 #include <sys/types.h>
@@ -38,9 +38,8 @@
 #include <dirent.h>
 
 #include "string.hh"
-#include "regex.hh"
 
-#define DEFAULT_MODE std::ios::in
+#define DEFAULT_MODE    std::ios::in
 
 namespace util
 {
@@ -62,224 +61,161 @@ namespace util
     void copy_file(const util::path_T &, const util::path_T &);
     void move_file(const util::path_T &, const util::path_T &);
 
-    enum type_T { FTYPE_FILE, FTYPE_DIR };
+    enum ftype_T { REGULAR, DIRECTORY, CHARACTER, BLOCK, FIFO, LINK, SOCKET };
 
-    /* Represents a path to a file object */
+    /* path string */
     class path_T : public util::string
     {
         public:
-            explicit path_T() : util::string() { }
-            path_T(const char *n) : util::string(n) { }
-            path_T(const std::string &n) : util::string(n) { }
-#ifdef UNICODE
-            path_T(const Glib::ustring &n) : util::string(n) { }
-#endif
-            path_T(const path_T &n) : util::string(n) { }
-
-            const char * basename() const
+            const char *basename() const
             { return util::basename(this->c_str()); }
-            const char * dirname() const
+            const char *dirname() const
             { return util::dirname(this->c_str()); }
-            const char * parent() const
-            { return util::basename(this->dirname()); }
 
-            /* same as util::string::split but with a diff default delim */
-            virtual std::vector<util::string>
-                split(const util::string::value_type delim = static_cast<util::string::value_type>('/'))
+            /* same as util::string::split but with a diff delim */
+            std::vector<util::string>
+            split(const util::string::value_type delim = 
+                static_cast<util::string::value_type>('/'))
             { return util::string::split(delim); }
 
             bool exists() const
             {
-                struct stat s;
-                return stat(this->c_str(), &s) == 0;
+                int r = access(this->c_str(), F_OK);
+                return ((r == 0) or (errno != ENOENT));
             }
     };
 
-    /* generic file object */
-    class fileobject_T
+    /* stat wrapper */
+    class stat_T : public stat
     {
         public:
-            typedef off_t size_type;
-            typedef time_t time_type;
-            typedef mode_t mode_type;
-            typedef uid_t uid_type;
-            typedef gid_t gid_type;
-            typedef dev_t device_type;
-            typedef ino_t inode_type;
-/* FIXME: need to add configure check to determine type of st_blocks and
- * st_blksize.
-            typedef blksize_t blksize_type;
-            typedef blkcnt_t blkcnt_type;
- */
-            fileobject_T(type_T t) : _type(t), _opened(false) { }
-            fileobject_T(const path_T &path, type_T t)
-                : _path(path), _type(t), _opened(false)
-            { this->stat(); }
-            virtual ~fileobject_T() { if (this->_opened) this->close(); }
+            typedef dev_t   device_type;
+            typedef ino_t   inode_type;
+            typedef mode_t  mode_type;
+            typedef uid_t   uid_type;
+            typedef gid_t   gid_type;
+            typedef off_t   size_type;
+            typedef time_t  time_type;
+            typedef path_T  string_type;
 
-            size_type size() const { return this->_sbuf.st_size; }
-            time_type mtime() const { return this->_sbuf.st_mtime; }
-            time_type atime() const { return this->_sbuf.st_atime; }
-            time_type ctime() const { return this->_sbuf.st_ctime; }
-            uid_type uid() const { return this->_sbuf.st_uid; }
-            gid_type gid() const { return this->_sbuf.st_gid; }
-            mode_type mode() const { return this->_sbuf.st_mode; }
-            inode_type inode() const { return this->_sbuf.st_ino; }
-            device_type device() const { return this->_sbuf.st_dev; }
-//            blksize_type blksize() const { return this->_sbuf.st_blksize; }
-//            blkcnt_type blkcnt() const { return this->_sbuf.st_blocks; }
+            stat_T() : _type(REGULAR), _exists(false), _opened(false) { }
+            stat_T(const util::path_T &p, bool opened = false)
+                : _path(p), _type(REGULAR), _exists(false), _opened(opened)
+            { (*this)(); }
 
-            path_T &name() { return this->_path; }
-            path_T basename() const { return this->_path.basename(); }
-            path_T dirname() const { return this->_path.dirname(); }
-            type_T type() const { return this->_type; }
-            bool exists() const { return this->_exists; }
+            virtual ~stat_T() { }
 
-            virtual void display(std::ostream &) { }
-            virtual void open() { }
-            virtual void read() { }
-            virtual void close() { }
-            virtual bool is_open() const { return this->_opened; }
+            device_type &device()   const { return this->st_dev; }
+            inode_type  &inode()    const { return this->st_ino; }
+            mode_type   &mode()     const { return this->st_mode; }
+            uid_type    &uid()      const { return this->st_uid; }
+            gid_type    &gid()      const { return this->st_gid; }
+            size_type   &size()     const { return this->st_size; }
+            time_type   &atime()    const { return this->st_atime; }
+            time_type   &mtime()    const { return this->st_mtime; }
+            time_type   &ctime()    const { return this->st_ctime; }
+            string_type &path()     const { return this->_path; }
+            ftype_T     &type()     const { return this->_type; }
 
-        protected:
-            void stat()
+            void assign(const util::path_T &p, bool opened = false)
             {
-                this->_exists = ( ::stat(this->_path.c_str(),
-                    &this->_sbuf) == 0);
+                this->_opened = opened;
+                this->_path.assign(p);
+                (*this)();
             }
 
-            path_T _path;        /* path object */
-            struct stat _sbuf;   /* stat structure */
-            type_T _type;
-            bool _exists, _opened;
+            virtual void operator() ();
+
+        protected:
+            const util::path_T _path;
+            ftype_T _type;
+            bool _exists;
+            const bool _opened;
     };
 
-    /* represents a regular file */
-    class file_T : public fileobject_T
+    template <class C>
+    class base_file_T : public std::vector<C>
+    {
+        public:
+            typedef std::vector<C> base_type;
+
+            base_file_T(ftype_T t) : _type(t), _opened(false) { }
+            base_file_T(const path_T &path, ftype_T t)
+                : _path(path), _stat(path), _type(t)
+            { this->open(); this->read(); }
+
+            virtual ~base_file_T() { if (this->_opened) this->close(); }
+
+            /* properties */
+            bool is_open() const { return this->_opened; }
+
+            /* comparions */
+            virtual bool operator== (const base_file_T<C> &) const;
+            virtual bool operator!= (const base_file_T<C> &f) const
+            { return not (*this == f); }
+
+            /* actions */
+            
+            /* TODO: operator= would be a nice interface for copying files. */
+
+            virtual void dump(std::ostream &) const;
+
+            virtual void open()     = 0;
+            virtual void close()    = 0;
+            virtual void read()     = 0;
+            
+        protected:
+            stat_T  _stat;
+            path_T  _path;
+            bool    _opened;
+    };
+
+    class file_T : public base_file_T<util::string>
     {
         public:
             typedef std::fstream stream_type;
-            typedef std::vector<util::string> value_type;
-            typedef value_type::value_type string_type;
-            typedef value_type::iterator iterator;
-            typedef value_type::const_iterator const_iterator;
-            typedef value_type::size_type size_type;
 
-            file_T() : fileobject_T(FTYPE_FILE), stream(NULL) { }
-            file_T(const path_T &path, bool open = true)
-                : fileobject_T(path, FTYPE_FILE), stream(NULL)
-            { if (open) { this->open(); this->read(); } }
-            file_T(const path_T &path, stream_type *s)
-                : fileobject_T(path, FTYPE_FILE), stream(s)
-            { if (not s->is_open()) this->open(); }
+            file_T() : base_type(REGULAR), stream(NULL) { }
+            file_T(const path_T &path)
+                : base_type(path, REGULAR), stream(NULL) { }
+
             virtual ~file_T() { }
 
-            iterator begin() { return this->_contents.begin(); }
-            const_iterator begin() const { return this->_contents.begin(); }
-            iterator end() { return this->_contents.end(); }
-            const_iterator end() const { return this->_contents.end(); }
-            size_type bufsize() const { return this->_contents.size(); }
-            void push_back(const string_type &s)
-            { this->_contents.push_back(s); }
+            stat_T::size_type &size() const { return this->_stat.size(); }
 
-            virtual void open()
-            { this->open(this->_path.c_str(), DEFAULT_MODE); }
+            virtual void open() { this->open(this->path.c_str(), DEFAULT_MODE); }
             virtual void open(const char *,
                 std::ios_base::openmode mode = DEFAULT_MODE);
             virtual void open(std::ios_base::openmode mode)
             { this->open(this->_path.c_str(), mode); }
-
             virtual void close();
-
-            virtual void read() { this->read(&(this->_contents)); }
-            virtual void read(value_type *);
-
-            virtual void write() { this->display(*(this->stream)); }
-            virtual void write(const value_type &v)
-            { this->_contents = v; this->write(); }
-
-            virtual void display(std::ostream &);
-
-            virtual bool operator==(const file_T &f);
-            virtual bool operator!=(const file_T &f)
-            { return not (*this == f); }
+            virtual void read();
+            virtual void write() const { this->dump(*(this->stream)); }
 
         protected:
             stream_type *stream;
-            value_type _contents;
     };
 
-    /* generic directory object */
-    template <class C>
-    class base_dir_T : public fileobject_T
+    class dir_T  : public base_file_T<util::path_T>
     {
         public:
-            typedef typename std::vector<C> value_type;
-            typedef typename value_type::iterator iterator;
-            typedef typename value_type::const_iterator const_iterator;
-            typedef typename value_type::size_type size_type;
+            dir_T() : base_type(DIRECTORY), _dirp(NULL) { }
+            dir_T(const path_T &path)
+                : base_type(path, DIRECTORY), _dirp(NULL) { }
 
-            base_dir_T(const path_T &path, bool r = false)
-                : fileobject_T(path, FTYPE_DIR), _recurse(r), _dir(NULL)
-            { this->open(); }
-
-            virtual ~base_dir_T() { }
-
-            /* small subset of vector methods */
-            iterator begin() { return this->_contents.begin(); }
-            const_iterator begin() const { return this->_contents.begin(); }
-            iterator end() { return this->_contents.end(); }
-            const_iterator end() const { return this->_contents.end(); }
-            size_type bufsize() const { return this->_contents.size(); }
-            bool empty() const { return this->_contents.size() == 0; }
+            virtual ~dir_T() { }
 
             virtual void open();
-            virtual void open(const char *n)
-            {
-                this->_path.assign(n);
-                this->stat();
-                this->open();
-            }
-
             virtual void close();
-            virtual void display(std::ostream &);
-            virtual void read() = 0;
+            virtual void read();
 
-            value_type &contents() const { return this->_contents; }
+            virtual iterator find(const value_type &);
+            virtual iterator find(const regex_T &);
+            virtual const_iterator find(const value_type &) const;
+            virtual const_iterator find(const regex_T &) const;
 
         protected:
-            bool _recurse;
-            DIR *_dir;
-            value_type _contents;
-    };
-
-    /* represents a fileobject_T container (aka a directory).
-     * of course, directories are file objects themselves... */
-    class dirobject_T : public base_dir_T<fileobject_T * >
-    {
-        public:
-            dirobject_T(const path_T &path, bool r = false)
-                : base_dir_T<fileobject_T * >(path, r) { this->read(); }
-            virtual ~dirobject_T();
-            virtual void read();
-            virtual void display(std::ostream &);
-    };
-
-    /* acts as a DIR/dirent wrapper (only provides
-     * the filename) instead of creating fileobject_T
-     * objects for each child like dirobject_T */
-    class dir_T : public base_dir_T<path_T>
-    {
-        public:
-            dir_T(const path_T &path, bool r = false)
-                : base_dir_T<path_T>(path, r) { this->read(); }
-            virtual ~dir_T() { }
-            virtual void read();
-
-            virtual iterator find(const path_T &);
-            virtual iterator find(const regex_T &);
-            virtual const_iterator find(const path_T &) const;
-            virtual const_iterator find(const regex_T &) const;
+            DIR *_dirp;
     };
 }
 
