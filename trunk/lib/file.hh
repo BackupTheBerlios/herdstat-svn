@@ -111,10 +111,11 @@ namespace util
             typedef blksize_t blksize_type;
             typedef blkcnt_t blkcnt_type;
  */
-            fileobject_T(type_T t) : _type(t) { }
-            fileobject_T(const path_T &path, type_T t) : _path(path), _type(t)
+            fileobject_T(type_T t) : _type(t), _opened(false) { }
+            fileobject_T(const path_T &path, type_T t)
+                : _path(path), _type(t), _opened(false)
             { this->stat(); }
-            virtual ~fileobject_T() { this->close(); }
+            virtual ~fileobject_T() { if (this->_opened) this->close(); }
 
             size_type size() const { return this->_sbuf.st_size; }
             time_type mtime() const { return this->_sbuf.st_mtime; }
@@ -138,18 +139,19 @@ namespace util
             virtual void open() { }
             virtual void read() { }
             virtual void close() { }
+            virtual bool is_open() const { return this->_opened; }
 
         protected:
             void stat()
             {
                 this->_exists = ( ::stat(this->_path.c_str(),
-                    &this->_sbuf) == 0 ? true : false );
+                    &this->_sbuf) == 0);
             }
 
             path_T _path;        /* path object */
             struct stat _sbuf;   /* stat structure */
             type_T _type;
-            bool _exists;
+            bool _exists, _opened;
     };
 
     /* represents a regular file */
@@ -164,10 +166,12 @@ namespace util
             typedef value_type::size_type size_type;
 
             file_T() : fileobject_T(FTYPE_FILE), stream(NULL) { }
-            file_T(const path_T &path)
-                : fileobject_T(path, FTYPE_FILE), stream(NULL) { }
+            file_T(const path_T &path, bool open = true)
+                : fileobject_T(path, FTYPE_FILE), stream(NULL)
+            { if (open) { this->open(); this->read(); } }
             file_T(const path_T &path, stream_type *s)
-                : fileobject_T(path, FTYPE_FILE), stream(NULL) { }
+                : fileobject_T(path, FTYPE_FILE), stream(s)
+            { if (not s->is_open()) this->open(); }
             virtual ~file_T() { }
 
             iterator begin() { return this->_contents.begin(); }
@@ -216,11 +220,10 @@ namespace util
             typedef typename value_type::size_type size_type;
 
             base_dir_T(const path_T &path, bool r = false)
-                : fileobject_T(path, FTYPE_DIR), _recurse(r), _opened(false),
-                  _dir(NULL)
+                : fileobject_T(path, FTYPE_DIR), _recurse(r), _dir(NULL)
             { this->open(); }
 
-            virtual ~base_dir_T() { if (this->_opened) this->close(); }
+            virtual ~base_dir_T() { }
 
             /* small subset of vector methods */
             iterator begin() { return this->_contents.begin(); }
@@ -245,7 +248,7 @@ namespace util
             value_type &contents() const { return this->_contents; }
 
         protected:
-            bool _recurse, _opened;
+            bool _recurse;
             DIR *_dir;
             value_type _contents;
     };

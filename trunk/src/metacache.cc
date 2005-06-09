@@ -61,6 +61,8 @@ metacache_T::valid() const
             if (timestamp and lastsync)
             {
                 util::file_T t(path), l(LASTSYNC);
+                debug_msg("t.is_open? %d l.is_open? %d", t.is_open(), l.is_open());
+                debug_msg("t.bufsize? %d l.bufsize? %d", t.bufsize(), l.bufsize());
                 valid = (t == l);
                 if (not valid)
                 {
@@ -148,14 +150,16 @@ metacache_T::load()
     try
     {
         util::vars_T cache(METACACHE);
+
         this->_portdir = cache["portdir"];
         if (this->_portdir.empty())
             throw metacache_parse_E();
 
-        if (not cache["size"].empty())
-            this->reserve(std::atoi(cache["size"].c_str()));
-        else
+        /* reserve to prevent tons of reallocations */
+        if (cache["size"].empty() or cache["size"] == "0")
             this->reserve(METACACHE_RESERVE);
+        else
+            this->reserve(std::atoi(cache["size"].c_str()));
 
         util::vars_T::iterator i;
         for (i = cache.begin() ; i != cache.end() ; ++i)
@@ -172,10 +176,12 @@ metacache_T::load()
             if (parts.empty())
                 throw metacache_parse_E();
 
+            /* get herds */
             str = parts.front();
             parts.erase(parts.begin());
             meta.herds = str.split(',');
 
+            /* get devs */
             if (not parts.empty())
             {
                 str = parts.front();
@@ -184,12 +190,13 @@ metacache_T::load()
                     meta.devs = str.split(',');
             }
 
-            /* longdesc contains a ':', so reconstruct it */
+            /* get longdesc */
             if (not parts.empty())
             {
                 str = parts.front();
                 parts.erase(parts.begin());
 
+                /* longdesc contains a ':', so reconstruct it */
                 while (not parts.empty())
                 {
                     str += ":" + parts.front();
@@ -238,6 +245,7 @@ metacache_T::dump()
 
         f << ci->pkg << "=";
 
+        /* herds */
         metadata_T::herds_type::iterator h;
         for (h = ci->herds.begin(), n = 1 ; h != ci->herds.end() ; ++h, ++n)
         {
@@ -248,6 +256,7 @@ metacache_T::dump()
 
         f << str << ":";
         
+        /* developers */
         metadata_T::herd_type::iterator d;
         for (d = ci->devs.begin(), n = 1, str.clear() ; d != ci->devs.end() ; 
             ++d, ++n)
@@ -259,6 +268,7 @@ metacache_T::dump()
 
         f << str << ":";
 
+        /* longdesc */
         if (ci->longdesc.empty())
             f << std::endl;
         else

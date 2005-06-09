@@ -49,7 +49,7 @@ util::vars_T::read(const util::path_T &path)
 void
 util::vars_T::read()
 {
-    if (not this->stream or not this->stream->is_open())
+    if (not this->_opened)
         this->open();
 
     std::string s;

@@ -46,10 +46,9 @@ namespace util
 
             vars_T() : _depth(0) { }
             vars_T(const util::path_T &path) : util::file_T(path), _depth(0)
-            {
-                this->open();
-                this->read();
-            }
+            { this->read(); }
+
+            virtual ~vars_T() { }
 
             /* map subset */
             size_type count(const string_type &s)

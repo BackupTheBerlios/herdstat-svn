@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include <vector>
+#include "string.hh"
 #include "file.hh"
 
 namespace util
@@ -43,24 +43,10 @@ namespace util
         public:
             typedef util::string string_type;
             typedef C value_type;
-//            typedef typename value_type::iterator iterator;
-//            typedef typename value_type::const_iterator const_iterator;
-//            typedef typename value_type::size_type size_type;
 
             cache_T(const string_type &p) : _path(p) { }
-
             virtual ~cache_T() { }
 
-            /* value_type subset */
-//            iterator begin() { return this->begin(); }
-//            const_iterator begin() const { return this->begin(); }
-//            iterator end() { return this->end(); }
-//            const_iterator end() const { return this->end(); }
-//            size_type size() const { return this->size(); }
-//            void clear() { this->clear(); }
-//            bool empty() const { return this->size() == 0; }
-
-            /* main cache interface */
             virtual bool valid() const = 0;
             virtual void fill() = 0;
             virtual void load() = 0;

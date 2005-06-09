@@ -42,6 +42,9 @@
 void
 util::file_T::open(const char *n, std::ios_base::openmode mode)
 {
+    if (this->_opened)
+        return;
+
     if (this->_path != n)
     {
         this->_path = n;
@@ -60,6 +63,8 @@ util::file_T::open(const char *n, std::ios_base::openmode mode)
 
     if (not this->stream->is_open())
         throw util::bad_fileobject_E(n);
+
+    this->_opened = true;
 }
 /*****************************************************************************/
 void
@@ -93,7 +98,9 @@ util::file_T::close()
 {
     if (this->stream)
     {
-        this->stream->close();
+        if (this->stream->is_open())
+            this->stream->close();
+        this->_opened = false;
         delete this->stream;
         this->stream = NULL;
     }
@@ -118,6 +125,9 @@ template <class C>
 void
 util::base_dir_T<C>::close()
 {
+    if (not this->_opened)
+        return;
+
 #ifdef CLOSEDIR_VOID
     closedir(this->_dir);
 #else /* CLOSEDIR_VOID */
