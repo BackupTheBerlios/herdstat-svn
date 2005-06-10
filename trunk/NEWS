@@ -1,6 +1,20 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc8:
+    Bug fixes:
+     - Rewrote file utility classes from scratch to fix a few design issues and
+       bugs.
+     - Fixed bug in --nocolor output when a highlight occurs (highlight color
+       was never cleared).
+     - Fixed significant bug in portage tree regex search code.  An errant
+       'not' caused the pkgcache to be used when empty (resulting in no
+       results) and when the pkgcache wasn't empty, the tree was still
+       traversed, resulting in slower results.
+     - Fixed bug in --versions --count output (a sleu of new lines were
+       displayed).
+     - Fixed bug in package cache: overlays were not searched.
+
 1.1.1_rc7:
     New features:
      - Broke out code from metadata cache that gets the list of all packages

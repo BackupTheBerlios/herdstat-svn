@@ -94,9 +94,15 @@ formatter_T::add_highlights(const std::vector<string_type> &pairs)
     {
         std::vector<string_type> parts(i->split(','));
         if (parts.size() == 1)
-            attr.highlights[parts.front()] = attr.highlight_color;
+        {
+            util::string c(attr.colors? attr.highlight_color : "");
+            attr.highlights[parts.front()] = c;
+        }
         else if (parts.size() == 2)
-            attr.highlights[parts.front()] = color[parts.back()];
+        {
+            util::string c(attr.colors? color[parts.back()] : "");
+            attr.highlights[parts.front()] = c;
+        }
         else
             throw format_E("Invalid highlight '%s'", i->c_str());
     }
@@ -111,12 +117,6 @@ formatter_T::highlight(const std::vector<string_type> &data)
 {
     string_type s;
     std::vector<string_type>::const_iterator i;
-
-    if (not colors())
-    {
-        attr.highlight_color.clear();
-        attr.devaway_color.clear();
-    }
 
     for (i = data.begin() ; i != data.end() ; ++i)
     {

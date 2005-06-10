@@ -24,13 +24,22 @@
 # include "config.h"
 #endif
 
-#include <iostream>
+#include <ostream>
+#include <utility>
 #include <cassert>
 
 #include "vars.hh"
 #include "util_exceptions.hh"
 #include "portage_version.hh"
 #include "portage_misc.hh"
+
+void
+util::vars_T::dump(std::ostream &stream) const
+{
+    const_iterator i;
+    for (i = this->begin() ; i != this->end() ; ++i)
+        stream << i->first << "=" << i->second << std::endl;
+}
 
 void
 util::vars_T::read(const util::path_T &path)
@@ -53,62 +62,62 @@ util::vars_T::read()
         this->open();
 
     std::string s;
-    string_type::size_type pos;
+    util::string::size_type pos;
 
     while (std::getline(*(this->stream), s))
     {
-        string_type line(s);
+        util::string line(s);
         pos = line.find_first_not_of(" \t");
-        if (pos != string_type::npos)
+        if (pos != util::string::npos)
             line.erase(0, pos);
 
         if (line.length() < 1 or line[0] == '#')
             continue;
 
         pos = line.find('=');
-        if (pos != string_type::npos)
+        if (pos != util::string::npos)
         {
-            string_type key = line.substr(0, pos);
-            string_type val = line.substr(pos + 1);
+            util::string key = line.substr(0, pos);
+            util::string val = line.substr(pos + 1);
 
             /* handle leading/trailing whitespace */
-            if (string_type::npos != (pos = key.find_first_not_of(" \t")))
+            if (util::string::npos != (pos = key.find_first_not_of(" \t")))
                 key.erase(0, pos);
-            if (string_type::npos != (pos = val.find_first_not_of(" \t")))
+            if (util::string::npos != (pos = val.find_first_not_of(" \t")))
                 val.erase(0, pos);
-            if (string_type::npos != (pos = key.find_last_not_of(" \t")))
+            if (util::string::npos != (pos = key.find_last_not_of(" \t")))
                 key.erase(++pos);
-            if (string_type::npos != (pos = val.find_last_not_of(" \t")))
+            if (util::string::npos != (pos = val.find_last_not_of(" \t")))
                 val.erase(++pos);
  
             /* handle quotes */
-            if (string_type::npos != (pos = val.find_first_of("'\"")))
+            if (util::string::npos != (pos = val.find_first_of("'\"")))
             {
                 val.erase(pos, pos + 1);
-                if (string_type::npos != (pos = val.find_last_of("'\"")))
+                if (util::string::npos != (pos = val.find_last_of("'\"")))
                     val.erase(pos, pos + 1);
             }
  
-            this->_keys[key] = val;
+            this->insert(std::make_pair(key, val));
         }
     }
 
     /* are we an ebuild? */
-    this->_ebuild = portage::is_ebuild(this->name());
+    this->_ebuild = portage::is_ebuild(this->_path);
 
     /* if so, insert its variable components
      * (${P}, ${PN}, ${PV}, etc) into our map */
     if (this->_ebuild)
     {
-        portage::version_string_T version(this->name());
+        portage::version_string_T version(this->_path);
         portage::version_string_T::iterator v;
 
         for (v = version.begin() ; v != version.end() ; ++v)
-            this->_keys[v->first] = v->second;
+            this->insert(std::make_pair(v->first, v->second));
     }
 
     /* loop through our map performing variable substitutions */
-    for (iterator i = this->_keys.begin() ; i != this->_keys.end() ; ++i)
+    for (iterator i = this->begin() ; i != this->end() ; ++i)
         this->subst(i->second);
 }
 
@@ -118,22 +127,22 @@ util::vars_T::read()
  */
 
 void
-util::vars_T::subst(string_type &value)
+util::vars_T::subst(util::string &value)
 {
 
-    std::vector<string_type> vars;
-    std::vector<string_type>::iterator v;
-    string_type::size_type lpos = 0;
+    std::vector<util::string> vars;
+    std::vector<util::string>::iterator v;
+    util::string::size_type lpos = 0;
 
     /* find variables that need substituting */
     while (true)
     {
-        string_type::size_type begin = value.find("${", lpos);
-        if (begin == string_type::npos)
+        util::string::size_type begin = value.find("${", lpos);
+        if (begin == util::string::npos)
             break;
 
-        string_type::size_type end = value.find("}", begin);
-        if (end == string_type::npos)
+        util::string::size_type end = value.find("}", begin);
+        if (end == util::string::npos)
             break;
 
         /* save it */
@@ -146,11 +155,11 @@ util::vars_T::subst(string_type &value)
     /* for each variable we found */
     for (v = vars.begin() ; v != vars.end() ; ++v)
     {
-        string_type subst;
-        string_type var("${"+(*v)+"}");
+        util::string subst;
+        util::string var("${"+(*v)+"}");
 
-        string_type::size_type pos = value.find(var);
-        if (pos == string_type::npos)
+        util::string::size_type pos = value.find(var);
+        if (pos == util::string::npos)
             continue;
 
         /* is that variable defined? */
@@ -158,7 +167,7 @@ util::vars_T::subst(string_type &value)
         if (x != this->end())
             subst = x->second;
 
-        if (subst.find("${") != string_type::npos)
+        if (subst.find("${") != util::string::npos)
         {
             ++(this->_depth);
             this->subst(subst);

@@ -92,7 +92,7 @@ class formatter_T
 
         void add_highlight(const string_type &s,
                            const string_type &c = attr.highlight_color)
-        { attr.highlights[s] = c; }
+        { attr.highlights[s] = attr.colors? c : ""; }
         void add_highlights(const std::vector<string_type> &);
 
         void set_devaway(const std::vector<string_type> &v)
