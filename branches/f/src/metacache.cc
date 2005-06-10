@@ -61,12 +61,19 @@ metacache_T::valid() const
             if (timestamp and lastsync)
             {
                 util::file_T t(path), l(LASTSYNC);
-                debug_msg("t.is_open? %d l.is_open? %d", t.is_open(), l.is_open());
-                debug_msg("t.bufsize? %d l.bufsize? %d", t.bufsize(), l.bufsize());
+
+                if (optget("debug", bool))
+                {
+                    debug_msg("Checking timestamps...");
+                    t.dump(std::cout);
+                    l.dump(std::cout);
+                }
+
                 valid = (t == l);
+                
                 if (not valid)
                 {
-                    debug_msg("timestamp != lastsync ; replacing lastsync file.");
+                    debug_msg("timestamps don't match ; replacing lastsync");
                     t.close(); l.close();
                     util::copy_file(path, LASTSYNC);
                 }
@@ -149,7 +156,7 @@ metacache_T::load()
 
     try
     {
-        util::vars_T cache(METACACHE);
+        const util::vars_T cache(METACACHE);
 
         this->_portdir = cache["portdir"];
         if (this->_portdir.empty())
@@ -161,7 +168,7 @@ metacache_T::load()
         else
             this->reserve(std::atoi(cache["size"].c_str()));
 
-        util::vars_T::iterator i;
+        util::vars_T::const_iterator i;
         for (i = cache.begin() ; i != cache.end() ; ++i)
         {
             /* not a category/package, so skip it */

@@ -27,6 +27,7 @@
 #include <algorithm>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "formatter.hh"
 #include "action_versions_handler.hh"
@@ -106,8 +107,9 @@ action_versions_handler_T::operator() (opts_type &opts)
         else
             regexp.assign(re, REG_ICASE);
         
+        pkgcache_T pkgcache(portdir);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer);
+                    overlay, &search_timer, pkgcache);
         
         if (matches.empty())
         {
@@ -127,6 +129,8 @@ action_versions_handler_T::operator() (opts_type &opts)
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         util::string package;
+
+//        std::cout << m->first << " : " << m->second << std::endl;
 
         try
         {
@@ -183,7 +187,7 @@ action_versions_handler_T::operator() (opts_type &opts)
                 }
             }
 
-            if (n != matches.size())
+            if (not count and (n != matches.size()))
                 output.endl();
         }
         catch (const portage::ambiguous_pkg_E &e)

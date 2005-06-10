@@ -63,9 +63,8 @@ util::stat_T::operator() ()
         this->_type = SOCKET;
 }
 /*****************************************************************************/
-template <class C>
 void
-util::base_file_T<C>::open(const char *n, std::ios_base::openmode mode)
+util::base_file_T::open(const char *n, std::ios_base::openmode mode)
 {
     if (this->_opened)
         return;
@@ -95,9 +94,8 @@ util::base_file_T<C>::open(const char *n, std::ios_base::openmode mode)
     this->_opened = true;
 }
 /*****************************************************************************/
-template <class C>
 void
-util::base_file_T<C>::close()
+util::base_file_T::close()
 {
     if (not this->_opened)
         return;
@@ -112,20 +110,19 @@ void
 util::file_T::read()
 {
     assert(this->stream and this->stream->is_open());
-    std::copy(std::istream_iterator<value_type>(*(this->stream)),
-        std::istream_iterator<value_type>(), std::back_inserter(*this));
+
+    std::string line;
+    while (std::getline(*(this->stream), line))
+        this->push_back(util::string(line));
 }
 /*****************************************************************************/
 bool
 util::file_T::operator== (const file_T &that) const
 {
-    if (this->size() != that.size())
+    if (this->bufsize() != that.bufsize())
         return false;
 
-    /* is every single element equal? */
-    std::pair<const_iterator, const_iterator> p;
-    p = std::mismatch(this->begin(), this->end(), that.begin());
-    return (p.first != this->end());
+    return std::equal(this->begin(), this->end(), that.begin());
 }
 /*****************************************************************************/
 void
@@ -158,6 +155,7 @@ util::dir_T::open()
         return;
 
     assert(not this->_path.empty());
+
     this->_dirp = opendir(this->_path.c_str());
     if (not this->_dirp)
         throw util::bad_fileobject_E(this->_path);
@@ -302,20 +300,18 @@ util::copy_file(const util::path_T &from, const util::path_T &to)
     if (util::is_file(to) and (unlink(to.c_str()) != 0))
 	throw util::bad_fileobject_E(to);
 
-    const std::auto_ptr<std::ifstream>
-        ffrom(new std::ifstream(from.c_str()));
-    const std::auto_ptr<std::ofstream>
-        fto(new std::ofstream(to.c_str()));
+    std::ifstream ffrom(from.c_str());
+    std::ofstream fto(to.c_str());
 
-    if (not (*ffrom))
+    if (not ffrom)
 	throw util::bad_fileobject_E(from);
-    if (not (*fto))
+    if (not fto)
 	throw util::bad_fileobject_E(to);
 
     /* read from ffrom and write to fto */
     std::string line;
-    while (std::getline(*ffrom, line))
-	*fto << line << std::endl;
+    while (std::getline(ffrom, line))
+	fto << line << std::endl;
 }
 /*****************************************************************************/
 void

@@ -393,6 +393,9 @@ portage::versions_T::assign(const util::path_T &path)
 {
     this->_vs.clear();
 
+    if (not util::is_dir(path))
+        return;
+
     const util::dir_T pkgdir(path);
     util::dir_T::const_iterator d;
     

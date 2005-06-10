@@ -233,7 +233,7 @@ portage::find_package_regex_in(const util::string &portdir,
 
     std::vector<util::string> matches;
 
-    if (not pkgcache.empty())
+    if (pkgcache.empty())
     {
         const portage::categories_T categories;
         portage::categories_T::const_iterator c;
@@ -275,12 +275,13 @@ portage::find_package_regex_in(const util::string &portdir,
         for (i = pkgcache.begin() ; i != pkgcache.end() ; ++i)
         {
             util::string::size_type pos = i->find('/');
-            if (pos != util::string::npos)
+            if (pos != util::string::npos and i->substr(pos+1) != "metadata.xml")
             {
                 if (knowncat and i->substr(0, pos) != cat)
                     continue;
 
-                if ((regex == i->substr(pos+1)) or (regex == *i))
+                if (((regex == i->substr(pos+1)) or (regex == *i)) and
+                    util::is_dir(portdir + "/" + (*i)))
                     matches.push_back(*i);
             }
         }

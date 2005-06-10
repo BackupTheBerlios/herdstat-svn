@@ -33,12 +33,14 @@
 
 namespace util
 {
-    class vars_T : public base_file_T<std::map<string, string> >
+    class vars_T : public base_file_T,
+                   public std::map<string, string>
     {
         public:
             vars_T() : _depth(0) { }
-            vars_T(const path_T &path) 
-                : base_file_T<base_type>(path), _depth(0) { }
+            vars_T(const path_T &path) : base_file_T(path), _depth(0)
+            { this->read(); }
+
             virtual ~vars_T() { }
 
             /* work around the fact that std::map doesn't have a
@@ -49,6 +51,7 @@ namespace util
                 return (i == this->end() ? "" : i->second);
             }
 
+            virtual void dump(std::ostream &) const;
             virtual void read();
             virtual void read(const path_T &);
 

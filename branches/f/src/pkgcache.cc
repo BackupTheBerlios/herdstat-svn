@@ -116,19 +116,32 @@ pkgcache_T::fill()
     const portage::categories_T categories(this->_portdir,
         optget("qa", bool));
 
+    std::vector<util::string>::iterator i;
+    std::vector<util::string> dirs = 
+        optget("portage.config", portage::config_T).overlays();
+    dirs.insert(dirs.begin(), this->_portdir);
+
     /* for each category */
     portage::categories_T::const_iterator c;
     for (c = categories.begin() ; c != categories.end() ; ++c)
     {
-        const util::path_T cat(this->_portdir + "/" + (*c));
-        if (not cat.exists())
-            continue;
+        for (i = dirs.begin() ; i != dirs.end() ; ++i)
+        {
+            const util::path_T cat(*i + "/" + (*c));
+            if (not cat.exists())
+                continue;
 
-        /* for each directory in category */
-        const util::dir_T category(cat);
-        util::dir_T::const_iterator d;
-        for (d = category.begin() ; d != category.end() ; ++d)
-            this->push_back(util::sprintf("%s/%s", c->c_str(), d->basename()));
+            /* for each directory in category */
+            const util::dir_T category(cat);
+            util::dir_T::const_iterator d;
+            for (d = category.begin() ; d != category.end() ; ++d)
+            {
+                util::string pkg(util::sprintf("%s/%s", c->c_str(), d->basename()));
+                if ((*i == this->_portdir) or 
+                    (std::find(this->begin(), this->end(), pkg) == this->end()))
+                    this->push_back(pkg);
+            }
+        }
     }
 
     if (optget("timer", bool))

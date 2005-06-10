@@ -91,8 +91,8 @@ namespace util
 
             bool exists() const
             {
-                int r = access(this->c_str(), F_OK);
-                return ((r == 0) or (errno != ENOENT));
+                struct stat s;
+                return (::stat(this->c_str(), &s) == 0);
             }
     };
 
@@ -142,27 +142,17 @@ namespace util
             bool _exists, _opened;
     };
 
-    template <class C>
-    class base_fileobject_T : public C
+    class base_fileobject_T
     {
         public:
-            typedef C base_type;
-            typedef typename base_type::iterator iterator;
-            typedef typename base_type::const_iterator const_iterator;
-            typedef typename base_type::size_type size_type;
-            typedef typename base_type::value_type value_type;
-
             base_fileobject_T() : _opened(false) { }
             base_fileobject_T(const path_T &path)
-                : _path(path), _stat(path), _opened(false)
-            { this->open(); this->read(); }
+                : _path(path), _stat(path), _opened(false) { }
 
             virtual ~base_fileobject_T() { }
 
             /* properties */
             bool is_open() const { return this->_opened; }
-
-            /* TODO: operator= would be a nice interface for copying files. */
 
             virtual void dump(std::ostream &) const { }
             virtual void open()     = 0;
@@ -175,18 +165,15 @@ namespace util
             bool    _opened;
     };
 
-    template <class C>
-    class base_file_T : public base_fileobject_T<C>
+    class base_file_T : public base_fileobject_T
     {
         public:
             typedef std::fstream stream_type;
-            typedef typename C::size_type size_type;
-            typedef typename C::iterator iterator;
-            typedef typename C::const_iterator const_iterator;
 
             base_file_T() : stream(NULL) { }
-            base_file_T(const path_T &path)
-                : base_fileobject_T<C>(path), stream(NULL) { }
+            base_file_T(const path_T &path, std::ios_base::openmode mode = DEFAULT_MODE)
+                : base_fileobject_T(path), stream(NULL)
+            { this->open(this->_path.c_str(), mode); }
 
             virtual ~base_file_T() { if (this->_opened) this->close(); }
 
@@ -197,18 +184,24 @@ namespace util
             { this->open(this->_path.c_str(), mode); }
             virtual void close();
 
-            stat_T::size_type size() const { return this->_stat.size(); }
-            size_type bufsize() const { return this->size(); }
-
         protected:
             stream_type *stream;
     };
 
-    class file_T : public base_file_T<std::vector<string> >
+    class file_T : public base_file_T,
+                   public std::vector<string>
     {
         public:
             file_T() { }
-            file_T(const path_T &path) : base_file_T<base_type>(path) { }
+            file_T(const path_T &path, std::ios_base::openmode mode = DEFAULT_MODE)
+                : base_file_T(path, mode)
+            { this->read(); }
+
+            virtual ~file_T() { }
+
+            stat_T::size_type size() const { return this->_stat.size(); }
+            size_type bufsize() const
+            { return std::vector<string>::size(); }
 
             virtual bool operator== (const file_T &) const;
             virtual bool operator!= (const file_T &f) const
@@ -216,17 +209,23 @@ namespace util
 
             virtual void read();
             virtual void dump(std::ostream &) const;
-            virtual void write() const { this->dump(*(this->stream)); }
+            virtual void write()
+            {
+                this->dump(*(this->stream));
+                this->clear();
+            }
     };
 
-    class dir_T  : public base_fileobject_T<std::vector<path_T> >
+    class dir_T  : public base_fileobject_T,
+                   public std::vector<path_T>
     {
         public:
             dir_T() : _dirp(NULL) { }
             dir_T(const path_T &path)
-                : base_fileobject_T<base_type>(path), _dirp(NULL) { }
+                : base_fileobject_T(path), _dirp(NULL)
+            { this->open(); this->read(); }
 
-            virtual ~dir_T() { }
+            virtual ~dir_T() { if (this->_opened) this->close(); }
 
             virtual void open();
             virtual void close();

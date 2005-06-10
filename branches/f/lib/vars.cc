@@ -24,13 +24,22 @@
 # include "config.h"
 #endif
 
-#include <iostream>
+#include <ostream>
+#include <utility>
 #include <cassert>
 
 #include "vars.hh"
 #include "util_exceptions.hh"
 #include "portage_version.hh"
 #include "portage_misc.hh"
+
+void
+util::vars_T::dump(std::ostream &stream) const
+{
+    const_iterator i;
+    for (i = this->begin() ; i != this->end() ; ++i)
+        stream << i->first << "=" << i->second << std::endl;
+}
 
 void
 util::vars_T::read(const util::path_T &path)
@@ -89,7 +98,7 @@ util::vars_T::read()
                     val.erase(pos, pos + 1);
             }
  
-            (*this)[key] = val;
+            this->insert(std::make_pair(key, val));
         }
     }
 
@@ -104,7 +113,7 @@ util::vars_T::read()
         portage::version_string_T::iterator v;
 
         for (v = version.begin() ; v != version.end() ; ++v)
-            (*this)[v->first] = v->second;
+            this->insert(std::make_pair(v->first, v->second));
     }
 
     /* loop through our map performing variable substitutions */
