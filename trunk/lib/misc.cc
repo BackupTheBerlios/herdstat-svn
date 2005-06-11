@@ -218,9 +218,9 @@ const std::vector<T>
 util::map<T,U>::keys() const
 {
     std::vector<T> v;
-    typename map<T,U>::iterator i;
-    for (i = this->begin() ; i != this->end() ; ++i)
-        v.push_back(i->first);
+    typename map<T,U>::iterator i = this->begin();
+    typename map<T,U>::iterator e = this->end();
+    for (; i != e ; ++i) v.push_back(i->first);
     return v;
 }
 /****************************************************************************/
@@ -229,9 +229,9 @@ const std::vector<U>
 util::map<T,U>::values() const
 {
     std::vector<U> v;
-    typename map<T,U>::iterator i;
-    for (i = this->begin() ; i != this->end() ; ++i)
-        v.push_back(i->second);
+    typename map<T,U>::iterator i = this->begin();
+    typename map<T,U>::iterator e = this->end();
+    for (; i != e ; ++i) v.push_back(i->second);
     return v;
 }
 /****************************************************************************/

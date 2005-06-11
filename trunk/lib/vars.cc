@@ -110,14 +110,15 @@ util::vars_T::read()
     if (this->_ebuild)
     {
         portage::version_string_T version(this->_path);
-        portage::version_string_T::iterator v;
+        portage::version_string_T::iterator v = version.begin(),
+                                            e = version.end();
 
-        for (v = version.begin() ; v != version.end() ; ++v)
-            this->insert(std::make_pair(v->first, v->second));
+        for (; v != e ; ++v) this->insert(*v);
     }
 
     /* loop through our map performing variable substitutions */
-    for (iterator i = this->begin() ; i != this->end() ; ++i)
+    iterator e = this->end();
+    for (iterator i = this->begin() ; i != e ; ++i)
         this->subst(i->second);
 }
 
@@ -131,7 +132,7 @@ util::vars_T::subst(util::string &value)
 {
 
     std::vector<util::string> vars;
-    std::vector<util::string>::iterator v;
+    std::vector<util::string>::iterator v, e;
     util::string::size_type lpos = 0;
 
     /* find variables that need substituting */
@@ -153,7 +154,8 @@ util::vars_T::subst(util::string &value)
     }
 
     /* for each variable we found */
-    for (v = vars.begin() ; v != vars.end() ; ++v)
+    e = vars.end();
+    for (v = vars.begin() ; v != e ; ++v)
     {
         util::string subst;
         util::string var("${"+(*v)+"}");

@@ -1,8 +1,19 @@
 ChangeLog for herdstat
 
-2005-06-10 Aaron Walker <ka0ttic@gentoo.org>
+2005-06-11 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.1_rc8).
+	* src/file.hh: Added exists() member func.  Modified operator() to
+	return a bool (exists).
+	* src/metacache.cc, src/pkgcache.cc, src/herds_xml.cc,
+	src/herds_xml_handler.cc, src/devaway.cc: Updated to use stat_T over
+	struct stat.
+	* src/action_which_handler.cc: Fixed bug in --which --regex that
+	caused certain matches (those that also exist in an overlay) to not be
+	displayed.
+
+2005-06-10 Aaron Walker <ka0ttic@gentoo.org>
+
 	* lib/file.cc, lib/file.hh:  Rewrote file classes from scratch.  Added
 	a stat_T class which acts as a stat wrapper.  The rewrite fixes a few
 	design flaws/bugs with the previous implementation.  Also use

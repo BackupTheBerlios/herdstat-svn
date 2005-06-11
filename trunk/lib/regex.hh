@@ -79,9 +79,7 @@ namespace util
     {
         public:
             bool operator() (regex_T *re, string s) const
-            {
-                return (*re == s);
-            }
+            { return (*re == s); }
     };
 }
 

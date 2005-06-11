@@ -89,8 +89,8 @@ formatter_T::set_attrs()
 void
 formatter_T::add_highlights(const std::vector<string_type> &pairs)
 {
-    std::vector<string_type>::const_iterator i;
-    for (i = pairs.begin() ; i != pairs.end() ; ++i)
+    std::vector<string_type>::const_iterator i, e = pairs.end();
+    for (i = pairs.begin() ; i != e ; ++i)
     {
         std::vector<string_type> parts(i->split(','));
         if (parts.size() == 1)
@@ -116,14 +116,15 @@ formatter_T::string_type
 formatter_T::highlight(const std::vector<string_type> &data)
 {
     string_type s;
-    std::vector<string_type>::const_iterator i;
+    std::vector<string_type>::const_iterator i, e = data.end();
 
-    for (i = data.begin() ; i != data.end() ; ++i)
+    for (i = data.begin() ; i != e ; ++i)
     {
         bool highlight = false;
         /* search highlights */
-        std::map<string_type, string_type>::iterator h;
-        for (h = attr.highlights.begin() ; h != attr.highlights.end() ; ++h)
+        std::map<string_type, string_type>::iterator h,
+            he = attr.highlights.end();
+        for (h = attr.highlights.begin() ; h != he ; ++h)
         {
             string_type::size_type pos = h->first.find("re:");
             if (pos == string_type::npos and h->first == *i)
@@ -273,8 +274,8 @@ formatter_T::append(const string_type &label, const string_type &data)
                 std::vector<string_type> leftovers =
                     highlight(data.substr(pos).split()).split();
 
-                std::vector<string_type>::iterator i;
-                for (i = leftovers.begin() ; i != leftovers.end() ; ++i)
+                std::vector<string_type>::iterator i, e = leftovers.end();
+                for (i = leftovers.begin() ; i != e ; ++i)
                 {
                     string_type::size_type oldlen = 0;
                     bool highlight_found = false,
@@ -399,8 +400,8 @@ formatter_T::flush(std::ostream &stream)
 {
 #ifdef UNICODE
 
-    buffer_type::iterator i;
-    for (i = this->buffer.begin() ; i != this->buffer.end() ; ++i)
+    buffer_type::iterator i, e = this->buffer.end();
+    for (i = this->buffer.begin() ; i != e ; ++i)
     {
         try
         {

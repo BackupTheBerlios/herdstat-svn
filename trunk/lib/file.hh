@@ -111,7 +111,7 @@ namespace util
             stat_T() : _type(REGULAR), _exists(false), _opened(false) { }
             stat_T(const path_T &p, bool opened = false)
                 : _path(p), _type(REGULAR), _exists(false), _opened(opened)
-            { (*this)(); }
+            { (void)(*this)(); }
 
             virtual ~stat_T() { }
 
@@ -131,10 +131,12 @@ namespace util
             {
                 this->_opened = opened;
                 this->_path.assign(p);
-                (*this)();
+                (void)(*this)();
             }
 
-            virtual void operator() ();
+            bool exists() const { return this->_exists; }
+
+            virtual bool operator() ();
 
         protected:
             path_T _path;

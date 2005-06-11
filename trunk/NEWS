@@ -14,6 +14,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
      - Fixed bug in --versions --count output (a sleu of new lines were
        displayed).
      - Fixed bug in package cache: overlays were not searched.
+     - Fixed bug in --which --regex that caused packages that exist in an
+       overlay but not in PORTDIR to not be displayed.
 
 1.1.1_rc7:
     New features:

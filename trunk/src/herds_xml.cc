@@ -34,7 +34,7 @@ void
 herds_xml_T::init()
 {
     char *result = NULL;
-    struct stat s;
+    const util::stat_T herds_xml(HERDS_XML_FETCH_LOCATION);
     
     if (not optget("herds.xml", util::string).empty())
         this->_path.assign(optget("herds.xml", util::string));
@@ -43,8 +43,9 @@ herds_xml_T::init()
         this->_path.assign(result);
     
     /* check if previously fetched copy is recent */
-    else if ((stat(HERDS_XML_FETCH_LOCATION, &s) == 0) and
-            ((time(NULL) - s.st_mtime) < HERDS_XML_EXPIRE) and (s.st_size > 0))
+    else if (herds_xml.exists() and
+            ((std::time(NULL) - herds_xml.mtime()) < HERDS_XML_EXPIRE) and
+            (herds_xml.size() > 0))
         this->_path = util::path_T(HERDS_XML_FETCH_LOCATION);
     else
         this->_path = this->_default;
@@ -56,7 +57,6 @@ herds_xml_T::fetch()
     if (this->_fetched)
         return;
 
-    struct stat s;
     try
     {
         if ((optget("action", options_action_T) == action_fetch) and
@@ -85,7 +85,8 @@ herds_xml_T::fetch()
             /* because we tell wget to clobber the file, if fetching fails
              * for some reason, it'll truncate the old one - make sure the
              * file is >0 bytes. */
-            if ((stat(HERDS_XML_FETCH_LOCATION, &s) == 0) and (s.st_size > 0))
+            const util::stat_T herds_xml(HERDS_XML_FETCH_LOCATION);
+            if (herds_xml.exists() and (herds_xml.size() > 0))
                 this->_path = util::path_T(HERDS_XML_FETCH_LOCATION);
             else
                 throw fetch_E();
@@ -112,9 +113,10 @@ herds_xml_T::fetch()
             << std::endl << "setting the HERDS environment variable."
             << std::endl;
 
-        if (stat(HERDS_XML_FETCH_LOCATION, &s) != 0)
+        const util::stat_T herds_xml(HERDS_XML_FETCH_LOCATION);
+        if (not herds_xml.exists())
             throw;
-        else if (s.st_size == 0)
+        else if (herds_xml.size() == 0)
         {
             unlink(HERDS_XML_FETCH_LOCATION);
             throw;
@@ -138,7 +140,8 @@ herds_xml_T::get_dev_info(const string_type &dev) const
 {
     devinfo_T info(dev);
 
-    for (const_iterator h = this->begin() ; h != this->end() ; ++h)
+    const_iterator e = this->end();
+    for (const_iterator h = this->begin() ; h != e ; ++h)
     {
         herd_type::iterator d =
             this->_handler->herds[h->first]->find(dev+"@gentoo.org");

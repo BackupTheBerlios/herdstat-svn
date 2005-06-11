@@ -36,10 +36,10 @@
 void
 devaway_T::init()
 {
-    struct stat s;
-    if ((stat(DEVAWAY_LOCAL, &s) != 0) or
-       ((time(NULL) - s.st_mtime) > optget("devaway.expire", long))
-       or (s.st_size == 0))
+    util::stat_T devaway(DEVAWAY_LOCAL);
+    if (not devaway.exists() or
+       ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
+       or (devaway.size() == 0))
         this->_path.assign(DEVAWAY_REMOTE);
 }
 
@@ -49,39 +49,34 @@ devaway_T::fetch()
     if (this->_fetched)
         return;
 
-    struct stat s;
+    util::stat_T devaway;
 
     try
     {
         if (this->_path.find("http://") == util::path_T::npos)
             return;
 
-//        debug_msg("fetching '%s'", DEVAWAY_REMOTE);
-
-        if (util::is_file(DEVAWAY_LOCAL))
+        devaway.assign(DEVAWAY_LOCAL);
+        if (devaway.exists())
             util::copy_file(DEVAWAY_LOCAL, DEVAWAY_LOCAL".bak");
 
         fetcher_T fetch(DEVAWAY_REMOTE, DEVAWAY_LOCAL);
 
-        if ((stat(DEVAWAY_LOCAL, &s) != 0) or (s.st_size == 0))
+        if (not devaway() or (devaway.size() == 0))
             throw fetch_E();
-
-//        debug_msg("fetching succeeded");
 
         unlink(DEVAWAY_LOCAL".bak");
     }
     catch (const fetch_E &e)
     {
         if (util::is_file(DEVAWAY_LOCAL".bak"))
-        {
             util::move_file(DEVAWAY_LOCAL".bak", DEVAWAY_LOCAL);
-//            debug_msg("fetching failed, using backup copy");
-        }
         else
             std::cerr << "Failed to fetch " << DEVAWAY_REMOTE << "."
                 << std::endl;
 
-        if (stat(DEVAWAY_LOCAL, &s) == 0 and s.st_size == 0)
+        devaway.assign(DEVAWAY_LOCAL);
+        if (devaway.exists() and (devaway.size() == 0))
             unlink(DEVAWAY_LOCAL);
 
         if (optget("action", options_action_T) == action_fetch)
@@ -89,7 +84,7 @@ devaway_T::fetch()
     }
 
     this->_path.assign(DEVAWAY_LOCAL);
-    assert(util::is_file(this->_path));
+    assert(devaway());
     this->_fetched = true;
 }
 

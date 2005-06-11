@@ -35,7 +35,7 @@
 #include "util_exceptions.hh"
 
 /*****************************************************************************/
-void
+bool
 util::stat_T::operator() ()
 {
     if (this->_opened)
@@ -61,6 +61,8 @@ util::stat_T::operator() ()
         this->_type = LINK;
     else if (S_ISSOCK(this->st_mode))
         this->_type = SOCKET;
+
+    return this->_exists;
 }
 /*****************************************************************************/
 void

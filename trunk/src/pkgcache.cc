@@ -54,12 +54,12 @@ pkgcache_T::init(const util::string &portdir)
 bool
 pkgcache_T::valid() const
 {
-    struct stat s;
+    const util::stat_T pkgcache(PKGCACHE);
     bool valid = false;
 
     const util::string expire(optget("metacache.expire", util::string));
 
-    if (stat(PKGCACHE, &s) == 0)
+    if (pkgcache.exists())
     {
         if (expire == "lastsync")
         {
@@ -81,20 +81,20 @@ pkgcache_T::valid() const
             else if (lastsync)
             {
                 unlink(LASTSYNC);
-                valid = ((std::time(NULL) - s.st_mtime) < PKGCACHE_EXPIRE);
+                valid = ((std::time(NULL) - pkgcache.mtime()) < PKGCACHE_EXPIRE);
             }
             else if (timestamp)
                 util::copy_file(path, LASTSYNC);
             else
-                valid = ((std::time(NULL) - s.st_mtime) < PKGCACHE_EXPIRE);
+                valid = ((std::time(NULL) - pkgcache.mtime()) < PKGCACHE_EXPIRE);
         }
         else
-            valid = ((std::time(NULL) - s.st_mtime) <
+            valid = ((std::time(NULL) - pkgcache.mtime()) <
                     std::strtol(expire.c_str(), NULL, 10));
 
         /* only valid if size > 0 */
         if (valid)
-            valid = (s.st_size > 0);
+            valid = (pkgcache.size() > 0);
     }
 
     debug_msg("pkgcache is valid? %d", valid);
@@ -116,16 +116,17 @@ pkgcache_T::fill()
     const portage::categories_T categories(this->_portdir,
         optget("qa", bool));
 
-    std::vector<util::string>::iterator i;
+    std::vector<util::string>::iterator i, e;
     std::vector<util::string> dirs = 
         optget("portage.config", portage::config_T).overlays();
     dirs.insert(dirs.begin(), this->_portdir);
 
     /* for each category */
-    portage::categories_T::const_iterator c;
-    for (c = categories.begin() ; c != categories.end() ; ++c)
+    portage::categories_T::const_iterator c, ce = categories.end();
+    for (c = categories.begin() ; c != ce ; ++c)
     {
-        for (i = dirs.begin() ; i != dirs.end() ; ++i)
+        e = dirs.end();
+        for (i = dirs.begin() ; i != e ; ++i)
         {
             const util::path_T cat(*i + "/" + (*c));
             if (not cat.exists())
@@ -133,8 +134,8 @@ pkgcache_T::fill()
 
             /* for each directory in category */
             const util::dir_T category(cat);
-            util::dir_T::const_iterator d;
-            for (d = category.begin() ; d != category.end() ; ++d)
+            util::dir_T::const_iterator d , de = category.end();
+            for (d = category.begin() ; d != de ; ++d)
             {
                 util::string pkg(util::sprintf("%s/%s", c->c_str(), d->basename()));
                 if ((*i == this->_portdir) or 

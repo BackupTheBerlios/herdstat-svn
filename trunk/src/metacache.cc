@@ -45,12 +45,12 @@ metacache_T::metacache_T(const util::string &portdir)
 bool
 metacache_T::valid() const
 {
-    struct stat s;
+    const util::stat_T metacache(METACACHE);
     bool valid = false;
 
     const util::string expire(optget("metacache.expire", util::string));
 
-    if (stat(METACACHE, &s) == 0)
+    if (metacache.exists())
     {
         if (expire == "lastsync")
         {
@@ -81,20 +81,22 @@ metacache_T::valid() const
             else if (lastsync)
             {
                 unlink(LASTSYNC);
-                valid = ((std::time(NULL) - s.st_mtime) < METACACHE_EXPIRE);
+                valid = ((std::time(NULL) - metacache.mtime())
+                        < METACACHE_EXPIRE);
             }
             else if (timestamp)
                 util::copy_file(path, LASTSYNC);
             else
-                valid = ((std::time(NULL) - s.st_mtime) < METACACHE_EXPIRE);
+                valid = ((std::time(NULL) - metacache.mtime())
+                        < METACACHE_EXPIRE);
         }
         else
-            valid = ((std::time(NULL) - s.st_mtime) <
+            valid = ((std::time(NULL) - metacache.mtime()) <
                     std::strtol(expire.c_str(), NULL, 10));
 
         /* only valid if size > 0 */
         if (valid)
-            valid = (s.st_size > 0);
+            valid = (metacache.size() > 0);
     }
 
     debug_msg("metadata cache is valid? %d", valid);
@@ -123,8 +125,8 @@ metacache_T::fill()
         }
 
         /* for each pkg */
-        pkgcache_T::iterator p;
-        for (p = pkgcache.begin() ; p != pkgcache.end() ; ++p)
+        pkgcache_T::iterator p, e = pkgcache.end();
+        for (p = pkgcache.begin() ; p != e ; ++p)
         {
             if (status)
                 ++progress;
@@ -168,8 +170,8 @@ metacache_T::load()
         else
             this->reserve(std::atoi(cache["size"].c_str()));
 
-        util::vars_T::const_iterator i;
-        for (i = cache.begin() ; i != cache.end() ; ++i)
+        util::vars_T::const_iterator i, e = cache.end();
+        for (i = cache.begin() ; i != e ; ++i)
         {
             /* not a category/package, so skip it */
             if (i->first.find('/') == util::string::npos)
@@ -240,7 +242,8 @@ metacache_T::dump()
     f << "size=" << this->size() << std::endl;
 
     /* for each metadata_T object */
-    for (iterator ci = this->begin() ; ci != this->end() ; ++ci)
+    iterator ce = this->end();
+    for (iterator ci = this->begin() ; ci != ce ; ++ci)
     {
         /*
          * format is the form of:
@@ -253,8 +256,8 @@ metacache_T::dump()
         f << ci->pkg << "=";
 
         /* herds */
-        metadata_T::herds_type::iterator h;
-        for (h = ci->herds.begin(), n = 1 ; h != ci->herds.end() ; ++h, ++n)
+        metadata_T::herds_type::iterator h, he = ci->herds.end();
+        for (h = ci->herds.begin(), n = 1 ; h != he ; ++h, ++n)
         {
             str += (*h);
             if (n != ci->herds.size())
@@ -264,9 +267,8 @@ metacache_T::dump()
         f << str << ":";
         
         /* developers */
-        metadata_T::herd_type::iterator d;
-        for (d = ci->devs.begin(), n = 1, str.clear() ; d != ci->devs.end() ; 
-            ++d, ++n)
+        metadata_T::herd_type::iterator d, de = ci->devs.end();
+        for (d = ci->devs.begin(), n = 1, str.clear() ; d != de ; ++d, ++n)
         {
             str += d->first;
             if (n != ci->devs.size())

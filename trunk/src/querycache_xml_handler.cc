@@ -36,8 +36,8 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
     {
         in_query = true;
 
-        attrs_type::const_iterator pos;
-        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
+        attrs_type::const_iterator pos, pose = attrs.end();
+        for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
 #ifdef USE_LIBXMLPP
             if (pos->name == "date")
@@ -60,8 +60,8 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
     {
         in_pkg = true;
 
-        attrs_type::const_iterator pos;
-        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
+        attrs_type::const_iterator pos, pose = attrs.end();
+        for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
 #ifdef USE_LIBXMLPP
             if (pos->name == "name")

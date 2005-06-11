@@ -50,9 +50,9 @@ MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
     {
         util::string locale = optget("locale", util::string);
 
-        attrs_type::const_iterator pos;
+        attrs_type::const_iterator pos, pose = attrs.end();
         util::string value;
-        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
+        for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
 #ifdef USE_LIBXMLPP
             if (pos->name == "lang")

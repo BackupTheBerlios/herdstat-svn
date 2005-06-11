@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include <iostream>
+//#include <iostream>
 #include <vector>
 #include <iterator>
 #include <memory>
@@ -326,8 +326,7 @@ void
 portage::version_string_T::parse()
 {
     string_type::size_type pos;
-    std::vector<string_type> parts, comps;
-    std::vector<string_type>::iterator i;
+    std::vector<string_type> parts;
 
     assert(not this->_verstr.empty());
 
@@ -351,26 +350,22 @@ portage::version_string_T::parse()
     /* If parts > 3, ${PN} contains a '-' */
     if (parts.size() > 3)
     {
-        /* reconstruct ${PN} */
-        string_type PN = parts.front();
-        parts.erase(parts.begin());
-
-        while (parts.size() >= 3)
+        string_type PN;
+        while (parts.size() > 2)
         {
             PN += "-" + parts.front();
             parts.erase(parts.begin());
         }
 
-        comps.push_back(PN);
+        parts.insert(parts.begin(), PN);
     }
 
-    std::copy(parts.begin(), parts.end(), std::back_inserter(comps));
-    assert(comps.size() == 3);
+    assert(parts.size() == 3);
 
     /* fill our map with the components */
-    this->_v["PN"] = comps[0];
-    this->_v["PV"] = comps[1];
-    this->_v["PR"] = comps[2];
+    this->_v["PN"] = parts[0];
+    this->_v["PV"] = parts[1];
+    this->_v["PR"] = parts[2];
     this->_v["P"]   = this->_v["PN"] + "-" + this->_v["PV"];
     this->_v["PVR"] = this->_v["PV"] + "-" + this->_v["PR"];
     this->_v["PF"]  = this->_v["PN"] + "-" + this->_v["PVR"];
@@ -380,9 +375,9 @@ portage::version_string_T::parse()
  *****************************************************************************/
 portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
 {
-    std::vector<util::path_T>::const_iterator i;
-    for (i = paths.begin() ; i != paths.end() ; ++i)
-        this->append(*i);
+    std::vector<util::path_T>::const_iterator i = paths.begin(),
+                                              e = paths.end();
+    for (; i != e ; ++i) this->append(*i);
 }
 /*****************************************************************************
  * Given a path to a package directory, insert a new version_string_T for    *
@@ -397,11 +392,13 @@ portage::versions_T::assign(const util::path_T &path)
         return;
 
     const util::dir_T pkgdir(path);
-    util::dir_T::const_iterator d;
+    util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
     
-    for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+    for (; d != e ; ++d)
+    {
         if (portage::is_ebuild(*d))
             assert(this->insert(*d));
+    }
 }
 /*****************************************************************************
  * Same as assign() but does not call clear().                               *
@@ -410,11 +407,13 @@ void
 portage::versions_T::append(const util::path_T &path)
 {
     const util::dir_T pkgdir(path);
-    util::dir_T::const_iterator d;
+    util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
     
-    for (d = pkgdir.begin() ; d != pkgdir.end() ; ++d)
+    for (; d != e ; ++d)
+    {
         if (portage::is_ebuild(*d))
             assert(this->insert(*d));
+    }
 }
 /*****************************************************************************
  * find wrapper                                                              *
@@ -453,8 +452,8 @@ portage::versions_T::insert(const util::path_T &path)
  *****************************************************************************/
 portage::versions_T::~versions_T()
 {
-    for (iterator i = this->_vs.begin() ; i != this->_vs.end() ; ++i)
-        delete *i;
+    iterator i = this->_vs.begin(), e = this->_vs.end();
+    for (; i != e ; ++i) delete *i;
 }
 /*****************************************************************************/
 

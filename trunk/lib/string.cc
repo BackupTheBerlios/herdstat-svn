@@ -135,7 +135,8 @@ util::lowercase(const util::string &s)
 	return "";
 
     util::string result;
-    for (util::string::const_iterator i = s.begin() ; i != s.end() ; ++i)
+    util::string::const_iterator i = s.begin(), e = s.end();
+    for (; i != e ; ++i)
         result.push_back(util::tolower(*i));
     
     return result;
@@ -182,8 +183,8 @@ util::tidy_whitespace(const util::string &s)
 
     /* convert any newlines in the middle to a space */
     util::string result2;
-    util::string::iterator i;
-    for (i = result.begin() ; i != result.end() ; ++i)
+    util::string::iterator i = result.begin(), e = result.end();
+    for (; i != e ; ++i)
         result2.push_back(*i == '\n' ? ' ' : *i);
 
     /* remove any trailing whitespace */
@@ -233,12 +234,13 @@ util::htmlify(const util::string &str)
 {
     util::string result(str);
     std::map<util::string, util::string> sr;
-    std::map<util::string, util::string>::iterator i;
+    std::map<util::string, util::string>::iterator i, e;
     sr["&"] = "&amp;";
     sr[">"] = "&gt;";
     sr["<"] = "&lt;";
 
-    for (i = sr.begin() ; i != sr.end() ; ++i)
+    i = sr.begin(), e = sr.end();
+    for (; i != e ; ++i)
     {
 	util::string::size_type pos, lpos = 0;
 	while (true)
@@ -265,12 +267,13 @@ util::unhtmlify(const util::string &str)
 {
     util::string result(str);
     std::map<util::string, util::string> sr;
-    std::map<util::string, util::string>::iterator i;
+    std::map<util::string, util::string>::iterator i, e;
     sr["&amp;"] = "&";
     sr["&gt;"] = ">";
     sr["&lt;"] = "<";
 
-    for (i = sr.begin() ; i != sr.end() ; ++i)
+    i = sr.begin(), e = sr.end();
+    for (; i != e ; ++i)
     {
 	util::string::size_type pos, lpos = 0;
 	while (true)
@@ -322,8 +325,8 @@ util::stringify(const std::vector<util::string> &v,
 {
     util::string result;
 
-    std::vector<util::string>::const_iterator i;
-    for (i = v.begin() ; i != v.end() ; ++i)
+    std::vector<util::string>::const_iterator i = v.begin(), e = v.end();
+    for (; i != e ; ++i)
         result += *i + delim;
 
     /* remove the extra delim */

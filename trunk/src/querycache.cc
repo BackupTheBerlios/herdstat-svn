@@ -158,9 +158,9 @@ querycache_T::dump()
 #endif /* USE_LIBXMLPP */
 
         /* for each query */
-        iterator i;
+        iterator i, e = this->end();
         size_type n = 1;
-        for (i = this->begin() ; i != this->end() ; ++i, ++n)
+        for (i = this->begin() ; i != e ; ++i, ++n)
         {
 #ifdef USE_LIBXMLPP
             /* <query id="n"> */
@@ -210,8 +210,8 @@ querycache_T::dump()
 #endif /* USE_LIBXMLPP */
 
             /* for each package in query results */
-            pkgQuery_T::const_iterator p;
-            for (p = i->begin() ; p != i->end() ; ++p)
+            pkgQuery_T::const_iterator p, pe = i->end();
+            for (p = i->begin() ; p != pe ; ++p)
             {
 
 #ifdef USE_LIBXMLPP

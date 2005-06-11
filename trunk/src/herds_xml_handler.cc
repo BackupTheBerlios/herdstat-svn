@@ -68,8 +68,8 @@ mpXMLHandler_T::START_ELEMENT(const string_type &name,
     if (name == "dev")
     {
         in_dev = true;
-        attrs_type::const_iterator pos;
-        for (pos = attrs.begin() ; pos != attrs.end() ; ++pos)
+        attrs_type::const_iterator pos, pose = attrs.end();
+        for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
 #ifdef USE_LIBXMLPP
             if (pos->name == "role")
@@ -121,8 +121,8 @@ mpXMLHandler_T::CHARACTERS(const string_type &str)
 
 mpXMLHandler_T::~mpXMLHandler_T()
 {
-    herd_type::iterator i;
-    for (i = devs.begin() ; i != devs.end() ; ++i)
+    herd_type::iterator i, e = devs.end();
+    for (i = devs.begin() ; i != e ; ++i)
         delete i->second;
 }
 
@@ -218,22 +218,21 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
          */
 
         util::string path(util::string(LOCALSTATEDIR)+"/"+cur_herd+".xml");
-        struct stat s;
-        int rv = stat(path.c_str(), &s);
+        util::stat_T mps(path);
 
         try
         {
-            if ((rv != 0) or ((time(NULL) - s.st_mtime) > 592200) or
-                (s.st_size == 0))
+            if (mps.exists() or ((std::time(NULL) - mps.mtime()) > 592200) or
+                (mps.size() == 0))
             {
-                if (rv == 0)
+                if (mps.exists())
                     util::copy_file(path, path+".bak");
 
                 util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
 
                 fetch(url, path);
 
-                if ((stat(path.c_str(), &s) != 0) or (s.st_size == 0))
+                if (not mps() or (mps.size() == 0))
                     throw fetch_E();
 
                 unlink((path+".bak").c_str());
@@ -245,7 +244,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             if (util::is_file(path+".bak"))
                 util::move_file(path+".bak", path);
 
-            if ((stat(path.c_str(), &s) != 0) or (s.st_size == 0))
+            if (not mps() or (mps.size() == 0))
             {
                 unlink(path.c_str());
 #ifdef USE_LIBXMLPP
@@ -256,13 +255,13 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             }
         }
 
-        assert(util::is_file(path));
+        assert(mps());
         
         xml_T<mpXMLHandler_T> xml(path);
         mpXMLHandler_T *handler = xml.handler();
 
-        mpXMLHandler_T::herd_type::iterator i;
-        for (i = handler->devs.begin() ; i != handler->devs.end() ; ++i)
+        mpXMLHandler_T::herd_type::iterator i, e = handler->devs.end();
+        for (i = handler->devs.begin() ; i != e ; ++i)
         {
             std::pair<herd_type::iterator, bool> p =
                 herds[cur_herd]->insert(std::make_pair(i->first, new dev_type()));
@@ -312,10 +311,11 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
 
 HerdsXMLHandler_T::~HerdsXMLHandler_T()
 {
-    for (herds_type::iterator i = herds.begin() ; i != herds.end() ; ++i)
+    herds_type::iterator he = herds.end();
+    for (herds_type::iterator i = herds.begin() ; i != he ; ++i)
     {
-        herd_type::iterator h;
-        for (h = i->second->begin() ; h != i->second->end() ; ++h)
+        herd_type::iterator h, e = i->second->end();
+        for (h = i->second->begin() ; h != e ; ++h)
             delete h->second;
         delete i->second;
     }

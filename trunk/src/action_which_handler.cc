@@ -52,13 +52,8 @@ action_which_handler_T::operator() (opts_type &opts)
         util::regex_T::string_type re(opts.front());
         opts.clear();
 
-        if (eregex)
-            regexp.assign(re, REG_EXTENDED|REG_ICASE);
-        else
-            regexp.assign(re, REG_ICASE);
-
-
         pkgcache.init(portdir);
+        regexp.assign(re, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
         matches = portage::find_package_regex(config, regexp,
                     overlay, &search_timer, pkgcache);
 
@@ -74,7 +69,10 @@ action_which_handler_T::operator() (opts_type &opts)
             if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
                 opts.push_back(m->second);
             else
+            {
                 matches.erase(m);
+                --m;
+            }
         }
     }
     else
