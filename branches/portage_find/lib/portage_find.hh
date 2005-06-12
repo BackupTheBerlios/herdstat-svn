@@ -27,45 +27,13 @@
 # include "config.h"
 #endif
 
-#include <vector>
-#include <map>
-#include <utility>
+#include "string.hh"
 #include "regex.hh"
-#include "timer.hh"
+#include "portage_config.hh"
 
 namespace portage
 {
-    /*************************************************************************/
-    const util::path_T
-    ebuild_which(const portage::config_T &, const util::string &,
-        bool overlays = true, util::timer_T *t = NULL,
-        const std::vector<util::string>& = std::vector<util::string>());
-    /*************************************************************************/
-    const util::path_T
-    ebuild_which(const util::string &, const util::string &,
-        util::timer_T *t = NULL,
-        const std::vector<util::string>& = std::vector<util::string>());
-    /*************************************************************************/
-    const util::string
-    find_package_in(const util::string &, const util::string &,
-        util::timer_T *t = NULL,
-        const std::vector<util::string>& = std::vector<util::string>());
-    /*************************************************************************/    
-    std::vector<util::string>
-    find_package_regex_in(const util::string &, const util::regex_T &,
-        util::timer_T *t = NULL,
-        const std::vector<util::string>& = std::vector<util::string>());
-    /*************************************************************************/
-    std::pair<util::string, util::string>
-    find_package(const portage::config_T &, const util::string &,
-        bool overlays = true, util::timer_T *t = NULL,
-        const std::vector<util::string>& = std::vector<util::string>());
-    /*************************************************************************/
-    std::multimap<util::string, util::string>
-    find_package_regex(const portage::config_T &, const util::regex_T &,
-        bool overlays = true, util::timer_T *t = NULL,
-        const std::vector<util::string>& = std::vector<util::string>());
-    /*************************************************************************/
+
 }
 
 #endif
