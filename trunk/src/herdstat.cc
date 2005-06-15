@@ -121,53 +121,55 @@ help()
 	<< "usage: " << PACKAGE << " [options] [args]" << std::endl
 
 #ifdef HAVE_GETOPT_LONG
-	<< " -h, --help             Display this help message." << std::endl
-	<< " -V, --version          Display version information." << std::endl
+	<< " -h, --help              Display this help message." << std::endl
+	<< " -V, --version           Display version information." << std::endl
 	<< std::endl
 	<< "Where [options] can be any of the following:" << std::endl
-	<< " -p, --package          Look up packages by herd." << std::endl
-	<< " -d, --dev              Look up herds by developer." << std::endl
-	<< " -m, --metadata         Look up metadata by package/category." << std::endl
-	<< " -w, --which            Look up full path to ebuild for specified packages." << std::endl
-	<< " -f, --find             Look up category/package for the specified packages." << std::endl
-	<< " -a, --away             Look up away information for the specified developers." << std::endl
-	<< "     --versions         Look up versions of specified packages." << std::endl
-	<< "     --with-herd <herd> When used in conjunction with --package and --dev," << std::endl
-	<< "                        display all packages that belong to the specified herd." << std::endl
-	<< "     --no-herd          Shorthand for --with-herd=no-herd" << std::endl
-	<< "     --with-maintainer <dev>" << std::endl
-	<< "                        When used in conjunction with --package, display" << std::endl
-	<< "                        all packages that the specified developer maintains." << std::endl
-	<< "     --no-maintainer    Shorthand for --with-maintainer=none" << std::endl
-	<< " -N, --no-overlay       Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
-	<< "     --nometacache      When used in conjunction with --package, don't use any" << std::endl
-	<< "                        cached query results." << std::endl
-	<< " -r, --regex            Display results matching the specified regular" << std::endl
-	<< "                        expression." << std::endl
-	<< " -E, --extended         Use extended regular expressions. Implies --regex." << std::endl
-	<< " -H, --herdsxml <file>  Specify location of herds.xml." << std::endl
-	<< " -o, --outfile  <file>  Send output to the specified file" << std::endl
-	<< "                        instead of stdout." << std::endl
-	<< " -F, --fetch            Force a fetch of herds.xml." << std::endl
-	<< " -v, --verbose          Display verbose output." << std::endl
-	<< " -q, --quiet            Don't display labels and fancy colors. Use this" << std::endl
-	<< "                        option to pipe herdstat output to other programs" << std::endl
-	<< " -D, --debug            Display debugging messages." << std::endl
-	<< " -t, --timer            Display elapsed time of XML parsing." << std::endl
-	<< " -c, --count            Display the number of items instead of the" << std::endl
-	<< "                        items themself." << std::endl
-	<< " -n, --nocolor          Don't display colored output." << std::endl
-	<< "     --qa               Complain loudly if a QA-related problem occurs." << std::endl
+	<< " -p, --package           Look up packages by herd." << std::endl
+	<< " -d, --dev               Look up herds by developer." << std::endl
+	<< " -m, --metadata          Look up metadata by package/category." << std::endl
+	<< " -w, --which             Look up full path to ebuild for specified packages." << std::endl
+	<< " -f, --find              Look up category/package for the specified packages." << std::endl
+	<< " -a, --away              Look up away information for the specified developers." << std::endl
+	<< "     --versions          Look up versions of specified packages." << std::endl
+	<< "     --with-herd <regex> When used in conjunction with --package and --dev," << std::endl
+	<< "                         display all packages that belong to a herd that matches" << std::endl
+	<< "                         the specified regular expression." << std::endl
+	<< "     --no-herd           Shorthand for --with-herd=no-herd" << std::endl
+	<< "     --with-maintainer <regex>" << std::endl
+	<< "                         When used in conjunction with --package, display" << std::endl
+	<< "                         all packages that are maintained by a developer matching" << std::endl
+	<< "                         the specified regular expression." << std::endl
+	<< "     --no-maintainer     Shorthand for --with-maintainer=none" << std::endl
+	<< " -N, --no-overlay        Don't search overlay(s) in PORTDIR_OVERLAY." << std::endl
+	<< "     --nometacache       When used in conjunction with --package, don't use any" << std::endl
+	<< "                         cached query results." << std::endl
+	<< " -r, --regex             Display results matching the specified regular" << std::endl
+	<< "                         expression." << std::endl
+	<< " -E, --extended          Use extended regular expressions. Implies --regex." << std::endl
+	<< " -H, --herdsxml <file>   Specify location of herds.xml." << std::endl
+	<< " -o, --outfile  <file>   Send output to the specified file" << std::endl
+	<< "                         instead of stdout." << std::endl
+	<< " -F, --fetch             Force a fetch of herds.xml." << std::endl
+	<< " -v, --verbose           Display verbose output." << std::endl
+	<< " -q, --quiet             Don't display labels and fancy colors. Use this" << std::endl
+	<< "                         option to pipe herdstat output to other programs" << std::endl
+	<< " -D, --debug             Display debugging messages." << std::endl
+	<< " -t, --timer             Display elapsed time of XML parsing." << std::endl
+	<< " -c, --count             Display the number of items instead of the" << std::endl
+	<< "                         items themself." << std::endl
+	<< " -n, --nocolor           Don't display colored output." << std::endl
+	<< "     --qa                Complain loudly if a QA-related problem occurs." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
-	<< " default action         1 or more herds." << std::endl
-	<< " -p, --package          1 or more herds." << std::endl
-	<< " -d, --dev              1 or more developers." << std::endl
-	<< " -m, --metadata         1 or more categories/packages." << std::endl
-	<< " -w, --which            1 or more packages." << std::endl
-	<< " -f, --find             1 or more packages." << std::endl
-	<< " -a, --away             1 or more developers." << std::endl
-	<< "     --versions         1 or more packages." << std::endl
+	<< " default action          1 or more herds." << std::endl
+	<< " -p, --package           1 or more herds." << std::endl
+	<< " -d, --dev               1 or more developers." << std::endl
+	<< " -m, --metadata          1 or more categories/packages." << std::endl
+	<< " -w, --which             1 or more packages." << std::endl
+	<< " -f, --find              1 or more packages." << std::endl
+	<< " -a, --away              1 or more developers." << std::endl
+	<< "     --versions          1 or more packages." << std::endl
 	<< std::endl
 	<< "Both the default action and the --dev action support an 'all' target" << std::endl
 	<< "that show all of the devs or herds.  If both --dev and --package are" << std::endl

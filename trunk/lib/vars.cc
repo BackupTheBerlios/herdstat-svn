@@ -98,6 +98,7 @@ util::vars_T::read()
                     val.erase(pos, pos + 1);
             }
  
+            (void)this->erase(key);
             this->insert(std::make_pair(key, val));
         }
     }

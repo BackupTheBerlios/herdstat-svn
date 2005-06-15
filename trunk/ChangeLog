@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-06-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/vars.cc: ensure that a previously existing element in the vars
+	map is erased before trying to insert it (otherwise insert() fails).
+	* bashcomp: Updated to only define _complete_herd and _complete_dev if
+	not previously defined, as the upcoming gentoo-bashcomp will define
+	them.
+
 2005-06-11 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.1_rc8).

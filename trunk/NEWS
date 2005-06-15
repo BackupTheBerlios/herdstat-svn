@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_rc9:
+    Bug fixes:
+     - Fixed bug in vars_T that caused values specified in /etc/make.conf to
+       not override pre-existing values set by /etc/make.globals.
+
 1.1.1_rc8:
     Bug fixes:
      - Rewrote file utility classes from scratch to fix a few design issues and

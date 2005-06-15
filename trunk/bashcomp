@@ -2,12 +2,13 @@
 # bash command line completion for herdstat.
 # Author: Aaron Walker <ka0ttic@gentoo.org>
 
+type _complete_herd &>/dev/null || \
 _complete_herd()
 {
     if [[ -f /var/lib/herdstat/herds ]] &&
         [[ $(stat /var/lib/herdstat/herds | sed -n -e 's/^Modify: \([[:digit:]]\+-[[:digit:]]\+-[[:digit:]]\+\).*$/\1/p') == "$(date +%F)" ]]
     then
-        echo $(< /var/lib/herdstat/herds)
+        cat /var/lib/herdstat/herds
     else
         local herds=$(herdstat -q all 2>/dev/null)
         echo ${herds} > /var/lib/herdstat/herds
@@ -15,12 +16,13 @@ _complete_herd()
     fi
 }
 
+type _complete_dev &>/dev/null || \
 _complete_dev()
 {
     if [[ -f /var/lib/herdstat/devs ]] &&
         [[ $(stat /var/lib/herdstat/devs | sed -n -e 's/^Modify: \([[:digit:]]\+-[[:digit:]]\+-[[:digit:]]\+\).*$/\1/p') == "$(date +%F)" ]]
     then
-        echo $(< /var/lib/herdstat/devs)
+        cat /var/lib/herdstat/devs
     else
         local devs=$(herdstat -dq all 2>/dev/null)
         echo ${devs} > /var/lib/herdstat/devs
