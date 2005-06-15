@@ -1,7 +1,17 @@
 ChangeLog for herdstat
 
+2005-06-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metacache.cc: Updated valid() to check first line of metacache.
+	If it does not equal "version=VERSION" then it'll be considered
+	invalid, and of course updated dump() to write it.  This will prevent
+	weird bugs caused by any future format changes.
+	* src/querycachectl.cc: Updated summary action to display what the
+	newest and oldest query/with strings are.
+
 2005-06-14 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Updated version (1.1.1_rc9).
 	* lib/vars.cc: ensure that a previously existing element in the vars
 	map is erased before trying to insert it (otherwise insert() fails).
 	* bashcomp: Updated to only define _complete_herd and _complete_dev if

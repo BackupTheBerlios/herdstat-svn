@@ -129,10 +129,22 @@ doaction(querycache_T &querycache, const util::string &action)
         if (querycache.size() > 1)
         {
             querycache.sort_oldest_to_newest();
-            out("Oldest query", util::format_date(querycache.front().date, "%s")
-                + " (" + util::format_date(querycache.front().date) + ")");
-            out("Newest query", util::format_date(querycache.back().date, "%s")
-                + " (" + util::format_date(querycache.back().date) + ")");
+
+            util::string oldest(querycache.front().query);
+            util::string newest(querycache.back().query);
+
+            if (not querycache.front().with.empty())
+                oldest += "/" + querycache.front().with;
+            if (not querycache.back().with.empty())
+                newest += "/" + querycache.back().with;
+
+            oldest += " " + util::format_date(querycache.front().date, "%s")
+                + " (" + util::format_date(querycache.front().date) + ")";
+            newest += " " + util::format_date(querycache.back().date, "%s")
+                + " (" + util::format_date(querycache.back().date) + ")";
+
+            out("Oldest query", oldest);
+            out("Newest query", newest);
         }
 
         out("Query strings", querycache.queries());
