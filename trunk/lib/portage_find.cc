@@ -132,7 +132,7 @@ portage::find_package_in(const util::string &portdir,
      * make sure it's a valid package directory */
     if (pkg.find('/') != util::string::npos)
     {
-        if (portage::is_pkg_dir(portdir + "/" + pkg))
+        if (is_pkg_dir(portdir + "/" + pkg))
         {
             if (timer) timer->stop();
             return pkg;
@@ -177,7 +177,8 @@ portage::find_package_in(const util::string &portdir,
             /* for each package in the category */
             for (; d != e ; ++d)
             {
-                if (pkg == d->basename())
+                if ((pkg == d->basename()) and
+                    is_pkg_dir(portdir + "/" + (*c) + "/" + pkg))
                     pkgs.push_back(*c + "/" + pkg);
             }
         }
@@ -191,7 +192,8 @@ portage::find_package_in(const util::string &portdir,
             util::string::size_type pos = i->find('/');
             if (pos != util::string::npos)
             {
-                if (i->substr(pos+1) == pkg)
+                if (i->substr(pos+1) == pkg and
+                    is_pkg_dir(portdir + "/" + (*i)))
                     pkgs.push_back(*i);
             }
         }

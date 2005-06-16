@@ -1,5 +1,11 @@
 ChangeLog for herdstat
 
+2005-06-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_find.cc: Fixed missing is_pkg_dir check in
+	find_package_in() that caused the overlay display to be printed if the
+	package directory exists in an overlay but no ebuild is present.
+
 2005-06-15 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/metacache.cc: Updated valid() to check first line of metacache.
