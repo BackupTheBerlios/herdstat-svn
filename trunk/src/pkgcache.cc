@@ -97,6 +97,17 @@ pkgcache_T::valid() const
             valid = (pkgcache.size() > 0);
     }
 
+    if (valid)
+    {
+        std::ifstream stream(PKGCACHE);
+        if (not stream)
+            throw util::bad_fileobject_E(PKGCACHE);
+
+        std::string line;
+        valid = (std::getline(stream, line) and
+                (line == (std::string("portdir=")+this->_portdir)));
+    }
+
     debug_msg("pkgcache is valid? %d", valid);
     return valid;
 }
@@ -165,6 +176,9 @@ pkgcache_T::load()
 
     std::copy(std::istream_iterator<util::string>(stream),
         std::istream_iterator<util::string>(), std::back_inserter(*this));
+
+    /* ignore first line, it's just used for validating the cache */
+    this->erase(this->begin());
 }
 
 /*
@@ -177,6 +191,9 @@ pkgcache_T::dump()
     std::ofstream stream(PKGCACHE);
     if (not stream.is_open())
         throw util::bad_fileobject_E(PKGCACHE);
+
+    /* this cache came from this->_portdir */
+    stream << "portdir=" << this->_portdir << std::endl;
 
     std::copy(this->begin(), this->end(),
         std::ostream_iterator<util::string>(stream, "\n"));

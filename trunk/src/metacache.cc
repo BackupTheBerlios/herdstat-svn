@@ -103,6 +103,10 @@ metacache_T::valid() const
      * only valid if first line is "version=VERSION".
      * this prevents weird bugs if for some reason the
      * metacache format changed between versions.
+     *
+     * also, if second line (which should be portdir=)
+     * does not list the same portdir as our current
+     * setting, it needs to be invalidated.
      */
 
     if (valid)
@@ -114,6 +118,10 @@ metacache_T::valid() const
         std::string line;
         valid = (std::getline(stream, line) and
                 (line == (std::string("version=")+VERSION)));
+
+        if (valid)
+            valid = (std::getline(stream, line) and
+                    (line == (std::string("portdir=")+this->_portdir)));
     }
 
     debug_msg("metadata cache is valid? %d", valid);

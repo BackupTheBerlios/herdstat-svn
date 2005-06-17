@@ -1,5 +1,11 @@
 ChangeLog for herdstat
 
+2005-06-17 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgcache.cc, src/metacache.cc: modified valid() to also test and
+	make sure the PORTDIR in "portdir=PORTDIR" is equal to the current
+	portdir setting, otherwise the cache should be considered invalid.
+
 2005-06-16 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/portage_find.cc: Fixed missing is_pkg_dir check in
