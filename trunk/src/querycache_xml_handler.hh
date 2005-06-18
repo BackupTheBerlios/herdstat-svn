@@ -61,7 +61,7 @@ class querycacheXMLHandler_T : public XMLHandler_T
     private:
         /* internal state variables */
         bool in_query, in_string, in_with, in_type, in_results, in_pkg;
-        util::string cur_pkg, cur_date;
+        util::string cur_pkg, cur_date, cur_pd;
 };
 
 #endif

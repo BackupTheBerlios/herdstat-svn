@@ -38,6 +38,7 @@ pkgQuery_T::dump(std::ostream &stream) const
     out("Query string", this->query);
     out("Query with", this->with);
     out("Query type", (this->type == QUERYTYPE_DEV ? "dev":"herd"));
+    out("Query Portdir", this->portdir);
     out("Query date", util::sprintf("%lu", static_cast<unsigned long>(this->date))
         + " (" + util::format_date(this->date) + ")");
 
@@ -66,11 +67,14 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
         this->with.c_str(), that.with.c_str(), (this->with == that.with));
     debug_msg("   this->type(%d) == that.type(%d) ? %d",
         this->type, that.type, (this->type == that.type));
+    debug_msg("   this->portdir(%s) == that.portdir(%s) ? %d",
+        this->portdir.c_str(), that.portdir.c_str(), (this->portdir == that.portdir));
 
     return  /* normal lookup */
             ((this->query == that.query) and
              (this->with  == that.with) and
-             (this->type  == that.type))
+             (this->type  == that.type) and
+             (this->portdir == that.portdir))
 
             or
             

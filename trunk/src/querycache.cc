@@ -167,6 +167,7 @@ querycache_T::dump()
             xmlpp::Element *query_node = root->add_child("query");
             query_node->set_attribute("date",
                 util::sprintf("%lu", static_cast<unsigned long>(i->date)));
+            query_node->set_attribute("portdir", i->portdir);
 
             /* <criteria> */
             xmlpp::Element *criteria_node = query_node->add_child("criteria");
@@ -193,6 +194,7 @@ querycache_T::dump()
             xml::node query("query");
             query.get_attributes().insert("date",
                 util::sprintf("%lu", static_cast<unsigned long>(i->date)).c_str());
+            query.get_attributes().insert("portdir", i->portdir.c_str());
 
             xml::node::iterator it = root.insert(root.begin(), query);
 
@@ -237,7 +239,11 @@ querycache_T::dump()
         }
 
 #ifdef USE_LIBXMLPP
+#ifdef DEBUG
+        doc.write_to_file_formatted(QUERYCACHE, "UTF-8");
+#else /* DEBUG */
         doc.write_to_file(QUERYCACHE, "UTF-8");
+#endif /* DEBUG */
 #else /* USE_LIBXMLPP */
         doc.save_to_file(QUERYCACHE, 0);
 #endif /* USE_LIBXMLPP */

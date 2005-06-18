@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-06-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgquery.cc, src/pkgquery.hh, src/querycache.cc,
+	src/querycache_xml_handler.cc, src/querycache_xml_handler.hh: Updated
+	to cache PORTDIR as well, so we can determine whether the cached
+	results came from the same PORTDIR, invalidating if not.
+
 2005-06-17 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/pkgcache.cc, src/metacache.cc: modified valid() to also test and

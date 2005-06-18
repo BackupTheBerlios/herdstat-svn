@@ -7,6 +7,8 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        no ebuild is present.  While the displayed results were correct, the
        overlay display would be invoked causing the user to think the results
        came from an overlay instead of PORTDIR.
+     - Fixed bug in caching that would show the cached results for a query even
+       if the cached query came from a different PORTDIR.
 
 1.1.1_rc9:
     Bug fixes:

@@ -42,9 +42,13 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
 #ifdef USE_LIBXMLPP
             if (pos->name == "date")
                 cur_date = pos->value;
+            else if (pos->name == "portdir")
+                cur_pd = pos->value;
 #else /* USE_LIBXMLPP */
             if (pos->first == "date")
                 cur_date = pos->second;
+            else if (pos->first == "portdir")
+                cur_pd = pos->second;
 #endif /* USE_LIBXMLPP */
         }
     }
@@ -111,6 +115,7 @@ querycacheXMLHandler_T::CHARACTERS(const string_type &text)
     {
         queries.push_back(pkgQuery_T(text));
         queries.back().date = std::strtol(cur_date.c_str(), NULL, 10);
+        queries.back().portdir = cur_pd;
     }
     else if (in_with)
         queries.back().with = text;
