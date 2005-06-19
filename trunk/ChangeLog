@@ -1,5 +1,9 @@
 ChangeLog for herdstat
 
+2005-06-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1).
+
 2005-06-18 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/pkgquery.cc, src/pkgquery.hh, src/querycache.cc,
