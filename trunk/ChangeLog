@@ -1,5 +1,11 @@
 ChangeLog for herdstat
 
+2005-06-20 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_pkg_handler.cc: Updated metadata_matches() to interpret
+	packages whose sole maintainer is the herd itself (herd@gentoo.org is
+	listed as the maintainer) as a package with no maintainer.
+
 2005-06-19 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.1).

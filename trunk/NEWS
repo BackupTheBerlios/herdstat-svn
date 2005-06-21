@@ -1,6 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_p1:
+    Bug fixes:
+     - Interpret packages in a herd (have <herd>some_herd</herd> in metadata.xml)
+       that have a maintainer of 'some_herd@gentoo.org' (and no other explicit
+       maintainers) as a package with no maintainer.  Previously, this was not
+       taken into account and thus did not show up in --no-maintainer output.
+
 1.1.1:
     Bug fixes:
      - Fixed bug that occurs when a package directory exists in an overlay but

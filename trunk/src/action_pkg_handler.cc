@@ -97,8 +97,17 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
                 return true;
             else
             {
-                if ((with() == "none") and metadata.devs.empty())
-                    return true;
+                /* --no-maintainer was specified.  It's true if there are
+                 * a) no maintainers, or b) the herd is listed as a maintainer.
+                 */
+                if (with() == "none")
+                {
+                    if (metadata.devs.empty() or
+                        ((metadata.devs.size() == 1) and
+                        metadata.dev_exists(criteria)
+                        or metadata.dev_exists(criteria+"@gentoo.org")))
+                        return true;
+                }
                 else if (metadata.dev_exists(with) or
                          metadata.dev_exists(with()+"@gentoo.org"))
                     return true;
