@@ -108,15 +108,18 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
 
+AC_ARG_ENABLE(ncurses, [ --enable-ncurses   use ncurses to determine terminal width [on]],
+	      enable_ncurses=$enableval, enable_ncurses=yes)
+
+if test x$enable_ncurses = "xyes" ; then
+    AC_CHECK_LIB(ncurses, tgetent)
+fi
+
 AC_ARG_ENABLE(unicode, [ --enable-unicode   enable Unicode support [on]],
-    [case "${enableval}" in
-	yes)	unicode=true  ;;
-	no)	unicode=false ;;
-	*)	AC_MSG_ERROR(--enable-unicode accepts yes or no only) ;;
-    esac], [unicode=true])
+    enable_unicode=$enableval, enable_unicode=yes)
 
 PKG_PROG_PKG_CONFIG
-if test x$unicode = "xtrue"; then
+if test x$enable_unicode = "xyes"; then
     AC_DEFINE_UNQUOTED(UNICODE, 1, [Enable Unicode support])
     PKG_CHECK_MODULES(GLIBMM, glibmm-2.4 >= 2.4)
     PKG_CHECK_MODULES(LIBXMLPP, libxml++-2.6 >= 2.6)
