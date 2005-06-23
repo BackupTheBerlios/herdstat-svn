@@ -58,7 +58,10 @@ AC_CHECK_HEADERS(glob.h,,
 AC_CHECK_HEADERS(fnmatch.h,,
     [AC_MSG_ERROR([fnmatch.h is required])])
 
-dnl Required funcs
+dnl Optional headers
+AC_CHECK_HEADERS(getopt.h)
+
+dnl Required functions
 AC_FUNC_CLOSEDIR_VOID
 AC_CHECK_FUNCS(gettimeofday,,
     [AC_MSG_ERROR([gettimeofday is required])])
@@ -75,11 +78,26 @@ AC_CHECK_FUNCS(glob,,
 AC_CHECK_FUNCS(fnmatch,,
     [AC_MSG_ERROR([fnmatch is required])])
 
-dnl Optional headers
-AC_CHECK_HEADERS(getopt.h)
-
 dnl Optional functions
 AC_CHECK_FUNCS(strtoumax getopt_long)
+
+dnl Required libs
+
+dnl Check for termcap lib
+for termlib in ncurses curses termcap terminfo termlib ; do
+    AC_CHECK_LIB(${termlib}, tgetent,
+	[TERMCAP_LIBS="$TERMCAP_LIBS -l$termlib"])
+    case "$TERMCAP_LIBS" in
+	*-l${termlib}*) break ;;
+    esac
+done
+
+if test -z "$TERMCAP_LIBS" ; then
+    AC_MSG_ERROR([a termcap library is required])
+fi
+
+AC_SUBST(TERMCAP_LIBS)
+AC_DEFINE(USE_TERMCAP, 1, [Use termcap lib to determine terminal width])
 
 dnl zlib
 #AC_MSG_CHECKING([whether to include zlib support])
@@ -107,13 +125,6 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
         *)      AC_MSG_ERROR(--enable-debug accepts yes or no only) ;;
     esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
-
-AC_ARG_ENABLE(ncurses, [ --enable-ncurses   use ncurses to determine terminal width [on]],
-	      enable_ncurses=$enableval, enable_ncurses=yes)
-
-if test x$enable_ncurses = "xyes" ; then
-    AC_CHECK_LIB(ncurses, tgetent)
-fi
 
 AC_ARG_ENABLE(unicode, [ --enable-unicode   enable Unicode support [on]],
     enable_unicode=$enableval, enable_unicode=yes)

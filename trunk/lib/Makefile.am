@@ -21,7 +21,7 @@ libutil_la_SOURCES += portage_exceptions.hh \
 		      portage_version.hh portage_version.cc \
 		      portage_find.hh portage_find.cc
 
-LIBS = @LIBS@ @GLIBMM_LIBS@
+LIBS = @LIBS@ @TERMCAP_LIBS@ @GLIBMM_LIBS@
 AM_CXXFLAGS = -pedantic -ansi -Wall -Wno-long-long @GLIBMM_CFLAGS@
 
 CLEANFILES = version-test
