@@ -35,8 +35,18 @@
 #include "util_exceptions.hh"
 #include "misc.hh"
 
+#ifdef USE_TERMCAP
+# include <curses.h>
+# include <term.h>
+#endif /* USE_TERMCAP */
+
 /** static members **********************************************************/
 util::color_map_T::cmap_T util::color_map_T::_cm;
+
+#ifdef USE_TERMCAP
+static bool term_init = false;
+static char term_info[2048];
+#endif /* USE_TERMCAP */
 /****************************************************************************/
 util::color_map_T::string_type &
 util::color_map_T::operator[] (const string_type &color)
@@ -134,6 +144,33 @@ util::current_user()
 util::string::size_type
 util::getcols()
 {
+#ifdef USE_TERMCAP
+
+    if (not term_init)
+    {
+        const char *type = std::getenv("TERM");
+        /* default to 'vt100' */
+        if (not type)
+        {
+            if (setenv("TERM", "vt100", 0) != 0)
+                throw util::va_msg_base_E("setenv(\"TERM\", \"vt100\") failed");
+        }
+
+        int result = tgetent(term_info, std::getenv("TERM"));
+        if (result < 0)
+            throw util::va_msg_base_E("Failed to access termcap database.");
+        else if (result == 0)
+            throw util::va_msg_base_E("Unknown terminal type '%s'", type);
+
+        term_init = true;
+    }
+
+    int cols = tgetnum("co");
+    if (cols > 0)
+        return cols;
+
+#else /* USE_TERMCAP */
+
     util::string output;
     FILE *p = popen("stty size 2>/dev/null", "r");
     if (p)
@@ -150,6 +187,8 @@ util::getcols()
 	if ((pos = output.find(" ")) != util::string::npos)
 	    return std::atoi(output.substr(pos).c_str());
     }
+
+#endif /* USE_TERMCAP */
 
     return 78;
 }

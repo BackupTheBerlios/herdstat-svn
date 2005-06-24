@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-06-24 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated to detect a termcap lib (prefers ncurses).
+	Define USE_TERMCAP if found.  Updated version (1.1.1_p1).
+	* lib/misc.cc: Updated getcols() to use tgetent/tgetnum to get the
+	terminal width instead of the nasty stty pipe.
+	* doc/examples.txt: Added missing --versions example.
+
 2005-06-20 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/action_pkg_handler.cc: Updated metadata_matches() to interpret

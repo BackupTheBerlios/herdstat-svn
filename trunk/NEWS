@@ -7,6 +7,9 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        that have a maintainer of 'some_herd@gentoo.org' (and no other explicit
        maintainers) as a package with no maintainer.  Previously, this was not
        taken into account and thus did not show up in --no-maintainer output.
+     - Programmaticaly determine current terminal width (if a termcap lib is
+       found - we prefer ncurses over others) instead of parsing the output of
+       'stty size'.
 
 1.1.1:
     Bug fixes:
