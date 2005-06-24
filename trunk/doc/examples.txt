@@ -112,4 +112,12 @@ Display devaway information for all developers: ::
 
     $ herdstat -a all
 
+Display available versions (sorted) for the gcc package: ::
+
+    $ herdstat --versions gcc
+
+Display the number of ebuilds present in ${PORTDIR}: ::
+
+    $ herdstat --versions --no-overlay -cr .
+
 .. vim: set ft=glep tw=80 sw=4 et spell spelllang=en : ..
