@@ -35,6 +35,10 @@
 
 namespace portage
 {
+    /**
+     * Bad version suffix exception.
+     */
+
     class bad_version_suffix_E : public util::msg_base_E
     {
         public:
@@ -50,9 +54,14 @@ namespace portage
             }
     };
 
+    /**
+     * Ambiguous package name exception.
+     */
+
     class ambiguous_pkg_E : public util::base_E
     {
         protected:
+            /// Ambiguous package name.
             util::string _name;
 
         public:
@@ -74,8 +83,13 @@ namespace portage
                 return s;
             }
 
+            /// Vector of possible matches.
             const std::vector<util::string> packages;
     };
+
+    /**
+     * Non-existent package exception.
+     */
 
     class nonexistent_pkg_E : public util::msg_base_E
     {
@@ -90,7 +104,15 @@ namespace portage
             }
     };
 
+    /**
+     * Quality Assurance exception.
+     */
+
     class qa_E : public util::base_E { };
+
+    /**
+     * Quality Assurance (with strerror()) exception.
+     */
 
     class qa_errno_E : public util::errno_E
     {

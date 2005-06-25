@@ -57,29 +57,67 @@ namespace util
     void debug(const char *, ...);
 #endif /* UNICODE */
 
+    /// getcwd() wrapper.
     util::string getcwd();
-    util::string get_user_from_email(const util::string &);
+
+    /** Determine username from email address.
+     * @param e E-mail address.
+     * @returns A string object.
+     */
+    util::string get_user_from_email(const util::string &e);
+
+    /** Determine current user.
+     * Uses ECHANGELOG_USER, if set.  Uses USER otherwise.
+     * @returns A string object.
+     */
     util::string current_user();
+
+    /// Determine current terminal width.
     util::string::size_type getcols();
-    const util::string format_date(const std::time_t &,
-        const char * = "%a %b %d %T %Z %Y");
-    const util::string format_date(const util::string &,
-        const char * = "%a %b %d %T %Z %Y");
-    int fetch(const util::string &, const util::string &,
-            bool = false, bool = false);
-    int fetch(const char *, const char *, bool = false, bool = false);
+
+    /** Format date string.
+     * @param t Reference to a time_t object.
+     * @param f Format string as accepted by strftime(3).
+     * @returns A constant string object.
+     */
+    const util::string format_date(const std::time_t &t,
+        const char *f = "%a %b %d %T %Z %Y");
+
+    /** Format date string.
+     * @param t Reference to a string object that contains the time.
+     * @param f Format string as accepted by strftime(3).
+     * @returns A constant string object.
+     */
+    const util::string format_date(const util::string &t,
+        const char *f = "%a %b %d %T %Z %Y");
+
+    /**
+     * Color map.
+     */
 
     class color_map_T
     {
         public:
             typedef util::string string_type;
+
+            /** Access color string associated with the given color type.
+             * @param c Color type (color_name_T).
+             * @returns The associated string object.
+             */
 	    string_type &operator[](color_name_T c) { return this->_cm[c]; }
-            string_type &operator[](const string_type &);
+
+            /** Access color string associated with the given color name.
+             * @param s Color name.
+             * @returns The associated string object.
+             */
+            string_type &operator[](const string_type &s);
 
         private:
+            /// Internal color map.
             class cmap_T : public std::map<color_name_T, string_type>
             {
                 public:
+                    /// Default constructor.  Fills map.
                     cmap_T()
                     {
                         (*this)[red]     = "\033[0;31m";
@@ -95,16 +133,8 @@ namespace util
                     }
             };
 
+            /// Internal color map.
             static cmap_T _cm;
-    };
-
-    template <typename T, typename U>
-    class map : public std::map<T,U>
-    {
-        public:
-            virtual ~map() { }
-            virtual const std::vector<T> keys() const;
-            virtual const std::vector<U> values() const;
     };
 }
 

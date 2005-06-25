@@ -47,25 +47,73 @@ namespace util
 {
     class path_T;
 
-    /* general purpose file-related functions */
-    bool is_dir(const char *);
-    bool is_dir(const path_T &);
-    bool is_dir(const struct stat &);
-    bool is_file(const char *);
-    bool is_file(const path_T &);
-    bool is_file(const struct stat &);
-    const char *basename(const char *);
-    const char *basename(const path_T &);
-    const char *dirname(const char *);
-    const char *dirname(const path_T &);
-    const char *chop_fileext(const char *, unsigned short depth = 1);
-    const char *chop_fileext(const path_T &, unsigned short depth = 1);
-    void copy_file(const path_T &, const path_T &);
-    void move_file(const path_T &, const path_T &);
+    /** Is the given path a directory?
+     * @param p Path.
+     * @returns A boolean value.
+     */
+    bool is_dir(const char *p);
+    bool is_dir(const path_T &p);
 
+    /** Is the file associated with the given stat structure a directory?
+     * @param s Reference to a struct stat.
+     * @returns A boolean value.
+     */
+    bool is_dir(const struct stat &s);
+
+    /** Is the given path a regular file?
+     * @param p Path.
+     * @returns A boolean value.
+     */
+    bool is_file(const char *p);
+    bool is_file(const path_T &p);
+
+    /** Is the file associated with the given stat structure a regular file?
+     * @param s Reference to a struct stat.
+     * @returns A boolean value.
+     */
+    bool is_file(const struct stat &s);
+
+    /** Return the basename of the given path.
+     * @param p Path.
+     * @returns A pointer of type char.
+     */
+    const char *basename(const char *p);
+    const char *basename(const path_T &p);
+    
+    /** Return the directory name the given path is located in.
+     * @param p Path.
+     * @returns A pointer of type char.
+     */
+    const char *dirname(const char *p);
+    const char *dirname(const path_T &p);
+
+    /** Chop file extension from the given path.
+     * @param p Path.
+     * @param depth Number of period-delimited extensions to chop.
+     * @returns A pointer of type char.
+     */
+    const char *chop_fileext(const char *p, unsigned short depth = 1);
+    const char *chop_fileext(const path_T &p, unsigned short depth = 1);
+
+    /** Copy file 'from' to file 'to'.
+     * @param from Source location.
+     * @param to   Destination location.
+     */
+    void copy_file(const path_T &to, const path_T &from);
+
+    /** Move file 'from' to file 'to'.
+     * @param from Source location.
+     * @param to   Destination location.
+     */
+    void move_file(const path_T &to, const path_T &from);
+
+    /// Denotes file type.
     enum ftype_T { REGULAR, DIRECTORY, CHARACTER, BLOCK, FIFO, LINK, SOCKET };
 
-    /* path string */
+    /**
+     * A type of string that represents a path to a file.
+     */
+
     class path_T : public string
     {
         public:
@@ -78,17 +126,30 @@ namespace util
             path_T(const Glib::ustring &n) : string(n) { }
 #endif
 
+            /** Get basename of this path.
+             * @returns A pointer of type char.
+             */
             const char *basename() const
             { return util::basename(this->c_str()); }
+
+            /** Get directory name of this path.
+             * @returns A pointer of type char.
+             */
             const char *dirname() const
             { return util::dirname(this->c_str()); }
 
-            /* same as util::string::split but with a diff delim */
+            /** Split path.
+             * @param delim Delimiter used to split path (defaults to '/').
+             * @returns A vector of sub-strings.
+             */
             std::vector<string>
             split(const string::value_type delim =
                 static_cast<string::value_type>('/'))
             { return string::split(delim); }
 
+            /** Does this path exist?
+             * @returns A boolean value.
+             */
             bool exists() const
             {
                 struct stat s;
@@ -96,7 +157,10 @@ namespace util
             }
     };
 
-    /* stat wrapper */
+    /**
+     * A wrapper for struct stat and the stat() system call.
+     */
+
     class stat_T : public stat
     {
         public:
@@ -108,7 +172,13 @@ namespace util
             typedef off_t   size_type;
             typedef time_t  time_type;
 
+            /// Default constructor.
             stat_T() : _type(REGULAR), _exists(false), _opened(false) { }
+
+            /** Constructor.
+             * @param p Path.
+             * @param opened Has the file associated with this been opened?
+             */
             stat_T(const path_T &p, bool opened = false)
                 : _path(p), _type(REGULAR), _exists(false), _opened(opened)
             { (void)(*this)(); }
@@ -127,6 +197,7 @@ namespace util
             path_T      path()     const { return this->_path; }
             ftype_T     type()     const { return this->_type; }
 
+            /// Assign a new path and stat it.
             void assign(const path_T &p, bool opened = false)
             {
                 this->_opened = opened;
@@ -134,8 +205,14 @@ namespace util
                 (void)(*this)();
             }
 
+            /** Does the file associated with this exist?
+             * @returns A boolean value.
+             */
             bool exists() const { return this->_exists; }
 
+            /** stat() wrapper.
+             * @returns A boolean value (exists()).
+             */
             virtual bool operator() ();
 
         protected:
@@ -144,73 +221,151 @@ namespace util
             bool _exists, _opened;
     };
 
+    /**
+     * Abstract file object.
+     */
+
     class base_fileobject_T
     {
         public:
+            /// Default constructor.
             base_fileobject_T() : _opened(false) { }
+
+            /** Constructor.
+             * @param path Path.
+             */
             base_fileobject_T(const path_T &path)
                 : _path(path), _stat(path), _opened(false) { }
 
             virtual ~base_fileobject_T() { }
 
-            /* properties */
+            /** Has this file object been opened?
+             * @returns A boolean value.
+             */
             bool is_open() const { return this->_opened; }
 
-            virtual void dump(std::ostream &) const { }
+            /** Dump our internal contents to disk.
+             * @param s Output stream.
+             */
+            virtual void dump(std::ostream &s) const { }
+
+            /// Open file object.
             virtual void open()     = 0;
+
+            /// Close file object.
             virtual void close()    = 0;
+
+            /// Read file object, filling internal container.
             virtual void read()     = 0;
             
         protected:
+            /// path to file object.
             path_T  _path;
+            /// stat object associated with this file object.
             stat_T  _stat;
+            /// whether this file has been opened.
             bool    _opened;
     };
+
+    /**
+     * Base type for representing regular files.
+     */
 
     class base_file_T : public base_fileobject_T
     {
         public:
             typedef std::fstream stream_type;
 
+            /// Default constructor.
             base_file_T() : stream(NULL) { }
+
+            /** Constructor.  Opens file.
+             * @param path Path to file.
+             * @param mode Open mode (defaults to DEFAULT_MODE).
+             */
             base_file_T(const path_T &path, std::ios_base::openmode mode = DEFAULT_MODE)
                 : base_fileobject_T(path), stream(NULL)
             { this->open(this->_path.c_str(), mode); }
 
+            /// Destructor.  Closes file if opened.
             virtual ~base_file_T() { if (this->_opened) this->close(); }
 
+            /// Open file with default open mode.
             virtual void open() { this->open(this->_path.c_str(), DEFAULT_MODE); }
-            virtual void open(const char *,
+
+            /** Open specified path with specified open mode.
+             * @param path Path to file.
+             * @param mode Open mode (defaults to DEFAULT_MODE).
+             */
+            virtual void open(const char *path,
                 std::ios_base::openmode mode = DEFAULT_MODE);
+
+            /** Open with specified open mode.
+             * @param mode Open mode.
+             */
             virtual void open(std::ios_base::openmode mode)
             { this->open(this->_path.c_str(), mode); }
+
+            /// Close file.
             virtual void close();
 
         protected:
+            /// Stream associated with this file object.
             stream_type *stream;
     };
+
+    /**
+     * Represents a regular file using a vector of strings
+     * for storing file contents.
+     */
 
     class file_T : public base_file_T,
                    public std::vector<string>
     {
         public:
-            file_T() { }
+            /** Constructor.  Opens and reads file.
+             * @param path Path to file.
+             * @param mode Open mode (defaults to DEFAULT_MODE).
+             */
             file_T(const path_T &path, std::ios_base::openmode mode = DEFAULT_MODE)
                 : base_file_T(path, mode)
             { this->read(); }
 
             virtual ~file_T() { }
 
+            /** File size.
+             * @returns An unsigned integer value.
+             */
             stat_T::size_type size() const { return this->_stat.size(); }
+
+            /** Internal buffer size (number of lines in file).
+             * @returns An unsigned integer value.
+             */
             size_type bufsize() const
             { return std::vector<string>::size(); }
 
-            virtual bool operator== (const file_T &) const;
+            /** Determine if two files are equal.
+             * @param f file_T object.
+             * @returns A boolean value.
+             */
+            virtual bool operator== (const file_T &f) const;
+
+            /** Determine if two files are not equal.
+             * @param f file_T object.
+             * @returns A boolean value.
+             */
             virtual bool operator!= (const file_T &f) const
             { return not (*this == f); }
 
+            /// Load file into internal container.
             virtual void read();
-            virtual void dump(std::ostream &) const;
+
+            /** Dump internal container to specified stream.
+             * @param s Output stream.
+             */
+            virtual void dump(std::ostream &s) const;
+
+            /// Dump internal container to disk.
             virtual void write()
             {
                 this->dump(*(this->stream));
@@ -218,27 +373,63 @@ namespace util
             }
     };
 
+    /**
+     * A directory using a vector of path_T's to represent
+     * directory contents.
+     */
+
     class dir_T  : public base_fileobject_T,
                    public std::vector<path_T>
     {
         public:
+            /// Default constructor.
             dir_T() : _dirp(NULL) { }
+
+            /** Constructor.  Opens and reads directory.
+             * @param path Path.
+             */
             dir_T(const path_T &path)
                 : base_fileobject_T(path), _dirp(NULL)
             { this->open(); this->read(); }
 
+            /// Destructor. Closes directory if opened.
             virtual ~dir_T() { if (this->_opened) this->close(); }
 
+            /// Open directory.
             virtual void open();
+
+            /// Close directory.
             virtual void close();
+
+            /// Read directory.
             virtual void read();
 
-            virtual iterator find(const value_type &);
-            virtual iterator find(const regex_T &);
-            virtual const_iterator find(const value_type &) const;
-            virtual const_iterator find(const regex_T &) const;
+            /** Find element with the specified name.
+             * @param p Path.
+             * @returns An iterator to the element (or end() if not found).
+             */
+            virtual iterator find(const value_type &p);
+
+            /** Find element that matches the specified regular expression.
+             * @param r Reference to a util::regex_T object.
+             * @returns An iterator to the element (or end() if not found).
+             */
+            virtual iterator find(const regex_T &r);
+
+            /** Find element with the specified name.
+             * @param p Path.
+             * @returns A const_iterator to the element (or end() if not found).
+             */
+            virtual const_iterator find(const value_type &p) const;
+
+            /** Find element that matches the specified regular expression.
+             * @param r Reference to a util::regex_T object.
+             * @returns A const_iterator to the element (or end() if not found).
+             */
+            virtual const_iterator find(const regex_T &r) const;
 
         protected:
+            /// Internal DIR pointer.
             DIR *_dirp;
     };
 }

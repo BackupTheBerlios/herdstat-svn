@@ -193,44 +193,6 @@ util::getcols()
     return 78;
 }
 /****************************************************************************/
-int
-util::fetch(const util::string &url, const util::string &dir, bool verbose,
-        bool timestamp)
-{
-    return util::fetch(url.c_str(), dir.c_str(), verbose, timestamp);
-}
-/****************************************************************************/
-int
-util::fetch(const char *url, const char *file, bool verbose, bool timestamp)
-{
-    const char *dir = util::dirname(file);
-
-    /* we have permission to write? */
-    if (access(dir, W_OK) != 0)
-    {
-	std::cerr << "You don't have proper permissions to write to "
-	    << dir << "." << std::endl
-	    << "Did you forget to add yourself to the portage group?"
-	    << std::endl;
-	throw util::bad_fileobject_E(dir);
-    }
-
-    util::string cmd;
-    
-    if (verbose and timestamp)
-	cmd = util::sprintf("%s -r -N -t3 -T15 -O %s '%s'", WGET, file, url);
-    else if (verbose)
-        cmd = util::sprintf("%s -r -t3 -T15 -O %s '%s'", WGET, file, url);
-    else if (timestamp)
-        cmd = util::sprintf("%s -rq -N -t3 -T15 -O %s '%s'", WGET, file, url);
-    else
-	cmd = util::sprintf("%s -rq -t3 -T15 -O %s '%s'", WGET, file, url);
-
-//    util::debug("executing '%s'", cmd.c_str());
-
-    return std::system(cmd.c_str());
-}
-/****************************************************************************/
 const util::string
 util::format_date(const std::time_t &epoch, const char *fmt)
 {
@@ -250,28 +212,6 @@ const util::string
 util::format_date(const util::string &epoch, const char *fmt)
 {
     return format_date(std::strtol(epoch.c_str(), NULL, 10), fmt);
-}
-/****************************************************************************/
-template <typename T, typename U>
-const std::vector<T>
-util::map<T,U>::keys() const
-{
-    std::vector<T> v;
-    typename map<T,U>::iterator i = this->begin();
-    typename map<T,U>::iterator e = this->end();
-    for (; i != e ; ++i) v.push_back(i->first);
-    return v;
-}
-/****************************************************************************/
-template <typename T, typename U>
-const std::vector<U>
-util::map<T,U>::values() const
-{
-    std::vector<U> v;
-    typename map<T,U>::iterator i = this->begin();
-    typename map<T,U>::iterator e = this->end();
-    for (; i != e ; ++i) v.push_back(i->second);
-    return v;
 }
 /****************************************************************************/
 

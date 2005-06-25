@@ -42,6 +42,11 @@
 
 namespace util
 {
+    /** string derivative.
+     * Derives from Glib::ustring if --enable-unicode.
+     * Otherwise derives from std::string.
+     */
+
 #ifdef UNICODE
     class string : public Glib::ustring
     {
@@ -66,24 +71,46 @@ namespace util
             string substr(size_type i = 0, size_type n = npos) const
             { return base_type::substr(i, n); }
 
+            /** Split string.
+             * @param delim  Delimiter.
+             * @param append Append empty string if delim not found?
+             *               (defaults to false).
+             * @returns      A vector of sub-strings.
+             */
             virtual std::vector<util::string>
-            split(const value_type delim = ' ', bool = false) const;
+            split(const value_type delim = ' ', bool append = false) const;
     };
 
+    /// strtoumax() wrapper
     uintmax_t strtouint(const util::string &);
+    /// strtoul() wrapper
     unsigned long strtoul(const util::string &);
 
 #ifdef UNICODE
+    /// tolower() wrapper
     gunichar tolower(const gunichar);
+    /// toupper() wrapper
     gunichar toupper(const gunichar);
 #else /* UNICODE */
+    /// tolower() wrapper
     char tolower(const char);
+    /// toupper() wrapper
     char toupper(const char);
 #endif /* UNICODE */
 
-    util::string lowercase(const util::string &);
-    util::string tidy_whitespace(const util::string &);
+    /** Convert string to all lowercase.
+     * @param s String object.
+     * @returns Resulting string object.
+     */
+    util::string lowercase(const util::string &s);
 
+    /** Tidy whitespace of the given string.
+     * @param s String object
+     * @returns Resulting string object.
+     */
+    util::string tidy_whitespace(const util::string &s);
+
+    /// sprintf() wrapper
 #ifdef UNICODE
     util::string sprintf(const gchar *, ...);
     util::string sprintf(const gchar *, va_list);
@@ -92,13 +119,35 @@ namespace util
     util::string sprintf(const char *, va_list);
 #endif /* UNICODE */
 
-    std::vector<util::string> split(const util::string &,
+    /** Split string.
+     * @param s String to split.
+     * @param d Delimiter.
+     * @returns Vector of sub-strings.
+     */
+    std::vector<util::string> split(const util::string &s,
                                     const util::string::value_type d = ' ');
-    util::string stringify(const std::vector<util::string> &,
+
+    /** Convert vector of strings to one string.
+     * @param v Vector of strings
+     * @param d Delimiter.
+     * @returns Resulting string object.
+     */
+    util::string stringify(const std::vector<util::string> &v,
                            const util::string::value_type d = ' ');
 
-    util::string htmlify(const util::string &);
-    util::string unhtmlify(const util::string &);
+    /** Replace any unfriendly characters in the given string to their
+     * HTML counterparts.
+     * @param s String object.
+     * @returns Resulting string object.
+     */
+    util::string htmlify(const util::string &s);
+
+    /** Replace any HTML'ized characters in the given string to their
+     * respective counterparts.
+     * @param s String object.
+     * @returns Resulting string object.
+     */
+    util::string unhtmlify(const util::string &s);
 }
 
 #endif

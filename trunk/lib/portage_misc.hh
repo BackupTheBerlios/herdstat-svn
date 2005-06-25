@@ -37,11 +37,27 @@
 
 namespace portage
 {
+    /** Are we inside a package directory?
+     * @returns A boolean value.
+     */
     bool in_pkg_dir();
-    bool is_pkg_dir(const util::path_T &);
-    bool is_ebuild(const util::path_T &);
 
-    /* represents a list of package categories */
+    /** Is the specified path a package directory?
+     * @param p Path.
+     * @returns A boolean value.
+     */
+    bool is_pkg_dir(const util::path_T &p);
+
+    /** Is the specified path an ebuild?
+     * @param p Path.
+     * @returns A boolean value.
+     */
+    bool is_ebuild(const util::path_T &p);
+
+    /**
+     * Represents a list of valid package categories.
+     */
+
     class categories_T
     {
         public:
@@ -50,9 +66,17 @@ namespace portage
             typedef value_type::const_iterator const_iterator;
             typedef value_type::size_type size_type;
 
+            /** Constructor.
+             * @param validate Whether or not to validate categories.
+             */
             categories_T(bool validate = false)
                 : _portdir(portage::portdir()), _validate(validate)
             { this->init(); }
+
+            /** Constructor.
+             * @param p        PORTDIR.
+             * @param validate Whether or not to validate categories.
+             */
             categories_T(const util::path_T &p, bool validate = false)
                 : _portdir(p), _validate(validate)
             { this->init(); }
@@ -70,9 +94,13 @@ namespace portage
         private:
             void init();
 
+            /// PORTDIR.
             const util::path_T _portdir;
+            /// validate categories?
             bool _validate;
+            /// category string container
             static value_type _s;
+            /// has _s been initialized?
             static bool _init;
     };
 }

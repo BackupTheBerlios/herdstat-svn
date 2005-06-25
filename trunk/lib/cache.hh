@@ -32,7 +32,7 @@
 
 namespace util
 {
-    /*
+    /**
      * Abstract interface for a cache of data.  Template argument
      * is the container type in which the data will be stored.
      */
@@ -44,15 +44,28 @@ namespace util
             typedef util::string string_type;
             typedef C value_type;
 
+            /** Constructor
+             * @param p Path to file that contains cached data.
+             */
             cache_T(const string_type &p) : _path(p) { }
             virtual ~cache_T() { }
 
+            /** Determine whether cache is valid.
+             * @returns A boolean value.
+             */
             virtual bool valid() const = 0;
+
+            /// Fill cache with data.
             virtual void fill() = 0;
+
+            /// Load cache from disk.
             virtual void load() = 0;
+
+            /// Dump cache to disk.
             virtual void dump() = 0;
 
         protected:
+            /// Initialize cache.
             virtual void init()
             {
                 if (this->valid())
@@ -64,6 +77,7 @@ namespace util
                 }
             }
 
+            /// Path to file containing cached data
             const string_type _path;
     };
 }

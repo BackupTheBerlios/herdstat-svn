@@ -1,5 +1,19 @@
 ChangeLog for herdstat
 
+2005-06-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added check for --enable-api-docs and check for
+	doxygen if enabled.  Currently just playing with doxygen.  It's
+	pointless at this point to provide API docs for an internal
+	convenience lib.
+	* doc/Doxyfile.in: Added doxygen configuration.
+	* lib/misc.cc: Removed util::map since we don't use it.
+	* lib/glob.hh, lib/portage_config.hh, lib/misc.hh,
+	lib/portage_find.hh, lib/portage_exceptions.hh, lib/cache.hh,
+	lib/file.hh, lib/vars.hh, lib/util_exceptions.hh, lib/timer.hh,
+	lib/progress.hh, lib/regex.hh, lib/portage_version.hh,
+	lib/portage_misc.hh: Added doxygen-style comments.
+
 2005-06-24 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated to detect a termcap lib (prefers ncurses).

@@ -41,13 +41,17 @@
 
 namespace util
 {
-    /*
-     * glob() interface
+    /**
+     * POSIX glob() interface.  Fills container with all files
+     * matching a glob pattern.
      */
 
     class glob_T : public std::vector<util::path_T>
     {
         public:
+            /** Constructor.
+             * @param pattern Glob pattern.
+             */
             glob_T(const char *pattern)
             {
                 int rv = glob(pattern, GLOB_ERR, NULL, &(this->_glob));
@@ -59,23 +63,35 @@ namespace util
                     this->push_back(this->_glob.gl_pathv[i]);
             }
 
+            /// Destructor.
             ~glob_T() { globfree(&(this->_glob)); }
 
         protected:
+            /// Internal glob_t instance.
             glob_t _glob;
     };
 
-    /*
+    /**
      * fnmatch() functor interface.
      */
 
     class patternMatch
     {
         public:
+            /** Overloaded operator().
+             * @param pattern Glob pattern.
+             * @param path Path.
+             * @returns A boolean value (Does glob match pattern?).
+             */
             bool operator() (const util::string pattern,
                              const util::string path)
             { return (*this)(pattern.c_str(), path.c_str()); }
 
+            /** fnmatch() wrapper.
+             * @param pattern Glob pattern.
+             * @param path Path.
+             * @returns A boolean value (Does glob match pattern?).
+             */
             bool operator() (const char *pattern, const char *path)
             {
                 return fnmatch(pattern, path, 0) == 0;

@@ -18,6 +18,21 @@ if test x$_WGET = "x"; then
 fi
 AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
+dnl build API docs?
+AC_MSG_CHECKING([whether to build API docs for internal libutil])
+AC_ARG_ENABLE([api-docs],
+    [ --enable-api-docs  enable API docs for internal libutil.la [off]],
+    enable_api_docs=$enableval, enable_api_docs=no)
+AM_CONDITIONAL(GENERATE_API_DOCS, test x$enable_api_docs = xyes)
+AC_MSG_RESULT($enable_api_docs)
+
+if test x$enable_api_docs = "xyes" ; then
+    AC_CHECK_PROGS(DOXYGEN, doxygen)
+    if test x$DOXYGEN = "x" ; then
+	AC_MSG_ERROR([doxygen is required to build API docs])
+    fi
+fi
+
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_MAKE_SET

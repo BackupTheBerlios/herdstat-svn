@@ -31,36 +31,46 @@
 
 namespace util
 {
+    /**
+     * Represents the amount of progress on an operation.
+     */
+
     class progress_T
     {
 	public:
-	    progress_T() : cur(0), step(0), started(false) { }
+            /// Default constructor.
+	    progress_T() : _cur(0), _step(0), _started(false) { }
+
             ~progress_T()
             {
-                if (not this->started)
+                if (not this->_started)
                     return;
 
                 /* sometimes we're one off and it ends at 99% */
-                while (this->cur < 100.0)
+                while (this->_cur < 100.0)
                     ++(*this);
             }
 
+            /** Start progress.
+             * @param m Number of total items to process.
+             */
 	    void start(unsigned m)
 	    {
-                if (this->started)
+                if (this->_started)
                     return;
 
-                this->started = true;
-		this->step = 100.0 / m;
+                this->_started = true;
+		this->_step = 100.0 / m;
 		std::printf("  0%%");
 	    }
 
+            /// Increment progress.
 	    void operator++ ()
 	    {
-                if (not this->started)
+                if (not this->_started)
                     return;
 
-		int inc = static_cast<int>(this->cur += this->step);
+		int inc = static_cast<int>(this->_cur += this->_step);
 		if (inc < 10)
 		    std::printf("\b\b%.1d%%", inc);
 		else if (inc < 100)
@@ -71,8 +81,12 @@ namespace util
             }
 
 	private:
-	    float cur, step;
-            bool started;
+            /// Current progress.
+	    float _cur;
+            /// Increment amount.
+            float _step;
+            /// Whether we've started yet.
+            bool  _started;
     };
 }
 

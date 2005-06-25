@@ -39,7 +39,10 @@
 
 namespace portage
 {
-    /* Represents a single version string */
+    /**
+     * Represents a single version string.
+     */
+
     class version_string_T
     {
         public:
@@ -48,6 +51,9 @@ namespace portage
             typedef value_type::iterator iterator;
             typedef value_type::const_iterator const_iterator;
 
+            /** Constructor.
+             * @param path Path to ebuild.
+             */
             version_string_T(const util::path_T &path) : _ebuild(path),
                 _verstr(util::chop_fileext(path.basename()))
             { this->init(); }
@@ -55,19 +61,60 @@ namespace portage
 //            const suffix_T &suffix() const
 //            { return this->_suffix; }
 
+            /** Prepare version string in a format identical to what
+             * portage would use.
+             * @returns String object.
+             */
             const string_type operator() () const;
+
+            /** Get version string (minus the suffix).
+             * @returns String object.
+             */
             const string_type &version() const { return this->_version(); }
+
+            /** Get path to ebuild for this version.
+             * @returns String object.
+             */
             const util::path_T &ebuild() const { return this->_ebuild; }
 
-            bool operator< (version_string_T &);
-            bool operator> (version_string_T &v) { return !(*this < v); }
-            bool operator==(version_string_T &);
-            bool operator!=(version_string_T &v) { return !(*this == v); }
+            /** Determine whether given version_string_T object is less
+             * than this one.
+             * @param that Reference to a version_string_T object.
+             * @returns    A boolean value.
+             */
+            bool operator< (version_string_T &that);
 
-            /* map subset for accessing P, PN, PV, etc */
+            /** Determine whether given version_string_T object is greater
+             * than this one.
+             * @param that Reference to a version_string_T object.
+             * @returns    A boolean value.
+             */
+            bool operator> (version_string_T &that)
+            { return !(*this < that); }
+
+            /** Determine whether given version_string_T object is equal
+             * to this one.
+             * @param that Reference to a version_string_T object.
+             * @returns    A boolean value.
+             */
+            bool operator==(version_string_T &that);
+
+            /** Determine whether given version_string_T object is not equal
+             * to this one.
+             * @param that Reference to a version_string_T object.
+             * @returns    A boolean value.
+             */
+            bool operator!=(version_string_T &that)
+            { return !(*this == that); }
+
+            /** Retrieve values for version components (ie. P, PV, PN, etc).
+             * @param s String object.
+             * @returns String object mapped to s.
+             */
             const string_type &operator[] (const string_type &s)
             { return this->_v[s]; }
             
+            /* map subset */
             iterator begin() { return this->_v.begin(); }
             const_iterator begin() const { return this->_v.begin(); }
             iterator end() { return this->_v.end(); }
@@ -77,79 +124,188 @@ namespace portage
             { return this->_v.find(s); }
 
         protected:
-            /* Represents a version suffix (_alpha, _beta, etc) */
+            /**
+             * Represents a version suffix (_alpha, _beta, etc).
+             */
+
             class suffix_T
             {
                 public:
+                    /// Default constructor.
                     suffix_T() { }
+
+                    /** Constructor.
+                     * @param pvr PVR char array (version+revision).
+                     */
                     suffix_T(const char *pvr) { this->init(pvr); }
+
+                    /** Constructor.
+                     * @param pvr PVR string object (version+revision).
+                     */
                     suffix_T(const string_type &pvr) { this->init(pvr); }
 
+                    /** Get suffix string.
+                     * @returns String object.
+                     */
                     const string_type &suffix() const { return this->_suffix; }
+
+                    /** Get suffix version string.
+                     * @returns String object.
+                     */
                     const string_type &version() const
                     { return this->_suffix_ver; }
 
+                    /** Assign a new PVR string.
+                     * @param pvr PVR string object (version+revision).
+                     */
                     void assign(const string_type &pvr) { this->init(pvr); }
 
-                    bool operator< (suffix_T &);
-                    bool operator> (suffix_T &s) { return not (*this < s); }
-                    bool operator==(suffix_T &);
-                    bool operator!=(suffix_T &s) { return not (*this == s); }
+                    /** Determine whether that suffix is less than this suffix.
+                     * @param that Reference to a suffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator< (suffix_T &that);
+
+                    /** Determine whether that suffix is greater than this
+                     * suffix.
+                     * @param that Reference to a suffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator> (suffix_T &that)
+                    { return not (*this < that); }
+                    
+                    /** Determine whether that suffix is equal to this suffix.
+                     * @param that Reference to a suffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator==(suffix_T &that);
+                    
+                    /** Determine whether that suffix is not equal to this
+                     * suffix.
+                     * @param that Reference to a suffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator!=(suffix_T &that)
+                    { return not (*this == that); }
 
                 protected:
+                    /// Initialize this suffix string.
                     void init(const string_type &);
+                    /// Parse PVR string to get suffix string.
                     void get_suffix(const string_type &);
 
-                    static std::vector<string_type>
-                                _suffixes;      /* valid suffixes */
-                    string_type _suffix;        /* suffix */
-                    string_type _suffix_ver;    /* suffix version */
+                    /// Valid suffixes.
+                    static std::vector<string_type> _suffixes;
+                    /// Suffix string.
+                    string_type _suffix;
+                    /// Suffix version string.
+                    string_type _suffix_ver;
             };
 
-            /* represents ${PV} minus the suffix */
+            /**
+             * Represents package version minus the suffix.
+             */
+
             class nosuffix_T
             {
                 public:
                     nosuffix_T() { }
+
+                    /** Constructor.
+                     * @param pv PV char array.
+                     */
                     nosuffix_T(const char *pv) { this->init(pv); }
+
+                    /** Constructor.
+                     * @param pv PV string object.
+                     */
                     nosuffix_T(const string_type &pv) { this->init(pv); }
 
+                    /** Get version string minus suffix.
+                     * @returns String object.
+                     */
                     const string_type &operator() () const
                     { return this->_version; }
 
+                    /** Assign new PV string.
+                     * @param pv PV string object.
+                     */
                     void assign(const string_type &pv) { this->init(pv); }
 
-                    bool operator< (nosuffix_T &);
-                    bool operator> (nosuffix_T &s) { return !(*this < s); }
-                    bool operator==(nosuffix_T &);
-                    bool operator!=(nosuffix_T &s) { return !(*this == s); }
+                    /** Determine whether that nosuffix is less than this
+                     * nosuffix.
+                     * @param that Reference to a nosuffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator< (nosuffix_T &that);
+
+                    /** Determine whether that nosuffix is greater than this
+                     * nosuffix.
+                     * @param that Reference to a nosuffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator> (nosuffix_T &that)
+                    { return !(*this < that); }
+
+                    /** Determine whether that nosuffix is equal to this
+                     * nosuffix.
+                     * @param that Reference to a nosuffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator==(nosuffix_T &that);
+
+                    /** Determine whether that nosuffix is not equal to this
+                     * nosuffix.
+                     * @param that Reference to a nosuffix_T object.
+                     * @returns    A boolean value.
+                     */
+                    bool operator!=(nosuffix_T &that)
+                    { return !(*this == that); }
 
                 protected:
+                    /// Initialize this nosuffix string.
                     void init(const string_type &);
+                    /// Version string (minus suffix).
                     string_type _version;
+                    /// Any extra non-digit characters.
                     string_type _extra;
             };
 
+            /// Initialize this version string.
             void init();
+            /// Parse this version string and fill version components map.
             void parse();
 
-            const util::path_T _ebuild;             /* abs path of ebuild */
-            string_type _verstr;                    /* full version string */
-            value_type  _v;                         /* version component map */
-            suffix_T _suffix;                       /* version suffix object */
-            nosuffix_T _version;                    /* version minus suffix */
+            /// Absolute path to ebuild.
+            const util::path_T _ebuild;
+            /// Full version string.
+            string_type _verstr;
+            /// Version components map.
+            value_type  _v;
+            /// Our version suffix.
+            suffix_T _suffix;
+            /// Our version minus suffix.
+            nosuffix_T _version;
     };
 
-    /* version_string_T sorting criterion */
+    /**
+     * Functor for sorting version_string_T objects with standard algorithms.
+     */
+
     class version_sort_T
     {
         public:
+            /** Is the first version_string_T less than the second?
+             * @param v1 A pointer of type version_string_T.
+             * @param v2 A pointer of type version_string_T.
+             * @returns  A boolean value.
+             */
             bool operator() (version_string_T *v1,
                              version_string_T *v2)
             { return *v1 < *v2; }
     };
 
-    /* 
+    /** 
      * version_string_T container - generally used
      * for all versions of a single package.
      */
@@ -163,9 +319,21 @@ namespace portage
             typedef value_type::size_type size_type;
             typedef version_string_T::string_type string_type;
 
+            /// Default constructor.
             versions_T() { }
+
+            /** Constructor.  Instantiate version_string_T objects for each
+             * ebuild existing in the specified package directory.
+             * @param path Path to package directory.
+             */
             versions_T(const util::path_T &path) { this->assign(path); }
-            versions_T(const std::vector<util::path_T> &);
+
+            /** Constructor.  Instantiate version_string_T objects for each
+             * ebuild existing in each element (package directories).
+             * @param v Vector of package directory paths.
+             */
+            versions_T(const std::vector<util::path_T> &v);
+
             virtual ~versions_T();
 
             /* small set subset */
@@ -181,11 +349,26 @@ namespace portage
             version_string_T *front() { return *(++this->begin()); }
             version_string_T *back() { return *(--this->end()); }
 
-            virtual bool insert(const util::path_T &);
-            virtual void assign(const util::path_T &);
-            virtual void append(const util::path_T &);
+            /** Instantiate and insert a version_string_T object with the
+             * specified path.
+             * @param p Path.
+             * @returns A boolean value (whether insertion succeeded).
+             */
+            virtual bool insert(const util::path_T &p);
+
+            /** Assign a new package directory clearing any previously
+             * contained version_string_T instances.
+             * @param p Path to package directory.
+             */
+            virtual void assign(const util::path_T &p);
+
+            /** Append a new package directory.
+             * @param p Path to package directory.
+             */
+            virtual void append(const util::path_T &p);
 
         protected:
+            /// version_string_T container
             value_type _vs;
     };
 }

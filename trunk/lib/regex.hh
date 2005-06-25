@@ -34,50 +34,97 @@
 #include <regex.h>
 #include "string.hh"
 
-/*
- * POSIX Regular Expressions
- * Initialize with regular expression
- * Use operator== to compare a string to the regular expression
- */
-
 namespace util
 {
+    /**
+     * POSIX Regular Expressions interface.
+     */
+
     class regex_T
     {
         public:
             typedef util::string string_type;
             typedef regex_t regex_type;
 
+            /// Default constructor.
             regex_T() : _compiled(false), _cflags(0), _eflags(0) { }
+
+            /** Constructor.
+             * @param r regular expression string.
+             * @param c CFLAGS.
+             * @param e EFLAGS.
+             */
             regex_T(const string_type &r, int c = 0, int e = 0)
                 : _str(r), _compiled(false), _cflags(c), _eflags(e)
             { this->assign(r, c, e); }
+
             ~regex_T() { if (this->_compiled) this->cleanup(); }
 
-            void assign(const string_type &, int c = 0, int e = 0);
+            /** Assign a new regular expression.
+             * @param r regular expression string.
+             * @param c CFLAGS.
+             * @param e EFLAGS.
+             */
+            void assign(const string_type &r, int c = 0, int e = 0);
+
+            /** Assign a new regular expression (no CFLAGS/EFLAGS).
+             * @param s regular expression string.
+             * @returns a regex_T object.
+             */
             regex_T &operator= (const string_type &s)
             { this->assign(s); return *this; }
+
+            /** Determine if this regex matches the specified string.
+             * @param cmp Comparison string.
+             * @returns   A boolean value.
+             */
             bool operator== (const string_type &cmp) const;
+
+            /** Determine if this regex does not match the specified string.
+             * @param cmp Comparison string.
+             * @returns   A boolean value.
+             */
             bool operator!= (const string_type &cmp) const
             { return not (*this == cmp); }
+
+            /** Get regular expression string.
+             * @returns A string object.
+             */
             const string_type &operator()() const { return this->_str; }
 
+            /** Is this regular expression string empty?
+             * @returns A boolean value.
+             */
             bool empty() const { return this->_str.empty(); }
 
         private:
+            /// Clean up compiled regex_t
             void cleanup();
 
-            string_type _str;       /* regular expression string */
-            bool        _compiled;  /* has this->_regex been compiled? */
-            int         _cflags,    /* cflags, see regcomp(3) */
-                        _eflags;    /* eflags, see regexec(3) */
-            regex_type  _regex;     /* our regex structure, see regex.h(P) */
+            /// regular expression string
+            string_type _str;
+            /// has our regex_t been compiled?
+            bool        _compiled;
+            /// cflags
+            int         _cflags;
+            /// eflags
+            int         _eflags;
+            /// regex_t
+            regex_type  _regex;
     };
 
-    /* function object for use in standard algorithms */
+    /**
+     * Functor for using regex_T with standard algorithms.
+     */
+
     class regexMatch : public std::binary_function<regex_T *, string, bool>
     {
         public:
+            /** Does regex match string?
+             * @param re Pointer to a regex_T object.
+             * @param s  String object.
+             * @returns  A boolean value.
+             */
             bool operator() (regex_T *re, string s) const
             { return (*re == s); }
     };

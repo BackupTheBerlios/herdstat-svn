@@ -39,8 +39,10 @@
 
 namespace util
 {
+    /// base exception
     class base_E                                : public std::exception { };
 
+    /// base message exception
     class msg_base_E                            : public base_E
     {
         protected:
@@ -53,6 +55,7 @@ namespace util
             virtual const char *what() const throw() { return this->str; }
     };
 
+    /// base variable message exception
     class va_msg_base_E                         : public msg_base_E
     {
         protected:
@@ -83,6 +86,7 @@ namespace util
             }
     };
 
+    /// strerror() exception
     class errno_E                               : public msg_base_E
     {
         public:
@@ -98,6 +102,7 @@ namespace util
             }
     };
 
+    /// bad file object exception
     class bad_fileobject_E                      : public errno_E
     {
         public:
@@ -106,6 +111,7 @@ namespace util
             bad_fileobject_E(const util::string &msg) : errno_E(msg) { }
     };
 
+    /// bad regular expression exception
     class bad_regex_E                           : public base_E
     {
         private:

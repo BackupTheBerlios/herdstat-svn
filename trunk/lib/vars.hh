@@ -33,11 +33,21 @@
 
 namespace util
 {
+    /**
+     * Represents a file with variables in the form of VARIABLE=VALUE,
+     * stored in key,value pairs.
+     */
+
     class vars_T : public base_file_T,
                    public std::map<string, string>
     {
         public:
+            /// Default constructor.
             vars_T() : _depth(0) { }
+
+            /** Constructor.
+             * @param path Path.
+             */
             vars_T(const path_T &path) : base_file_T(path), _depth(0)
             { this->read(); }
 
@@ -45,21 +55,41 @@ namespace util
 
             /* work around the fact that std::map doesn't have a
              * operator[]() const */
-            string operator[] (const string &s) const
+
+            /** Overloaded operator[] since std::map doesn't provide
+             * a const version.
+             * @param k Key to look up.
+             * @returns A string object (Value mapped to Key).
+             */
+            string operator[] (const string &k) const
             {
-                const_iterator i = this->find(s);
+                const_iterator i = this->find(k);
                 return (i == this->end() ? "" : i->second);
             }
 
-            virtual void dump(std::ostream &) const;
+            /** Dump keys/values to specified stream.
+             * @param s Output stream.
+             */
+            virtual void dump(std::ostream &s) const;
+
+            /// Read file.
             virtual void read();
-            virtual void read(const path_T &);
+
+            /** Read specified file.
+             * @param p Path.
+             */
+            virtual void read(const path_T &p);
 
         private:
-            void subst(string &);
+            /** Perform elementary variable substituion.
+             * @param v Variable.
+             */
+            void subst(string &v);
 
-            unsigned short _depth;  /* subst() recursion depth */
-            bool _ebuild;           /* are we an ebuild? */
+            /// subst() recursion depth (safeguard).
+            unsigned short _depth;
+            /// are we an ebuild?
+            bool _ebuild;
     };
 }
 

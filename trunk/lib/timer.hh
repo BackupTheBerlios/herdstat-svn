@@ -32,20 +32,27 @@
 
 namespace util
 {
+    /**
+     * Represents a timer.
+     */
+
     class timer_T
     {
         public:
             typedef long size_type;
             typedef struct timeval time_type;
 
+            /// Default constructor.
             timer_T() : _elapsed(0), _running(false) { }
 
+            /// Start timer.
             void start()
 	    {
 	        gettimeofday(&(this->_begin), NULL);
                 this->_running = true;
 	    }
 
+            /// Stop timer.
 	    void stop()
 	    {
 	        gettimeofday(&(this->_end), NULL);
@@ -58,9 +65,18 @@ namespace util
                 this->_running = false;
 	    }
 
+            /** Is the timer running?
+             * @returns A boolean value.
+             */
             bool is_running() const { return this->_running; }
+
+            /** How long has the timer been running?
+             * @returns An long integer value.
+             */
             size_type elapsed() const { return this->_elapsed; }
-            void clear() { this->_elapsed = 0; }
+
+            /// Reset elapsed value.
+            void reset() { this->_elapsed = 0; }
 
         private:
 	    time_type _begin, _end;
