@@ -53,9 +53,6 @@ namespace util
 
             virtual ~vars_T() { }
 
-            /* work around the fact that std::map doesn't have a
-             * operator[]() const */
-
             /** Overloaded operator[] since std::map doesn't provide
              * a const version.
              * @param k Key to look up.
