@@ -28,7 +28,6 @@
 #endif
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "metadata.hh"
 
 /*
@@ -44,8 +43,6 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
         virtual void fill();
         virtual void load();
         virtual void dump();
-
-        void parse(util::string, util::progress_T *);
 
     private:
         util::string _portdir;
