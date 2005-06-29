@@ -2,7 +2,7 @@
 # $Id: configure.ac 246 2005-04-26 12:03:53Z ka0ttic $
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.1_p1], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.1_p2], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 dist-bzip2 no-dist-gzip])
@@ -94,7 +94,7 @@ AC_CHECK_FUNCS(fnmatch,,
     [AC_MSG_ERROR([fnmatch is required])])
 
 dnl Optional functions
-AC_CHECK_FUNCS(strtoumax getopt_long)
+AC_CHECK_FUNCS(getopt_long)
 
 dnl Required libs
 
@@ -114,22 +114,7 @@ fi
 AC_SUBST(TERMCAP_LIBS)
 AC_DEFINE(USE_TERMCAP, 1, [Use termcap lib to determine terminal width])
 
-dnl zlib
-#AC_MSG_CHECKING([whether to include zlib support])
-#AC_ARG_WITH(zlib,
-#    AS_HELP_STRING([--without-zlib], [disable zlib support]),
-#    ac_zlib=$withval,
-#    ac_zlib=yes)
-
-#AM_CONDITIONAL(HAVE_LIBZ, test x$ac_zlib = xyes)
-
-#if test x$ac_zlib = xno ; then
-#    AC_MSG_RESULT(no)
-#else
-#    AC_MSG_RESULT(yes)
-#    AC_CHECK_LIB(z, compress)
-#fi
-
+dnl --enable-debug
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     [case "${enableval}" in
         yes)    debug=true
@@ -141,6 +126,7 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     esac], [debug=false])
 AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
 
+dnl --enable-unicode
 AC_ARG_ENABLE(unicode, [ --enable-unicode   enable Unicode support [on]],
     enable_unicode=$enableval, enable_unicode=yes)
 
@@ -159,4 +145,6 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
 	  doc/Makefile
 	  lib/Makefile
-	  src/Makefile)
+	  src/Makefile
+	  tests/Makefile
+	  tests/foo/Makefile)

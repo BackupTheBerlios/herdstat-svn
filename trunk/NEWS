@@ -1,6 +1,15 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_p2:
+    Added regression tests.
+
+    Bug fixes:
+     - Fixed NULL pointer dereference causing a segmentation fault when
+       'herdstat -p no-herd' is run.
+     - Interpret metadatas with no herd specified (not even no-herd) as
+       "no-herd".
+
 1.1.1_p1:
     Bug fixes:
      - Interpret packages in a herd (have <herd>some_herd</herd> in metadata.xml)

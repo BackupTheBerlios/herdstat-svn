@@ -1,5 +1,28 @@
 ChangeLog for herdstat
 
+2005-06-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added tests/ Makefile's to the output list.  Updated
+	version (1.1.1_p2).
+	* src/action_pkg_handler.cc: Added missing check to ensure herd exists
+	before dereferencing the result of herds_xml_T::operator[].  Fixes
+	segmentation fault when "no-herd" packages are queried.  Also fixed
+	metadata_matches() to interpret packages with no herd specified (not
+	even "no-herd") as "no-herd".
+	* lib/string.cc, lib/string.hh: Added stringify and destringify
+	template functions.  Eliminates the need for the strtoul/strtoumax
+	wrappers.
+	* lib/portage_version.cc: Updated to use destringify<>.
+	* lib/util_exceptions.hh: Added bad_cast_E exception used by
+	destringify templates.
+	* tests/common.sh, tests/dev-test.sh, tests/herd-test.sh,
+	tests/metadata-test.sh, tests/stats-test.sh, test/versions-test.sh:
+	Added tests to be run during 'make check'.
+
+2005-06-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metacache.hh: Removed non-existent function.
+
 2005-06-25 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Added check for --enable-api-docs and check for

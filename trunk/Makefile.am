@@ -1,6 +1,6 @@
 # $Id: Makefile.am 234 2005-04-19 12:34:46Z ka0ttic $
 
-SUBDIRS = doc lib src
+SUBDIRS = doc lib src tests
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
