@@ -116,8 +116,8 @@ portage::version_string_T::suffix_T::operator< (suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-                return ( util::strtoul(this->version()) < 
-                         util::strtoul(that.version()) );
+                return ( util::destringify<unsigned long>(this->version()) <
+                         util::destringify<unsigned long>(that.version()) );
             else if (this->version().empty() and that.version().empty())
                 return true;
             else
@@ -159,8 +159,8 @@ portage::version_string_T::suffix_T::operator== (suffix_T &that)
         if (ti == si)
         {
             if (not this->version().empty() and not that.version().empty())
-                return ( util::strtoul(this->version()) ==
-                         util::strtoul(that.version()) );
+                return ( util::destringify<unsigned long>(this->version()) ==
+                         util::destringify<unsigned long>(that.version()) );
             else if (this->version().empty() and that.version().empty())
                 return true;
             else
@@ -226,9 +226,10 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
         /* loop until the version components differ */
 
         /* TODO: use std::mismatch() ?? */
-
-        uintmax_t thisver = util::strtouint(*thisiter);
-        uintmax_t thatver = util::strtouint(*thatiter);
+        unsigned long thisver =
+            util::destringify<unsigned long>(*thisiter);
+        unsigned long thatver =
+            util::destringify<unsigned long>(*thatiter);
 
         bool same = false;
         if (thisver == thatver)
@@ -298,10 +299,10 @@ portage::version_string_T::operator< (version_string_T &that)
             return true;
         else if (this->_suffix == that._suffix)
         {
-            uintmax_t thisrev =
-                util::strtouint(this->_v["PR"].substr(1).c_str());
-            uintmax_t thatrev =
-                util::strtouint(that["PR"].substr(1).c_str());
+            unsigned long thisrev =
+                util::destringify<unsigned long>(this->_v["PR"].substr(1).c_str());
+            unsigned long thatrev =
+                util::destringify<unsigned long>(that["PR"].substr(1).c_str());
             return thisrev <= thatrev;
         }
     }

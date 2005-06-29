@@ -28,6 +28,7 @@
 #include <iterator>
 #include <vector>
 #include <map>
+#include <sstream>
 #include <cstdarg>
 #include <cstring>
 
@@ -39,92 +40,44 @@
 #endif /* UNICODE */
 
 #include "string.hh"
+#include "util_exceptions.hh"
 
-#ifdef HAVE_STDINT_H
-/* It looks like glibc's stdint.h wraps the UINTMAX_MAX define
- * in a #if !defined __cplusplus || defined __STDC_LIMIT_MACROS,
- * so enable it, as we need it to check the return value of strtoumax(). */
-#ifndef __STDC_LIMIT_MACROS
-# define __STDC_LIMIT_MACROS
-#endif /* __STDC_LIMIT_MACROS */
-# include <stdint.h>
-/* don't use strtoumax if UINTMAX_MAX is still unavailable */
-# ifndef UINTMAX_MAX
-#  undef HAVE_STRTOUMAX
-# endif /* UINTMAX_MAX */
-#endif /* HAVE_STDINT_H */
-
-/*****************************************************************************
- * strtoumax wrapper                                                         *
- *****************************************************************************/
-uintmax_t
-util::strtouint(const util::string &str)
+std::vector<util::string>
+util::string::split(const string::value_type delim, bool append_only) const
 {
-#ifdef HAVE_STRTOUMAX
-    uintmax_t i = strtoumax(str.c_str(), NULL, 10);
-
-    switch (i)
-    {
-	case 0:
-	    if (str == "0")
-		return 0;
-	    break;
-	case INTMAX_MIN:
-	case INTMAX_MAX:
-	case UINTMAX_MAX:
-	    break;
-	default:
-	    return i;
-    }
-#endif /* HAVE_STRTOUMAX */
-    return std::atoi(str.c_str());
+    return util::split(*this, delim, append_only);
 }
-/*****************************************************************************
- * strtoul wrapper                                                           *
- *****************************************************************************/
-unsigned long
-util::strtoul(const util::string &str)
-{
-    unsigned long result = 0;
 
-    result = std::strtoul(str.c_str(), NULL, 10);
-    if (result == ULONG_MAX)
-        result = 0;
-    
-    /* zero's only valid when str == "0" */
-    if ((result == 0) and (str != "0"))
-        result = std::atol(str.c_str());
-
-    return result;
-}
 /*****************************************************************************
  * Convert the given character to (lower|upper)case                          *
  *****************************************************************************/
+util::string::value_type
+util::tolower(const string::value_type c)
+{
 #ifdef UNICODE
-gunichar
-util::tolower(const gunichar c)
-{
     return Glib::Unicode::tolower(c);
-}
-
-gunichar
-util::toupper(const gunichar c)
-{
-    return Glib::Unicode::toupper(c);
-}
-#else /* UNICODE */
-char
-util::tolower(const char c)
-{
+#else
     return std::tolower(c, std::locale(""));
+#endif
 }
-
-char
-util::toupper(const char c)
+util::string::value_type
+util::toupper(const string::value_type c)
 {
+#ifdef UNICODE
+    return Glib::Unicode::toupper(c);
+#else
     return std::toupper(c, std::locale(""));
+#endif
 }
-#endif /* UNICODE */
+bool
+util::isdigit(const string::value_type c)
+{
+#ifdef UNICODE
+    return Glib::Unicode::isdigit(c);
+#else
+    return std::isdigit(c, std::locale(""));
+#endif
+}
 /*****************************************************************************
  * Convert the given string to all lowercase.                                *
  *****************************************************************************/
@@ -291,17 +244,36 @@ util::unhtmlify(const util::string &str)
 
     return result;
 }
+/*****************************************************************************
+ * Convert a vector of string to one string.                                 *
+ *****************************************************************************/
+util::string
+util::join(const std::vector<util::string> &v,
+                const util::string::value_type delim)
+{
+    util::string result;
+
+    std::vector<util::string>::const_iterator i = v.begin(), e = v.end();
+    for (; i != e ; ++i)
+    {
+        result += *i;
+
+        if ((i+1) != e)
+            result += delim;
+    }
+
+    return result;
+}
 /*****************************************************************************/
 std::vector<util::string>
-util::split(const util::string &str, const util::string::value_type delim)
+util::split(const string &str, const string::value_type delim, bool append_empty)
 {
     std::vector<util::string> vec;
-    util::string::size_type pos, lpos = 0;
+    string::size_type pos, lpos = 0;
     
     while (true)
     {
-	pos = str.find(delim, lpos);
-	if (pos == util::string::npos)
+	if ((pos = str.find(delim, lpos)) == string::npos)
 	{
 	    vec.push_back(str.substr(lpos));
 	    break;
@@ -311,51 +283,6 @@ util::split(const util::string &str, const util::string::value_type delim)
 	 * delimiters in a row were encountered) */
 	if (str.substr(lpos, pos - lpos).length() > 0)
 	    vec.push_back(str.substr(lpos, pos - lpos));
-
-	lpos = ++pos;
-    }
-    return vec;
-}
-/*****************************************************************************
- * Convert a vector of string to one string.                                 *
- *****************************************************************************/
-util::string
-util::stringify(const std::vector<util::string> &v,
-                const util::string::value_type delim)
-{
-    util::string result;
-
-    std::vector<util::string>::const_iterator i = v.begin(), e = v.end();
-    for (; i != e ; ++i)
-        result += *i + delim;
-
-    /* remove the extra delim */
-    util::string::size_type pos = result.rfind(delim);
-    if (pos != util::string::npos)
-        result = result.substr(0, pos);
-    
-    return result;
-}
-/*****************************************************************************/
-std::vector<util::string>
-util::string::split(const util::string::value_type delim,
-                    bool append_empty) const
-{
-    std::vector<util::string> vec;
-    size_type pos, lpos = 0;
-    
-    while (true)
-    {
-	if ((pos = this->find(delim, lpos)) == this->npos)
-	{
-	    vec.push_back(this->substr(lpos));
-	    break;
-	}
-
-	/* don't append empty strings (two
-	 * delimiters in a row were encountered) */
-	if (this->substr(lpos, pos - lpos).length() > 0)
-	    vec.push_back(this->substr(lpos, pos - lpos));
         else if (append_empty)
             vec.push_back("");
 
@@ -364,5 +291,99 @@ util::string::split(const util::string::value_type delim,
     return vec;
 }
 /*****************************************************************************/
+template <typename T>
+util::string
+util::stringify(const T &v)
+{
+    std::ostringstream os;
+    os << v;
+    return os.str();
+}
+/*****************************************************************************/
+template <typename T>
+T
+util::destringify(const util::string &s)
+{
+    std::istringstream is(s.c_str());
 
+    T v;
+    is >> v;
+
+    if (not is.eof())
+        throw bad_cast_E("Failed to cast '"+s+"'.");
+
+    return v;
+}
+/*****************************************************************************/
+template <>
+int
+util::destringify<int>(const string &s)
+{
+    char *invalid;
+    int result = std::strtol(s.c_str(), &invalid, 10);
+    if (*invalid)
+        throw bad_cast_E("Failed to cast '"+s+"' to int.");
+
+    return result;
+}
+/*****************************************************************************/
+template <>
+long
+util::destringify<long>(const string &s)
+{
+    char *invalid;
+    long result = std::strtol(s.c_str(), &invalid, 10);
+    if (*invalid)
+        throw bad_cast_E("Failed to cast '"+s+"' to long.");
+
+    return result;
+}
+/*****************************************************************************/
+template <>
+unsigned long
+util::destringify<unsigned long>(const string &s)
+{
+    char *invalid;
+    unsigned long result = std::strtoul(s.c_str(), &invalid, 10);
+    if (*invalid or ((result == ULONG_MAX) and (errno == ERANGE)))
+        throw bad_cast_E("Failed to cast '"+s+"' to unsigned long.");
+
+    return result;
+}
+/*****************************************************************************/
+template <>
+double
+util::destringify<double>(const string &s)
+{
+    char *invalid;
+    double result = std::strtod(s.c_str(), &invalid);
+    if (*invalid)
+        throw bad_cast_E("Failed to cast '"+s+"' to double.");
+
+    return result;
+}
+/*****************************************************************************/
+template <>
+float
+util::destringify<float>(const string &s)
+{
+    char *invalid;
+    float result = std::strtod(s.c_str(), &invalid);
+    if (*invalid)
+        throw bad_cast_E("Failed to cast '"+s+"' to float.");
+
+    return result;
+}
+/*****************************************************************************/
+template <>
+bool
+util::destringify<bool>(const string &s)
+{
+    if (s == "true" or s == "yes" or s == "on")
+        return true;
+    if (s == "false" or s == "no" or s == "off")
+        return false;
+    return destringify<int>(s);
+}
+/*****************************************************************************/
 /* vim: set tw=80 sw=4 et : */

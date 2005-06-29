@@ -36,10 +36,6 @@
 # include <string>
 #endif /* UNICODE */
 
-#ifdef HAVE_INTTYPES_H
-# include <inttypes.h>
-#endif
-
 namespace util
 {
     /** string derivative.
@@ -81,34 +77,21 @@ namespace util
             split(const value_type delim = ' ', bool append = false) const;
     };
 
-    /// strtoumax() wrapper
-    uintmax_t strtouint(const util::string &);
-    /// strtoul() wrapper
-    unsigned long strtoul(const util::string &);
-
-#ifdef UNICODE
-    /// tolower() wrapper
-    gunichar tolower(const gunichar);
-    /// toupper() wrapper
-    gunichar toupper(const gunichar);
-#else /* UNICODE */
-    /// tolower() wrapper
-    char tolower(const char);
-    /// toupper() wrapper
-    char toupper(const char);
-#endif /* UNICODE */
+    string::value_type tolower(const string::value_type c);
+    string::value_type toupper(const string::value_type c);
+    bool isdigit(const string::value_type c);
 
     /** Convert string to all lowercase.
      * @param s String object.
      * @returns Resulting string object.
      */
-    util::string lowercase(const util::string &s);
+    string lowercase(const string &s);
 
     /** Tidy whitespace of the given string.
      * @param s String object
      * @returns Resulting string object.
      */
-    util::string tidy_whitespace(const util::string &s);
+    string tidy_whitespace(const string &s);
 
     /// sprintf() wrapper
 #ifdef UNICODE
@@ -124,30 +107,50 @@ namespace util
      * @param d Delimiter.
      * @returns Vector of sub-strings.
      */
-    std::vector<util::string> split(const util::string &s,
-                                    const util::string::value_type d = ' ');
+    std::vector<string> split(const string &s,
+                              const string::value_type d = ' ',
+                              bool append_only = false);
 
     /** Convert vector of strings to one string.
      * @param v Vector of strings
      * @param d Delimiter.
      * @returns Resulting string object.
      */
-    util::string stringify(const std::vector<util::string> &v,
-                           const util::string::value_type d = ' ');
+    string join(const std::vector<string> &v, const string::value_type d = ' ');
+
+    /** Convert a type to a string.
+     * @param v Value of type T.
+     * @returns A string object.
+     */
+    template <typename T> string stringify(const T &v);
+
+    /** Convert a string to a type.
+     * @param s A string object.
+     * @returns Value of type T.
+     */
+    template <typename T> T destringify(const string &s);
+
+    // destringify specializations
+    template <> int destringify<int>(const string &s);
+    template <> long destringify<long>(const string &s);
+    template <> unsigned long destringify<unsigned long>(const string &s);
+    template <> double destringify<double>(const string &s);
+    template <> float destringify<float>(const string &s);
+    template <> bool destringify<bool>(const string &s);
 
     /** Replace any unfriendly characters in the given string to their
      * HTML counterparts.
      * @param s String object.
      * @returns Resulting string object.
      */
-    util::string htmlify(const util::string &s);
+    string htmlify(const string &s);
 
     /** Replace any HTML'ized characters in the given string to their
      * respective counterparts.
      * @param s String object.
      * @returns Resulting string object.
      */
-    util::string unhtmlify(const util::string &s);
+    string unhtmlify(const string &s);
 }
 
 #endif
