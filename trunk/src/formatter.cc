@@ -192,14 +192,14 @@ formatter_T::append(const string_type &label,
     /* if quiet, handle it here, as we're going to end up splitting
      * the data string into a vector anyways */
     if (attr.quiet and attr.quiet_delim == " ")
-        buffer.push_back(util::stringify(data));
+        buffer.push_back(util::join(data));
 
     else if (attr.quiet)
         std::copy(data.begin(), data.end(), std::back_inserter(buffer));
 
     /* otherwise, produce a data string and call the real append() */
     else
-        append(label, util::stringify(data));
+        append(label, util::join(data));
 }
 /****************************************************************************
  * Append text to the output buffer.  Smartly handle lines that are bigger  *

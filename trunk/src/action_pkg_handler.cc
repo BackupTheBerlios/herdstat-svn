@@ -91,7 +91,8 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
         if ((regex and std::find_if(metadata.herds.begin(),
             metadata.herds.end(), std::bind1st(util::regexMatch(), &regexp))
             != metadata.herds.end()) or (not regex and
-            metadata.herd_exists(criteria)))
+            metadata.herd_exists(criteria)) or (criteria == "no-herd" and
+            metadata.herds.empty()))
         {
             if (with.empty())
                 return true;
@@ -232,7 +233,7 @@ action_pkg_handler_T::display(pkgQuery_T *q)
 
             output("Email", q->query + "@gentoo.org");
         }
-        else
+        else if (herds_xml.exists(q->query))
         {
             output("Herd", q->query);
             if (not herds_xml[q->query]->mail.empty())
@@ -241,6 +242,9 @@ action_pkg_handler_T::display(pkgQuery_T *q)
                 output("Description",
                     util::tidy_whitespace(herds_xml[q->query]->desc));
         }
+        else
+            output("Herd", q->query);
+
 
         if (q->empty())
             output("Packages(0)", "none");
