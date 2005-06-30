@@ -18,6 +18,9 @@ ChangeLog for herdstat
 	* tests/common.sh, tests/dev-test.sh, tests/herd-test.sh,
 	tests/metadata-test.sh, tests/stats-test.sh, test/versions-test.sh:
 	Added tests to be run during 'make check'.
+	* src/herdstat.cc, src/options.cc, src/rc.cc, bashcomp,
+	doc/herdstat.1.in: Added -A|--devaway for specifying the location of
+	devaway.html.  Mainly needed for the tests.
 
 2005-06-27 Aaron Walker <ka0ttic@gentoo.org>
 

@@ -93,6 +93,8 @@ rc_T::set_options()
     if (not vars["devaway.expire"].empty())
 	optset("devaway.expire", long,
 	    std::strtol(vars["devaway.expire"].c_str(), NULL, 10));
+    if (not vars["devaway.location"].empty())
+        optset("devaway.location", util::string, vars["devaway.location"]);
     if (not vars["use.metacache"].empty())
     {
 	s = vars["use.metacache"];

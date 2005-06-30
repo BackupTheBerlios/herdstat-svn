@@ -36,7 +36,13 @@
 void
 devaway_T::init()
 {
-    util::stat_T devaway(DEVAWAY_LOCAL);
+    util::path_T file(optget("devaway.location", util::string));
+    if (file.empty())
+        this->_path.assign(DEVAWAY_LOCAL);
+    else
+        this->_path.assign(file);
+    
+    util::stat_T devaway(this->_path);
     if (not devaway.exists() or
        ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
        or (devaway.size() == 0))

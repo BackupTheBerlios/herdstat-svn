@@ -9,6 +9,9 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        'herdstat -p no-herd' is run.
      - Interpret metadatas with no herd specified (not even no-herd) as
        "no-herd".
+     - Fixed bug that caused XML files listed in <maintainingproject> (in
+       herds.xml) to not be fetched properly and fail with a failed mps()
+       assertion.
 
 1.1.1_p1:
     Bug fixes:

@@ -2,7 +2,7 @@
 
 SUBDIRS = foo
 
-tests = versions metadata dev herd stats
+tests = versions metadata dev herd stats away
 TESTS = $(foreach f, $(tests), $(f)-test.sh)
 
 CLEANFILES = $(tests)

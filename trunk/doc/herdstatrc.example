@@ -39,6 +39,10 @@ use.devaway=true
 #   value can be a number (seconds)
 devaway.expire=86400
 
+# devaway.html location (defaults to ${localstatedir}/herdstat/devaway.html)/
+#   value needs to be a path to a file that exists.
+#devaway.location=
+
 # use metadata cache?
 #   value can be one of: yes,no,true,false
 #   The metadata cache is used soley for --package queries.

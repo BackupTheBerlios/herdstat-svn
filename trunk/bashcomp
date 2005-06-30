@@ -40,7 +40,7 @@ _herdstat() {
         -F --fetch -c --count -n --nocolor --no-herd -m --metadata
         --with-herd -w --which --versions --no-overlay -r --regex
         -E --extended -f --find --qa --with-maintainer --no-maintainer
-        -a --away --nometacache"
+        -a --away --nometacache -A --devaway"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -51,7 +51,7 @@ _herdstat() {
     fi
 
     case "${prev}" in
-	-H|--herdsxml|-o|--outfile)
+	-H|--herdsxml|-o|--outfile|-A|--devaway)
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
 	    ;;
 	-a|--away|-d|--dev)
@@ -113,7 +113,8 @@ _herdstat() {
                 # dev
                 if [[ ${x} != "--debug" && ${x} != "--metadata" ]] && \
                     [[ ${x} != "--package" && ${x} != "--no-overlay" ]] && \
-                    [[ ${x} != *maintainer* && ${x} != "--nometacache" ]]
+                    [[ ${x} != *maintainer* && ${x} != "--nometacache" ]] && \
+                    [[ ${x} != "--devaway" ]]
                 then
                     [[ ${x} == *d* || ${x} == *a* ]] && dev=1
                 fi

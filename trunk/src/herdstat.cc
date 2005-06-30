@@ -56,7 +56,7 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    "/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfa";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -80,6 +80,8 @@ static struct option long_opts[] =
     {"dev",	    no_argument,	0,  'd'},
     /* specify the location of a local herds.xml */
     {"herdsxml",    required_argument,	0,  'H'},
+    /* specify the location of devaway.html. */
+    {"devaway",	    required_argument,	0,  'A'},
     /* show package stats for the specified herds */
     {"package",	    no_argument,	0,  'p'},
     /* display package metadata information */
@@ -148,6 +150,7 @@ help()
 	<< "                         expression." << std::endl
 	<< " -E, --extended          Use extended regular expressions. Implies --regex." << std::endl
 	<< " -H, --herdsxml <file>   Specify location of herds.xml." << std::endl
+	<< " -A, --devaway  <file>   Specify location of devaway.html." << std::endl
 	<< " -o, --outfile  <file>   Send output to the specified file" << std::endl
 	<< "                         instead of stdout." << std::endl
 	<< " -F, --fetch             Force a fetch of herds.xml." << std::endl
@@ -381,6 +384,9 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --herdsxml */
 	    case 'H':
 		optset("herds.xml", util::string, optarg);
+		break;
+	    case 'A':
+		optset("devaway.location", util::string, optarg);
 		break;
 	    /* --debug */
 	    case 'D':

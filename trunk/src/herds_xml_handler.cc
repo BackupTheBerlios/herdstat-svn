@@ -217,18 +217,18 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
          * container.
          */
 
+        util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
         util::string path(util::string(LOCALSTATEDIR)+"/"+cur_herd+".xml");
         util::stat_T mps(path);
 
         try
         {
-            if (mps.exists() or ((std::time(NULL) - mps.mtime()) > 592200) or
+            if (not mps.exists() or
+                (mps.exists() and ((std::time(NULL) - mps.mtime()) > 592200)) or
                 (mps.size() == 0))
             {
                 if (mps.exists())
                     util::copy_file(path, path+".bak");
-
-                util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
 
                 fetch(url, path);
 
@@ -255,21 +255,25 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             }
         }
 
-        assert(mps());
-        
-        xml_T<mpXMLHandler_T> xml(path);
-        mpXMLHandler_T *handler = xml.handler();
-
-        mpXMLHandler_T::herd_type::iterator i, e = handler->devs.end();
-        for (i = handler->devs.begin() ; i != e ; ++i)
+        if (not mps())
+            std::cerr << "Failed to save '" << url << "' to" << std::endl
+                << "'" << path << "'." << std::endl;
+        else
         {
-            std::pair<herd_type::iterator, bool> p =
-                herds[cur_herd]->insert(std::make_pair(i->first, new dev_type()));
+            xml_T<mpXMLHandler_T> xml(path);
+            mpXMLHandler_T *handler = xml.handler();
 
-            if (p.second)
-                p.first->second->role = i->second->role;
+            mpXMLHandler_T::herd_type::iterator i, e = handler->devs.end();
+            for (i = handler->devs.begin() ; i != e ; ++i)
+            {
+                std::pair<herd_type::iterator, bool> p =
+                    herds[cur_herd]->insert(std::make_pair(i->first, new dev_type()));
 
-//            debug_msg("p.second = %d\ncur_role = %s", p.second, i->second->role.c_str());
+                if (p.second)
+                    p.first->second->role = i->second->role;
+
+//              debug_msg("p.second = %d\ncur_role = %s", p.second, i->second->role.c_str());
+            }
         }
     }
 

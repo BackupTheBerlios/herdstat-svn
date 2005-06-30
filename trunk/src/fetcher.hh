@@ -33,6 +33,7 @@ class fetcher_T
 {
     public:
         fetcher_T() { }
+
         fetcher_T(const util::string &url, const util::string &file)
         {
             if (this->fetch(url, file) != EXIT_SUCCESS)

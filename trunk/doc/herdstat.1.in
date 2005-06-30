@@ -93,6 +93,9 @@ Display away information for the specified developer(s).
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
 for an alternative way of setting the herds.xml location.
 .TP
+.B "\-A, \-\-devaway \fI<file>\fR"
+Specify the location of devaway.html.
+.TP
 .B "\-o, \-\-outfile \fI<file>\fR"
 Send output to the specified file instead of stdout.  \fI<file>\fR can also be
 either stdout (default if -o is not specified) or stderr. This option implies --quiet.
