@@ -1,0 +1,1349 @@
+ChangeLog for herdstat
+
+2005-06-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added tests/ Makefile's to the output list.  Updated
+	version (1.1.1_p2).
+	* src/action_pkg_handler.cc: Added missing check to ensure herd exists
+	before dereferencing the result of herds_xml_T::operator[].  Fixes
+	segmentation fault when "no-herd" packages are queried.  Also fixed
+	metadata_matches() to interpret packages with no herd specified (not
+	even "no-herd") as "no-herd".
+	* lib/string.cc, lib/string.hh: Added stringify and destringify
+	template functions.  Eliminates the need for the strtoul/strtoumax
+	wrappers.
+	* lib/portage_version.cc: Updated to use destringify<>.
+	* lib/util_exceptions.hh: Added bad_cast_E exception used by
+	destringify templates.
+	* tests/common.sh, tests/dev-test.sh, tests/herd-test.sh,
+	tests/metadata-test.sh, tests/stats-test.sh, test/versions-test.sh:
+	Added tests to be run during 'make check'.
+	* src/herdstat.cc, src/options.cc, src/rc.cc, bashcomp,
+	doc/herdstat.1.in: Added -A|--devaway for specifying the location of
+	devaway.html.  Mainly needed for the tests.
+
+2005-06-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metacache.hh: Removed non-existent function.
+
+2005-06-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added check for --enable-api-docs and check for
+	doxygen if enabled.  Currently just playing with doxygen.  It's
+	pointless at this point to provide API docs for an internal
+	convenience lib.
+	* doc/Doxyfile.in: Added doxygen configuration.
+	* lib/misc.cc: Removed util::map since we don't use it.
+	* lib/glob.hh, lib/portage_config.hh, lib/misc.hh,
+	lib/portage_find.hh, lib/portage_exceptions.hh, lib/cache.hh,
+	lib/file.hh, lib/vars.hh, lib/util_exceptions.hh, lib/timer.hh,
+	lib/progress.hh, lib/regex.hh, lib/portage_version.hh,
+	lib/portage_misc.hh: Added doxygen-style comments.
+
+2005-06-24 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated to detect a termcap lib (prefers ncurses).
+	Define USE_TERMCAP if found.  Updated version (1.1.1_p1).
+	* lib/misc.cc: Updated getcols() to use tgetent/tgetnum to get the
+	terminal width instead of the nasty stty pipe.
+	* doc/examples.txt: Added missing --versions example.
+
+2005-06-20 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_pkg_handler.cc: Updated metadata_matches() to interpret
+	packages whose sole maintainer is the herd itself (herd@gentoo.org is
+	listed as the maintainer) as a package with no maintainer.
+
+2005-06-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1).
+
+2005-06-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgquery.cc, src/pkgquery.hh, src/querycache.cc,
+	src/querycache_xml_handler.cc, src/querycache_xml_handler.hh: Updated
+	to cache PORTDIR as well, so we can determine whether the cached
+	results came from the same PORTDIR, invalidating if not.
+
+2005-06-17 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgcache.cc, src/metacache.cc: modified valid() to also test and
+	make sure the PORTDIR in "portdir=PORTDIR" is equal to the current
+	portdir setting, otherwise the cache should be considered invalid.
+
+2005-06-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_find.cc: Fixed missing is_pkg_dir check in
+	find_package_in() that caused the overlay display to be printed if the
+	package directory exists in an overlay but no ebuild is present.
+
+2005-06-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metacache.cc: Updated valid() to check first line of metacache.
+	If it does not equal "version=VERSION" then it'll be considered
+	invalid, and of course updated dump() to write it.  This will prevent
+	weird bugs caused by any future format changes.
+	* src/querycachectl.cc: Updated summary action to display what the
+	newest and oldest query/with strings are.
+
+2005-06-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc9).
+	* lib/vars.cc: ensure that a previously existing element in the vars
+	map is erased before trying to insert it (otherwise insert() fails).
+	* bashcomp: Updated to only define _complete_herd and _complete_dev if
+	not previously defined, as the upcoming gentoo-bashcomp will define
+	them.
+
+2005-06-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc8).
+	* src/file.hh: Added exists() member func.  Modified operator() to
+	return a bool (exists).
+	* src/metacache.cc, src/pkgcache.cc, src/herds_xml.cc,
+	src/herds_xml_handler.cc, src/devaway.cc: Updated to use stat_T over
+	struct stat.
+	* src/action_which_handler.cc: Fixed bug in --which --regex that
+	caused certain matches (those that also exist in an overlay) to not be
+	displayed.
+
+2005-06-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.cc, lib/file.hh:  Rewrote file classes from scratch.  Added
+	a stat_T class which acts as a stat wrapper.  The rewrite fixes a few
+	design flaws/bugs with the previous implementation.  Also use
+	std::equal in file_T::operator== instead of std::mismatch.
+	* lib/vars.hh: Updated vars_T with new file_base_T interface.
+	* lib/portage_find.cc: Fixed significant bug in
+	find_package_regex_in().  An errant 'not' caused the function to
+	search the pkgcache when it was empty, and walk the tree when it
+	wasn't (should be the other way around).
+	* src/formatter.cc, src/formatter.hh: Fixed bug that caused colors to
+	be assigned to the highlight map, even if --nocolor was specified.
+	This caused weird colored output (with no end) on output that is
+	highlighted.
+	* src/metacache.cc: minor style changes.
+	* src/pkgcache.cc: Fixed fill() to search overlays as well.
+
+2005-06-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.cc, lib/file.hh: Clean up a little.
+
+2005-06-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc7).
+	* lib/Makefile.am, lib/glob.hh: Added glob_T class, an interface for
+	POSIX glob() as well as a patternMatch function object, an interface
+	for fnmatch().
+	* lib/regex.hh: Added regexMatch function object for easily using
+	regex_T objects in standard algorithms.  Also, define _POSIX_C_SOURCE
+	to 200112 if it is undefined (instead of just having an empty define).
+	Fixes yet another FreeBSD build failure (thanks Diego).
+	* lib/file.cc, lib/file.hh: Added dir_T::find(path_T) and
+	dir_T::find(regex_T) for searching directories.  The latter uses the
+	just-added regexMatch functor.  Also added path_T::parent() which
+	returns the basename of dirname.  Added file_T::operator== for
+	comparing files.
+	* lib/misc.cc, lib/misc.hh: Removed non-portage md5check().
+	* lib/portage_misc.cc: Updated is_pkg_dir() to use
+	dir_T::find(regex_T).
+	* src/action_pkg_handler.cc: Updated to use regexMatch.
+	* src/metacache.cc, src/pkgcache.cc: Few modifications in an attempt
+	to reduce the amount of time it takes to fill the caches.
+	* src/formatter.cc: Fixed bug where user-defined highlighting failed
+	for instances where formatter_T::operator()(string, vector) is called.
+	* src/metadata.cc: Fixed small bug in metadata_T::display() that
+	caused weirdness for packages who rather than having a valid HOMEPAGE,
+	have space-delimited words explaining there is no HOMEPAGE (unix2dos
+	and dos2unix are examples).
+	* lib/portage_find.cc: Fixed bug in ebuild_which that caused it to
+	fail if the package we're searching for exists in an overlay but not
+	in PORTDIR proper.
+
+2005-06-07 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.hh: Fixed pretty huge bug in base_dir_T.
+	base_dir_T::close() (which calls closedir()) was not previously called
+	on base_dir_T destruction like it should've been.  This causes "Too
+	many open files" errors if doing an operation on a lot of directories.
+	* lib/progress.hh: Added started member which is set to true if
+	start() is called.  This fixes an infinite loop if ~progress_T is
+	called for a progress_T object that was never started.
+	* lib/cache.hh: Rewrote cache_T.
+	* src/pkgcache.cc, src/pkgcache.hh: Added package list cache.
+	Basically broke out some of the metacache_T::fill() code as we'll need
+	it for caching the package list (which find handler will make use of
+	as well).
+	* src/metacache.cc, src/metacache.hh: Inherit from cache_T again.
+	Also, make use of pkgcache_T instead of directly traversing over
+	portage::categories_T.
+	* lib/portage_find.cc, lib/portage_find.hh: Updated
+	portage::find_package suite of functions to accept a vector of package
+	names (defaults to empty vector).  If empty, then it traverses all
+	categories in PORTDIR (like before). Otherwise, it uses the package
+	list to get the results.
+	* src/action_find_handler.cc, src/action_which_handler.cc: Updated to
+	use pkgcache_T.  We can pass a pkgcache_T object to the find_package
+	suite of functions since it ultimately derives from std::vector.
+	* lib/string.hh: Add missing inttypes.h include (for uintmax_t).  For
+	some reason, gcc-3.4.x and gcc-4.x don't fail, while 3.3.x does.
+
+2005-06-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.hh: Comment out code referring to blksize_t and blkcount_t
+	since they're a GNUism (causing build to fail on BSD). None of
+	herdstat's code uses it anyways, so there's not really any point in
+	having it.
+
+2005-06-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc6).
+	* lib/regex.hh: Added operator=.
+	* src/herdstat.cc, src/formatter.cc, src/formatter.hh:
+	formatter_T::attrs_T::highlights is now a map, so we can allow setting
+	a different color for each word.  Added a plural version of
+	formatter_T::add_highlight() for passing a vector of string in the
+	format of 'word,color', which gets inserted into the highlights map.
+	* src/action_find_handler.cc, src/action_find_handler.hh: Updated so
+	that --find --metadata will show metadata of the results of the
+	--find.
+
+2005-06-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: define SYSCONFDIR.
+	* src/Makefile.am, src/fetcher.cc, src/fetcher.hh: Moved fetching code
+	into it's own class, fetcher_T.
+	* src/herdstat.cc, src/metacache.cc, src/querycache.cc,
+	src/options.cc, src/rc.cc, src/rc.hh: Added configuration file support. 
+	herdstat will first read /etc/herdstatrc if it exists and
+	$HOME/.herdstatrc if it exists.  Options defined in the latter will
+	override options defined in the former.
+	* src/devaway.cc, src/herds_xml.cc, src/herds_xml_handler.cc: Updated
+	to use fetcher_T.
+	* lib/portage_version.cc, lib/string.cc, lib/string.hh: Moved strtoul
+	and strtouint wrappers in with rest of string utility functions.
+	* doc/herdstat.1.in: Added CONFIGURATION section.
+	* doc/herdstatrc.example: Added example configuration file.
+
+2005-06-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc5).
+	* src/herdstat.cc, src/options.cc, src/action_fetch_handler.cc,
+	src/action_fetch_handler.hh: Added action_fetch_handler_T so that
+	--fetch works as expected and fetches anything needed for offline use.
+	Currently fetches/parses herds.xml (parsing is required to fetch
+	<maintainingproject> XML's) and fetches devaway.
+	* src/metadata.cc, src/metadata.hh: moved metadata_T to it's own
+	files.  Added a display() member function.
+	* src/metadata_xml_handler.cc, src/metadata_xml_handler.hh,
+	src/metadata_xml.cc, src/metadata_xml.hh: Updated to use metadata_T
+	for holding the actual data.  the *_exists() functions now just call
+	their respective metadata_T functions.  metadata_xml.cc is now empty
+	and has been removed.
+	* src/action_meta_handler.cc: Moved most of display() to
+	metadata_T::display().  The only remaining code is for cases where the
+	metadata doesn't exist.
+	* lib/misc.cc: Increase timeout in wget command for slower
+	connections.
+
+2005-06-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc4).
+	* lib/string.cc, lib/string.hh: Added a default bool arg to
+	util::string::split() that decides whether or not to push_back() and
+	empty string if two consecutive delimiters are encountered.  This
+	fixes a bug in reading the metacache (pkgs with a dev but no herd (not
+	even "no-herd") would interpret the dev as a herd.
+	* lib/Makefile.am: Removed cache.hh for now.
+	* src/querycache.cc, src/querycache.hh, src/metacache.cc,
+	src/metacache.hh: Don't inherit from cache_T.  It's more of a PITA
+	than it's worth.  Instead inherit directly from std::vector.  Also
+	cleaned up load/dump code a bit, trying to make it a tad faster.
+	* src/action_pkg_handler.cc: Fixed bug if -p and -m are specified at
+	the same time.  Only call formatter_T::set_attrs() if -m isnt
+	specified.  Also, since metacache_T::load() takes forever (since the
+	file's so huge), if a wider-scoped query is found, and the number of
+	packages is less than a certain amount, parse those metadata.xml's.
+	This is much quicker than metacache_T::load().
+
+2005-06-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.1_rc3).
+	* lib/portage_find.cc: Fixed bug in find_package_in() that caused a
+	search to fail if a pkg dir exists in an overlay but there's no
+	ebuild.
+	* lib/string.cc, lib/string.hh: Added htmlify() and unhtmlify() for
+	lovely things like "&gt;", etc.
+	* src/devaway.cc: Run away message through util::unhtmlify() before
+	saving.  Fixes lv's &lt;jedi mind trick and any future ones.  Also
+	added _fetched member to guarantee devaway is only fetched once.
+	* src/querycache.cc, src/querycache.hh, src/querycache_xml_handler.cc,
+	src/querycache_xml_handler.hh, src/querycachectl.cc: Bring back
+	pkgcache from the dead, as we still have a need for it.  Renamed
+	querycache_T.  Updated format of querycache.xml to make more sense.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Updated to use
+	devaway_T.
+
+2005-05-31 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgquery.cc, src/pkgquery.hh: Moved pkgQuery_T to it's own
+	source files.
+	* src/metacache.cc, src/metacache.hh: Added metacache_T which
+	obsoletes metadatas_T.  We now parse all the metadata data instead of
+	just the metadata list.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Updated to use
+	metacache_T.
+
+2005-05-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.0_rc2).
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Rewrote most
+	of the package handler, due to a huge design flaw.  It would
+	previously parse every metadata.xml PER non-option arg, so if you
+	specified two non-opt args, it would parse every metadata.xml twice.
+	Also, --with-{herd,maintainer} option args are now interpreted as a
+	regular expression for more flexibility.
+	* src/pkgcache.cc, src/pkgcache.hh: implement smarter caching.  Fex,
+	it is now able to recognize reverse-lookups being the same.
+	* src/metadata_xml_handler.cc, src/metadata_xml_handler.hh: Added
+	overloaded dev_exists and herds_exists member functions that take a
+	regex_T.
+	* src/pkgcachectl.cc: s/pkgcache-dump/pkgcachectl/. Also, added a few
+	command line opts.  It's now able to --dump, --clear, and --summary.
+
+2005-05-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added zlib checks. Can be disabled via --without-zlib.
+	Updated version (1.1.0_rc1).
+	* lib/zlib.cc, lib/zlib.hh: Added a simple zlib wrapper class, zlib_T.
+	* src/pkgcache.cc, src/pkgcache.hh: Make use of zlib_T if HAVE_LIBZ is
+	defined, (de)compressing the cache when we read/write to disk.
+	* src/formatter.cc: Modified highlight() to remove any ANSI colors
+	before searching the devaway list.  Otherwise, std::find() will always
+	fail if the current word has colors.
+	* src/options.cc, src/herdstat.cc, bashcomp, doc/herdstat.1.in: Added
+	--nopkgcache option for disabling cache lookups (queries are still
+	cached, however).
+	* src/metadatas.hh: Added set() member for manually setting a
+	metadatas_T object to a certain list of metadatas.
+	* src/action_pkg_handler.cc: If a cache lookup fails,
+	--with-{herd,maintainer} is specified, and a previously cached query
+	that is equivelent to the query (minus the --with of course), use the
+	cached object to get a list of possibles.  For example, if a cached
+	query of cron herd packages exists but one doesnt exists for cron herd
+	packages with maintainer ka0ttic, use the cached cron packages to
+	deduce those maintained by ka0ttic.
+	* src/metadata_xml_handler.cc: Run herd names through
+	util::lowercase() before saving.
+	* src/action_handler.hh: Fixed small bug that caused the away footnote
+	to be displayed twice when running --package --metadata.
+	* src/Makefile.am, src/pkgcache-dump.cc: Added a simple utility,
+	pkgcache-dump, used for debugging purposes.  It is only
+	built/installed if --enable-debug is passed to configure.
+
+2005-05-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/pkgcache.cc, src/pkgcache.hh, src/pkgcache_xml_handler.cc,
+	src/pkgcache_xml_handler.hh, src/common.hh, src/formatter.cc,
+	src/action_pkg_handler.cc, src/action_pkg_handler.hh, src/herdstat.cc,
+	src/xmlparser.hh, src/exceptions.hh, src/metadatas.hh,
+	src/herds_xml_handler.cc, src/Makefile.am, lib/cache.hh: Merged
+	pkgcache branch.
+
+2005-05-26 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/devaway.hh: Make constructor have a bool arg that defaults to
+	false. If true, then call fetch/parse member functions.
+	* src/action_handler.hh: Have action_fancy_handler_T use a devaway_T
+	object instead of action_herds_xml_handler_T.  This way it's available
+	to action_meta_handler_T for use.
+	* src/action_meta_handler.cc: Use our newly inherited devaway_T object
+	so any away maintainers are marked as such.
+
+2005-05-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_handler.hh: Added devaway_T instance to
+	action_herds_xml_handler_T base class.  Display little key if a dev
+	displayed is in the devaway list in flush().
+	* src/devaway.cc, src/devaway.hh: Inherit straight from std::map
+	instead of having it as a member.
+	* src/formatter.cc, src/formatter.hh: Added support for highlighting
+	developers who are in the devaway list.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_stats_handler.cc: Added devaway_T support, so that
+	formatter_T will mark devs who occur in output who are in the devaway
+	list.
+
+2005-05-24 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/parsable.hh: Added new base class for parsable things.
+	* src/xml.hh: Inherit from parsable_T.
+	* src/devaway.cc, src/devaway.hh: Added new devaway_T class that
+	represents a devaway list.
+	* src/herdstat.cc, src/action_away_handler.cc,
+	src/action_away_handler.hh: Added new action handler for --away.
+	* bashcomp, doc/herdstat.1.in: Added --away.
+
+2005-05-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac, lib/Makefile.am, src/Makefile.am: set LIBTOOL in
+	configure.in and AC_SUBST rather than setting it in each Makefile.am.
+
+2005-05-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.0 final).
+
+2005-05-17 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/Makefile.am, lib/Makefile.am: Use libtool --silent.
+	* lib/string.hh: Added string::substr() as Glib::ustring::substr()
+	returns a Glib::ustring.
+	* src/formatter.cc: util::string instantiation is no longer needed
+	when calling util::string::split() now that substr returns a
+	util::string.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: display()
+	argument need not be non-const.
+
+2005-05-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Explicitly call PKG_PROG_PKG_CONFIG.  Gentoo bug
+	92788.
+
+2005-05-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.0_rc6).
+
+2005-05-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc, src/options.cc, doc/herdstat.1.in, bashcomp: Added
+	--with-maintainer and --no-maintainer.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Added support
+	for --with-maintainer.  Move search error messages to it's own
+	function, error().  Also moved the search found determination code to
+	it's own member func, is_found().
+
+2005-05-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Added gcc version check and define HAVE_GCC4 if using
+	gcc-4.
+	* lib/util_exceptions.hh, src/exceptions.hh: Use correct form of
+	va_start if HAVE_GCC4.
+	* src/action_meta_handler.cc: Fixed bug that caused 'herdstat -m' with
+	no non-options to break.
+
+2005-05-12 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, doc/examples.txt, doc/default.css,
+	doc/Makefile.am: Moved EXAMPLES section of manual page to it's own
+	file, as it was starting to get quite large.  Stole Makefile.am
+	snippet and default.css from eclectic, so credit to ciaranm for those.
+	* src/misc.cc, src/misc.hh: Added util::map which at present provides
+	keys() and values() member functions.
+	* src/regex.hh: Fix typo.
+	* lib/progress.hh: Initialize 'step' member to 0.
+
+2005-05-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.0_rc5).
+	* lib/version-test.cc, lib/Makefile.am: Updated version-test to work
+	again (haven't used it since the util::string move).
+	* lib/file.hh: Use static_cast to ensure the '/' literal in
+	util::path_T::split() argument is of the correct type (required for
+	version_test to compile).
+	* lib/portage_version.cc, lib/portage_version.hh: Fixed bug in version
+	sorting code. Versions with extra characters after the version (for
+	example libevent-1.0c or openssl-0.9.7g) were sorted incorrectly.  We
+	now seach for non-digits (and non '.') and compare them separately.
+	* src/options.cc: Added 'meta' option.
+	* src/herdstat.cc: Allow --metadata to be specified with -p or -pd.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Display
+	metadata for each package in package list instead of the package list
+	itself if --metadata is specified.
+	* src/action_which_handler.cc: Fix small formatting issue when
+	ambiguous packages are encountered.
+
+2005-05-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/timer.hh: improved timer_T so that it can be stopped/started an
+	arbitrary number of times.  Added is_running() member function for
+	determining whether the timer is currently running or not (duh).
+	* lib/portage_config.cc, lib/portage_config.hh: Added an operator[]()
+	const hack (since std::map doesn't provide one) so that we can declare
+	const config_T objects.
+	* lib/portage_version.cc, lib/portage_version.hh: Added clear() member
+	function which does the obvious. We now make assign() call clear()
+	like it does for standard containers.  Added an append() member
+	function which does the same thing as assign() but doesn't clear()
+	first.  Added new constructor that takes a vector of paths, then loops
+	through the vector calling append() for each vector element. Tidy up
+	version code.  Move version_suffix_T and version_nosuffix_T to
+	version_string_T::suffix_T and version_string_T::nosuffix_T
+	respectively.
+	* lib/portage_find.cc, lib/portage_find.hh: Added optional timer_T
+	pointer argument to all functions (defaults to NULL) so that we can
+	time how long package searches take.  Also modified all functions that
+	take a config_T to take a const config_T. Also fixed major bug with
+	ebuild_which (didn't return correct path if a package was in an
+	overlay but a newer version existed in portage).
+	* src/action_handler.hh: Added action_portage_find_handler_T base
+	class for all action handler's that use one of the
+	portage::find_package functions.  Moved matches multimap and timer_T
+	object here and added a flush() to display the timer results.
+	* src/action_find_handler.cc, src/action_find_handler.hh,
+	src/action_meta_handler.cc, src/action_meta_handler.hh,
+	src/action_versions_handler.cc, src/action_versions_handler.hh,
+	src/action_which_handler.cc, src/action_which_handler.hh: Updated to
+	derive from action_portage_find_handler_T.  Removed matches multimap
+	declaration from operator() since the base class now defines it.
+	Modified all portage::find*/portage::ebuild_which calls (that matter)
+	to pass the search_timer timer_T object.
+	* src/herds_xml_handler.cc: Fixed bug in <maintainingproject> XML file
+	fetching (pre-existing copy gets truncated if fetching fails).
+	* src/action_meta_handler.cc: Fixed bug when ambiguous packages are
+	encountered (didn't display category).
+	* src/action_which_handler.cc: Remove matches that have the same
+	package name.
+
+2005-05-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.0_rc4).
+	* lib/portage_find.cc: in find_package_regex_in, if it looks like a
+	category was specified, and it exists, dont bother looking in the
+	other categories.
+
+2005-05-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in: A few small changes to the description. Added
+	another example.
+	* src/action_stats_handler.cc: Initial value of smallest_herd should
+	be 1.
+	* src/xml.hh: Added handler() member func for returning a pointer to
+	the _handler member for use by users who don't want to create a
+	sub-class of xml_T.
+	* src/herds_xml_handler.cc, src/herds_xml_handler.hh: Added
+	mpXMLHandler_T XML handler class for parsing XML files listed in
+	herds.xml <maintainingproject> elements.  HerdsXMLHandler_T will now
+	parse said file for developer information, then fill the herds member
+	like it normally would.
+	* lib/misc.hh: Updated fetch() prototypes so third arg (verbose)
+	defaults to false.
+
+2005-05-07 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metadata_xml_handler.cc: Don't append if @gentoo.org if the
+	domain is not @gentoo.org to maintainer email.
+	* src/action_pkg_handler.cc: Fixed a couple bugs; one where the first
+	package would still be displayed in color if --nocolor was specified.
+	The second one involved the longdesc not being displayed when
+	--verbose is used.
+	* src/herds_xml.cc, src/herds_xml.hh: Don't call fetch() and parse()
+	from init() and have callers call it manually.  Otherwise, it'll be
+	fetched/parsed on each action_herds_xml_handler_T instantiation.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc, src/action_stats_handler.cc: Update to call
+	herds_xml_T::{fetch,parse}() at the beginning of operator().
+
+2005-05-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metadata_xml.cc: Moved herd_exists and dev_exists bodies here.
+
+2005-05-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herds_xml.cc, src/herds_xml.hh: Added a devinfo_T structure for
+	storing herds devs belong to, name, etc.  Added get_dev_info() member
+	that returns a devinfo_T object.
+	* src/metadata_xml.hh: Added member functions dev_exists and
+	herd_exists for quickly checking whether the dev/herd exists in the
+	metadata.xml.
+	* src/action_dev_handler.cc: Modified display() to use
+	herd_xml_T::get_dev_info().
+	* src/action_meta_handler.cc: display_metadata() is now a member
+	function, display().  Added meta structure for passing data between
+	operator() and display().
+	* src/action_meta_handler.cc, src/action_versions_handler.cc: Move
+	OverlayDisplay_T instantiation from class declaration to operator() as
+	it's destructor won't be called otherwise (and hence the overlays
+	won't be displayed).
+	* src/action_pkg_handler.cc: Removed static dev_name() and updated to
+	use herds_xml_T::get_dev_info() instead.  Cleaned up 'found' logic as
+	well.
+	* src/action_find_handler.cc, src/action_versions_handler.cc,
+	src/action_which_handler.cc: Add missing flush() call to operator() so
+	that --count works as expected.
+	* src/action_which_handler.cc: Added missing continue's in both of the
+	catch clauses; fixes an obvious bug.
+	* src/formatter.cc: clear internal buffer after flushing to outstream.
+	* src/overlaydisplay.hh: Fixed bug where colors are still displayed
+	even if --nocolor is specified.
+	* src/options.cc, src/herdstat.cc: Added --qa option.
+
+2005-05-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_misc.cc, lib/portage_misc.hh: Rewrote
+	portage::categories_T.  Now supports /etc/portage/categories.
+	* lib/portage_find.cc, lib/portage_version.cc, src/metadatas.cc: Use
+	const dir_T/dir_T::const_iterator.
+	* src/action_handler.hh: Added two action_handler_T derivatives that
+	contain common setups (one using a formatter, one that parses
+	herds.xml, etc).
+	* src/action_herd_handler.cc, src/action_herd_handler.hh: Derive from
+	action_herds_xml_handler_T.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Derive from
+	action_herds_xml_handler_T. Converted static helper funcs to members
+	search() and display().
+	* src/action_dev_handler.cc, src/action_dev_handler.hh: Derive from
+	action_herds_xml_handler_T.  Converted static display_developer() to
+	member func display().
+
+2005-05-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.0_rc3).
+	* src/action_dev_handler.cc, src/action_pkg_handler.cc,
+	src/action_meta_handler.cc: Tidy up.  Broke up operator() into smaller
+	static functions to make it easier to read/maintain.
+	* src/action_dev_handler.cc, src/action_pkg_handler.cc,
+	src/action_stats_handler.cc: Display elapsed parsing time of
+	herds.xml if --timer.
+	* lib/misc.cc, lib/string.cc, lib/cache.hh, lib/file.cc, lib/file.hh:
+	Tidy.
+	* src/herds_xml.hh: Added const version of operator[] so we can
+	use const herds_xml_T objects (there's not really a reason to ever
+	have a non-const instantiation).
+	* src/herds.cc: Run herd description through util::tidy_whitespace()
+	before displaying.
+	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc: Modified
+	on_characters() callback to append "@gentoo.org" if the domain is not
+	gentoo.org (usually caused by a typo).  Otherwise, the dev shows up as
+	not existing in herds.xml since we search for 'dev + @gentoo.org'.
+
+2005-05-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/file.cc: Throw a bad_fileobject_E exception if open() fails.
+
+2005-04-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/xmlparser.hh, src/herds_xml_handler.cc,
+	src/herds_xml_handler.hh, src/metadata_xml_handler.cc,
+	src/metadata_xml_handler.hh: Updated parser interface to be easily
+	changeable in the case we ever change the parser lib again.
+	* src/xml.hh: Added generic xml_T type to represent any XML file.
+	This is now the sole user of our XMLParser_T interface, in addition to
+	util::timer_T and std::auto_ptr<content_handler>.
+	* src/herds_xml.cc, src/herds_xml.hh: Updated to inherit from xml_T.
+	* src/metadata_xml.hh: Added metadata_xml_T, which is the herds_xml_T
+	equivelent for a metadata.xml file.  Inherits from the new xml_T.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_meta_handler.cc, src/action_pkg_handler.cc:  Updated to use
+	{herds,metadata}_xml_T::herds_type so that herd_T/herds_T, etc is
+	opaque.  The action handlers need not know about it explicitly.
+	* lib/string.cc, lib/string.hh, lib/misc.cc, lib/misc.hh,
+	lib/portage_version.cc, src/formatter.cc, src/common.cc,
+	src/common.hh, src/herdstat.cc, configure.ac: Added --enable-unicode
+	option.  If disabled, use xmlwrapp.
+
+2005-04-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in: Fix typo.
+	* src/overlaydisplay.hh: Tidy.
+
+2005-04-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Remove *printf checks since we now use g_vasprintf().
+	Update version (1.1.0_rc2).
+	* lib/misc.cc, lib/misc.hh, lib/string.cc, lib/string.hh,
+	lib/regex.cc, lib/regex.hh, lib/vars.cc, lib/vars.hh: Finished
+	s/std::string/util::string/ transition.
+	* lib/portage_version.cc, lib/portage_version.hh: Fixed a few bugs in
+	the version code.  Package names containing a '_' were previously
+	assumed to be a suffix causing an invalid_version_suffix_E to be
+	thrown.  Also, package names containing a '-r' were assumed to be a
+	revision, causing the -r* part of the package name to end up in the
+	version string.
+	* src/action_find_handler.cc, src/action_find_handler.hh: Added find
+	action handler (--find).
+	* lib/Makefile.am, src/Makefile.am, src/cache.hh, lib/cache.hh: Moved
+	cache.hh to lib/ as it's fairly generic and there's no reason to keep
+	it in src/.
+	* lib/string.cc, lib/string.hh: Use g_vasprintf() instead of
+	vasprintf.
+	* doc/herdstat.1.in, bashcomp, src/herdstat.cc: Added --find.
+	* src/formatter.cc, src/formatter.hh: Tidy.
+
+2005-04-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/xmlparser.hh, src/herds_xml_handler.cc,
+	src/herds_xml_handler.hh, src/metadata_xml_handler.cc,
+	src/metadata_xml_handler.hh:  Updated to use libxml++ over the
+	inferior xmlwrapp.
+	* lib/string.cc, lib/string.hh: util::string now inherits from
+	Glib::ustring so we can handle UTF-8 chars properly since std::string
+	doesn't handle multibyte chars well (specifically operator[] and
+	length()).
+	* lib/portage_version.cc: Fixed bug in version_suffix_T::get_suffix()
+	that caused an invalid suffix exception to be thrown for any package
+	strings containing both a suffix and a revision.
+	* lib/misc.cc, lib/misc.hh, lib/file.cc, lib/file.hh,
+	lib/util_exceptions.hh, lib/portage_exceptions.hh,
+	lib/portage_version.cc, lib/portage_version.hh, lib/portage_config.cc,
+	lib/portage_config.hh, lib/portage_find.cc, lib/portage_find.hh,
+	src/options.cc, src/common.hh, src/devs.hh, src/herds.cc,
+	src/herds.hh, src/formatter.cc, src/formatter.hh, src/metadatas.cc,
+	src/cache.hh, src/common.cc, src/overlaydisplay.hh, src/herds_xml.hh,
+	src/options.hh, src/exceptions.hh, src/herdstat.cc,
+	src/action_handler.hh, src/action_dev_handler.cc,
+	src/action_dev_handler.hh, src/action_herd_handler.cc,
+	src/action_herd_handler.hh, src/action_pkg_handler.cc,
+	src/action_pkg_handler.hh, src/action_stats_handler.cc,
+	src/action_stats_handler.hh, src/action_which_handler.cc,
+	src/action_which_handler.hh, src/action_versions_handler.cc,
+	src/action_versions_handler.hh, src/action_meta_handler.cc,
+	src/action_meta_handler.hh: s/std::string/util::string/.
+
+2005-04-26 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util.cc, lib/util.hh, lib/misc.cc, lib/misc.hh: Moved everything
+	in util.{cc,hh} to misc.{cc,hh}. Removed util.cc. util.hh now just
+	includes all the lib/ headers.
+	* lib/regex.cc, lib/regex.hh: Added regex_T, an interface to the POSIX
+	regular expression interface (regcomp, regexec, etc).
+	* lib/portage_misc.cc, lib/portage_misc.hh, lib/portage_find.cc,
+	lib/portage_find.hh: Moved all find_package related stuff to
+	portage_find.{cc,hh}.  Added find_package_regex_in() and
+	find_package_regex().
+	* src/herdstat.cc, src/options.cc: Added --regex and --extended
+	options.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_meta_handler.cc, src/action_pkg_handler.cc,
+	src/action_versions_handler.cc, src/action_which_handler.cc: Added
+	regex_T support.
+
+2005-04-22 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.0_rc1)
+
+2005-04-21 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/overlaydisplay.hh: Added OverlayDisplay_T class for keeping
+	track of which overlays are used, their number, and then displaying
+	the little overlay key upon destruction.
+	* src/action_meta_handler.cc, src/action_versions_handler.cc: Make
+	use of OverlayDisplay_T for marking packages/categories that appear in
+	overlays.
+	* src/action_pkg_handler.cc: Fixed bug where pkg handler would not
+	even search the metadata.xml's if the developer/herd is not listed in
+	herds.xml.
+
+2005-04-20 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_misc.cc, lib/portage_misc.hh,
+	src/action_meta_handler.cc, src/action_versions_handler.cc: Added
+	optional argument to find_package that determines whether or not to
+	search overlays.
+	* src/options.cc, src/herdstat.cc: Added --no-overlay option.
+	* bashcomp, doc/herdstat.1.in: Added --versions and --no-overlay.
+	* src/action_meta_handler.cc, src/action_pkg_handler.cc: Removed the
+	catch XMLParser_E clause since we catch it in main().
+
+2005-04-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.0_pre2)
+
+2005-04-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/formatter.cc: fixed bug in append(string, vector) that caused an
+	abort if data.size() == 0.  Thanks to tove for the heads up.
+	* lib/portage_misc.cc, lib/portage_misc.hh: Move find_package to
+	find_package_in and make find_package take a config_T object and call
+	find_package_in for PORTDIR and PORTDIR_OVERLAY's.  Moved
+	search_overlays here from meta action handler.  Also added an
+	overloaded ebuild_which that takes a portdir.  The original
+	ebuild_which now does it's work and then calls the new ebuild_which
+	for each portdir.  This fixed a bug where the metadata would be
+	retrieved from one directory and the ebuild data from another (in the
+	case of an overlay).
+	* src/action_meta_handler.cc, src/action_versions_handler.cc: Modified
+	to use new find_package() which means it now respects PORTDIR_OVERLAY
+	as it should.  Modified meta handler to display any overlays that any
+	queries came from.
+
+2005-04-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_versions_handler.cc, src/action_versions_handler.hh:
+	Added versions action handler for just displaying package versions.
+
+	* configure.ac: Updated version (1.1.0_pre1)
+	* lib/vars.cc, lib/vars.hh: Fixed bug where any reference to a
+	variable not yet in the var map would not get replaced.  Added subst()
+	method to accomplish this, which recursively calls itself until all
+	variable occurences have been replaced (unless we can't find it of
+	course).
+	* src/options.cc: Instead of saving portage::config_T::portdir(), save
+	the config_T object itself.
+	* lib/portage_config.hh: Added a operator<< for portage::config_T so
+	that it can properly be stored in option_T::option_map_T.  Dumps
+	entire portage config along with the rest of our options when --debug
+	is specified.
+	* src/action_meta_handler.cc: Fixed bug that caused funky formatting
+	in --metadata output when multiple url's are listed in ${HOMEPAGE}.
+	Added search_overlays().
+
+2005-04-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.hh: Added bool util::path_T::exists().
+	* src/herds_xml.cc, src/herds_xml.hh, src/herdstat.cc,
+	src/action_dev_handler.cc, src/action_dev_handler.hh,
+	src/action_herd_handler.cc, src/action_herd_handler.hh,
+	src/action_meta_handler.cc, src/action_meta_handler.hh,
+	src/action_pkg_handler.cc, src/action_pkg_handler.hh,
+	src/action_stats_handler.cc, src/action_stats_handler.hh,
+	src/action_which_handler.cc, src/action_which_handler.hh,
+	src/action_handler.hh: Moved all fetching and parsing logic into it's
+	own class, herds_xml_T.  We no longer parse herds.xml in main() which
+	means we no longer need to pass a herds_T to all the action handlers.
+	Instead we have each action handler that needs it create an instance
+	of herds_xml_T which will take care of any fetching/parsing.
+	* src/options.cc: Removed "parse herds.xml" and "herds.xml" options
+	since they're no longer necessary.
+	* src/herds_xml_handler.hh: Removed unnecessary exists() member.
+	* bashcomp: Updated to cache output of 'herdstat -q all' and 'herdstat
+	-dq all'.  Fixed bug where if any previous option contained a 'm' or
+	'q' it would assume -m or -q were specified and complete
+	appropriately.
+
+2005-04-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util.cc, lib/util.hh, lib/file.cc, lib/file.hh: Moved copy_file
+	and move_file to file.{cc,hh}.
+	* src/action_meta_handler.cc, src/action_which_handler.cc,
+	src/herdstat.cc: catch ambiguous_pkg_E and nonexistent_pkg_E in
+	action_{which,meta}_handler instead of main() so we can continue in
+	the opts loop if opts > 1.
+	* lib/file.cc: Use a for loop instead of std::copy and and an
+	ostream_iterator for file_T::display since for some reason it isn't
+	copying the entire vector to the stream.
+
+2005-04-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_exceptions.hh: Added ambiguous_pkg_E and
+	nonexistent_pkg_E exceptions.
+	* lib/portage_misc.cc, lib/portage_misc.hh: Modified find_package() to
+	return the full category/package string instead of a vector of
+	possibles.  find_package() now throws ambiguous_pkg_E() or
+	nonexistent_pkg_E() where appropriate instead of making the caller
+	handle it.
+	* src/action_meta_handler.cc: Removed possibles handling code now that
+	find_package handles it.
+	* src/action_which_handler.cc: Added "which" action handler which is
+	comparable to running 'equery which' but maybe a tad faster.  With the
+	new versions_T/version_string_T classes, this is too trivial not to
+	add.
+	* src/options.hh: Added option_which to options_actions_T.
+	* src/herdstat.cc: Added --which option.
+	* bashcomp, doc/herdstat.1.in: Updated for --which.
+
+2005-04-12 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_version.cc, lib/portage_version.hh: Added
+	version_nosuffix_T for representing ${PV} minus the suffix.
+	version_string_T::operator< now uses version_nosuffix_T::operator< for
+	comparison instead of simple string comparison, and thus is now more
+	reliable.
+	* lib/portage_misc.cc: Updated ebuild_which() to use newly finished
+	versions_T/version_string_T classes.
+
+2005-04-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_version.cc, lib/portage_version.hh: Finally have the
+	version sorting code working.
+
+2005-04-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/string.cc, lib/string.hh: Added string class which inherits from
+	std::string.  For now just provides the split() member function.
+	* lib/file.cc, lib/file.hh: Added generic directory container from
+	which we derive two types (dirobject_T formerly known as dir_T and
+	dir_T which just hold's the filenames not whole file objects. Also
+	added path_T to represent path strings.
+
+2005-04-07 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_misc.cc, lib/portage_misc.hh, src/categories.hh,
+	src/action_meta_handler.cc: Moved categories_T to portage namespace.
+	Also moved get_possibles() to portage::find_package().
+	* lib/portage_version.cc, lib/portage_version.hh: Added
+	version_string_T and the plural version versions_T.
+	* lib/string.cc, lib/string.hh: Added vec2str() for converting a
+	vector of strings into a string delimited by the specified delimiter.
+	* lib/portage_misc.cc, lib/portage_misc.hh, lib/portage_config.cc,
+	lib/portage_config.hh: Put portage stuff into it's own namespace.
+	* lib/file.cc, lib/file.hh: delete stream on close(). Also added
+	chop_fileext() for chopping file extensions.
+	* lib/vars.cc: Modified read() to open stream if stream is NULL.
+	* lib/portage_config.hh: Rename portage_config_T to config_T now that
+	it resides in the portage namespace.  Modified config_T to work nicely
+	with new modified vars_T.
+	* src/herdstat.cc: Removed errant duplicate formatter_T declaration.
+	Also moved the very large try...catch block for fetching herds.xml to
+	it's own function, fetch_herds_xml().
+	* src/action_pkg_handler.cc: Fix bug where progress was displayed if
+	-pq <non-existent> was specified.
+	* src/formatter.cc, src/formatter.hh: Added quiet_delim member to
+	formatter_T::attrs_T for allowing the caller to choose which delimiter
+	is used in quiet output (defaults to '\n').
+	* src/action_meta_handler.cc: Removed all the special quiet code that
+	was required before formatter_T's quiet_delim member was added.
+
+2005-04-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/file.cc, lib/file.hh: Finished up file_T methods.
+	* src/categories.hh, src/cache.hh, src/action_meta_handler.cc,
+	src/metadatas.cc, src/metadatas.hh: Updated to use file_T/dir_T.
+
+2005-04-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* tags/release-1.0.3: copy tags/release-1.0.2 and backport bug fixes.
+	* tags/release-1.0.3/configure.ac: Update version (1.0.3 release).
+
+	* lib/file.cc, lib/file.hh: Added file/dir objects and moved
+	file-related util functions here.
+	* lib/progress.hh: Moved progress_T to it's own header.
+	* lib/util.cc, lib/util.hh: Tidy! moved a lot of the file-related util
+	functions to file.{cc,hh}.
+
+2005-04-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util.cc, lib/util.hh, lib/vars.cc, lib/vars.hh: added vars_T and
+	removed get_*_var().
+
+2005-04-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/portage_misc.cc, lib/portage_misc.hh: Added
+	get_version_components().
+	* src/util.cc, src/util.hh, lib/util.cc, lib/util.hh, lib/string.cc,
+	lib/string.hh, lib/vars.cc, lib/vars.hh, lib/timer.hh,
+	lib/util_exceptions.hh, lib/portage_misc.cc, lib/portage_misc.hh,
+	lib/portage_config.hh: broke up util.{cc,hh} into it's own convenience
+	lib.
+	* src/cache.hh: Added new cache_T class, broken out from the caching
+	code in metadatas.cc.
+	* src/metadatas.cc: Use cache_T.
+	* src/util.cc: Modified copy_file to use istream/ostream_iterator's.
+	* src/categories.hh: Using cache_T, categories_T is now even more
+	trivial, as the categories file is really just a manual cache.
+
+2005-04-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/metadatas.cc: Fixed bug where new timestamp isnt copied when
+	md5sum fails.
+	* src/action_meta_handler.cc: Don't display colors in the ambiguous
+	package warning when --quiet.
+	* src/action_pkg_handler.cc: Fix bug where first package of list was
+	displayed when --count was specified.
+
+2005-04-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.0.2 release).
+	* src/metadatas.cc: If $PORTDIR/metadata/timestamp exists, dont
+	re-cache the metadata.xml list until it changes.
+	* src/util.cc, src/util.hh: Modified get_ebuild_var() to handle
+	HOMEPAGE specially, doing variable substituion in an attempt to
+	produce readable HOMEPAGE output.  Also added a plural version of
+	get_var(), get_vars() since it's not practical to open the same file
+	many times.  Added md5check().
+	* src/action_meta_handler.cc: Instead of throwing an instance of
+	args_usage_E if -m is specified w/no non-opt args, print a message
+	telling the user they must be in a package directory or category.
+	Added a few comments.  Added --quiet support for pythonhead.
+	* src/action_pkg_handler.cc: Fixed bug where first package was
+	displayed w/no color while the rest were blue when --verbose.
+
+2005-03-31 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/categories.hh: Added new categories_T class.
+	* src/metadatas.cc: Modified to use new categories_T.
+	* src/action_meta_handler.cc: Display ebuild's DESCRIPTION and
+	HOMEPAGE even if no metadata.xml exists.  Allow user to run 'herdstat
+	-m' with no non-opt args *IF* in a package directory or category.
+	* src/exceptions.hh: Added errno_error_E and modified bad_fileobject_E
+	to derive from it.
+	* src/util.cc, src/util.hh: Added getcwd(). Moved get_categories() to
+	it's own categories_T class.
+
+2005-03-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, bashcomp: Added --with-herd.
+	* src/util.cc, src/util.hh: Added a generic get_var() for retrieving
+	variables from files using rcfile_T. Modified portdir() to use it.
+	Added ebuild_which() which haphazardly tries to determine the latest
+	ebuild of a package (does a crappy job).  I'll write a real version
+	parser if 100% accuracy is needed.  Added get_ebuild_var() which uses
+	get_var() to retrieve a variable value from an ebuild.
+	* src/action_meta_handler.cc: Modified to show ebuild DESCRIPTION if
+	metadata longdesc is non-existent. Also show HOMEPAGE if non-empty.
+	* src/herdstat.cc: Catch std::runtime_error when trying to set a non-C
+	locale, print an error, and exit.
+	* src/options.cc, src/herdstat.cc, src/action_pkg_handler.cc: Added a
+	--with-herd option, a generalization of --no-herd.  --no-herd will be
+	kept around and will be considered shorthand for --with-herd=no-herd.
+
+2005-03-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.0.1-release).
+	* doc/herdstat.1.in, bashcomp: Updated for --metadata and --no-herd.
+	* src/action_pkg_handler.cc, src/options.cc: Added --no-herd option
+	for only displaying packages in herd "no-herd".
+	* src/action_meta_handler.cc, src/action_meta_handler.hh: Added
+	metadata handler for looking up package/category metadata (--metadata).
+	* src/options.cc: Added 'parse herds.xml' option since
+	action_meta_handler will not need to parse herds.xml. Also added
+	action_meta to action_options_T.
+	* src/util.hh: Renamed status_T to progress_T. Modified it to not
+	print leading zeros.
+	* src/metadatas.cc, src/metadatas.hh: Moved metadata.xml retrieval
+	code from action_pkg_handler.cc into it's own class.
+	* src/action_pkg_handler.cc: Moved metadata.xml retrieval code to
+	metadatas.{cc,hh}.  Also reworked the way we handle invalid
+	devs/herds.  Got the progress thinggy to work as it should when
+	parsing metadata.xml's.
+
+2005-03-26 Aaron Walker <ka0ttic@gentoo.org>
+	
+	* configure.ac: Update version (1.0-release).
+	* src/util.hh: Added status_T class for showing percent of task
+	completion.
+	* src/action_pkg_handler.cc: Use util::status_T for metadata caching
+	and parsing.
+
+2005-03-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/util.cc: Use C++ version of std::isspace and std::tolower with
+	locale.
+
+2005-03-24 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.0_rc2-release).
+	* src/action_pkg_handler.cc: Modified get_metadatas() to cache the
+	list of metadata.xml's for 24hrs; This should make subsequent queries
+	a lot faster.
+	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc, src/herds.cc,
+	src/devs.hh, src/action_pkg_handler.cc: Call util::tidy_whitespace()
+	for only the data shown, not ALL data when filling the containers.
+	This should make a slight dent in elapsed runtime.
+	* src/formatter.cc: Added a sleu of debug_msg calls to aid in
+	debugging. Fixed formatting bug causing some lines to not wrap and
+	indent properly.
+
+2005-03-23 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc: Add formatter_T::set_highlightcolor() and
+	formatter_T::add_highlight() calls.  Removed unnecessary remove_if()
+	call.
+	* src/herds.cc: Remove highlighting stuff since we do it in main()
+	now.
+	* src/action_stats_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc, src/action_dev_handler.cc, src/util.cc:
+	s/size_t/std::size_t/.
+	* src/action_pkg_handler.cc: Fix small formatting issue (errant \n).
+
+2005-03-22 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.0_rc1-release).
+	* bashcomp, doc/herdstat.1.in, src/herdstat.cc, src/options.cc:
+	Added --nocolor.
+	* src/formatter.cc: Fixed a few bugs to allow --nocolor to work as
+	expected.  Moved append() to private, and added operator() as an
+	interface. Also moved format_attrs_T and highlight() private.
+
+2005-03-21 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/exceptions.hh: Revert gcc-4 fixes since gcc-3.3.x has a broken
+	va_start macro, causing numerous warnings.
+
+2005-03-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_dev_handler.cc: Fixed too low maxlabel value causing an
+	exception when '-d all' is specified.
+
+2005-03-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (release-0.6).
+	* doc/herdstat.1.in: Added --count and a couple examples.
+	* bashcomp: Updated to allow --dev and --package to be specified at
+	the same time. Also added --count.
+	* src/options.cc: Added dev and count option.
+	* src/herdstat.cc: Allow both --dev and --package to be specified at
+	the same time in order to allow us to look up packages belonging to a
+	certain developer. Added --count option.
+	* src/action_pkg_handler.cc: Added developer support so that
+	specifying --dev and --package will work.  Also added --count support.
+	* src/action_dev_handler.cc: Removed check for dev w/o email address
+	since metadata_xml_handler_T now handles that. Also added --count
+	support.
+	* src/action_herd_handler.cc: Added --count support.
+	* src/herds.cc: Added --count support.
+	* src/formatter.hh: Added size() method for returning the current
+	buffer size.
+
+2005-03-17 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/formatter.cc, src/formatter.hh: Added highlighting
+	functionality.  New functions highlight(), add_highlight(),
+	set_highlightcolor(), highlightcolor().  Added vector to
+	format_attrs_T for storing words we should highlight on.
+	* src/herds.cc: Remove nasty highlighting hack since it's now
+	incorporated in formatter_T.
+	* src/devs.hh: Added name & role members.  Only data other than those
+	two will be stored in the dev_attrs_T vector.
+	* src/herds_xml_handler.cc: Store name and role in respective
+	dev_attrs_T members instead of the vector.
+	* src/action_dev_handler.cc: Display developer's full name (if
+	available) and their email address.
+	* src/action_pkg_handler.cc: Fixed bug where a newline would get
+	displayed after a herd, even if the number of pkgs in that herd == 0.
+
+2005-03-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc: Ignore --quiet if invoked with no other arguments.
+	* bashcomp: Added 2>/dev/null to any herdstat invocations so that no
+	errors (failed to fetch fex) show up in the completions.
+	* src/util.cc, src/util.hh: Added lowercase().
+	* src/herds_xml_handler.cc: Run developer username through
+	util::lowercase() before saving it.  Should get rid of another
+	duplicate or two.
+
+2005-03-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/exceptions.hh: va_start doesn't necessarily need a const char *.
+	Thanks to azarah for helping me with this.  This fix gets rid of the
+	only remaining gcc-4 warnings.
+
+	* configure.ac: Update version (release-0.5).
+	* NEWS: Update for 0.5 (and forgot to update for 0.4).
+	* src/formatter.hh: Added peek() member function for peeking at the
+	last element of formatter_T's internal buffer.
+	* src/action_pkg_handler.cc: Fixed borked --package output (extra
+	newlines should only be included in --verbose output where package
+	<longdesciption>'s are displayed.
+	* src/action_stats_handler.cc, src/action_stats_handler.hh: Added new
+	action handler which shows a nice summary of statistics.  This handler
+	is called if no arguments are specified on the command-line.
+	* src/options.hh: Added action_stats to options_action_T enum.
+	* src/herdstat.cc: Added action_stats_handler_T to the handler list.
+	Also fixed bug where backup copy of fetched herds.xml wasn't removed.
+	* src/Makefile.am: Added action_stats_handler.{cc,hh} to source list.
+
+2005-03-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (release-0.4).
+	* src/util.cc, src/util.hh: Added collapse_whitespace() which
+	collapses any consecutive whitepsace, strips leading/trailing
+	whitespace, and converts any '\n''s in the middle into spaces.
+	* src/herds_xml_handler.cc, src/metadata_xml_handler.cc: Run data
+	through util::collapse_whitespace() while parsing and store the
+	result.
+	* src/options.cc, src/options.hh: Added generic container for holding
+	options (option_type_T). options_T now holds an internal static map of
+	strings (option names) and their corresponding data in whatever type
+	it is.
+	* src/exceptions.hh: Added base herdstat class for bad_casts and added
+	bad_option_cast_E and invalid_option_E exceptions.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc, src/herds.cc, src/devs.hh, src/herdstat.cc:
+	Updated to use new options interface.
+
+2005-03-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* doc/herdstat.1.in, bashcomp: Updated for --fetch.
+
+2005-03-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/util.cc, src/util.hh: Don't use wget -q if --verbose.
+	* src/herdstat.cc: Set the common format attrs here. Also added new
+	option --fetch.
+	* src/options.cc, src/options.hh: Added option fetch.
+	* src/formatter.cc: Added quiet to format_attrs_T. Updated both
+	append() functions to use it. In flush(), use remove_copy() and an
+	ostream_iterator instead of a loop.
+	* src/herds.cc, src/action_herd_handler.cc, src/action_dev_handler.cc,
+	src/action_pkg_handler.cc: Removed a lot of the options_T::quiet()
+	checks since formatter_T now handles *most* of it.
+
+2005-03-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* Makefile.am: Added TODO target for automatically generating the TODO
+	file with devtodo.
+	* src/herds_xml_handler.cc: append '@gentoo.org' to email addresses
+	that lack it.
+	* src/util.cc: Make current_user() return the whole email address.
+	* src/herds.cc, src/herds.hh: Added herd_T::keys(); cleaned up
+	herd_T::display() a little.
+	* src/xmlparser.hh: Added a few comments.
+
+2005-03-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (release-0.3).
+	* bashcomp: Fixed the two errant ')' causing 'all' completion to
+	complete to 'all\)'.  Also, moving out of distribution and into the
+	portage tree for easier access.
+	* doc/herdstat.1.in: Updated for --outfile.
+	* src/herdstat.cc: Added new command-line option --outfile.
+	* src/herds.cc: Fix bug where yellow user highlighting doesn't occur
+	in verbose output. Also fixed another bug where output was being sent
+	to stdout instead of the stream arg if options.quiet().
+	* src/devs.hh: Fix dev_attrs_T::display() to only display all
+	developer attributes if option all is not set.
+	* src/options.cc, src/options.hh: Added options all, outfile, and
+	outstream.
+	* src/action_herd_handler.cc, src/action_dev_handler.cc,
+	src/action_pkg_handler.cc: Updated to use options_T::outstream()
+	instead of std::cout.
+
+2005-03-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (release-0.2).
+	* doc/herdstat.1.in: Added a few more examples.
+	* src/util.cc, src/util.hh: Added copy_file(), move_file(), and
+	get_user_from_email().
+	* src/herdstat.cc: Use cached copy of herds.xml if it exists and we
+	are unable to fetch it.
+	* src/herds.cc: Highlight current user's nick *after* sorting,
+	otherwise the highlighted nick will always be at the beginning of the
+	vector.
+
+2005-03-07 Aaron Walker <ka0ttic@gentoo.org>
+
+	* bashcomp: Now that the 'all' target is completed, we can now use it
+	to generate our completions!
+	* doc/herdstat.1.in: Added a non-option args section to explain them.
+	Also added the info relevant to the all target.
+	* src/herdstat.cc: Added herds.xml filesize check as it seems wget
+	will write a 0 byte file if fetching fails, rather than return an
+	exit code.
+	* src/action_pkg_handler.cc: Display a small message at the beginning
+	of operator() to give the user a hint as to why it might be taking a
+	while.  Also, added check early on to make sure herd exists before
+	going through the trouble of getting the list of metadatas.
+	* src/action_dev_handler.cc: Added support for the 'all' target.
+	* src/action_herd_handler.cc: Fixed to respect --quiet when 'all'
+	target is specified.
+	* src/herds.cc: Only display name,desc, and email members of herd_T if
+	they're not empty.
+	* src/util.cc, src/util.hh: Moved the ECHANGELOG_USER check here in
+	current_user().
+
+2005-03-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/types.hh: Moved to devs.hh.
+	* src/devs.hh: Moved from types.hh.
+	* src/herds.cc, src/herds.hh: Moved content handler stuff to
+	herds_xml_handler.{cc,hh}. Added display() member functions.
+	* src/herds_xml_handler.cc, src/herds_xml_handler.hh: Moved from
+	herds.{cc,hh}.
+	* src/metadata.cc, src/metadata.hh: Moved to
+	metadata_xml_handler.{cc,hh}.
+	* src/metadata_xml_handler.cc, src/metadata_xml_handler.hh: Moved from
+	metadata.{cc,hh}.
+	* src/herdstat.cc, src/action_handler.hh, src/action_dev_handler.hh,
+	src/action_herd_handler.hh, src/action_pkg_handler.hh: Only pass the
+	herds_T object not the whole handler now that we properly store the
+	herd desc in the herd_T object.
+	* src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_pkg_handler.cc: Updated with all the changes; moved most of
+	the displaying code to the appropriate display() member function.
+
+2005-03-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/util.cc, src/util.hh: Added rcfile_T class originally written by
+	Ciaran McCreesh for annodir.  Slightly modified to support quotes.
+	Also added a portdir() function that tries to read
+	make.conf/make.globals to determine PORTDIR. A *lot* faster than calling
+	portageq.
+	* src/herdstat.cc: Call util::portdir() to set the portdir.
+	* src/action_pkg_handler.cc: Removed portageq popen.
+
+2005-03-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/configure.ac: Update version (release-0.1).
+	* doc/herdstat.1.in: Added example thanks to dragonheart.  Added
+	PORTDIR and ECHANGELOG_USER to the Environment section.
+	* src/herdstat.cc, src/action_dev_handler.cc,
+	src/action_dev_handler.hh, src/action_pkg_handler.cc,
+	src/action_pkg_handler.hh, src/action_herd_handler.cc,
+	src/action_herd_handler.hh, src/action_handler.hh: Since all action
+	handlers need to parse herds.xml for one reason or another, do it
+	before calling the handler and then pass the data to the handler.
+	* src/formatter.cc, src/formatter.hh: Added member functions for
+	setting/getting attributes rather than having the caller set the
+	attributes manually.
+
+2005-03-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* README: Now has more content than "TODO".
+	* doc/Makefile.am, doc/herdstat.1.in: Added.
+	* src/exceptions.hh: Added timer_E.
+	* src/action_dev_handler.cc: Finished; now works.
+	* src/action_herd_handler.cc: Added some code to highlight the user's
+	nick if it occurs in the output (uses ECHANGELOG_USER). Also colorize
+	the email address, if verbose.
+	* src/action_pkg_handler.cc: removed the second level opendir() stuff
+	as it's totally unnecessary and overkill.  get_metadatas() is much
+	faster now as a result.
+	* src/xmlparser.hh: Added overloaded parse() that takes a stream.
+	* src/util.cc, src/util.hh: Added is_dir() and is_file().
+
+2005-03-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_dev_handler.cc, src/action_dev_handler.hh: Added template
+	for new action handler for doing reverse lookups (by dev instead of
+	herd).
+	* src/herdstat.cc: Fix unique() call.
+	* src/action_herd_handler.cc, src/action_pkg_handler.cc: Update to use
+	new handlers and directly use XMLParser_T.
+	* src/metadata.cc, src/metadata.hh: Move MetadataXMLParser_T to
+	MetadataXMLHandler_T.
+	* src/herds.cc, src/herds.hh: Move HerdsXMLParser_T to
+	HerdsXMLHandler_T.
+	* src/xmlparser.hh: XMLParser_T no longer inherits from
+	xml::event_parser; added XMLHandler_T as an abstract handler type.
+	* src/exceptions.hh: XMLParser_E now accepts two args, file and error
+	string.
+	* src/types.hh, src/herds.hh: Use typedef instead of classes for types
+	devs_T, dev_attrs_T, and herds_T.
+	* configure.ac: Use pkg-config for the xmlwrapp check.
+
+2005-03-01 Aaron Walker <ka0ttic@gentoo.org>
+	
+	* src/exceptions.hh: Added base msg and va exception classes.
+	* src/util.cc, src/util.hh: Added color_map_T class.
+	* src/formatter.cc, src/formatter.hh: Removed color_map_T.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Added these
+	for package stats.
+	* src/herds.cc, src/herds.hh: Moved herds.xml content handler here.
+	* src/metadata.cc, src/metadata.hh: Added metadata.xml content
+	handler.
+	* src/types.h: Moved container classes that are common between herds
+	and metadata content handlers here.
+	* src/herdstat.cc: Fixed catch clause when running action handler.
+
+2005-02-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/formatter.cc, src/formatter.hh: Added formatter_T class.
+	* src/output.cc, src/output.hh: obsoleted by formatter_T.
+	* src/util.cc, src/util.hh: Added splitstr() function and timer class.
+	* src/Makefile.am: Added formatter.{cc,hh} and removed
+	output.{cc,hh}.
+	* src/action_herd_handler.cc: Updated to use formatter_T.
+
+2005-02-23 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/options.cc, src/options.hh: Added verbose and maxcol options.
+	* src/output.cc, src/output.hh: New files for output-related functions.
+	* src/action_herd_handler.cc: Finished herd loop.
+	* src/herdstat.cc: Use a vector to save all non-option arguments.
+	* src/herds.hh: New file containing derived-types for dev/herd
+	containers.
+	* src/xmlparser.cc: Finished text callback.
+
+2005-02-22 Aaron Walker <ka0ttic@gentoo.org>
+
+	* ChangeLog: Start keeping a GNU-style ChangeLog.
