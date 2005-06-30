@@ -42,7 +42,7 @@
 #include "string.hh"
 #include "util_exceptions.hh"
 
-std::vector<util::string>
+inline std::vector<util::string>
 util::string::split(const string::value_type delim, bool append_only) const
 {
     return util::split(*this, delim, append_only);
