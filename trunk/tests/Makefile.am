@@ -10,4 +10,5 @@ MAINTAINERCLEANFILES = Makefile.in *~
 EXTRA_DIST = $(TESTS) \
 	     common.sh \
 	     herds.xml \
+	     devaway.html \
 	     $(foreach f, $(tests), $(f).expected)
