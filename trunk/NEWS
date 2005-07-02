@@ -1,6 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_p3:
+    Bug fixes:
+     - Added -L|--localstatedir option so that the local state directory can
+       be decided at run-time.  This was mainly added so that we can run our
+       regression tests from within a sandbox without having to hack around
+       it with a call to addwrite in the ebuild.
+
 1.1.1_p2:
     Added regression tests.
 

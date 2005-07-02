@@ -64,6 +64,9 @@ namespace util
             /// Dump cache to disk.
             virtual void dump() = 0;
 
+            /// Get our path.
+            const string_type &path() const { return this->_path; }
+
         protected:
             /// Initialize cache.
             virtual void init()
