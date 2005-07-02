@@ -54,7 +54,7 @@ class xml_T : public parsable_T
 
         virtual void parse(const string_type &p = "")
         {
-            const util::string file(p.empty() ? this->_path : p);
+            const util::string file(p.empty() ? this->path() : p);
             XMLParser_T parser(this->_handler.get(), this->_validate);
             this->_timer.start();
             parser.parse(file);
@@ -64,8 +64,8 @@ class xml_T : public parsable_T
     protected:
         virtual void init()
         {
-            if (not this->_path.exists())
-                throw bad_fileobject_E(this->_path);
+            if (not this->path().exists())
+                throw bad_fileobject_E(this->path());
 
             this->parse();
         }

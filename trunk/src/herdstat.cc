@@ -56,7 +56,7 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    "/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -82,6 +82,8 @@ static struct option long_opts[] =
     {"herdsxml",    required_argument,	0,  'H'},
     /* specify the location of devaway.html. */
     {"devaway",	    required_argument,	0,  'A'},
+    /* specify local statedir */
+    {"localstatedir", required_argument,0,  'L'},
     /* show package stats for the specified herds */
     {"package",	    no_argument,	0,  'p'},
     /* display package metadata information */
@@ -153,6 +155,8 @@ help()
 	<< " -A, --devaway  <file>   Specify location of devaway.html." << std::endl
 	<< " -o, --outfile  <file>   Send output to the specified file" << std::endl
 	<< "                         instead of stdout." << std::endl
+	<< " -L, --localstatedir <dir>" << std::endl
+	<< "                         Specify local state directory." << std::endl
 	<< " -F, --fetch             Force a fetch of herds.xml." << std::endl
 	<< " -v, --verbose           Display verbose output." << std::endl
 	<< " -q, --quiet             Don't display labels and fancy colors. Use this" << std::endl
@@ -385,8 +389,13 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    case 'H':
 		optset("herds.xml", util::string, optarg);
 		break;
+	    /* --devaway */
 	    case 'A':
 		optset("devaway.location", util::string, optarg);
+		break;
+	    /* --localstatedir */
+	    case 'L':
+		optset("localstatedir", util::string, optarg);
 		break;
 	    /* --debug */
 	    case 'D':

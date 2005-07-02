@@ -38,8 +38,6 @@
 #include "querycache_xml_handler.hh"
 #include "querycache.hh"
 
-#define QUERYCACHE  LOCALSTATEDIR"/querycache.xml"
-
 /*
  * Add a pkgQuery_T object to the cache, removing
  * an expired pkgQuery_T object if it exists.
@@ -71,11 +69,11 @@ querycache_T::operator() (const pkgQuery_T &q)
 void
 querycache_T::load()
 {
-    if (not util::is_file(QUERYCACHE))
+    if (not util::is_file(this->_path))
         return;
 
     xml_T<querycacheXMLHandler_T> querycache_xml;
-    querycache_xml.parse(QUERYCACHE);
+    querycache_xml.parse(this->_path);
     querycacheXMLHandler_T *handler = querycache_xml.handler();
 
     std::copy(handler->queries.begin(), handler->queries.end(),
@@ -240,12 +238,12 @@ querycache_T::dump()
 
 #ifdef USE_LIBXMLPP
 #ifdef DEBUG
-        doc.write_to_file_formatted(QUERYCACHE, "UTF-8");
+        doc.write_to_file_formatted(this->_path, "UTF-8");
 #else /* DEBUG */
-        doc.write_to_file(QUERYCACHE, "UTF-8");
+        doc.write_to_file(this->_path, "UTF-8");
 #endif /* DEBUG */
 #else /* USE_LIBXMLPP */
-        doc.save_to_file(QUERYCACHE, 0);
+        doc.save_to_file(this->_path, 0);
 #endif /* USE_LIBXMLPP */
     }
 #ifdef USE_LIBXMLPP
@@ -254,7 +252,7 @@ querycache_T::dump()
     catch (const std::exception &e)
 #endif /* USE_LIBXMLPP */
     {
-        throw XMLWriter_E(QUERYCACHE, e.what());
+        throw XMLWriter_E(this->_path, e.what());
     }
 }
 

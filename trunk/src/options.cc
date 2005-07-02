@@ -67,11 +67,13 @@ options_T::option_map_T::set_defaults()
     insopt("querycache.expire", static_cast<long>(84600));
     insopt("wget.options", util::string("-rq -t3 -T15"));
     insopt("devaway.expire", static_cast<long>(84600));
-    insopt("devaway.location", util::string(""));
 
     insopt("maxcol", static_cast<std::size_t>(78));
 
+    insopt("localstatedir", util::string(util::string(LOCALSTATEDIR)+"/herdstat"));
     insopt("herds.xml", util::string());
+    insopt("devaway.location", util::string(""));
+
     insopt("with-herd", util::string());
     insopt("with-maintainer", util::string());
     insopt("outfile", util::string("stdout"));

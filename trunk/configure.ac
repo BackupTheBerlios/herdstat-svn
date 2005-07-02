@@ -2,14 +2,14 @@
 # $Id: configure.ac 246 2005-04-26 12:03:53Z ka0ttic $
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.1_p2], [ka0ttic@gentoo.org])
+AC_INIT([herdstat], [1.1.1_p3], [ka0ttic@gentoo.org])
 AC_CONFIG_SRCDIR([src/herdstat.cc])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE([1.8 dist-bzip2 no-dist-gzip])
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
 test x$sysconfdir = "xNONE" && sysconfdir="$ac_default_sysconfdir"
-AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
+AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir", [Local state directory])
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir", [System configuration directory])
 
 AC_CHECK_PROGS(_WGET, wget)

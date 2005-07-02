@@ -31,12 +31,13 @@
 #include "metadata_xml.hh"
 #include "metacache.hh"
 
-#define METACACHE               LOCALSTATEDIR"/metacache"
+#define METACACHE               /*LOCALSTATEDIR*/"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
 #define METACACHE_RESERVE       8650
 
 metacache_T::metacache_T(const util::string &portdir)
-    : util::cache_T<value_type>(METACACHE), _portdir(portdir) { }
+    : util::cache_T<value_type>(optget("localstatedir", util::string)+METACACHE),
+      _portdir(portdir) { }
 
 /*
  * Is the cache valid?
@@ -45,22 +46,23 @@ metacache_T::metacache_T(const util::string &portdir)
 bool
 metacache_T::valid() const
 {
-    const util::stat_T metacache(METACACHE);
+    const util::stat_T metacache(this->path());
     bool valid = false;
 
     const util::string expire(optget("metacache.expire", util::string));
+    const util::string lastsync(optget("localstatedir", util::string)+LASTSYNC);
 
     if (metacache.exists())
     {
         if (expire == "lastsync")
         {
             const util::string path(this->_portdir + "/metadata/timestamp");
-            bool timestamp = util::is_file(path);
-            bool lastsync  = util::is_file(LASTSYNC);
+            bool has_timestamp = util::is_file(path);
+            bool has_lastsync  = util::is_file(lastsync);
 
-            if (timestamp and lastsync)
+            if (has_timestamp and has_lastsync)
             {
-                util::file_T t(path), l(LASTSYNC);
+                util::file_T t(path), l(lastsync);
 
                 if (optget("debug", bool))
                 {
@@ -75,17 +77,17 @@ metacache_T::valid() const
                 {
                     debug_msg("timestamps don't match ; replacing lastsync");
                     t.close(); l.close();
-                    util::copy_file(path, LASTSYNC);
+                    util::copy_file(path, lastsync);
                 }
             }
-            else if (lastsync)
+            else if (has_lastsync)
             {
                 unlink(LASTSYNC);
                 valid = ((std::time(NULL) - metacache.mtime())
                         < METACACHE_EXPIRE);
             }
-            else if (timestamp)
-                util::copy_file(path, LASTSYNC);
+            else if (has_timestamp)
+                util::copy_file(path, lastsync);
             else
                 valid = ((std::time(NULL) - metacache.mtime())
                         < METACACHE_EXPIRE);
@@ -111,9 +113,9 @@ metacache_T::valid() const
 
     if (valid)
     {
-        std::ifstream stream(METACACHE);
+        std::ifstream stream(this->path().c_str());
         if (not stream)
-            throw util::bad_fileobject_E(METACACHE);
+            throw util::bad_fileobject_E(this->path());
 
         std::string line;
         valid = (std::getline(stream, line) and
@@ -178,12 +180,12 @@ metacache_T::fill()
 void
 metacache_T::load()
 {
-    if (not util::is_file(METACACHE))
+    if (not util::is_file(this->path()))
         return;
 
     try
     {
-        const util::vars_T cache(METACACHE);
+        const util::vars_T cache(this->path());
 
         this->_portdir = cache["portdir"];
         if (this->_portdir.empty())
@@ -245,7 +247,7 @@ metacache_T::load()
     }
     catch (const metacache_parse_E)
     {
-        std::cerr << "Error parsing " << METACACHE << std::endl;
+        std::cerr << "Error parsing " << this->path() << std::endl;
         throw;
     }
 }
@@ -257,9 +259,9 @@ metacache_T::load()
 void
 metacache_T::dump()
 {
-    std::ofstream f(METACACHE);
+    std::ofstream f(this->path().c_str());
     if (not f)
-        throw util::bad_fileobject_E(METACACHE);
+        throw util::bad_fileobject_E(this->path());
 
     f << "version=" << VERSION << std::endl;
     f << "portdir=" << this->_portdir << std::endl;

@@ -37,12 +37,10 @@ void
 devaway_T::init()
 {
     util::path_T file(optget("devaway.location", util::string));
-    if (file.empty())
-        this->_path.assign(DEVAWAY_LOCAL);
-    else
+    if (not file.empty())
         this->_path.assign(file);
     
-    util::stat_T devaway(this->_path);
+    util::stat_T devaway(this->path());
     if (not devaway.exists() or
        ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
        or (devaway.size() == 0))
@@ -55,6 +53,7 @@ devaway_T::fetch()
     if (this->_fetched)
         return;
 
+    const util::string path(this->path());
     util::stat_T devaway;
 
     try
@@ -62,34 +61,34 @@ devaway_T::fetch()
         if (this->_path.find("http://") == util::path_T::npos)
             return;
 
-        devaway.assign(DEVAWAY_LOCAL);
+        devaway.assign(this->_local);
         if (devaway.exists())
-            util::copy_file(DEVAWAY_LOCAL, DEVAWAY_LOCAL".bak");
+            util::copy_file(this->_local, this->_local+".bak");
 
-        fetcher_T fetch(DEVAWAY_REMOTE, DEVAWAY_LOCAL);
+        fetcher_T fetch(DEVAWAY_REMOTE, this->_local);
 
         if (not devaway() or (devaway.size() == 0))
             throw fetch_E();
 
-        unlink(DEVAWAY_LOCAL".bak");
+        unlink((this->_local+".bak").c_str());
     }
     catch (const fetch_E &e)
     {
-        if (util::is_file(DEVAWAY_LOCAL".bak"))
-            util::move_file(DEVAWAY_LOCAL".bak", DEVAWAY_LOCAL);
+        if (util::is_file(this->_local+".bak"))
+            util::move_file(this->_local+".bak", this->_local);
         else
             std::cerr << "Failed to fetch " << DEVAWAY_REMOTE << "."
                 << std::endl;
 
-        devaway.assign(DEVAWAY_LOCAL);
+        devaway.assign(this->_local);
         if (devaway.exists() and (devaway.size() == 0))
-            unlink(DEVAWAY_LOCAL);
+            unlink(this->_local.c_str());
 
         if (optget("action", options_action_T) == action_fetch)
             throw;
     }
 
-    this->_path.assign(DEVAWAY_LOCAL);
+    this->_path.assign(this->_local);
     assert(devaway());
     this->_fetched = true;
 }

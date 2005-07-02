@@ -30,7 +30,6 @@
 #include "xml.hh"
 #include "herds_xml_handler.hh"
 
-#define HERDS_XML_FETCH_LOCATION    LOCALSTATEDIR"/herds.xml"
 #define HERDS_XML_EXPIRE            86400
 
 /*
@@ -49,7 +48,8 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
         typedef herds_type::size_type size_type;
 
         herds_xml_T()
-            : xml_T<handler_type>(optget("qa", bool)), _fetched(false)
+            : xml_T<handler_type>(optget("qa", bool)), _fetched(false),
+              _local_default(optget("localstatedir", util::string)+"/herds.xml")
         { this->init(); }
         virtual ~herds_xml_T() { }
 
@@ -92,7 +92,8 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
 
     private:
         bool _fetched;
-        static const string_type _default;
+        static const string_type _remote_default;
+        const string_type _local_default;
 };
 
 #endif

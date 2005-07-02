@@ -40,8 +40,10 @@
 class querycache_T : public std::vector<pkgQuery_T>
 {
     public:
-        querycache_T() : _max(optget("querycache.max", int)),
-                         _expire(optget("querycache.expire", long))
+        querycache_T()
+            : _max(optget("querycache.max", int)),
+              _expire(optget("querycache.expire", long)),
+              _path(optget("localstatedir", util::string)+"/querycache.xml")
         { }
 
         void operator() (const pkgQuery_T &);
@@ -60,6 +62,7 @@ class querycache_T : public std::vector<pkgQuery_T>
 
         int _max;
         long _expire;
+        const util::string _path;
 };
 
 #endif

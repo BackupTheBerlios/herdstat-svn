@@ -52,7 +52,7 @@ void debug_msg(const char *, ...);
 #endif /* UNICODE */
 
 /* common defines */
-#define LASTSYNC                LOCALSTATEDIR"/lastsync"
+#define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
 
 /* common typedefs */
 typedef std::vector<util::string> opts_type;

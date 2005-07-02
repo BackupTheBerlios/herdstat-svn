@@ -29,13 +29,15 @@
 
 #include "pkgcache.hh"
 
-#define PKGCACHE                    LOCALSTATEDIR"/pkgcache"
+#define PKGCACHE                    /*LOCALSTATEDIR*/"/pkgcache"
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
-pkgcache_T::pkgcache_T() : util::cache_T<value_type>(PKGCACHE) { }
+pkgcache_T::pkgcache_T()
+    : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE) { }
 
 pkgcache_T::pkgcache_T(const util::string &portdir)
-    : util::cache_T<value_type>(PKGCACHE), _portdir(portdir)
+    : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE),
+      _portdir(portdir)
 {
     util::cache_T<value_type>::init();
 }
@@ -54,37 +56,38 @@ pkgcache_T::init(const util::string &portdir)
 bool
 pkgcache_T::valid() const
 {
-    const util::stat_T pkgcache(PKGCACHE);
+    const util::stat_T pkgcache(this->path());
     bool valid = false;
 
     const util::string expire(optget("metacache.expire", util::string));
+    const util::string lastsync(optget("localstatedir", util::string)+LASTSYNC);
 
     if (pkgcache.exists())
     {
         if (expire == "lastsync")
         {
             const util::string path(this->_portdir + "/metadata/timestamp");
-            bool timestamp = util::is_file(path);
-            bool lastsync  = util::is_file(LASTSYNC);
+            bool has_timestamp = util::is_file(path);
+            bool has_lastsync  = util::is_file(lastsync);
 
-            if (timestamp and lastsync)
+            if (has_timestamp and has_lastsync)
             {
-                util::file_T t(path), l(LASTSYNC);
+                util::file_T t(path), l(lastsync);
                 valid = (t == l);
                 if (not valid)
                 {
                     debug_msg("timestamp != lastsync ; replacing lastsync file.");
                     t.close(); l.close();
-                    util::copy_file(path, LASTSYNC);
+                    util::copy_file(path, lastsync);
                 }
             }
-            else if (lastsync)
+            else if (has_lastsync)
             {
-                unlink(LASTSYNC);
+                unlink(lastsync.c_str());
                 valid = ((std::time(NULL) - pkgcache.mtime()) < PKGCACHE_EXPIRE);
             }
-            else if (timestamp)
-                util::copy_file(path, LASTSYNC);
+            else if (has_timestamp)
+                util::copy_file(path, lastsync);
             else
                 valid = ((std::time(NULL) - pkgcache.mtime()) < PKGCACHE_EXPIRE);
         }
@@ -99,9 +102,9 @@ pkgcache_T::valid() const
 
     if (valid)
     {
-        std::ifstream stream(PKGCACHE);
+        std::ifstream stream(this->path().c_str());
         if (not stream)
-            throw util::bad_fileobject_E(PKGCACHE);
+            throw util::bad_fileobject_E(this->path());
 
         std::string line;
         valid = (std::getline(stream, line) and
@@ -170,9 +173,9 @@ pkgcache_T::fill()
 void
 pkgcache_T::load()
 {
-    std::ifstream stream(PKGCACHE);
-    if (not stream.is_open())
-        throw util::bad_fileobject_E(PKGCACHE);
+    std::ifstream stream(this->path().c_str());
+    if (not stream)
+        throw util::bad_fileobject_E(this->path());
 
     std::copy(std::istream_iterator<util::string>(stream),
         std::istream_iterator<util::string>(), std::back_inserter(*this));
@@ -188,9 +191,9 @@ pkgcache_T::load()
 void
 pkgcache_T::dump()
 {
-    std::ofstream stream(PKGCACHE);
+    std::ofstream stream(this->path().c_str());
     if (not stream.is_open())
-        throw util::bad_fileobject_E(PKGCACHE);
+        throw util::bad_fileobject_E(this->path());
 
     /* this cache came from this->_portdir */
     stream << "portdir=" << this->_portdir << std::endl;
