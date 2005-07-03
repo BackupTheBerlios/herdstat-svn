@@ -114,6 +114,11 @@ fi
 AC_SUBST(TERMCAP_LIBS)
 AC_DEFINE(USE_TERMCAP, 1, [Use termcap lib to determine terminal width])
 
+dnl --enable-tests
+AC_ARG_ENABLE(tests, [ --enable-tests	build code to test herdstat [off]],
+    enable_tests=$enableval, enable_tests=no)
+AM_CONDITIONAL(BUILD_TESTS, test x$enable_tests = "xyes")
+
 dnl --enable-debug
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
     [case "${enableval}" in
@@ -146,4 +151,5 @@ AC_OUTPUT(Makefile
 	  doc/Makefile
 	  lib/Makefile
 	  src/Makefile
-	  tests/Makefile)
+	  tests/Makefile
+	  tests/src/Makefile)
