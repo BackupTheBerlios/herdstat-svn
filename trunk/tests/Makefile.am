@@ -8,7 +8,8 @@ tests = versions \
 	stats \
 	away \
 	find \
-	find-regex
+	find-regex \
+	which
 
 TESTS = $(foreach f, $(tests), $(f)-test.sh)
 TESTS_ENVIRONMENT = PORTDIR=${PWD}/portdir PORTDIR_OVERLAY=''
