@@ -218,7 +218,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
          */
 
         util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
-        util::string path(util::string(LOCALSTATEDIR)+"/"+cur_herd+".xml");
+        util::string path(localstatedir+"/"+cur_herd+".xml");
         util::stat_T mps(path);
 
         try

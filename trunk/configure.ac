@@ -146,5 +146,4 @@ AC_OUTPUT(Makefile
 	  doc/Makefile
 	  lib/Makefile
 	  src/Makefile
-	  tests/Makefile
-	  tests/foo/Makefile)
+	  tests/Makefile)

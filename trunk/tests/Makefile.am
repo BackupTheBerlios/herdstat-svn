@@ -1,8 +1,15 @@
 # $Id$
 
-SUBDIRS = foo
+tests = versions \
+	metadata \
+	metadata-regex \
+	dev \
+	herd \
+	stats \
+	away \
+	find \
+	find-regex
 
-tests = versions metadata dev herd stats away
 TESTS = $(foreach f, $(tests), $(f)-test.sh)
 
 CLEANFILES = $(tests)
@@ -11,4 +18,5 @@ EXTRA_DIST = $(TESTS) \
 	     common.sh \
 	     herds.xml \
 	     devaway.html \
-	     $(foreach f, $(tests), $(f).expected)
+	     $(foreach f, $(tests), $(f).expected) \
+	     portdir

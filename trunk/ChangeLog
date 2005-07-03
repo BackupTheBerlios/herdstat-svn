@@ -1,5 +1,14 @@
 ChangeLog for herdstat
 
+2005-07-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herds_xml_handler.cc: missed a LOCALSTATEDIR usage.
+	* tests/common.sh, tests/away-test.sh, tests/dev-test.sh,
+	tests/herd-test.sh, tests/metadata-test.sh, tests/stats-test.sh,
+	tests/versions-test.sh: Reworked tests.  Added a test PORTDIR.
+	* tests/metadata-regex-test.sh, tests/find-test.sh,
+	tests/find-regex-test.sh: Added some more tests.
+
 2005-07-02 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/options.cc, src/devaway.cc, src/pkgcache.cc, src/herdstat.cc,
