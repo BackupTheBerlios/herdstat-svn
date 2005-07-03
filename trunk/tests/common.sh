@@ -6,33 +6,27 @@ else
     function eend() { : ; }
 fi
 
+get_caller() {
+    local x=${1##*/}
+    echo ${x%-*}
+}
+
 run_test() {
     local caller="${1}" name="${2}" prog="${3}" opts="${4}" rv=0
-    local actual="${PWD}/actual/${caller}" expected="${PWD}/expected/${caller}"
+    local actual="${srcdir}/actual/${caller}" expected="${srcdir}/expected/${caller}"
+
+    [[ -d ${srcdir}/actual ]] || mkdir ${srcdir}/actual
 
     ebegin "Testing ${name}"
     ${prog} ${opts} > ${actual} || rv=1
     diff ${expected} ${actual}  || rv=1
     eend ${rv}
+    echo -n "   "
     return ${rv}
 }
 
 run_herdstat() {
-    run_test "${1}" "${2}" \
-	"env PORTDIR_OVERLAY='' PORTDIR=${PWD}/portdir ../src/herdstat" \
-	"${3}"
+    local lsd="${srcdir}/localstatedir"
+    run_test "$(get_caller ${1})" "${2}" "${srcdir}/../src/herdstat" \
+	"-L ${lsd} -A ${lsd}/devaway.html -H ${lsd}/herds.xml ${3}"
 }
-
-#run_herdstat() {
-#    local name="${1}" opts="${2}" actual="${3}" expected="${4}" rv=0
-
-#    ebegin "Testing ${name}"
-#    
-#    env PORTDIR_OVERLAY='' PORTDIR=${PWD}/portdir ../src/herdstat -L . \
-#        -H ./herds.xml -A ./devaway.html ${opts:-} -o ${actual} || rv=1
-#    
-#    diff ${expected} ${actual} &>/dev/null || rv=1
-#    
-#    eend ${rv}
-#    return ${rv}
-#}

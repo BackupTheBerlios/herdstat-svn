@@ -1,3 +1,3 @@
 #!/bin/sh
 source common.sh || exit 1
-run_herdstat "stats handler" "" stats stats.expected
+run_herdstat "${0}" "stats handler" "-q"

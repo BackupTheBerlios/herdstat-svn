@@ -1,3 +1,3 @@
 #!/bin/sh
 source common.sh || exit 1
-run_herdstat "metadata handler (regex)" "-mr ." metadata-regex metadata-regex.expected
+run_herdstat "${0}" "metadata handler (regex)" "-mrq ."

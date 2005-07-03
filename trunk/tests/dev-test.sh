@@ -1,3 +1,3 @@
 #!/bin/sh
 source common.sh || exit 1
-run_herdstat "dev handler" "-d ka0ttic" dev dev.expected
+run_herdstat "${0}" "dev handler" "-dq ka0ttic"
