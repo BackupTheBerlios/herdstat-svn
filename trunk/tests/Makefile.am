@@ -11,12 +11,11 @@ tests = versions \
 	find-regex
 
 TESTS = $(foreach f, $(tests), $(f)-test.sh)
-
-CLEANFILES = $(tests)
+CLEANFILES = $(foreach f, $(tests), actual/$(f))
 MAINTAINERCLEANFILES = Makefile.in *~
 EXTRA_DIST = $(TESTS) \
 	     common.sh \
 	     herds.xml \
 	     devaway.html \
-	     $(foreach f, $(tests), $(f).expected) \
-	     portdir
+	     portdir \
+	     expected
