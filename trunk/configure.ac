@@ -38,9 +38,6 @@ AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
-AC_MSG_CHECKING([devrel wang size])
-AC_MSG_RESULT(huge)
-
 AC_DISABLE_SHARED
 dnl hack to disable damn f77 libtool checks (stolen from sandbox's configure.in)
 m4_undefine([AC_PROG_F77])
@@ -115,9 +112,9 @@ AC_SUBST(TERMCAP_LIBS)
 AC_DEFINE(USE_TERMCAP, 1, [Use termcap lib to determine terminal width])
 
 dnl --enable-tests
-AC_ARG_ENABLE(tests, [ --enable-tests	build code to test herdstat [off]],
-    enable_tests=$enableval, enable_tests=no)
-AM_CONDITIONAL(BUILD_TESTS, test x$enable_tests = "xyes")
+#AC_ARG_ENABLE(tests, [ --enable-tests	build code to test herdstat [off]],
+#    enable_tests=$enableval, enable_tests=no)
+#AM_CONDITIONAL(BUILD_TESTS, test x$enable_tests = "xyes")
 
 dnl --enable-debug
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],

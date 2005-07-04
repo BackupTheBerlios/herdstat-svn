@@ -1,6 +1,6 @@
 # $Id: Makefile.am 234 2005-04-19 12:34:46Z ka0ttic $
 
-SUBDIRS = doc lib src tests
+SUBDIRS = doc lib src
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
@@ -12,7 +12,10 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       html/*/*.html \
 		       *~
 
-EXTRA_DIST = autogen.sh .todo bashcomp
+EXTRA_DIST = autogen.sh .todo bashcomp tests
+
+check:
+	cd tests && $(MAKE) $@
 
 srchtml:
 	@test -d ${PWD}/html || mkdir ${PWD}/html ; \

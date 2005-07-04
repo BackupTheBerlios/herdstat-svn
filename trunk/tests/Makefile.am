@@ -1,5 +1,9 @@
 # $Id$
-tests = versions \
+
+SUBDIRS = src
+
+tests = string \
+	versions \
 	metadata \
 	metadata-regex \
 	dev \
@@ -9,12 +13,6 @@ tests = versions \
 	find \
 	find-regex \
 	which
-
-if BUILD_TESTS
-SUBDIRS = src
-tests += string
-endif
-
 
 TESTS = $(foreach f, $(tests), $(f)-test.sh)
 TESTS_ENVIRONMENT = PORTDIR=portdir PORTDIR_OVERLAY=''
