@@ -243,7 +243,7 @@ querycache_T::dump()
         doc.write_to_file(this->_path, "UTF-8");
 #endif /* DEBUG */
 #else /* USE_LIBXMLPP */
-        doc.save_to_file(this->_path, 0);
+        doc.save_to_file(this->_path.c_str(), 0);
 #endif /* USE_LIBXMLPP */
     }
 #ifdef USE_LIBXMLPP
