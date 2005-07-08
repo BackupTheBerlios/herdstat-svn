@@ -133,13 +133,13 @@ namespace util
 	        if (this->_str)
 	        {
 		    std::size_t len = regerror(this->_err, this->_re, NULL, 0);
-		    char *buf = (char *)std::malloc(len);
+                    char *buf = new char[len];
 		    if (not buf)
 		        throw msg_base_E("Failed to allocate memory.");
 
 		    regerror(this->_err, this->_re, buf, len);
 		    string s(buf);
-		    std::free(buf);
+                    delete[] buf;
 		    return s.c_str();
 	        }
 

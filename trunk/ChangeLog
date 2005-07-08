@@ -1,5 +1,9 @@
 ChangeLog for herdstat
 
+2005-07-08 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/util_exceptions.hh: Use new[]/delete[] instead of malloc/free.
+
 2005-07-03 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/herds_xml_handler.cc: missed a LOCALSTATEDIR usage.
