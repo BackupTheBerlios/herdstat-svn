@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-07-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/Makefile.am, src/Makefile.am, tests/src/Makefile.am: Added
+	-Werror to AM_CXXFLAGS.
+	* src/pkgcache.cc, src/pkgcache.hh, src/querycache.cc,
+	src/querycache.hh, src/pkgquery.cc, src/pkgquery.hh,
+	src/querycache_xml_handler.cc, src/querycache_xml_handler.hh,
+	src/metacache.cc, src/metacache.hh: Cache PORTDIR_OVERLAY in addition
+	to PORTDIR, so that the caches will be regenerated if a different
+	PORTDIR_OVERLAY is specified.
+
 2005-07-08 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/util_exceptions.hh: Use new[]/delete[] instead of malloc/free.

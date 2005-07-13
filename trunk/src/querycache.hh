@@ -33,8 +33,8 @@
 #include "herds_xml.hh"
 
 /*
- * Represents a cache of package query
- * results (produced by action_pkg_handler_T::search()).
+ * Represents a package query results
+ * (produced by action_pkg_handler_T::search()).
  */
 
 class querycache_T : public std::vector<pkgQuery_T>

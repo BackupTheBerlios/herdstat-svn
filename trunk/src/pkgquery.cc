@@ -27,6 +27,14 @@
 #include "formatter.hh"
 #include "pkgquery.hh"
 
+pkgQuery_T::pkgQuery_T(const util::string &n, const util::string &w, bool dev)
+    : info(n), query(n), with(w), portdir(optget("portdir", util::string)),
+      overlays(optget("portage.config", portage::config_T).overlays()),
+      type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
+{
+
+}
+
 void
 pkgQuery_T::dump(std::ostream &stream) const
 {
@@ -69,12 +77,15 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
         this->type, that.type, (this->type == that.type));
     debug_msg("   this->portdir(%s) == that.portdir(%s) ? %d",
         this->portdir.c_str(), that.portdir.c_str(), (this->portdir == that.portdir));
+    debug_msg("   this->overlays == that.overlays ? %d",
+            (this->overlays == that.overlays));
 
     return  /* normal lookup */
             ((this->query == that.query) and
              (this->with  == that.with) and
              (this->type  == that.type) and
-             (this->portdir == that.portdir))
+             (this->portdir == that.portdir) and
+             (this->overlays == that.overlays))
 
             or
             

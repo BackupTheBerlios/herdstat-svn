@@ -33,11 +33,13 @@
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
 pkgcache_T::pkgcache_T()
-    : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE) { }
+    : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE),
+      _overlays(optget("portage.config", portage::config_T).overlays()) { }
 
 pkgcache_T::pkgcache_T(const util::string &portdir)
     : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE),
-      _portdir(portdir)
+      _portdir(portdir),      
+      _overlays(optget("portage.config", portage::config_T).overlays())
 {
     util::cache_T<value_type>::init();
 }
@@ -109,6 +111,13 @@ pkgcache_T::valid() const
         std::string line;
         valid = (std::getline(stream, line) and
                 (line == (std::string("portdir=")+this->_portdir)));
+
+        if (valid)
+        {
+            valid = (std::getline(stream, line) and
+                    (line == (std::string("overlays=") +
+                              util::join(this->_overlays, ':'))));
+        }
     }
 
     debug_msg("pkgcache is valid? %d", valid);
@@ -177,11 +186,13 @@ pkgcache_T::load()
     if (not stream)
         throw util::bad_fileobject_E(this->path());
 
+    /* ignore first two lines, it's just used for validating the cache */
+    std::string line;
+    std::getline(stream, line);
+    std::getline(stream, line);
+
     std::copy(std::istream_iterator<util::string>(stream),
         std::istream_iterator<util::string>(), std::back_inserter(*this));
-
-    /* ignore first line, it's just used for validating the cache */
-    this->erase(this->begin());
 }
 
 /*
@@ -192,11 +203,12 @@ void
 pkgcache_T::dump()
 {
     std::ofstream stream(this->path().c_str());
-    if (not stream.is_open())
+    if (not stream)
         throw util::bad_fileobject_E(this->path());
 
     /* this cache came from this->_portdir */
     stream << "portdir=" << this->_portdir << std::endl;
+    stream << "overlays=" << util::join(this->_overlays, ':') << std::endl;
 
     std::copy(this->begin(), this->end(),
         std::ostream_iterator<util::string>(stream, "\n"));

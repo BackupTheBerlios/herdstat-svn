@@ -42,13 +42,13 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
 #ifdef USE_LIBXMLPP
             if (pos->name == "date")
                 cur_date = pos->value;
-            else if (pos->name == "portdir")
-                cur_pd = pos->value;
+//            else if (pos->name == "portdir")
+//                cur_pd = pos->value;
 #else /* USE_LIBXMLPP */
             if (pos->first == "date")
                 cur_date = pos->second;
-            else if (pos->first == "portdir")
-                cur_pd = pos->second;
+//            else if (pos->first == "portdir")
+//                cur_pd = pos->second;
 #endif /* USE_LIBXMLPP */
         }
     }
@@ -58,6 +58,10 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
         in_with = true;
     else if (name == "type" and in_query)
         in_type = true;
+    else if (name == "portdir" and in_query)
+        in_portdir = true;
+    else if (name == "overlays" and in_query)
+        in_overlays = true;
     else if (name == "results" and in_query)
         in_results = true;
     else if (name == "pkg" and in_results)
@@ -98,6 +102,10 @@ querycacheXMLHandler_T::END_ELEMENT(const string_type &name)
         in_with = false;
     else if (name == "type")
         in_type = false;
+    else if (name == "portdir")
+        in_portdir = false;
+    else if (name == "overlays")
+        in_overlays = false;
     else if (name == "results")
         in_results = false;
     else if (name == "pkg")
@@ -115,13 +123,16 @@ querycacheXMLHandler_T::CHARACTERS(const string_type &text)
     {
         queries.push_back(pkgQuery_T(text));
         queries.back().date = std::strtol(cur_date.c_str(), NULL, 10);
-        queries.back().portdir = cur_pd;
     }
     else if (in_with)
         queries.back().with = text;
     else if (in_type)
         queries.back().type =
             (text == "dev" ? QUERYTYPE_DEV : QUERYTYPE_HERD);
+    else if (in_portdir)
+        queries.back().portdir = text;
+    else if (in_overlays)
+        queries.back().overlays = util::split(text, ':');
     else if (in_pkg)
         (queries.back())[cur_pkg] = text;
 

@@ -46,6 +46,7 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
 
     private:
         util::string _portdir;
+        std::vector<util::string> _overlays;
 };
 
 #endif

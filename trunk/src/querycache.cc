@@ -165,7 +165,6 @@ querycache_T::dump()
             xmlpp::Element *query_node = root->add_child("query");
             query_node->set_attribute("date",
                 util::sprintf("%lu", static_cast<unsigned long>(i->date)));
-            query_node->set_attribute("portdir", i->portdir);
 
             /* <criteria> */
             xmlpp::Element *criteria_node = query_node->add_child("criteria");
@@ -182,6 +181,14 @@ querycache_T::dump()
             xmlpp::Element *type_node = criteria_node->add_child("type");
             type_node->set_child_text(i->type == QUERYTYPE_DEV ? "dev":"herd");
 
+            /* <portdir> */
+            xmlpp::Element *pd_node = criteria_node->add_child("portdir");
+            pd_node->set_child_text(i->portdir);
+
+            /* <overlays> */
+            xmlpp::Element *ov_node = criteria_node->add_child("overlays");
+            ov_node->set_child_text(util::join(i->overlays, ':'));
+
             /* <results> */
             xmlpp::Element *results_node = query_node->add_child("results");
             results_node->set_attribute("total",
@@ -192,7 +199,6 @@ querycache_T::dump()
             xml::node query("query");
             query.get_attributes().insert("date",
                 util::sprintf("%lu", static_cast<unsigned long>(i->date)).c_str());
-            query.get_attributes().insert("portdir", i->portdir.c_str());
 
             xml::node::iterator it = root.insert(root.begin(), query);
 
@@ -200,6 +206,9 @@ querycache_T::dump()
             cri_node.push_back(xml::node("string", i->query.c_str()));
             cri_node.push_back(xml::node("with", i->with.c_str()));
             cri_node.push_back(xml::node("type", i->type == QUERYTYPE_DEV? "dev":"herd"));
+            cri_node.push_back(xml::node("portdir", i->portdir.c_str()));
+            cri_node.push_back(xml::node("overlays",
+                util::join(i->overlays, ':').c_str()));
             it->push_back(cri_node);
 
             it = root.begin();

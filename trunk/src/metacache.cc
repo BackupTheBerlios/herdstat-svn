@@ -37,7 +37,11 @@
 
 metacache_T::metacache_T(const util::string &portdir)
     : util::cache_T<value_type>(optget("localstatedir", util::string)+METACACHE),
-      _portdir(portdir) { }
+      _portdir(portdir),
+      _overlays(optget("portage.config", portage::config_T).overlays())
+{
+
+}
 
 /*
  * Is the cache valid?
@@ -124,6 +128,13 @@ metacache_T::valid() const
         if (valid)
             valid = (std::getline(stream, line) and
                     (line == (std::string("portdir=")+this->_portdir)));
+
+        if (valid)
+        {
+            valid = (std::getline(stream, line) and
+                    (line == (std::string("overlays=") +
+                              util::join(this->_overlays, ':'))));
+        }
     }
 
     debug_msg("metadata cache is valid? %d", valid);
@@ -265,6 +276,7 @@ metacache_T::dump()
 
     f << "version=" << VERSION << std::endl;
     f << "portdir=" << this->_portdir << std::endl;
+    f << "overlays=" << util::join(this->_overlays, ':') << std::endl;
     f << "size=" << this->size() << std::endl;
 
     /* for each metadata_T object */

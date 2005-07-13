@@ -44,6 +44,7 @@ class pkgcache_T : public util::cache_T<std::vector<util::string> >
 
     private:
         util::string _portdir;
+        std::vector<util::string> _overlays;
 };
 
 #endif
