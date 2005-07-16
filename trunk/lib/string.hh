@@ -28,6 +28,7 @@
 #endif
 
 #include <vector>
+#include <sstream>
 
 #ifdef UNICODE
 # include <glib/gtypes.h>
@@ -151,6 +152,17 @@ namespace util
      * @returns Resulting string object.
      */
     string unhtmlify(const string &s);
+
+    /************************************************************************/
+
+    template <typename T>
+    inline string
+    stringify(const T &v)
+    {
+        std::ostringstream os;
+        os << v;
+        return os.str();
+    }
 }
 
 #endif

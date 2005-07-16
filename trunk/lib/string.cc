@@ -28,7 +28,6 @@
 #include <iterator>
 #include <vector>
 #include <map>
-#include <sstream>
 #include <cstdarg>
 #include <cstring>
 
@@ -289,15 +288,6 @@ util::split(const string &str, const string::value_type delim, bool append_empty
 	lpos = ++pos;
     }
     return vec;
-}
-/*****************************************************************************/
-template <typename T>
-util::string
-util::stringify(const T &v)
-{
-    std::ostringstream os;
-    os << v;
-    return os.str();
 }
 /*****************************************************************************/
 template <typename T>
