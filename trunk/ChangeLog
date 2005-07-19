@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-07-19 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/string.hh: Add cstdarg include (failure on uclibc).  Thanks to
+	SpanKY for pointing it out.
+
 2005-07-16 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/string.cc, lib/string.hh: Define stringify<> inline instead of

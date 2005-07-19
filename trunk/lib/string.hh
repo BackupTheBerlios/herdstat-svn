@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <sstream>
+#include <cstdarg>
 
 #ifdef UNICODE
 # include <glib/gtypes.h>
@@ -45,22 +46,24 @@ namespace util
      */
 
 #ifdef UNICODE
+
     class string : public Glib::ustring
     {
         public:
             typedef Glib::ustring base_type;
+            string(const std::string &n) : base_type(n) { }
+
 #else /* UNICODE */
+
     class string : public std::string
     {
         public:
             typedef std::string base_type;
+
 #endif /* UNICODE */
             explicit string() : base_type() { }
             string(const char *n) : base_type(n) { }
             string(const base_type &n) : base_type(n) { }
-#ifdef UNICODE
-            string(const std::string &n) : base_type(n) { }
-#endif
             string(const string &n) : base_type(n) { }
 
             virtual ~string() { }
