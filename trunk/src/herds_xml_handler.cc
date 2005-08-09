@@ -297,7 +297,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
     {
         herd_type::iterator i = herds[cur_herd]->find(cur_dev);
         if (i != herds[cur_herd]->end())
-            i->second->name = str;
+            i->second->name += str;
     }
 
     /* <maintainer><role> */

@@ -1,5 +1,14 @@
 ChangeLog for herdstat
 
+2005-08-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herds_xml_handler.cc: Append to developer name instead of
+	overwriting it as the SAX2 implementation does not guarantee that the
+	characters callback will be invoked only once.  This fixes the
+	long-time herdstat bug that caused developer names with non-ASCII
+	characters to be truncated (since the second invocation of the
+	callback would overwrite what was stored on the first invocation).
+
 2005-07-19 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/string.hh: Add cstdarg include (failure on uclibc).  Thanks to
