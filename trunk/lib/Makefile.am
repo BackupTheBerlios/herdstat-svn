@@ -16,8 +16,8 @@ libutil_la_SOURCES = util_exceptions.hh \
 		     portage_version.hh portage_version.cc \
 		     portage_find.hh portage_find.cc
 
-LIBS = @LIBS@ @TERMCAP_LIBS@ @GLIBMM_LIBS@
-AM_CXXFLAGS = -pedantic -ansi -Wall @GLIBMM_CFLAGS@
+LIBS = @LIBS@ @TERMCAP_LIBS@
+AM_CXXFLAGS = -pedantic -ansi -Wall
 
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 
