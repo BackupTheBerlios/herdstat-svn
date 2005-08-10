@@ -1,6 +1,12 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_p4:
+    THE UTF-8 BUG IS FIXED (Not the glib one)! Even better, I've been able
+    to get it to work with xmlwrapp and std::string, which means we no longer
+    need to depend on glib,glibmm,libsigc++ just for Glib::ustring (which of
+    course didnt work anyways).
+
 1.1.1_p3:
     Added a few more tests.
 

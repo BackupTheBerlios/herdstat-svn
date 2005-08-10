@@ -1,5 +1,9 @@
 ChangeLog for herdstat
 
+2005-08-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.1_p4).
+
 2005-08-09 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/herds_xml_handler.cc: Append to developer name instead of
