@@ -27,8 +27,10 @@
 # include "config.h"
 #endif
 
-#include "string.hh"
-#include "file.hh"
+/**
+ * @file cache.hh
+ * @brief Defines the abstrace cache interface.
+ */
 
 namespace util
 {
@@ -37,38 +39,28 @@ namespace util
      * is the container type in which the data will be stored.
      */
 
-    template <class C>
-    class cache_T : public C
+    template <class T>
+    class cache
     {
         public:
-            typedef util::string string_type;
-            typedef C value_type;
-
-            /** Constructor
-             * @param p Path to file that contains cached data.
-             */
-            cache_T(const string_type &p) : _path(p) { }
-            virtual ~cache_T() { }
+            virtual ~cache() { }
 
             /** Determine whether cache is valid.
-             * @returns A boolean value.
+             * @returns True if valid.
              */
             virtual bool valid() const = 0;
 
             /// Fill cache with data.
             virtual void fill() = 0;
 
-            /// Load cache from disk.
+            /// Load cache.
             virtual void load() = 0;
 
-            /// Dump cache to disk.
+            /// Dump cache.
             virtual void dump() = 0;
 
-            /// Get our path.
-            const string_type &path() const { return this->_path; }
-
         protected:
-            /// Initialize cache.
+            /// Default logic implementation.
             virtual void init()
             {
                 if (this->valid())
@@ -80,8 +72,8 @@ namespace util
                 }
             }
 
-            /// Path to file containing cached data
-            const string_type _path;
+        private:
+            T container;
     };
 }
 

@@ -72,10 +72,10 @@ action_find_handler_T::operator() (opts_type &opts)
             matches.insert(std::make_pair("", *i));
     }
 
-    std::multimap<util::string, util::string>::iterator m;
+    std::multimap<std::string, std::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
-        std::pair<util::string, util::string> p;
+        std::pair<std::string, std::string> p;
 
         try
         {
@@ -129,7 +129,7 @@ action_find_handler_T::operator() (opts_type &opts)
         else
         {
             std::copy(results.begin(), results.end(), 
-                std::ostream_iterator<util::string>(*stream, "\n"));
+                std::ostream_iterator<std::string>(*stream, "\n"));
         }
     }
 

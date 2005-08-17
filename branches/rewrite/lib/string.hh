@@ -77,7 +77,7 @@ namespace util
              *               (defaults to false).
              * @returns      A vector of sub-strings.
              */
-            virtual std::vector<util::string>
+            virtual std::vector<std::string>
             split(const value_type delim = ' ', bool append = false) const;
     };
 
@@ -99,11 +99,11 @@ namespace util
 
     /// sprintf() wrapper
 #ifdef UNICODE
-    util::string sprintf(const gchar *, ...);
-    util::string sprintf(const gchar *, va_list);
+    std::string sprintf(const gchar *, ...);
+    std::string sprintf(const gchar *, va_list);
 #else /* UNICODE */
-    util::string sprintf(const char *, ...);
-    util::string sprintf(const char *, va_list);
+    std::string sprintf(const char *, ...);
+    std::string sprintf(const char *, va_list);
 #endif /* UNICODE */
 
     /** Split string.

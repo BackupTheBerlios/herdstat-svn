@@ -41,8 +41,8 @@
 #include "string.hh"
 #include "util_exceptions.hh"
 
-inline std::vector<util::string>
-util::string::split(const string::value_type delim, bool append_only) const
+inline std::vector<std::string>
+std::string::split(const string::value_type delim, bool append_only) const
 {
     return util::split(*this, delim, append_only);
 }
@@ -50,7 +50,7 @@ util::string::split(const string::value_type delim, bool append_only) const
 /*****************************************************************************
  * Convert the given character to (lower|upper)case                          *
  *****************************************************************************/
-util::string::value_type
+std::string::value_type
 util::tolower(const string::value_type c)
 {
 #ifdef UNICODE
@@ -59,7 +59,7 @@ util::tolower(const string::value_type c)
     return std::tolower(c, std::locale(""));
 #endif
 }
-util::string::value_type
+std::string::value_type
 util::toupper(const string::value_type c)
 {
 #ifdef UNICODE
@@ -80,14 +80,14 @@ util::isdigit(const string::value_type c)
 /*****************************************************************************
  * Convert the given string to all lowercase.                                *
  *****************************************************************************/
-util::string
-util::lowercase(const util::string &s)
+std::string
+util::lowercase(const std::string &s)
 {
     if (s.empty())
 	return "";
 
-    util::string result;
-    util::string::const_iterator i = s.begin(), e = s.end();
+    std::string result;
+    std::string::const_iterator i = s.begin(), e = s.end();
     for (; i != e ; ++i)
         result.push_back(util::tolower(*i));
     
@@ -98,8 +98,8 @@ util::lowercase(const util::string &s)
  * trailing/leading whitespace, and convert any \n's to spaces).             *
  *****************************************************************************/
 bool
-bothspaces(util::string::value_type c1,
-           util::string::value_type c2)
+bothspaces(std::string::value_type c1,
+           std::string::value_type c2)
 {
 #ifdef UNICODE
     return Glib::Unicode::isspace(c1) and
@@ -116,38 +116,38 @@ bothspaces(util::string::value_type c1,
 #endif /* UNICODE */
 }
 
-util::string
-util::tidy_whitespace(const util::string &s)
+std::string
+util::tidy_whitespace(const std::string &s)
 {
     if (s.empty())
 	return "";
 
-    util::string result;
+    std::string result;
 
     /* collapse whitespace */
     std::unique_copy(s.begin(), s.end(), std::back_inserter(result),
         bothspaces);
 
     /* remove any leading whitespace */
-    util::string::size_type pos = result.find_first_not_of(" \t\n");
-    if (pos != util::string::npos)
+    std::string::size_type pos = result.find_first_not_of(" \t\n");
+    if (pos != std::string::npos)
 	result.erase(0, pos);
 
     /* convert any newlines in the middle to a space */
-    util::string result2;
-    util::string::iterator i = result.begin(), e = result.end();
+    std::string result2;
+    std::string::iterator i = result.begin(), e = result.end();
     for (; i != e ; ++i)
         result2.push_back(*i == '\n' ? ' ' : *i);
 
     /* remove any trailing whitespace */
     pos = result2.find_last_not_of(" \t\n");
-    if (pos != util::string::npos)
+    if (pos != std::string::npos)
 	result2.erase(++pos);
 	
     return result2;
 }
 /*****************************************************************************/
-util::string
+std::string
 #ifdef UNICODE
 util::sprintf(const gchar *fmt, ...)
 #else /* UNICODE */
@@ -156,12 +156,12 @@ util::sprintf(const char *fmt, ...)
 {
     va_list v;
     va_start(v, fmt);
-    util::string s(util::sprintf(fmt, v));
+    std::string s(util::sprintf(fmt, v));
     va_end(v);
     return s;
 }
 /*****************************************************************************/
-util::string
+std::string
 #ifdef UNICODE
 util::sprintf(const gchar *fmt, va_list v)
 {
@@ -174,19 +174,19 @@ util::sprintf(const char *fmt, va_list v)
     vasprintf(&buf, fmt, v);
 #endif /* UNICODE */
     
-    util::string s(buf);
+    std::string s(buf);
     free(buf);
     return s;
 }
 /*****************************************************************************
  * HTMLify the given string (replace any occurrences of &,>,<)               *
  *****************************************************************************/
-util::string
-util::htmlify(const util::string &str)
+std::string
+util::htmlify(const std::string &str)
 {
-    util::string result(str);
-    std::map<util::string, util::string> sr;
-    std::map<util::string, util::string>::iterator i, e;
+    std::string result(str);
+    std::map<std::string, std::string> sr;
+    std::map<std::string, std::string>::iterator i, e;
     sr["&"] = "&amp;";
     sr[">"] = "&gt;";
     sr["<"] = "&lt;";
@@ -194,11 +194,11 @@ util::htmlify(const util::string &str)
     i = sr.begin(), e = sr.end();
     for (; i != e ; ++i)
     {
-	util::string::size_type pos, lpos = 0;
+	std::string::size_type pos, lpos = 0;
 	while (true)
 	{
 	    pos = result.find(i->first, lpos);
-	    if (pos == util::string::npos)
+	    if (pos == std::string::npos)
 		break;
 
 	    if (result.substr(pos, pos + i->second.length()) == i->second)
@@ -214,12 +214,12 @@ util::htmlify(const util::string &str)
 /*****************************************************************************
  * unHTMLify the given string (replace occurrences of &amp;,&gt;,&;lt;       *
  *****************************************************************************/
-util::string
-util::unhtmlify(const util::string &str)
+std::string
+util::unhtmlify(const std::string &str)
 {
-    util::string result(str);
-    std::map<util::string, util::string> sr;
-    std::map<util::string, util::string>::iterator i, e;
+    std::string result(str);
+    std::map<std::string, std::string> sr;
+    std::map<std::string, std::string>::iterator i, e;
     sr["&amp;"] = "&";
     sr["&gt;"] = ">";
     sr["&lt;"] = "<";
@@ -227,11 +227,11 @@ util::unhtmlify(const util::string &str)
     i = sr.begin(), e = sr.end();
     for (; i != e ; ++i)
     {
-	util::string::size_type pos, lpos = 0;
+	std::string::size_type pos, lpos = 0;
 	while (true)
 	{
 	    pos = result.find(i->first, lpos);
-	    if (pos == util::string::npos)
+	    if (pos == std::string::npos)
 		break;
 
 	    result.replace(pos, i->first.length(), i->second,
@@ -246,13 +246,13 @@ util::unhtmlify(const util::string &str)
 /*****************************************************************************
  * Convert a vector of string to one string.                                 *
  *****************************************************************************/
-util::string
-util::join(const std::vector<util::string> &v,
-                const util::string::value_type delim)
+std::string
+util::join(const std::vector<std::string> &v,
+                const std::string::value_type delim)
 {
-    util::string result;
+    std::string result;
 
-    std::vector<util::string>::const_iterator i = v.begin(), e = v.end();
+    std::vector<std::string>::const_iterator i = v.begin(), e = v.end();
     for (; i != e ; ++i)
     {
         result += *i;
@@ -264,10 +264,10 @@ util::join(const std::vector<util::string> &v,
     return result;
 }
 /*****************************************************************************/
-std::vector<util::string>
+std::vector<std::string>
 util::split(const string &str, const string::value_type delim, bool append_empty)
 {
-    std::vector<util::string> vec;
+    std::vector<std::string> vec;
     string::size_type pos, lpos = 0;
     
     while (true)
@@ -292,7 +292,7 @@ util::split(const string &str, const string::value_type delim, bool append_empty
 /*****************************************************************************/
 template <typename T>
 T
-util::destringify(const util::string &s)
+util::destringify(const std::string &s)
 {
     std::istringstream is(s.c_str());
 

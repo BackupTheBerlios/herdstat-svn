@@ -43,7 +43,7 @@ rc_T::rc_T()
     char *result = std::getenv("HOME");
     if (result)
     {
-        util::path_T path(util::string(result) + HERDSTATRC_LOCAL);
+        std::string path(std::string(result) + HERDSTATRC_LOCAL);
         if (not path.exists())
             return;
 
@@ -58,7 +58,7 @@ rc_T::rc_T()
 void
 rc_T::set_options()
 {
-    util::string s;
+    std::string s;
 
     if (not vars["colors"].empty())
     {
@@ -69,9 +69,9 @@ rc_T::set_options()
 	    optset("color", bool, true);
     }
     if (not vars["label.color"].empty())
-	optset("label.color", util::string, vars["label.color"]);
+	optset("label.color", std::string, vars["label.color"]);
     if (not vars["highlight.color"].empty())
-	optset("highlight.color", util::string, vars["highlight.color"]);
+	optset("highlight.color", std::string, vars["highlight.color"]);
     if (not vars["qa"].empty())
     {
 	s = vars["qa"];
@@ -81,7 +81,7 @@ rc_T::set_options()
 	    optset("qa", bool, true);
     }
     if (not vars["herdsxml"].empty())
-	optset("herds.xml", util::string, vars["herdsxml"]);
+	optset("herds.xml", std::string, vars["herdsxml"]);
     if (not vars["use.devaway"].empty())
     {
 	s = vars["use.devaway"];
@@ -94,7 +94,7 @@ rc_T::set_options()
 	optset("devaway.expire", long,
 	    std::strtol(vars["devaway.expire"].c_str(), NULL, 10));
     if (not vars["devaway.location"].empty())
-        optset("devaway.location", util::string, vars["devaway.location"]);
+        optset("devaway.location", std::string, vars["devaway.location"]);
     if (not vars["use.metacache"].empty())
     {
 	s = vars["use.metacache"];
@@ -104,7 +104,7 @@ rc_T::set_options()
 	    optset("metacache", bool, true);
     }
     if (not vars["metacache.expire"].empty())
-	optset("metacache.expire", util::string, vars["metacache.expire"]);
+	optset("metacache.expire", std::string, vars["metacache.expire"]);
     if (not vars["use.querycache"].empty())
     {
 	s = vars["use.querycache"];
@@ -120,10 +120,10 @@ rc_T::set_options()
 	optset("querycache.expire", long,
 	    std::strtol(vars["querycache.expire"].c_str(), NULL, 10));
     if (not vars["wget.options"].empty())
-	optset("wget.options", util::string, vars["wget.options"]);
+	optset("wget.options", std::string, vars["wget.options"]);
 
     if (not vars["highlights"].empty())
-        optset("highlights", util::string, vars["highlights"]);
+        optset("highlights", std::string, vars["highlights"]);
 }
 
 /* vim: set tw=80 sw=4 et : */

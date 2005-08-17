@@ -33,11 +33,11 @@
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
 pkgcache_T::pkgcache_T()
-    : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE),
+    : util::cache_T<value_type>(optget("localstatedir", std::string)+PKGCACHE),
       _overlays(optget("portage.config", portage::config_T).overlays()) { }
 
-pkgcache_T::pkgcache_T(const util::string &portdir)
-    : util::cache_T<value_type>(optget("localstatedir", util::string)+PKGCACHE),
+pkgcache_T::pkgcache_T(const std::string &portdir)
+    : util::cache_T<value_type>(optget("localstatedir", std::string)+PKGCACHE),
       _portdir(portdir),      
       _overlays(optget("portage.config", portage::config_T).overlays())
 {
@@ -45,7 +45,7 @@ pkgcache_T::pkgcache_T(const util::string &portdir)
 }
 
 void
-pkgcache_T::init(const util::string &portdir)
+pkgcache_T::init(const std::string &portdir)
 {
     this->_portdir.assign(portdir);
     util::cache_T<value_type>::init();
@@ -58,23 +58,23 @@ pkgcache_T::init(const util::string &portdir)
 bool
 pkgcache_T::valid() const
 {
-    const util::stat_T pkgcache(this->path());
+    const util::stat pkgcache(this->path());
     bool valid = false;
 
-    const util::string expire(optget("metacache.expire", util::string));
-    const util::string lastsync(optget("localstatedir", util::string)+LASTSYNC);
+    const std::string expire(optget("metacache.expire", std::string));
+    const std::string lastsync(optget("localstatedir", std::string)+LASTSYNC);
 
     if (pkgcache.exists())
     {
         if (expire == "lastsync")
         {
-            const util::string path(this->_portdir + "/metadata/timestamp");
+            const std::string path(this->_portdir + "/metadata/timestamp");
             bool has_timestamp = util::is_file(path);
             bool has_lastsync  = util::is_file(lastsync);
 
             if (has_timestamp and has_lastsync)
             {
-                util::file_T t(path), l(lastsync);
+                util::file t(path), l(lastsync);
                 valid = (t == l);
                 if (not valid)
                 {
@@ -139,8 +139,8 @@ pkgcache_T::fill()
     const portage::categories_T categories(this->_portdir,
         optget("qa", bool));
 
-    std::vector<util::string>::iterator i, e;
-    std::vector<util::string> dirs = 
+    std::vector<std::string>::iterator i, e;
+    std::vector<std::string> dirs = 
         optget("portage.config", portage::config_T).overlays();
     dirs.insert(dirs.begin(), this->_portdir);
 
@@ -151,16 +151,16 @@ pkgcache_T::fill()
         e = dirs.end();
         for (i = dirs.begin() ; i != e ; ++i)
         {
-            const util::path_T cat(*i + "/" + (*c));
+            const std::string cat(*i + "/" + (*c));
             if (not cat.exists())
                 continue;
 
             /* for each directory in category */
-            const util::dir_T category(cat);
-            util::dir_T::const_iterator d , de = category.end();
+            const util::dir category(cat);
+            util::dir::const_iterator d , de = category.end();
             for (d = category.begin() ; d != de ; ++d)
             {
-                util::string pkg(util::sprintf("%s/%s", c->c_str(), d->basename()));
+                std::string pkg(util::sprintf("%s/%s", c->c_str(), d->basename()));
                 if ((*i == this->_portdir) or 
                     (std::find(this->begin(), this->end(), pkg) == this->end()))
                     this->push_back(pkg);
@@ -191,8 +191,8 @@ pkgcache_T::load()
     std::getline(stream, line);
     std::getline(stream, line);
 
-    std::copy(std::istream_iterator<util::string>(stream),
-        std::istream_iterator<util::string>(), std::back_inserter(*this));
+    std::copy(std::istream_iterator<std::string>(stream),
+        std::istream_iterator<std::string>(), std::back_inserter(*this));
 }
 
 /*
@@ -211,7 +211,7 @@ pkgcache_T::dump()
     stream << "overlays=" << util::join(this->_overlays, ':') << std::endl;
 
     std::copy(this->begin(), this->end(),
-        std::ostream_iterator<util::string>(stream, "\n"));
+        std::ostream_iterator<std::string>(stream, "\n"));
 }
 
 /* vim: set tw=80 sw=4 et : */

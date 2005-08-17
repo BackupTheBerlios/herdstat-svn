@@ -34,7 +34,7 @@
 class parsable_T
 {
     public:
-        typedef util::path_T string_type;
+        typedef std::string string_type;
         typedef util::timer_T timer_type;
 
         parsable_T() { }

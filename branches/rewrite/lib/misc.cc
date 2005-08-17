@@ -74,32 +74,32 @@ util::debug(const char *fmt, ...)
     va_list v;
     va_start(v, fmt);
 
-    util::string s(util::sprintf(fmt, v));
+    std::string s(util::sprintf(fmt, v));
     std::cerr << "!!! " << s << std::endl;
     
     va_end(v);
 #endif /* DEBUG */
 }
 /****************************************************************************/
-util::string
+std::string
 util::getcwd()
 {
     char *pwd = ::getcwd(NULL, 0);
     if (not pwd)
 	throw util::errno_E("getcwd");
 
-    util::string s(pwd);
+    std::string s(pwd);
     std::free(pwd);
     return s;
 }
 /****************************************************************************
  * Given an email address, return the username.                             *
  ****************************************************************************/
-util::string
-util::get_user_from_email(const util::string &email)
+std::string
+util::get_user_from_email(const std::string &email)
 {
-    util::string::size_type pos = email.find('@');
-    if (pos == util::string::npos)
+    std::string::size_type pos = email.find('@');
+    if (pos == std::string::npos)
         return email;
 
     return email.substr(0, pos);
@@ -110,20 +110,20 @@ util::get_user_from_email(const util::string &email)
  * since a developer might use a different username than what his           *
  * developer username is.                                                   *
  ****************************************************************************/
-util::string
+std::string
 util::current_user()
 {
-    util::string user;
-    util::string::size_type pos;
+    std::string user;
+    std::string::size_type pos;
 
     char *result = std::getenv("ECHANGELOG_USER");
     if (result)
     {
 	user = result;
-	if ((pos = user.find('<')) != util::string::npos)
+	if ((pos = user.find('<')) != std::string::npos)
 	{
 	    user = user.substr(pos + 1);
-	    if ((pos = user.find('>')) != util::string::npos)
+	    if ((pos = user.find('>')) != std::string::npos)
 		user = user.substr(0, pos);
 	}
 	else
@@ -141,7 +141,7 @@ util::current_user()
  * Try to determine the columns of the current terminal; use                *
  * a sensible default if we can't get it for some reason.                   *
  ****************************************************************************/
-util::string::size_type
+std::string::size_type
 util::getcols()
 {
 #ifdef USE_TERMCAP
@@ -171,7 +171,7 @@ util::getcols()
 
 #else /* USE_TERMCAP */
 
-    util::string output;
+    std::string output;
     FILE *p = popen("stty size 2>/dev/null", "r");
     if (p)
     {
@@ -183,8 +183,8 @@ util::getcols()
 
     if (not output.empty())
     {
-	util::string::size_type pos;
-	if ((pos = output.find(" ")) != util::string::npos)
+	std::string::size_type pos;
+	if ((pos = output.find(" ")) != std::string::npos)
 	    return std::atoi(output.substr(pos).c_str());
     }
 
@@ -193,10 +193,10 @@ util::getcols()
     return 78;
 }
 /****************************************************************************/
-const util::string
+const std::string
 util::format_date(const std::time_t &epoch, const char *fmt)
 {
-    util::string date;
+    std::string date;
 
     if (epoch != 0)
     {
@@ -208,8 +208,8 @@ util::format_date(const std::time_t &epoch, const char *fmt)
     return (date.empty() ? "(no date)" : date);
 }
 
-const util::string
-util::format_date(const util::string &epoch, const char *fmt)
+const std::string
+util::format_date(const std::string &epoch, const char *fmt)
 {
     return format_date(std::strtol(epoch.c_str(), NULL, 10), fmt);
 }

@@ -95,12 +95,12 @@ formatter_T::add_highlights(const std::vector<string_type> &pairs)
         std::vector<string_type> parts(i->split(','));
         if (parts.size() == 1)
         {
-            util::string c(attr.colors? attr.highlight_color : "");
+            std::string c(attr.colors? attr.highlight_color : "");
             attr.highlights[parts.front()] = c;
         }
         else if (parts.size() == 2)
         {
-            util::string c(attr.colors? color[parts.back()] : "");
+            std::string c(attr.colors? color[parts.back()] : "");
             attr.highlights[parts.front()] = c;
         }
         else
@@ -135,7 +135,7 @@ formatter_T::highlight(const std::vector<string_type> &data)
             }
             else if (pos != string_type::npos)
             {
-                util::regex_T regex(h->first.substr(pos+3));
+                util::regex regex(h->first.substr(pos+3));
                 if (regex == *i)
                 {
                     highlight = true;
@@ -296,7 +296,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                         }
                         else if (pos != string_type::npos)
                         {
-                            util::regex_T regex(h->first.substr(pos+3));
+                            util::regex regex(h->first.substr(pos+3));
                             if (regex == *i)
                             {
                                 highlight_found = true;

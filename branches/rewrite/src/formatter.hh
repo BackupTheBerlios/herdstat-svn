@@ -36,7 +36,7 @@ class formatter_T
 {
     public:
         typedef std::size_t size_type;
-        typedef util::string string_type;
+        typedef std::string string_type;
         typedef std::vector<string_type> buffer_type;
         typedef util::color_map_T color_type;
 

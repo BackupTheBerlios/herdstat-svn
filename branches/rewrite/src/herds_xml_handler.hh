@@ -43,7 +43,7 @@ class HerdsXMLHandler_T : public XMLHandler_T
         typedef dev_attrs_T dev_type;
 
         HerdsXMLHandler_T()
-            : localstatedir(optget("localstatedir", util::string))
+            : localstatedir(optget("localstatedir", std::string))
         {
             in_herd = in_herd_name = in_herd_email = in_herd_desc =
             in_maintainer = in_maintainer_name = in_maintainer_email =

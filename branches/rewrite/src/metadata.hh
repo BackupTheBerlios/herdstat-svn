@@ -33,7 +33,7 @@
 class metadata_T
 {
     public:
-        typedef util::string string_type;
+        typedef std::string string_type;
         typedef std::vector<string_type> herds_type;
         typedef herd_T herd_type;
 
@@ -49,9 +49,9 @@ class metadata_T
         void get_pkg_from_path();
         void display() const;
         bool dev_exists(const string_type &) const;
-        bool dev_exists(const util::regex_T &) const;
+        bool dev_exists(const util::regex &) const;
         bool herd_exists(const string_type &) const;
-        bool herd_exists(const util::regex_T &) const;
+        bool herd_exists(const util::regex &) const;
 
         bool is_category;
         string_type path, pkg, longdesc, portdir;

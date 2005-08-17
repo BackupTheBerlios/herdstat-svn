@@ -46,7 +46,7 @@ namespace portage
     class version_string_T
     {
         public:
-            typedef util::string string_type;
+            typedef std::string string_type;
             typedef std::map<string_type, string_type> value_type;
             typedef value_type::iterator iterator;
             typedef value_type::const_iterator const_iterator;
@@ -54,7 +54,7 @@ namespace portage
             /** Constructor.
              * @param path Path to ebuild.
              */
-            version_string_T(const util::path_T &path) : _ebuild(path),
+            version_string_T(const std::string &path) : _ebuild(path),
                 _verstr(util::chop_fileext(path.basename()))
             { this->init(); }
 
@@ -75,7 +75,7 @@ namespace portage
             /** Get path to ebuild for this version.
              * @returns String object.
              */
-            const util::path_T &ebuild() const { return this->_ebuild; }
+            const std::string &ebuild() const { return this->_ebuild; }
 
             /** Determine whether given version_string_T object is less
              * than this one.
@@ -277,7 +277,7 @@ namespace portage
             void parse();
 
             /// Absolute path to ebuild.
-            const util::path_T _ebuild;
+            const std::string _ebuild;
             /// Full version string.
             string_type _verstr;
             /// Version components map.
@@ -326,13 +326,13 @@ namespace portage
              * ebuild existing in the specified package directory.
              * @param path Path to package directory.
              */
-            versions_T(const util::path_T &path) { this->assign(path); }
+            versions_T(const std::string &path) { this->assign(path); }
 
             /** Constructor.  Instantiate version_string_T objects for each
              * ebuild existing in each element (package directories).
              * @param v Vector of package directory paths.
              */
-            versions_T(const std::vector<util::path_T> &v);
+            versions_T(const std::vector<std::string> &v);
 
             virtual ~versions_T();
 
@@ -354,18 +354,18 @@ namespace portage
              * @param p Path.
              * @returns A boolean value (whether insertion succeeded).
              */
-            virtual bool insert(const util::path_T &p);
+            virtual bool insert(const std::string &p);
 
             /** Assign a new package directory clearing any previously
              * contained version_string_T instances.
              * @param p Path to package directory.
              */
-            virtual void assign(const util::path_T &p);
+            virtual void assign(const std::string &p);
 
             /** Append a new package directory.
              * @param p Path to package directory.
              */
-            virtual void append(const util::path_T &p);
+            virtual void append(const std::string &p);
 
         protected:
             /// version_string_T container

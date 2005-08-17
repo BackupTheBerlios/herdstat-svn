@@ -36,11 +36,11 @@
 void
 devaway_T::init()
 {
-    util::path_T file(optget("devaway.location", util::string));
+    std::string file(optget("devaway.location", std::string));
     if (not file.empty())
         this->_path.assign(file);
     
-    util::stat_T devaway(this->path());
+    util::stat devaway(this->path());
     if (not devaway.exists() or
        ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
        or (devaway.size() == 0))
@@ -53,12 +53,12 @@ devaway_T::fetch()
     if (this->_fetched)
         return;
 
-    const util::string path(this->path());
-    util::stat_T devaway;
+    const std::string path(this->path());
+    util::stat devaway;
 
     try
     {
-        if (this->_path.find("http://") == util::path_T::npos)
+        if (this->_path.find("http://") == std::string::npos)
             return;
 
         devaway.assign(this->_local);
@@ -103,37 +103,37 @@ devaway_T::parse(const string_type &path)
         throw util::bad_fileobject_E(this->_path);
 
     std::string s;
-    util::string::size_type beginpos, endpos;
+    std::string::size_type beginpos, endpos;
     while (std::getline(*f, s))
     {
-        util::string line(s), dev, awaymsg;
+        std::string line(s), dev, awaymsg;
 
         /* strip leading whitespace */
         beginpos = line.find_first_not_of(" \t");
-        if (beginpos != util::string::npos)
+        if (beginpos != std::string::npos)
             line.erase(0, beginpos);
 
         if (line.length() < 1)
             continue;
 
         beginpos = line.find(DEVAWAY_USER_TOKEN);
-        if (beginpos == util::string::npos)
+        if (beginpos == std::string::npos)
             continue;
 
         endpos = line.find('<', beginpos);
-        if (endpos == util::string::npos)
+        if (endpos == std::string::npos)
             continue;
 
         dev = line.substr(beginpos+std::strlen(DEVAWAY_USER_TOKEN));
         beginpos = dev.find('<');
-        if (beginpos == util::string::npos)
+        if (beginpos == std::string::npos)
             continue;
 
         dev = dev.substr(0, beginpos);
 //        debug_msg("dev = '%s'", dev.c_str());
 
         beginpos = line.find(DEVAWAY_MSG_TOKEN);
-        if (beginpos == util::string::npos)
+        if (beginpos == std::string::npos)
             continue;
 
         if (line.length() < std::strlen(DEVAWAY_MSG_TOKEN))

@@ -37,7 +37,7 @@
 
 /*****************************************************************************/
 bool
-util::regex_T::operator== (const string_type &cmp) const
+util::regex::operator== (const string_type &cmp) const
 {
     assert(this->_compiled);
 
@@ -49,7 +49,7 @@ util::regex_T::operator== (const string_type &cmp) const
 }
 /*****************************************************************************/
 void
-util::regex_T::assign(const string_type &regex, int cflags, int eflags)
+util::regex::assign(const string_type &regex, int cflags, int eflags)
 {
     if (this->_compiled)
         this->cleanup();
@@ -67,7 +67,7 @@ util::regex_T::assign(const string_type &regex, int cflags, int eflags)
 }
 /*****************************************************************************/
 void
-util::regex_T::cleanup()
+util::regex::cleanup()
 {
     regfree(&(this->_regex));
     this->_compiled = false;

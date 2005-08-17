@@ -45,7 +45,7 @@ class herdstat_msg_base_E               : public herdstat_base_E
     public:
         herdstat_msg_base_E() { }
         herdstat_msg_base_E(const char *msg) : str(msg) { }
-        herdstat_msg_base_E(const util::string &msg) : str(msg.c_str()) { }
+        herdstat_msg_base_E(const std::string &msg) : str(msg.c_str()) { }
         virtual const char *what() const throw() { return str; }
 };
 
@@ -59,7 +59,7 @@ class herdstat_va_base_E                : public herdstat_msg_base_E
         herdstat_va_base_E() { }
         herdstat_va_base_E(const char *msg, va_list v)
             : str(util::sprintf(msg, v).c_str()) { }
-        herdstat_va_base_E(const util::string &msg, va_list v)
+        herdstat_va_base_E(const std::string &msg, va_list v)
             : str(util::sprintf(msg.c_str(), v).c_str()) { }
 
         herdstat_va_base_E(const char *msg, ...)
@@ -69,7 +69,7 @@ class herdstat_va_base_E                : public herdstat_msg_base_E
             va_end(v);
         }
 
-        herdstat_va_base_E(const util::string &msg, ...)
+        herdstat_va_base_E(const std::string &msg, ...)
         {
 #ifdef HAVE_GCC4
             va_start(v, msg);
@@ -102,7 +102,7 @@ class bad_option_cast_E                 : public herdstat_base_bad_cast_E { };
 class invalid_option_E                  : public herdstat_msg_base_E
 {
     public:
-        invalid_option_E(util::string const &msg) : herdstat_msg_base_E(msg) {}
+        invalid_option_E(std::string const &msg) : herdstat_msg_base_E(msg) {}
         virtual const char *what() const throw()
         {
             return util::sprintf("Invalid option '%s'", str).c_str();
@@ -114,10 +114,10 @@ class errno_error_E                     : public herdstat_msg_base_E
     public:
         errno_error_E() { }
         errno_error_E(const char *msg) : herdstat_msg_base_E(msg) { }
-        errno_error_E(const util::string &msg) : herdstat_msg_base_E(msg) { }
+        errno_error_E(const std::string &msg) : herdstat_msg_base_E(msg) { }
         virtual const char *what() const throw()
         {
-            util::string s(str);
+            std::string s(str);
             if (s.empty())
                 return std::strerror(errno);
             return (s + ": " + std::strerror(errno)).c_str();
@@ -129,7 +129,7 @@ class bad_fileobject_E                  : public errno_error_E
     public:
         bad_fileobject_E() { }
         bad_fileobject_E(const char *msg) : errno_error_E(msg) { }
-        bad_fileobject_E(const util::string &msg) : errno_error_E(msg) { }
+        bad_fileobject_E(const std::string &msg) : errno_error_E(msg) { }
 };
 
 class bad_herdsXML_E                    : public herdstat_base_E { };
@@ -171,7 +171,7 @@ class format_E                          : public herdstat_va_base_E
 class XMLWriter_E                       : public herdstat_base_E
 {
     public:
-        typedef util::string string_type;
+        typedef std::string string_type;
 
         XMLWriter_E() { }
         XMLWriter_E(const string_type &f, const string_type &e)

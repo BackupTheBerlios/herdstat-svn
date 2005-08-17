@@ -34,20 +34,20 @@ class fetcher_T
     public:
         fetcher_T() { }
 
-        fetcher_T(const util::string &url, const util::string &file)
+        fetcher_T(const std::string &url, const std::string &file)
         {
             if (this->fetch(url, file) != EXIT_SUCCESS)
                 throw fetch_E();
         }
 
-        void operator() (const util::string &url, const util::string &file)
+        void operator() (const std::string &url, const std::string &file)
         {
             if (this->fetch(url, file) != EXIT_SUCCESS)
                 throw fetch_E();
         }
 
     protected:
-        int fetch(const util::string &, const util::string &);
+        int fetch(const std::string &, const std::string &);
 };
 
 #endif

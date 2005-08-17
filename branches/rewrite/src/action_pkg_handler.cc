@@ -39,7 +39,7 @@
  */
 
 void
-action_pkg_handler_T::error(const util::string &criteria) const
+action_pkg_handler_T::error(const std::string &criteria) const
 {
     if (quiet)
         return;
@@ -64,7 +64,7 @@ action_pkg_handler_T::error(const util::string &criteria) const
  */
 
 static bool
-doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
+doesHerdMatch(metadata_T::herd_type::value_type m, util::regex *r)
 { return *r == util::get_user_from_email(m.first); }
 
 /*
@@ -74,7 +74,7 @@ doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
 
 bool
 action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
-                                       const util::string &criteria)
+                                       const std::string &criteria)
 {
     if (dev)
     {
@@ -136,7 +136,7 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
     for (i = pkgs.begin() ; i != pkgs.end() ; ++i)
     {
         /* parse it's metadata.xml */
-        const util::string path(portdir + "/" + *i + "/metadata.xml");
+        const std::string path(portdir + "/" + *i + "/metadata.xml");
         const metadata_xml_T mxml(path);
         const metadata_T meta(mxml.data(portdir));
 
@@ -178,7 +178,7 @@ action_pkg_handler_T::search(const opts_type &opts)
                 debug_msg("Match found in %s.", m->path.c_str());
 
                 /* we've already inserted at least one package */
-                std::map<util::string, pkgQuery_T * >::iterator mpos;
+                std::map<std::string, pkgQuery_T * >::iterator mpos;
                 if ((mpos = matches.find(*i)) != matches.end())
                     (*(mpos->second))[m->pkg] = m->longdesc;
                 /* nope, so create a new query object */
@@ -205,7 +205,7 @@ action_pkg_handler_T::search(const opts_type &opts)
     }
 
     /* cache everything */
-    std::map<util::string, pkgQuery_T * >::iterator p;
+    std::map<std::string, pkgQuery_T * >::iterator p;
     for (p = matches.begin() ; p != matches.end() ; ++p)
         querycache(*(p->second));
 }
@@ -265,7 +265,7 @@ action_pkg_handler_T::display(pkgQuery_T *q)
     pkgQuery_T::size_type pn = 1;
     for ( ; p != q->end() ; ++p, ++pn)
     {
-        util::string longdesc;
+        std::string longdesc;
             
         if (not p->second.empty())
             longdesc = util::tidy_whitespace(p->second);
@@ -318,7 +318,7 @@ action_pkg_handler_T::display()
     }
 
     opts_type::size_type n = 1;
-    std::map<util::string, pkgQuery_T * >::iterator m;
+    std::map<std::string, pkgQuery_T * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         if (m->second->empty())
@@ -399,8 +399,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     /* setup with regex */
-    with.assign(dev? optget("with-herd", util::string) :
-                     optget("with-maintainer", util::string), REG_ICASE);
+    with.assign(dev? optget("with-herd", std::string) :
+                     optget("with-maintainer", std::string), REG_ICASE);
 
     /* load previously cached results */
     if (optget("querycache", bool))
@@ -558,7 +558,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
 void
 action_pkg_handler_T::cleanup()
 {
-    std::map<util::string, pkgQuery_T * >::iterator m;
+    std::map<std::string, pkgQuery_T * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
         delete m->second;
 }

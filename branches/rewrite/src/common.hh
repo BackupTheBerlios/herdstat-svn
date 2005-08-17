@@ -55,7 +55,7 @@ void debug_msg(const char *, ...);
 #define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
 
 /* common typedefs */
-typedef std::vector<util::string> opts_type;
+typedef std::vector<std::string> opts_type;
 
 #endif
 

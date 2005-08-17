@@ -49,7 +49,7 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
 
         herds_xml_T()
             : xml_T<handler_type>(optget("qa", bool)), _fetched(false),
-              _local_default(optget("localstatedir", util::string)+"/herds.xml")
+              _local_default(optget("localstatedir", std::string)+"/herds.xml")
         { this->init(); }
         virtual ~herds_xml_T() { }
 
@@ -77,10 +77,10 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
 
         struct devinfo_T
         {
-            devinfo_T(const util::string &u) : user(u) { }
+            devinfo_T(const std::string &u) : user(u) { }
             opts_type herds;
-            util::string name;
-            util::string user;
+            std::string name;
+            std::string user;
         };
 
         const devinfo_T get_dev_info(const string_type &) const;

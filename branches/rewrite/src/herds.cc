@@ -31,9 +31,9 @@
 #include "herds.hh"
 
 herd_T &
-herd_T::operator= (const std::vector<util::string> &devs)
+herd_T::operator= (const std::vector<std::string> &devs)
 {
-    std::vector<util::string>::const_iterator i;
+    std::vector<std::string>::const_iterator i;
     for (i = devs.begin() ; i != devs.end() ; ++i)
         (*this)[*i] = new dev_attrs_T();
     return *this;

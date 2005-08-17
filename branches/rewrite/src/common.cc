@@ -39,12 +39,12 @@ debug_msg(const char *fmt, ...)
     va_list v;
     va_start(v, fmt);
     
-    util::string s = util::sprintf(fmt, v);
+    std::string s = util::sprintf(fmt, v);
 
     /* make ASCII colors visible - TODO: anyway to escape them?
      * simply inserting a '\' before it doesnt work... */
-    util::string::size_type pos = s.find("\033");
-    if (pos != util::string::npos)
+    std::string::size_type pos = s.find("\033");
+    if (pos != std::string::npos)
 	s.erase(pos, 1);
 
     *(optget("outstream", std::ostream *)) << "!!! " << s << std::endl;

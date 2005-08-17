@@ -54,7 +54,7 @@ class xml_T : public parsable_T
 
         virtual void parse(const string_type &p = "")
         {
-            const util::string file(p.empty() ? this->path() : p);
+            const std::string file(p.empty() ? this->path() : p);
             XMLParser_T parser(this->_handler.get(), this->_validate);
             this->_timer.start();
             parser.parse(file);

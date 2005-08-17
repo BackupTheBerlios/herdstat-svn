@@ -40,20 +40,20 @@ bool portage::in_pkg_dir() { return portage::is_pkg_dir(util::getcwd()); }
  * Given path a package directory?                                           *
  *****************************************************************************/
 bool
-portage::is_pkg_dir(const util::path_T &path)
+portage::is_pkg_dir(const std::string &path)
 {
     if (not util::is_dir(path))
         return false;
 
-    const util::regex_T regex("\\.ebuild$");
-    const util::dir_T dir(path);
+    const util::regex regex("\\.ebuild$");
+    const util::dir dir(path);
     return dir.find(regex) != dir.end();
 }
 /*****************************************************************************
  * Is the given path an ebuild?                                              *
  *****************************************************************************/
 bool
-portage::is_ebuild(const util::path_T &path)
+portage::is_ebuild(const std::string &path)
 {
     return ( (path.length() > 7) and
              (path.substr(path.length() - 7) == ".ebuild") );

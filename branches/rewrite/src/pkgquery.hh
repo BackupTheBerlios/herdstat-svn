@@ -37,22 +37,22 @@
 
 enum query_type { QUERYTYPE_DEV, QUERYTYPE_HERD };
 
-class pkgQuery_T : public std::map<util::string, util::string>
+class pkgQuery_T : public std::map<std::string, std::string>
 {
     public:
-        pkgQuery_T(const util::string &n,
-                   const util::string &w = "",
+        pkgQuery_T(const std::string &n,
+                   const std::string &w = "",
                    bool dev = false);
 
         /* functions */
         void dump(std::ostream &) const;
         bool operator== (const pkgQuery_T &) const;
-        std::vector<util::string> pkgs() const;
+        std::vector<std::string> pkgs() const;
 
         /* members */
         herds_xml_T::devinfo_T info;
-        util::string query, with, portdir;
-        std::vector<util::string> overlays;
+        std::string query, with, portdir;
+        std::vector<std::string> overlays;
         std::time_t date;
         query_type type;
 };

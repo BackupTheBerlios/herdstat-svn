@@ -34,9 +34,32 @@
 #include "file.hh"
 #include "util_exceptions.hh"
 
+namespace util {
+/*****************************************************************************/
+stat::stat() : _type(file_type::regular), _exists(false), _opened(false)
+{
+}
+/*****************************************************************************/
+stat::stat(const std::string &path, bool opened)
+    : _path(path), _type(file_type::regular), _exists(false), _opened(opened)
+{
+    this->operator()();
+}
+/*****************************************************************************/
+stat::~stat()
+{
+}
+/*****************************************************************************/
+void
+stat::assign(const std::string &path, bool opened)
+{
+    this->_opened = opened;
+    this->_path.assign(path);
+    this->operator()();
+}
 /*****************************************************************************/
 bool
-util::stat_T::operator() ()
+stat::operator() ()
 {
     if (this->_opened)
     {
@@ -48,25 +71,50 @@ util::stat_T::operator() ()
     }
 
     if (S_ISREG(this->st_mode))
-        this->_type = REGULAR;
+        this->_type = file_type::regular;
     else if (S_ISDIR(this->st_mode))
-        this->_type = DIRECTORY;
+        this->_type = file_type::directory;
     else if (S_ISCHR(this->st_mode))
-        this->_type = CHARACTER;
+        this->_type = file_type::character;
     else if (S_ISBLK(this->st_mode))
-        this->_type = BLOCK;
+        this->_type = file_type::block;
     else if (S_ISFIFO(this->st_mode))
-        this->_type = FIFO;
+        this->_type = file_type::fifo;
     else if (S_ISLNK(this->st_mode))
-        this->_type = LINK;
+        this->_type = file_type::link;
     else if (S_ISSOCK(this->st_mode))
-        this->_type = SOCKET;
+        this->_type = file_type::socket;
 
     return this->_exists;
 }
 /*****************************************************************************/
+base_fileobject::base_fileobject() : _opened(false)
+{
+}
+/*****************************************************************************/
+base_fileobject::base_fileobject(const std::string &path)
+    : _path(path), _stat(path), _opened(false)
+{
+}
+/*****************************************************************************/
+base_file::base_file() : stream(NULL)
+{
+}
+/*****************************************************************************/
+base_file::base_file(const std::string &path, std::ios_base::openmode mode)
+    : base_fileobject(path), stream(NULL)
+{
+    this->open(this->_path.c_str(), mode);
+}
+/*****************************************************************************/
+base_file::~base_file()
+{
+    if (this->_opened)
+        this->close();
+}
+/*****************************************************************************/
 void
-util::base_file_T::open(const char *n, std::ios_base::openmode mode)
+base_file::open(const char *n, std::ios_base::openmode mode)
 {
     if (this->_opened)
         return;
@@ -91,13 +139,13 @@ util::base_file_T::open(const char *n, std::ios_base::openmode mode)
         this->stream = new std::fstream(n, mode);
 
     if (not this->stream->is_open())
-        throw util::bad_fileobject_E(n);
+        throw bad_fileobject_E(n);
 
     this->_opened = true;
 }
 /*****************************************************************************/
 void
-util::base_file_T::close()
+base_file::close()
 {
     if (not this->_opened)
         return;
@@ -108,18 +156,31 @@ util::base_file_T::close()
     this->_opened = false;
 }
 /*****************************************************************************/
+file::file(const std::string &path, std::ios_base::openmode mode)
+    : base_file(path, mode), _contents()
+{
+    this->read();
+}
+/*****************************************************************************/
 void
-util::file_T::read()
+file::read()
 {
     assert(this->stream and this->stream->is_open());
 
     std::string line;
     while (std::getline(*(this->stream), line))
-        this->push_back(util::string(line));
+        this->push_back(std::string(line));
+}
+/*****************************************************************************/
+void
+file::write()
+{
+    this->dump(*(this->stream));
+    this->clear();
 }
 /*****************************************************************************/
 bool
-util::file_T::operator== (const file_T &that) const
+file::operator== (const file &that) const
 {
     if (this->bufsize() != that.bufsize())
         return false;
@@ -128,14 +189,31 @@ util::file_T::operator== (const file_T &that) const
 }
 /*****************************************************************************/
 void
-util::file_T::dump(std::ostream &os) const
+file::dump(std::ostream &os) const
 {
     std::copy(this->begin(), this->end(),
         std::ostream_iterator<value_type>(os, "\n"));
 }
 /*****************************************************************************/
+dir::dir() : base_fileobject(), _dirp(NULL), _contents()
+{
+}
+/*****************************************************************************/
+dir::dir(const std::string &path)
+    : base_fileobject(), _dirp(NULL), _contents()
+{
+    this->open();
+    this->read();
+}
+/*****************************************************************************/
+dir::~dir()
+{
+    if (this->_opened)
+        this->_close();
+}
+/*****************************************************************************/
 void
-util::dir_T::close()
+dir::close()
 {
     if (not this->_opened)
         return;
@@ -144,14 +222,14 @@ util::dir_T::close()
     closedir(this->_dirp);
 #else /* CLOSEDIR_VOID */
     if (closedir(this->_dirp) != 0)
-        throw util::errno_E("closedir: " + this->_path);
+        throw errno_E("closedir: " + this->_path);
 #endif /* CLOSEDIR_VOID */
 
     this->_opened = false;
 }
 /*****************************************************************************/
 void
-util::dir_T::open()
+dir::open()
 {
     if (this->_opened)
         return;
@@ -160,15 +238,15 @@ util::dir_T::open()
 
     this->_dirp = opendir(this->_path.c_str());
     if (not this->_dirp)
-        throw util::bad_fileobject_E(this->_path);
+        throw bad_fileobject_E(this->_path);
 
     this->_opened = true;
 }
 /*****************************************************************************/
 void
-util::dir_T::read()
+dir::read()
 {
-    struct dirent *d = NULL;
+    dirent *d = NULL;
     while ((d = readdir(this->_dirp)))
     {
         /* skip . and .. */
@@ -180,135 +258,119 @@ util::dir_T::read()
     }
 }
 /*****************************************************************************/
-util::dir_T::iterator
-util::dir_T::find(const util::path_T &base)
+dir::iterator
+dir::find(const std::string &base)
 {
     return std::find(this->begin(), this->end(),
         this->_path + "/" + base);
 }
 /*****************************************************************************/
-util::dir_T::iterator
-util::dir_T::find(const util::regex_T &regex)
+dir::iterator
+dir::find(const regex &regex)
 {
     return std::find_if(this->begin(), this->end(),
-        std::bind1st(util::regexMatch(), &regex));
+        std::bind1st(regexMatch(), &regex));
 }
 /*****************************************************************************/
-util::dir_T::const_iterator
-util::dir_T::find(const util::path_T &base) const
+dir::const_iterator
+dir::find(const std::string &base) const
 {
     return std::find(this->begin(), this->end(),
         this->_path + "/" + base);
 }
 /*****************************************************************************/
-util::dir_T::const_iterator
-util::dir_T::find(const util::regex_T &regex) const
+dir::const_iterator
+dir::find(const regex &regex) const
 {
     return std::find_if(this->begin(), this->end(),
-        std::bind1st(util::regexMatch(), &regex));
+        std::bind1st(regexMatch(), &regex));
 }
 /*****************************************************************************
  * general purpose file-related functions                                    *
  *****************************************************************************/
 bool
-util::is_dir(const char *path)
+is_dir(const std::string &path)
 {
-    struct stat s;
-    if (stat(path, &s) != 0)
+    ::stat s;
+    if (::stat(path.c_str(), &s) != 0)
 	return false;
     return S_ISDIR(s.st_mode);
 }
 /*****************************************************************************/
-bool util::is_dir(const util::path_T &path) { return is_dir(path.c_str()); }
-/*****************************************************************************/
-bool util::is_dir(const struct stat &s) { return S_ISDIR(s.st_mode); }
+bool is_dir(const struct stat &s) { return S_ISDIR(s.st_mode); }
 /*****************************************************************************/
 bool
-util::is_file(const char *path)
+is_file(const std::string &path)
 {
-    struct stat s;
-    if (stat(path, &s) != 0)
+    ::stat s;
+    if (::stat(path.c_str(), &s) != 0)
 	return false;
     return S_ISREG(s.st_mode);
 }
 /*****************************************************************************/
-bool util::is_file(const util::path_T &path) { return is_file(path.c_str()); }
-/*****************************************************************************/
-bool util::is_file(const struct stat &s) { return S_ISREG(s.st_mode); }
+bool is_file(const struct stat &s) { return S_ISREG(s.st_mode); }
 /*****************************************************************************/
 const char *
-util::basename(const char *path)
+basename(const std::string &path)
 {
-    util::path_T result(path);
-    util::path_T::size_type pos;
+    std::string result(path);
+    std::string::size_type pos;
 
     /* chop all trailing /'s */
     while (result[result.length() - 1] == '/' and result.length() > 1)
 	result.erase(result.length() - 1);
 
-    if ((pos = result.rfind('/')) != util::path_T::npos)
+    if ((pos = result.rfind('/')) != std::string::npos)
 	result = result.substr(pos + 1);
 
     return ( result.empty() ? "/" : result.c_str() );
 }
 /*****************************************************************************/
 const char *
-util::basename(const util::path_T &path) { return util::basename(path.c_str()); }
-/*****************************************************************************/
-const char *
-util::dirname(const char *path)
+dirname(const std::string &path)
 {
-    util::path_T result(path);
-    util::path_T::size_type pos;
+    std::string result(path);
+    std::string::size_type pos;
 
     /* chop all trailing /'s */
     while (result[result.length() - 1] == '/' and result.length() > 1)
 	result.erase(result.length() - 1);
 
-    if ((pos = result.rfind('/')) != util::path_T::npos)
+    if ((pos = result.rfind('/')) != std::string::npos)
 	result = result.substr(0, pos);
 
     return ( result.empty() ? "/" : result.c_str() );
 }
 /*****************************************************************************/
 const char *
-util::dirname(const util::path_T &path) { return util::dirname(path.c_str()); }
-/*****************************************************************************/
-const char *
-util::chop_fileext(const char *path, unsigned short depth)
+chop_fileext(const std::string &path, unsigned short depth)
 {
-    util::path_T result(path);
+    std::string result(path);
 
     for (; depth > 0 ; --depth)
     {
-        util::path_T::size_type pos = result.rfind('.');
-        if (pos != util::path_T::npos)
+        std::string::size_type pos = result.rfind('.');
+        if (pos != std::string::npos)
             result = result.substr(0, pos);
     }
 
     return result.c_str();
 }
 /*****************************************************************************/
-const char *
-util::chop_fileext(const util::path_T &path, unsigned short depth)
-{
-    return util::chop_fileext(path.c_str(), depth);
-}
-/*****************************************************************************/
 void
-util::copy_file(const util::path_T &from, const util::path_T &to)
+copy_file(const std::string &from, const std::string &to)
 {
     /* remove to if it exists */
-    if (util::is_file(to) and (unlink(to.c_str()) != 0))
-	throw util::bad_fileobject_E(to);
+    if (is_file(to) and (unlink(to.c_str()) != 0))
+	throw bad_fileobject_E(to);
 
     std::ifstream ffrom(from.c_str());
     std::ofstream fto(to.c_str());
 
     if (not ffrom)
-	throw util::bad_fileobject_E(from);
+	throw bad_fileobject_E(from);
     if (not fto)
-	throw util::bad_fileobject_E(to);
+	throw bad_fileobject_E(to);
 
     /* read from ffrom and write to fto */
     std::string line;
@@ -317,11 +379,11 @@ util::copy_file(const util::path_T &from, const util::path_T &to)
 }
 /*****************************************************************************/
 void
-util::move_file(const util::path_T &from, const util::path_T &to)
+move_file(const std::string &from, const std::string &to)
 {
-    util::copy_file(from, to);
+    copy_file(from, to);
     if (unlink(from.c_str()) != 0)
-	throw util::bad_fileobject_E(from);
+	throw bad_fileobject_E(from);
 }
 /*****************************************************************************/
 

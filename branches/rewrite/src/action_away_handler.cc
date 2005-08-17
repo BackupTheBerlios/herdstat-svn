@@ -28,7 +28,7 @@
 #include "action_away_handler.hh"
 
 void
-action_away_handler_T::display(const util::string &dev)
+action_away_handler_T::display(const std::string &dev)
 {
     if (devaway.find(dev) == devaway.end())
         throw dev_E();
@@ -101,7 +101,7 @@ action_away_handler_T::operator() (opts_type &opts)
     }
     else if (regex)
     {
-        util::regex_T::string_type re(opts.front());
+        util::regex::string_type re(opts.front());
         opts.clear();
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);

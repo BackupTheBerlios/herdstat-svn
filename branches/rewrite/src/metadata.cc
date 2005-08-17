@@ -36,7 +36,7 @@ metadata_T::dev_exists(const string_type &dev) const
 }
 
 bool
-metadata_T::dev_exists(const util::regex_T &regex) const
+metadata_T::dev_exists(const util::regex &regex) const
 {
     herd_type::const_iterator i;
     for (i = this->devs.begin() ; i != this->devs.end() ; ++i)
@@ -53,7 +53,7 @@ metadata_T::herd_exists(const string_type &herd) const
 }
 
 bool
-metadata_T::herd_exists(const util::regex_T &regex) const
+metadata_T::herd_exists(const util::regex &regex) const
 {
     herds_type::const_iterator i;
     for (i = this->herds.begin() ; i != this->herds.end() ; ++i)
@@ -113,7 +113,7 @@ metadata_T::display() const
 
     if (not this->is_category)
     {
-        util::string ebuild;
+        std::string ebuild;
         try
         {
             ebuild = portage::ebuild_which(this->portdir, this->pkg);
@@ -132,16 +132,16 @@ metadata_T::display() const
         if (not ebuild_vars["HOMEPAGE"].empty())
         {
             /* it's possible to have more than one HOMEPAGE */
-            if (ebuild_vars["HOMEPAGE"].find("://") != util::string::npos)
+            if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
             {
-                std::vector<util::string> parts = ebuild_vars["HOMEPAGE"].split();
+                std::vector<std::string> parts = ebuild_vars["HOMEPAGE"].split();
 
                 if (parts.size() >= 1)
                     output("Homepage", parts.front());
 
                 if (parts.size() > 1)
                 {
-                    std::vector<util::string>::iterator h;
+                    std::vector<std::string>::iterator h;
                     for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
                         output("", *h);
                 }

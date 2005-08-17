@@ -38,7 +38,7 @@ namespace util
      * stored in key,value pairs.
      */
 
-    class vars_T : public base_file_T,
+    class vars_T : public base_file,
                    public std::map<string, string>
     {
         public:
@@ -48,7 +48,7 @@ namespace util
             /** Constructor.
              * @param path Path.
              */
-            vars_T(const path_T &path) : base_file_T(path), _depth(0)
+            vars_T(const path_T &path) : base_file(path), _depth(0)
             { this->read(); }
 
             virtual ~vars_T() { }

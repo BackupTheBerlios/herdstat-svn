@@ -54,7 +54,7 @@ action_meta_handler_T::display(const metadata_T &meta)
         /* at least show ebuild DESCRIPTION and HOMEPAGE */
         if (not meta.is_category)
         {
-            util::string ebuild;
+            std::string ebuild;
             try
             {
                 ebuild = portage::ebuild_which(meta.portdir, meta.pkg);
@@ -72,16 +72,16 @@ action_meta_handler_T::display(const metadata_T &meta)
             if (not ebuild_vars["HOMEPAGE"].empty())
             {
                 /* it's possible to have more than one HOMEPAGE */
-                if (ebuild_vars["HOMEPAGE"].find("://") != util::string::npos)
+                if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
                 {
-                    std::vector<util::string> parts = ebuild_vars["HOMEPAGE"].split();
+                    std::vector<std::string> parts = ebuild_vars["HOMEPAGE"].split();
 
                     if (parts.size() >= 1)
                         output("Homepage", parts.front());
 
                     if (parts.size() > 1)
                     {
-                        std::vector<util::string>::iterator h;
+                        std::vector<std::string>::iterator h;
                         for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
                             output("", *h);
                     }
@@ -110,7 +110,7 @@ action_meta_handler_T::operator() (opts_type &opts)
     OverlayDisplay_T od;
 
     bool pwd = false;
-    util::string dir;
+    std::string dir;
 
     if (use_devaway)
     {
@@ -156,12 +156,12 @@ action_meta_handler_T::operator() (opts_type &opts)
         }
 
         /* Loop, trimming each directory from the end until depth == 0 */
-        util::string leftover;
-        util::string path = util::getcwd();
+        std::string leftover;
+        std::string path = util::getcwd();
         while (depth > 0)
         {
-            util::string::size_type pos = path.rfind('/');
-            if (pos != util::string::npos)
+            std::string::size_type pos = path.rfind('/');
+            if (pos != std::string::npos)
             {
                 if (leftover.empty())
                     leftover = path.substr(pos + 1);
@@ -190,7 +190,7 @@ action_meta_handler_T::operator() (opts_type &opts)
     }
     else if (regex)
     {
-        util::regex_T::string_type re(opts.front());
+        util::regex::string_type re(opts.front());
         opts.clear();
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
@@ -211,8 +211,8 @@ action_meta_handler_T::operator() (opts_type &opts)
         matches.insert(std::make_pair(dir, *i));
 
     /* for each specified package/category... */
-    std::multimap<util::string, util::string>::size_type n = 1;
-    std::multimap<util::string, util::string>::iterator m;
+    std::multimap<std::string, std::string>::size_type n = 1;
+    std::multimap<std::string, std::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         metadata_T meta;
@@ -232,7 +232,7 @@ action_meta_handler_T::operator() (opts_type &opts)
             }
             else
             {
-                std::pair<util::string, util::string> p =
+                std::pair<std::string, std::string> p =
                     portage::find_package(config, m->second,
                     overlay, &search_timer);
                 meta.portdir = p.first;
@@ -245,7 +245,7 @@ action_meta_handler_T::operator() (opts_type &opts)
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
             
-            std::vector<util::string>::const_iterator i;
+            std::vector<std::string>::const_iterator i;
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
                 if (quiet or not optget("color", bool))
@@ -278,7 +278,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         /* if no '/' exists, assume it's a category */
         /* FIXME: metadata_xml_handler_T should determine this
          * by checking for <catmetadata>. */
-        meta.is_category = (meta.pkg.find('/') == util::string::npos);
+        meta.is_category = (meta.pkg.find('/') == std::string::npos);
 
         if (n != 1)
             output.endl();

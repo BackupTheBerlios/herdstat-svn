@@ -27,8 +27,8 @@
 #include "formatter.hh"
 #include "pkgquery.hh"
 
-pkgQuery_T::pkgQuery_T(const util::string &n, const util::string &w, bool dev)
-    : info(n), query(n), with(w), portdir(optget("portdir", util::string)),
+pkgQuery_T::pkgQuery_T(const std::string &n, const std::string &w, bool dev)
+    : info(n), query(n), with(w), portdir(optget("portdir", std::string)),
       overlays(optget("portage.config", portage::config_T).overlays()),
       type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
 {
@@ -99,10 +99,10 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
  * Return a vector of the packages we contain.
  */
 
-std::vector<util::string>
+std::vector<std::string>
 pkgQuery_T::pkgs() const
 {
-    std::vector<util::string> v;
+    std::vector<std::string> v;
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)
         v.push_back(i->first);
     return v;

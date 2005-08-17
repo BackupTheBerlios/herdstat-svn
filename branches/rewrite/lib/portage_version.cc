@@ -44,7 +44,7 @@
 #include "portage_exceptions.hh"
 #include "portage_version.hh"
 
-std::vector<util::string> portage::version_string_T::suffix_T::_suffixes;
+std::vector<std::string> portage::version_string_T::suffix_T::_suffixes;
 
 /*****************************************************************************
  * version_suffix_T                                                          *
@@ -374,9 +374,9 @@ portage::version_string_T::parse()
 /*****************************************************************************
  * versions_T                                                                *
  *****************************************************************************/
-portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
+portage::versions_T::versions_T(const std::vector<std::string> &paths)
 {
-    std::vector<util::path_T>::const_iterator i = paths.begin(),
+    std::vector<std::string>::const_iterator i = paths.begin(),
                                               e = paths.end();
     for (; i != e ; ++i) this->append(*i);
 }
@@ -385,15 +385,15 @@ portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
  * each ebuild found.  clear()'s container first.                            *
  *****************************************************************************/
 void
-portage::versions_T::assign(const util::path_T &path)
+portage::versions_T::assign(const std::string &path)
 {
     this->_vs.clear();
 
     if (not util::is_dir(path))
         return;
 
-    const util::dir_T pkgdir(path);
-    util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
+    const util::dir pkgdir(path);
+    util::dir::const_iterator d = pkgdir.begin(), e = pkgdir.end();
     
     for (; d != e ; ++d)
     {
@@ -405,10 +405,10 @@ portage::versions_T::assign(const util::path_T &path)
  * Same as assign() but does not call clear().                               *
  *****************************************************************************/
 void
-portage::versions_T::append(const util::path_T &path)
+portage::versions_T::append(const std::string &path)
 {
-    const util::dir_T pkgdir(path);
-    util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
+    const util::dir pkgdir(path);
+    util::dir::const_iterator d = pkgdir.begin(), e = pkgdir.end();
     
     for (; d != e ; ++d)
     {
@@ -431,7 +431,7 @@ portage::versions_T::find(const string_type &path)
  * insert wrapper                                                            *
  *****************************************************************************/
 bool
-portage::versions_T::insert(const util::path_T &path)
+portage::versions_T::insert(const std::string &path)
 {
     version_string_T *v = new version_string_T(path);
 

@@ -40,25 +40,25 @@ namespace util
      * POSIX Regular Expressions interface.
      */
 
-    class regex_T
+    class regex
     {
         public:
-            typedef util::string string_type;
+            typedef std::string string_type;
             typedef regex_t regex_type;
 
             /// Default constructor.
-            regex_T() : _compiled(false), _cflags(0), _eflags(0) { }
+            regex() : _compiled(false), _cflags(0), _eflags(0) { }
 
             /** Constructor.
              * @param r regular expression string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            regex_T(const string_type &r, int c = 0, int e = 0)
+            regex(const string_type &r, int c = 0, int e = 0)
                 : _str(r), _compiled(false), _cflags(c), _eflags(e)
             { this->assign(r, c, e); }
 
-            ~regex_T() { if (this->_compiled) this->cleanup(); }
+            ~regex() { if (this->_compiled) this->cleanup(); }
 
             /** Assign a new regular expression.
              * @param r regular expression string.
@@ -69,9 +69,9 @@ namespace util
 
             /** Assign a new regular expression (no CFLAGS/EFLAGS).
              * @param s regular expression string.
-             * @returns a regex_T object.
+             * @returns a regex object.
              */
-            regex_T &operator= (const string_type &s)
+            regex &operator= (const string_type &s)
             { this->assign(s); return *this; }
 
             /** Determine if this regex matches the specified string.
@@ -114,18 +114,18 @@ namespace util
     };
 
     /**
-     * Functor for using regex_T with standard algorithms.
+     * Functor for using regex with standard algorithms.
      */
 
-    class regexMatch : public std::binary_function<regex_T *, string, bool>
+    class regexMatch : public std::binary_function<regex *, string, bool>
     {
         public:
             /** Does regex match string?
-             * @param re Pointer to a regex_T object.
+             * @param re Pointer to a regex object.
              * @param s  String object.
              * @returns  A boolean value.
              */
-            bool operator() (regex_T *re, string s) const
+            bool operator() (regex *re, string s) const
             { return (*re == s); }
     };
 }

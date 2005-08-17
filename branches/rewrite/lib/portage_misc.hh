@@ -46,13 +46,13 @@ namespace portage
      * @param p Path.
      * @returns A boolean value.
      */
-    bool is_pkg_dir(const util::path_T &p);
+    bool is_pkg_dir(const std::string &p);
 
     /** Is the specified path an ebuild?
      * @param p Path.
      * @returns A boolean value.
      */
-    bool is_ebuild(const util::path_T &p);
+    bool is_ebuild(const std::string &p);
 
     /**
      * Represents a list of valid package categories.
@@ -61,7 +61,7 @@ namespace portage
     class categories_T
     {
         public:
-            typedef std::set<util::string> value_type;
+            typedef std::set<std::string> value_type;
             typedef value_type::iterator iterator;
             typedef value_type::const_iterator const_iterator;
             typedef value_type::size_type size_type;
@@ -77,7 +77,7 @@ namespace portage
              * @param p        PORTDIR.
              * @param validate Whether or not to validate categories.
              */
-            categories_T(const util::path_T &p, bool validate = false)
+            categories_T(const std::string &p, bool validate = false)
                 : _portdir(p), _validate(validate)
             { this->init(); }
 
@@ -95,7 +95,7 @@ namespace portage
             void init();
 
             /// PORTDIR.
-            const util::path_T _portdir;
+            const std::string _portdir;
             /// validate categories?
             bool _validate;
             /// category string container

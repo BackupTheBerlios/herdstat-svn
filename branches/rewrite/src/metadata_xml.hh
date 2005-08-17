@@ -39,7 +39,7 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
     public:
         typedef metadata_T::herds_type      herds_type;
         typedef metadata_T::herd_type       herd_type;
-        typedef util::string                string_type;
+        typedef std::string                string_type;
 
         typedef herds_type::iterator        herds_iterator;
         typedef herds_type::const_iterator  const_herds_iterator;
@@ -70,11 +70,11 @@ class metadata_xml_T : public xml_T<MetadataXMLHandler_T>
         bool is_category() const { return this->_handler->data.is_category; }
         bool dev_exists(const herd_type::key_type &dev) const
         { return this->_handler->data.dev_exists(dev); }
-        bool dev_exists(const util::regex_T &re) const
+        bool dev_exists(const util::regex &re) const
         { return this->_handler->data.dev_exists(re); }
         bool herd_exists(const herds_type::value_type &herd) const
         { return this->_handler->data.herd_exists(herd); }
-        bool herd_exists(const util::regex_T &re) const
+        bool herd_exists(const util::regex &re) const
         { return this->_handler->data.herd_exists(re); }
 };
 

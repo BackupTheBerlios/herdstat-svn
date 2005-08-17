@@ -35,7 +35,7 @@
  */
 
 void
-action_dev_handler_T::display(const util::string &dev)
+action_dev_handler_T::display(const std::string &dev)
 {
     herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
 
@@ -139,7 +139,7 @@ action_dev_handler_T::operator() (opts_type &devs)
     }
     else if (regex)
     {
-        util::regex_T::string_type re(devs.front());
+        util::regex::string_type re(devs.front());
         devs.clear();
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);

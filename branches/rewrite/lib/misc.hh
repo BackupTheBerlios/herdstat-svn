@@ -58,29 +58,29 @@ namespace util
 #endif /* UNICODE */
 
     /// getcwd() wrapper.
-    util::string getcwd();
+    std::string getcwd();
 
     /** Determine username from email address.
      * @param e E-mail address.
      * @returns A string object.
      */
-    util::string get_user_from_email(const util::string &e);
+    std::string get_user_from_email(const std::string &e);
 
     /** Determine current user.
      * Uses ECHANGELOG_USER, if set.  Uses USER otherwise.
      * @returns A string object.
      */
-    util::string current_user();
+    std::string current_user();
 
     /// Determine current terminal width.
-    util::string::size_type getcols();
+    std::string::size_type getcols();
 
     /** Format date string.
      * @param t Reference to a time_t object.
      * @param f Format string as accepted by strftime(3).
      * @returns A constant string object.
      */
-    const util::string format_date(const std::time_t &t,
+    const std::string format_date(const std::time_t &t,
         const char *f = "%a %b %d %T %Z %Y");
 
     /** Format date string.
@@ -88,7 +88,7 @@ namespace util
      * @param f Format string as accepted by strftime(3).
      * @returns A constant string object.
      */
-    const util::string format_date(const util::string &t,
+    const std::string format_date(const std::string &t,
         const char *f = "%a %b %d %T %Z %Y");
 
     /**
@@ -98,7 +98,7 @@ namespace util
     class color_map_T
     {
         public:
-            typedef util::string string_type;
+            typedef std::string string_type;
 
             /** Access color string associated with the given color type.
              * @param c Color type (color_name_T).
