@@ -76,7 +76,7 @@ void
 metadata_T::display() const
 {
     formatter_T output;
-    util::vars_T ebuild_vars;
+    util::vars ebuild_vars;
     const bool quiet = optget("quiet", bool);
 
     /* herds */

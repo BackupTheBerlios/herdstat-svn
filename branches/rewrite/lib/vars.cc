@@ -33,8 +33,20 @@
 #include "portage_version.hh"
 #include "portage_misc.hh"
 
+namespace util {
+
+vars::vars() : _depth(0)
+{
+}
+
+vars::vars(const std::string &path)
+    : base_file(path), _depth(0)
+{
+    this->read();
+}
+
 void
-util::vars_T::dump(std::ostream &stream) const
+vars::dump(std::ostream &stream) const
 {
     const_iterator i;
     for (i = this->begin() ; i != this->end() ; ++i)
@@ -42,7 +54,7 @@ util::vars_T::dump(std::ostream &stream) const
 }
 
 void
-util::vars_T::read(const std::string &path)
+vars::read(const std::string &path)
 {
     this->_path.assign(path);
     this->read();
@@ -56,7 +68,7 @@ util::vars_T::read(const std::string &path)
  */
 
 void
-util::vars_T::read()
+vars::read()
 {
     if (not this->_opened)
         this->open();
@@ -129,7 +141,7 @@ util::vars_T::read()
  */
 
 void
-util::vars_T::subst(std::string &value)
+vars::subst(std::string &value)
 {
 
     std::vector<std::string> vars;
@@ -181,5 +193,7 @@ util::vars_T::subst(std::string &value)
             value.replace(pos, var.length(), subst, 0, subst.length());
     }
 }
+
+} // namespace util
 
 /* vim: set tw=80 sw=4 et : */

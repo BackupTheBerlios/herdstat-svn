@@ -38,31 +38,33 @@ namespace util
      * stored in key,value pairs.
      */
 
-    class vars_T : public base_file,
-                   public std::map<string, string>
+    class vars : public base_file
     {
         public:
+            typedef std::map<std::string, std::string> map_type;
+            typedef map_type::iterator iterator;
+            typedef map_type::const_iterator const_iterator;
+            typedef map_type::mapped_type mapped_type;
+            typedef map_type::key_type key_type;
+            typedef map_type::value_type value_type;
+            typedef map_type::size_type size_type;
+
             /// Default constructor.
-            vars_T() : _depth(0) { }
+            vars();
 
             /** Constructor.
              * @param path Path.
              */
-            vars_T(const path_T &path) : base_file(path), _depth(0)
-            { this->read(); }
+            vars(const std::string &path);
 
-            virtual ~vars_T() { }
+            virtual ~vars() { }
 
             /** Overloaded operator[] since std::map doesn't provide
              * a const version.
              * @param k Key to look up.
              * @returns A string object (Value mapped to Key).
              */
-            string operator[] (const string &k) const
-            {
-                const_iterator i = this->find(k);
-                return (i == this->end() ? "" : i->second);
-            }
+            std::string operator[] (const std::string &k) const;
 
             /** Dump keys/values to specified stream.
              * @param s Output stream.
@@ -75,19 +77,29 @@ namespace util
             /** Read specified file.
              * @param p Path.
              */
-            virtual void read(const path_T &p);
+            virtual void read(const std::string &p);
 
         private:
             /** Perform elementary variable substituion.
              * @param v Variable.
              */
-            void subst(string &v);
+            void subst(std::string &v);
 
             /// subst() recursion depth (safeguard).
             unsigned short _depth;
+
             /// are we an ebuild?
             bool _ebuild;
+            
+            map_type _v;
     };
+
+    inline std::string
+    vars::operator[] (const std::string &k) const
+    {
+        const_iterator i = this->_v.find(k);
+        return (i == this->_v.end() ? "" : i->second);
+    }
 }
 
 #endif

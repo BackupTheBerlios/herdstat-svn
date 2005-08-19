@@ -39,50 +39,50 @@ namespace portage
      * @param c  Reference to a portage::config_T object.
      * @param p  Package name.
      * @param o  Search overlays?
-     * @param t  Pointer to a util::timer_T object (defaults to NULL).
+     * @param t  Pointer to a util::timer object (defaults to NULL).
      * @param pc Package cache (vector of package names).
      * @returns  A constant std::string object (path to ebuild).
      */
     const std::string
     ebuild_which(const portage::config_T &c, const std::string &p,
-        bool o = true, util::timer_T *t = NULL,
+        bool o = true, util::timer *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
     /** Determine path to latest ebuild for specified package.
      * @param pd PORTDIR.
      * @param p  Package name.
-     * @param t  Pointer to a util::timer_T object (defaults to NULL).
+     * @param t  Pointer to a util::timer object (defaults to NULL).
      * @param pc Package cache (vector of package names).
      * @returns  A constant std::string object (path to ebuild).
      */
     const std::string
     ebuild_which(const std::string &pd, const std::string &p,
-        util::timer_T *t = NULL,
+        util::timer *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
     
     /** Find full category/package specification for the specified package.
      * @param pd PORTDIR.
      * @param p  Package name.
-     * @param t  Pointer to a util::timer_T object (defaults to NULL).
+     * @param t  Pointer to a util::timer object (defaults to NULL).
      * @param pc Package cache (vector of package names).
      * @returns  A string object (full category/path specification).
      */
     const std::string
     find_package_in(const std::string &pd, const std::string &p,
-        util::timer_T *t = NULL,
+        util::timer *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
     /** Find full category/package specification for the specified
      * regular expression.
      * @param pd  PORTDIR.
      * @param r   Reference to util::regex object.
-     * @param t   Pointer to util::timer_T object (Defaults to NULL).
+     * @param t   Pointer to util::timer object (Defaults to NULL).
      * @param pc  Package cache (vector of package names).
      * @returns   A vector of matching packages (in category/package form).
      */
     std::vector<std::string>
     find_package_regex_in(const std::string &pd, const util::regex &r,
-        util::timer_T *t = NULL,
+        util::timer *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
     /** Find full category/package specification (and PORTDIR it is located
@@ -90,13 +90,13 @@ namespace portage
      * @param c  Reference to a portage::config_T object.
      * @param p  Package name.
      * @param o  Search overlays?
-     * @param t  Pointer to util::timer_T object (Defaults to NULL).
+     * @param t  Pointer to util::timer object (Defaults to NULL).
      * @param pc Package cache (vector of package names).
      * @returns  A std::pair containing PORTDIR and category/package.
      */
     std::pair<std::string, std::string>
     find_package(const portage::config_T &c, const std::string &p,
-        bool o = true, util::timer_T *t = NULL,
+        bool o = true, util::timer *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
     /** Find full category/package specification (and PORTDIR it is located
@@ -104,14 +104,14 @@ namespace portage
      * @param c  Reference to a portage::config_T object.
      * @param r  Reference to a util::regex object.
      * @param o  Search overlays?
-     * @param t  Pointer to util::timer_T object (Defaults to NULL).
+     * @param t  Pointer to util::timer object (Defaults to NULL).
      * @param pc Package cache (vector of package names).
      * @returns  A std::multimap containing PORTDIR and category/package for
      *           each match found.
      */
     std::multimap<std::string, std::string>
     find_package_regex(const portage::config_T &c, const util::regex &r,
-        bool o = true, util::timer_T *t = NULL,
+        bool o = true, util::timer *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 }
 

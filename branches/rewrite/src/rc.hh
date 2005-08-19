@@ -40,7 +40,7 @@ class rc_T
 
     private:
         void set_options();
-        util::vars_T vars;
+        util::vars vars;
 };
 
 #endif

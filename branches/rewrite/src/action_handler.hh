@@ -151,7 +151,7 @@ class action_portage_find_handler_T : public action_fancy_handler_T
         }
 
         std::multimap<std::string, std::string> matches;
-        util::timer_T search_timer;
+        util::timer search_timer;
         const bool overlay;
 };
 

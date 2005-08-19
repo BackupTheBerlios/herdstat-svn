@@ -36,14 +36,14 @@ namespace util
      * Represents a timer.
      */
 
-    class timer_T
+    class timer
     {
         public:
             typedef long size_type;
             typedef struct timeval time_type;
 
             /// Default constructor.
-            timer_T() : _elapsed(0), _running(false) { }
+            timer() : _elapsed(0), _running(false) { }
 
             /// Start timer.
             void start()

@@ -37,7 +37,7 @@
 const std::string
 portage::ebuild_which(const std::string &portdir,
                       const std::string &pkg,
-                      util::timer_T *timer,
+                      util::timer *timer,
                       const std::vector<std::string> &pkgcache)
 {
     std::string package(pkg);
@@ -68,7 +68,7 @@ portage::ebuild_which(const std::string &portdir,
 const std::string
 portage::ebuild_which(const portage::config_T &config,
                       const std::string &pkg,
-                      bool overlays, util::timer_T *timer,
+                      bool overlays, util::timer *timer,
                       const std::vector<std::string> &pkgcache)
 {
     std::pair<std::string, std::string> p =
@@ -122,7 +122,7 @@ portage::ebuild_which(const portage::config_T &config,
 const std::string
 portage::find_package_in(const std::string &portdir,
                          const std::string &pkg,
-                         util::timer_T *timer,
+                         util::timer *timer,
                          const std::vector<std::string> &pkgcache)
 {
     if (timer and not timer->is_running())
@@ -216,7 +216,7 @@ portage::find_package_in(const std::string &portdir,
 std::vector<std::string>
 portage::find_package_regex_in(const std::string &portdir,
                                const util::regex &regex,
-                               util::timer_T *timer,
+                               util::timer *timer,
                                const std::vector<std::string> &pkgcache)
 {
     /* if it looks like a category was specified, and no
@@ -311,7 +311,7 @@ portage::find_package_regex_in(const std::string &portdir,
 static std::pair<std::string, std::string>
 search_overlays(const std::vector<std::string> &overlays,
                 const std::string &pkg,
-                util::timer_T *timer,
+                util::timer *timer,
                 const std::vector<std::string> &pkgcache)
 {
     std::pair<std::string, std::string> p;
@@ -342,7 +342,7 @@ std::pair<std::string, std::string>
 portage::find_package(const portage::config_T &config,
                       const std::string &pkg,
                       bool do_overlays,
-                      util::timer_T *timer,
+                      util::timer *timer,
                       const std::vector<std::string> &pkgcache)
 {
     std::string package;
@@ -390,7 +390,7 @@ portage::find_package(const portage::config_T &config,
 static std::multimap<std::string, std::string>
 search_overlays_regex(const std::vector<std::string> &overlays,
                       const util::regex &regex,
-                      util::timer_T *timer,
+                      util::timer *timer,
                       const std::vector<std::string> &pkgcache)
 {
     std::vector<std::string> result;
@@ -424,7 +424,7 @@ std::multimap<std::string, std::string>
 portage::find_package_regex(const portage::config_T &config,
                             const util::regex &regex,
                             bool do_overlays,
-                            util::timer_T *timer,
+                            util::timer *timer,
                             const std::vector<std::string> &pkgcache)
 {
     std::string portdir(config.portdir());

@@ -36,7 +36,6 @@
 # include <fnmatch.h>
 #endif /* HAVE_FNMATCH_H */
 
-#include "file.hh"
 #include "util_exceptions.hh"
 
 namespace util
@@ -46,36 +45,57 @@ namespace util
      * matching a glob pattern.
      */
 
-    class glob_T : public std::vector<std::string>
+    class glob : private noncopyable
     {
         public:
+            typedef std::string value_type;
+            typedef std::vector<value_type>::iterator iterator;
+            typedef std::vector<value_type>::const_iterator const_iterator;
+            typedef std::vector<value_type>::reverse_iterator reverse_iterator;
+            typedef std::vector<value_type>::const_reverse_iterator const_reverse_iterator;
+            typedef std::vector<value_type>::size_type size_type;
+
             /** Constructor.
              * @param pattern Glob pattern.
              */
-            glob_T(const char *pattern)
+            glob(const char *pattern) : _glob(), _results()
             {
-                int rv = glob(pattern, GLOB_ERR, NULL, &(this->_glob));
+                int rv = ::glob(pattern, GLOB_ERR, NULL, &(this->_glob));
                 if (rv != 0 and rv != GLOB_NOMATCH)
                     throw util::errno_E("glob");
 
                 /* fill vector with glob results */
                 for (std::size_t i = 0 ; this->_glob.gl_pathv[i] ; ++i)
-                    this->push_back(this->_glob.gl_pathv[i]);
+                    this->_results.push_back(this->_glob.gl_pathv[i]);
             }
 
             /// Destructor.
-            ~glob_T() { globfree(&(this->_glob)); }
+            ~glob() { globfree(&(this->_glob)); }
 
-        protected:
+            iterator begin() { return _results.begin(); }
+            const_iterator begin() const { return _results.begin(); }
+            iterator end() { return _results.end(); }
+            const_iterator end() const { return _results.end(); }
+            reverse_iterator rbegin() { return _results.rbegin(); }
+            const_reverse_iterator rbegin() const { return _results.rbegin(); }
+            reverse_iterator rend() { return _results.rend(); }
+            const_reverse_iterator rend() const { return _results.rend(); }
+
+            size_type size() const { return _results.size(); }
+            bool empty() const { return this->_results.size() != 0; }
+
+        private:
             /// Internal glob_t instance.
             glob_t _glob;
+            /// Glob results container.
+            std::vector<std::string> _results;
     };
 
     /**
      * fnmatch() functor interface.
      */
 
-    class patternMatch
+    class patternMatch : private noncopyable
     {
         public:
             /** Overloaded operator().

@@ -65,7 +65,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         metacache_T metacache;
         querycache_T querycache;
         opts_type::size_type optsize;
-        util::timer_T::size_type elapsed;
+        util::timer::size_type elapsed;
         const bool dev, meta, status, cache_is_valid;
         bool at_least_one_not_cached;
         util::regex with;

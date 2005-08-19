@@ -131,7 +131,7 @@ pkgcache_T::valid() const
 void
 pkgcache_T::fill()
 {
-    util::timer_T timer;
+    util::timer timer;
 
     if (optget("timer", bool))
         timer.start();

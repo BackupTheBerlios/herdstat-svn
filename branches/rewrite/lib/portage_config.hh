@@ -41,7 +41,7 @@ namespace portage
      * make.globals and stores variables in key/value pairs.
      */
 
-    class config_T : public util::vars_T
+    class config_T : public util::vars
     {
         public:
             typedef std::string string_type;

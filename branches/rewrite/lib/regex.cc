@@ -35,9 +35,10 @@
 #include "regex.hh"
 #include "util_exceptions.hh"
 
+namespace util {
 /*****************************************************************************/
 bool
-util::regex::operator== (const string_type &cmp) const
+regex::operator== (const string_type &cmp) const
 {
     assert(this->_compiled);
 
@@ -49,7 +50,7 @@ util::regex::operator== (const string_type &cmp) const
 }
 /*****************************************************************************/
 void
-util::regex::assign(const string_type &regex, int cflags, int eflags)
+regex::assign(const string_type &regex, int cflags, int eflags)
 {
     if (this->_compiled)
         this->cleanup();
@@ -61,13 +62,13 @@ util::regex::assign(const string_type &regex, int cflags, int eflags)
     /* compile regex */
     int rv = regcomp(&(this->_regex), regex.c_str(), this->_cflags);
     if (rv != 0)
-        throw util::bad_regex_E(rv, &(this->_regex));
+        throw bad_regex_E(rv, &(this->_regex));
 
     this->_compiled = true;
 }
 /*****************************************************************************/
 void
-util::regex::cleanup()
+regex::cleanup()
 {
     regfree(&(this->_regex));
     this->_compiled = false;
@@ -75,5 +76,6 @@ util::regex::cleanup()
     this->_str.clear();
 }
 /*****************************************************************************/
+} // namespace util
 
 /* vim: set tw=80 sw=4 et : */
