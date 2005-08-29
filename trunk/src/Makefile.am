@@ -59,7 +59,7 @@ endif
 
 INCLUDES = -I../lib
 LIBS = @LIBS@ @XMLWRAPP_LIBS@
-AM_CXXFLAGS = -pedantic -ansi -Wall
+AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
 
 MAINTAINERCLEANFILES = Makefile.in *~
 

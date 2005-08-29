@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-08-29 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/Makefile.am, tests/src/Makefile.am, lib/Makefile.am: Add
+	-Wold-style-cast to AM_CXXFLAGS.
+
 2005-08-10 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Forgot to remove glibmm/libxml++ stuff.  Do 1.1.1_p5.
