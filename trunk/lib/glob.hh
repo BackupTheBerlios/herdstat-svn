@@ -46,7 +46,7 @@ namespace util
      * matching a glob pattern.
      */
 
-    class glob_T : public std::vector<util::path_T>
+    class glob_T : public std::vector<std::string>
     {
         public:
             /** Constructor.
@@ -83,8 +83,8 @@ namespace util
              * @param path Path.
              * @returns A boolean value (Does glob match pattern?).
              */
-            bool operator() (const util::string pattern,
-                             const util::string path)
+            bool operator() (const std::string pattern,
+                             const std::string path)
             { return (*this)(pattern.c_str(), path.c_str()); }
 
             /** fnmatch() wrapper.

@@ -33,7 +33,7 @@
 class metadata_T
 {
     public:
-        typedef util::string string_type;
+        typedef std::string string_type;
         typedef std::vector<string_type> herds_type;
         typedef herd_T herd_type;
 

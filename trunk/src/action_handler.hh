@@ -42,7 +42,7 @@ class action_handler_T
     public:
         action_handler_T() : stream(optget("outstream", std::ostream *)),
                              config(optget("portage.config", portage::config_T)),
-                             portdir(optget("portdir", util::string)),
+                             portdir(optget("portdir", std::string)),
                              size(0),
                              quiet(optget("quiet", bool)),
                              verbose(optget("verbose", bool)),
@@ -63,7 +63,7 @@ class action_handler_T
         util::regex_T regexp;               /* regular expression */
         util::color_map_T color;            /* color map */
         portage::config_T config;           /* portage configuration */
-        const util::string portdir;         /* PORTDIR */
+        const std::string portdir;         /* PORTDIR */
         std::size_t size;                   /* number of results */
 
         const bool quiet, verbose, regex, eregex,
@@ -150,7 +150,7 @@ class action_portage_find_handler_T : public action_fancy_handler_T
                     << "ms to perform search." << std::endl;
         }
 
-        std::multimap<util::string, util::string> matches;
+        std::multimap<std::string, std::string> matches;
         util::timer_T search_timer;
         const bool overlay;
 };

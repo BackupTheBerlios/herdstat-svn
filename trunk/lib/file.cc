@@ -115,7 +115,7 @@ util::file_T::read()
 
     std::string line;
     while (std::getline(*(this->stream), line))
-        this->push_back(util::string(line));
+        this->push_back(std::string(line));
 }
 /*****************************************************************************/
 bool
@@ -181,7 +181,7 @@ util::dir_T::read()
 }
 /*****************************************************************************/
 util::dir_T::iterator
-util::dir_T::find(const util::path_T &base)
+util::dir_T::find(const std::string &base)
 {
     return std::find(this->begin(), this->end(),
         this->_path + "/" + base);
@@ -195,7 +195,7 @@ util::dir_T::find(const util::regex_T &regex)
 }
 /*****************************************************************************/
 util::dir_T::const_iterator
-util::dir_T::find(const util::path_T &base) const
+util::dir_T::find(const std::string &base) const
 {
     return std::find(this->begin(), this->end(),
         this->_path + "/" + base);
@@ -210,93 +210,55 @@ util::dir_T::find(const util::regex_T &regex) const
 /*****************************************************************************
  * general purpose file-related functions                                    *
  *****************************************************************************/
-bool
-util::is_dir(const char *path)
-{
-    struct stat s;
-    if (stat(path, &s) != 0)
-	return false;
-    return S_ISDIR(s.st_mode);
-}
-/*****************************************************************************/
-bool util::is_dir(const util::path_T &path) { return is_dir(path.c_str()); }
-/*****************************************************************************/
-bool util::is_dir(const struct stat &s) { return S_ISDIR(s.st_mode); }
-/*****************************************************************************/
-bool
-util::is_file(const char *path)
-{
-    struct stat s;
-    if (stat(path, &s) != 0)
-	return false;
-    return S_ISREG(s.st_mode);
-}
-/*****************************************************************************/
-bool util::is_file(const util::path_T &path) { return is_file(path.c_str()); }
-/*****************************************************************************/
-bool util::is_file(const struct stat &s) { return S_ISREG(s.st_mode); }
-/*****************************************************************************/
 const char *
-util::basename(const char *path)
+util::basename(const std::string &path)
 {
-    util::path_T result(path);
-    util::path_T::size_type pos;
+    std::string result(path);
+    std::string::size_type pos;
 
     /* chop all trailing /'s */
     while (result[result.length() - 1] == '/' and result.length() > 1)
 	result.erase(result.length() - 1);
 
-    if ((pos = result.rfind('/')) != util::path_T::npos)
+    if ((pos = result.rfind('/')) != std::string::npos)
 	result = result.substr(pos + 1);
 
     return ( result.empty() ? "/" : result.c_str() );
 }
 /*****************************************************************************/
 const char *
-util::basename(const util::path_T &path) { return util::basename(path.c_str()); }
-/*****************************************************************************/
-const char *
-util::dirname(const char *path)
+util::dirname(const std::string &path)
 {
-    util::path_T result(path);
-    util::path_T::size_type pos;
+    std::string result(path);
+    std::string::size_type pos;
 
     /* chop all trailing /'s */
     while (result[result.length() - 1] == '/' and result.length() > 1)
 	result.erase(result.length() - 1);
 
-    if ((pos = result.rfind('/')) != util::path_T::npos)
+    if ((pos = result.rfind('/')) != std::string::npos)
 	result = result.substr(0, pos);
 
     return ( result.empty() ? "/" : result.c_str() );
 }
 /*****************************************************************************/
 const char *
-util::dirname(const util::path_T &path) { return util::dirname(path.c_str()); }
-/*****************************************************************************/
-const char *
-util::chop_fileext(const char *path, unsigned short depth)
+util::chop_fileext(const std::string &path, unsigned short depth)
 {
-    util::path_T result(path);
+    std::string result(path);
 
     for (; depth > 0 ; --depth)
     {
-        util::path_T::size_type pos = result.rfind('.');
-        if (pos != util::path_T::npos)
+        std::string::size_type pos = result.rfind('.');
+        if (pos != std::string::npos)
             result = result.substr(0, pos);
     }
 
     return result.c_str();
 }
 /*****************************************************************************/
-const char *
-util::chop_fileext(const util::path_T &path, unsigned short depth)
-{
-    return util::chop_fileext(path.c_str(), depth);
-}
-/*****************************************************************************/
 void
-util::copy_file(const util::path_T &from, const util::path_T &to)
+util::copy_file(const std::string &from, const std::string &to)
 {
     /* remove to if it exists */
     if (util::is_file(to) and (unlink(to.c_str()) != 0))
@@ -317,7 +279,7 @@ util::copy_file(const util::path_T &from, const util::path_T &to)
 }
 /*****************************************************************************/
 void
-util::move_file(const util::path_T &from, const util::path_T &to)
+util::move_file(const std::string &from, const std::string &to)
 {
     util::copy_file(from, to);
     if (unlink(from.c_str()) != 0)

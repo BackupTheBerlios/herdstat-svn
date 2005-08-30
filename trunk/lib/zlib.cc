@@ -33,7 +33,7 @@
 #include "zlib.hh"
 
 int
-util::zlib_T::compress(const util::string &in, const util::string &out, int level)
+util::zlib_T::compress(const std::string &in, const std::string &out, int level)
 {
     this->err = Z_OK;
     this->avail_in = 0;
@@ -93,7 +93,7 @@ util::zlib_T::compress(const util::string &in, const util::string &out, int leve
 }
 
 int
-util::zlib_T::decompress(const util::string &in, const util::string &out)
+util::zlib_T::decompress(const std::string &in, const std::string &out)
 {
     this->err = Z_OK;
     this->avail_in = 0;

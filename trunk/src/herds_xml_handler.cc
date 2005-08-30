@@ -32,7 +32,7 @@
 
 /* any path's found inside <maintainingproject> will be sprintf'd
  * into this if we need to fetch it */
-static const util::string mpBaseURL("http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain");
+static const std::string mpBaseURL("http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain");
 
 /*
  * XML handler for XML file listed in
@@ -217,8 +217,8 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
          * container.
          */
 
-        util::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
-        util::string path(localstatedir+"/"+cur_herd+".xml");
+        std::string url(util::sprintf(mpBaseURL.c_str(), str.c_str()));
+        std::string path(localstatedir+"/"+cur_herd+".xml");
         util::stat_T mps(path);
 
         try

@@ -29,22 +29,22 @@
 
 #include "common.hh"
 
-class pkgcache_T : public util::cache_T<std::vector<util::string> >
+class pkgcache_T : public util::cache_T<std::vector<std::string> >
 {
     public:
         pkgcache_T();
-        pkgcache_T(const util::string &portdir);
+        pkgcache_T(const std::string &portdir);
 
         virtual bool valid() const;
         virtual void fill();
         virtual void load();
         virtual void dump();
 
-        void init(const util::string &portdir);
+        void init(const std::string &portdir);
 
     private:
-        util::string _portdir;
-        std::vector<util::string> _overlays;
+        std::string _portdir;
+        std::vector<std::string> _overlays;
 };
 
 #endif

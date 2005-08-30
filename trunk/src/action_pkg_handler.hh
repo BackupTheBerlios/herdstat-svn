@@ -56,9 +56,9 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         void search(const opts_type &);
         void display();
         void display(pkgQuery_T *);
-        void error(const util::string &) const;
+        void error(const std::string &) const;
         void cleanup();
-        bool metadata_matches(const metadata_T &, const util::string &);
+        bool metadata_matches(const metadata_T &, const std::string &);
 
         std::map<opts_type::value_type, pkgQuery_T * > matches;
         opts_type not_found, packages;

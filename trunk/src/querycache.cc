@@ -169,7 +169,7 @@ querycache_T::dump()
             /* <criteria> */
             xmlpp::Element *criteria_node = query_node->add_child("criteria");
 
-            /* <string> */
+            /* <std::string> */
             xmlpp::Element *query_string_node = criteria_node->add_child("string");
             query_string_node->set_child_text(i->query);
 
@@ -289,15 +289,15 @@ querycache_T::find(const pkgQuery_T &q)
  * Return a vector of query names in the cache.
  */
 
-std::vector<util::string>
+std::vector<std::string>
 querycache_T::queries() const
 {
-    std::vector<util::string> v;
+    std::vector<std::string> v;
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)
     {
-        util::string s(i->query);
+        std::string s(i->query);
         if (not i->with.empty())
-            s.append(util::string("/") + i->with);
+            s.append(std::string("/") + i->with);
         v.push_back(s);
     }
     return v;

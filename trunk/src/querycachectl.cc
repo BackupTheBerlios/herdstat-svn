@@ -58,7 +58,7 @@ static void usage()
 }
 
 int
-handle_opts(int argc, char **argv, util::string *action)
+handle_opts(int argc, char **argv, std::string *action)
 {
     int key, opt_index = 0;
 
@@ -103,7 +103,7 @@ handle_opts(int argc, char **argv, util::string *action)
 }
 
 static void
-doaction(querycache_T &querycache, const util::string &action)
+doaction(querycache_T &querycache, const std::string &action)
 {
     if (action == "dump")
     {
@@ -130,8 +130,8 @@ doaction(querycache_T &querycache, const util::string &action)
         {
             querycache.sort_oldest_to_newest();
 
-            util::string oldest(querycache.front().query);
-            util::string newest(querycache.back().query);
+            std::string oldest(querycache.front().query);
+            std::string newest(querycache.back().query);
 
             if (not querycache.front().with.empty())
                 oldest += "/" + querycache.front().with;
@@ -165,7 +165,7 @@ main(int argc, char **argv)
 
     try
     {
-        util::string action;
+        std::string action;
 
         { rc_T rc; }
 

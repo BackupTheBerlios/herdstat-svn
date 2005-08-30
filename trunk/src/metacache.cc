@@ -35,8 +35,8 @@
 #define METACACHE_EXPIRE        259200 /* 3 days */
 #define METACACHE_RESERVE       8650
 
-metacache_T::metacache_T(const util::string &portdir)
-    : util::cache_T<value_type>(optget("localstatedir", util::string)+METACACHE),
+metacache_T::metacache_T(const std::string &portdir)
+    : util::cache_T<value_type>(optget("localstatedir", std::string)+METACACHE),
       _portdir(portdir),
       _overlays(optget("portage.config", portage::config_T).overlays())
 {
@@ -53,14 +53,14 @@ metacache_T::valid() const
     const util::stat_T metacache(this->path());
     bool valid = false;
 
-    const util::string expire(optget("metacache.expire", util::string));
-    const util::string lastsync(optget("localstatedir", util::string)+LASTSYNC);
+    const std::string expire(optget("metacache.expire", std::string));
+    const std::string lastsync(optget("localstatedir", std::string)+LASTSYNC);
 
     if (metacache.exists())
     {
         if (expire == "lastsync")
         {
-            const util::string path(this->_portdir + "/metadata/timestamp");
+            const std::string path(this->_portdir + "/metadata/timestamp");
             bool has_timestamp = util::is_file(path);
             bool has_lastsync  = util::is_file(lastsync);
 
@@ -169,8 +169,8 @@ metacache_T::fill()
             if (status)
                 ++progress;
 
-            util::path_T metadata(this->_portdir + "/" + (*p) + "/metadata.xml");
-            if (metadata.exists())
+            std::string metadata(this->_portdir + "/" + (*p) + "/metadata.xml");
+            if (util::is_file(metadata))
             {
                 /* parse it */
                 const metadata_xml_T m(metadata);
@@ -184,8 +184,7 @@ metacache_T::fill()
 }
 
 /*
- * Load cache from disk.  If a vector is given, only load lines
- * whose package is in the vector.
+ * Load cache from disk.
  */
 
 void
@@ -212,21 +211,21 @@ metacache_T::load()
         for (i = cache.begin() ; i != e ; ++i)
         {
             /* not a category/package, so skip it */
-            if (i->first.find('/') == util::string::npos)
+            if (i->first.find('/') == std::string::npos)
                 continue;
 
-            util::string str;
+            std::string str;
             metadata_T meta(this->_portdir,
                 this->_portdir + "/" + i->first + "/metadata.xml");
 
-            std::vector<util::string> parts = i->second.split(':', true);
+            std::vector<std::string> parts = util::split(i->second, ':', true);
             if (parts.empty())
                 throw metacache_parse_E();
 
             /* get herds */
             str = parts.front();
             parts.erase(parts.begin());
-            meta.herds = str.split(',');
+            meta.herds = util::split(str, ',');
 
             /* get devs */
             if (not parts.empty())
@@ -234,7 +233,7 @@ metacache_T::load()
                 str = parts.front();
                 parts.erase(parts.begin());
                 if (not str.empty())
-                    meta.devs = str.split(',');
+                    meta.devs = util::split(str, ',');
             }
 
             /* get longdesc */
@@ -288,7 +287,7 @@ metacache_T::dump()
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
-        util::string str;
+        std::string str;
         std::size_t n;
 
         f << ci->pkg << "=";

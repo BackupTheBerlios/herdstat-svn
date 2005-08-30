@@ -38,14 +38,14 @@
  * corresponding away message.
  */
 
-class devaway_T : public std::map<util::string, util::string>,
+class devaway_T : public std::map<std::string, std::string>,
                   public parsable_T
 {
     public:
         devaway_T(bool x = false)
-            : parsable_T(optget("localstatedir", util::string)+DEVAWAY_LOCAL),
+            : parsable_T(optget("localstatedir", std::string)+DEVAWAY_LOCAL),
               _fetched(false),
-              _local(optget("localstatedir", util::string)+DEVAWAY_LOCAL)
+              _local(optget("localstatedir", std::string)+DEVAWAY_LOCAL)
         { this->init(); if (x) { this->fetch(); this->parse(); } }
 
         virtual void fetch();
@@ -58,7 +58,7 @@ class devaway_T : public std::map<util::string, util::string>,
 
     private:
         bool _fetched;
-        const util::string _local;
+        const std::string _local;
 };
 
 #endif

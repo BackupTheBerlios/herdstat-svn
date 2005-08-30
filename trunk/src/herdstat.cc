@@ -333,7 +333,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 		{
 		    if (strcmp(optarg, "stderr") == 0)
 			optset("outstream", std::ostream *, &std::cerr);
-		    optset("outfile", util::string, optarg);
+		    optset("outfile", std::string, optarg);
 		    optset("quiet", bool, true);
 		    optset("timer", bool, false);
 		}
@@ -349,19 +349,19 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --no-herd */
 	    case '\n':
-		optset("with-herd", util::string, "no-herd");
+		optset("with-herd", std::string, "no-herd");
 		break;
 	    /* --with-herd */
 	    case '\v':
-		optset("with-herd", util::string, optarg);
+		optset("with-herd", std::string, optarg);
 		break;
 	    /* --no-maintainer */
 	    case '\r':
-		optset("with-maintainer", util::string, "none");
+		optset("with-maintainer", std::string, "none");
 		break;
 	    /* --with-maintainer */
 	    case '\t':
-		optset("with-maintainer", util::string, optarg);
+		optset("with-maintainer", std::string, optarg);
 		break;
 	    /* --noquerycache */
 	    case '\f':
@@ -387,15 +387,15 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --herdsxml */
 	    case 'H':
-		optset("herds.xml", util::string, optarg);
+		optset("herds.xml", std::string, optarg);
 		break;
 	    /* --devaway */
 	    case 'A':
-		optset("devaway.location", util::string, optarg);
+		optset("devaway.location", std::string, optarg);
 		break;
 	    /* --localstatedir */
 	    case 'L':
-		optset("localstatedir", util::string, optarg);
+		optset("localstatedir", std::string, optarg);
 		break;
 	    /* --debug */
 	    case 'D':
@@ -404,7 +404,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --timer */
 	    case 't':
-		if (optget("outfile", util::string) == "stdout")
+		if (optget("outfile", std::string) == "stdout")
 		    optset("timer", bool, true);
 		break;
 	    /* --qa */
@@ -485,12 +485,12 @@ main(int argc, char **argv)
 
 	/* setup output stream */
 	std::ostream *outstream = NULL;
-	if (optget("outfile", util::string) != "stdout" and
-	    optget("outfile", util::string) != "stderr")
+	if (optget("outfile", std::string) != "stdout" and
+	    optget("outfile", std::string) != "stderr")
 	{
-	    outstream = new std::ofstream(optget("outfile", util::string).c_str());
+	    outstream = new std::ofstream(optget("outfile", std::string).c_str());
 	    if (not *outstream)
-		throw bad_fileobject_E(optget("outfile", util::string));
+		throw bad_fileobject_E(optget("outfile", std::string));
 	    optset("outstream", std::ostream *, outstream);
 	}
 	else
@@ -498,14 +498,14 @@ main(int argc, char **argv)
 	    /* save locale name */
 	    try
 	    {
-		optset("locale", util::string, std::locale("").name());
+		optset("locale", std::string, std::locale("").name());
 	    }
 	    catch (const std::runtime_error)
 	    {
-		util::string error("Invalid locale");
+		std::string error("Invalid locale");
 		char *result = std::getenv("LC_ALL");
 		if (result)
-		    error += " '" + util::string(result) + "'.";
+		    error += " '" + std::string(result) + "'.";
 		std::cerr << error << std::endl;
 		return EXIT_FAILURE;
 	    }
@@ -517,15 +517,15 @@ main(int argc, char **argv)
 
 	/* set locale */
 	optget("outstream", std::ostream *)->imbue
-	    (std::locale(optget("locale", util::string).c_str()));
+	    (std::locale(optget("locale", std::string).c_str()));
 
 	/* set common format attributes */
 	util::color_map_T color;
 	formatter_T output;
 	output.set_colors(optget("color", bool));
 	output.set_quiet(optget("quiet", bool));
-	output.set_labelcolor(color[optget("label.color", util::string)]);
-	output.set_highlightcolor(color[optget("highlight.color", util::string)]);
+	output.set_labelcolor(color[optget("label.color", std::string)]);
+	output.set_highlightcolor(color[optget("highlight.color", std::string)]);
 	output.set_devaway_color(color[red]);
 
 	/* add highlights */
@@ -534,16 +534,16 @@ main(int argc, char **argv)
 	
 	/* user-defined highlights */
 //        {
-//            const std::vector<util::string> hv(optget("highlights",
-//                util::string).split());
-//            std::vector<util::string>::const_iterator i;
+//            const std::vector<std::string> hv(optget("highlights",
+//                std::string).split());
+//            std::vector<std::string>::const_iterator i;
 //            for (i = hv.begin() ; i != hv.end() ; ++i)
 //                output.add_highlight(*i);
 //        }
 
 	{
-	    const std::vector<util::string> hv(optget("highlights",
-		util::string).split());
+	    const std::vector<std::string> hv(util::split(optget("highlights",
+		std::string)));
 	    output.add_highlights(hv);
 	}
 

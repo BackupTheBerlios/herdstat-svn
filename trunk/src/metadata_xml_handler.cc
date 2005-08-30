@@ -48,10 +48,10 @@ MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
         in_desc = true;
     else if (name == "longdescription")
     {
-        util::string locale = optget("locale", util::string);
+        std::string locale = optget("locale", std::string);
 
         attrs_type::const_iterator pos, pose = attrs.end();
-        util::string value;
+        std::string value;
         for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
 #ifdef USE_LIBXMLPP

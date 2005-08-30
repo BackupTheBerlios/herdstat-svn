@@ -44,7 +44,7 @@ namespace portage
     class config_T : public util::vars_T
     {
         public:
-            typedef util::string string_type;
+            typedef std::string string_type;
 
             /** Default constructor.
              * Opens and reads make.conf and make.globals.
@@ -60,12 +60,12 @@ namespace portage
             }
 
             /** Determine PORTDIR.
-             * @returns A string object.
+             * @returns A std::string object.
              */
             const string_type portdir() const;
 
             /** Determine PORTDIR_OVERLAY.
-             * @returns A vector of string objects.
+             * @returns A vector of std::string objects.
              */
             const std::vector<string_type> overlays() const;
     };
@@ -81,7 +81,7 @@ operator<< (std::basic_ostream<charT, traits> &stream,
     portage::config_T::const_iterator i;
     for (i = that.begin() ; i != that.end() ; ++i)
     {
-        util::string s;
+        std::string s;
         while (s.length() < 20)
             s.append(" ");
         s += i->first + " = " + i->second;

@@ -35,7 +35,7 @@
  */
 
 void
-action_dev_handler_T::display(const util::string &dev)
+action_dev_handler_T::display(const std::string &dev)
 {
     herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
 

@@ -28,7 +28,7 @@
 #include "action_away_handler.hh"
 
 void
-action_away_handler_T::display(const util::string &dev)
+action_away_handler_T::display(const std::string &dev)
 {
     if (devaway.find(dev) == devaway.end())
         throw dev_E();

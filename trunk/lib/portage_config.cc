@@ -34,7 +34,7 @@ const char *
 portage::portdir()
 {
     portage::config_T config;
-    util::path_T portdir = config["PORTDIR"];
+    std::string portdir = config["PORTDIR"];
 
     /* environment overrides all */
     char *result = std::getenv("PORTDIR");
@@ -51,7 +51,7 @@ portage::portdir()
 const portage::config_T::string_type
 portage::config_T::portdir() const
 {
-    util::path_T portdir = (*this)["PORTDIR"];
+    std::string portdir = (*this)["PORTDIR"];
 
     /* environment overrides all */
     char *result = std::getenv("PORTDIR");
@@ -74,7 +74,7 @@ portage::config_T::overlays() const
     if (result)
         overlays = result;
 
-    return overlays.split(' ');
+    return util::split(overlays);
 }
 
 /* vim: set tw=80 sw=4 et : */

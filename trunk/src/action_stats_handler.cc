@@ -60,10 +60,10 @@ action_stats_handler_T::operator() (opts_type &null)
     herds_xml_T::herd_type::iterator d;
 
     float nherds = 0, ndevs = 0;
-    std::vector<util::string> most_herds, least_herds, most_devs, least_devs;
+    std::vector<std::string> most_herds, least_herds, most_devs, least_devs;
     unsigned short biggest_dev = 0, smallest_dev = 1;
     herds_xml_T::herd_type::size_type biggest_herd = 0, smallest_herd = 1;
-    std::map<util::string, unsigned short> herds_per_dev;
+    std::map<std::string, unsigned short> herds_per_dev;
 
     /* for each herd in herds.xml... */
     for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
@@ -83,7 +83,7 @@ action_stats_handler_T::operator() (opts_type &null)
     }
 
     /* for each developer in herds.xml */
-    std::map<util::string, unsigned short>::iterator i;
+    std::map<std::string, unsigned short>::iterator i;
     for (i = herds_per_dev.begin() ; i != herds_per_dev.end() ; ++i)
     {
         nherds += i->second;

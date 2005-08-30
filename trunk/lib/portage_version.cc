@@ -44,7 +44,7 @@
 #include "portage_exceptions.hh"
 #include "portage_version.hh"
 
-std::vector<util::string> portage::version_string_T::suffix_T::_suffixes;
+std::vector<std::string> portage::version_string_T::suffix_T::_suffixes;
 
 /*****************************************************************************
  * version_suffix_T                                                          *
@@ -204,14 +204,14 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
     bool differ = false;
     bool result = false;
 
-    /* string comparison should be sufficient for == */
+    /* std::string comparison should be sufficient for == */
     if (*this == that)
         return false;
     else if (this->_version == that._version)
         return this->_extra < that._extra;
 
-    std::vector<string_type> thisparts = this->_version.split('.');
-    std::vector<string_type> thatparts = that._version.split('.');
+    std::vector<string_type> thisparts = util::split(this->_version, '.');
+    std::vector<string_type> thatparts = util::split(that._version, '.');
     std::vector<string_type>::size_type stoppos =
         std::min<std::vector<string_type>::size_type>(thisparts.size(),
                                                        thatparts.size());
@@ -235,7 +235,7 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
         if (thisver == thatver)
         {
             /* 1 == 01 ? they're the same in comparison speak but 
-             * absolutely not the same in version string speak */
+             * absolutely not the same in version std::string speak */
             if (*thisiter == (string_type("0") + *thatiter))
                 same = true;
             else
@@ -258,7 +258,7 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
 bool
 portage::version_string_T::nosuffix_T::operator== (nosuffix_T &that)
 {
-    /* string comparison should be sufficient for == */
+    /* std::string comparison should be sufficient for == */
     return ((this->_version == that._version) and
             (this->_extra   == that._extra));
 }
@@ -273,7 +273,7 @@ portage::version_string_T::init()
     this->_version.assign(this->_v["PV"]);
 }
 /*****************************************************************************
- * Display full version string (as portage would).                           *
+ * Display full version std::string (as portage would).                           *
  *****************************************************************************/
 const portage::version_string_T::string_type
 portage::version_string_T::operator() () const
@@ -320,7 +320,7 @@ portage::version_string_T::operator== (version_string_T &that)
              (this->_v["PR"] == that["PR"]) );
 }
 /*****************************************************************************
- * Split full version string into components ${P}, ${PV}, ${PN}, etc and     *
+ * Split full version std::string into components ${P}, ${PV}, ${PN}, etc and     *
  * save each one in our internal map.                                        *
  *****************************************************************************/
 void
@@ -346,7 +346,7 @@ portage::version_string_T::parse()
         this->_verstr.append("-r0");
     }
 
-    parts = this->_verstr.split('-');
+    parts = util::split(this->_verstr, '-');
 
     /* If parts > 3, ${PN} contains a '-' */
     if (parts.size() > 3)
@@ -374,9 +374,9 @@ portage::version_string_T::parse()
 /*****************************************************************************
  * versions_T                                                                *
  *****************************************************************************/
-portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
+portage::versions_T::versions_T(const std::vector<std::string> &paths)
 {
-    std::vector<util::path_T>::const_iterator i = paths.begin(),
+    std::vector<std::string>::const_iterator i = paths.begin(),
                                               e = paths.end();
     for (; i != e ; ++i) this->append(*i);
 }
@@ -385,7 +385,7 @@ portage::versions_T::versions_T(const std::vector<util::path_T> &paths)
  * each ebuild found.  clear()'s container first.                            *
  *****************************************************************************/
 void
-portage::versions_T::assign(const util::path_T &path)
+portage::versions_T::assign(const std::string &path)
 {
     this->_vs.clear();
 
@@ -405,7 +405,7 @@ portage::versions_T::assign(const util::path_T &path)
  * Same as assign() but does not call clear().                               *
  *****************************************************************************/
 void
-portage::versions_T::append(const util::path_T &path)
+portage::versions_T::append(const std::string &path)
 {
     const util::dir_T pkgdir(path);
     util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
@@ -431,7 +431,7 @@ portage::versions_T::find(const string_type &path)
  * insert wrapper                                                            *
  *****************************************************************************/
 bool
-portage::versions_T::insert(const util::path_T &path)
+portage::versions_T::insert(const std::string &path)
 {
     version_string_T *v = new version_string_T(path);
 

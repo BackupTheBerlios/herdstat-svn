@@ -53,9 +53,9 @@ namespace util
                 opaque = NULL;
             }
 
-            int compress(const util::string &, const util::string &,
+            int compress(const std::string &, const std::string &,
                 int = Z_DEFAULT_COMPRESSION);
-            int decompress(const util::string &, const util::string &);
+            int decompress(const std::string &, const std::string &);
 
         protected:
             int load();

@@ -37,7 +37,7 @@
  * Display developer attributes (name, role, etc).
  */
 
-class dev_attrs_T : public std::vector<util::string>
+class dev_attrs_T : public std::vector<std::string>
 {
     public:
         void display(std::ostream &stream)
@@ -60,8 +60,8 @@ class dev_attrs_T : public std::vector<util::string>
             out.endl();
         }
 
-        util::string role;
-        util::string name;
+        std::string role;
+        std::string name;
 };
 
 #endif

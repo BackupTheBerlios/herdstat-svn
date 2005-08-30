@@ -113,7 +113,7 @@ metadata_T::display() const
 
     if (not this->is_category)
     {
-        util::string ebuild;
+        std::string ebuild;
         try
         {
             ebuild = portage::ebuild_which(this->portdir, this->pkg);
@@ -132,16 +132,16 @@ metadata_T::display() const
         if (not ebuild_vars["HOMEPAGE"].empty())
         {
             /* it's possible to have more than one HOMEPAGE */
-            if (ebuild_vars["HOMEPAGE"].find("://") != util::string::npos)
+            if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
             {
-                std::vector<util::string> parts = ebuild_vars["HOMEPAGE"].split();
+                std::vector<std::string> parts = util::split(ebuild_vars["HOMEPAGE"]);
 
                 if (parts.size() >= 1)
                     output("Homepage", parts.front());
 
                 if (parts.size() > 1)
                 {
-                    std::vector<util::string>::iterator h;
+                    std::vector<std::string>::iterator h;
                     for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
                         output("", *h);
                 }

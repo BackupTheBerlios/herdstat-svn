@@ -36,15 +36,15 @@
  * with a couple attributes a herd would have (name, desc, etc).
  */
 
-class herd_T  : public std::map<util::string, dev_attrs_T * >
+class herd_T  : public std::map<std::string, dev_attrs_T * >
 {
     public:
-        typedef util::string string_type;
+        typedef std::string string_type;
 
         herd_T() { }
         herd_T(const string_type &n) : name(n) { }
 
-        herd_T &operator= (const std::vector<util::string> &);
+        herd_T &operator= (const std::vector<std::string> &);
         std::vector<key_type> keys() const;
         void display(std::ostream &);
 
@@ -57,10 +57,10 @@ class herd_T  : public std::map<util::string, dev_attrs_T * >
  * A group of herds, mapped from herd name to a herd_T object
  */
 
-class herds_T : public std::map<util::string, herd_T * >
+class herds_T : public std::map<std::string, herd_T * >
 {
     public:
-        typedef util::string string_type;
+        typedef std::string string_type;
 
         void display(std::ostream &);
         bool exists(const key_type &s)

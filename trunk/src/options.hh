@@ -142,7 +142,7 @@ T option_cast(const option_type_T &opt)
 class options_T
 {
     private:
-	class option_map_T : public std::map<util::string, option_type_T * >
+	class option_map_T : public std::map<std::string, option_type_T * >
 	{
 	    public:
 		option_map_T() { set_defaults(); }
@@ -160,12 +160,12 @@ class options_T
 	static option_map_T optmap;
 
     public:
-        static bool exists(const util::string &id)
+        static bool exists(const std::string &id)
         { return optmap.find(id) != optmap.end(); }
 
 	/* get option with specified name */
 	template<typename T>
-	static const T get(const util::string &id)
+	static const T get(const std::string &id)
 	{
 	    if (not optmap[id])
 		throw invalid_option_E(id);
@@ -174,7 +174,7 @@ class options_T
 
 	/* set specified option name to specified value */
 	template<typename T>
-	static void set(const util::string &id, const T &t)
+	static void set(const std::string &id, const T &t)
 	{
 	    option_map_T::iterator i = optmap.find(id);
 	    if (i != optmap.end())
@@ -192,7 +192,7 @@ class options_T
 	    option_map_T::iterator i;
 	    for (i = optmap.begin() ; i != optmap.end() ; ++i)
 	    {
-		util::string s(i->first);
+		std::string s(i->first);
 		while(s.size() < 20)
 		    s.append(" ");
 		stream << s;

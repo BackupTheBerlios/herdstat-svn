@@ -28,7 +28,6 @@
 #endif
 
 #include <map>
-#include "string.hh"
 #include "file.hh"
 
 namespace util
@@ -39,7 +38,7 @@ namespace util
      */
 
     class vars_T : public base_file_T,
-                   public std::map<string, string>
+                   public std::map<std::string, std::string>
     {
         public:
             /// Default constructor.
@@ -48,7 +47,7 @@ namespace util
             /** Constructor.
              * @param path Path.
              */
-            vars_T(const path_T &path) : base_file_T(path), _depth(0)
+            vars_T(const std::string &path) : base_file_T(path), _depth(0)
             { this->read(); }
 
             virtual ~vars_T() { }
@@ -56,9 +55,9 @@ namespace util
             /** Overloaded operator[] since std::map doesn't provide
              * a const version.
              * @param k Key to look up.
-             * @returns A string object (Value mapped to Key).
+             * @returns A std::string object (Value mapped to Key).
              */
-            string operator[] (const string &k) const
+            std::string operator[] (const std::string &k) const
             {
                 const_iterator i = this->find(k);
                 return (i == this->end() ? "" : i->second);
@@ -75,13 +74,13 @@ namespace util
             /** Read specified file.
              * @param p Path.
              */
-            virtual void read(const path_T &p);
+            virtual void read(const std::string &p);
 
         private:
             /** Perform elementary variable substituion.
              * @param v Variable.
              */
-            void subst(string &v);
+            void subst(std::string &v);
 
             /// subst() recursion depth (safeguard).
             unsigned short _depth;

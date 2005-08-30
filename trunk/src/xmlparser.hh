@@ -82,7 +82,7 @@ class XMLHandler_T : public xml::event_parser
 class XMLParser_E : public herdstat_base_E
 {
     public:
-        typedef util::string string_type;
+        typedef std::string string_type;
 
         XMLParser_E() { }
         XMLParser_E(const string_type &f, const string_type &e)
@@ -104,7 +104,7 @@ class XMLParser_T
 {
     public:
         typedef XMLHandler_T value_type;
-        typedef util::path_T string_type;
+        typedef std::string string_type;
 
         XMLParser_T(value_type *h, bool validate = false) : handler(h)
         {

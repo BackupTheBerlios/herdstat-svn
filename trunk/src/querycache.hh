@@ -43,7 +43,7 @@ class querycache_T : public std::vector<pkgQuery_T>
         querycache_T()
             : _max(optget("querycache.max", int)),
               _expire(optget("querycache.expire", long)),
-              _path(optget("localstatedir", util::string)+"/querycache.xml")
+              _path(optget("localstatedir", std::string)+"/querycache.xml")
         { }
 
         void operator() (const pkgQuery_T &);
@@ -55,14 +55,14 @@ class querycache_T : public std::vector<pkgQuery_T>
 
         bool is_expired(const pkgQuery_T &) const;
         void sort_oldest_to_newest();
-        std::vector<util::string> queries() const;
+        std::vector<std::string> queries() const;
 
     protected:
         void purge_old();
 
         int _max;
         long _expire;
-        const util::string _path;
+        const std::string _path;
 };
 
 #endif

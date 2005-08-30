@@ -92,15 +92,15 @@ formatter_T::add_highlights(const std::vector<string_type> &pairs)
     std::vector<string_type>::const_iterator i, e = pairs.end();
     for (i = pairs.begin() ; i != e ; ++i)
     {
-        std::vector<string_type> parts(i->split(','));
+        std::vector<string_type> parts(util::split(*i, ','));
         if (parts.size() == 1)
         {
-            util::string c(attr.colors? attr.highlight_color : "");
+            std::string c(attr.colors? attr.highlight_color : "");
             attr.highlights[parts.front()] = c;
         }
         else if (parts.size() == 2)
         {
-            util::string c(attr.colors? color[parts.back()] : "");
+            std::string c(attr.colors? color[parts.back()] : "");
             attr.highlights[parts.front()] = c;
         }
         else
@@ -234,7 +234,7 @@ formatter_T::append(const string_type &label, const string_type &data)
 //        debug_msg("data = '%s'", data.c_str());
 
         if (quiet())
-            append(label, data.split());
+            append(label, util::split(data));
         else
         {
             size_type maxlen =
@@ -243,7 +243,7 @@ formatter_T::append(const string_type &label, const string_type &data)
 
             if ((cur.length() + data.length()) < maxlen)
             {
-                cur += highlight(data.split());
+                cur += highlight(util::split(data));
 //                debug_msg("it all fits on one line");
             }
             else
@@ -251,10 +251,9 @@ formatter_T::append(const string_type &label, const string_type &data)
                 /* line's full, so find a location where we can truncate */
                 string_type::size_type pos = data.rfind(" ", attr.maxdata-3);
                 if (pos == string_type::npos)
-                    cur += highlight(data.split());
+                    cur += highlight(util::split(data));
                 else
-                    cur += highlight(data.substr(0, pos).split());
-
+                    cur += highlight(util::split(data.substr(0, pos)));
 //                debug_msg("pushing back '%s'", cur.c_str());
                 buffer.push_back(cur);
                 cur.clear();
@@ -272,7 +271,7 @@ formatter_T::append(const string_type &label, const string_type &data)
 //                std::vector<string_type> leftovers = data.substr(pos).split();
 
                 std::vector<string_type> leftovers =
-                    highlight(data.substr(pos).split()).split();
+                    util::split(highlight(util::split(data.substr(pos))));
 
                 std::vector<string_type>::iterator i, e = leftovers.end();
                 for (i = leftovers.begin() ; i != e ; ++i)

@@ -36,8 +36,8 @@ herds_xml_T::init()
     char *result = NULL;
     const util::stat_T herds_xml(this->_local_default);
     
-    if (not optget("herds.xml", util::string).empty())
-        this->_path.assign(optget("herds.xml", util::string));
+    if (not optget("herds.xml", std::string).empty())
+        this->_path.assign(optget("herds.xml", std::string));
     
     else if ((result = std::getenv("HERDS")))
         this->_path.assign(result);
@@ -60,11 +60,11 @@ herds_xml_T::fetch()
     try
     {
         if ((optget("action", options_action_T) == action_fetch) and
-            (this->_path.find("://") == util::path_T::npos))
-            this->_path = util::path_T(_remote_default);
+            (this->_path.find("://") == std::string::npos))
+            this->_path = std::string(_remote_default);
 
         /* is it a URL? */
-        if (this->_path.find("://") != util::path_T::npos)
+        if (this->_path.find("://") != std::string::npos)
         {
             if (not optget("quiet", bool))
             {

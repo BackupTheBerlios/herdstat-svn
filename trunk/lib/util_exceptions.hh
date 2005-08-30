@@ -35,10 +35,12 @@
 #include <sys/types.h>
 #include <regex.h>
 
-#include "string.hh"
-
 namespace util
 {
+    /// sprintf() wrapper
+    std::string sprintf(const char *, ...);
+    std::string sprintf(const char *, va_list);
+
     /// base exception
     class base_E                                : public std::exception { };
 
@@ -51,7 +53,7 @@ namespace util
         public:
             msg_base_E() { }
             msg_base_E(const char *msg) : str(msg) { }
-            msg_base_E(const string &msg) : str(msg.c_str()) { }
+            msg_base_E(const std::string &msg) : str(msg.c_str()) { }
             virtual const char *what() const throw() { return this->str; }
     };
 
@@ -66,7 +68,7 @@ namespace util
             va_msg_base_E() { }
             va_msg_base_E(const char *msg, va_list v)
                 : str(util::sprintf(msg, v).c_str()) { }
-            va_msg_base_E(const string &msg, va_list v)
+            va_msg_base_E(const std::string &msg, va_list v)
                 : str(util::sprintf(msg.c_str(), v).c_str()) { }
             va_msg_base_E(const char *msg, ...)
             {
@@ -74,7 +76,7 @@ namespace util
                 str = util::sprintf(msg, v).c_str();
                 va_end(v);
             }
-            va_msg_base_E(const string &msg, ...)
+            va_msg_base_E(const std::string &msg, ...)
             {
 #ifdef HAVE_GCC4
                 va_start(v, msg);
@@ -92,10 +94,10 @@ namespace util
         public:
             errno_E() { }
             errno_E(const char *msg) : msg_base_E(msg) { }
-            errno_E(const string &msg) : msg_base_E(msg) { }
+            errno_E(const std::string &msg) : msg_base_E(msg) { }
             virtual const char *what() const throw()
             {
-                string s(this->str);
+                std::string s(this->str);
                 if (s.empty())
                     return std::strerror(errno);
                 return (s + ": " + std::strerror(errno)).c_str();
@@ -108,7 +110,7 @@ namespace util
         public:
             bad_fileobject_E() { }
             bad_fileobject_E(const char *msg) : errno_E(msg) { }
-            bad_fileobject_E(const string &msg) : errno_E(msg) { }
+            bad_fileobject_E(const std::string &msg) : errno_E(msg) { }
     };
 
     /// bad regular expression exception
@@ -123,7 +125,7 @@ namespace util
             bad_regex_E() : _str(NULL), _err(0), _re(NULL) { }
             bad_regex_E(int e, const regex_t *re)
                 : _str(NULL), _err(e), _re(re) { }
-            bad_regex_E(const string &s) : _str(s.c_str()), _err(0),
+            bad_regex_E(const std::string &s) : _str(s.c_str()), _err(0),
                                                 _re(NULL) { }
             virtual const char *what() const throw()
             {
@@ -138,7 +140,7 @@ namespace util
 		        throw msg_base_E("Failed to allocate memory.");
 
 		    regerror(this->_err, this->_re, buf, len);
-		    string s(buf);
+		    std::string s(buf);
                     delete[] buf;
 		    return s.c_str();
 	        }
@@ -152,7 +154,7 @@ namespace util
         public:
             bad_cast_E() { }
             bad_cast_E(const char *msg) : msg_base_E(msg) { }
-            bad_cast_E(const string &msg) : msg_base_E(msg) { }
+            bad_cast_E(const std::string &msg) : msg_base_E(msg) { }
     };
 }
 

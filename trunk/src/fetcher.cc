@@ -27,23 +27,23 @@
 #include "fetcher.hh"
 
 int
-fetcher_T::fetch(const util::string &url, const util::string &file)
+fetcher_T::fetch(const std::string &url, const std::string &file)
 {
     const char *dir = util::dirname(file);
     if (access(dir, W_OK) != 0)
         throw util::bad_fileobject_E(dir);
 
-    util::string opts(optget("wget.options", util::string));
+    std::string opts(optget("wget.options", std::string));
     
     /* try to be somewhat safe and search for occurrences of
      * ';' and '&&' from wget options just in case... */
-    util::string::size_type pos = opts.find(';');
-    if (pos != util::string::npos)
+    std::string::size_type pos = opts.find(';');
+    if (pos != std::string::npos)
         opts = opts.substr(0, pos);
-    if ((pos = opts.find("&&")) != util::string::npos)
+    if ((pos = opts.find("&&")) != std::string::npos)
         opts = opts.substr(0, pos);
 
-    util::string cmd(util::sprintf("%s %s -O %s '%s'", WGET, opts.c_str(),
+    std::string cmd(util::sprintf("%s %s -O %s '%s'", WGET, opts.c_str(),
         file.c_str(), url.c_str()));
 
     debug_msg("executing '%s'", cmd.c_str());

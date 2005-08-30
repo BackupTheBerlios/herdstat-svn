@@ -27,145 +27,110 @@
 # include "config.h"
 #endif
 
+#include <string>
 #include <vector>
 #include <sstream>
 #include <cstdarg>
-
-#ifdef UNICODE
-# include <glib/gtypes.h>
-# include <glibmm/ustring.h>
-#else /* UNICODE */
-# include <string>
-#endif /* UNICODE */
+#include "util_exceptions.hh"
 
 namespace util
 {
-    /** string derivative.
-     * Derives from Glib::ustring if --enable-unicode.
-     * Otherwise derives from std::string.
-     */
+    std::string::value_type tolower(const std::string::value_type c);
+    std::string::value_type toupper(const std::string::value_type c);
+    bool isdigit(const std::string::value_type c);
 
-#ifdef UNICODE
-
-    class string : public Glib::ustring
-    {
-        public:
-            typedef Glib::ustring base_type;
-            string(const std::string &n) : base_type(n) { }
-
-#else /* UNICODE */
-
-    class string : public std::string
-    {
-        public:
-            typedef std::string base_type;
-
-#endif /* UNICODE */
-            explicit string() : base_type() { }
-            string(const char *n) : base_type(n) { }
-            string(const base_type &n) : base_type(n) { }
-            string(const string &n) : base_type(n) { }
-
-            virtual ~string() { }
-
-            string substr(size_type i = 0, size_type n = npos) const
-            { return base_type::substr(i, n); }
-
-            /** Split string.
-             * @param delim  Delimiter.
-             * @param append Append empty string if delim not found?
-             *               (defaults to false).
-             * @returns      A vector of sub-strings.
-             */
-            virtual std::vector<util::string>
-            split(const value_type delim = ' ', bool append = false) const;
-    };
-
-    string::value_type tolower(const string::value_type c);
-    string::value_type toupper(const string::value_type c);
-    bool isdigit(const string::value_type c);
-
-    /** Convert string to all lowercase.
+    /** Convert std::string to all lowercase.
      * @param s String object.
-     * @returns Resulting string object.
+     * @returns Resulting std::string object.
      */
-    string lowercase(const string &s);
+    std::string lowercase(const std::string &s);
 
-    /** Tidy whitespace of the given string.
+    /** Tidy whitespace of the given std::string.
      * @param s String object
-     * @returns Resulting string object.
+     * @returns Resulting std::string object.
      */
-    string tidy_whitespace(const string &s);
+    std::string tidy_whitespace(const std::string &s);
 
     /// sprintf() wrapper
-#ifdef UNICODE
-    util::string sprintf(const gchar *, ...);
-    util::string sprintf(const gchar *, va_list);
-#else /* UNICODE */
-    util::string sprintf(const char *, ...);
-    util::string sprintf(const char *, va_list);
-#endif /* UNICODE */
+    std::string sprintf(const char *, ...);
+    std::string sprintf(const char *, va_list);
 
-    /** Split string.
+    /** Split std::string.
      * @param s String to split.
      * @param d Delimiter.
      * @returns Vector of sub-strings.
      */
-    std::vector<string> split(const string &s,
-                              const string::value_type d = ' ',
+    std::vector<std::string> split(const std::string &s,
+                              const std::string::value_type d = ' ',
                               bool append_only = false);
 
-    /** Convert vector of strings to one string.
-     * @param v Vector of strings
+    /** Convert vector of std::strings to one std::string.
+     * @param v Vector of std::strings
      * @param d Delimiter.
-     * @returns Resulting string object.
+     * @returns Resulting std::string object.
      */
-    string join(const std::vector<string> &v, const string::value_type d = ' ');
+    std::string join(const std::vector<std::string> &v,
+                     const std::string::value_type d = ' ');
 
-    /** Convert a type to a string.
+    /** Convert a type to a std::string.
      * @param v Value of type T.
-     * @returns A string object.
+     * @returns A std::string object.
      */
-    template <typename T> string stringify(const T &v);
+    template <typename T> std::string stringify(const T &v);
 
-    /** Convert a string to a type.
-     * @param s A string object.
+    /** Convert a std::string to a type.
+     * @param s A std::string object.
      * @returns Value of type T.
      */
-    template <typename T> T destringify(const string &s);
+    template <typename T> T destringify(const std::string &s);
 
     // destringify specializations
-    template <> int destringify<int>(const string &s);
-    template <> long destringify<long>(const string &s);
-    template <> unsigned long destringify<unsigned long>(const string &s);
-    template <> double destringify<double>(const string &s);
-    template <> float destringify<float>(const string &s);
-    template <> bool destringify<bool>(const string &s);
+    template <> int destringify<int>(const std::string &s);
+    template <> long destringify<long>(const std::string &s);
+    template <> unsigned long destringify<unsigned long>(const std::string &s);
+    template <> double destringify<double>(const std::string &s);
+    template <> float destringify<float>(const std::string &s);
+    template <> bool destringify<bool>(const std::string &s);
 
-    /** Replace any unfriendly characters in the given string to their
+    /** Replace any unfriendly characters in the given std::string to their
      * HTML counterparts.
      * @param s String object.
-     * @returns Resulting string object.
+     * @returns Resulting std::string object.
      */
-    string htmlify(const string &s);
+    std::string htmlify(const std::string &s);
 
-    /** Replace any HTML'ized characters in the given string to their
+    /** Replace any HTML'ized characters in the given std::string to their
      * respective counterparts.
      * @param s String object.
-     * @returns Resulting string object.
+     * @returns Resulting std::string object.
      */
-    string unhtmlify(const string &s);
+    std::string unhtmlify(const std::string &s);
 
     /************************************************************************/
-
     template <typename T>
-    inline string
+    std::string
     stringify(const T &v)
     {
         std::ostringstream os;
         os << v;
         return os.str();
     }
+    /************************************************************************/
+    template <typename T>
+    T
+    destringify(const std::string &s)
+    {
+        std::istringstream is(s.c_str());
+
+        T v;
+        is >> v;
+
+        if (not is.eof())
+            throw bad_cast_E("Failed to cast '"+s+"'.");
+
+        return v;
+    }
+    /************************************************************************/
 }
 
 #endif

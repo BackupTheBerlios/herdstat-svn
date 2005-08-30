@@ -1,5 +1,15 @@
 ChangeLog for herdstat
 
+2005-08-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.1_p6).
+	* lib/vars.cc: Add check to subst() member so that variable
+	substitution does not occur when encountering stuff like
+	"var=...${var}", preventing possible inf loops, bug #104190.
+	* lib/file.cc, lib/file.hh: inline is_file() and is_dir().
+	* too many files to list: s/util::string/std::string/,
+	s/util::path_T/std::string/.
+
 2005-08-29 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/Makefile.am, tests/src/Makefile.am, lib/Makefile.am: Add

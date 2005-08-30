@@ -40,13 +40,13 @@
 namespace portage
 {
     /**
-     * Represents a single version string.
+     * Represents a single version std::string.
      */
 
     class version_string_T
     {
         public:
-            typedef util::string string_type;
+            typedef std::string string_type;
             typedef std::map<string_type, string_type> value_type;
             typedef value_type::iterator iterator;
             typedef value_type::const_iterator const_iterator;
@@ -54,20 +54,20 @@ namespace portage
             /** Constructor.
              * @param path Path to ebuild.
              */
-            version_string_T(const util::path_T &path) : _ebuild(path),
-                _verstr(util::chop_fileext(path.basename()))
+            version_string_T(const std::string &path) : _ebuild(path),
+                _verstr(util::chop_fileext(util::basename(path)))
             { this->init(); }
 
 //            const suffix_T &suffix() const
 //            { return this->_suffix; }
 
-            /** Prepare version string in a format identical to what
+            /** Prepare version std::string in a format identical to what
              * portage would use.
              * @returns String object.
              */
             const string_type operator() () const;
 
-            /** Get version string (minus the suffix).
+            /** Get version std::string (minus the suffix).
              * @returns String object.
              */
             const string_type &version() const { return this->_version(); }
@@ -75,7 +75,7 @@ namespace portage
             /** Get path to ebuild for this version.
              * @returns String object.
              */
-            const util::path_T &ebuild() const { return this->_ebuild; }
+            const std::string &ebuild() const { return this->_ebuild; }
 
             /** Determine whether given version_string_T object is less
              * than this one.
@@ -140,23 +140,23 @@ namespace portage
                     suffix_T(const char *pvr) { this->init(pvr); }
 
                     /** Constructor.
-                     * @param pvr PVR string object (version+revision).
+                     * @param pvr PVR std::string object (version+revision).
                      */
                     suffix_T(const string_type &pvr) { this->init(pvr); }
 
-                    /** Get suffix string.
+                    /** Get suffix std::string.
                      * @returns String object.
                      */
                     const string_type &suffix() const { return this->_suffix; }
 
-                    /** Get suffix version string.
+                    /** Get suffix version std::string.
                      * @returns String object.
                      */
                     const string_type &version() const
                     { return this->_suffix_ver; }
 
-                    /** Assign a new PVR string.
-                     * @param pvr PVR string object (version+revision).
+                    /** Assign a new PVR std::string.
+                     * @param pvr PVR std::string object (version+revision).
                      */
                     void assign(const string_type &pvr) { this->init(pvr); }
 
@@ -189,16 +189,16 @@ namespace portage
                     { return not (*this == that); }
 
                 protected:
-                    /// Initialize this suffix string.
+                    /// Initialize this suffix std::string.
                     void init(const string_type &);
-                    /// Parse PVR string to get suffix string.
+                    /// Parse PVR std::string to get suffix std::string.
                     void get_suffix(const string_type &);
 
                     /// Valid suffixes.
                     static std::vector<string_type> _suffixes;
-                    /// Suffix string.
+                    /// Suffix std::string.
                     string_type _suffix;
-                    /// Suffix version string.
+                    /// Suffix version std::string.
                     string_type _suffix_ver;
             };
 
@@ -217,18 +217,18 @@ namespace portage
                     nosuffix_T(const char *pv) { this->init(pv); }
 
                     /** Constructor.
-                     * @param pv PV string object.
+                     * @param pv PV std::string object.
                      */
                     nosuffix_T(const string_type &pv) { this->init(pv); }
 
-                    /** Get version string minus suffix.
+                    /** Get version std::string minus suffix.
                      * @returns String object.
                      */
                     const string_type &operator() () const
                     { return this->_version; }
 
-                    /** Assign new PV string.
-                     * @param pv PV string object.
+                    /** Assign new PV std::string.
+                     * @param pv PV std::string object.
                      */
                     void assign(const string_type &pv) { this->init(pv); }
 
@@ -263,22 +263,22 @@ namespace portage
                     { return !(*this == that); }
 
                 protected:
-                    /// Initialize this nosuffix string.
+                    /// Initialize this nosuffix std::string.
                     void init(const string_type &);
-                    /// Version string (minus suffix).
+                    /// Version std::string (minus suffix).
                     string_type _version;
                     /// Any extra non-digit characters.
                     string_type _extra;
             };
 
-            /// Initialize this version string.
+            /// Initialize this version std::string.
             void init();
-            /// Parse this version string and fill version components map.
+            /// Parse this version std::string and fill version components map.
             void parse();
 
             /// Absolute path to ebuild.
-            const util::path_T _ebuild;
-            /// Full version string.
+            const std::string _ebuild;
+            /// Full version std::string.
             string_type _verstr;
             /// Version components map.
             value_type  _v;
@@ -326,13 +326,13 @@ namespace portage
              * ebuild existing in the specified package directory.
              * @param path Path to package directory.
              */
-            versions_T(const util::path_T &path) { this->assign(path); }
+            versions_T(const std::string &path) { this->assign(path); }
 
             /** Constructor.  Instantiate version_string_T objects for each
              * ebuild existing in each element (package directories).
              * @param v Vector of package directory paths.
              */
-            versions_T(const std::vector<util::path_T> &v);
+            versions_T(const std::vector<std::string> &v);
 
             virtual ~versions_T();
 
@@ -354,18 +354,18 @@ namespace portage
              * @param p Path.
              * @returns A boolean value (whether insertion succeeded).
              */
-            virtual bool insert(const util::path_T &p);
+            virtual bool insert(const std::string &p);
 
             /** Assign a new package directory clearing any previously
              * contained version_string_T instances.
              * @param p Path to package directory.
              */
-            virtual void assign(const util::path_T &p);
+            virtual void assign(const std::string &p);
 
             /** Append a new package directory.
              * @param p Path to package directory.
              */
-            virtual void append(const util::path_T &p);
+            virtual void append(const std::string &p);
 
         protected:
             /// version_string_T container

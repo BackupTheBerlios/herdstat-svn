@@ -41,21 +41,14 @@
 # include "config.h"
 #endif
 
-#ifdef UNICODE
-# include <glib/gtypes.h>
-# include <glibmm.h>
-# define USE_LIBXMLPP
-void debug_msg(const gchar *, ...);
-#else /* UNICODE */
 #define USE_XMLWRAPP
 void debug_msg(const char *, ...);
-#endif /* UNICODE */
 
 /* common defines */
 #define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
 
 /* common typedefs */
-typedef std::vector<util::string> opts_type;
+typedef std::vector<std::string> opts_type;
 
 #endif
 

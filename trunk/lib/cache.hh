@@ -41,7 +41,7 @@ namespace util
     class cache_T : public C
     {
         public:
-            typedef util::string string_type;
+            typedef std::string string_type;
             typedef C value_type;
 
             /** Constructor

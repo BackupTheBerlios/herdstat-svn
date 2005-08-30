@@ -32,13 +32,13 @@
 
 int main(int argc, char **argv)
 {
-    util::string s("Mary had a little lamb!");
+    std::string s("Mary had a little lamb!");
     std::cout << s << std::endl;
     
-    /* test string::split() */
-    std::vector<util::string> v(s.split());
+    /* test util::split() */
+    std::vector<std::string> v(util::split(s));
     assert(v.size() == 5);
-    std::vector<util::string>::iterator i;
+    std::vector<std::string>::iterator i;
     std::cout << "[ ";
     for (i = v.begin() ; i != v.end() ; ++i)
     {

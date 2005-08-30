@@ -33,7 +33,7 @@ int
 action_which_handler_T::operator() (opts_type &opts)
 {
     pkgcache_T pkgcache;
-    std::multimap<util::string, util::string>::iterator m;
+    std::multimap<std::string, std::string>::iterator m;
 
     if (all)
     {
@@ -84,8 +84,8 @@ action_which_handler_T::operator() (opts_type &opts)
 
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
-        util::string ebuild;
-        std::pair<util::string, util::string> p;
+        std::string ebuild;
+        std::pair<std::string, std::string> p;
 
         try
         {
@@ -101,7 +101,7 @@ action_which_handler_T::operator() (opts_type &opts)
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
             
-            std::vector<util::string>::const_iterator i;
+            std::vector<std::string>::const_iterator i;
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
                 if (optget("quiet", bool) or not optget("color", bool))

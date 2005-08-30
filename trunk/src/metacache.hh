@@ -37,7 +37,7 @@
 class metacache_T : public util::cache_T<std::vector<metadata_T> >
 {
     public:
-        metacache_T(const util::string &portdir);
+        metacache_T(const std::string &portdir);
 
         virtual bool valid() const;
         virtual void fill();
@@ -45,8 +45,8 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
         virtual void dump();
 
     private:
-        util::string _portdir;
-        std::vector<util::string> _overlays;
+        std::string _portdir;
+        std::vector<std::string> _overlays;
 };
 
 #endif

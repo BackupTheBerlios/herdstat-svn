@@ -59,32 +59,32 @@ options_T::option_map_T::set_defaults()
     insopt("querycache", true);
     insopt("devaway", true);
 
-    insopt("label.color", util::string("green"));
-    insopt("highlight.color", util::string("yellow"));
+    insopt("label.color", std::string("green"));
+    insopt("highlight.color", std::string("yellow"));
 
-    insopt("metacache.expire", util::string("lastsync"));
+    insopt("metacache.expire", std::string("lastsync"));
     insopt("querycache.max", 100);
     insopt("querycache.expire", static_cast<long>(84600));
-    insopt("wget.options", util::string("-rq -t3 -T15"));
+    insopt("wget.options", std::string("-rq -t3 -T15"));
     insopt("devaway.expire", static_cast<long>(84600));
 
     insopt("maxcol", static_cast<std::size_t>(78));
 
-    insopt("localstatedir", util::string(util::string(LOCALSTATEDIR)+"/herdstat"));
-    insopt("herds.xml", util::string());
-    insopt("devaway.location", util::string(""));
+    insopt("localstatedir", std::string(std::string(LOCALSTATEDIR)+"/herdstat"));
+    insopt("herds.xml", std::string());
+    insopt("devaway.location", std::string(""));
 
-    insopt("with-herd", util::string());
-    insopt("with-maintainer", util::string());
-    insopt("outfile", util::string("stdout"));
+    insopt("with-herd", std::string());
+    insopt("with-maintainer", std::string());
+    insopt("outfile", std::string("stdout"));
     insopt("outstream", &std::cout);
 
-    insopt("highlights", util::string());
+    insopt("highlights", std::string());
 
     insopt("action",
         static_cast<options_action_T>(action_unspecified));
 
-    insopt("locale", util::string(std::locale::classic().name()));
+    insopt("locale", std::string(std::locale::classic().name()));
 
     portage::config_T config;
     insopt("portage.config", config);

@@ -44,11 +44,11 @@ namespace portage
         public:
             bad_version_suffix_E() { }
             bad_version_suffix_E(const char *msg) : util::msg_base_E(msg) { }
-            bad_version_suffix_E(const util::string &msg)
+            bad_version_suffix_E(const std::string &msg)
                 : util::msg_base_E(msg) { }
             virtual const char *what() const throw()
             {
-                util::string s("Invalid version suffix: ");
+                std::string s("Invalid version suffix: ");
                 s += this->str;
                 return s.c_str();
             }
@@ -62,20 +62,20 @@ namespace portage
     {
         protected:
             /// Ambiguous package name.
-            util::string _name;
+            std::string _name;
 
         public:
             ambiguous_pkg_E() { }
-            ambiguous_pkg_E(const std::vector<util::string> &v) : packages(v) { }
+            ambiguous_pkg_E(const std::vector<std::string> &v) : packages(v) { }
             virtual ~ambiguous_pkg_E() throw() { }
 
-            virtual const util::string name() const
+            virtual const std::string name() const
             {
-                util::string s;
+                std::string s;
                 if (not this->packages.empty())
                 {
-                    util::string::size_type pos = this->packages.front().find('/');
-                    if (pos == util::string::npos)
+                    std::string::size_type pos = this->packages.front().find('/');
+                    if (pos == std::string::npos)
                         s = this->packages.front();
                     else
                         s = this->packages.front().substr(pos + 1);
@@ -84,7 +84,7 @@ namespace portage
             }
 
             /// Vector of possible matches.
-            const std::vector<util::string> packages;
+            const std::vector<std::string> packages;
     };
 
     /**
@@ -96,10 +96,10 @@ namespace portage
         public:
             nonexistent_pkg_E() { }
             nonexistent_pkg_E(const char *msg) : util::msg_base_E(msg) { }
-            nonexistent_pkg_E(const util::string &msg) : util::msg_base_E(msg) { }
+            nonexistent_pkg_E(const std::string &msg) : util::msg_base_E(msg) { }
             virtual const char *what() const throw()
             {
-                return (util::string(this->str) +
+                return (std::string(this->str) +
                         " doesn't seem to exist.").c_str();
             }
     };
@@ -119,7 +119,7 @@ namespace portage
         public:
             qa_errno_E() { }
             qa_errno_E(const char *msg) : util::errno_E(msg) { }
-            qa_errno_E(const util::string &msg) : util::errno_E(msg) { }
+            qa_errno_E(const std::string &msg) : util::errno_E(msg) { }
             virtual const char *what() const throw()
             {
                 return util::sprintf("QA Violation: %s",

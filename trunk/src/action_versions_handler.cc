@@ -36,7 +36,7 @@ int
 action_versions_handler_T::operator() (opts_type &opts)
 {
     OverlayDisplay_T od;
-    util::string dir;
+    std::string dir;
     bool pwd = false;
 
     output.set_maxlabel(8);
@@ -66,12 +66,12 @@ action_versions_handler_T::operator() (opts_type &opts)
         unsigned short depth = 2;
 
         /* Loop, trimming each directory from the end until depth == 0 */
-        util::string leftover;
-        util::string path = util::getcwd();
+        std::string leftover;
+        std::string path = util::getcwd();
         while (depth > 0)
         {
-            util::string::size_type pos = path.rfind('/');
-            if (pos != util::string::npos)
+            std::string::size_type pos = path.rfind('/');
+            if (pos != std::string::npos)
             {
                 if (leftover.empty())
                     leftover = path.substr(pos + 1);
@@ -124,11 +124,11 @@ action_versions_handler_T::operator() (opts_type &opts)
     for (i = opts.begin() ; i != opts.end() ; ++i)
         matches.insert(std::make_pair("", *i));
 
-    std::multimap<util::string, util::string>::iterator m;
-    std::multimap<util::string, util::string>::size_type n = 1;
+    std::multimap<std::string, std::string>::iterator m;
+    std::multimap<std::string, std::string>::size_type n = 1;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
-        util::string package;
+        std::string package;
 
 //        std::cout << m->first << " : " << m->second << std::endl;
 
@@ -144,7 +144,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             }
             else
             {
-                std::pair<util::string, util::string> p =
+                std::pair<std::string, std::string> p =
                     portage::find_package(config, m->second,
                     overlay, &search_timer);
                 dir = p.first;
@@ -178,9 +178,9 @@ action_versions_handler_T::operator() (opts_type &opts)
                 portage::versions_T::iterator v;
                 for (v = versions.begin() ; v != versions.end() ; ++v)
                 {
-                    util::string s((*(*v))["PVR"]);
-                    util::string::size_type pos = s.rfind("-r0");
-                    if (pos != util::string::npos)
+                    std::string s((*(*v))["PVR"]);
+                    std::string::size_type pos = s.rfind("-r0");
+                    if (pos != std::string::npos)
                         s = s.substr(0, pos);
 
                     output("", s);
@@ -196,7 +196,7 @@ action_versions_handler_T::operator() (opts_type &opts)
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
 
-            std::vector<util::string>::const_iterator x;
+            std::vector<std::string>::const_iterator x;
             for (x = e.packages.begin() ; x != e.packages.end() ; ++x)
             {
                 if (quiet or not optget("color", bool))
