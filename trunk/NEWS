@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_p6:
+    Bug fixes:
+     - Fix infinite loop if certain conditions are present when trying to do
+       simple variable substitution (bug #104190).
+
 1.1.1_p4:
     THE UTF-8 BUG IS FIXED (Not the glib one)! Even better, I've been able
     to get it to work with xmlwrapp and std::string, which means we no longer
