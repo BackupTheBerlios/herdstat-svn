@@ -1,6 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.1_p7:
+    Bug fixes:
+     - The xml::init object from libxmlwrapp should only be instantiated once,
+       not once per XML file.  This probably fixes a few subtle bugs.  For sure,
+       it fixes a segmentation fault when trying to parse metadata.xml's that
+       use non UTF-8 encoding (which they shouldn't be doing anyways).
+
 1.1.1_p6:
     Bug fixes:
      - Fix infinite loop if certain conditions are present when trying to do

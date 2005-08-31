@@ -30,8 +30,8 @@
 #include "devs.hh"
 #include "metadata_xml_handler.hh"
 
-MetadataXMLHandler_T::return_type
-MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
+bool
+MetadataXMLHandler_T::start_element(const std::string &name,
                                     const attrs_type &attrs)
 {
     if (name == "catmetadata")
@@ -54,13 +54,8 @@ MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
         std::string value;
         for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
-#ifdef USE_LIBXMLPP
-            if (pos->name == "lang")
-                value = pos->value;
-#else /* USE_LIBXMLPP */
             if (pos->first == "lang")
                 value = pos->second;
-#endif /* USE_LIBXMLPP */
         }
 
         if (not value.empty())
@@ -74,13 +69,11 @@ MetadataXMLHandler_T::START_ELEMENT(const string_type &name,
             in_longdesc = true;
     }
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-MetadataXMLHandler_T::return_type
-MetadataXMLHandler_T::END_ELEMENT(const string_type &name)
+bool
+MetadataXMLHandler_T::end_element(const std::string &name)
 {
     if (name == "herd")
         in_herd = false;
@@ -95,13 +88,11 @@ MetadataXMLHandler_T::END_ELEMENT(const string_type &name)
     else if (name == "longdescription")
         in_longdesc = false;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-MetadataXMLHandler_T::return_type
-MetadataXMLHandler_T::CHARACTERS(const string_type &str)
+bool
+MetadataXMLHandler_T::text(const std::string &str)
 {
     /* <herd> */
     if (in_herd)
@@ -112,7 +103,7 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
     {
         cur_dev = util::lowercase(str);
 
-        if (str.find('@') == string_type::npos)
+        if (str.find('@') == std::string::npos)
             cur_dev += "@gentoo.org";
 
         data.devs[cur_dev] = new dev_type();
@@ -130,9 +121,7 @@ MetadataXMLHandler_T::CHARACTERS(const string_type &str)
     else if (in_longdesc)
         data.longdesc = str;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
 /* vim: set tw=80 sw=4 et : */

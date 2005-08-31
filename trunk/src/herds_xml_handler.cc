@@ -51,18 +51,17 @@ class mpXMLHandler_T : public XMLHandler_T
         herd_type devs;
 
     protected:
-        virtual return_type
-        START_ELEMENT(const string_type &, const attrs_type &);
-        virtual return_type END_ELEMENT(const string_type &);
-        virtual return_type CHARACTERS(const string_type &);
+        virtual bool start_element(const std::string &, const attrs_type &);
+        virtual bool end_element(const std::string &);
+        virtual bool text(const std::string &);
 
     private:
         bool in_dev;
-        string_type cur_role;
+        std::string cur_role;
 };
 
-mpXMLHandler_T::return_type
-mpXMLHandler_T::START_ELEMENT(const string_type &name,
+bool
+mpXMLHandler_T::start_element(const std::string &name,
                               const attrs_type &attrs)
 {
     if (name == "dev")
@@ -71,41 +70,32 @@ mpXMLHandler_T::START_ELEMENT(const string_type &name,
         attrs_type::const_iterator pos, pose = attrs.end();
         for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
-#ifdef USE_LIBXMLPP
-            if (pos->name == "role")
-                cur_role = pos->value;
-#else /* USE_LIBXMLPP */
             if (pos->first == "role")
                 cur_role = pos->second;
-#endif /* USE_LIBXMLPP */
         }
 
     }
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-mpXMLHandler_T::return_type
-mpXMLHandler_T::END_ELEMENT(const string_type &name)
+bool
+mpXMLHandler_T::end_element(const std::string &name)
 {
     if (name == "dev")
         in_dev = false;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-mpXMLHandler_T::return_type
-mpXMLHandler_T::CHARACTERS(const string_type &str)
+bool
+mpXMLHandler_T::text(const std::string &str)
 {
     if (in_dev)
     {
-        string_type s(util::lowercase(str));
+        std::string s(util::lowercase(str));
 
-        if (str.find('@') == string_type::npos)
+        if (str.find('@') == std::string::npos)
             s += "@gentoo.org";
 
         std::pair<herd_type::iterator, bool> p =
@@ -114,9 +104,7 @@ mpXMLHandler_T::CHARACTERS(const string_type &str)
             p.first->second->role = cur_role;
     }
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
 mpXMLHandler_T::~mpXMLHandler_T()
@@ -126,8 +114,8 @@ mpXMLHandler_T::~mpXMLHandler_T()
         delete i->second;
 }
 
-HerdsXMLHandler_T::return_type
-HerdsXMLHandler_T::START_ELEMENT(const string_type &name,
+bool
+HerdsXMLHandler_T::start_element(const std::string &name,
                                  const attrs_type &attrs)
 {
     if (name == "herd")
@@ -149,13 +137,11 @@ HerdsXMLHandler_T::START_ELEMENT(const string_type &name,
     else if (name == "maintainingproject")
         in_maintaining_project = true;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-HerdsXMLHandler_T::return_type
-HerdsXMLHandler_T::END_ELEMENT(const string_type &name)
+bool
+HerdsXMLHandler_T::end_element(const std::string &name)
 {
     if (name == "herd")
         in_herd = false;
@@ -176,13 +162,11 @@ HerdsXMLHandler_T::END_ELEMENT(const string_type &name)
     else if (name == "maintainingproject")
         in_maintaining_project = false;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-HerdsXMLHandler_T::return_type
-HerdsXMLHandler_T::CHARACTERS(const string_type &str)
+bool
+HerdsXMLHandler_T::text(const std::string &str)
 {
     /* <herd><name> */
     if (in_herd_name)
@@ -199,8 +183,8 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
     else if (in_herd_email)
     {
         /* append @gentoo.org if needed */
-        string_type::size_type pos = str.find('@');
-        if (pos == string_type::npos)
+        std::string::size_type pos = str.find('@');
+        if (pos == std::string::npos)
             herds[cur_herd]->mail = str + "@gentoo.org";
         else if (str.substr(pos) != "@gentoo.org")
             herds[cur_herd]->mail = str.substr(0, pos) + "@gentoo.org";
@@ -247,11 +231,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             if (not mps() or (mps.size() == 0))
             {
                 unlink(path.c_str());
-#ifdef USE_LIBXMLPP
-                return;
-#else
                 return true;
-#endif
             }
         }
 
@@ -281,8 +261,8 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
     else if (in_maintainer_email)
     {
         /* append @gentoo.org if needed */
-        string_type::size_type pos = str.find('@');
-        if (pos == string_type::npos)
+        std::string::size_type pos = str.find('@');
+        if (pos == std::string::npos)
             cur_dev = util::lowercase(str) + "@gentoo.org";
         else if (str.substr(pos) != "@gentoo.org")
             cur_dev = util::lowercase(str.substr(0,pos)) + "@gentoo.org";
@@ -308,9 +288,7 @@ HerdsXMLHandler_T::CHARACTERS(const string_type &str)
             i->second->role = str;
     }
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
 HerdsXMLHandler_T::~HerdsXMLHandler_T()

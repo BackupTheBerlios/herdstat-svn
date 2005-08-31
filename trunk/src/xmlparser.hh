@@ -28,51 +28,20 @@
 #endif
 
 #include <istream>
-
+#include <xmlwrapp/init.h>
+#include <xmlwrapp/event_parser.h>
 #include "common.hh"
-
-#ifdef USE_LIBXMLPP
-# include <libxml++/libxml++.h>
-#else /* USE_LIBXMLPP */
-# include <xmlwrapp/init.h>
-# include <xmlwrapp/event_parser.h>
-#endif /* USE_LIBXMLPP */
-
-/* callback names - XML parser implementation-dependant */
-#ifdef USE_LIBXMLPP
-# define START_ELEMENT   on_start_element
-# define END_ELEMENT     on_end_element
-# define CHARACTERS      on_characters
-#else /* USE_LIBXMLPP */
-# define START_ELEMENT  start_element
-# define END_ELEMENT    end_element
-# define CHARACTERS     text
-#endif /* USE_LIBXMLPP */
 
 /*
  * Abstract XML Content Handler
  */
 
-#ifdef USE_LIBXMLPP
-class XMLHandler_T : public xmlpp::SaxParser
-#else
 class XMLHandler_T : public xml::event_parser
-#endif /* USE_LIBXMLPP */
 {
     protected:
-#ifdef USE_LIBXMLPP
-        typedef Glib::ustring string_type;
-        typedef AttributeList attrs_type;
-        typedef void return_type;
-#else /* USE_LIBXMLPP */
-        typedef std::string string_type;
-        typedef bool return_type;
-#endif /* USE_LIBXMLPP */
-
-        virtual return_type
-        START_ELEMENT(const string_type &, const attrs_type &) = 0;
-        virtual return_type END_ELEMENT(const string_type &) = 0;
-        virtual return_type CHARACTERS(const string_type &) = 0;
+        virtual bool start_element(const std::string &, const attrs_type &) = 0;
+        virtual bool end_element(const std::string &) = 0;
+        virtual bool text(const std::string &) = 0;
 };
 
 /*
@@ -106,14 +75,10 @@ class XMLParser_T
         typedef XMLHandler_T value_type;
         typedef std::string string_type;
 
-        XMLParser_T(value_type *h, bool validate = false) : handler(h)
+        explicit XMLParser_T(value_type *h, bool validate = false) : handler(h)
         {
-#ifdef USE_LIBXMLPP
-            handler->set_validate(validate);
-#else /* USE_LIBXMLPP */
-            init.remove_whitespace(true);
-            init.validate_xml(validate);
-#endif /* USE_LIBXMLPP */
+            _init.remove_whitespace(true);
+            _init.validate_xml(validate);
         }
 
         virtual ~XMLParser_T() { }
@@ -121,36 +86,15 @@ class XMLParser_T
         /* parse the given filename */
         virtual void parse(const string_type &path)
         {
-#ifdef USE_LIBXMLPP
-            try { handler->parse_file(path); }
-            catch (const xmlpp::exception &e)
-            { throw XMLParser_E(path, e.what()); }
-#else /* USE_LIBXMLPP */
             if (not handler->parse_file(path.c_str()))
                 throw XMLParser_E(path, handler->get_error_message());
-#endif /* USE_LIBXMLPP */
-        }
-
-        /* parse the given open stream */
-        virtual void parse(std::istream &stream,
-                           const string_type &path = "stream")
-        {
-#ifdef USE_LIBXMLPP
-            try { handler->parse_stream(stream); }
-            catch (const xmlpp::exception &e)
-            { throw XMLParser_E(path, e.what()); }
-#else /* USE_LIBXMLPP */
-            if (not handler->parse_stream(stream))
-                throw XMLParser_E(path, handler->get_error_message());
-#endif /* USE_LIBXMLPP */
         }
 
     protected:
-#ifdef USE_XMLWRAPP
-        xml::init init;
-#endif
-
         value_type *handler;
+
+    private:
+        static xml::init _init;
 };
 
 #endif

@@ -55,10 +55,9 @@ class HerdsXMLHandler_T : public XMLHandler_T
 
     protected:
         /* callbacks */
-        virtual return_type
-        START_ELEMENT(const string_type &, const attrs_type &);
-        virtual return_type END_ELEMENT(const string_type &);
-        virtual return_type CHARACTERS(const string_type &);
+        virtual bool start_element(const std::string &, const attrs_type &);
+        virtual bool end_element(const std::string &);
+        virtual bool text(const std::string &);
 
     private:
         fetcher_T fetch;
@@ -74,11 +73,11 @@ class HerdsXMLHandler_T : public XMLHandler_T
         bool in_maintainer_role;
         bool in_maintaining_project;
 
-        string_type cur_herd;
-        string_type cur_dev;
-        string_type cur_role;
+        std::string cur_herd;
+        std::string cur_dev;
+        std::string cur_role;
 
-        const string_type localstatedir;
+        const std::string localstatedir;
 };
 
 #endif

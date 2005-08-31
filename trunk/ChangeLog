@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-08-31 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/xmlparser.cc, src/xmlparser.hh: xml::init should only be
+	instantiated once, not once per XMLParser_T instantiation, and
+	therefore needs to be static.  This change probably fixes some subtle
+	bugs.
+
 2005-08-30 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.1_p6).

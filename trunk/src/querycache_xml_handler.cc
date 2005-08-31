@@ -26,8 +26,8 @@
 
 #include "querycache_xml_handler.hh"
 
-querycacheXMLHandler_T::return_type
-querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
+bool
+querycacheXMLHandler_T::start_element(const std::string &name,
                                     const attrs_type &attrs)
 {
 //    debug_msg("entering <%s>", name.c_str());
@@ -39,17 +39,8 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
         attrs_type::const_iterator pos, pose = attrs.end();
         for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
-#ifdef USE_LIBXMLPP
-            if (pos->name == "date")
-                cur_date = pos->value;
-//            else if (pos->name == "portdir")
-//                cur_pd = pos->value;
-#else /* USE_LIBXMLPP */
             if (pos->first == "date")
                 cur_date = pos->second;
-//            else if (pos->first == "portdir")
-//                cur_pd = pos->second;
-#endif /* USE_LIBXMLPP */
         }
     }
     else if (name == "string" and in_query)
@@ -71,26 +62,19 @@ querycacheXMLHandler_T::START_ELEMENT(const string_type &name,
         attrs_type::const_iterator pos, pose = attrs.end();
         for (pos = attrs.begin() ; pos != pose ; ++pos)
         {
-#ifdef USE_LIBXMLPP
-            if (pos->name == "name")
-                cur_pkg = pos->value;
-#else /* USE_LIBXMLPP */
             if (pos->first == "name")
                 cur_pkg = pos->second;
-#endif /* USE_LIBXMLPP */
         }
 
         (queries.back())[cur_pkg] = "";
 //        debug_msg("in <pkg name='%s'>", cur_pkg.c_str());
     }
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-querycacheXMLHandler_T::return_type
-querycacheXMLHandler_T::END_ELEMENT(const string_type &name)
+bool
+querycacheXMLHandler_T::end_element(const std::string &name)
 {
 //    debug_msg("leaving <%s>", name.c_str());
 
@@ -111,13 +95,11 @@ querycacheXMLHandler_T::END_ELEMENT(const string_type &name)
     else if (name == "pkg")
         in_pkg = false;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
-querycacheXMLHandler_T::return_type
-querycacheXMLHandler_T::CHARACTERS(const string_type &text)
+bool
+querycacheXMLHandler_T::text(const std::string &text)
 {
     if (in_string)
     {
@@ -136,9 +118,7 @@ querycacheXMLHandler_T::CHARACTERS(const string_type &text)
     else if (in_pkg)
         (queries.back())[cur_pkg] = text;
 
-#ifdef USE_XMLWRAPP
     return true;
-#endif
 }
 
 /* vim: set tw=80 sw=4 et : */

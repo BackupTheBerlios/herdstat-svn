@@ -56,10 +56,9 @@ class MetadataXMLHandler_T : public XMLHandler_T
 
     protected:
         /* callbacks */
-        virtual return_type
-        START_ELEMENT(const string_type &, const attrs_type &);
-        virtual return_type END_ELEMENT(const string_type &);
-        virtual return_type CHARACTERS(const string_type &);
+        virtual bool start_element(const std::string &, const attrs_type &);
+        virtual bool end_element(const std::string &);
+        virtual bool text(const std::string &);
 
     private:
         /* internal state variables */
@@ -70,7 +69,7 @@ class MetadataXMLHandler_T : public XMLHandler_T
         bool in_desc;
         bool in_longdesc;
 
-        string_type cur_dev;
+        std::string cur_dev;
 };
 
 #endif
