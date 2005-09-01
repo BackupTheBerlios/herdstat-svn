@@ -29,10 +29,6 @@
 #include <vector>
 #include <algorithm>
 
-#ifdef UNICODE
-# include <glibmm/error.h>
-#endif /* UNICODE */
-
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
 #endif
@@ -660,13 +656,6 @@ main(int argc, char **argv)
     {
 	return EXIT_FAILURE;
     }
-#ifdef UNICODE
-    catch (const herdstat_glib_E &e)
-    {
-	std::cerr << e.what() << std::endl;
-	return EXIT_FAILURE;
-    }
-#endif /* UNICODE */
     catch (const herdstat_base_E &e)
     {
 	std::cerr << "Unhandled exception: " << e.what() << std::endl;

@@ -57,7 +57,7 @@ querycachectl_SOURCES = common.hh common.cc \
 querycachectl_LDADD = ../lib/libutil.la
 endif
 
-INCLUDES = -I../lib
+INCLUDES = -I$(top_builddir)/lib
 LIBS = @LIBS@ @XMLWRAPP_LIBS@
 AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
 

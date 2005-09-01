@@ -70,7 +70,7 @@ options_T::option_map_T::set_defaults()
 
     insopt("maxcol", static_cast<std::size_t>(78));
 
-    insopt("localstatedir", std::string(std::string(LOCALSTATEDIR)+"/herdstat"));
+    insopt("localstatedir", std::string(LOCALSTATEDIR)+"/herdstat");
     insopt("herds.xml", std::string());
     insopt("devaway.location", std::string(""));
 
@@ -89,6 +89,24 @@ options_T::option_map_T::set_defaults()
     portage::config_T config;
     insopt("portage.config", config);
     insopt("portdir", config.portdir());
+}
+
+void
+options_T::dump(std::ostream &stream)
+{
+    stream << "******************** options ********************" << std::endl;
+    option_map_T::iterator i;
+    for (i = optmap.begin() ; i != optmap.end() ; ++i)
+    {
+        std::string s(i->first);
+	while(s.size() < 20)
+	    s.append(" ");
+	stream << s;
+	i->second->dump(stream);
+	stream << std::endl;
+    }
+    stream << "*************************************************" << std::endl;
+    stream << std::endl;
 }
 
 /* vim: set tw=80 sw=4 et : */

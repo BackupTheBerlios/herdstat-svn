@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-09-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.1_p7).
+	* options.cc, options.hh: Clean up a little.
+
 2005-08-31 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/xmlparser.cc, src/xmlparser.hh: xml::init should only be
