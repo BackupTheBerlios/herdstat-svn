@@ -67,9 +67,8 @@ action_versions_handler_T::operator() (opts_type &opts)
             return EXIT_FAILURE;
         }
 
-        unsigned short depth = 2;
-
         /* Loop, trimming each directory from the end until depth == 0 */
+        unsigned short depth = 2;
         std::string leftover;
         std::string path = util::getcwd();
         while (depth > 0)
@@ -113,7 +112,7 @@ action_versions_handler_T::operator() (opts_type &opts)
         
         pkgcache_T pkgcache(portdir);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer, pkgcache);
+                    overlay, &search_timer, pkgcache.pkgs());
         
         if (matches.empty())
         {

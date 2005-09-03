@@ -9,6 +9,10 @@ ChangeLog for herdstat
 	* src/*: update include paths, etc.
 	* Makfile.am.common: Added a common Makefile.am which is now include'd
 	by all other Makefile.am's.
+	* herdstat/noncopyable.hh, herdstat/cachable.hh: Added some new
+	abstract types.  The latter replaces util::cache_T.
+	* src/pkgcache.hh, src/pkgcache.cc, src/metacache.hh,
+	src/metacache.hh: update to use new cachable type.
 
 2005-09-01 Aaron Walker <ka0ttic@gentoo.org>
 

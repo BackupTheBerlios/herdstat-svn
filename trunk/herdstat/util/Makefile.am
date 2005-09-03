@@ -14,7 +14,6 @@ hh_sources = string.hh \
 	     vars.hh \
 	     glob.hh \
 	     timer.hh \
-	     cache.hh \
 	     progress.hh
 
 noinst_LTLIBRARIES = libutil.la

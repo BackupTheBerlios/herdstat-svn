@@ -60,7 +60,7 @@ action_find_handler_T::operator() (opts_type &opts)
                                              REG_ICASE);
 
         matches = portage::find_package_regex(config,
-                    regexp, overlay, &search_timer, pkgcache);
+                    regexp, overlay, &search_timer, pkgcache.pkgs());
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '"
@@ -86,7 +86,7 @@ action_find_handler_T::operator() (opts_type &opts)
                 p = *m;
             else
                 p = portage::find_package(config, m->second,
-                        overlay, &search_timer, pkgcache);
+                        overlay, &search_timer, pkgcache.pkgs());
         }
         catch (const portage::AmbiguousPkg &e)
         {

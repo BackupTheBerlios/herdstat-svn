@@ -1,5 +1,5 @@
 /*
- * herdstat -- herdstat/Cachable.hh
+ * herdstat -- herdstat/cachable.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -27,22 +27,40 @@
 # include "config.h"
 #endif
 
-#include <herdstat/Noncopyable.hh>
+/**
+ * @file cachable.hh
+ * @brief Defines the cachable abstract class.
+ */
 
-class Cachable : private Noncopyable
+#include <herdstat/noncopyable.hh>
+
+/**
+ * Abstract interface for cachable things.
+ */
+
+class cachable : private noncopyable
 {
     public:
+        /** Determine if cache is valid.
+         * @returns True if valid.
+         */
         virtual bool valid() const = 0;
+
+        /// Fill cache.
         virtual void fill() = 0;
+
+        /// Load cache.
         virtual void load() = 0;
+
+        /// Dump cache.
         virtual void dump() = 0;
 
     protected:
-        Cachable(const std::string &path) : _path(path) { }
-        virtual ~Cachable() { }
+        cachable(const std::string &path) : _path(path) { }
+        virtual ~cachable() { }
 
-        /// Initialize cache.  Main cache logic.
-        virtual void init()
+        /// Initialize cache.  Default cache logic.
+        virtual void logic()
         {
             if (this->valid())
                 this->load();

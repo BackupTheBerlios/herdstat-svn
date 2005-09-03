@@ -31,15 +31,15 @@
  * Base for non-copyable things.
  */
 
-class Noncopyable
+class noncopyable
 {
     protected:
-        Noncopyable() { }
-        virtual ~Noncopyable() { }
+        noncopyable() { }
+        virtual ~noncopyable() { }
 
     private:
-        Noncopyable(const Noncopyable&);
-        Noncopyable &operator= (const Noncopyable&);
+        noncopyable(const noncopyable&);
+        noncopyable &operator= (const noncopyable&);
 };
 
 #endif /* _HAVE_NONCOPYABLE_HH */

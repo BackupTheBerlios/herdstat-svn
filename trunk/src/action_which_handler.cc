@@ -56,7 +56,7 @@ action_which_handler_T::operator() (opts_type &opts)
         pkgcache.init(portdir);
         regexp.assign(re, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer, pkgcache);
+                    overlay, &search_timer, pkgcache.pkgs());
 
         if (matches.empty())
         {
@@ -139,7 +139,7 @@ action_which_handler_T::operator() (opts_type &opts)
 
         if (regex)
             ebuild = portage::ebuild_which(config, p.second, overlay, NULL,
-                pkgcache);
+                pkgcache.pkgs());
         else
             ebuild = portage::ebuild_which(config, p.second, overlay, NULL);
 

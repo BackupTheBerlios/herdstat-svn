@@ -38,22 +38,22 @@
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
 pkgcache_T::pkgcache_T()
-    : util::cache_T<value_type>(optget("localstatedir", std::string)+PKGCACHE),
+    : cachable(optget("localstatedir", std::string)+PKGCACHE),
       _overlays(optget("portage.config", portage::config_T).overlays()) { }
 
 pkgcache_T::pkgcache_T(const std::string &portdir)
-    : util::cache_T<value_type>(optget("localstatedir", std::string)+PKGCACHE),
+    : cachable(optget("localstatedir", std::string)+PKGCACHE),
       _portdir(portdir),      
       _overlays(optget("portage.config", portage::config_T).overlays())
 {
-    util::cache_T<value_type>::init();
+    this->logic();
 }
 
 void
 pkgcache_T::init(const std::string &portdir)
 {
     this->_portdir.assign(portdir);
-    util::cache_T<value_type>::init();
+    this->logic();
 }
 
 /*
@@ -197,7 +197,7 @@ pkgcache_T::load()
     std::getline(stream, line);
 
     std::copy(std::istream_iterator<std::string>(stream),
-        std::istream_iterator<std::string>(), std::back_inserter(*this));
+        std::istream_iterator<std::string>(), std::back_inserter(this->_pkgs));
 }
 
 /*

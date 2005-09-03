@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/pkgcache.hh
+ * herdstat -- src/pkgcache_T.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -27,26 +27,91 @@
 # include "config.h"
 #endif
 
-#include <herdstat/util/cache.hh>
+#include <herdstat/cachable.hh>
 #include "common.hh"
 
-class pkgcache_T : public util::cache_T<std::vector<std::string> >
+class pkgcache_T : public cachable
 {
     public:
+        typedef std::vector<std::string> container_type;
+        typedef container_type::value_type value_type;
+        typedef container_type::iterator iterator;
+        typedef container_type::const_iterator const_iterator;
+        typedef container_type::size_type size_type;
+
         pkgcache_T();
         pkgcache_T(const std::string &portdir);
+        void init(const std::string &portdir);
 
         virtual bool valid() const;
         virtual void fill();
         virtual void load();
         virtual void dump();
 
-        void init(const std::string &portdir);
+        iterator begin();
+        const_iterator begin() const;
+        iterator end();
+        const_iterator end() const;
+        size_type size() const;
+        bool empty() const;
+
+        const std::vector<std::string>& pkgs() const;
 
     private:
+        void push_back(const value_type &v);
+
         std::string _portdir;
         std::vector<std::string> _overlays;
+        std::vector<std::string> _pkgs;
 };
+
+inline pkgcache_T::iterator
+pkgcache_T::begin()
+{
+    return _pkgs.begin();
+}
+
+inline pkgcache_T::const_iterator
+pkgcache_T::begin() const
+{
+    return _pkgs.begin();
+}
+
+inline pkgcache_T::iterator
+pkgcache_T::end()
+{
+    return _pkgs.end();
+}
+
+inline pkgcache_T::const_iterator
+pkgcache_T::end() const
+{
+    return _pkgs.end();
+}
+
+inline pkgcache_T::size_type
+pkgcache_T::size() const
+{
+    return _pkgs.size();
+}
+
+inline bool
+pkgcache_T::empty() const
+{
+    return _pkgs.empty();
+}
+
+inline void
+pkgcache_T::push_back(const value_type &v)
+{
+    _pkgs.push_back(v);
+}
+
+inline const std::vector<std::string>&
+pkgcache_T::pkgs() const
+{
+    return _pkgs;
+}
 
 #endif
 

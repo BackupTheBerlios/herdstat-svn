@@ -27,17 +27,22 @@
 # include "config.h"
 #endif
 
-#include <herdstat/util/cache.hh>
-#include "common.hh"
+#include <herdstat/cachable.hh>
 #include "metadata.hh"
 
 /*
  * A cache of all metadata.xml's.
  */
 
-class metacache_T : public util::cache_T<std::vector<metadata_T> >
+class metacache_T : public cachable
 {
     public:
+        typedef std::vector<metadata_T> container_type;
+        typedef container_type::value_type value_type;
+        typedef container_type::iterator iterator;
+        typedef container_type::const_iterator const_iterator;
+        typedef container_type::size_type size_type;
+
         metacache_T(const std::string &portdir);
 
         virtual bool valid() const;
@@ -45,10 +50,69 @@ class metacache_T : public util::cache_T<std::vector<metadata_T> >
         virtual void load();
         virtual void dump();
 
+        iterator begin();
+        const_iterator begin() const;
+        iterator end();
+        const_iterator end() const;
+        size_type size() const;
+        bool empty() const;
+
     private:
+        void reserve(size_type size);
+        void push_back(const value_type &);
+
         std::string _portdir;
         std::vector<std::string> _overlays;
+        std::vector<metadata_T> _metadatas;
 };
+
+inline metacache_T::iterator
+metacache_T::begin()
+{
+    return _metadatas.begin();
+}
+
+inline metacache_T::const_iterator
+metacache_T::begin() const
+{
+    return _metadatas.begin();
+}
+
+inline metacache_T::iterator
+metacache_T::end()
+{
+    return _metadatas.end();
+}
+
+inline metacache_T::const_iterator
+metacache_T::end() const
+{
+    return _metadatas.end();
+}
+
+inline metacache_T::size_type
+metacache_T::size() const
+{
+    return _metadatas.size();
+}
+
+inline bool
+metacache_T::empty() const
+{
+    return _metadatas.empty();
+}
+
+inline void
+metacache_T::reserve(size_type size)
+{
+    _metadatas.reserve(size);
+}
+
+inline void
+metacache_T::push_back(const value_type &v)
+{
+    _metadatas.push_back(v);
+}
 
 #endif
 

@@ -38,7 +38,7 @@
 #define METACACHE_RESERVE       8650
 
 metacache_T::metacache_T(const std::string &portdir)
-    : util::cache_T<value_type>(optget("localstatedir", std::string)+METACACHE),
+    : cachable(optget("localstatedir", std::string)+METACACHE),
       _portdir(portdir),
       _overlays(optget("portage.config", portage::config_T).overlays())
 {
