@@ -16,6 +16,8 @@ libherdstat_la_SOURCES = $(cc_sources) $(hh_sources)
 # library_includedir=$(includedir)/$(PACKAGE)-$(VERSION_MAJOR).$(VERSION_MINOR)/$(PACKAGE)
 # library_include_HEADERS = $(hh_sources)
 
+MAINTAINERCLEANFILES = Makefile.in *~ .loT
+
 srchtml: $(foreach f, $(libherdstat_la_SOURCES), $(f).html)
 	@for x in $(SUBDIRS) ; do \
 		cd ${PWD}/$${x} && $(MAKE) $@ ; \

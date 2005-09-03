@@ -18,6 +18,8 @@ libportage_la_SOURCES = $(cc_sources) $(hh_sources)
 # library_includedir=$(includedir)/$(PACKAGE)-$(VERSION_MAJOR).$(VERSION_MINOR)/$(PACKAGE)/portage
 # library_include_HEADERS = $(hh_sources)
 
+MAINTAINERCLEANFILES = Makefile.in *~ .loT
+
 srchtml: $(foreach f, $(libportage_la_SOURCES), $(f).html)
 %.cc.html: %.cc
 	@echo Generating $@

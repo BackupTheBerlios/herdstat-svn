@@ -21,8 +21,10 @@ noinst_LTLIBRARIES = libutil.la
 libutil_la_SOURCES = $(cc_sources) $(hh_sources)
 libutil_la_LIBADD  = @TERMCAP_LIBS@
 
-library_includedir=$(includedir)/$(PACKAGE)-$(VERSION_MAJOR).$(VERSION_MINOR)/$(PACKAGE)/util
-library_include_HEADERS = $(hh_sources)
+# library_includedir=$(includedir)/$(PACKAGE)-$(VERSION_MAJOR).$(VERSION_MINOR)/$(PACKAGE)/util
+# library_include_HEADERS = $(hh_sources)
+
+MAINTAINERCLEANFILES = Makefile.in *~ .loT
 
 srchtml: $(foreach f, $(libutil_la_SOURCES), $(f).html)
 
