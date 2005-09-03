@@ -28,7 +28,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cassert>
-#include "string.hh"
+#include <herdstat/util/string.hh>
 
 int main(int argc, char **argv)
 {
