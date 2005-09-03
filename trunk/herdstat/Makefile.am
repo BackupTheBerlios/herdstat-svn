@@ -5,7 +5,9 @@ include $(top_builddir)/Makefile.am.common
 SUBDIRS = util portage
 
 cc_sources =
-hh_sources = exceptions.hh
+hh_sources = exceptions.hh \
+	     noncopyable.hh \
+	     cachable.hh
 
 noinst_LTLIBRARIES = libherdstat.la
 # libherdstat_la_LDFLAGS = -release $(VERSION_MAJOR).$(VERSION_MINOR) -version-info $(LIBRARY_VERSION)
