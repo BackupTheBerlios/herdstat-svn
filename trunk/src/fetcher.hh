@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/exceptions.hh>
 #include "common.hh"
 
 class fetcher_T
@@ -37,13 +38,13 @@ class fetcher_T
         fetcher_T(const std::string &url, const std::string &file)
         {
             if (this->fetch(url, file) != EXIT_SUCCESS)
-                throw fetch_E();
+                throw FetchException();
         }
 
         void operator() (const std::string &url, const std::string &file)
         {
             if (this->fetch(url, file) != EXIT_SUCCESS)
-                throw fetch_E();
+                throw FetchException();
         }
 
     protected:

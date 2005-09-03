@@ -31,7 +31,6 @@
 #include <cstring>
 
 #include "options.hh"
-#include "util.hh"
 #include "exceptions.hh"
 
 #ifndef HAVE_COMMON_HH

@@ -89,13 +89,13 @@ herds_xml_T::fetch()
             if (herds_xml.exists() and (herds_xml.size() > 0))
                 this->_path = this->_local_default;
             else
-                throw fetch_E();
+                throw FetchException();
 
             /* remove backup copy */
             unlink((this->_local_default+".bak").c_str());
         }
     }
-    catch (const fetch_E &e)
+    catch (const FetchException &e)
     {
         std::cerr << "Error fetching " << this->_path << std::endl << std::endl;
 

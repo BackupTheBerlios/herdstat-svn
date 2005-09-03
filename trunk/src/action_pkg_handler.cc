@@ -328,7 +328,7 @@ action_pkg_handler_T::display()
             {
                 error(m->first);
                 cleanup();
-                throw action_E();
+                throw ActionException();
             }
 
             not_found.push_back(m->first);
@@ -385,7 +385,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     /* check PORTDIR */
     if (not util::is_dir(portdir))
-	throw util::bad_fileobject_E(portdir);
+	throw FileException(portdir);
 
     /* fetch/parse herds.xml for info lookup */
     herds_xml.fetch();
@@ -478,7 +478,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
         {
             metacache.load();
         }
-        catch (const metacache_parse_E)
+        catch (const Exception)
         {
             return EXIT_FAILURE;
         }

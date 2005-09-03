@@ -28,6 +28,7 @@
 #endif
 
 #include <memory>
+#include <herdstat/util/file.hh>
 #include "common.hh"
 #include "parsable.hh"
 #include "xmlparser.hh"
@@ -65,7 +66,7 @@ class xml_T : public parsable_T
         virtual void init()
         {
             if (not util::is_file(this->path()))
-                throw bad_fileobject_E(this->path());
+                throw FileException(this->path());
 
             this->parse();
         }

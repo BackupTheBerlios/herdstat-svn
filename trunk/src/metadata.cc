@@ -24,6 +24,10 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/vars.hh>
+#include <herdstat/portage/exceptions.hh>
+#include <herdstat/portage/config.hh>
+#include <herdstat/portage/find.hh>
 #include "metadata.hh"
 
 bool
@@ -118,7 +122,7 @@ metadata_T::display() const
         {
             ebuild = portage::ebuild_which(this->portdir, this->pkg);
         }
-        catch (const portage::nonexistent_pkg_E)
+        catch (const portage::NonExistentPkg)
         {
             ebuild = portage::ebuild_which
                 (optget("portage.config", portage::config_T).portdir(), this->pkg);

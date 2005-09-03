@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <herdstat/exceptions.hh>
+
 #include "common.hh"
 #include "rc.hh"
 #include "formatter.hh"
@@ -76,7 +78,7 @@ handle_opts(int argc, char **argv, std::string *action)
         switch (key)
         {
             case 'V':
-                throw args_version_E();
+                throw argsVersion();
                 break;
             case 'd':
                 (*action)="dump";
@@ -88,16 +90,16 @@ handle_opts(int argc, char **argv, std::string *action)
                 (*action)="summary";
                 break;
             case 0:
-                throw args_E();
+                throw argsException();
                 break;
             default:
-                throw args_E();
+                throw argsException();
                 break;
         }
     }
 
     if (optind < argc)
-        throw args_usage_E();
+        throw argsUsage();
 
     return 0;
 }
@@ -150,7 +152,7 @@ doaction(querycache_T &querycache, const std::string &action)
         out("Query strings", querycache.queries());
     }
     else
-        throw args_E();
+        throw argsException();
 }
 
 int
@@ -170,7 +172,7 @@ main(int argc, char **argv)
         { rc_T rc; }
 
         if (handle_opts(argc, argv, &action) != 0)
-            throw args_E();
+            throw argsException();
 
         querycache_T querycache;
         querycache.load();
@@ -178,17 +180,17 @@ main(int argc, char **argv)
         doaction(querycache, action);
         out.flush(std::cout);
     }
-    catch (const args_version_E)
+    catch (const argsVersion)
     {
         version();
         return EXIT_SUCCESS;
     }
-    catch (const args_E)
+    catch (const argsException)
     {
         usage();
         return EXIT_FAILURE;
     }
-    catch (const herdstat_base_E &e)
+    catch (const BaseException &e)
     {
         std::cerr << "Unhandled exception: " << e.what() << std::endl;
         return EXIT_FAILURE;

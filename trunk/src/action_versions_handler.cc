@@ -25,7 +25,11 @@
 #endif
 
 #include <algorithm>
-
+#include <herdstat/util/misc.hh>
+#include <herdstat/portage/exceptions.hh>
+#include <herdstat/portage/find.hh>
+#include <herdstat/portage/misc.hh>
+#include <herdstat/portage/version.hh>
 #include "common.hh"
 #include "pkgcache.hh"
 #include "overlaydisplay.hh"
@@ -190,7 +194,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             if (not count and (n != matches.size()))
                 output.endl();
         }
-        catch (const portage::ambiguous_pkg_E &e)
+        catch (const portage::AmbiguousPkg &e)
         {
             std::cerr << e.name()
                 << " is ambiguous. Possible matches are: "
@@ -208,7 +212,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             if (matches.size() == 1)
                 return EXIT_FAILURE;
         }
-        catch (const portage::nonexistent_pkg_E &e)
+        catch (const portage::NonExistentPkg &e)
         {
             std::cerr << m->second << " doesn't seem to exist." << std::endl;
 

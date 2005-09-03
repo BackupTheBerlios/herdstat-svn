@@ -1,5 +1,7 @@
 # $Id: Makefile.am 243 2005-04-22 13:30:17Z ka0ttic $
 
+include $(top_builddir)/Makefile.am.common
+
 bin_PROGRAMS = herdstat
 
 herdstat_SOURCES = common.hh common.cc \
@@ -38,7 +40,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   action_versions_handler.hh action_versions_handler.cc \
 		   herdstat.cc
 
-herdstat_LDADD = ../lib/libutil.la
+herdstat_LDADD = $(top_builddir)/herdstat/libherdstat.la @xmlwrapp_LIBS@
 
 if DEBUG
 bin_PROGRAMS += querycachectl
@@ -54,12 +56,8 @@ querycachectl_SOURCES = common.hh common.cc \
 			parsable.hh \
 			xml.hh \
 			querycachectl.cc
-querycachectl_LDADD = ../lib/libutil.la
+querycachectl_LDADD = $(top_builddir)/herdstat/libherdstat.la @xmlwrapp_LIBS@
 endif
-
-INCLUDES = -I$(top_builddir)/lib
-LIBS = @LIBS@ @XMLWRAPP_LIBS@
-AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
 
 MAINTAINERCLEANFILES = Makefile.in *~
 

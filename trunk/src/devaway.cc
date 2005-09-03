@@ -25,6 +25,8 @@
 #endif
 
 #include <memory>
+#include <herdstat/util/string.hh>
+#include <herdstat/util/file.hh>
 #include "fetcher.hh"
 #include "devaway.hh"
 
@@ -68,11 +70,11 @@ devaway_T::fetch()
         fetcher_T fetch(DEVAWAY_REMOTE, this->_local);
 
         if (not devaway() or (devaway.size() == 0))
-            throw fetch_E();
+            throw FetchException();
 
         unlink((this->_local+".bak").c_str());
     }
-    catch (const fetch_E &e)
+    catch (const FetchException &e)
     {
         if (util::is_file(this->_local+".bak"))
             util::move_file(this->_local+".bak", this->_local);
@@ -100,7 +102,7 @@ devaway_T::parse(const string_type &path)
         f(new std::ifstream(this->_path.c_str()));
     
     if (not (*f))
-        throw util::bad_fileobject_E(this->_path);
+        throw FileException(this->_path);
 
     std::string s;
     std::string::size_type beginpos, endpos;

@@ -58,11 +58,14 @@ class option_type_T
 {
     public:
 	option_type_T() : value(NULL) { }
+
 	template<typename T> 
 	option_type_T(const T &v) : value(new option_type_holder<T>(v)) { }
-	option_type_T(const option_type_T &ot)
-	    : value(ot.value ? ot.value->clone() : 0) { }
-	~option_type_T() { delete value; }
+	
+        option_type_T(const option_type_T &ot)
+	    : value(ot.value ? ot.value->clone() : NULL) { }
+	
+        ~option_type_T() { if (value) delete value; }
 
 	template<typename T>
 	option_type_T &operator= (const T &t)
@@ -88,7 +91,7 @@ class option_type_T
 	bool empty() const { return (not value); }
 
 	const std::type_info &type() const 
-	    { return value ? value->type() : typeid(void); }
+	{ return value ? value->type() : typeid(void); }
 
 	/* abstract base for option_type_holder */
 	class option_type_holder_base
@@ -105,27 +108,35 @@ class option_type_T
 	{
 	    public:
 		option_type_holder(const T &val) : v(val) { }
+                virtual ~option_type_holder() { }
+
 		virtual const std::type_info &type() const
-		    { return typeid(T); }
-		virtual option_type_holder_base *clone() const
-		    { return new option_type_holder(v); }
-		virtual void dump(std::ostream &stream) const
-		    { stream << v; }
-		T v;
+		{ return typeid(T); }
+		
+                virtual option_type_holder_base *clone() const
+		{ return new option_type_holder(v); }
+		
+                /* T must have a valid operator<< */
+                virtual void dump(std::ostream &stream) const
+		{ stream << v; }
+		
+                T v;
 	};
 
 	option_type_holder_base *value;
 };
 
 template<typename T>
-T *option_cast(option_type_T *opt)
+inline T *
+option_cast(option_type_T *opt)
 {
     return opt && opt->type() == typeid(T) ?
 	&static_cast<option_type_T::option_type_holder<T> *>(opt->value)->v : 0;
 }
 
 template<typename T>
-const T *option_cast(const option_type_T *opt)
+inline const T *
+option_cast(const option_type_T *opt)
 {
     return option_cast<T>(const_cast<option_type_T * >(opt));
 }
@@ -165,43 +176,14 @@ class options_T
 
 	/* get option with specified name */
 	template<typename T>
-	static const T get(const std::string &id)
-	{
-	    if (not optmap[id])
-		throw invalid_option_E(id);
-	    return option_cast<T>(*optmap[id]);
-	}
+	static const T get(const std::string &id);
 
 	/* set specified option name to specified value */
-	template<typename T>
-	static void set(const std::string &id, const T &t)
-	{
-	    option_map_T::iterator i = optmap.find(id);
-	    if (i != optmap.end())
-	    {
-		delete i->second;
-		optmap.erase(i);
-	    }
-            optmap[id] = new option_type_T(t);
-	}
+	template <typename T>
+	static void set(const std::string &id, const T &t);
 
 	/* dump all the options to the specified stream */
-	static void dump(std::ostream &stream)
-	{
-	    stream << "******************** options ********************" << std::endl;
-	    option_map_T::iterator i;
-	    for (i = optmap.begin() ; i != optmap.end() ; ++i)
-	    {
-		std::string s(i->first);
-		while(s.size() < 20)
-		    s.append(" ");
-		stream << s;
-		i->second->dump(stream);
-		stream << std::endl;
-	    }
-	    stream << "*************************************************" << std::endl;
-            stream << std::endl;
-	}
+	static void dump(std::ostream &stream);
 
 	/* real public interface */
 #	define optset(key,type,value)   options_T::set<type>(key, value)
@@ -209,6 +191,29 @@ class options_T
 #       define optexists(key)           options_T::exists(key)
 
 };
+
+template <typename T>
+inline const T
+options_T::get(const std::string &id)
+{
+    if (not optmap[id])
+        throw invalid_option_E(id);
+    return option_cast<T>(*(optmap[id]));
+}
+
+template <typename T>
+void
+options_T::set(const std::string &id, const T &t)
+{
+    option_map_T::iterator i = optmap.find(id);
+    if (i != optmap.end())
+    {
+        if (i->second)
+            delete i->second;
+	optmap.erase(i);
+    }
+    optmap.insert(std::make_pair(id, new option_type_T(t)));
+}
 
 #endif
 

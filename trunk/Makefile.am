@@ -1,6 +1,6 @@
 # $Id: Makefile.am 234 2005-04-19 12:34:46Z ka0ttic $
 
-SUBDIRS = doc lib src
+SUBDIRS = doc herdstat src
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
@@ -12,14 +12,14 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       html/*/*.html \
 		       *~
 
-EXTRA_DIST = autogen.sh .todo bashcomp tests
+EXTRA_DIST = Makefile.am.common autogen.sh .todo bashcomp tests
 
 check:
 	cd tests && $(MAKE) $@
 
 srchtml:
 	@test -d ${PWD}/html || mkdir ${PWD}/html ; \
-	for x in lib src ; do \
+	for x in herdstat src ; do \
 		if test -d ${PWD}/html/$${x} ; then \
 			rm -fr ${PWD}/html/$${x}/* ; \
 		else \

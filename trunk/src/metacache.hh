@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/cache.hh>
 #include "common.hh"
 #include "metadata.hh"
 

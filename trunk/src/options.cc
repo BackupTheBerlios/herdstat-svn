@@ -27,7 +27,7 @@
 #include <locale>
 #include <utility>
 #include <sys/types.h>
-
+#include <herdstat/portage/config.hh>
 #include "options.hh"
 
 options_T::option_map_T options_T::optmap;

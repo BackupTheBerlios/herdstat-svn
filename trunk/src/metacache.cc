@@ -26,7 +26,9 @@
 
 #include <algorithm>
 #include <functional>
-
+#include <herdstat/util/vars.hh>
+#include <herdstat/util/progress.hh>
+#include <herdstat/portage/config.hh>
 #include "pkgcache.hh"
 #include "metadata_xml.hh"
 #include "metacache.hh"
@@ -119,7 +121,7 @@ metacache_T::valid() const
     {
         std::ifstream stream(this->path().c_str());
         if (not stream)
-            throw util::bad_fileobject_E(this->path());
+            throw FileException(this->path());
 
         std::string line;
         valid = (std::getline(stream, line) and
@@ -199,7 +201,7 @@ metacache_T::load()
 
         this->_portdir = cache["portdir"];
         if (this->_portdir.empty())
-            throw metacache_parse_E();
+            throw Exception();
 
         /* reserve to prevent tons of reallocations */
         if (cache["size"].empty() or cache["size"] == "0")
@@ -220,7 +222,7 @@ metacache_T::load()
 
             std::vector<std::string> parts = util::split(i->second, ':', true);
             if (parts.empty())
-                throw metacache_parse_E();
+                throw Exception();
 
             /* get herds */
             str = parts.front();
@@ -255,7 +257,7 @@ metacache_T::load()
             this->push_back(meta);
         }
     }
-    catch (const metacache_parse_E)
+    catch (const Exception)
     {
         std::cerr << "Error parsing " << this->path() << std::endl;
         throw;
@@ -271,7 +273,7 @@ metacache_T::dump()
 {
     std::ofstream f(this->path().c_str());
     if (not f)
-        throw util::bad_fileobject_E(this->path());
+        throw FileException(this->path());
 
     f << "version=" << VERSION << std::endl;
     f << "portdir=" << this->_portdir << std::endl;
@@ -318,20 +320,7 @@ metacache_T::dump()
         if (ci->longdesc.empty())
             f << std::endl;
         else
-        {
-#ifdef UNICODE
-            try
-            {
-                f << util::tidy_whitespace(ci->longdesc) << std::endl;
-            }
-            catch (const Glib::ConvertError)
-            {
-                f << std::endl;
-            }
-#else /* UNICODE */
             f << util::tidy_whitespace(ci->longdesc) << std::endl;
-#endif /* UNICODE */
-        }
     }
 }
 

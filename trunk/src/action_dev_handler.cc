@@ -41,7 +41,7 @@ action_dev_handler_T::display(const std::string &dev)
 
     /* was the dev in any of the herds? */
     if (info.herds.empty())
-        throw dev_E();
+        throw DevException();
 
     if (not quiet)
     {
@@ -179,7 +179,7 @@ action_dev_handler_T::operator() (opts_type &devs)
         {
             display(*dev);
         }
-        catch (const dev_E)
+        catch (const DevException)
         {
             std::cerr << "Developer '" << *dev << "' doesn't seem to "
                 << "belong to any herds." << std::endl;

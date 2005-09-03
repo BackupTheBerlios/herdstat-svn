@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/cache.hh>
 #include "common.hh"
 
 class pkgcache_T : public util::cache_T<std::vector<std::string> >

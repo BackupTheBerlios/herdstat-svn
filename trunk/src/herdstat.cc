@@ -33,6 +33,9 @@
 # include <getopt.h>
 #endif
 
+#include <herdstat/exceptions.hh>
+#include <herdstat/portage/exceptions.hh>
+
 #include "common.hh"
 #include "rc.hh"
 #include "herds_xml.hh"
@@ -50,7 +53,7 @@
 #include "action_fetch_handler.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
-#define HERDSTATRC_LOCAL    "/.herdstatrc"
+#define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
 static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:";
 
@@ -252,7 +255,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 		if (optget("action", options_action_T) != action_unspecified and
 		    optget("action", options_action_T) != action_pkg and
 		    optget("action", options_action_T) != action_meta)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		if (optget("action", options_action_T) == action_pkg or
 		    optget("action", options_action_T) == action_meta)
 		    optset("dev", bool, true);
@@ -264,7 +267,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 		if (optget("action", options_action_T) != action_unspecified and
 		    optget("action", options_action_T) != action_dev and
 		    optget("action", options_action_T) != action_meta)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		if (optget("action", options_action_T) == action_dev)
 		    optset("dev", bool, true);
 		if (optget("action", options_action_T) == action_meta)
@@ -277,7 +280,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 		    optget("action", options_action_T) != action_pkg and
 		    optget("action", options_action_T) != action_dev and
 		    optget("action", options_action_T) != action_find)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 
 		if (optget("action", options_action_T) == action_pkg or
 		    optget("action", options_action_T) == action_dev or
@@ -289,14 +292,14 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --which */
 	    case 'w':
 		if (optget("action", options_action_T) != action_unspecified)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		optset("action", options_action_T, action_which);
 		break;
 	    /* --find */
 	    case 'f':
 		if (optget("action", options_action_T) != action_unspecified and
 		    optget("action", options_action_T) != action_meta)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		if (optget("action", options_action_T) == action_meta)
 		    optset("meta", bool, true);
 		optset("action", options_action_T, action_find);
@@ -304,19 +307,19 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --versions */
 	    case '\b':
 		if (optget("action", options_action_T) != action_unspecified)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		optset("action", options_action_T, action_versions);
 		break;
 	    /* --away */
 	    case 'a':
 		if (optget("action", options_action_T) != action_unspecified)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		optset("action", options_action_T, action_away);
 		break;
 	    /* --fetch */
 	    case 'F':
 		if (optget("action", options_action_T) != action_unspecified)
-		    throw args_one_action_only_E();
+		    throw argsOneActionOnly();
 		optset("action", options_action_T, action_fetch);
 		break;
 	    /* --no-overlay */
@@ -409,17 +412,17 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --version */
 	    case 'V':
-		throw args_version_E();
+		throw argsVersion();
 		break;
 	    /* --help */
 	    case 'h':
-		throw args_help_E();
+		throw argsHelp();
 		break;
 	    case 0:
-		throw args_usage_E();
+		throw argsUsage();
 		break;
 	    default:
-		throw args_E();
+		throw argsException();
 		break;
 	}
     }
@@ -437,7 +440,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    action != action_meta and
 	    action != action_versions and
 	    action != action_fetch)
-	    throw args_usage_E();
+	    throw argsUsage();
     }
 
     return 0;
@@ -460,7 +463,7 @@ main(int argc, char **argv)
 
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
-	    throw args_E();
+	    throw argsException();
 
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output */
@@ -486,7 +489,7 @@ main(int argc, char **argv)
 	{
 	    outstream = new std::ofstream(optget("outfile", std::string).c_str());
 	    if (not *outstream)
-		throw bad_fileobject_E(optget("outfile", std::string));
+		throw FileException(optget("outfile", std::string));
 	    optset("outstream", std::ostream *, outstream);
 	}
 	else
@@ -574,13 +577,13 @@ main(int argc, char **argv)
 		if ((*action_handler)(nonopt_args) != EXIT_SUCCESS)
 		    return EXIT_FAILURE;
 	    }
-	    catch (const action_E)
+	    catch (const ActionException)
 	    {
 		return EXIT_FAILURE;
 	    }
 	}
 	else
-	    throw args_unimplemented_E();
+	    throw argsUnimplemented();
 
 	if (outstream)
 	    delete outstream;
@@ -592,71 +595,66 @@ main(int argc, char **argv)
 	    << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const XMLWriter_E &e)
-    {
-	std::cerr << "Error writing '" << e.file() << "': " << e.error()
-	    << std::endl;
-	return EXIT_FAILURE;
-    }
-    catch (const format_E &e)
+//    catch (const XMLWriter_E &e)
+//    {
+//        std::cerr << "Error writing '" << e.file() << "': " << e.error()
+//            << std::endl;
+//        return EXIT_FAILURE;
+//    }
+    catch (const FormatException &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const fetch_E)
+    catch (const FetchException)
     { return EXIT_FAILURE; }
-    catch (const portage::qa_E)
+    catch (const portage::QAException)
     { return EXIT_FAILURE; }
-    catch (const util::bad_regex_E)
+    catch (const BadRegex)
     {
 	std::cerr << "Bad regular expression." << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const util::bad_fileobject_E &e)
+    catch (const FileException &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const util::base_E &e)
+    catch (const ErrnoException &e)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const errno_error_E &e)
-    {
-	std::cerr << e.what() << std::endl;
-	return EXIT_FAILURE;
-    }
-    catch (const timer_E &e)
-    {
-	std::cout
-	    << "Took " << e.what() << "ms to parse herds.xml." << std::endl;
-    }
-    catch (const args_help_E)
+//    catch (const timer_E &e)
+//    {
+//        std::cout
+//            << "Took " << e.what() << "ms to parse herds.xml." << std::endl;
+//    }
+    catch (const argsHelp)
     {
 	help();
 	return EXIT_SUCCESS;
     }
-    catch (const args_version_E)
+    catch (const argsVersion)
     {
 	version();
 	return EXIT_SUCCESS;
     }
-    catch (const args_usage_E)
+    catch (const argsUsage)
     {
 	usage();
 	return EXIT_FAILURE;
     }
-    catch (const args_E)
+    catch (const argsException)
     {
 	usage();
 	return EXIT_FAILURE;
     }
-    catch (const rc_E)
-    {
-	return EXIT_FAILURE;
-    }
-    catch (const herdstat_base_E &e)
+//    catch (const rcException)
+//    {
+//        return EXIT_FAILURE;
+//    }
+    catch (const BaseException &e)
     {
 	std::cerr << "Unhandled exception: " << e.what() << std::endl;
 	return EXIT_FAILURE;

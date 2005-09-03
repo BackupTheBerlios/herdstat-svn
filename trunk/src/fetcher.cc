@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/file.hh>
+#include <herdstat/util/string.hh>
 #include "fetcher.hh"
 
 int
@@ -31,7 +33,7 @@ fetcher_T::fetch(const std::string &url, const std::string &file)
 {
     const char *dir = util::dirname(file);
     if (access(dir, W_OK) != 0)
-        throw util::bad_fileobject_E(dir);
+        throw FileException(dir);
 
     std::string opts(optget("wget.options", std::string));
     

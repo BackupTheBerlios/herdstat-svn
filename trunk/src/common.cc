@@ -26,12 +26,10 @@
 
 #include "common.hh"
 
+#include <herdstat/util/string.hh>
+
 void
-#ifdef UNICODE
-debug_msg(const gchar *fmt, ...)
-#else /* UNICODE */
 debug_msg(const char *fmt, ...)
-#endif /* UNICODE */
 {
     if (not optget("debug", bool))
 	return;

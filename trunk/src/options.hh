@@ -33,6 +33,7 @@
 #include <map>
 
 #include "common.hh"
+#include <herdstat/exceptions.hh>
 
 enum options_action_T
 {
@@ -146,7 +147,7 @@ T option_cast(const option_type_T &opt)
 {
     const T *result = option_cast<T>(&opt);
     if (not result)
-	throw bad_option_cast_E();
+	throw BadCast();
     return *result;
 }
 
@@ -197,7 +198,7 @@ inline const T
 options_T::get(const std::string &id)
 {
     if (not optmap[id])
-        throw invalid_option_E(id);
+        throw BadOption(id);
     return option_cast<T>(*(optmap[id]));
 }
 

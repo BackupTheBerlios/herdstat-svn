@@ -1,8 +1,17 @@
 ChangeLog for herdstat
 
+2005-09-03 Aaron Walker <ka0ttic@gentoo.org>
+
+	* lib/*: Break up everything.  All convenience libs are now located in
+	herdstat/LIB.  utility stuff in herdstat/util, portage stuff in
+	herdstat/portage, etc.
+	* herdstat/exceptions.hh: Moved base exceptions here.
+	* src/*: update include paths, etc.
+	* Makfile.am.common: Added a common Makefile.am which is now include'd
+	by all other Makefile.am's.
+
 2005-09-01 Aaron Walker <ka0ttic@gentoo.org>
 
-	* configure.ac: Update version (1.1.1_p7).
 	* options.cc, options.hh: Clean up a little.
 
 2005-08-31 Aaron Walker <ka0ttic@gentoo.org>

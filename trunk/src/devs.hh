@@ -29,7 +29,7 @@
 
 #include <ostream>
 #include <vector>
-
+#include <herdstat/util/string.hh>
 #include "common.hh"
 #include "formatter.hh"
 

@@ -107,7 +107,7 @@ action_herd_handler_T::operator() (opts_type &herds)
                 continue;
             }
             else
-                throw herd_E();
+                throw HerdException();
         }
 
         herds_xml[*herd]->display(*stream);

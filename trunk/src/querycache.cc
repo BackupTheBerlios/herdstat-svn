@@ -261,7 +261,7 @@ querycache_T::dump()
     catch (const std::exception &e)
 #endif /* USE_LIBXMLPP */
     {
-        throw XMLWriter_E(this->_path, e.what());
+        throw Exception("Failed to write xml file: %s", this->_path.c_str());
     }
 }
 

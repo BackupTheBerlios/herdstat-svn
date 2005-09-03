@@ -2,4 +2,7 @@
     <title>
         Todo list for herdstat
     </title>
+    <note priority="veryhigh" time="1125741574">
+        Re-add ${P}, ${PN}, etc substitution functionality to vars_T (via a derivative, ebuild_T perhaps)
+    </note>
 </todo>

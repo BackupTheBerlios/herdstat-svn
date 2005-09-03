@@ -217,12 +217,12 @@ HerdsXMLHandler_T::text(const std::string &str)
                 fetch(url, path);
 
                 if (not mps() or (mps.size() == 0))
-                    throw fetch_E();
+                    throw FetchException();
 
                 unlink((path+".bak").c_str());
             }
         }
-        catch (const fetch_E)
+        catch (const FetchException)
         {
             /* restore back-up copy if it exists and use it */
             if (util::is_file(path+".bak"))

@@ -2,10 +2,46 @@
 # $Id: configure.ac 246 2005-04-26 12:03:53Z ka0ttic $
 
 AC_PREREQ(2.59)
-AC_INIT([herdstat], [1.1.1_p7], [ka0ttic@gentoo.org])
-AC_CONFIG_SRCDIR([src/herdstat.cc])
-AC_CONFIG_AUX_DIR([config])
-AM_INIT_AUTOMAKE([1.8 dist-bzip2 no-dist-gzip])
+AC_INIT(src/herdstat.cc)
+
+# release versioning
+VERSION_MAJOR=1
+VERSION_MINOR=1
+VERSION_MICRO=2
+VERSION_SUFFIX=alpha
+VERSION_SUFFIX_VERSION=1
+VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_MICRO"
+
+if ! test -z "$VERSION_SUFFIX" ; then
+    VERSION_FULL="$VERSION_FULL"_"$VERSION_SUFFIX""$VERSION_SUFFIX_VERSION"
+fi
+
+AC_SUBST(VERSION_MAJOR)
+AC_SUBST(VERSION_MINOR)
+AC_SUBST(VERSION_MICRO)
+AC_SUBST(VERSION_SUFFIX)
+AC_SUBST(VERSION_SUFFIX_VERSION)
+AC_SUBST(VERSION_FULL)
+
+# shared lib versioning
+LIBRARY_VERSION=1:0:0
+#               | | |
+#        +------+ | +---+
+#        |        |     |
+#        current:revision:age
+#        |        |     |
+#        |        |     +- increment if interfaces have been added
+#        |        |        set to zero if interfaces have been removed
+#                          or changed
+#        |        +- increment if source code has changed
+#        |           set to zero if current is incremented
+#        +- increment if interfaces have been added, removed or changed
+AC_SUBST(LIBRARY_VERSION)
+
+VERSION=$VERSION_FULL
+
+AC_CONFIG_AUX_DIR(config)
+AM_INIT_AUTOMAKE(herdstat, $VERSION_FULL)
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
 test x$sysconfdir = "xNONE" && sysconfdir="$ac_default_sysconfdir"
@@ -19,9 +55,9 @@ fi
 AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
 dnl build API docs?
-AC_MSG_CHECKING([whether to build API docs for internal libutil])
+AC_MSG_CHECKING([whether to build API docs for internal libherdstat])
 AC_ARG_ENABLE([api-docs],
-    [ --enable-api-docs  enable API docs for internal libutil.la [off]],
+    AC_HELP_STRING([--enable-api-docs],[Enable API docs for internal libherdstat.la [off]]),
     enable_api_docs=$enableval, enable_api_docs=no)
 AM_CONDITIONAL(GENERATE_API_DOCS, test x$enable_api_docs = xyes)
 AC_MSG_RESULT($enable_api_docs)
@@ -31,6 +67,17 @@ if test x$enable_api_docs = "xyes" ; then
     if test x$DOXYGEN = "x" ; then
 	AC_MSG_ERROR([doxygen is required to build API docs])
     fi
+fi
+
+dnl --enable-debug
+AC_ARG_ENABLE(debug,
+    AC_HELP_STRING([--enable-debug],[Enable debugging code/flags]),
+    [enable_debug=$enableval],[enable_debug=no])
+AM_CONDITIONAL(DEBUG, test x$enable_debug != "xno")
+
+if test x$enable_debug != "xno" ; then
+    CXXFLAGS="-ggdb3"
+    AC_DEFINE(DEBUG, 1, [Enable debugging code])
 fi
 
 AC_LANG_CPLUSPLUS
@@ -113,30 +160,15 @@ fi
 AC_SUBST(TERMCAP_LIBS)
 AC_DEFINE(USE_TERMCAP, 1, [Use termcap lib to determine terminal width])
 
-dnl --enable-tests
-#AC_ARG_ENABLE(tests, [ --enable-tests	build code to test herdstat [off]],
-#    enable_tests=$enableval, enable_tests=no)
-#AM_CONDITIONAL(BUILD_TESTS, test x$enable_tests = "xyes")
-
-dnl --enable-debug
-AC_ARG_ENABLE(debug, [  --enable-debug      enable debugging flags [off]],
-    [case "${enableval}" in
-        yes)    debug=true
-                CXXFLAGS="-ggdb3"
-                AC_DEFINE_UNQUOTED(DEBUG, 1, [Enable debugging code])
-                ;;
-        no)     debug=false ;;
-        *)      AC_MSG_ERROR(--enable-debug accepts yes or no only) ;;
-    esac], [debug=false])
-AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
-
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES(XMLWRAPP, xmlwrapp >= 0.5.0)
+PKG_CHECK_MODULES(xmlwrapp, xmlwrapp >= 0.5.0)
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
 	  doc/Makefile
-	  lib/Makefile
+	  herdstat/Makefile
+	  herdstat/util/Makefile
+	  herdstat/portage/Makefile
 	  src/Makefile
 	  tests/Makefile
 	  tests/src/Makefile)

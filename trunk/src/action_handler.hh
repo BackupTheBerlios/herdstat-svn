@@ -28,6 +28,8 @@
 #endif
 
 #include <ostream>
+#include <herdstat/portage/config.hh>
+
 #include "common.hh"
 #include "devaway.hh"
 #include "herds_xml.hh"

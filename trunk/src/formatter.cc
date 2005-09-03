@@ -28,6 +28,9 @@
 #include <functional>
 #include <iterator>
 
+#include <herdstat/exceptions.hh>
+#include <herdstat/util/string.hh>
+#include <herdstat/util/regex.hh>
 #include "formatter.hh"
 
 /** static members **********************************************************/
@@ -104,7 +107,7 @@ formatter_T::add_highlights(const std::vector<string_type> &pairs)
             attr.highlights[parts.front()] = c;
         }
         else
-            throw format_E("Invalid highlight '%s'", i->c_str());
+            throw Exception("Invalid highlight '%s'", i->c_str());
     }
 }
 /****************************************************************************
@@ -214,7 +217,7 @@ formatter_T::append(const string_type &label, const string_type &data)
     if (not quiet())
     {
         if (label.length() > attr.maxlabel)
-            throw format_E("Label '%s' is greater than maxlabel attribute (%d)",
+            throw Exception("Label '%s' is greater than maxlabel attribute (%d)",
                 label.c_str(), attr.maxlabel);
 
         if (not label.empty())
@@ -397,26 +400,6 @@ formatter_T::append(const string_type &label, const string_type &data)
 void
 formatter_T::flush(std::ostream &stream)
 {
-#ifdef UNICODE
-
-    buffer_type::iterator i, e = this->buffer.end();
-    for (i = this->buffer.begin() ; i != e ; ++i)
-    {
-        try
-        {
-            stream << *i << std::endl;
-        }
-        catch (const Glib::ConvertError &e)
-        {
-            stream
-                << "pfft. glib found a utf8 char and puked (gnome bug 301935)."
-                << std::endl;
-            continue;
-        }
-    }
-
-#else /* UNICODE */
-
 //    std::remove_copy(buffer.begin(), buffer.end(),
 //        std::ostream_iterator<string_type>(stream, "\n"),
 //        "supercalifragilisticexpialidocious");
@@ -425,10 +408,7 @@ formatter_T::flush(std::ostream &stream)
     for (i = this->buffer.begin() ; i != this->buffer.end() ; ++i)
         stream << *i << std::endl;
 
-#endif /* UNICODE */
-
     this->buffer.clear();
-
 }
 /****************************************************************************/
 

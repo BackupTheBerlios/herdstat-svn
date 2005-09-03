@@ -318,20 +318,7 @@ metacache_T::dump()
         if (ci->longdesc.empty())
             f << std::endl;
         else
-        {
-#ifdef UNICODE
-            try
-            {
-                f << util::tidy_whitespace(ci->longdesc) << std::endl;
-            }
-            catch (const Glib::ConvertError)
-            {
-                f << std::endl;
-            }
-#else /* UNICODE */
             f << util::tidy_whitespace(ci->longdesc) << std::endl;
-#endif /* UNICODE */
-        }
     }
 }
 

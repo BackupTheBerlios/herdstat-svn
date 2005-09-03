@@ -27,6 +27,11 @@
 #include <algorithm>
 #include <iterator>
 
+#include <herdstat/util/string.hh>
+#include <herdstat/util/file.hh>
+#include <herdstat/util/timer.hh>
+#include <herdstat/portage/misc.hh>
+#include <herdstat/portage/config.hh>
 #include "pkgcache.hh"
 
 #define PKGCACHE                    /*LOCALSTATEDIR*/"/pkgcache"
@@ -106,7 +111,7 @@ pkgcache_T::valid() const
     {
         std::ifstream stream(this->path().c_str());
         if (not stream)
-            throw util::bad_fileobject_E(this->path());
+            throw FileException(this->path());
 
         std::string line;
         valid = (std::getline(stream, line) and
@@ -184,7 +189,7 @@ pkgcache_T::load()
 {
     std::ifstream stream(this->path().c_str());
     if (not stream)
-        throw util::bad_fileobject_E(this->path());
+        throw FileException(this->path());
 
     /* ignore first two lines, it's just used for validating the cache */
     std::string line;
@@ -204,7 +209,7 @@ pkgcache_T::dump()
 {
     std::ofstream stream(this->path().c_str());
     if (not stream)
-        throw util::bad_fileobject_E(this->path());
+        throw FileException(this->path());
 
     /* this cache came from this->_portdir */
     stream << "portdir=" << this->_portdir << std::endl;

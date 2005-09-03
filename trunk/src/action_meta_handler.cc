@@ -29,6 +29,10 @@
 #include <algorithm>
 #include <iterator>
 
+#include <herdstat/portage/exceptions.hh>
+#include <herdstat/portage/find.hh>
+#include <herdstat/portage/misc.hh>
+
 #include "common.hh"
 #include "metadata_xml.hh"
 #include "overlaydisplay.hh"
@@ -59,7 +63,7 @@ action_meta_handler_T::display(const metadata_T &meta)
             {
                 ebuild = portage::ebuild_which(meta.portdir, meta.pkg);
             }
-            catch (const portage::nonexistent_pkg_E)
+            catch (const portage::NonExistentPkg)
             {
                 ebuild = portage::ebuild_which(portdir, meta.pkg);
             }
@@ -239,7 +243,7 @@ action_meta_handler_T::operator() (opts_type &opts)
                 meta.pkg = p.second;
             }
         }
-        catch (const portage::ambiguous_pkg_E &e)
+        catch (const portage::AmbiguousPkg &e)
         {
             std::cerr << e.name()
                 << " is ambiguous. Possible matches are: "
@@ -259,7 +263,7 @@ action_meta_handler_T::operator() (opts_type &opts)
             else
                 continue;
         }
-        catch (const portage::nonexistent_pkg_E &e)
+        catch (const portage::NonExistentPkg &e)
         {
             std::cerr << m->second << " doesn't seem to exist." << std::endl;
 

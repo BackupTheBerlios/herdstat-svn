@@ -30,6 +30,7 @@
 #include <istream>
 #include <xmlwrapp/init.h>
 #include <xmlwrapp/event_parser.h>
+#include <herdstat/exceptions.hh>
 #include "common.hh"
 
 /*
@@ -48,7 +49,7 @@ class XMLHandler_T : public xml::event_parser
  * parser exception class
  */
 
-class XMLParser_E : public herdstat_base_E
+class XMLParser_E : public Exception
 {
     public:
         typedef std::string string_type;

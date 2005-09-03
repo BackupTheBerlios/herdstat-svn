@@ -39,7 +39,7 @@ action_fetch_handler_T::operator() (opts_type &null)
         if (use_devaway)
             devaway.fetch();
     }
-    catch (const fetch_E)
+    catch (const FetchException)
     {
         return EXIT_FAILURE;
     }

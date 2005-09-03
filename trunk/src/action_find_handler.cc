@@ -29,6 +29,9 @@
 #include <algorithm>
 #include <iterator>
 
+#include <herdstat/portage/find.hh>
+#include <herdstat/portage/exceptions.hh>
+
 #include "pkgcache.hh"
 #include "action_meta_handler.hh"
 #include "action_find_handler.hh"
@@ -85,7 +88,7 @@ action_find_handler_T::operator() (opts_type &opts)
                 p = portage::find_package(config, m->second,
                         overlay, &search_timer, pkgcache);
         }
-        catch (const portage::ambiguous_pkg_E &e)
+        catch (const portage::AmbiguousPkg &e)
         {
             /* ambiguous still matches */
             std::copy(e.packages.begin(), e.packages.end(),
@@ -93,7 +96,7 @@ action_find_handler_T::operator() (opts_type &opts)
 
             continue;
         }
-        catch (const portage::nonexistent_pkg_E &e)
+        catch (const portage::NonExistentPkg &e)
         {
             std::cerr << m->second << " doesn't seem to exist." << std::endl;
 

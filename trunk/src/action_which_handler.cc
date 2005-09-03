@@ -25,7 +25,8 @@
 #endif
 
 #include <algorithm>
-
+#include <herdstat/portage/exceptions.hh>
+#include <herdstat/portage/find.hh>
 #include "pkgcache.hh"
 #include "action_which_handler.hh"
 
@@ -95,7 +96,7 @@ action_which_handler_T::operator() (opts_type &opts)
                 p = portage::find_package(config, m->second,
                     overlay, &search_timer);
         }
-        catch (const portage::ambiguous_pkg_E &e)
+        catch (const portage::AmbiguousPkg &e)
         {
             std::cerr << e.name()
                 << " is ambiguous. Possible matches are: "
@@ -115,7 +116,7 @@ action_which_handler_T::operator() (opts_type &opts)
 
             continue;
         }
-        catch (const portage::nonexistent_pkg_E &e)
+        catch (const portage::NonExistentPkg &e)
         {
             std::cerr << m->second << " doesn't seem to exist." << std::endl;
 
@@ -130,7 +131,7 @@ action_which_handler_T::operator() (opts_type &opts)
 //            /* try p.first (may be an overlay) first */
 //            ebuild = portage::ebuild_which(p.first, p.second);
 //        }
-//        catch (const portage::nonexistent_pkg_E)
+//        catch (const portage::NonExistentPkg)
 //        {
 //            /* nope, so use real PORTDIR */
 //            ebuild = portage::ebuild_which(portdir, p.second);

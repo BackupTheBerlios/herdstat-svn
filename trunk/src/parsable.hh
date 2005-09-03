@@ -27,6 +27,8 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/timer.hh>
+
 /*
  * Defines an abstract base class for parsable things.
  */

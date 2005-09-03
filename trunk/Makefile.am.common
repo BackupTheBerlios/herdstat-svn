@@ -1,0 +1,3 @@
+INCLUDES = -I$(top_builddir)
+AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
+MAINTAINERCLEANFILES = Makefile.in *~ *.loT

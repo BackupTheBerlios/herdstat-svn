@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/regex.hh>
 #include "common.hh"
 #include "herds.hh"
 

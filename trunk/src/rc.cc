@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <string>
+#include "common.hh"
 #include "rc.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/"PACKAGE"rc"

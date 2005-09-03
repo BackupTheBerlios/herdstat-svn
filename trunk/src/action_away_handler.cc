@@ -31,7 +31,7 @@ void
 action_away_handler_T::display(const std::string &dev)
 {
     if (devaway.find(dev) == devaway.end())
-        throw dev_E();
+        throw DevException();
 
     if (quiet)
         *stream << dev << " - " << util::tidy_whitespace(devaway[dev])
@@ -128,7 +128,7 @@ action_away_handler_T::operator() (opts_type &opts)
         {
             display(*i);
         }
-        catch (const dev_E)
+        catch (const DevException)
         {
             std::cerr << "Developer '" << *i << "' either doesn't exist or "
                 << "is not currently away." << std::endl;

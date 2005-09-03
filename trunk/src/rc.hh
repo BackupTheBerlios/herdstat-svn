@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "common.hh"
+#include <herdstat/util/vars.hh>
 
 /*
  * configuration file class

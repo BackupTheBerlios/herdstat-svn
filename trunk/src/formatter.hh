@@ -29,7 +29,7 @@
 
 #include <ostream>
 #include <map>
-
+#include <herdstat/util/misc.hh>
 #include "common.hh"
 
 class formatter_T
