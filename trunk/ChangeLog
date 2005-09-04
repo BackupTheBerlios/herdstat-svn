@@ -23,6 +23,8 @@ ChangeLog for herdstat
 	no HOMEPAGE or <longdescription>/DESCRIPTION specified; in --quiet
 	mode, it should display "none" instead of nothing, which it failed to
 	do before.
+	* src/devaway.cc: return immediately from fetch() if a local path was
+	specified on the command line.
 	* tests/expected/metadata, tests/expected/metadata-regex: Update
 	metadata expected files with the missing none's (bug mentioned above).
 	* tests/glob-test.sh, tests/expected/glob, tests/src/glob-test.cc,

@@ -153,6 +153,26 @@ T option_cast(const option_type_T &opt)
 
 class options_T
 {
+    public:
+        static bool exists(const std::string &id)
+        { return optmap.find(id) != optmap.end(); }
+
+	/* get option with specified name */
+	template<typename T>
+	static const T get(const std::string &id);
+
+	/* set specified option name to specified value */
+	template <typename T>
+	static void set(const std::string &id, const T &t);
+
+	/* dump all the options to the specified stream */
+	static void dump(std::ostream &stream);
+
+	/* convenience */
+#	define optset(key,type,value)   options_T::set<type>(key, value)
+#	define optget(key,type)         options_T::get<type>(key)
+#       define optexists(key)           options_T::exists(key)
+
     private:
 	class option_map_T : public std::map<std::string, option_type_T * >
 	{
@@ -170,27 +190,6 @@ class options_T
 	};
 
 	static option_map_T optmap;
-
-    public:
-        static bool exists(const std::string &id)
-        { return optmap.find(id) != optmap.end(); }
-
-	/* get option with specified name */
-	template<typename T>
-	static const T get(const std::string &id);
-
-	/* set specified option name to specified value */
-	template <typename T>
-	static void set(const std::string &id, const T &t);
-
-	/* dump all the options to the specified stream */
-	static void dump(std::ostream &stream);
-
-	/* real public interface */
-#	define optset(key,type,value)   options_T::set<type>(key, value)
-#	define optget(key,type)         options_T::get<type>(key)
-#       define optexists(key)           options_T::exists(key)
-
 };
 
 template <typename T>

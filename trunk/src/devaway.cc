@@ -52,7 +52,8 @@ devaway_T::init()
 void
 devaway_T::fetch()
 {
-    if (this->_fetched)
+    if (this->_fetched or
+       (not optget("devaway.location", std::string).empty()))
         return;
 
     const std::string path(this->path());
