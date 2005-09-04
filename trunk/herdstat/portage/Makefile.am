@@ -5,12 +5,14 @@ include $(top_builddir)/Makefile.am.common
 cc_sources = misc.cc \
 	     config.cc \
 	     version.cc \
-	     find.cc
+	     find.cc \
+	     ebuild.cc
 hh_sources = exceptions.hh \
 	     misc.hh \
 	     config.hh \
              version.hh \
-	     find.hh
+	     find.hh \
+	     ebuild.hh
 
 noinst_LTLIBRARIES = libportage.la
 libportage_la_SOURCES = $(cc_sources) $(hh_sources)

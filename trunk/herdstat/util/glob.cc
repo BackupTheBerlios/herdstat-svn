@@ -1,5 +1,5 @@
 /*
- * herdstat -- herdstat/util/progress.hh
+ * herdstat -- herdstat/util/glob.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,46 +20,33 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PROGRESS_HH
-#define HAVE_PROGRESS_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include <herdstat/util/glob.hh>
+
 namespace util {
+/****************************************************************************/
+glob_T::glob_T(const char *pattern)
+{
+    int ret = glob(pattern, GLOB_ERR, NULL, &(this->_glob));
+    if (ret != 0 and ret != GLOB_NOMATCH)
+        throw ErrnoException("glob");
 
-    /**
-     * Represents the amount of progress on an operation.
-     */
-
-    class progress_T
+    /* fill results */
+    if (ret != GLOB_NOMATCH)
     {
-	public:
-            /// Default constructor.
-	    progress_T();
-
-            /// Destructor.
-            ~progress_T();
-
-            /** Start progress.
-             * @param m Number of total items to process.
-             */
-	    void start(unsigned m);
-
-            /// Increment progress.
-	    void operator++ ();
-
-	private:
-            /// Current progress.
-	    float _cur;
-            /// Increment amount.
-            float _step;
-            /// Whether we've started yet.
-            bool  _started;
-    };
+        for (std::size_t i = 0 ; this->_glob.gl_pathv[i] != NULL ; ++i)
+            this->_results.push_back(this->_glob.gl_pathv[i]);
+    }
+}
+/****************************************************************************/
+glob_T::~glob_T()
+{
+    globfree(&(this->_glob));
+}
+/****************************************************************************/
 } // namespace util
-
-#endif
 
 /* vim: set tw=80 sw=4 et : */

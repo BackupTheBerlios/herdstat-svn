@@ -6,7 +6,11 @@ cc_sources = string.cc \
 	     misc.cc \
 	     regex.cc \
 	     file.cc \
-	     vars.cc
+	     vars.cc \
+	     glob.cc \
+	     timer.cc \
+	     progress.cc
+
 hh_sources = string.hh \
 	     misc.hh \
 	     regex.hh \

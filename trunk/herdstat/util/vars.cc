@@ -31,6 +31,17 @@
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/vars.hh>
 
+/****************************************************************************/
+util::vars_T::vars_T() : _depth(0)
+{
+}
+/****************************************************************************/
+util::vars_T::vars_T(const std::string &path)
+    : base_file_T(path), _depth(0)
+{
+    this->read();
+}
+/****************************************************************************/
 void
 util::vars_T::dump(std::ostream &stream) const
 {
@@ -38,25 +49,23 @@ util::vars_T::dump(std::ostream &stream) const
     for (i = this->begin() ; i != this->end() ; ++i)
         stream << i->first << "=" << i->second << std::endl;
 }
-
+/****************************************************************************/
 void
 util::vars_T::read(const std::string &path)
 {
-    this->_path.assign(path);
+    this->stat().assign(path);
     this->read();
 }
-
-/*
+/****************************************************************************
  * Read from our stream, saving any VARIABLE=["']value['"]
  * statements in our map.  Lines beginning with a '#'
  * are considered to be comments.  Should work with shell
  * scripts or VARIABLE=value-type configuration files.
- */
-
+ ****************************************************************************/
 void
 util::vars_T::read()
 {
-    if (not this->_opened)
+    if (not this->is_open())
         this->open();
 
     std::string s;
@@ -101,25 +110,6 @@ util::vars_T::read()
         }
     }
 
-    /* are we an ebuild? */
-//    this->_ebuild = portage::is_ebuild(this->_path);
-
-    /* if so, insert its variable components
-     * (${P}, ${PN}, ${PV}, etc) into our map */
-//    if (this->_ebuild)
-//    {
-//        portage::version_string_T version(this->_path);
-//        portage::version_string_T::iterator v = version.begin(),
-//                                            e = version.end();
-
-//        for (; v != e ; ++v) this->insert(*v);
-//    }
-
-    /* 
-     * FIXME: the above code should go into a derivative
-     * that defines overrides set_defaults() which will be called below.
-     */
-
     this->set_defaults();
 
     /* loop through our map performing variable substitutions */
@@ -127,12 +117,10 @@ util::vars_T::read()
     for (iterator i = this->begin() ; i != e ; ++i)
         this->subst(i->second);
 }
-
-/*
+/****************************************************************************
  * Search the given variable value for any variable occurrences,
  * recursively calling ourselves each time we find another occurrence.
- */
-
+ ****************************************************************************/
 void
 util::vars_T::subst(std::string &value)
 {

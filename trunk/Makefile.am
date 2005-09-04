@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = 1.8 dist-bzip2 no-dist-gzip
 
-SUBDIRS = doc herdstat src
+SUBDIRS = herdstat src doc
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \

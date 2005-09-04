@@ -1,5 +1,5 @@
 /*
- * herdstat -- herdstat/util/progress.hh
+ * herdstat -- portage/ebuild.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,46 +20,40 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PROGRESS_HH
-#define HAVE_PROGRESS_HH 1
+#ifndef _HAVE_EBUILD_HH
+#define _HAVE_EBUILD_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-namespace util {
+/**
+ * @file ebuild.hh
+ * @brief Defines the ebuild_T class.
+ */
+
+#include <herdstat/util/vars.hh>
+
+namespace portage {
 
     /**
-     * Represents the amount of progress on an operation.
+     * Represents ebuild variables.  This is really identical to vars_T,
+     * except it re-defines set_defaults() and inserts variables that should
+     * be pre-existing (${PN}, ${P}, etc).
      */
 
-    class progress_T
+    class ebuild_T : public util::vars_T
     {
-	public:
-            /// Default constructor.
-	    progress_T();
+        public:
+            ebuild_T();
+            ebuild_T(const std::string &path);
+            virtual ~ebuild_T() { }
 
-            /// Destructor.
-            ~progress_T();
-
-            /** Start progress.
-             * @param m Number of total items to process.
-             */
-	    void start(unsigned m);
-
-            /// Increment progress.
-	    void operator++ ();
-
-	private:
-            /// Current progress.
-	    float _cur;
-            /// Increment amount.
-            float _step;
-            /// Whether we've started yet.
-            bool  _started;
+            virtual void set_defaults();
     };
-} // namespace util
 
-#endif
+} // namespace portage
+
+#endif /* _HAVE_EBUILD_HH */
 
 /* vim: set tw=80 sw=4 et : */

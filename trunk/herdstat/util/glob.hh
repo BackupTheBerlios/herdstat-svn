@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/glob.hh
+ * herdstat -- herdstat/util/glob.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -45,29 +45,24 @@ namespace util
      * matching a glob pattern.
      */
 
-    class glob_T : public std::vector<std::string>
+    class glob_T
     {
         public:
-            /** Constructor.
-             * @param pattern Glob pattern.
-             */
-            glob_T(const char *pattern)
-            {
-                int rv = glob(pattern, GLOB_ERR, NULL, &(this->_glob));
-                if (rv != 0 and rv != GLOB_NOMATCH)
-                    throw util::errno_E("glob");
+            typedef std::vector<std::string> container_type;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::size_type size_type;
 
-                /* fill vector with glob results */
-                for (std::size_t i = 0 ; this->_glob.gl_pathv[i] ; ++i)
-                    this->push_back(this->_glob.gl_pathv[i]);
-            }
+            glob_T(const char *pattern);
+            ~glob_T();
 
-            /// Destructor.
-            ~glob_T() { globfree(&(this->_glob)); }
+            const_iterator begin() const { return _results.begin(); }
+            const_iterator end()   const { return _results.end(); }
+            size_type size() const { return _results.size(); }
+            bool empty() const { return _results.empty(); }
 
-        protected:
-            /// Internal glob_t instance.
+        private:
             glob_t _glob;
+            container_type _results;
     };
 
     /**
@@ -77,24 +72,14 @@ namespace util
     class patternMatch
     {
         public:
-            /** Overloaded operator().
-             * @param pattern Glob pattern.
-             * @param path Path.
-             * @returns A boolean value (Does glob match pattern?).
-             */
-            bool operator() (const std::string pattern,
-                             const std::string path)
-            { return (*this)(pattern.c_str(), path.c_str()); }
-
             /** fnmatch() wrapper.
              * @param pattern Glob pattern.
              * @param path Path.
              * @returns A boolean value (Does glob match pattern?).
              */
-            bool operator() (const char *pattern, const char *path)
-            {
-                return fnmatch(pattern, path, 0) == 0;
-            }
+            bool operator() (const std::string pattern,
+                             const std::string path) const
+            { return (fnmatch(pattern.c_str(), path.c_str(), 0) == 0); }
     };
 }
 

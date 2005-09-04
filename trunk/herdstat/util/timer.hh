@@ -27,11 +27,10 @@
 # include "config.h"
 #endif
 
-#include <cstddef>
 #include <sys/time.h>
 
-namespace util
-{
+namespace util {
+
     /**
      * Represents a timer.
      */
@@ -40,50 +39,54 @@ namespace util
     {
         public:
             typedef long size_type;
-            typedef struct timeval time_type;
 
             /// Default constructor.
-            timer_T() : _elapsed(0), _running(false) { }
+            timer_T();
 
             /// Start timer.
-            void start()
-	    {
-	        gettimeofday(&(this->_begin), NULL);
-                this->_running = true;
-	    }
+            void start();
 
             /// Stop timer.
-	    void stop()
-	    {
-	        gettimeofday(&(this->_end), NULL);
-                size_type tmp(this->_elapsed);
-	        this->_elapsed = this->_end.tv_sec - this->_begin.tv_sec;
-	        this->_elapsed *= 1000;
-	        this->_elapsed +=
-                    (this->_end.tv_usec - this->_begin.tv_usec) / 1000;
-                this->_elapsed += tmp;
-                this->_running = false;
-	    }
+	    void stop();
 
             /** Is the timer running?
              * @returns A boolean value.
              */
-            bool is_running() const { return this->_running; }
+            bool is_running() const;
 
             /** How long has the timer been running?
              * @returns An long integer value.
              */
-            size_type elapsed() const { return this->_elapsed; }
+            size_type elapsed() const;
 
             /// Reset elapsed value.
-            void reset() { this->_elapsed = 0; }
+            void reset();
 
         private:
-	    time_type _begin, _end;
+	    timeval _begin, _end;
 	    size_type _elapsed;
             bool _running;
     };
-}
+
+    inline bool
+    timer_T::is_running() const
+    {
+        return this->_running;
+    }
+
+    inline timer_T::size_type
+    timer_T::elapsed() const
+    {
+        return this->_elapsed;
+    }
+
+    inline void
+    timer_T::reset()
+    {
+        this->_elapsed = 0;
+    }
+
+} // namespace util
 
 #endif
 

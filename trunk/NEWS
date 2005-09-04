@@ -1,8 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
-1.1.1_p7:
+1.1.2_alpha1:
+    *Many* behind-the-scenes changes.  Mostly code refactoring/cleanup.
+
     Bug fixes:
+     - Fixed bug in --metadata --quiet output; when encountering packages with
+       no HOMEPAGE or DESCRIPTION/<longdescription>, "none" is supposed to be
+       used rather than nothing at all.
      - The xml::init object from libxmlwrapp should only be instantiated once,
        not once per XML file.  This probably fixes a few subtle bugs.  For sure,
        it fixes a segmentation fault when trying to parse metadata.xml's that

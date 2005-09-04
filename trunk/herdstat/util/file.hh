@@ -30,6 +30,7 @@
 #include <ios>
 #include <ostream>
 #include <fstream>
+#include <string>
 #include <vector>
 #include <cstdlib>
 #include <cerrno>
@@ -128,15 +129,13 @@ namespace util
             typedef time_t  time_type;
 
             /// Default constructor.
-            stat_T() : _type(REGULAR), _exists(false), _opened(false) { }
+            stat_T();
 
             /** Constructor.
              * @param p Path.
              * @param opened Has the file associated with this been opened?
              */
-            stat_T(const std::string &p, bool opened = false)
-                : _path(p), _type(REGULAR), _exists(false), _opened(opened)
-            { (void)(*this)(); }
+            stat_T(const std::string &p, bool opened = false);
 
             virtual ~stat_T() { }
 
@@ -149,16 +148,11 @@ namespace util
             time_type   atime()    const { return this->st_atime; }
             time_type   mtime()    const { return this->st_mtime; }
             time_type   ctime()    const { return this->st_ctime; }
-            std::string path()     const { return this->_path; }
+            const std::string& path()    const { return this->_path; }
             ftype_T     type()     const { return this->_type; }
 
             /// Assign a new path and stat it.
-            void assign(const std::string &p, bool opened = false)
-            {
-                this->_opened = opened;
-                this->_path.assign(p);
-                (void)(*this)();
-            }
+            void assign(const std::string &p, bool opened = false);
 
             /** Does the file associated with this exist?
              * @returns A boolean value.
@@ -184,15 +178,18 @@ namespace util
     {
         public:
             /// Default constructor.
-            base_fileobject_T() : _opened(false) { }
+            base_fileobject_T();
 
             /** Constructor.
              * @param path Path.
              */
-            base_fileobject_T(const std::string &path)
-                : _path(path), _stat(path), _opened(false) { }
+            base_fileobject_T(const std::string &path);
 
             virtual ~base_fileobject_T() { }
+
+            const std::string& path() const { return this->_stat.path(); }
+            stat_T& stat() { return this->_stat; }
+            const stat_T& stat() const { return this->_stat; }
 
             /** Has this file object been opened?
              * @returns A boolean value.
@@ -212,10 +209,11 @@ namespace util
 
             /// Read file object, filling internal container.
             virtual void read()     = 0;
-            
+
         protected:
-            /// path to file object.
-            std::string  _path;
+            void set_open(const bool opened) { _opened = opened; }
+            
+        private:
             /// stat object associated with this file object.
             stat_T  _stat;
             /// whether this file has been opened.
@@ -232,21 +230,20 @@ namespace util
             typedef std::fstream stream_type;
 
             /// Default constructor.
-            base_file_T() : stream(NULL) { }
+            base_file_T();
 
             /** Constructor.  Opens file.
              * @param path Path to file.
              * @param mode Open mode (defaults to DEFAULT_MODE).
              */
-            base_file_T(const std::string &path, std::ios_base::openmode mode = DEFAULT_MODE)
-                : base_fileobject_T(path), stream(NULL)
-            { this->open(this->_path.c_str(), mode); }
+            base_file_T(const std::string &path,
+                    std::ios_base::openmode mode = DEFAULT_MODE);
 
             /// Destructor.  Closes file if opened.
-            virtual ~base_file_T() { if (this->_opened) this->close(); }
+            virtual ~base_file_T();
 
             /// Open file with default open mode.
-            virtual void open() { this->open(this->_path.c_str(), DEFAULT_MODE); }
+            virtual void open();
 
             /** Open specified path with specified open mode.
              * @param path Path to file.
@@ -258,8 +255,7 @@ namespace util
             /** Open with specified open mode.
              * @param mode Open mode.
              */
-            virtual void open(std::ios_base::openmode mode)
-            { this->open(this->_path.c_str(), mode); }
+            virtual void open(std::ios_base::openmode mode);
 
             /// Close file.
             virtual void close();
@@ -274,30 +270,32 @@ namespace util
      * for storing file contents.
      */
 
-    class file_T : public base_file_T,
-                   public std::vector<std::string>
+    class file_T : public base_file_T
     {
         public:
+            typedef std::vector<std::string> container_type;
+            typedef container_type::iterator iterator;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::value_type value_type;
+            typedef container_type::size_type size_type;
+
             /** Constructor.  Opens and reads file.
              * @param path Path to file.
              * @param mode Open mode (defaults to DEFAULT_MODE).
              */
-            file_T(const std::string &path, std::ios_base::openmode mode = DEFAULT_MODE)
-                : base_file_T(path, mode)
-            { this->read(); }
+            file_T(const std::string &path, std::ios_base::openmode mode = DEFAULT_MODE);
 
             virtual ~file_T() { }
 
             /** File size.
              * @returns An unsigned integer value.
              */
-            stat_T::size_type size() const { return this->_stat.size(); }
+            stat_T::size_type size() const { return this->stat().size(); }
 
             /** Internal buffer size (number of lines in file).
              * @returns An unsigned integer value.
              */
-            size_type bufsize() const
-            { return std::vector<std::string>::size(); }
+            size_type bufsize() const { return _contents.size(); }
 
             /** Determine if two files are equal.
              * @param f file_T object.
@@ -321,11 +319,18 @@ namespace util
             virtual void dump(std::ostream &s) const;
 
             /// Dump internal container to disk.
-            virtual void write()
-            {
-                this->dump(*(this->stream));
-                this->clear();
-            }
+            virtual void write();
+
+            iterator begin() { return _contents.begin(); }
+            const_iterator begin() const { return _contents.begin(); }
+            iterator end() { return _contents.end(); }
+            const_iterator end() const { return _contents.end(); }
+            bool empty() const { return _contents.empty(); }
+            void push_back(const value_type &v) { _contents.push_back(v); }
+            void clear() { _contents.clear(); }
+
+        private:
+            container_type _contents;
     };
 
     /**
@@ -333,22 +338,25 @@ namespace util
      * directory contents.
      */
 
-    class dir_T  : public base_fileobject_T,
-                   public std::vector<std::string>
+    class dir_T  : public base_fileobject_T
     {
         public:
+            typedef std::vector<std::string> container_type;
+            typedef container_type::iterator iterator;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::value_type value_type;
+            typedef container_type::size_type size_type;
+
             /// Default constructor.
-            dir_T() : _dirp(NULL) { }
+            dir_T();
 
             /** Constructor.  Opens and reads directory.
              * @param path Path.
              */
-            dir_T(const std::string &path)
-                : base_fileobject_T(path), _dirp(NULL)
-            { this->open(); this->read(); }
+            dir_T(const std::string &path);
 
             /// Destructor. Closes directory if opened.
-            virtual ~dir_T() { if (this->_opened) this->close(); }
+            virtual ~dir_T();
 
             /// Open directory.
             virtual void open();
@@ -383,12 +391,22 @@ namespace util
              */
             virtual const_iterator find(const regex_T &r) const;
 
-        protected:
+            iterator begin() { return _contents.begin(); }
+            const_iterator begin() const { return _contents.begin(); }
+            iterator end() { return _contents.end(); }
+            const_iterator end() const { return _contents.end(); }
+            size_type size() const { return _contents.size(); }
+            bool empty() const { return _contents.empty(); }
+            void push_back(const value_type &v) { _contents.push_back(v); }
+
+        private:
             /// Internal DIR pointer.
             DIR *_dirp;
+            /// Directory contents.
+            container_type _contents;
     };
 }
 
-#endif
+#endif /* HAVE_FILE_HH */
 
 /* vim: set tw=80 sw=4 et : */

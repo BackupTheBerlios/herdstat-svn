@@ -28,6 +28,7 @@
 #endif
 
 #include <map>
+#include <utility>
 #include <herdstat/util/file.hh>
 
 namespace util
@@ -37,18 +38,24 @@ namespace util
      * stored in key,value pairs.
      */
 
-    class vars_T : public base_file_T,
-                   public std::map<std::string, std::string>
+    class vars_T : public base_file_T
     {
         public:
+            typedef std::map<std::string, std::string> container_type;
+            typedef container_type::iterator iterator;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::mapped_type mapped_type;
+            typedef container_type::key_type key_type;
+            typedef container_type::value_type value_type;
+            typedef container_type::size_type size_type;
+
             /// Default constructor.
-            vars_T() : _depth(0) { }
+            vars_T();
 
             /** Constructor.
              * @param path Path.
              */
-            vars_T(const std::string &path) : base_file_T(path), _depth(0)
-            { this->read(); }
+            vars_T(const std::string &path);
 
             virtual ~vars_T() { }
 
@@ -79,6 +86,27 @@ namespace util
             /// Set default variables to be present before substitution.
             virtual void set_defaults() { }
 
+            iterator begin() { return _vars.begin(); }
+            const_iterator begin() const { return _vars.begin(); }
+            iterator end() { return _vars.end(); }
+            const_iterator end() const { return _vars.end(); }
+            size_type size() const { return _vars.size(); }
+            bool empty() const { return _vars.empty(); }
+            iterator find(const key_type &k) { return _vars.find(k); }
+            const_iterator find(const key_type &k) const { return _vars.find(k); }
+            mapped_type& operator[] (const key_type &k) { return _vars[k]; }
+            std::pair<iterator, bool> insert(const value_type &v)
+            { return _vars.insert(v); }
+            iterator insert(iterator hpos, const value_type &v)
+            { return _vars.insert(hpos, v); }
+            template <class In> void insert(In begin, In end)
+            { _vars.insert(begin, end); }
+            void erase(iterator pos) { _vars.erase(pos); }
+            size_type erase(const key_type &k) { return _vars.erase(k); }
+            void erase(iterator begin, iterator end)
+            { return _vars.erase(begin, end); }
+            void clear() { _vars.clear(); }
+
         private:
             /** Perform elementary variable substitution.
              * @param v Variable.
@@ -87,8 +115,8 @@ namespace util
 
             /// subst() recursion depth (safeguard).
             unsigned short _depth;
-            /// are we an ebuild?
-            bool _ebuild;
+            /// variable container
+            container_type _vars;
     };
 }
 

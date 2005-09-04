@@ -24,18 +24,12 @@
 # include "config.h"
 #endif
 
-#include <herdstat/util/misc.hh>
-#include <herdstat/util/file.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/misc.hh>
 
 bool portage::categories_T::_init = false;
 portage::categories_T::value_type portage::categories_T::_s;
 
-/*****************************************************************************
- * Current working directory a package directory?                            *
- *****************************************************************************/
-bool portage::in_pkg_dir() { return portage::is_pkg_dir(util::getcwd()); }
 /*****************************************************************************
  * Given path a package directory?                                           *
  *****************************************************************************/
@@ -48,15 +42,6 @@ portage::is_pkg_dir(const std::string &path)
     const util::regex_T regex("\\.ebuild$");
     const util::dir_T dir(path);
     return dir.find(regex) != dir.end();
-}
-/*****************************************************************************
- * Is the given path an ebuild?                                              *
- *****************************************************************************/
-bool
-portage::is_ebuild(const std::string &path)
-{
-    return ( (path.length() > 7) and
-             (path.substr(path.length() - 7) == ".ebuild") );
 }
 /*****************************************************************************/
 void

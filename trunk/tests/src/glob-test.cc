@@ -1,5 +1,5 @@
 /*
- * herdstat -- herdstat/util/progress.hh
+ * herdstat -- tests/src/glob-test.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,46 +20,31 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PROGRESS_HH
-#define HAVE_PROGRESS_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-namespace util {
+#include <iostream>
+#include <cstdlib>
+#include <herdstat/exceptions.hh>
+#include <herdstat/util/glob.hh>
 
-    /**
-     * Represents the amount of progress on an operation.
-     */
-
-    class progress_T
+int main()
+{
+    try
     {
-	public:
-            /// Default constructor.
-	    progress_T();
+        const util::glob_T results("portdir/*/*/*.ebuild");
+        util::glob_T::const_iterator i;
+        for (i = results.begin() ; i != results.end() ; ++i)
+            std::cout << *i << std::endl;
+    }
+    catch (const BaseException &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
-            /// Destructor.
-            ~progress_T();
-
-            /** Start progress.
-             * @param m Number of total items to process.
-             */
-	    void start(unsigned m);
-
-            /// Increment progress.
-	    void operator++ ();
-
-	private:
-            /// Current progress.
-	    float _cur;
-            /// Increment amount.
-            float _step;
-            /// Whether we've started yet.
-            bool  _started;
-    };
-} // namespace util
-
-#endif
+    return EXIT_SUCCESS;
+}
 
 /* vim: set tw=80 sw=4 et : */

@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <string>
 #include <set>
 #include <map>
 #include <vector>
@@ -35,10 +36,52 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <herdstat/util/file.hh>
+
 namespace portage
 {
     /**
-     * Represents a single version std::string.
+     * Version component (${P}, ${PN}, etc) map.
+     */
+
+    class version_map_T
+    {
+        public:
+            typedef std::map<std::string, std::string> container_type;
+            typedef container_type::iterator iterator;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::size_type size_type;
+
+            version_map_T(const std::string &path);
+
+            /* map subset */
+            iterator begin() { return _vmap.begin(); }
+            const_iterator begin() const { return _vmap.begin(); }
+            iterator end() { return _vmap.end(); }
+            const_iterator end() const { return _vmap.end(); }
+            iterator find(const std::string &s) { return _vmap.find(s); }
+            const_iterator find(const std::string &s) const
+            { return _vmap.find(s); }
+
+            const std::string &operator[](const std::string &key)
+            { return _vmap[key]; }
+            const std::string operator[](const std::string &key) const
+            {
+                const_iterator i = this->find(key);
+                return (i == this->end() ? "" : i->second);
+            }
+
+            const std::string& version() const { return _verstr; }
+
+        private:
+            void parse_verstr();
+
+            std::string _verstr;
+            mutable container_type _vmap;
+    };
+
+    /**
+     * Represents a single version string.
      */
 
     class version_string_T
@@ -52,18 +95,10 @@ namespace portage
             /** Constructor.
              * @param path Path to ebuild.
              */
-            version_string_T(const std::string &path) : _ebuild(path),
-                _verstr(util::chop_fileext(util::basename(path)))
-            { this->init(); }
+            version_string_T(const std::string &path);
 
-//            const suffix_T &suffix() const
-//            { return this->_suffix; }
-
-            /** Prepare version std::string in a format identical to what
-             * portage would use.
-             * @returns String object.
-             */
-            const string_type operator() () const;
+            /// Implicit conversion to std::string.
+            operator std::string() const;
 
             /** Get version std::string (minus the suffix).
              * @returns String object.
@@ -75,19 +110,24 @@ namespace portage
              */
             const std::string &ebuild() const { return this->_ebuild; }
 
+            /** Get version component map for this version string.
+             * @returns Reference to version_map_T object.
+             */
+            const version_map_T& components() const { return this->_v; }
+
             /** Determine whether given version_string_T object is less
              * than this one.
              * @param that Reference to a version_string_T object.
              * @returns    A boolean value.
              */
-            bool operator< (version_string_T &that);
+            bool operator< (version_string_T &that) const;
 
             /** Determine whether given version_string_T object is greater
              * than this one.
              * @param that Reference to a version_string_T object.
              * @returns    A boolean value.
              */
-            bool operator> (version_string_T &that)
+            bool operator> (version_string_T &that) const
             { return !(*this < that); }
 
             /** Determine whether given version_string_T object is equal
@@ -95,33 +135,17 @@ namespace portage
              * @param that Reference to a version_string_T object.
              * @returns    A boolean value.
              */
-            bool operator==(version_string_T &that);
+            bool operator==(version_string_T &that) const;
 
             /** Determine whether given version_string_T object is not equal
              * to this one.
              * @param that Reference to a version_string_T object.
              * @returns    A boolean value.
              */
-            bool operator!=(version_string_T &that)
+            bool operator!=(version_string_T &that) const
             { return !(*this == that); }
 
-            /** Retrieve values for version components (ie. P, PV, PN, etc).
-             * @param s String object.
-             * @returns String object mapped to s.
-             */
-            const string_type &operator[] (const string_type &s)
-            { return this->_v[s]; }
-            
-            /* map subset */
-            iterator begin() { return this->_v.begin(); }
-            const_iterator begin() const { return this->_v.begin(); }
-            iterator end() { return this->_v.end(); }
-            const_iterator end() const { return this->_v.end(); }
-            iterator find(const string_type &s) { return this->_v.find(s); }
-            const_iterator find(const string_type &s) const
-            { return this->_v.find(s); }
-
-        protected:
+        private:
             /**
              * Represents a version suffix (_alpha, _beta, etc).
              */
@@ -162,31 +186,31 @@ namespace portage
                      * @param that Reference to a suffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator< (suffix_T &that);
+                    bool operator< (suffix_T &that) const;
 
                     /** Determine whether that suffix is greater than this
                      * suffix.
                      * @param that Reference to a suffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator> (suffix_T &that)
+                    bool operator> (suffix_T &that) const
                     { return not (*this < that); }
                     
                     /** Determine whether that suffix is equal to this suffix.
                      * @param that Reference to a suffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator==(suffix_T &that);
+                    bool operator==(suffix_T &that) const;
                     
                     /** Determine whether that suffix is not equal to this
                      * suffix.
                      * @param that Reference to a suffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator!=(suffix_T &that)
+                    bool operator!=(suffix_T &that) const
                     { return not (*this == that); }
 
-                protected:
+                private:
                     /// Initialize this suffix std::string.
                     void init(const string_type &);
                     /// Parse PVR std::string to get suffix std::string.
@@ -235,14 +259,14 @@ namespace portage
                      * @param that Reference to a nosuffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator< (nosuffix_T &that);
+                    bool operator< (nosuffix_T &that) const;
 
                     /** Determine whether that nosuffix is greater than this
                      * nosuffix.
                      * @param that Reference to a nosuffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator> (nosuffix_T &that)
+                    bool operator> (nosuffix_T &that) const
                     { return !(*this < that); }
 
                     /** Determine whether that nosuffix is equal to this
@@ -250,17 +274,17 @@ namespace portage
                      * @param that Reference to a nosuffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator==(nosuffix_T &that);
+                    bool operator==(nosuffix_T &that) const;
 
                     /** Determine whether that nosuffix is not equal to this
                      * nosuffix.
                      * @param that Reference to a nosuffix_T object.
                      * @returns    A boolean value.
                      */
-                    bool operator!=(nosuffix_T &that)
+                    bool operator!=(nosuffix_T &that) const
                     { return !(*this == that); }
 
-                protected:
+                private:
                     /// Initialize this nosuffix std::string.
                     void init(const string_type &);
                     /// Version std::string (minus suffix).
@@ -269,17 +293,12 @@ namespace portage
                     string_type _extra;
             };
 
-            /// Initialize this version std::string.
-            void init();
-            /// Parse this version std::string and fill version components map.
-            void parse();
-
             /// Absolute path to ebuild.
             const std::string _ebuild;
-            /// Full version std::string.
-            string_type _verstr;
             /// Version components map.
-            value_type  _v;
+            const version_map_T  _v;
+            /// Reference to actual version string
+            const std::string &_verstr;
             /// Our version suffix.
             suffix_T _suffix;
             /// Our version minus suffix.

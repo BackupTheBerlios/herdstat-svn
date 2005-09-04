@@ -2,7 +2,55 @@
     <title>
         Todo list for herdstat
     </title>
-    <note priority="veryhigh" time="1125741574">
-        Re-add ${P}, ${PN}, etc substitution functionality to vars_T (via a derivative, ebuild_T perhaps)
+    <note priority="veryhigh" time="1125825370">
+        Fix lastsync bug.
+        <note priority="medium" time="1125825390">
+            pretty sure --fetch is overwriting lastsync
+        </note>
+    </note>
+    <note priority="veryhigh" time="1125826145">
+        Finish fixing broken code that inherits from std containers
+        <note priority="medium" time="1125826155">
+            herd_T
+        </note>
+        <note priority="medium" time="1125826159">
+            herds_T
+        </note>
+        <note priority="medium" time="1125826164">
+            dev_attrs_T
+        </note>
+        <note priority="medium" time="1125826170">
+            querycache_T
+        </note>
+        <note priority="medium" time="1125826184">
+            devaway_T
+        </note>
+        <note priority="medium" time="1125826191">
+            pkgQuery_T
+        </note>
+    </note>
+    <note priority="veryhigh" time="1125826740">
+        Add more tests
+        <note priority="medium" time="1125826774">
+            file_T/dir_T classes
+        </note>
+    </note>
+    <note priority="high" time="1125826259">
+        Break out generic XML parsing/writing code to a convenience lib
+        <note priority="medium" time="1125826290">
+            Move portage-specific XML code to libportage
+        </note>
+    </note>
+    <note priority="high" time="1125826378">
+        Add a userinfo_xml class.
+        <note priority="veryhigh" time="1125826409">
+            Have the -d flag also display info from userinfo.xml
+        </note>
+    </note>
+    <note priority="high" time="1125826980">
+        Update devaway class to use new devaway.xml instead of devaway.html
+    </note>
+    <note priority="low" time="1125827409">
+        Get make distcheck working.
     </note>
 </todo>

@@ -38,13 +38,60 @@
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/version.hh>
 
-std::vector<std::string> portage::version_string_T::suffix_T::_suffixes;
+namespace portage {
+/*** static members *********************************************************/
+std::vector<std::string> version_string_T::suffix_T::_suffixes;
+/****************************************************************************/
+version_map_T::version_map_T(const std::string &path)
+    : _verstr(util::chop_fileext(util::basename(path)))
+{
+    this->parse_verstr();
+}
+/****************************************************************************/
+void
+version_map_T::parse_verstr()
+{
+    /* append -r0 if necessary */
+    std::string::size_type pos = this->_verstr.rfind("-r0");
+    if (pos == std::string::npos)
+    {
+        pos = this->_verstr.rfind("-r");
+        if ((pos == std::string::npos) or (((pos+2) <= this->_verstr.size()) and
+            not std::isdigit(this->_verstr.at(pos+2))))
+            this->_verstr.append("-r0");
+    }
 
+    std::vector<std::string> parts(util::split(this->_verstr, '-'));
+
+    /* If parts > 3, ${PN} contains a '-' */
+    if (parts.size() > 3)
+    {
+        std::string PN;
+        while (parts.size() > 2)
+        {
+            PN += "-" + parts.front();
+            parts.erase(parts.begin());
+        }
+
+        parts.insert(parts.begin(), PN);
+    }
+
+    /* this should NEVER != 3. */
+    assert(parts.size() == 3);
+
+    /* fill our map with the components */
+    this->_vmap.insert(std::make_pair("PN", parts[0]));
+    this->_vmap.insert(std::make_pair("PV", parts[1]));
+    this->_vmap.insert(std::make_pair("PR", parts[2]));
+    this->_vmap.insert(std::make_pair("P", (*this)["PN"] + "-" + (*this)["PV"]));
+    this->_vmap.insert(std::make_pair("PVR", (*this)["PV"] + "-" + (*this)["PR"]));
+    this->_vmap.insert(std::make_pair("PF", (*this)["PN"] + "-" + (*this)["PVR"]));
+}
 /*****************************************************************************
- * version_suffix_T                                                          *
+ * suffix_T                                                                  *
  *****************************************************************************/
 void
-portage::version_string_T::suffix_T::init(const string_type &s)
+version_string_T::suffix_T::init(const string_type &s)
 {
     /* valid suffixes (in order) */
     if (this->_suffixes.empty())
@@ -56,14 +103,6 @@ portage::version_string_T::suffix_T::init(const string_type &s)
         this->_suffixes.push_back("p");
     }
 
-    this->get_suffix(s);
-}
-/*****************************************************************************
- * Given ${PVR}, retrieve the suffix and suffix version.                     *
- *****************************************************************************/
-void
-portage::version_string_T::suffix_T::get_suffix(const string_type &s)
-{
     string_type result(s);
     string_type::size_type pos = result.rfind("-r");
     if (pos != string_type::npos)
@@ -86,15 +125,12 @@ portage::version_string_T::suffix_T::get_suffix(const string_type &s)
             this->_suffix) == this->_suffixes.end())
             this->_suffix.clear();
     }
-
-//    util::debug("suffix == '%s' suffix version == '%s'",
-//            _suffix.c_str(), _suffix_ver.c_str());
 }
 /*****************************************************************************
  * Is this suffix less than that suffix?                                     *
  *****************************************************************************/
 bool
-portage::version_string_T::suffix_T::operator< (suffix_T &that)
+version_string_T::suffix_T::operator< (suffix_T &that) const
 {
     std::vector<string_type>::iterator ti, si;
 
@@ -137,7 +173,7 @@ portage::version_string_T::suffix_T::operator< (suffix_T &that)
  * Is this suffix equal to that suffix?                                      *
  *****************************************************************************/
 bool
-portage::version_string_T::suffix_T::operator== (suffix_T &that)
+version_string_T::suffix_T::operator== (suffix_T &that) const
 {
     std::vector<string_type>::iterator ti, si;
 
@@ -169,10 +205,10 @@ portage::version_string_T::suffix_T::operator== (suffix_T &that)
     return true;
 }
 /*****************************************************************************
- * version_nosuffix_T                                                        *
+ * nosuffix_T                                                                *
  *****************************************************************************/
 void
-portage::version_string_T::nosuffix_T::init(const string_type &s)
+version_string_T::nosuffix_T::init(const string_type &s)
 {
     string_type PV(s);
 
@@ -193,7 +229,7 @@ portage::version_string_T::nosuffix_T::init(const string_type &s)
  * Is this version (minus suffix) less that that version (minus suffix)?     *
  *****************************************************************************/
 bool
-portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
+version_string_T::nosuffix_T::operator< (nosuffix_T &that) const
 {
     bool differ = false;
     bool result = false;
@@ -250,7 +286,7 @@ portage::version_string_T::nosuffix_T::operator< (nosuffix_T &that)
  * Is this version (minus suffix) equal to that version (minus suffix)?      *
  *****************************************************************************/
 bool
-portage::version_string_T::nosuffix_T::operator== (nosuffix_T &that)
+version_string_T::nosuffix_T::operator== (nosuffix_T &that) const
 {
     /* std::string comparison should be sufficient for == */
     return ((this->_version == that._version) and
@@ -259,18 +295,17 @@ portage::version_string_T::nosuffix_T::operator== (nosuffix_T &that)
 /*****************************************************************************
  * version_string_T                                                          *
  *****************************************************************************/
-void
-portage::version_string_T::init()
+version_string_T::version_string_T(const std::string &path)
+    : _ebuild(path), _v(path), _verstr(_v.version())
 {
-    this->parse();
     this->_suffix.assign(this->_v["PVR"]);
     this->_version.assign(this->_v["PV"]);
 }
 /*****************************************************************************
  * Display full version std::string (as portage would).                           *
  *****************************************************************************/
-const portage::version_string_T::string_type
-portage::version_string_T::operator() () const
+version_string_T::operator
+std::string() const
 {
     /* chop -r0 if necessary */
     string_type::size_type pos = this->_verstr.rfind("-r0");
@@ -283,7 +318,7 @@ portage::version_string_T::operator() () const
  * Is this version less than that version?                                   *
  *****************************************************************************/
 bool
-portage::version_string_T::operator< (version_string_T &that)
+version_string_T::operator< (version_string_T &that) const
 {
     if (this->_version < that._version)
         return true;
@@ -296,7 +331,7 @@ portage::version_string_T::operator< (version_string_T &that)
             unsigned long thisrev =
                 util::destringify<unsigned long>(this->_v["PR"].substr(1).c_str());
             unsigned long thatrev =
-                util::destringify<unsigned long>(that["PR"].substr(1).c_str());
+                util::destringify<unsigned long>(that._v["PR"].substr(1).c_str());
             return thisrev <= thatrev;
         }
     }
@@ -307,68 +342,16 @@ portage::version_string_T::operator< (version_string_T &that)
  * Is this version equal to that version?                                    *
  *****************************************************************************/
 bool
-portage::version_string_T::operator== (version_string_T &that)
+version_string_T::operator== (version_string_T &that) const
 {
     return ( (this->_version == that._version) and
              (this->_suffix == that._suffix) and
-             (this->_v["PR"] == that["PR"]) );
-}
-/*****************************************************************************
- * Split full version std::string into components ${P}, ${PV}, ${PN}, etc and     *
- * save each one in our internal map.                                        *
- *****************************************************************************/
-void
-portage::version_string_T::parse()
-{
-    string_type::size_type pos;
-    std::vector<string_type> parts;
-
-    assert(not this->_verstr.empty());
-
-    /* append -r0 if necessary */
-    pos = this->_verstr.rfind("-r");
-
-#ifdef UNICODE
-    if ((pos == string_type::npos) or (((pos+2) <= this->_verstr.size()) and
-        not Glib::Unicode::isdigit(this->_verstr.at(pos+2))))
-#else /* UNICODE */
-    if ((pos == string_type::npos) or (((pos+2) <= this->_verstr.size()) and
-        not std::isdigit(this->_verstr.at(pos+2), std::locale(""))))
-#endif /* UNICODE */
-
-    {
-        this->_verstr.append("-r0");
-    }
-
-    parts = util::split(this->_verstr, '-');
-
-    /* If parts > 3, ${PN} contains a '-' */
-    if (parts.size() > 3)
-    {
-        string_type PN;
-        while (parts.size() > 2)
-        {
-            PN += "-" + parts.front();
-            parts.erase(parts.begin());
-        }
-
-        parts.insert(parts.begin(), PN);
-    }
-
-    assert(parts.size() == 3);
-
-    /* fill our map with the components */
-    this->_v["PN"] = parts[0];
-    this->_v["PV"] = parts[1];
-    this->_v["PR"] = parts[2];
-    this->_v["P"]   = this->_v["PN"] + "-" + this->_v["PV"];
-    this->_v["PVR"] = this->_v["PV"] + "-" + this->_v["PR"];
-    this->_v["PF"]  = this->_v["PN"] + "-" + this->_v["PVR"];
+             (this->_v["PR"] == that._v["PR"]) );
 }
 /*****************************************************************************
  * versions_T                                                                *
  *****************************************************************************/
-portage::versions_T::versions_T(const std::vector<std::string> &paths)
+versions_T::versions_T(const std::vector<std::string> &paths)
 {
     std::vector<std::string>::const_iterator i = paths.begin(),
                                               e = paths.end();
@@ -379,7 +362,7 @@ portage::versions_T::versions_T(const std::vector<std::string> &paths)
  * each ebuild found.  clear()'s container first.                            *
  *****************************************************************************/
 void
-portage::versions_T::assign(const std::string &path)
+versions_T::assign(const std::string &path)
 {
     this->_vs.clear();
 
@@ -391,7 +374,7 @@ portage::versions_T::assign(const std::string &path)
     
     for (; d != e ; ++d)
     {
-        if (portage::is_ebuild(*d))
+        if (is_ebuild(*d))
             assert(this->insert(*d));
     }
 }
@@ -399,22 +382,22 @@ portage::versions_T::assign(const std::string &path)
  * Same as assign() but does not call clear().                               *
  *****************************************************************************/
 void
-portage::versions_T::append(const std::string &path)
+versions_T::append(const std::string &path)
 {
     const util::dir_T pkgdir(path);
     util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
     
     for (; d != e ; ++d)
     {
-        if (portage::is_ebuild(*d))
+        if (is_ebuild(*d))
             assert(this->insert(*d));
     }
 }
 /*****************************************************************************
  * find wrapper                                                              *
  *****************************************************************************/
-portage::versions_T::iterator
-portage::versions_T::find(const string_type &path)
+versions_T::iterator
+versions_T::find(const string_type &path)
 {
     version_string_T *v = new version_string_T(path);
     versions_T::iterator i = this->_vs.find(v);
@@ -425,7 +408,7 @@ portage::versions_T::find(const string_type &path)
  * insert wrapper                                                            *
  *****************************************************************************/
 bool
-portage::versions_T::insert(const std::string &path)
+versions_T::insert(const std::string &path)
 {
     version_string_T *v = new version_string_T(path);
 
@@ -445,11 +428,12 @@ portage::versions_T::insert(const std::string &path)
 /*****************************************************************************
  * clean up                                                                  *
  *****************************************************************************/
-portage::versions_T::~versions_T()
+versions_T::~versions_T()
 {
     iterator i = this->_vs.begin(), e = this->_vs.end();
     for (; i != e ; ++i) delete *i;
 }
 /*****************************************************************************/
+} // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

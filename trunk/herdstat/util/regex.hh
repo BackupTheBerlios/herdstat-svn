@@ -44,53 +44,51 @@ namespace util
     {
         public:
             typedef std::string string_type;
-            typedef regex_t regex_type;
 
             /// Default constructor.
-            regex_T() : _compiled(false), _cflags(0), _eflags(0) { }
+            regex_T();
 
             /** Constructor.
              * @param r regular expression std::string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            regex_T(const string_type &r, int c = 0, int e = 0)
-                : _str(r), _compiled(false), _cflags(c), _eflags(e)
-            { this->assign(r, c, e); }
+            regex_T(const std::string &r, int c = 0, int e = 0);
 
-            ~regex_T() { if (this->_compiled) this->cleanup(); }
+            /// Destructor.
+            ~regex_T();
 
             /** Assign a new regular expression.
              * @param r regular expression std::string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            void assign(const string_type &r, int c = 0, int e = 0);
+            void assign(const std::string &r, int c = 0, int e = 0);
 
             /** Assign a new regular expression (no CFLAGS/EFLAGS).
              * @param s regular expression std::string.
              * @returns a regex_T object.
              */
-            regex_T &operator= (const string_type &s)
+            regex_T &operator= (const std::string &s)
             { this->assign(s); return *this; }
 
             /** Determine if this regex matches the specified std::string.
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator== (const string_type &cmp) const;
+            bool operator== (const std::string &cmp) const;
 
             /** Determine if this regex does not match the specified std::string.
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator!= (const string_type &cmp) const
+            bool operator!= (const std::string &cmp) const
             { return not (*this == cmp); }
 
             /** Get regular expression std::string.
              * @returns A std::string object.
              */
-            const string_type &operator()() const { return this->_str; }
+            const std::string& operator()() const { return this->_str; }
 
             /** Is this regular expression std::string empty?
              * @returns A boolean value.
@@ -100,9 +98,11 @@ namespace util
         private:
             /// Clean up compiled regex_t
             void cleanup();
+            /// Compile regex.
+            void compile();
 
             /// regular expression std::string
-            string_type _str;
+            std::string _str;
             /// has our regex_t been compiled?
             bool        _compiled;
             /// cflags
@@ -110,7 +110,7 @@ namespace util
             /// eflags
             int         _eflags;
             /// regex_t
-            regex_type  _regex;
+            regex_t     _regex;
     };
 
     /**

@@ -3,6 +3,7 @@
 SUBDIRS = src
 
 tests = string \
+	glob \
 	versions \
 	metadata \
 	metadata-regex \
@@ -18,7 +19,7 @@ TESTS = $(foreach f, $(tests), $(f)-test.sh)
 TESTS_ENVIRONMENT = PORTDIR=portdir PORTDIR_OVERLAY=''
 
 CLEANFILES = actual/*
-MAINTAINERCLEANFILES = Makefile.in *~
+MAINTAINERCLEANFILES = Makefile.in *~ localstatedir/*cache*
 EXTRA_DIST = $(TESTS) \
 	     common.sh \
 	     portdir \

@@ -28,6 +28,7 @@
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/find.hh>
+#include <herdstat/portage/ebuild.hh>
 #include "metadata.hh"
 
 bool
@@ -80,7 +81,7 @@ void
 metadata_T::display() const
 {
     formatter_T output;
-    util::vars_T ebuild_vars;
+    portage::ebuild_T ebuild_vars;
     const bool quiet = optget("quiet", bool);
 
     /* herds */

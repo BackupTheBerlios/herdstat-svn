@@ -35,21 +35,39 @@
 #include <herdstat/util/regex.hh>
 #include <herdstat/exceptions.hh>
 
+namespace util {
+/*****************************************************************************/
+regex_T::regex_T()
+    : _compiled(false), _cflags(0), _eflags(0)
+{
+}
+/*****************************************************************************/
+regex_T::regex_T(const std::string &regex, int cflags, int eflags)
+    : _str(regex), _compiled(false), _cflags(cflags), _eflags(eflags)
+{
+    this->compile();
+}
+/*****************************************************************************/
+regex_T::~regex_T()
+{
+    if (this->_compiled)
+        this->cleanup();
+}
 /*****************************************************************************/
 bool
-util::regex_T::operator== (const string_type &cmp) const
+regex_T::operator== (const std::string &cmp) const
 {
     assert(this->_compiled);
 
-    int rv = regexec(&(this->_regex), cmp.c_str(), 0, NULL, this->_eflags);
-    if (rv == REG_ESPACE)
-        throw BadRegex(rv, &(this->_regex));
+    int ret = regexec(&(this->_regex), cmp.c_str(), 0, NULL, this->_eflags);
+    if (ret == REG_ESPACE)
+        throw BadRegex(ret, &(this->_regex));
 
-    return rv == 0;
+    return (ret == 0);
 }
 /*****************************************************************************/
 void
-util::regex_T::assign(const string_type &regex, int cflags, int eflags)
+regex_T::assign(const std::string &regex, int cflags, int eflags)
 {
     if (this->_compiled)
         this->cleanup();
@@ -58,16 +76,24 @@ util::regex_T::assign(const string_type &regex, int cflags, int eflags)
     this->_cflags = cflags;
     this->_eflags = eflags;
 
-    /* compile regex */
-    int rv = regcomp(&(this->_regex), regex.c_str(), this->_cflags);
-    if (rv != 0)
-        throw BadRegex(rv, &(this->_regex));
+    this->compile();
+}
+/*****************************************************************************/
+void
+regex_T::compile()
+{
+    if (this->_compiled)
+        this->cleanup();
+
+    int ret = regcomp(&(this->_regex), this->_str.c_str(), this->_cflags);
+    if (ret != 0)
+        throw BadRegex(ret, &(this->_regex));
 
     this->_compiled = true;
 }
 /*****************************************************************************/
 void
-util::regex_T::cleanup()
+regex_T::cleanup()
 {
     regfree(&(this->_regex));
     this->_compiled = false;
@@ -75,5 +101,6 @@ util::regex_T::cleanup()
     this->_str.clear();
 }
 /*****************************************************************************/
+} // namespace util
 
 /* vim: set tw=80 sw=4 et : */

@@ -30,6 +30,7 @@
 #include <set>
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/file.hh>
+#include <herdstat/util/misc.hh>
 #include <herdstat/portage/config.hh>
 
 #define CATEGORIES "/profiles/categories"
@@ -37,22 +38,26 @@
 
 namespace portage
 {
-    /** Are we inside a package directory?
-     * @returns A boolean value.
-     */
-    bool in_pkg_dir();
-
     /** Is the specified path a package directory?
      * @param p Path.
      * @returns A boolean value.
      */
     bool is_pkg_dir(const std::string &p);
 
+    /** Are we inside a package directory?
+     * @returns A boolean value.
+     */
+    inline bool in_pkg_dir() { return is_pkg_dir(util::getcwd()); }
+
     /** Is the specified path an ebuild?
      * @param p Path.
      * @returns A boolean value.
      */
-    bool is_ebuild(const std::string &p);
+    inline bool is_ebuild(const std::string &path)
+    {
+        return ( (path.length() > 7) and
+                 (path.substr(path.length() - 7) == ".ebuild") );
+    }
 
     /**
      * Represents a list of valid package categories.

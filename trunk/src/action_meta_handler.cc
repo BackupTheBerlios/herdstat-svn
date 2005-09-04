@@ -32,6 +32,7 @@
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
+#include <herdstat/portage/ebuild.hh>
 
 #include "common.hh"
 #include "metadata_xml.hh"
@@ -68,7 +69,7 @@ action_meta_handler_T::display(const metadata_T &meta)
                 ebuild = portage::ebuild_which(portdir, meta.pkg);
             }
                 
-            util::vars_T ebuild_vars(ebuild);
+            portage::ebuild_T ebuild_vars(ebuild);
 
             if (quiet and ebuild_vars["HOMEPAGE"].empty())
                 ebuild_vars["HOMEPAGE"] = "none";

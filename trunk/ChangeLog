@@ -1,5 +1,34 @@
 ChangeLog for herdstat
 
+2005-09-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/util/file.cc, herdstat/util/file.hh: Cleaned up file
+	classes.  They are no longer naughty and inherit from std containers.
+	* herdstat/util/vars.cc, herdstat/util/vars.hh: removed
+	ebuild-specific portions of code.  Instead I've added a virtual
+	function set_defaults() so that vars_T derivatives can set default
+	variables/values before the file is read.
+	* herdstat/util/progress.cc, herdstat/util/progress.hh,
+	herdstat/util/glob.cc, herdstat/util/glob.hh, herdstat/util/timer.cc,
+	herdstat/util/timer.hh:
+	Add source files for glob.hh, progress.hh, and timer.hh, separating
+	interface from implementation.
+	* herdstat/portage/misc.cc, herdstat/portage/misc.hh: inline the
+	small one liner functions.
+	* herdstat/portage/ebuild.cc, herdstat/portage/ebuild.hh: Added new
+	ebuild_T type, a vars_T derivative that overrides set_defaults() in
+	order to set ${PN}, ${P}, ${PV}, etc.
+	* src/metadata.cc, src/action_meta_handler.cc: Update to use new
+	ebuild_T instead of vars_T.  Also fixed a bug in cases where there's
+	no HOMEPAGE or <longdescription>/DESCRIPTION specified; in --quiet
+	mode, it should display "none" instead of nothing, which it failed to
+	do before.
+	* tests/expected/metadata, tests/expected/metadata-regex: Update
+	metadata expected files with the missing none's (bug mentioned above).
+	* tests/glob-test.sh, tests/expected/glob, tests/src/glob-test.cc,
+	tests/src/Makefile.am: Added glob-test for testing pattern matching
+	via util::glob_T.
+
 2005-09-03 Aaron Walker <ka0ttic@gentoo.org>
 
 	* lib/*: Break up everything.  All convenience libs are now located in

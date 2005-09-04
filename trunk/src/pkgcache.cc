@@ -144,16 +144,16 @@ pkgcache_T::fill()
     const portage::categories_T categories(this->_portdir,
         optget("qa", bool));
 
-    std::vector<std::string>::iterator i, e;
     std::vector<std::string> dirs = 
         optget("portage.config", portage::config_T).overlays();
     dirs.insert(dirs.begin(), this->_portdir);
+    std::vector<std::string>::iterator i, e = dirs.end();
 
     /* for each category */
     portage::categories_T::const_iterator c, ce = categories.end();
     for (c = categories.begin() ; c != ce ; ++c)
     {
-        e = dirs.end();
+        /* for each portdir */
         for (i = dirs.begin() ; i != e ; ++i)
         {
             const std::string cat(*i + "/" + (*c));
