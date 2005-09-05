@@ -77,7 +77,7 @@ AC_ARG_ENABLE(debug,
 AM_CONDITIONAL(DEBUG, test x$enable_debug != "xno")
 
 if test x$enable_debug != "xno" ; then
-    CXXFLAGS="-Weffc++ -ggdb3 -O0"
+    CXXFLAGS="-ggdb3"
     AC_MSG_RESULT([$CXXFLAGS])
     AC_DEFINE(DEBUG, 1, [Enable debugging code])
 else
