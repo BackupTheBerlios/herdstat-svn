@@ -27,6 +27,9 @@
 #include <algorithm>
 #include <functional>
 
+#include <herdstat/util/file.hh>
+#include <herdstat/xml/document.hh>
+
 #include "common.hh"
 
 #ifdef USE_LIBXMLPP
@@ -72,7 +75,7 @@ querycache_T::load()
     if (not util::is_file(this->_path))
         return;
 
-    xml_T<querycacheXMLHandler_T> querycache_xml;
+    xml::Document<querycacheXMLHandler_T> querycache_xml;
     querycache_xml.parse(this->_path);
     querycacheXMLHandler_T *handler = querycache_xml.handler();
 
@@ -146,11 +149,11 @@ querycache_T::dump()
         xmlpp::Element *root = doc.create_root_node("queries");
         root->set_attribute("total", util::sprintf("%d", this->size()));
 #else
-        xml::init init;
-        xml::document doc("queries");
+//        xml::init init;
+        ::xml::document doc("queries");
         doc.set_encoding("UTF-8");
 
-        xml::node &root = doc.get_root_node();
+        ::xml::node &root = doc.get_root_node();
         root.get_attributes().insert("total",
             util::sprintf("%d", this->size()).c_str());
 #endif /* USE_LIBXMLPP */
@@ -196,23 +199,23 @@ querycache_T::dump()
 
 #else
 
-            xml::node query("query");
+            ::xml::node query("query");
             query.get_attributes().insert("date",
                 util::sprintf("%lu", static_cast<unsigned long>(i->date)).c_str());
 
-            xml::node::iterator it = root.insert(root.begin(), query);
+            ::xml::node::iterator it = root.insert(root.begin(), query);
 
-            xml::node cri_node("criteria");
-            cri_node.push_back(xml::node("string", i->query.c_str()));
-            cri_node.push_back(xml::node("with", i->with.c_str()));
-            cri_node.push_back(xml::node("type", i->type == QUERYTYPE_DEV? "dev":"herd"));
-            cri_node.push_back(xml::node("portdir", i->portdir.c_str()));
-            cri_node.push_back(xml::node("overlays",
+            ::xml::node cri_node("criteria");
+            cri_node.push_back(::xml::node("string", i->query.c_str()));
+            cri_node.push_back(::xml::node("with", i->with.c_str()));
+            cri_node.push_back(::xml::node("type", i->type == QUERYTYPE_DEV? "dev":"herd"));
+            cri_node.push_back(::xml::node("portdir", i->portdir.c_str()));
+            cri_node.push_back(::xml::node("overlays",
                 util::join(i->overlays, ':').c_str()));
             it->push_back(cri_node);
 
             it = root.begin();
-            xml::node results("results");
+            ::xml::node results("results");
             results.get_attributes().insert("total",
                 util::sprintf("%d", i->size()).c_str());
 
@@ -232,7 +235,7 @@ querycache_T::dump()
 
 #else
 
-                xml::node pkg("pkg", p->second.c_str());
+                ::xml::node pkg("pkg", p->second.c_str());
                 pkg.get_attributes().insert("name", p->first.c_str());
                 results.push_back(pkg);
 

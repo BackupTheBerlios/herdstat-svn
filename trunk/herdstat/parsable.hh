@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/xmlparser.cc
+ * herdstat -- src/parsable.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,12 +20,43 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef HAVE_PARSABLE_HH
+#define HAVE_PARSABLE_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "xmlparser.hh"
+#include <string>
+#include <herdstat/util/timer.hh>
 
-xml::init XMLParser_T::_init;
+/*
+ * Defines an abstract base class for parsable things.
+ */
+
+class parsable
+{
+    public:
+        typedef util::timer_T timer_type;
+
+        parsable() { }
+        parsable(const std::string &p) : _path(p) { }
+        virtual ~parsable() { }
+
+        virtual void parse(const std::string & = "") = 0;
+
+        const std::string &path() const { return _path; }
+        timer_type::size_type elapsed() const { return _timer.elapsed(); }
+
+    protected:
+        void set_path(const std::string &path) { _path.assign(path); }
+        timer_type& timer() { return _timer; }
+
+    private:
+        std::string _path;              /* path to file */
+        timer_type  _timer;             /* timer object */
+};
+
+#endif
 
 /* vim: set tw=80 sw=4 et : */

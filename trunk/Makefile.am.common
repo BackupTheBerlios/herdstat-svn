@@ -1,3 +1,7 @@
+# $Id$
+
 INCLUDES = -I$(top_builddir)
-AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
+AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
+
+# vim: set ft=automake :

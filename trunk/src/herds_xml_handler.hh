@@ -29,13 +29,14 @@
 
 #include "fetcher.hh"
 #include "herds.hh"
-#include "xmlparser.hh"
+
+#include <herdstat/xml/saxparser.hh>
 
 /*
  * Content Handler for herds.xml
  */
 
-class HerdsXMLHandler_T : public XMLHandler_T
+class HerdsXMLHandler_T : public xml::saxhandler
 {
     public:
         typedef herds_T herds_type;

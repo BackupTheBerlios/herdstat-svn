@@ -25,9 +25,10 @@
 #endif
 
 #include <ctime>
+#include <herdstat/util/file.hh>
+#include <herdstat/xml/document.hh>
 #include "common.hh"
 #include "fetcher.hh"
-#include "xml.hh"
 #include "herds_xml_handler.hh"
 
 /* any path's found inside <maintainingproject> will be sprintf'd
@@ -39,7 +40,7 @@ static const std::string mpBaseURL("http://www.gentoo.org/cgi-bin/viewcvs.cgi/*c
  * <maintainingproject> elements.
  */
 
-class mpXMLHandler_T : public XMLHandler_T
+class mpXMLHandler_T : public xml::saxhandler
 {
     public:
         typedef herd_T herd_type;
@@ -240,7 +241,7 @@ HerdsXMLHandler_T::text(const std::string &str)
                 << "'" << path << "'." << std::endl;
         else
         {
-            xml_T<mpXMLHandler_T> xml(path);
+            xml::Document<mpXMLHandler_T> xml(path);
             mpXMLHandler_T *handler = xml.handler();
 
             mpXMLHandler_T::herd_type::iterator i, e = handler->devs.end();

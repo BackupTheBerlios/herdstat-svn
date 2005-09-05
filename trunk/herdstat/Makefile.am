@@ -2,7 +2,7 @@
 
 include $(top_builddir)/Makefile.am.common
 
-SUBDIRS = util portage
+SUBDIRS = util xml portage
 
 cc_sources =
 hh_sources = exceptions.hh \
@@ -12,6 +12,7 @@ hh_sources = exceptions.hh \
 noinst_LTLIBRARIES = libherdstat.la
 # libherdstat_la_LDFLAGS = -release $(VERSION_MAJOR).$(VERSION_MINOR) -version-info $(LIBRARY_VERSION)
 libherdstat_la_LIBADD = util/libutil.la \
+			xml/libxml.la \
 			portage/libportage.la
 libherdstat_la_SOURCES = $(cc_sources) $(hh_sources)
 

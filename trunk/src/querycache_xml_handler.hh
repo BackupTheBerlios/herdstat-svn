@@ -27,14 +27,14 @@
 # include "config.h"
 #endif
 
-#include "xmlparser.hh"
+#include <herdstat/xml/saxparser.hh>
 #include "querycache.hh"
 
 /*
  * Content Handler for our internal querycache.xml
  */
 
-class querycacheXMLHandler_T : public XMLHandler_T
+class querycacheXMLHandler_T : public xml::saxhandler
 {
     public:
         typedef std::vector<pkgQuery_T> value_type;

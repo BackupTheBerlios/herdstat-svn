@@ -44,8 +44,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
                                  dev(optget("dev", bool)),
                                  meta(optget("meta", bool)),
                                  status(not quiet and not debug),
-                                 cache_is_valid(optget("metacache", bool) and
-                                          (metacache.valid())),
+                                 cache_is_valid(false),
                                  at_least_one_not_cached(false) { }
 
         virtual ~action_pkg_handler_T() { }
@@ -66,8 +65,8 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         querycache_T querycache;
         opts_type::size_type optsize;
         util::timer_T::size_type elapsed;
-        const bool dev, meta, status, cache_is_valid;
-        bool at_least_one_not_cached;
+        const bool dev, meta, status;
+        bool cache_is_valid, at_least_one_not_cached;
         util::regex_T with;
 };
 

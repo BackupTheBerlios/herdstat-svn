@@ -34,13 +34,13 @@
 #endif
 
 #include <herdstat/exceptions.hh>
+#include <herdstat/xml/init.hh>
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
 #include "rc.hh"
 #include "herds_xml.hh"
 #include "formatter.hh"
-#include "xmlparser.hh"
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
 #include "action_dev_handler.hh"
@@ -465,6 +465,9 @@ main(int argc, char **argv)
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw argsException();
 
+	/* initialize XML stuff */
+	xml::Init init(optget("qa", bool));
+
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output */
 	std::sort(nonopt_args.begin(), nonopt_args.end());
@@ -589,7 +592,7 @@ main(int argc, char **argv)
 	    delete outstream;
 
     }
-    catch (const XMLParser_E &e)
+    catch (const xml::ParserException &e)
     {
 	std::cerr << "Error parsing '" << e.file() << "': " << e.error()
 	    << std::endl;

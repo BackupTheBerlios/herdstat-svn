@@ -4,14 +4,17 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 1.1.2_alpha1:
     *Many* behind-the-scenes changes.  Mostly code refactoring/cleanup.
 
+1.1.1_p7:
     Bug fixes:
-     - Fixed bug in --metadata --quiet output; when encountering packages with
-       no HOMEPAGE or DESCRIPTION/<longdescription>, "none" is supposed to be
-       used rather than nothing at all.
-     - The xml::init object from libxmlwrapp should only be instantiated once,
-       not once per XML file.  This probably fixes a few subtle bugs.  For sure,
-       it fixes a segmentation fault when trying to parse metadata.xml's that
-       use non UTF-8 encoding (which they shouldn't be doing anyways).
+     - Fixed segv when parsing metadata.xml's that are iso-8859-1 (or possibly
+       any non-UTF8) encoded (even though they shouldn't be).
+     - Fixed bug where devaway's fetching function would fetch the devaway.html
+       even if a local patch was specfied on the command-line.  This has the
+       side affect of also fixing a failed test (away-test) since beu removed
+       his away message that's been present since I added the test :)
+     - Fixed bug that caused LOCALSTATEDIR/lastsync to be updated even when the
+       (meta|pkg)cache was not being updated, meaning the cache wouldn't be
+       updated even when needed (since lastsync was equivelent).
 
 1.1.1_p6:
     Bug fixes:

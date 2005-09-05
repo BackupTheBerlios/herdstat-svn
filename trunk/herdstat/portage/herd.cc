@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/parsable.hh
+ * herdstat -- portage/herd.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,43 +20,22 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PARSABLE_HH
-#define HAVE_PARSABLE_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/util/timer.hh>
+#include <herdstat/portage/herd.hh>
 
-/*
- * Defines an abstract base class for parsable things.
- */
-
-class parsable_T
+namespace portage {
+/****************************************************************************/
+herd::herd(const std::string &name,
+           const std::string &email, const std::string &desc)
+    : _name(name), _email(email.empty() ? name+"@gentoo.org" : email),
+      _desc(desc)
 {
-    public:
-        typedef std::string string_type;
-        typedef util::timer_T timer_type;
 
-        parsable_T() { }
-        parsable_T(const string_type &p) : _path(p) { }
-        virtual ~parsable_T() { }
-
-        virtual void parse(const string_type & = "") = 0;
-
-        string_type &path() { return this->_path; }
-        timer_type::size_type elapsed() const
-        { return this->_timer.elapsed(); }
-
-    protected:
-        virtual void init() = 0;
-        virtual void fetch() { }
-
-        string_type _path;              /* path to XML file */
-        timer_type  _timer;             /* timer object */
-};
-
-#endif
+}
+/****************************************************************************/
+} // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

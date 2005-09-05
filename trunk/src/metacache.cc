@@ -42,7 +42,6 @@ metacache_T::metacache_T(const std::string &portdir)
       _portdir(portdir),
       _overlays(optget("portage.config", portage::config_T).overlays())
 {
-
 }
 
 /*

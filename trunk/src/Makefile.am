@@ -16,12 +16,9 @@ herdstat_SOURCES = common.hh common.cc \
 		   pkgcache.hh pkgcache.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
-		   xmlparser.hh xmlparser.cc \
 		   querycache_xml_handler.hh querycache_xml_handler.cc \
 		   herds_xml_handler.hh herds_xml_handler.cc \
 		   metadata_xml_handler.hh metadata_xml_handler.cc \
-		   parsable.hh \
-		   xml.hh \
 		   devaway.hh devaway.cc \
 		   herds_xml.hh herds_xml.cc \
 		   metadata_xml.hh \
@@ -51,10 +48,7 @@ querycachectl_SOURCES = common.hh common.cc \
 			formatter.hh formatter.cc \
 			pkgquery.hh pkgquery.cc \
 			querycache.hh querycache.cc \
-			xmlparser.hh xmlparser.cc \
 			querycache_xml_handler.hh querycache_xml_handler.cc \
-			parsable.hh \
-			xml.hh \
 			querycachectl.cc
 querycachectl_LDADD = $(top_builddir)/herdstat/libherdstat.la @xmlwrapp_LIBS@
 endif

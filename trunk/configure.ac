@@ -55,14 +55,14 @@ fi
 AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
 
 dnl build API docs?
-AC_MSG_CHECKING([whether to build API docs for internal libherdstat])
-AC_ARG_ENABLE([api-docs],
-    AC_HELP_STRING([--enable-api-docs],[Enable API docs for internal libherdstat.la [off]]),
-    enable_api_docs=$enableval, enable_api_docs=no)
-AM_CONDITIONAL(GENERATE_API_DOCS, test x$enable_api_docs = xyes)
-AC_MSG_RESULT($enable_api_docs)
+AC_MSG_CHECKING([whether to build API docs for libherdstat])
+AC_ARG_ENABLE(doc,
+    AC_HELP_STRING([--enable-doc],[Enable API docs for libherdstat [off]]),
+    [enable_doc=$enableval],[enable_doc=no])
+AM_CONDITIONAL(GENERATE_API_DOCS, test x$enable_doc != "xno")
+AC_MSG_RESULT([$enable_doc])
 
-if test x$enable_api_docs = "xyes" ; then
+if test x$enable_doc != "xno" ; then
     AC_CHECK_PROGS(DOXYGEN, doxygen)
     if test x$DOXYGEN = "x" ; then
 	AC_MSG_ERROR([doxygen is required to build API docs])
@@ -70,14 +70,18 @@ if test x$enable_api_docs = "xyes" ; then
 fi
 
 dnl --enable-debug
+AC_MSG_CHECKING([whether to enable debugging code/flags])
 AC_ARG_ENABLE(debug,
     AC_HELP_STRING([--enable-debug],[Enable debugging code/flags]),
     [enable_debug=$enableval],[enable_debug=no])
 AM_CONDITIONAL(DEBUG, test x$enable_debug != "xno")
 
 if test x$enable_debug != "xno" ; then
-    CXXFLAGS="-ggdb3"
+    CXXFLAGS="-Weffc++ -ggdb3 -O0"
+    AC_MSG_RESULT([$CXXFLAGS])
     AC_DEFINE(DEBUG, 1, [Enable debugging code])
+else
+    AC_MSG_RESULT(no)
 fi
 
 AC_LANG_CPLUSPLUS
@@ -168,6 +172,7 @@ AC_OUTPUT(Makefile
 	  doc/Makefile
 	  herdstat/Makefile
 	  herdstat/util/Makefile
+	  herdstat/xml/Makefile
 	  herdstat/portage/Makefile
 	  src/Makefile
 	  tests/Makefile

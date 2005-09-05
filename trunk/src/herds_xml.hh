@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "xml.hh"
+#include <herdstat/xml/document.hh>
 #include "herds_xml_handler.hh"
 
 #define HERDS_XML_EXPIRE            86400
@@ -36,7 +36,7 @@
  * Represents a herds.xml instance.
  */
 
-class herds_xml_T : public xml_T<HerdsXMLHandler_T>
+class herds_xml_T : public xml::Document<HerdsXMLHandler_T>
 {
     public:
         typedef handler_type::herds_type herds_type;
@@ -48,32 +48,32 @@ class herds_xml_T : public xml_T<HerdsXMLHandler_T>
         typedef herds_type::size_type size_type;
 
         herds_xml_T()
-            : xml_T<handler_type>(optget("qa", bool)), _fetched(false),
+            : xml::Document<HerdsXMLHandler_T>(), _fetched(false),
               _local_default(optget("localstatedir", std::string)+"/herds.xml")
         { this->init(); }
         virtual ~herds_xml_T() { }
 
         /* herd_type subset */
-        iterator begin() { return this->_handler->herds.begin(); }
-        const_iterator begin() const { return this->_handler->herds.begin(); }
-        iterator end() { return this->_handler->herds.end(); }
-        const_iterator end() const { return this->_handler->herds.end(); }
+        iterator begin() { return this->handler()->herds.begin(); }
+        const_iterator begin() const { return this->handler()->herds.begin(); }
+        iterator end() { return this->handler()->herds.end(); }
+        const_iterator end() const { return this->handler()->herds.end(); }
         iterator find(const string_type &s)
-        { return this->_handler->herds.find(s); }
+        { return this->handler()->herds.find(s); }
         const_iterator find(const string_type &s) const
-        { return this->_handler->herds.find(s); }
+        { return this->handler()->herds.find(s); }
         herd_type * &operator[] (const string_type &s)
-        { return this->_handler->herds[s]; }
+        { return this->handler()->herds[s]; }
         herd_type * &operator[] (const string_type &s) const
-        { return this->_handler->herds[s]; }
-        size_type size() const { return this->_handler->herds.size(); }
+        { return this->handler()->herds[s]; }
+        size_type size() const { return this->handler()->herds.size(); }
 
         /* interface */
-        herds_type &herds() const { return this->_handler->herds; }
+        herds_type &herds() const { return this->handler()->herds; }
         bool exists(const string_type &h) const
         { return this->find(h) != this->end(); }
         void display(std::ostream &s)
-        { return this->_handler->herds.display(s); }
+        { return this->handler()->herds.display(s); }
 
         struct devinfo_T
         {

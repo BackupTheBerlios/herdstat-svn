@@ -6,13 +6,17 @@ cc_sources = misc.cc \
 	     config.cc \
 	     version.cc \
 	     find.cc \
-	     ebuild.cc
+	     ebuild.cc \
+		 developer.cc \
+		 herd.cc
 hh_sources = exceptions.hh \
 	     misc.hh \
 	     config.hh \
-             version.hh \
+         version.hh \
 	     find.hh \
-	     ebuild.hh
+	     ebuild.hh \
+		 developer.hh \
+		 herd.hh
 
 noinst_LTLIBRARIES = libportage.la
 libportage_la_SOURCES = $(cc_sources) $(hh_sources)

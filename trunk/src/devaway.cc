@@ -40,13 +40,15 @@ devaway_T::init()
 {
     std::string file(optget("devaway.location", std::string));
     if (not file.empty())
-        this->_path.assign(file);
-    
-    util::stat_T devaway(this->path());
-    if (not devaway.exists() or
-       ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
-       or (devaway.size() == 0))
-        this->_path.assign(DEVAWAY_REMOTE);
+        this->set_path(file);
+    else
+    {
+        util::stat_T devaway(this->path());
+        if (not devaway.exists() or
+           ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
+                or (devaway.size() == 0))
+            this->set_path(DEVAWAY_REMOTE);
+    }
 }
 
 void
@@ -61,7 +63,7 @@ devaway_T::fetch()
 
     try
     {
-        if (this->_path.find("http://") == std::string::npos)
+        if (this->path().find("http://") == std::string::npos)
             return;
 
         devaway.assign(this->_local);
@@ -91,25 +93,25 @@ devaway_T::fetch()
             throw;
     }
 
-    this->_path.assign(this->_local);
+    this->set_path(this->_local);
     assert(devaway());
     this->_fetched = true;
 }
 
 void
-devaway_T::parse(const string_type &path)
+devaway_T::parse(const std::string &path)
 {
     const std::auto_ptr<std::ifstream>
-        f(new std::ifstream(this->_path.c_str()));
+        f(new std::ifstream(this->path().c_str()));
     
     if (not (*f))
-        throw FileException(this->_path);
+        throw FileException(this->path());
 
-    std::string s;
+    std::string line;
     std::string::size_type beginpos, endpos;
-    while (std::getline(*f, s))
+    while (std::getline(*f, line))
     {
-        std::string line(s), dev, awaymsg;
+        std::string dev, awaymsg;
 
         /* strip leading whitespace */
         beginpos = line.find_first_not_of(" \t");

@@ -28,8 +28,8 @@
 #endif
 
 #include <map>
+#include <herdstat/parsable.hh>
 #include "common.hh"
-#include "parsable.hh"
 
 #define DEVAWAY_LOCAL   "/devaway.html"
 
@@ -39,17 +39,17 @@
  */
 
 class devaway_T : public std::map<std::string, std::string>,
-                  public parsable_T
+                  public parsable
 {
     public:
         devaway_T(bool x = false)
-            : parsable_T(optget("localstatedir", std::string)+DEVAWAY_LOCAL),
+            : parsable(optget("localstatedir", std::string)+DEVAWAY_LOCAL),
               _fetched(false),
               _local(optget("localstatedir", std::string)+DEVAWAY_LOCAL)
         { this->init(); if (x) { this->fetch(); this->parse(); } }
 
         virtual void fetch();
-        virtual void parse(const string_type & = "");
+        virtual void parse(const std::string & = "");
 
         virtual const std::vector<key_type> keys() const;
 

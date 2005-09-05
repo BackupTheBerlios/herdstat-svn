@@ -27,15 +27,15 @@
 # include "config.h"
 #endif
 
+#include <herdstat/xml/saxparser.hh>
 #include "herds.hh"
 #include "metadata.hh"
-#include "xmlparser.hh"
 
 /*
  * Content Handler for metadata.xml
  */
 
-class MetadataXMLHandler_T : public XMLHandler_T
+class MetadataXMLHandler_T : public xml::saxhandler
 {
     public:
         typedef dev_attrs_T dev_type;

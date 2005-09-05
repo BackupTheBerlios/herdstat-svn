@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/file.hh>
 #include "fetcher.hh"
 #include "herds_xml.hh"
 
@@ -37,18 +38,18 @@ herds_xml_T::init()
     const util::stat_T herds_xml(this->_local_default);
     
     if (not optget("herds.xml", std::string).empty())
-        this->_path.assign(optget("herds.xml", std::string));
+        this->set_path(optget("herds.xml", std::string));
     
     else if ((result = std::getenv("HERDS")))
-        this->_path.assign(result);
+        this->set_path(result);
     
     /* check if previously fetched copy is recent */
     else if (herds_xml.exists() and
             ((std::time(NULL) - herds_xml.mtime()) < HERDS_XML_EXPIRE) and
             (herds_xml.size() > 0))
-        this->_path = this->_local_default;
+        this->set_path(this->_local_default);
     else
-        this->_path = this->_remote_default;
+        this->set_path(this->_remote_default);
 }
 
 void
@@ -60,11 +61,11 @@ herds_xml_T::fetch()
     try
     {
         if ((optget("action", options_action_T) == action_fetch) and
-            (this->_path.find("://") == std::string::npos))
-            this->_path = std::string(_remote_default);
+            (this->path().find("://") == std::string::npos))
+            this->set_path(_remote_default);
 
         /* is it a URL? */
-        if (this->_path.find("://") != std::string::npos)
+        if (this->path().find("://") != std::string::npos)
         {
             if (not optget("quiet", bool))
             {
@@ -80,14 +81,14 @@ herds_xml_T::fetch()
                                 this->_local_default+".bak");
 
             /* fetch it */
-            fetcher_T fetch(this->_path, this->_local_default);
+            fetcher_T fetch(this->path(), this->_local_default);
 
             /* because we tell wget to clobber the file, if fetching fails
              * for some reason, it'll truncate the old one - make sure the
              * file is >0 bytes. */
             const util::stat_T herds_xml(this->_local_default);
             if (herds_xml.exists() and (herds_xml.size() > 0))
-                this->_path = this->_local_default;
+                this->set_path(this->_local_default);
             else
                 throw FetchException();
 
@@ -97,7 +98,7 @@ herds_xml_T::fetch()
     }
     catch (const FetchException &e)
     {
-        std::cerr << "Error fetching " << this->_path << std::endl << std::endl;
+        std::cerr << "Error fetching " << this->path() << std::endl << std::endl;
 
         /* if we have an old cached copy, use it */
         if (util::is_file(this->_local_default+".bak"))
@@ -105,7 +106,7 @@ herds_xml_T::fetch()
             std::cerr << "Using cached copy... ";
             util::move_file(this->_local_default+".bak",
                             this->_local_default);
-            this->_path = this->_local_default;
+            this->set_path(this->_local_default);
         }
 
         std::cerr
@@ -144,8 +145,8 @@ herds_xml_T::get_dev_info(const string_type &dev) const
     for (const_iterator h = this->begin() ; h != e ; ++h)
     {
         herd_type::iterator d =
-            this->_handler->herds[h->first]->find(dev+"@gentoo.org");
-        if (d != this->_handler->herds[h->first]->end())
+            this->handler()->herds[h->first]->find(dev+"@gentoo.org");
+        if (d != this->handler()->herds[h->first]->end())
         {
             info.herds.push_back(h->first);
 
