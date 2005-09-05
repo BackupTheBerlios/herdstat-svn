@@ -39,12 +39,14 @@ devaway_T::init()
     std::string file(optget("devaway.location", std::string));
     if (not file.empty())
         this->_path.assign(file);
-    
-    util::stat_T devaway(this->path());
-    if (not devaway.exists() or
-       ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
-       or (devaway.size() == 0))
-        this->_path.assign(DEVAWAY_REMOTE);
+    else
+    {
+        util::stat_T devaway(this->path());
+        if (not devaway.exists() or
+            ((std::time(NULL) - devaway.mtime()) > optget("devaway.expire", long))
+                or (devaway.size() == 0))
+            this->_path.assign(DEVAWAY_REMOTE);
+    }
 }
 
 void

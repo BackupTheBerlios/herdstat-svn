@@ -9,6 +9,9 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
        even if a local patch was specfied on the command-line.  This has the
        side affect of also fixing a failed test (away-test) since beu removed
        his away message that's been present since I added the test :)
+     - Fixed bug that caused LOCALSTATEDIR/lastsync to be updated even when the
+       (meta|pkg)cache was not being updated, meaning the cache wouldn't be
+       updated even when needed (since lastsync was equivelent).
 
 1.1.1_p6:
     Bug fixes:

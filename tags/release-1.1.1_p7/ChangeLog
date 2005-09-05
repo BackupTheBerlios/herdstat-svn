@@ -1,8 +1,14 @@
 ChangeLog for herdstat
 
-2005-09-04 Aaron Walker <ka0ttic@gentoo.org>
+2005-09-05 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.1_p7).
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Don't run
+	metacache_T::valid() in the constructor since each handler is
+	instantiated in main() even if its operator() isn't executed.
+
+2005-09-04 Aaron Walker <ka0ttic@gentoo.org>
+
 	* src/devaway.cc: return immediately from fetch() if a local path was
 	specified on the command line.
 	* src/xmlparser.cc, src/xmlparser.hh: xmlwrapp's init object should

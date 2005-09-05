@@ -471,6 +471,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     at_least_one_not_cached = (not opts.empty());
+    cache_is_valid = (optget("metacache", bool) and metacache.valid());
 
     if (cache_is_valid and at_least_one_not_cached)
     {
