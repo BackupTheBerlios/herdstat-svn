@@ -24,7 +24,6 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <herdstat/portage/userinfo_xml.hh>
 
 namespace portage {
@@ -87,21 +86,8 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
         _cur_dev = _devs.end() - 1;
         assert(_cur_dev != _devs.end());
 
-        std::cout << "user == " << dev.user() << std::endl;
-
         in_user = true;
     }
-//    else if (name == "realname")
-//    {
-//        attrs_type::const_iterator pos = attrs.find("fullname");
-//        if (pos == attrs.end())
-//            throw Exception("<realname> tag with no fullname attribute!");
-
-//        _cur_dev->set_name(_cur_dev->name() + pos->second);
-//        std::cout << "name == " << _cur_dev->name() << std::endl;
-
-//        in_realname = true;
-//    }
     else if (name == "firstname")
         in_firstname = true;
     else if (name == "familyname")
@@ -149,7 +135,7 @@ userinfo_xml::text(const std::string& text)
     if (in_firstname)
         _cur_dev->set_name(_cur_dev->name() + text);
     else if (in_familyname)
-        _cur_dev->set_name(_cur_dev->name() + text);
+        _cur_dev->set_name(_cur_dev->name() + " " + text);
     else if (in_pgpkey)
         _cur_dev->set_pgpkey(text);
     else if (in_email)

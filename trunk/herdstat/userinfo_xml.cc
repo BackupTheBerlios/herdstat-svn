@@ -49,9 +49,13 @@ main(int argc, char **argv)
         std::cout << "Size: " << devs.size() << std::endl;
 
         Herd::const_iterator i = devs.find(dev);
-        if (i != devs.end())
+        if (i == devs.end())
             throw Exception(dev + " doesn't seem to exist.");
 
+//        for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
+//        {
+//        if(*i == dev)
+//        {
         std::cout << "Name:       " << i->name() << "(" << i->user() << ")" << std::endl;
         std::cout << "Email:      " << i->email() << std::endl;
         std::cout << "PGP Key ID: " << i->pgpkey() << std::endl;
@@ -60,6 +64,8 @@ main(int argc, char **argv)
         std::cout << "Status:     " << i->status() << std::endl;
         std::cout << "Roles:      " << i->role() << std::endl;
         std::cout << "Location:   " << i->location() << std::endl;
+//        }
+//        }
     }
     catch (const BaseException &e)
     {
