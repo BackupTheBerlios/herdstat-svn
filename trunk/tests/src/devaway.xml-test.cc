@@ -27,6 +27,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <herdstat/exceptions.hh>
+#include <herdstat/util/file.hh>
 #include <herdstat/portage/devaway_xml.hh>
 
 using namespace portage;
@@ -40,6 +41,7 @@ main(int argc, char **argv)
             throw Exception("usage: devaway_xml <path>");
 
         std::string path(argv[1]);
+        assert(util::is_file(path));
         devaway_xml devaway(path);
 
         const Herd& devs = devaway.devs();
@@ -48,6 +50,13 @@ main(int argc, char **argv)
 
         for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
             std::cout << i->user() << ": " << i->awaymsg() << std::endl;
+
+        std::cout << std::endl;
+
+        Herd::const_iterator i = devs.find("lv");
+        assert(i != devs.end());
+
+        std::cout << i->user() << " - " << i->awaymsg() << std::endl;
     }
     catch (const BaseException &e)
     {

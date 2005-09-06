@@ -123,8 +123,7 @@ herds_xml::herds_xml(const std::string& path)
       in_maintainer_role(false), in_maintaining_prj(false),
       _cur_herd(), _cur_dev()
 {
-    /* FIXME! */
-    // this->fetch();
+    this->fetch();
     this->parse();
 }
 /****************************************************************************/
@@ -135,7 +134,9 @@ herds_xml::~herds_xml()
 void
 herds_xml::parse(const std::string& path)
 {
-    this->set_path(path.empty() ? _local_default : path);
+    if      (not path.empty())      this->set_path(path);
+    else if (this->path().empty())  this->set_path(_local_default);
+
     this->parse_file(this->path().c_str());
 }
 /****************************************************************************/

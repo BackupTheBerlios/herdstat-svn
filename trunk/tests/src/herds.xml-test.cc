@@ -32,12 +32,14 @@
 using namespace portage;
 
 int
-main()
+main(int argc, char **argv)
 {
     try
     {
-        herds_xml h;
-        h.parse("/var/lib/herdstat/herds.xml");
+        if (argc != 2)
+            throw Exception("usage: herds.xml-test <path>");
+
+        herds_xml h(argv[1]);
         assert(not h.empty());
 
         std::cout << "Size: " << h.size() << std::endl;
