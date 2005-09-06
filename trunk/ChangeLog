@@ -16,6 +16,9 @@ ChangeLog for herdstat
 	and metdataXMLHandler_T.
 	* herdstat/portage/devaway_xml.cc, herdstat/portage/devaway_xml.hh:
 	Added devaway_xml class which will eventually replace devaway_T.
+	* herdstat/util/glob.hh, tests/src/glob-test.cc: patternMatch should
+	inherit from std::binary_function; added patternMatch test to
+	glob-test.cc.
 
 2005-09-05 Aaron Walker <ka0ttic@gentoo.org>
 

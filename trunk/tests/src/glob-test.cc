@@ -1,6 +1,6 @@
 /*
  * herdstat -- tests/src/glob-test.cc
- * $Id$
+ * $Id: glob-test.cc 515 2005-09-04 11:41:38Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -25,6 +25,8 @@
 #endif
 
 #include <iostream>
+#include <algorithm>
+#include <functional>
 #include <cstdlib>
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/glob.hh>
@@ -33,10 +35,21 @@ int main()
 {
     try
     {
+        /* test glob_T */
         const util::glob_T results("portdir/*/*/*.ebuild");
         util::glob_T::const_iterator i;
         for (i = results.begin() ; i != results.end() ; ++i)
             std::cout << *i << std::endl;
+
+        /* test patternMatch functor */
+        util::glob_T::size_type n = std::count_if(results.begin(), results.end(),
+                std::bind1st(util::patternMatch(), "*foo-1.10*"));
+        if (n == 0)
+            throw Exception("*foo-1.10* not found in results vector.");
+
+        std::cout << std::endl
+            << "The pattern '*foo-1.10*' appears " << n
+            << " times in the output above." << std::endl;
     }
     catch (const BaseException &e)
     {

@@ -1,6 +1,6 @@
 /*
  * herdstat -- herdstat/util/glob.hh
- * $Id$
+ * $Id: glob.hh 515 2005-09-04 11:41:38Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,6 +28,7 @@
 #endif
 
 #include <vector>
+#include <functional>
 
 #ifdef HAVE_GLOB_H
 # include <glob.h>
@@ -69,7 +70,7 @@ namespace util
      * fnmatch() functor interface.
      */
 
-    class patternMatch
+    class patternMatch : public std::binary_function<std::string, std::string, bool>
     {
         public:
             /** fnmatch() wrapper.
@@ -77,8 +78,8 @@ namespace util
              * @param path Path.
              * @returns A boolean value (Does glob match pattern?).
              */
-            bool operator() (const std::string pattern,
-                             const std::string path) const
+            bool operator() (std::string pattern,
+                             std::string path) const
             { return (fnmatch(pattern.c_str(), path.c_str(), 0) == 0); }
     };
 }
