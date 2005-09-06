@@ -1,6 +1,6 @@
 /*
- * herdstat -- portage/developer.cc
- * $Id: developer.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * herdstat -- herdstat/devaway_xml.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,24 +24,38 @@
 # include "config.h"
 #endif
 
-#include <herdstat/portage/developer.hh>
+#include <iostream>
+#include <cstdlib>
+#include <herdstat/exceptions.hh>
+#include <herdstat/portage/devaway_xml.hh>
 
-namespace portage {
-/****************************************************************************/
-Developer::Developer()
-    : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status("active"), _role(), _awaymsg(), _away(false)
+using namespace portage;
+
+int
+main(int argc, char **argv)
 {
+    try
+    {
+        if (argc != 2)
+            throw Exception("usage: devaway_xml <path>");
+
+        std::string path(argv[1]);
+        devaway_xml devaway(path);
+
+        const Herd& devs = devaway.devs();
+
+        std::cout << "Away developers(" << devs.size() << ")" << std::endl;
+
+        for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
+            std::cout << i->user() << ": " << i->awaymsg() << std::endl;
+    }
+    catch (const BaseException &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
-/****************************************************************************/
-Developer::Developer(const std::string &user, const std::string &email,
-                     const std::string &name)
-    : _user(user), _email(email.empty() ? user+"@gentoo.org" : email),
-      _name(name), _pgpkey(), _joined(), _birth(), _status("active"),
-      _role(), _awaymsg(), _away(false)
-{
-}
-/****************************************************************************/
-} // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

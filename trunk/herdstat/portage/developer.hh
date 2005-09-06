@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/developer.hh
- * $Id$
+ * $Id: developer.hh 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -40,23 +40,30 @@ namespace portage {
      * Represents a Gentoo developer.
      */
 
-    class developer
+    class Developer
     {
         public:
             /// Default constructor.
-            developer() { }
+            Developer();
 
             /** Constructor.
              * @param email email address.
              * @param name  name.
              */
-            developer(const std::string &email,
+            Developer(const std::string &user,
+                      const std::string &email = "",
                       const std::string &name = "");
 
             /** Implicit conversion to std::string.
              * @returns Developer user name.
              */
             operator std::string() const;
+
+            /** Determine if this developer is equal to that developer.
+             * @param user user name.
+             * @returns True if user name is equivelent.
+             */
+            bool operator== (const std::string& user) const;
 
             const std::string& user() const;
             const std::string& email() const;
@@ -93,36 +100,38 @@ namespace portage {
             bool _away;
     };
 
-    inline developer::operator std::string() const { return _user; }
-    inline const std::string& developer::user() const { return _user; }
-    inline const std::string& developer::email() const { return _email; }
-    inline const std::string& developer::name() const { return _name; }
-    inline const std::string& developer::pgpkey() const { return _pgpkey; }
-    inline const std::string& developer::joined() const { return _joined; }
-    inline const std::string& developer::birth() const { return _birth; }
-    inline const std::string& developer::status() const { return _status; }
-    inline const std::string& developer::role() const { return _role; }
-    inline const std::string& developer::awaymsg() const { return _awaymsg; }
-    inline bool developer::is_away() const { return _away; }
-    inline void developer::set_user(const std::string &user)
+    inline Developer::operator std::string() const { return _user; }
+    inline bool Developer::operator== (const std::string& user) const
+    { return (_user == user); }
+    inline const std::string& Developer::user() const { return _user; }
+    inline const std::string& Developer::email() const { return _email; }
+    inline const std::string& Developer::name() const { return _name; }
+    inline const std::string& Developer::pgpkey() const { return _pgpkey; }
+    inline const std::string& Developer::joined() const { return _joined; }
+    inline const std::string& Developer::birth() const { return _birth; }
+    inline const std::string& Developer::status() const { return _status; }
+    inline const std::string& Developer::role() const { return _role; }
+    inline const std::string& Developer::awaymsg() const { return _awaymsg; }
+    inline bool Developer::is_away() const { return _away; }
+    inline void Developer::set_user(const std::string &user)
     { _user.assign(user); }
-    inline void developer::set_email(const std::string &email)
+    inline void Developer::set_email(const std::string &email)
     { _email.assign(email); }
-    inline void developer::set_name(const std::string &name)
+    inline void Developer::set_name(const std::string &name)
     { _name.assign(name); }
-    inline void developer::set_pgpkey(const std::string &pgpkey)
+    inline void Developer::set_pgpkey(const std::string &pgpkey)
     { _pgpkey.assign(pgpkey); }
-    inline void developer::set_joined(const std::string &date)
+    inline void Developer::set_joined(const std::string &date)
     { _joined.assign(date); }
-    inline void developer::set_birth(const std::string &date)
+    inline void Developer::set_birth(const std::string &date)
     { _birth.assign(date); }
-    inline void developer::set_status(const std::string &status)
+    inline void Developer::set_status(const std::string &status)
     { _status.assign(status); }
-    inline void developer::set_role(const std::string &role)
+    inline void Developer::set_role(const std::string &role)
     { _role.assign(role); }
-    inline void developer::set_awaymsg(const std::string &msg)
+    inline void Developer::set_awaymsg(const std::string &msg)
     { _awaymsg.assign(msg); }
-    inline void developer::set_away(const bool away) { _away = away; }
+    inline void Developer::set_away(const bool away) { _away = away; }
 
 } // namespace portage
 

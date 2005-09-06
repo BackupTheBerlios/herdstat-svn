@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/metadata_xml.hh
- * $Id$
+ * $Id: metadata_xml.hh 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -26,6 +26,56 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+/**
+ * @file metadata_xml.hh
+ * @brief Defines the interface for metadata.xml files.
+ */
+
+#include <herdstat/parsable.hh>
+#include <herdstat/xml/saxparser.hh>
+#include <herdstat/portage/metadata.hh>
+
+namespace portage {
+
+    class metadata_xml : public parsable,
+                         protected xml::saxhandler
+    {
+        public:
+            metadata_xml();
+            metadata_xml(const std::string& path);
+            virtual ~metadata_xml();
+
+            virtual void parse(const std::string& path = "");
+
+            metadata& data();
+            const Herds& herds() const;
+            const Herd&  devs()  const;
+
+        protected:
+            virtual bool start_element(const std::string& name,
+                                       const attrs_type& attrs);
+            virtual bool end_element(const std::string& name);
+            virtual bool text(const std::string& text);
+
+        private:
+            metadata _data;
+
+            bool in_herd,
+                 in_maintainer,
+                 in_email,
+                 in_name,
+                 in_desc,
+                 in_longdesc;
+
+            Herd::iterator _cur_dev;
+    };
+
+    inline metadata& metadata_xml::data() { return _data; }
+    inline const Herds& metadata_xml::herds() const { return _data.herds(); }
+    inline const Herd& metadata_xml::devs() const { return _data.devs(); }
+
+} // namespace portage
 
 #endif /* _HAVE_METADATA_XML_HH */
 

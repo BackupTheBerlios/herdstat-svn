@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/herd.cc
- * $Id$
+ * $Id: herd.cc 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,12 +28,29 @@
 
 namespace portage {
 /****************************************************************************/
-herd::herd(const std::string &name,
+Herd::Herd(const std::string &name,
            const std::string &email, const std::string &desc)
-    : _name(name), _email(email.empty() ? name+"@gentoo.org" : email),
+    : _devs(), _name(name), _email(email.empty() ? name+"@gentoo.org" : email),
       _desc(desc)
 {
 
+}
+/****************************************************************************/
+void
+Herd::push_back(const std::string& email)
+{
+    std::string::size_type pos = email.find('@');
+    if (pos == std::string::npos)
+        _devs.push_back(Developer(email, email+"@gentoo.org"));
+    else
+        _devs.push_back(Developer(email.substr(0, pos), email));
+}
+/****************************************************************************/
+void
+Herd::set_email(const std::string& email)
+{
+    std::string::size_type pos = email.find('@');
+    _email.assign(pos == std::string::npos ? email+"@gentoo.org" : email);
 }
 /****************************************************************************/
 } // namespace portage

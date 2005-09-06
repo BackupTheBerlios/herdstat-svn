@@ -1,5 +1,22 @@
 ChangeLog for herdstat
 
+2005-09-06 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/fetchable.hh, herdstat/fetcher.cc, herdstat/fetcher.hh: moved
+	fetcher into lib.  Added abstract fetchable class for fetchable things.
+	* herdstat/portage/herd.cc, herdstat/portage/herd.hh,
+	herdstat/portage/developer.cc, herdstat/portage/developer.hh: Added
+	classes herd, herds and developer, which replace herd_T, herds_T, and
+	dev_attrs_T respectively.
+	* herdstat/portage/herds_xml.cc, herdstat/portage/herds_xml.hh: Added
+	herds_xml class which will eventually replace herds_xml_T and
+	herdsXMLHandler_T.
+	* herdstat/portage/metadata_xml.cc, herdstat/portage/metadata_xml.hh:
+	Added metadata_xml class which will eventually replace metdata_xml_T
+	and metdataXMLHandler_T.
+	* herdstat/portage/devaway_xml.cc, herdstat/portage/devaway_xml.hh:
+	Added devaway_xml class which will eventually replace devaway_T.
+
 2005-09-05 Aaron Walker <ka0ttic@gentoo.org>
 
 	* tags/release-1.1.1_p7: copied from tags/release-1.1.1_p6 and major

@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/herd.hh
- * $Id$
+ * $Id: herd.hh 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_HERD_HH
-#define _HAVE_HERD_HH 1
+#ifndef _HAVE_devs_HH
+#define _HAVE_devs_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -33,7 +33,7 @@
  */
 
 #include <string>
-#include <map>
+#include <vector>
 #include <herdstat/portage/developer.hh>
 
 namespace portage {
@@ -41,24 +41,35 @@ namespace portage {
     /**
      * Represents a herd.
      * Techically a herd is a group of packages, however here it makes more
-     * sense to represent them as a group of developers.
+     * sense to represent them as a group of developers.  Also note, that we
+     * often use this class as a Developer container, even if the collection
+     * isn't considered a "herd".
      */
 
-    class herd
+    class Herd
     {
         public:
-            typedef std::map<std::string, developer * > container_type;
+            typedef std::vector<Developer> container_type;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
             typedef container_type::value_type value_type;
-            typedef container_type::key_type key_type;
-            typedef container_type::mapped_type mapped_type;
             typedef container_type::size_type size_type;
 
-            herd() { }
-            herd(const std::string &name,
+            Herd() { }
+            Herd(const std::string &name,
                  const std::string &email = "",
                  const std::string &desc  = "");
+
+            /** Implicit conversion to std::string.
+             * @returns herd name.
+             */
+            operator std::string() const;
+
+            /** Determine if this herd is equal to that herd.
+             * @param name herd name.
+             * @returns True if herd names are equivelent.
+             */
+            bool operator==(const std::string& name) const;
 
             const std::string& name() const;
             const std::string& email() const;
@@ -71,41 +82,118 @@ namespace portage {
             const_iterator begin() const;
             iterator end();
             const_iterator end() const;
-            iterator find(const key_type &k);
-            const_iterator find(const key_type &k) const;
+            iterator find(const std::string& dev);
+            const_iterator find(const std::string& dev) const;
+            iterator find(const Developer& dev);
+            const_iterator find(const Developer& dev) const;
             size_type size() const;
             bool empty() const;
             void clear();
+            void push_back(const Developer& dev);
+            void push_back(const std::string& email);
+            template <class In>
+            void insert(iterator pos, In begin, In end);
 
         private:
-            container_type _herd;
+            container_type _devs;
             std::string _name;
             std::string _email;
             std::string _desc;
     };
 
-    inline const std::string& herd::name() const { return _name; }
-    inline const std::string& herd::email() const { return _email; }
-    inline const std::string& herd::desc() const { return _desc; }
-    inline void herd::set_name(const std::string &name) { _name.assign(name); }
-    inline void herd::set_email(const std::string &email) { _email.assign(email); }
-    inline void herd::set_desc(const std::string &desc) { _desc.assign(desc); }
-    inline herd::iterator herd::begin() { return _herd.begin(); }
-    inline herd::const_iterator herd::begin() const { return _herd.begin(); }
-    inline herd::iterator herd::end() { return _herd.end(); }
-    inline herd::const_iterator herd::end() const { return _herd.end(); }
-    inline herd::iterator herd::find(const key_type &k) { return _herd.find(k); }
-    inline herd::const_iterator herd::find(const key_type &k) const
-    { return _herd.find(k); }
-    inline herd::size_type herd::size() const { return _herd.size(); }
-    inline bool herd::empty() const { return _herd.empty(); }
-    inline void herd::clear() { return _herd.clear(); }
+    inline Herd::operator std::string() const { return _name; }
+    inline bool Herd::operator==(const std::string& name) const
+    { return (_name == name); }
+    inline const std::string& Herd::name() const { return _name; }
+    inline const std::string& Herd::email() const { return _email; }
+    inline const std::string& Herd::desc() const { return _desc; }
+    inline void Herd::set_name(const std::string &name) { _name.assign(name); }
+    inline void Herd::set_desc(const std::string &desc) { _desc.assign(desc); }
+    inline Herd::iterator Herd::begin() { return _devs.begin(); }
+    inline Herd::const_iterator Herd::begin() const { return _devs.begin(); }
+    inline Herd::iterator Herd::end() { return _devs.end(); }
+    inline Herd::const_iterator Herd::end() const { return _devs.end(); }
+    inline Herd::size_type Herd::size() const { return _devs.size(); }
+    inline bool Herd::empty() const { return _devs.empty(); }
+    inline void Herd::clear() { return _devs.clear(); }
+    inline void Herd::push_back(const Developer& dev) { _devs.push_back(dev); }
+    inline Herd::iterator Herd::find(const std::string& dev)
+    { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
+    inline Herd::const_iterator Herd::find(const std::string& dev) const
+    { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
+    inline Herd::iterator Herd::find(const Developer& dev)
+    { return std::find(_devs.begin(), _devs.end(), dev); }
+    inline Herd::const_iterator Herd::find(const Developer& dev) const
+    { return std::find(_devs.begin(), _devs.end(), dev); }
 
-    /// herd container.
-    typedef std::map<std::string, herd * > herds;
+    template <class In> inline void
+    Herd::insert(iterator pos, In begin, In end)
+    { _devs.insert(pos, begin, end); }
+
+
+    /**
+     * Herd container.
+     */
+
+    class Herds
+    {
+        public:
+            typedef std::vector<Herd> container_type;
+            typedef container_type::value_type value_type;
+            typedef container_type::iterator iterator;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::size_type size_type;
+
+            Herds() : _herds() { }
+
+            /// Implicit conversion to std::vector<herd>
+            operator std::vector<Herd>() const;
+
+            iterator begin();
+            const_iterator begin() const;
+            iterator end();
+            const_iterator end() const;
+            size_type size() const;
+            bool empty() const;
+            void clear();
+            void push_back(const Herd& h);
+
+            iterator find(const std::string &herd);
+            const_iterator find(const std::string &herd) const;
+            iterator find(const Herd& h);
+            const_iterator find(const Herd& h) const;
+
+            template <class In>
+            void insert(iterator pos, In begin, In end);
+
+        private:
+            container_type _herds;
+    };
+
+    inline Herds::operator std::vector<Herd>() const { return _herds; }
+    inline Herds::iterator Herds::begin() { return _herds.begin(); }
+    inline Herds::const_iterator Herds::begin() const { return _herds.begin(); }
+    inline Herds::iterator Herds::end() { return _herds.end(); }
+    inline Herds::const_iterator Herds::end() const { return _herds.end(); }
+    inline Herds::size_type Herds::size() const { return _herds.size(); }
+    inline bool Herds::empty() const { return _herds.empty(); }
+    inline void Herds::clear() { return _herds.clear(); }
+    inline void Herds::push_back(const Herd& h) { _herds.push_back(h); }
+    inline Herds::iterator Herds::find(const std::string& herd)
+    { return std::find(_herds.begin(), _herds.end(), herd); }
+    inline Herds::const_iterator Herds::find(const std::string& herd) const
+    { return std::find(_herds.begin(), _herds.end(), herd); }
+    inline Herds::iterator Herds::find(const Herd& h)
+    { return std::find(_herds.begin(), _herds.end(), h); }
+    inline Herds::const_iterator Herds::find(const Herd& h) const
+    { return std::find(_herds.begin(), _herds.end(), h); }
+
+    template <class In> inline void
+    Herds::insert(iterator pos, In begin, In end)
+    { _herds.insert(pos, begin, end); }
 
 } // namespace portage
 
-#endif /* _HAVE_HERD_HH */
+#endif /* _HAVE_devs_HH */
 
 /* vim: set tw=80 sw=4 et : */

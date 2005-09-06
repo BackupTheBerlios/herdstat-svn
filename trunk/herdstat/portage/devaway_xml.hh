@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/devaway_xml.hh
- * $Id$
+ * $Id: devaway_xml.hh 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -26,6 +26,59 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+/**
+ * @file devaway_xml.hh
+ * @brief Defines the interface for Gentoo's devaway.xml.
+ */
+
+#include <herdstat/parsable.hh>
+#include <herdstat/fetchable.hh>
+#include <herdstat/xml/saxparser.hh>
+#include <herdstat/portage/herd.hh>
+
+namespace portage {
+
+    /**
+     * Represents Gentoo's devaway.xml.
+     */
+
+    class devaway_xml : public parsable,
+                        public fetchable,
+                        protected xml::saxhandler
+    {
+        public:
+            devaway_xml();
+            devaway_xml(const std::string& path);
+            virtual ~devaway_xml();
+
+            virtual void fetch() const;
+            virtual void parse(const std::string& path = "");
+
+            const Herd& devs() const;
+
+        protected:
+            virtual bool start_element(const std::string& name,
+                                       const attrs_type& attrs);
+            virtual bool end_element(const std::string& name);
+            virtual bool text(const std::string& text);
+
+        private:
+            Herd _devs;
+            mutable bool _fetched;
+            static const char * const _local_default;
+            static const char * const _remote_default;
+
+            bool in_devaway,
+                 in_dev,
+                 in_reason;
+
+            Herd::iterator _cur_dev;
+    };
+
+    inline const Herd& devaway_xml::devs() const { return _devs; }
+
+} // namespace portage
 
 #endif /* _HAVE_DEVAWAY_XML_HH */
 

@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/herds.cc
- * $Id$
+ * $Id: herds.cc 502 2005-08-30 13:57:46Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.

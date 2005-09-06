@@ -1,6 +1,6 @@
 /*
- * herdstat -- portage/developer.cc
- * $Id: developer.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * herdstat -- herdstat/herds_xml.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,24 +24,41 @@
 # include "config.h"
 #endif
 
-#include <herdstat/portage/developer.hh>
+#include <iostream>
+#include <cstdlib>
+#include <herdstat/exceptions.hh>
+#include <herdstat/portage/herds_xml.hh>
 
-namespace portage {
-/****************************************************************************/
-Developer::Developer()
-    : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status("active"), _role(), _awaymsg(), _away(false)
+using namespace portage;
+
+int
+main()
 {
+    try
+    {
+        herds_xml h;
+        h.parse("/var/lib/herdstat/herds.xml");
+        assert(not h.empty());
+
+        std::cout << "Size: " << h.size() << std::endl;
+
+        Herds::iterator i;
+        for (i = h.begin() ; i != h.end() ; ++i)
+        {
+            std::cout << i->name() << "(" << i->size() << ")" << std::endl;
+
+            Herd::iterator h;
+            for (h = i->begin() ; h != i->end() ; ++h)
+                std::cout << "  " << h->user() << std::endl;
+        }
+    }
+    catch (const BaseException &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
-/****************************************************************************/
-Developer::Developer(const std::string &user, const std::string &email,
-                     const std::string &name)
-    : _user(user), _email(email.empty() ? user+"@gentoo.org" : email),
-      _name(name), _pgpkey(), _joined(), _birth(), _status("active"),
-      _role(), _awaymsg(), _away(false)
-{
-}
-/****************************************************************************/
-} // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

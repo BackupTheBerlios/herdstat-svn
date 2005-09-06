@@ -7,16 +7,24 @@ cc_sources = misc.cc \
 	     version.cc \
 	     find.cc \
 	     ebuild.cc \
-		 developer.cc \
-		 herd.cc
+	     developer.cc \
+	     herd.cc \
+	     herds_xml.cc \
+	     metadata.cc \
+	     metadata_xml.cc \
+	     devaway_xml.cc
 hh_sources = exceptions.hh \
 	     misc.hh \
 	     config.hh \
-         version.hh \
+	     version.hh \
 	     find.hh \
 	     ebuild.hh \
-		 developer.hh \
-		 herd.hh
+	     developer.hh \
+	     herd.hh \
+	     herds_xml.hh \
+	     metadata.hh \
+	     metadata_xml.hh \
+	     devaway_xml.hh
 
 noinst_LTLIBRARIES = libportage.la
 libportage_la_SOURCES = $(cc_sources) $(hh_sources)

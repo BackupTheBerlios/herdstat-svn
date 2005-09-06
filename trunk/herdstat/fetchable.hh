@@ -1,6 +1,6 @@
 /*
- * herdstat -- portage/developer.cc
- * $Id: developer.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * herdstat -- herdstat/fetchable.hh
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -20,28 +20,33 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_FETCHABLE_HH
+#define _HAVE_FETCHABLE_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/portage/developer.hh>
+/**
+ * @file fetchable.hh
+ * @brief Defines the abstract fetchable interface.
+ */
 
-namespace portage {
-/****************************************************************************/
-Developer::Developer()
-    : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status("active"), _role(), _awaymsg(), _away(false)
+#include <herdstat/noncopyable.hh>
+#include <herdstat/fetcher.hh>
+
+class fetchable
 {
-}
-/****************************************************************************/
-Developer::Developer(const std::string &user, const std::string &email,
-                     const std::string &name)
-    : _user(user), _email(email.empty() ? user+"@gentoo.org" : email),
-      _name(name), _pgpkey(), _joined(), _birth(), _status("active"),
-      _role(), _awaymsg(), _away(false)
-{
-}
-/****************************************************************************/
-} // namespace portage
+    public:
+        virtual void fetch() const = 0;
+
+    protected:
+        fetchable() : _fetch() { }
+        virtual ~fetchable() { }
+
+        const fetcher _fetch;
+};
+
+#endif /* _HAVE_FETCHABLE_HH */
 
 /* vim: set tw=80 sw=4 et : */
