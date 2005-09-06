@@ -48,7 +48,7 @@ test x$sysconfdir = "xNONE" && sysconfdir="$ac_default_sysconfdir"
 AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir", [Local state directory])
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir", [System configuration directory])
 
-AC_CHECK_PROGS(_WGET, wget)
+AC_PATH_PROGS(_WGET, wget)
 if test x$_WGET = "x"; then
     AC_MSG_ERROR([wget is required])
 fi
@@ -63,7 +63,7 @@ AM_CONDITIONAL(GENERATE_API_DOCS, test x$enable_doc != "xno")
 AC_MSG_RESULT([$enable_doc])
 
 if test x$enable_doc != "xno" ; then
-    AC_CHECK_PROGS(DOXYGEN, doxygen)
+    AC_PATH_PROGS(DOXYGEN, doxygen)
     if test x$DOXYGEN = "x" ; then
 	AC_MSG_ERROR([doxygen is required to build API docs])
     fi
