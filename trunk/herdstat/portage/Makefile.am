@@ -12,7 +12,8 @@ cc_sources = misc.cc \
 	     herds_xml.cc \
 	     metadata.cc \
 	     metadata_xml.cc \
-	     devaway_xml.cc
+	     devaway_xml.cc \
+	     userinfo_xml.cc
 hh_sources = exceptions.hh \
 	     misc.hh \
 	     config.hh \
@@ -24,10 +25,11 @@ hh_sources = exceptions.hh \
 	     herds_xml.hh \
 	     metadata.hh \
 	     metadata_xml.hh \
-	     devaway_xml.hh
+	     devaway_xml.hh \
+	     userinfo_xml.hh
 
 noinst_LTLIBRARIES = libportage.la
-libportage_la_SOURCES = $(cc_sources) $(hh_sources)
+libportage_la_SOURCES = $(hh_sources) $(cc_sources)
 
 # library_includedir=$(includedir)/$(PACKAGE)-$(VERSION_MAJOR).$(VERSION_MINOR)/$(PACKAGE)/portage
 # library_include_HEADERS = $(hh_sources)

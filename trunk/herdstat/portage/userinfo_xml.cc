@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <herdstat/portage/userinfo_xml.hh>
 
 namespace portage {
@@ -32,10 +33,18 @@ const char * const userinfo_xml::_local_default = LOCALSTATEDIR"/userinfo.xml";
 const char * const userinfo_xml::_remote_default = "FIXME";
 /****************************************************************************/
 userinfo_xml::userinfo_xml()
+    : parsable(), _devs(), _fetched(false), in_user(false), in_firstname(false),
+      in_familyname(false), in_pgpkey(false), in_email(false), in_joined(false),
+      in_birth(false), in_roles(false), in_status(false), in_location(false),
+      _cur_dev()
 {
 }
 /****************************************************************************/
 userinfo_xml::userinfo_xml(const std::string& path)
+    : parsable(path), _devs(), _fetched(false), in_user(false),
+      in_firstname(false), in_familyname(false), in_pgpkey(false),
+      in_email(false), in_joined(false), in_birth(false), in_roles(false),
+      in_status(false), in_location(false), _cur_dev()
 {
     this->fetch();
     this->parse();
@@ -65,11 +74,9 @@ userinfo_xml::parse(const std::string& path)
 }
 /****************************************************************************/
 bool
-metadata_xml::start_element(const std::string& name, const attrs_type& attrs)
+userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
 {
-    if (name == "userlist")
-        in_userlist = true;
-    else if (name == "user")
+    if (name == "user")
     {
         attrs_type::const_iterator pos = attrs.find("username");
         if (pos == attrs.end())
@@ -77,21 +84,28 @@ metadata_xml::start_element(const std::string& name, const attrs_type& attrs)
 
         Developer dev(pos->second);
         _devs.push_back(dev);
-        _cur_dev = _devs.find(dev);
+        _cur_dev = _devs.end() - 1;
         assert(_cur_dev != _devs.end());
+
+        std::cout << "user == " << dev.user() << std::endl;
 
         in_user = true;
     }
-    else if (name == "realname")
-    {
-        attrs_type::const_iterator pos = attrs.find("fullname");
-        if (pos == attrs.end())
-            throw Exception("<realname> tag with no fullname attribute!");
+//    else if (name == "realname")
+//    {
+//        attrs_type::const_iterator pos = attrs.find("fullname");
+//        if (pos == attrs.end())
+//            throw Exception("<realname> tag with no fullname attribute!");
 
-        _cur_dev->set_name(_cur_dev->name() + pos->second);
+//        _cur_dev->set_name(_cur_dev->name() + pos->second);
+//        std::cout << "name == " << _cur_dev->name() << std::endl;
 
-        in_realname = true;
-    }
+//        in_realname = true;
+//    }
+    else if (name == "firstname")
+        in_firstname = true;
+    else if (name == "familyname")
+        in_familyname = true;
     else if (name == "pgpkey")
         in_pgpkey = true;
     else if (name == "email")
@@ -114,16 +128,42 @@ metadata_xml::start_element(const std::string& name, const attrs_type& attrs)
 }
 /****************************************************************************/
 bool
-metadata_xml::end_element(const std::string& name)
+userinfo_xml::end_element(const std::string& name)
 {
-
+    if      (name == "user")        in_user = false;
+    else if (name == "firstname")   in_firstname = false;
+    else if (name == "familyname")  in_familyname = false;
+    else if (name == "pgpkey")      in_pgpkey = false;
+    else if (name == "email")       in_email = false;
+    else if (name == "joined")      in_joined = false;
+    else if (name == "birthday")    in_birth = false;
+    else if (name == "roles")       in_roles = false;
+    else if (name == "status")      in_status = false;
+    else if (name == "location")    in_location = false;
     return true;
 }
 /****************************************************************************/
 bool
-metadata_xml::text(const std::string& text)
+userinfo_xml::text(const std::string& text)
 {
-
+    if (in_firstname)
+        _cur_dev->set_name(_cur_dev->name() + text);
+    else if (in_familyname)
+        _cur_dev->set_name(_cur_dev->name() + text);
+    else if (in_pgpkey)
+        _cur_dev->set_pgpkey(text);
+    else if (in_email)
+        _cur_dev->set_email(text);
+    else if (in_joined)
+        _cur_dev->set_joined(text);
+    else if (in_birth)
+        _cur_dev->set_birthday(text);
+    else if (in_roles)
+        _cur_dev->set_role(_cur_dev->role() + text);
+    else if (in_status)
+        _cur_dev->set_status(text);
+    else if (in_location)
+        _cur_dev->set_location(_cur_dev->location() + text);
     return true;
 }
 /****************************************************************************/

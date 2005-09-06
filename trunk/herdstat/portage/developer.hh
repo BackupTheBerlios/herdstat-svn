@@ -70,21 +70,23 @@ namespace portage {
             const std::string& name() const;
             const std::string& pgpkey() const;
             const std::string& joined() const;
-            const std::string& birth() const;
+            const std::string& birthday() const;
             const std::string& status() const;
             const std::string& role() const;
+            const std::string& location() const;
             const std::string& awaymsg() const;
             bool is_away() const;
 
-            void set_user(const std::string &user);
-            void set_email(const std::string &email);
-            void set_name(const std::string &name);
-            void set_pgpkey(const std::string &pgpkey);
-            void set_joined(const std::string &date);
-            void set_birth(const std::string &date);
-            void set_status(const std::string &status);
-            void set_role(const std::string &role);
-            void set_awaymsg(const std::string &msg);
+            void set_user(const std::string& user);
+            void set_email(const std::string& email);
+            void set_name(const std::string& name);
+            void set_pgpkey(const std::string& pgpkey);
+            void set_joined(const std::string& date);
+            void set_birthday(const std::string& date);
+            void set_status(const std::string& status);
+            void set_role(const std::string& role);
+            void set_location(const std::string& location);
+            void set_awaymsg(const std::string& msg);
             void set_away(const bool away);
 
         private:
@@ -96,6 +98,7 @@ namespace portage {
             std::string _birth;
             std::string _status;
             std::string _role;
+            std::string _location;
             std::string _awaymsg;
             bool _away;
     };
@@ -108,28 +111,31 @@ namespace portage {
     inline const std::string& Developer::name() const { return _name; }
     inline const std::string& Developer::pgpkey() const { return _pgpkey; }
     inline const std::string& Developer::joined() const { return _joined; }
-    inline const std::string& Developer::birth() const { return _birth; }
+    inline const std::string& Developer::birthday() const { return _birth; }
     inline const std::string& Developer::status() const { return _status; }
     inline const std::string& Developer::role() const { return _role; }
+    inline const std::string& Developer::location() const { return _location; }
     inline const std::string& Developer::awaymsg() const { return _awaymsg; }
     inline bool Developer::is_away() const { return _away; }
-    inline void Developer::set_user(const std::string &user)
+    inline void Developer::set_user(const std::string& user)
     { _user.assign(user); }
-    inline void Developer::set_email(const std::string &email)
+    inline void Developer::set_email(const std::string& email)
     { _email.assign(email); }
-    inline void Developer::set_name(const std::string &name)
+    inline void Developer::set_name(const std::string& name)
     { _name.assign(name); }
-    inline void Developer::set_pgpkey(const std::string &pgpkey)
+    inline void Developer::set_pgpkey(const std::string& pgpkey)
     { _pgpkey.assign(pgpkey); }
-    inline void Developer::set_joined(const std::string &date)
+    inline void Developer::set_joined(const std::string& date)
     { _joined.assign(date); }
-    inline void Developer::set_birth(const std::string &date)
+    inline void Developer::set_birthday(const std::string& date)
     { _birth.assign(date); }
-    inline void Developer::set_status(const std::string &status)
+    inline void Developer::set_status(const std::string& status)
     { _status.assign(status); }
-    inline void Developer::set_role(const std::string &role)
+    inline void Developer::set_role(const std::string& role)
     { _role.assign(role); }
-    inline void Developer::set_awaymsg(const std::string &msg)
+    inline void Developer::set_location(const std::string& location)
+    { _location.assign(location); }
+    inline void Developer::set_awaymsg(const std::string& msg)
     { _awaymsg.assign(msg); }
     inline void Developer::set_away(const bool away) { _away = away; }
 

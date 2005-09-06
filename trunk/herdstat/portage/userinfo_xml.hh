@@ -55,7 +55,7 @@ namespace portage {
             virtual void fetch() const;
             virtual void parse(const std::string& path = "");
 
-            const Herd& devs() const;
+            Herd& devs();
 
         protected:
             virtual bool start_element(const std::string& name,
@@ -69,9 +69,7 @@ namespace portage {
             static const char * const _local_default;
             static const char * const _remote_default;
 
-            bool in_userlist,
-                 in_user,
-                 in_realname,
+            bool in_user,
                  in_firstname,
                  in_familyname,
                  in_pgpkey,
@@ -84,6 +82,8 @@ namespace portage {
 
             Herd::iterator _cur_dev;
     };
+
+    inline Herd& userinfo_xml::devs() { return _devs; }
 
 } // namespace portage
 
