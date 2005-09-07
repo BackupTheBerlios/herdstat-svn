@@ -31,7 +31,7 @@
 namespace portage {
 /*** static members *********************************************************/
 const char * const devaway_xml::_local_default = LOCALSTATEDIR"/devaway.xml";
-const char * const devaway_xml::_remote_default = "FIXME";
+const char * const devaway_xml::_remote_default = "http://dev.gentoo.org/devaway/xml/index.php";
 /****************************************************************************/
 devaway_xml::devaway_xml()
     : xmlBase(), _devs(), in_devaway(false),
@@ -56,6 +56,8 @@ devaway_xml::parse(const std::string& path)
 {
     if (not path.empty())
         this->set_path(path);
+    else if (this->path().empty())
+        this->set_path(this->_local_default);
 
     this->parse_file(this->path().c_str());
 }
