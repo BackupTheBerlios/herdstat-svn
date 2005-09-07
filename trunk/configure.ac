@@ -149,20 +149,19 @@ AC_CHECK_FUNCS(getopt_long)
 dnl Required libs
 
 dnl Check for termcap lib
-for termlib in ncurses curses termcap terminfo termlib ; do
-    AC_CHECK_LIB(${termlib}, tgetent,
-	[TERMCAP_LIBS="$TERMCAP_LIBS -l$termlib"])
-    case "$TERMCAP_LIBS" in
-	*-l${termlib}*) break ;;
-    esac
-done
+AC_MSG_CHECKING([whether to use ncurses to get screen width for output formatting])
+AC_ARG_WITH(ncurses,
+    AC_HELP_STRING([--with-ncurses],[Use ncurses to determine terminal width used for output formatting [on]]),
+    [WITH_NCURSES=$withval],[WITH_NCURSES=yes])
+AC_MSG_RESULT([$WITH_NCURSES])
 
-if test -z "$TERMCAP_LIBS" ; then
-    AC_MSG_ERROR([a termcap library is required])
+if test "$WITH_NCURSES" = "yes" ; then
+    AC_CHECK_LIB(ncurses, tgetent, [TERMCAP_LIBS="-lncurses"])
+    AC_CHECK_HEADERS([curses.h term.h])
+    AC_DEFINE(HAVE_NCURSES, 1, [Use ncurses to determine terminal width])
 fi
-
+    
 AC_SUBST(TERMCAP_LIBS)
-AC_DEFINE(USE_TERMCAP, 1, [Use termcap lib to determine terminal width])
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(xmlwrapp, xmlwrapp >= 0.5.0)

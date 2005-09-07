@@ -1,6 +1,6 @@
 /*
  * herdstat -- lib/misc.cc
- * $Id$
+ * $Id: misc.cc 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -35,18 +35,18 @@
 #include <herdstat/util/misc.hh>
 #include <herdstat/exceptions.hh>
 
-#ifdef USE_TERMCAP
+#ifdef HAVE_NCURSES
 # include <curses.h>
 # include <term.h>
-#endif /* USE_TERMCAP */
+#endif /* HAVE_NCURSES */
 
 /** static members **********************************************************/
 util::color_map_T::cmap_T util::color_map_T::_cm;
 
-#ifdef USE_TERMCAP
+#ifdef HAVE_NCURSES
 static bool term_init = false;
 static char term_info[2048];
-#endif /* USE_TERMCAP */
+#endif /* HAVE_NCURSES */
 /****************************************************************************/
 util::color_map_T::string_type &
 util::color_map_T::operator[] (const string_type &color)
@@ -144,7 +144,7 @@ util::current_user()
 std::string::size_type
 util::getcols()
 {
-#ifdef USE_TERMCAP
+#ifdef HAVE_NCURSES
 
     if (not term_init)
     {
@@ -169,7 +169,7 @@ util::getcols()
     if (cols > 0)
         return cols;
 
-#else /* USE_TERMCAP */
+#else /* HAVE_NCURSES */
 
     std::string output;
     FILE *p = popen("stty size 2>/dev/null", "r");
@@ -188,7 +188,7 @@ util::getcols()
 	    return std::atoi(output.substr(pos).c_str());
     }
 
-#endif /* USE_TERMCAP */
+#endif /* HAVE_NCURSES */
 
     return 78;
 }
