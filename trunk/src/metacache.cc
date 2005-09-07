@@ -26,16 +26,20 @@
 
 #include <algorithm>
 #include <functional>
+#include <herdstat/util/string.hh>
 #include <herdstat/util/vars.hh>
 #include <herdstat/util/progress.hh>
 #include <herdstat/portage/config.hh>
+#include <herdstat/portage/metadata_xml.hh>
+
 #include "pkgcache.hh"
-#include "metadata_xml.hh"
 #include "metacache.hh"
 
 #define METACACHE               /*LOCALSTATEDIR*/"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
 #define METACACHE_RESERVE       9100
+
+using namespace portage;
 
 metacache_T::metacache_T(const std::string &portdir)
     : cachable(optget("localstatedir", std::string)+METACACHE),
@@ -216,8 +220,9 @@ metacache_T::load()
                 continue;
 
             std::string str;
-            metadata_T meta(this->_portdir,
-                this->_portdir + "/" + i->first + "/metadata.xml");
+            metadata meta;
+            Herds& herds(meta.herds());
+            Herd&  devs(meta.devs());
 
             std::vector<std::string> parts = util::split(i->second, ':', true);
             if (parts.empty())
@@ -226,7 +231,7 @@ metacache_T::load()
             /* get herds */
             str = parts.front();
             parts.erase(parts.begin());
-            meta.herds = util::split(str, ',');
+            herds = util::split(str, ',');
 
             /* get devs */
             if (not parts.empty())
@@ -234,7 +239,7 @@ metacache_T::load()
                 str = parts.front();
                 parts.erase(parts.begin());
                 if (not str.empty())
-                    meta.devs = util::split(str, ',');
+                    devs = util::split(str, ',');
             }
 
             /* get longdesc */
@@ -250,7 +255,7 @@ metacache_T::load()
                     parts.erase(parts.begin());
                 }
 
-                meta.longdesc = str;
+                meta.set_longdesc(str);
             }
 
             this->push_back(meta);
@@ -288,38 +293,44 @@ metacache_T::dump()
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
+        const Herds& herds(ci->herds());
+        const Herd&  devs(ci->devs());
         std::string str;
         std::size_t n;
 
-        f << ci->pkg << "=";
+        f << ci->pkg() << "=";
 
         /* herds */
-        metadata_T::herds_type::iterator h, he = ci->herds.end();
-        for (h = ci->herds.begin(), n = 1 ; h != he ; ++h, ++n)
         {
-            str += (*h);
-            if (n != ci->herds.size())
-                str += ",";
+            Herds::const_iterator i, end = herds.end();
+            for (i = herds.begin(), n = 1 ; i != end ; ++i, ++n)
+            {
+                str += i->name();
+                if (n != herds.size())
+                    str += ",";
+            }
         }
 
         f << str << ":";
         
         /* developers */
-        metadata_T::herd_type::iterator d, de = ci->devs.end();
-        for (d = ci->devs.begin(), n = 1, str.clear() ; d != de ; ++d, ++n)
         {
-            str += d->first;
-            if (n != ci->devs.size())
-                str += ",";
+            Herd::const_iterator i, end = devs.end();
+            for (i = devs.begin(), n = 1, str.clear() ; i != end ; ++i, ++n)
+            {
+                str += *i;
+                if (n != devs.size())
+                    str += ",";
+            }
         }
 
         f << str << ":";
 
         /* longdesc */
-        if (ci->longdesc.empty())
+        if (ci->longdesc().empty())
             f << std::endl;
         else
-            f << util::tidy_whitespace(ci->longdesc) << std::endl;
+            f << util::tidy_whitespace(ci->longdesc()) << std::endl;
     }
 }
 

@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <vector>
 #include <herdstat/cachable.hh>
 #include <herdstat/portage/metadata.hh>
 
@@ -37,7 +38,7 @@
 class metacache_T : public cachable
 {
     public:
-        typedef std::vector<metadata> container_type;
+        typedef std::vector<portage::metadata> container_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
