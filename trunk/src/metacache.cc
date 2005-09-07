@@ -35,7 +35,7 @@
 
 #define METACACHE               /*LOCALSTATEDIR*/"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
-#define METACACHE_RESERVE       8650
+#define METACACHE_RESERVE       9100
 
 metacache_T::metacache_T(const std::string &portdir)
     : cachable(optget("localstatedir", std::string)+METACACHE),
@@ -170,12 +170,12 @@ metacache_T::fill()
             if (status)
                 ++progress;
 
-            std::string metadata(this->_portdir + "/" + (*p) + "/metadata.xml");
-            if (util::is_file(metadata))
+            std::string path(this->_portdir + "/" + (*p) + "/metadata.xml");
+            if (util::is_file(path))
             {
                 /* parse it */
-                const metadata_xml_T m(metadata);
-                this->push_back(m.data(this->_portdir));
+                const metadata_xml meta(path);
+                this->push_back(meta);
             }
         }
     }
@@ -206,7 +206,7 @@ metacache_T::load()
         if (cache["size"].empty() or cache["size"] == "0")
             this->reserve(METACACHE_RESERVE);
         else
-            this->reserve(std::atoi(cache["size"].c_str()));
+            this->reserve(util::destringify<int>(cache["size"]));
 
         util::vars_T::const_iterator i, e = cache.end();
         for (i = cache.begin() ; i != e ; ++i)

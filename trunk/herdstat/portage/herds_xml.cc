@@ -107,7 +107,7 @@ const char * const herds_xml::_local_default = LOCALSTATEDIR"/herds.xml";
 const char * const herds_xml::_remote_default = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 /****************************************************************************/
 herds_xml::herds_xml()
-    : parsable(), _herds(), _fetched(false), in_herd(false), in_herd_name(false),
+    : xmlBase(), _herds(), in_herd(false), in_herd_name(false),
       in_herd_email(false), in_herd_desc(false), in_maintainer(false),
       in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
@@ -116,8 +116,7 @@ herds_xml::herds_xml()
 }
 /****************************************************************************/
 herds_xml::herds_xml(const std::string& path)
-    : parsable(path),
-      _herds(), _fetched(false), in_herd(false), in_herd_name(false),
+    : xmlBase(path), _herds(), in_herd(false), in_herd_name(false),
       in_herd_email(false), in_herd_desc(false), in_maintainer(false),
       in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
@@ -141,14 +140,25 @@ herds_xml::parse(const std::string& path)
 }
 /****************************************************************************/
 void
-herds_xml::fetch() const
+herds_xml::do_fetch(const std::string& path) const
 {
-    if (this->_fetched)
-        return;
-
-
-
-    this->_fetched = true;
+}
+/****************************************************************************/
+void
+herds_xml::fill_developer(Developer& dev) const
+{
+    /* for each herd */
+    for (Herds::const_iterator h = _herds.begin() ; h != _herds.end() ; ++h)
+    {
+        /* is the developer in this herd? */
+        Herd::const_iterator d = h->find(dev);
+        if (d != h->end())
+        {
+            if (dev.name().empty() and not d->name().empty())
+                dev.set_name(d->name());
+            dev.append_herd(h->name());
+        }
+    }
 }
 /****************************************************************************/
 bool

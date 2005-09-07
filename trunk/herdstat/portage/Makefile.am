@@ -22,6 +22,7 @@ hh_sources = exceptions.hh \
 	     ebuild.hh \
 	     developer.hh \
 	     herd.hh \
+	     xmlbase.hh \
 	     herds_xml.hh \
 	     metadata.hh \
 	     metadata_xml.hh \

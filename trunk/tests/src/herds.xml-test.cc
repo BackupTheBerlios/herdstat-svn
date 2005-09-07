@@ -40,15 +40,16 @@ main(int argc, char **argv)
             throw Exception("usage: herds.xml-test <path>");
 
         herds_xml h(argv[1]);
-        assert(not h.empty());
+        const Herds& herds(h.herds());
+        assert(not herds.empty());
 
-        std::cout << "Size: " << h.size() << std::endl;
+        std::cout << "Size: " << herds.size() << std::endl;
 
-        Herds::iterator i = h.find("shell-tools");
-        assert(i != h.end());
+        Herds::const_iterator i = herds.find("shell-tools");
+        assert(i != herds.end());
 
         std::cout << i->name() << "(" << i->size() << ")" << std::endl;
-        for (Herd::iterator d = i->begin() ; d != i->end() ; ++d)
+        for (Herd::const_iterator d = i->begin() ; d != i->end() ; ++d)
             std::cout << "  " << d->user() << std::endl;
 
 //        Herds::iterator i;

@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_meta_handler.hh
- * $Id$
+ * $Id: action_meta_handler.hh 400 2005-06-03 13:34:49Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -27,7 +27,6 @@
 # include "config.h"
 #endif
 
-#include "metadata.hh"
 #include "action_handler.hh"
 
 class action_meta_handler_T : public action_portage_find_handler_T
@@ -37,7 +36,15 @@ class action_meta_handler_T : public action_portage_find_handler_T
         virtual int operator() (opts_type &);
 
     private:
-        void display(const metadata_T &);
+        struct metadata_data
+        {
+            std::string path;
+            std::string portdir;
+            std::string pkg;
+            bool is_category;
+        };
+
+        void display(const metadata_data&);
 };
 
 #endif

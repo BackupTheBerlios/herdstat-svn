@@ -28,7 +28,7 @@
 #endif
 
 #include <herdstat/cachable.hh>
-#include "metadata.hh"
+#include <herdstat/portage/metadata.hh>
 
 /*
  * A cache of all metadata.xml's.
@@ -37,7 +37,7 @@
 class metacache_T : public cachable
 {
     public:
-        typedef std::vector<metadata_T> container_type;
+        typedef std::vector<metadata> container_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
@@ -63,7 +63,7 @@ class metacache_T : public cachable
 
         std::string _portdir;
         std::vector<std::string> _overlays;
-        std::vector<metadata_T> _metadatas;
+        container_type _metadatas;
 };
 
 inline metacache_T::iterator

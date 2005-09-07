@@ -41,7 +41,6 @@ main(int argc, char **argv)
 
         std::string path(argv[1]);
         metadata_xml meta(path);
-
         const Herds& herds = meta.herds();
         const Herd&  devs  = meta.devs();
 

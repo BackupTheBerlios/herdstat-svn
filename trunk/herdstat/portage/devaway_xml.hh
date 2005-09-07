@@ -32,9 +32,8 @@
  * @brief Defines the interface for Gentoo's devaway.xml.
  */
 
-#include <herdstat/parsable.hh>
 #include <herdstat/fetchable.hh>
-#include <herdstat/xml/saxparser.hh>
+#include <herdstat/portage/xmlbase.hh>
 #include <herdstat/portage/herd.hh>
 
 namespace portage {
@@ -43,19 +42,20 @@ namespace portage {
      * Represents Gentoo's devaway.xml.
      */
 
-    class devaway_xml : public parsable,
-                        public fetchable,
-                        protected xml::saxhandler
+    class devaway_xml : public xmlBase,
+                        public fetchable
     {
         public:
             devaway_xml();
             devaway_xml(const std::string& path);
             virtual ~devaway_xml();
 
-            virtual void fetch() const;
             virtual void parse(const std::string& path = "");
+            virtual void fill_developer(Developer& dev) const;
 
             const Herd& devs() const;
+
+            const std::vector<std::string> keys() const;
 
         protected:
             virtual bool start_element(const std::string& name,
@@ -63,9 +63,10 @@ namespace portage {
             virtual bool end_element(const std::string& name);
             virtual bool text(const std::string& text);
 
+            virtual void do_fetch(const std::string& path = "") const;
+
         private:
             Herd _devs;
-            mutable bool _fetched;
             static const char * const _local_default;
             static const char * const _remote_default;
 

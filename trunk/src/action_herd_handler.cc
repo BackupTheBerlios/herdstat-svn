@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_herd_handler.cc
- * $Id$
+ * $Id: action_herd_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -38,15 +38,16 @@
  */
 
 int
-action_herd_handler_T::operator() (opts_type &herds)
+action_herd_handler_T::operator() (opts_type &opts)
 {
-    herds_xml.fetch();
-    herds_xml.parse();
+    herdsxml.fetch(optget("herds.xml", std::string));
+    herdsxml.parse(optget("herds.xml", std::string));
+    const Herds& herds(herdsxml.herds());
 
     if (use_devaway)
     {
-        devaway.fetch();
-        devaway.parse();
+        devaway.fetch(optget("devaway.location", std::string));
+        devaway.parse(optget("devaway.location", std::string));
     }
 
     /* set format attributes */
@@ -59,12 +60,12 @@ action_herd_handler_T::operator() (opts_type &herds)
     /* was the all target specified? */
     if (all)
     {
-        herds_xml.display(*stream);
-        size = herds_xml.size();
+        display_herds(herds, *stream);
+        size = herds.size();
         flush();
         return EXIT_SUCCESS;
     }
-    else if (regex and herds.size() > 1)
+    else if (regex and opts.size() > 1)
     {
         std::cerr << "You may only specify one regular expression."
             << std::endl;
@@ -73,27 +74,29 @@ action_herd_handler_T::operator() (opts_type &herds)
     else if (regex)
     {
         if (eregex)
-            regexp.assign(herds.front(), REG_EXTENDED|REG_ICASE);
+            regexp.assign(opts.front(), REG_EXTENDED|REG_ICASE);
         else
-            regexp.assign(herds.front(), REG_ICASE);
+            regexp.assign(opts.front(), REG_ICASE);
         
-        herds.clear();
+        opts.clear();
 
-        herds_xml_T::iterator h;
-        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        /* FIXME: use copy_if() ? */
+        Herds::const_iterator h;
+        for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            if (regexp == h->first)
-                herds.push_back(h->first);
+            if (regexp == h->name())
+                opts.push_back(h->name());
         }
     }
 
     /* for each specified herd... */
     opts_type::iterator herd;
     opts_type::size_type n = 1;
-    for (herd = herds.begin() ; herd != herds.end() ; ++herd, ++n)
+    for (herd = opts.begin() ; herd != opts.end() ; ++herd, ++n)
     {
         /* does the herd exist? */
-        if (not herds_xml.exists(*herd))
+        Herds::const_iterator h = herds.find(*herd);
+        if (h == herds.end())
         {
             std::cerr << "Herd '" << *herd << "' doesn't seem to exist."
                 << std::endl;
@@ -101,7 +104,7 @@ action_herd_handler_T::operator() (opts_type &herds)
             /* if the user specified more than one herd, then just print
              * the error and keep going; otherwise, we want to exit with
              * an error code */
-            if (herds.size() > 1)
+            if (opts.size() > 1)
             {
                 std::cerr << std::endl;
                 continue;
@@ -110,11 +113,11 @@ action_herd_handler_T::operator() (opts_type &herds)
                 throw HerdException();
         }
 
-        herds_xml[*herd]->display(*stream);
-        size += herds_xml[*herd]->size();
+        display_herd(*h, *stream);
+        size += h->size();
 
         /* only skip a line if we're not displaying the last one */
-        if (not count and n != herds.size())
+        if (not count and n != opts.size())
             output.endl();
     }
 

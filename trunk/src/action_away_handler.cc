@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_away_handler.cc
- * $Id$
+ * $Id: action_away_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,25 +28,21 @@
 #include "action_away_handler.hh"
 
 void
-action_away_handler_T::display(const std::string &dev)
+action_away_handler_T::display(Herd::const_iterator dev)
 {
-    if (devaway.find(dev) == devaway.end())
-        throw DevException();
-
     if (quiet)
-        *stream << dev << " - " << util::tidy_whitespace(devaway[dev])
-            << std::endl;
+        *stream << dev->user() << " - " << dev->awaymsg() << std::endl;
     else
     {
-        herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
+        herdsxml.fill_developer(*dev);
 
-        if (info.name.empty())
-            output("Developer", dev);
+        if (dev->name().empty())
+            output("Developer", dev->user());
         else
-            output("Developer", info.name + " (" + dev + ")");
+            output("Developer", dev->name() + " (" + dev->user() + ")");
 
-        output("Email", dev + "@gentoo.org");
-        output("Away Message", util::tidy_whitespace(devaway[dev]));
+        output("Email", dev->email());
+        output("Away Message", dev->awaymsg());
     }
 
     size += 1;
@@ -55,9 +51,10 @@ action_away_handler_T::display(const std::string &dev)
 int
 action_away_handler_T::operator() (opts_type &opts)
 {
-    devaway_T::iterator d;
-    devaway.fetch();
-    devaway.parse();
+    devaway.fetch(optget("devaway.location", std::string));
+    devaway.parse(optget("devaway.location", std::string));
+    const Herd& devs(devaway.devs());
+    Herd::const_iterator d;
 
     output.set_maxlabel(all ? 20 : 13);
     output.set_maxdata(maxcol - output.maxlabel());
@@ -65,33 +62,32 @@ action_away_handler_T::operator() (opts_type &opts)
 
     if (all)
     {
-        output(util::sprintf("Away Developers(%d)", devaway.size()), "");
-        for (d = devaway.begin() ; d != devaway.end() ; ++d)
+        output(util::sprintf("Away Developers(%d)", devs.size()), "");
+        for (d = devs.begin() ; d != devs.end() ; ++d)
         {
+            /* FIXME: use display() */
+
             if (quiet)
-            {
-                *stream << d->first << " - " << util::tidy_whitespace(d->second)
-                    << std::endl;
-            }
+                *stream << d->user() << " - " << d->awaymsg() << std::endl;
             else
             {
                 if (optget("color", bool))
-                    output("", color[blue] + d->first + color[none]);
+                    output("", color[blue] + d->user() + color[none]);
                 else
-                    output("", d->first);
+                    output("", d->user());
 
-                output("", util::tidy_whitespace(d->second));
+                output("", d->awaymsg());
                 output.endl();
             }
         }
 
-        size = devaway.size();
+        size = devs.size();
         flush();
         return EXIT_SUCCESS;
     }
         
-    herds_xml.fetch();
-    herds_xml.parse();
+    herdsxml.fetch(optget("herds.xml", std::string));
+    herdsxml.parse(optget("herds.xml", std::string));
 
     if (regex and opts.size() > 1)
     {
@@ -106,9 +102,9 @@ action_away_handler_T::operator() (opts_type &opts)
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-        for (d = devaway.begin() ; d != devaway.end() ; ++d)
-            if (regexp == d->first)
-                opts.push_back(d->first);
+        for (d = devs.begin() ; d != devs.end() ; ++d)
+            if (regexp == d->user())
+                opts.push_back(d->user());
 
         if (opts.empty())
         {
@@ -126,7 +122,11 @@ action_away_handler_T::operator() (opts_type &opts)
     {
         try
         {
-            display(*i);
+            d = devs.find(*i);
+            if (d == devs.end())
+                throw DevException();
+
+            display(d);
         }
         catch (const DevException)
         {

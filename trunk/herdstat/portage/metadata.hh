@@ -59,6 +59,8 @@ namespace portage {
 
             const Herds& herds() const;
             const Herd& devs() const;
+            Herds& herds();
+            Herd& devs();
 
         private:
             friend class metadata_xml;
@@ -79,6 +81,8 @@ namespace portage {
     { _longdesc.assign(longdesc); }
     inline const Herds& metadata::herds() const { return _herds; }
     inline const Herd& metadata::devs() const { return _devs; }
+    inline Herds& metadata::herds() { return _herds; }
+    inline Herd& metadata::devs() { return _devs; }
 
 } // namespace portage
 

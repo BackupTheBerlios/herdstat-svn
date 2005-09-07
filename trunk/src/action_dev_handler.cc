@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_dev_handler.cc
- * $Id$
+ * $Id: action_dev_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -37,29 +37,30 @@
 void
 action_dev_handler_T::display(const std::string &dev)
 {
-    herds_xml_T::devinfo_T info = herds_xml.get_dev_info(dev);
+    Developer d(dev);
+    herdsxml.fill_developer(d);
 
     /* was the dev in any of the herds? */
-    if (info.herds.empty())
+    if (d.herds().empty())
         throw DevException();
 
     if (not quiet)
     {
-        if (info.name.empty())
+        if (d.name.empty())
             output("Developer", dev);
         else
-            output("Developer", info.name + " (" + dev + ")");
+            output("Developer", d.name() + " (" + dev + ")");
         
-        output("Email", dev + "@gentoo.org");
+        output("Email", d.email());
     }
 
     if (verbose and not quiet)
     {
-        output(util::sprintf("Herds(%d)", info.herds.size()), "");
+        output(util::sprintf("Herds(%d)", d.herds.size()), "");
 
         opts_type::iterator i;
-        herds_xml_T::herds_type::size_type nh = 1;
-        for (i = info.herds.begin() ; i != info.herds.end() ; ++i, ++nh)
+        std::vector<std::string>::size_type nh = 1;
+        for (i = d.herds.begin() ; i != d.herds.end() ; ++i, ++nh)
         {
             /* display herd */
             if (optget("color", bool))
@@ -68,19 +69,20 @@ action_dev_handler_T::display(const std::string &dev)
                 output("", *i);
                         
             /* display herd info */
-            if (not herds_xml[*i]->mail.empty())
-                output("", herds_xml[*i]->mail);
-            if (not herds_xml[*i]->desc.empty())
-                output("", herds_xml[*i]->desc);
+            Herds::iterator h = herds.find(*i);
+            if (not h->mail().empty())
+                output("", h->mail());
+            if (not h->desc().empty())
+                output("", h->desc());
 
-            if (nh != info.herds.size())
+            if (nh != d.herds.size())
                 output.endl();
         }
     }
     else if (not count)
-        output(util::sprintf("Herds(%d)", info.herds.size()), info.herds);
+        output(util::sprintf("Herds(%d)", d.herds.size()), d.herds);
 
-    size += info.herds.size();
+    size += d.herds.size();
 }
 
 /*
@@ -91,15 +93,15 @@ action_dev_handler_T::display(const std::string &dev)
 int
 action_dev_handler_T::operator() (opts_type &devs)
 {
-    herds_xml_T::const_iterator h;
-
-    herds_xml.fetch();
-    herds_xml.parse();
+    herdsxml.fetch(optget("herds.xml", std::string));
+    herdsxml.parse(optget("herds.xml", std::string));
+    const Herds& herds(herdsxml.herds());
+    Herds::const_iterator h;
 
     if (use_devaway)
     {
-        devaway.fetch();
-        devaway.parse();
+        devaway.fetch(optget("devaway.location", std::string));
+        devaway.parse(optget("devaway.location", std::string));
     }
 
     /* set format attributes */
@@ -113,16 +115,16 @@ action_dev_handler_T::operator() (opts_type &devs)
     if (all)
     {
         /* treat ALL developers in herds.xml as a single herd */
-        herds_xml_T::herd_type all_devs;
-        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        Herd all_devs;
+        for (h = herds.begin() ; h != herds.end() ; ++h)
         {
             /* for each developer in the herd... */
-            herds_xml_T::herd_type::iterator d;
-            for (d = h->second->begin() ; d != h->second->end() ; ++d)
+            Herd::const_iterator d;
+            for (d = h->begin() ; d != h->end() ; ++d)
             {
                 /* if the developer is not already in our list, add it */
-                if (all_devs.find(d->first) == all_devs.end())
-                    all_devs[d->first] = d->second;
+                if (all_devs.find(*d) == all_devs.end())
+                    all_devs.push_back(*d);
             }
         }
 
@@ -146,17 +148,11 @@ action_dev_handler_T::operator() (opts_type &devs)
 
         /* loop through herds searching for devs who's username
          * matches the regular expression */
-        for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+        for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            herds_xml_T::herd_type::iterator d;
-            herds_xml_T::string_type herd = h->first;
-
-            for (d = herds_xml[herd]->begin() ; 
-                 d != herds_xml[herd]->end() ; ++d)
-            {
-                if (regexp == d->first)
-                    devs.push_back(util::get_user_from_email(d->first));
-            }
+            Herd::iterator d = h->find(regexp);
+            if (d != h->end())
+                devs.push_back(d->user());
         }
 
         if (devs.empty())

@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_devs_HH
-#define _HAVE_devs_HH 1
+#ifndef _HAVE_HERD_HH
+#define _HAVE_HERD_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -34,6 +34,9 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <functional>
+#include <herdstat/util/regex.hh>
 #include <herdstat/portage/developer.hh>
 
 namespace portage {
@@ -60,16 +63,17 @@ namespace portage {
                  const std::string &email = "",
                  const std::string &desc  = "");
 
-            /** Implicit conversion to std::string.
-             * @returns herd name.
-             */
+            /// Implicit conversion to std::string.
             operator std::string() const;
 
             /** Determine if this herd is equal to that herd.
              * @param name herd name.
              * @returns True if herd names are equivelent.
              */
-            bool operator==(const std::string& name) const;
+            bool operator== (const std::string& name) const;
+            bool operator== (const Herd& herd) const;
+            bool operator!= (const std::string& name) const;
+            bool operator!= (const Herd& herd) const;
 
             const std::string& name() const;
             const std::string& email() const;
@@ -86,6 +90,8 @@ namespace portage {
             const_iterator find(const std::string& dev) const;
             iterator find(const Developer& dev);
             const_iterator find(const Developer& dev) const;
+            iterator find(const util::regex_T &regex);
+            const_iterator find(const util::regex_T &regex) const;
             size_type size() const;
             bool empty() const;
             void clear();
@@ -102,8 +108,14 @@ namespace portage {
     };
 
     inline Herd::operator std::string() const { return _name; }
-    inline bool Herd::operator==(const std::string& name) const
+    inline bool Herd::operator== (const std::string& name) const
     { return (_name == name); }
+    inline bool Herd::operator== (const Herd& herd) const
+    { return (_name == herd._name); }
+    inline bool Herd::operator!= (const std::string& name) const
+    { return (_name != name); }
+    inline bool Herd::operator!= (const Herd& herd) const
+    { return (_name != herd._name); }
     inline const std::string& Herd::name() const { return _name; }
     inline const std::string& Herd::email() const { return _email; }
     inline const std::string& Herd::desc() const { return _desc; }
@@ -117,6 +129,7 @@ namespace portage {
     inline bool Herd::empty() const { return _devs.empty(); }
     inline void Herd::clear() { return _devs.clear(); }
     inline void Herd::push_back(const Developer& dev) { _devs.push_back(dev); }
+
     inline Herd::iterator Herd::find(const std::string& dev)
     { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
     inline Herd::const_iterator Herd::find(const std::string& dev) const
@@ -125,7 +138,12 @@ namespace portage {
     { return std::find(_devs.begin(), _devs.end(), dev); }
     inline Herd::const_iterator Herd::find(const Developer& dev) const
     { return std::find(_devs.begin(), _devs.end(), dev); }
-
+    inline Herd::iterator Herd::find(const util::regex_T &regex)
+    { return std::find_if(_devs.begin(), _devs.end(),
+            std::bind1st(util::regexMatch(), &regex)); }
+    inline Herd::const_iterator Herd::find(const util::regex_T &regex) const
+    { return std::find_if(_devs.begin(), _devs.end(),
+            std::bind1st(util::regexMatch(), &regex)); }
     template <class In> inline void
     Herd::insert(iterator pos, In begin, In end)
     { _devs.insert(pos, begin, end); }
@@ -159,9 +177,11 @@ namespace portage {
             void push_back(const Herd& h);
 
             iterator find(const std::string &herd);
-            const_iterator find(const std::string &herd) const;
             iterator find(const Herd& h);
+            iterator find(const util::regex_T &regex);
+            const_iterator find(const std::string &herd) const;
             const_iterator find(const Herd& h) const;
+            const_iterator find(const util::regex_T &regex) const;
 
             template <class In>
             void insert(iterator pos, In begin, In end);
@@ -179,6 +199,7 @@ namespace portage {
     inline bool Herds::empty() const { return _herds.empty(); }
     inline void Herds::clear() { return _herds.clear(); }
     inline void Herds::push_back(const Herd& h) { _herds.push_back(h); }
+
     inline Herds::iterator Herds::find(const std::string& herd)
     { return std::find(_herds.begin(), _herds.end(), herd); }
     inline Herds::const_iterator Herds::find(const std::string& herd) const
@@ -187,6 +208,12 @@ namespace portage {
     { return std::find(_herds.begin(), _herds.end(), h); }
     inline Herds::const_iterator Herds::find(const Herd& h) const
     { return std::find(_herds.begin(), _herds.end(), h); }
+    inline Herds::iterator Herds::find(const util::regex_T &regex)
+    { return std::find_if(_herds.begin(), _herds.end(),
+            std::bind1st(util::regexMatch(), &regex)); }
+    inline Herds::const_iterator Herds::find(const util::regex_T &regex) const
+    { return std::find_if(_herds.begin(), _herds.end(),
+            std::bind1st(util::regexMatch(), &regex)); }
 
     template <class In> inline void
     Herds::insert(iterator pos, In begin, In end)
@@ -194,6 +221,6 @@ namespace portage {
 
 } // namespace portage
 
-#endif /* _HAVE_devs_HH */
+#endif /* _HAVE_HERD_H */
 
 /* vim: set tw=80 sw=4 et : */

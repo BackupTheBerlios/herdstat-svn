@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_pkg_handler.cc
- * $Id$
+ * $Id: action_pkg_handler.cc 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -63,9 +63,9 @@ action_pkg_handler_T::error(const std::string &criteria) const
  * a regular expression via find_if().
  */
 
-static bool
-doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
-{ return *r == util::get_user_from_email(m.first); }
+//static bool
+//doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
+//{ return *r == util::get_user_from_email(m.first); }
 
 /*
  * Determine whether or not the metadata.xml matches our
@@ -73,26 +73,26 @@ doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
  */
 
 bool
-action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
+action_pkg_handler_T::metadata_matches(const metadata &meta,
                                        const std::string &criteria)
 {
+    const Herds& herds(meta.herds());
+    const Herd&  devs(meta.devs());
+
     if (dev)
     {
-        if ((regex and (std::find_if(metadata.devs.begin(),
-            metadata.devs.end(), std::bind2nd(
-            std::ptr_fun(doesHerdMatch), &regexp)) != metadata.devs.end()) and
-            (with.empty() or metadata.herd_exists(with))) or
-            (not regex and metadata.dev_exists(criteria) and
-            (with.empty() or metadata.herd_exists(with))))
+        if ((regex and (std::find_if(devs.begin(), devs.end(), std::bind1st(
+            util::regexMatch(), &regexp)) != devs.end()) and
+            (with.empty() or meta.herd_exists(with))) or
+            (not regex and meta.dev_exists(criteria) and
+            (with.empty() or meta.herd_exists(with))))
             return true;
     }
     else
     {
-        if ((regex and std::find_if(metadata.herds.begin(),
-            metadata.herds.end(), std::bind1st(util::regexMatch(), &regexp))
-            != metadata.herds.end()) or (not regex and
-            metadata.herd_exists(criteria)) or (criteria == "no-herd" and
-            metadata.herds.empty()))
+        if ((regex and std::find_if(herds.begin(), herds.end(), std::bind1st(
+            util::regexMatch(), &regexp)) != herds.end()) or (not regex and
+            meta.herd_exists(criteria)) or (criteria == "no-herd" and herds.empty()))
         {
             if (with.empty())
                 return true;
@@ -103,14 +103,13 @@ action_pkg_handler_T::metadata_matches(const metadata_T &metadata,
                  */
                 if (with() == "none")
                 {
-                    if (metadata.devs.empty() or
-                        ((metadata.devs.size() == 1) and
-                        metadata.dev_exists(criteria)
-                        or metadata.dev_exists(criteria+"@gentoo.org")))
+                    if (devs.empty() or ((devs.size() == 1) and
+                        meta.dev_exists(criteria)
+                        or meta.dev_exists(criteria+"@gentoo.org")))
                         return true;
                 }
-                else if (metadata.dev_exists(with) or
-                         metadata.dev_exists(with()+"@gentoo.org"))
+                else if (meta.dev_exists(with) or
+                         meta.dev_exists(with()+"@gentoo.org"))
                     return true;
             }
         }
@@ -388,14 +387,14 @@ action_pkg_handler_T::operator() (opts_type &opts)
 	throw FileException(portdir);
 
     /* fetch/parse herds.xml for info lookup */
-    herds_xml.fetch();
-    herds_xml.parse();
+    herdsxml.fetch(optget("herds.xml", std::string));
+    herdsxml.parse(optget("herds.xml", std::string));
 
     /* fetch/parse devaway for marking away devs */
     if (use_devaway)
     {
-        devaway.fetch();
-        devaway.parse();
+        devaway.fetch(optget("devaway.location", std::string));
+        devaway.parse(optget("devaway.location", std::string));
     }
 
     /* setup with regex */

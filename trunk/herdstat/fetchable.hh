@@ -32,19 +32,31 @@
  * @brief Defines the abstract fetchable interface.
  */
 
-#include <herdstat/noncopyable.hh>
 #include <herdstat/fetcher.hh>
 
 class fetchable
 {
     public:
-        virtual void fetch() const = 0;
+        virtual void fetch(const std::string& path = "") const
+        {
+            if (this->_fetched)
+                return;
+            this->do_fetch(path);
+            this->_fetched = true;
+        }
+
+        bool fetched() const { return _fetched; }
 
     protected:
-        fetchable() : _fetch() { }
+        fetchable() : _fetch(), _fetched(false) { }
         virtual ~fetchable() { }
 
+        virtual void do_fetch(const std::string& path = "") const = 0;
+
         const fetcher _fetch;
+
+    private:
+        mutable bool _fetched;
 };
 
 #endif /* _HAVE_FETCHABLE_HH */

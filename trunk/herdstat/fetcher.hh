@@ -34,12 +34,13 @@
 
 #include <string>
 #include <herdstat/exceptions.hh>
+#include <herdstat/noncopyable.hh>
 
 /**
  * File fetcher.
  */
 
-class fetcher
+class fetcher : private noncopyable
 {
     public:
         /// Default constructor.

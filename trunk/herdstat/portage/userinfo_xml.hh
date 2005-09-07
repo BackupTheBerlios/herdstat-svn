@@ -32,9 +32,7 @@
  * @brief Defines the interface to Gentoo's userinfo.xml.
  */
 
-#include <herdstat/parsable.hh>
-#include <herdstat/fetchable.hh>
-#include <herdstat/xml/saxparser.hh>
+#include <herdstat/portage/xmlbase.hh>
 #include <herdstat/portage/herd.hh>
 
 namespace portage {
@@ -43,19 +41,17 @@ namespace portage {
      * Represents Gentoo's userinfo.xml.
      */
 
-    class userinfo_xml : public parsable,
-                         public fetchable,
-                         protected xml::saxhandler
+    class userinfo_xml : public xmlBase
     {
         public:
             userinfo_xml();
             userinfo_xml(const std::string& path);
             virtual ~userinfo_xml();
 
-            virtual void fetch() const;
             virtual void parse(const std::string& path = "");
+            virtual void fill_developer(Developer& dev) const;
 
-            Herd& devs();
+            const Herd& devs() const;
 
         protected:
             virtual bool start_element(const std::string& name,
@@ -65,9 +61,7 @@ namespace portage {
 
         private:
             Herd _devs;
-            mutable bool _fetched;
             static const char * const _local_default;
-            static const char * const _remote_default;
 
             bool in_user,
                  in_firstname,
@@ -83,7 +77,7 @@ namespace portage {
             Herd::iterator _cur_dev;
     };
 
-    inline Herd& userinfo_xml::devs() { return _devs; }
+    inline const Herd& userinfo_xml::devs() const { return _devs; }
 
 } // namespace portage
 

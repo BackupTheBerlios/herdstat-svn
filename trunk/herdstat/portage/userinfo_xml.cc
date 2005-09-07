@@ -29,10 +29,9 @@
 namespace portage {
 /*** static members *********************************************************/
 const char * const userinfo_xml::_local_default = LOCALSTATEDIR"/userinfo.xml";
-const char * const userinfo_xml::_remote_default = "FIXME";
 /****************************************************************************/
 userinfo_xml::userinfo_xml()
-    : parsable(), _devs(), _fetched(false), in_user(false), in_firstname(false),
+    : xmlBase(), _devs(), in_user(false), in_firstname(false),
       in_familyname(false), in_pgpkey(false), in_email(false), in_joined(false),
       in_birth(false), in_roles(false), in_status(false), in_location(false),
       _cur_dev()
@@ -40,27 +39,16 @@ userinfo_xml::userinfo_xml()
 }
 /****************************************************************************/
 userinfo_xml::userinfo_xml(const std::string& path)
-    : parsable(path), _devs(), _fetched(false), in_user(false),
+    : xmlBase(path), _devs(), in_user(false),
       in_firstname(false), in_familyname(false), in_pgpkey(false),
       in_email(false), in_joined(false), in_birth(false), in_roles(false),
       in_status(false), in_location(false), _cur_dev()
 {
-    this->fetch();
     this->parse();
 }
 /****************************************************************************/
 userinfo_xml::~userinfo_xml()
 {
-}
-/****************************************************************************/
-void
-userinfo_xml::fetch() const
-{
-    if (this->_fetched)
-        return;
-
-
-    this->_fetched = true;
 }
 /****************************************************************************/
 void
@@ -70,6 +58,21 @@ userinfo_xml::parse(const std::string& path)
         this->set_path(path);
 
     this->parse_file(this->path().c_str());
+}
+/****************************************************************************/
+void
+userinfo_xml::fill_developer(Developer& dev) const
+{
+    Herd::const_iterator d = this->_devs.find(dev);
+    if (d != this->_devs.end())
+    {
+        dev.set_status(d->status());
+        dev.set_location(d->location());
+        dev.set_joined(d->joined());
+        dev.set_birthday(d->birthday());
+        dev.set_role(d->role());
+        dev.set_pgpkey(d->pgpkey());
+    }
 }
 /****************************************************************************/
 bool

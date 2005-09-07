@@ -1,6 +1,6 @@
 /*
  * herdstat -- lib/string.cc
- * $Id$
+ * $Id: string.cc 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -73,7 +73,7 @@ util::lowercase(const std::string &s)
  * Clean up the whitespace of the given std::string (collapse whitespace, remove  *
  * trailing/leading whitespace, and convert any \n's to spaces).             *
  *****************************************************************************/
-bool
+static bool
 bothspaces(std::string::value_type c1,
            std::string::value_type c2)
 {

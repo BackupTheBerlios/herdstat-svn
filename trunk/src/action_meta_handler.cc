@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_meta_handler.cc
- * $Id$
+ * $Id: action_meta_handler.cc 515 2005-09-04 11:41:38Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -33,20 +33,20 @@
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/ebuild.hh>
+#include <herdstat/portage/metdata_xml.hh>
 
 #include "common.hh"
-#include "metadata_xml.hh"
 #include "overlaydisplay.hh"
 #include "action_meta_handler.hh"
 
 void
-action_meta_handler_T::display(const metadata_T &meta)
+action_meta_handler_T::display(const metadata_data& data)
 {
     /* does the metadata.xml exist? */
-    if (util::is_file(meta.path))
+    if (util::is_file(data.path))
     {
-        const metadata_xml_T metadata(meta.path);
-        metadata.display(meta.portdir);
+        const metadata_xml metadata(data.path);
+        display_metadata(metadata, *stream);
     }
     /* package or category exists, but metadata.xml doesn't */
     else
@@ -57,16 +57,16 @@ action_meta_handler_T::display(const metadata_T &meta)
             output("", color[red] + "No metadata.xml." + color[none]);
             
         /* at least show ebuild DESCRIPTION and HOMEPAGE */
-        if (not meta.is_category)
+        if (not data.is_category)
         {
             std::string ebuild;
             try
             {
-                ebuild = portage::ebuild_which(meta.portdir, meta.pkg);
+                ebuild = portage::ebuild_which(data.portdir, data.pkg);
             }
             catch (const portage::NonExistentPkg)
             {
-                ebuild = portage::ebuild_which(portdir, meta.pkg);
+                ebuild = portage::ebuild_which(portdir, data.pkg);
             }
                 
             portage::ebuild_T ebuild_vars(ebuild);
@@ -119,8 +119,8 @@ action_meta_handler_T::operator() (opts_type &opts)
 
     if (use_devaway)
     {
-        devaway.fetch();
-        devaway.parse();
+        devaway.fetch(optget("devaway.location", std::string));
+        devaway.parse(optget("devaway.location", std::string));
     }
 
     output.set_maxlabel(16);
@@ -220,28 +220,28 @@ action_meta_handler_T::operator() (opts_type &opts)
     std::multimap<std::string, std::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
-        metadata_T meta;
-        meta.portdir = dir;
+        metadata_data data;
+        data.portdir = dir;
 
         try
         {
             /* The only reason portdir should be set already is if
              * opts == 0 and portdir is set to $PWD */
             if (pwd)
-                meta.pkg = portage::find_package_in(meta.portdir,
+                data.pkg = portage::find_package_in(data.portdir,
                                 m->second, &search_timer);
             else if (regex and not m->first.empty())
             {
-                meta.portdir = m->first;
-                meta.pkg = m->second;
+                data.dir = m->first;
+                data.pkg = m->second;
             }
             else
             {
                 std::pair<std::string, std::string> p =
                     portage::find_package(config, m->second,
                     overlay, &search_timer);
-                meta.portdir = p.first;
-                meta.pkg = p.second;
+                data.dir = p.first;
+                data.pkg = p.second;
             }
         }
         catch (const portage::AmbiguousPkg &e)
@@ -274,29 +274,27 @@ action_meta_handler_T::operator() (opts_type &opts)
                 continue;
         }
 
-        meta.path = meta.portdir + "/" + meta.pkg + "/metadata.xml";
+        data.path = data.portdir + "/" + data.pkg + "/metadata.xml";
 
         /* are we in an overlay? */
-        if (meta.portdir != portdir and not pwd)
-            od.insert(meta.portdir);
+        if (data.portdir != portdir and not pwd)
+            od.insert(data.portdir);
 
         /* if no '/' exists, assume it's a category */
-        /* FIXME: metadata_xml_handler_T should determine this
-         * by checking for <catmetadata>. */
-        meta.is_category = (meta.pkg.find('/') == std::string::npos);
+        data.is_category = (data.pkg.find('/') == std::string::npos);
 
         if (n != 1)
             output.endl();
 
-        if (meta.portdir == portdir or pwd)
-            output(meta.is_category ? "Category" : "Package", meta.pkg);
+        if (data.portdir == portdir or pwd)
+            output(data.is_category ? "Category" : "Package", data.pkg);
 
         /* it's in an overlay, so show a little thinggy to mark it as such */
         else
-            output(meta.is_category ? "Category" : "Package",
-                meta.pkg + od[meta.portdir]);
+            output(data.is_category ? "Category" : "Package",
+                    data.pkg + od[data.portdir]);
 
-        display(meta);
+        display(data);
     }
 
     flush();

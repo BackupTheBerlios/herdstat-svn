@@ -30,15 +30,15 @@ namespace portage {
 /****************************************************************************/
 Developer::Developer()
     : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status("active"), _role(), _awaymsg(), _away(false)
+      _status("active"), _role(), _awaymsg(), _away(false), _herds()
 {
 }
 /****************************************************************************/
 Developer::Developer(const std::string &user, const std::string &email,
                      const std::string &name)
-    : _user(user), _email(email.empty() ? user+"@gentoo.org" : email),
+    : _user(user), _email(email.empty() ? _user+"@gentoo.org" : email),
       _name(name), _pgpkey(), _joined(), _birth(), _status("active"),
-      _role(), _awaymsg(), _away(false)
+      _role(), _awaymsg(), _away(false), _herds()
 {
 }
 /****************************************************************************/

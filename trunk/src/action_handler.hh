@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_handler.hh
- * $Id$
+ * $Id: action_handler.hh 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -29,10 +29,10 @@
 
 #include <ostream>
 #include <herdstat/portage/config.hh>
+#include <herdstat/portage/herds_xml.hh>
+#include <herdstat/portage/devaway_xml.hh>
 
 #include "common.hh"
-#include "devaway.hh"
-#include "herds_xml.hh"
 #include "formatter.hh"
 
 /*
@@ -103,7 +103,7 @@ class action_fancy_handler_T : public action_handler_T
             }
         }
 
-        devaway_T devaway;
+        devaway_xml devaway;
         formatter_T output;                 /* output formatter */
         const std::size_t maxcol;           /* columns of current terminal */
         const bool use_devaway;
@@ -128,7 +128,7 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
                     << "ms to parse herds.xml." << std::endl;
         }
 
-        herds_xml_T herds_xml;
+        herds_xml herdsxml;
 };
 
 /*

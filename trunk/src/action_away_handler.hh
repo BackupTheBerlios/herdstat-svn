@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_away_handler.hh
- * $Id$
+ * $Id: action_away_handler.hh 502 2005-08-30 13:57:46Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -36,7 +36,7 @@ class action_away_handler_T : public action_herds_xml_handler_T
         virtual int operator() (opts_type &);
 
     private:
-        void display(const std::string &);
+        void display(Herd::const_iterator);
 };
 
 #endif

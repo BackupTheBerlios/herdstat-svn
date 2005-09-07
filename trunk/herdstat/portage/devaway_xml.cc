@@ -34,17 +34,16 @@ const char * const devaway_xml::_local_default = LOCALSTATEDIR"/devaway.xml";
 const char * const devaway_xml::_remote_default = "FIXME";
 /****************************************************************************/
 devaway_xml::devaway_xml()
-    : parsable(), _devs(), _fetched(false), in_devaway(false),
+    : xmlBase(), _devs(), in_devaway(false),
       in_dev(false), in_reason(false), _cur_dev()
 {
 }
 /****************************************************************************/
 devaway_xml::devaway_xml(const std::string &path)
-    : parsable(path), _devs(), _fetched(false), in_devaway(false),
+    : xmlBase(path), _devs(), in_devaway(false),
       in_dev(false), in_reason(false), _cur_dev()
 {
-    /* FIXME! */
-    // this->fetch();
+    this->fetch();
     this->parse();
 }
 /****************************************************************************/
@@ -62,13 +61,32 @@ devaway_xml::parse(const std::string& path)
 }
 /****************************************************************************/
 void
-devaway_xml::fetch() const
+devaway_xml::do_fetch(const std::string& path) const
 {
-    if (this->_fetched)
-        return;
-
-
-    this->_fetched = true;
+}
+/****************************************************************************/
+void
+devaway_xml::fill_developer(Developer& dev) const
+{
+    Herd::const_iterator d = _devs.find(dev);
+    if (d != _devs.end())
+    {
+        dev.set_away(true);
+        dev.set_awaymsg(d->awaymsg());
+    }
+}
+/****************************************************************************/
+const std::vector<std::string>
+devaway_xml::keys() const
+{
+    std::vector<std::string> v;
+    Herd::const_iterator i;
+    for (i = _devs.begin() ; i != _devs.end() ; ++i)
+    {
+        v.push_back(i->user());
+        v.push_back(i->email());
+    }
+    return v;
 }
 /****************************************************************************/
 bool
@@ -112,7 +130,8 @@ bool
 devaway_xml::text(const std::string& text)
 {
     if (in_reason)
-        _cur_dev->set_awaymsg(_cur_dev->awaymsg() + text);
+        _cur_dev->set_awaymsg(util::tidy_whitespace(
+                    _cur_dev->awaymsg() + text));
 
     return true;
 }

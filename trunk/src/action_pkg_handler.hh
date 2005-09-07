@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_pkg_handler.hh
- * $Id$
+ * $Id: action_pkg_handler.hh 520 2005-09-05 11:59:58Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,8 +28,6 @@
 #endif
 
 #include <map>
-#include "herds_xml.hh"
-#include "metadata_xml.hh"
 #include "metacache.hh"
 #include "pkgquery.hh"
 #include "querycache.hh"

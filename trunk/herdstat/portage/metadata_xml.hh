@@ -48,7 +48,11 @@ namespace portage {
 
             virtual void parse(const std::string& path = "");
 
-            metadata& data();
+            /// Implicit conversion to metadata.
+            operator metadata() const;
+
+            /* for convenience */
+            const std::string& longdesc() const;
             const Herds& herds() const;
             const Herd&  devs()  const;
 
@@ -71,9 +75,11 @@ namespace portage {
             Herd::iterator _cur_dev;
     };
 
-    inline metadata& metadata_xml::data() { return _data; }
+    inline metadata_xml::operator metadata() const { return _data; }
     inline const Herds& metadata_xml::herds() const { return _data.herds(); }
-    inline const Herd& metadata_xml::devs() const { return _data.devs(); }
+    inline const Herd&  metadata_xml::devs()  const { return _data.devs(); }
+    inline const std::string& metadata_xml::longdesc() const
+    { return _data.longdesc(); }
 
 } // namespace portage
 
