@@ -53,6 +53,24 @@ Herd::set_email(const std::string& email)
     _email.assign(pos == std::string::npos ? email+"@gentoo.org" : email);
 }
 /****************************************************************************/
+Herd&
+Herd::operator= (const std::vector<std::string>& devs)
+{
+    std::vector<std::string>::const_iterator i;
+    for (i = devs.begin() ; i != devs.end() ; ++i)
+        _devs.push_back(Developer(*i));
+    return *this;
+}
+/****************************************************************************/
+Herds&
+Herds::operator= (const std::vector<std::string>& herds)
+{
+    std::vector<std::string>::const_iterator i;
+    for (i = herds.begin() ; i != herds.end() ; ++i)
+        _herds.push_back(Herd(*i));
+    return *this;
+}
+/****************************************************************************/
 } // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

@@ -66,6 +66,9 @@ namespace portage {
             /// Implicit conversion to std::string.
             operator std::string() const;
 
+            Herd& operator= (const std::vector<Developer>& v);
+            Herd& operator= (const std::vector<std::string>& v);
+
             /** Determine if this herd is equal to that herd.
              * @param name herd name.
              * @returns True if herd names are equivelent.
@@ -108,6 +111,8 @@ namespace portage {
     };
 
     inline Herd::operator std::string() const { return _name; }
+    inline Herd& Herd::operator= (const std::vector<Developer>& v)
+    { _devs = v; return *this; }
     inline bool Herd::operator== (const std::string& name) const
     { return (_name == name); }
     inline bool Herd::operator== (const Herd& herd) const
@@ -163,9 +168,13 @@ namespace portage {
             typedef container_type::size_type size_type;
 
             Herds() : _herds() { }
+            Herds(const std::vector<Herd>& v) : _herds(v) { }
 
             /// Implicit conversion to std::vector<herd>
             operator std::vector<Herd>() const;
+
+            Herds& operator= (const std::vector<Herd>& v);
+            Herds& operator= (const std::vector<std::string>& v);
 
             iterator begin();
             const_iterator begin() const;
@@ -191,6 +200,8 @@ namespace portage {
     };
 
     inline Herds::operator std::vector<Herd>() const { return _herds; }
+    inline Herds& Herds::operator= (const std::vector<Herd>& v)
+    { _herds = v; return *this; }
     inline Herds::iterator Herds::begin() { return _herds.begin(); }
     inline Herds::const_iterator Herds::begin() const { return _herds.begin(); }
     inline Herds::iterator Herds::end() { return _herds.end(); }
