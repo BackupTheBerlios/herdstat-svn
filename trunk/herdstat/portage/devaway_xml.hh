@@ -54,6 +54,7 @@ namespace portage {
             virtual void fill_developer(Developer& dev) const;
 
             const Herd& devs() const;
+            Herd& devs();
 
             const std::vector<std::string> keys() const;
 
@@ -77,6 +78,7 @@ namespace portage {
             Herd::iterator _cur_dev;
     };
 
+    inline Herd& devaway_xml::devs() { return _devs; }
     inline const Herd& devaway_xml::devs() const { return _devs; }
 
 } // namespace portage

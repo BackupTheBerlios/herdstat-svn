@@ -57,8 +57,8 @@ action_away_handler_T::operator() (opts_type &opts)
 {
     devaway.fetch(optget("devaway.location", std::string));
     devaway.parse(optget("devaway.location", std::string));
-    const Herd& devs(devaway.devs());
-    Herd::const_iterator d;
+    Herd& devs(devaway.devs());
+    Herd::iterator d;
 
     output.set_maxlabel(all ? 20 : 13);
     output.set_maxdata(maxcol - output.maxlabel());

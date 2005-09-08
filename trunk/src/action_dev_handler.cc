@@ -25,10 +25,12 @@
 #endif
 
 #include <memory>
+#include <herdstat/util/string.hh>
 
 #include "common.hh"
-#include "herds_xml.hh"
 #include "action_dev_handler.hh"
+
+using namespace portage;
 
 /*
  * Display data for the specified developer.
@@ -39,14 +41,15 @@ action_dev_handler_T::display(const std::string &dev)
 {
     Developer d(dev);
     herdsxml.fill_developer(d);
+    const std::vector<std::string>& herds(d.herds());
 
     /* was the dev in any of the herds? */
-    if (d.herds().empty())
+    if (herds.empty())
         throw DevException();
 
     if (not quiet)
     {
-        if (d.name.empty())
+        if (d.name().empty())
             output("Developer", dev);
         else
             output("Developer", d.name() + " (" + dev + ")");
@@ -56,11 +59,11 @@ action_dev_handler_T::display(const std::string &dev)
 
     if (verbose and not quiet)
     {
-        output(util::sprintf("Herds(%d)", d.herds.size()), "");
+        output(util::sprintf("Herds(%d)", herds.size()), "");
 
-        opts_type::iterator i;
+        std::vector<std::string>::const_iterator i;
         std::vector<std::string>::size_type nh = 1;
-        for (i = d.herds.begin() ; i != d.herds.end() ; ++i, ++nh)
+        for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
         {
             /* display herd */
             if (optget("color", bool))
@@ -69,20 +72,20 @@ action_dev_handler_T::display(const std::string &dev)
                 output("", *i);
                         
             /* display herd info */
-            Herds::iterator h = herds.find(*i);
-            if (not h->mail().empty())
-                output("", h->mail());
+            Herds::const_iterator h = herdsxml.herds().find(*i);
+            if (not h->email().empty())
+                output("", h->email());
             if (not h->desc().empty())
                 output("", h->desc());
 
-            if (nh != d.herds.size())
+            if (nh != herds.size())
                 output.endl();
         }
     }
     else if (not count)
-        output(util::sprintf("Herds(%d)", d.herds.size()), d.herds);
+        output(util::sprintf("Herds(%d)", herds.size()), herds);
 
-    size += d.herds.size();
+    size += herds.size();
 }
 
 /*
@@ -128,7 +131,7 @@ action_dev_handler_T::operator() (opts_type &devs)
             }
         }
 
-        all_devs.display(*stream);
+        display_herd(all_devs, *stream);
         size = all_devs.size();
         flush();
         return EXIT_SUCCESS;
@@ -150,7 +153,7 @@ action_dev_handler_T::operator() (opts_type &devs)
          * matches the regular expression */
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            Herd::iterator d = h->find(regexp);
+            Herd::const_iterator d = h->find(regexp);
             if (d != h->end())
                 devs.push_back(d->user());
         }
