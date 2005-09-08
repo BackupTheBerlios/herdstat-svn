@@ -25,10 +25,14 @@
 #endif
 
 #include <algorithm>
+#include <herdstat/util/string.hh>
+
 #include "action_away_handler.hh"
 
+using namespace portage;
+
 void
-action_away_handler_T::display(Herd::const_iterator dev)
+action_away_handler_T::display(Herd::iterator dev)
 {
     if (quiet)
         *stream << dev->user() << " - " << dev->awaymsg() << std::endl;
