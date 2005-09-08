@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/herd.hh
- * $Id: herd.hh 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -65,6 +65,8 @@ namespace portage {
 
             /// Implicit conversion to std::string.
             operator std::string() const;
+            /// Implicit conversion to std::vector<std::string>.
+            operator std::vector<std::string>() const;
 
             Herd& operator= (const std::vector<Developer>& v);
             Herd& operator= (const std::vector<std::string>& v);

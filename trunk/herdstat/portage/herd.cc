@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/herd.cc
- * $Id: herd.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -48,6 +48,15 @@ Herd::operator= (const std::vector<std::string>& devs)
     for (i = devs.begin() ; i != devs.end() ; ++i)
         _devs.push_back(Developer(*i));
     return *this;
+}
+/****************************************************************************/
+Herd::operator
+std::vector<std::string>() const
+{
+    std::vector<std::string> v;
+    for (Herd::const_iterator i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->user());
+    return v;
 }
 /****************************************************************************/
 Herds&

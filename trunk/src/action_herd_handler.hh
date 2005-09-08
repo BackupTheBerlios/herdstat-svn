@@ -36,6 +36,8 @@ class action_herd_handler_T : public action_herds_xml_handler_T
 	virtual int operator() (opts_type &);
 };
 
+void display_herd(const portage::Herd& herd);
+
 #endif
 
 /* vim: set tw=80 sw=4 et : */

@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_herd_handler.cc
- * $Id: action_herd_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -27,10 +27,61 @@
 #include <fstream>
 #include <memory>
 #include <algorithm>
+#include <herdstat/util/string.hh>
 
 #include "common.hh"
-#include "herds_xml.hh"
 #include "action_herd_handler.hh"
+
+using namespace portage;
+
+void
+display_herd(const Herd& herd)
+{
+    formatter_T out;
+    util::color_map_T color;
+
+    std::string user(util::current_user());
+
+    if (not optget("quiet", bool))
+    {
+        if (not herd.name().empty())
+            out("Herd", herd.name());
+        if (not herd.email().empty())
+            out("Email", herd.email());
+        if (not herd.desc().empty())
+            out("Description", herd.desc());
+
+        if (optget("verbose", bool))
+            out(util::sprintf("Developers(%d)", herd.size()), "");
+    }
+
+    if (optget("verbose", bool) and not optget("quiet", bool))
+    {
+        for (Herd::const_iterator i = herd.begin() ; i != herd.end() ; ++i)
+        {
+            if ((i->user() == user) or not optget("color", bool))
+                out("", i->user());
+            else
+                out("", color[blue] + i->user() + color[none]);
+
+            /* FIXME: display attributes (role, etc) */
+        }
+    }
+
+    if ((not optget("verbose", bool) and not optget("quiet", bool)) or
+        (optget("verbose", bool) and optget("quiet", bool) and not
+         optget("count", bool)))
+    {
+        std::vector<std::string> devs(herd);
+        out(util::sprintf("Developers(%d)", herd.size()), devs);
+    }
+}
+
+static void
+display_herds(const Herds& herds)
+{
+
+}
 
 /*
  * Given a list of herds, display herd and developer
@@ -60,7 +111,7 @@ action_herd_handler_T::operator() (opts_type &opts)
     /* was the all target specified? */
     if (all)
     {
-        display_herds(herds, *stream);
+        display_herds(herds);
         size = herds.size();
         flush();
         return EXIT_SUCCESS;
@@ -113,7 +164,7 @@ action_herd_handler_T::operator() (opts_type &opts)
                 throw HerdException();
         }
 
-        display_herd(*h, *stream);
+        display_herd(*h);
         size += h->size();
 
         /* only skip a line if we're not displaying the last one */

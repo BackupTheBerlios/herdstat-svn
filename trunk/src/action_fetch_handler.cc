@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_fetch_handler.cc
- * $Id: action_fetch_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -33,8 +33,8 @@ action_fetch_handler_T::operator() (opts_type &null)
     {
         optset("verbose", bool, true);
 
-        herds_xml.fetch(optget("herds.xml", std::string));
-        herds_xml.parse(optget("herds.xml", std::string));
+        herdsxml.fetch(optget("herds.xml", std::string));
+        herdsxml.parse(optget("herds.xml", std::string));
 
         if (use_devaway)
             devaway.fetch(optget("devaway.location", std::string));

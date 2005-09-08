@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_meta_handler.cc
- * $Id: action_meta_handler.cc 515 2005-09-04 11:41:38Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -29,15 +29,24 @@
 #include <algorithm>
 #include <iterator>
 
+#include <herdstat/util/string.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/ebuild.hh>
-#include <herdstat/portage/metdata_xml.hh>
+#include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
 #include "overlaydisplay.hh"
 #include "action_meta_handler.hh"
+
+using namespace portage;
+
+static void
+display_metadata(const metadata& meta)
+{
+    formatter_T
+}
 
 void
 action_meta_handler_T::display(const metadata_data& data)
@@ -46,7 +55,7 @@ action_meta_handler_T::display(const metadata_data& data)
     if (util::is_file(data.path))
     {
         const metadata_xml metadata(data.path);
-        display_metadata(metadata, *stream);
+        display_metadata(metadata);
     }
     /* package or category exists, but metadata.xml doesn't */
     else

@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_dev_handler.cc
- * $Id: action_dev_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,6 +28,7 @@
 #include <herdstat/util/string.hh>
 
 #include "common.hh"
+#include "action_herd_handler.hh"   /* for display_herd() */
 #include "action_dev_handler.hh"
 
 using namespace portage;
@@ -131,7 +132,7 @@ action_dev_handler_T::operator() (opts_type &devs)
             }
         }
 
-        display_herd(all_devs, *stream);
+        display_herd(all_devs);
         size = all_devs.size();
         flush();
         return EXIT_SUCCESS;
@@ -148,6 +149,8 @@ action_dev_handler_T::operator() (opts_type &devs)
         devs.clear();
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
+
+        /* FIXME: use copy_if() and regexMatch() */
 
         /* loop through herds searching for devs who's username
          * matches the regular expression */
