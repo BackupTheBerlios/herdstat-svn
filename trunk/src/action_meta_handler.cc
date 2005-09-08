@@ -54,7 +54,7 @@ display_metadata(const metadata_data& data)
     ebuild_T ebuild_vars;
 
     if (not meta.is_category() and (herds.empty() or
-        (herds[0] == "no-herd")))
+        (herds.front() == "no-herd")))
         output("Herds(0)", "none");
     else if (not herds.empty())
         output(util::sprintf("Herds(%d)", herds.size()), herds);

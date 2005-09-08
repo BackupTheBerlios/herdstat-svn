@@ -88,8 +88,9 @@ namespace portage {
     inline const std::string& Herd::name() const { return _name; }
     inline const std::string& Herd::email() const { return _email.str(); }
     inline const std::string& Herd::desc() const { return _desc; }
-    inline void Herd::set_name(const std::string &name) { _name.assign(name); }
-    inline void Herd::set_desc(const std::string &desc) { _desc.assign(desc); }
+    inline void Herd::set_name(const std::string& name) { _name.assign(name); }
+    inline void Herd::set_email(const std::string& email) { _email.assign(email); }
+    inline void Herd::set_desc(const std::string& desc) { _desc.assign(desc); }
 
     /**
      * Herd container.
@@ -100,6 +101,8 @@ namespace portage {
         public:
             typedef std::vector<Herd> container_type;
             typedef container_type::value_type value_type;
+            typedef container_type::reference reference;
+            typedef container_type::const_reference const_reference;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
             typedef container_type::size_type size_type;
@@ -118,8 +121,14 @@ namespace portage {
             const_iterator begin() const;
             iterator end();
             const_iterator end() const;
+            reference front();
+            const_reference front() const;
+            reference back();
+            const_reference back() const;
+
             size_type size() const;
             bool empty() const;
+
             void clear();
             void push_back(const Herd& h);
 
@@ -133,7 +142,7 @@ namespace portage {
             template <class In>
             void insert(iterator pos, In begin, In end);
 
-            const value_type& operator[] (size_type pos) const;
+//            const value_type& operator[] (size_type pos) const;
 
         private:
             container_type _herds;
@@ -146,6 +155,11 @@ namespace portage {
     inline Herds::const_iterator Herds::begin() const { return _herds.begin(); }
     inline Herds::iterator Herds::end() { return _herds.end(); }
     inline Herds::const_iterator Herds::end() const { return _herds.end(); }
+    inline Herds::reference Herds::front() { return _herds.front(); }
+    inline Herds::const_reference Herds::front() const { return _herds.front(); }
+    inline Herds::reference Herds::back() { return _herds.back(); }
+    inline Herds::const_reference Herds::back() const { return _herds.back(); }
+
     inline Herds::size_type Herds::size() const { return _herds.size(); }
     inline bool Herds::empty() const { return _herds.empty(); }
     inline void Herds::clear() { return _herds.clear(); }
@@ -170,8 +184,8 @@ namespace portage {
     Herds::insert(iterator pos, In begin, In end)
     { _herds.insert(pos, begin, end); }
 
-    const Herds::value_type& Herds::operator[] (size_type pos) const
-    { return _herds[pos]; }
+//    const Herds::value_type& Herds::operator[] (size_type pos) const
+//    { return _herds[pos]; }
 
 } // namespace portage
 

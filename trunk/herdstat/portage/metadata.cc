@@ -38,26 +38,6 @@ metadata::metadata(const std::string &pkg)
 {
 }
 /****************************************************************************/
-//bool
-//metadata::dev_exists(const std::string &dev) const
-//{
-//}
-/****************************************************************************/
-//bool
-//metadata::dev_exists(const util::regex_T &re) const
-//{
-//}
-/****************************************************************************/
-//bool
-//metadata::herd_exists(const std::string &herd) const
-//{
-//}
-/****************************************************************************/
-//bool
-//metadata::herd_exists(const util::regex_T &re) const
-//{
-//}
-/****************************************************************************/
 } // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

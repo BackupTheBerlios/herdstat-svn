@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_pkg_handler.cc
- * $Id: action_pkg_handler.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -29,10 +29,13 @@
 #include <functional>
 #include <iterator>
 #include <map>
+#include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
 #include "action_meta_handler.hh"
 #include "action_pkg_handler.hh"
+
+using namespace portage;
 
 /*
  * Show search failure message.
@@ -77,22 +80,29 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
                                        const std::string &criteria)
 {
     const Herds& herds(meta.herds());
-    const Herd&  devs(meta.devs());
+    const Developers& devs(meta.devs());
 
     if (dev)
     {
-        if ((regex and (std::find_if(devs.begin(), devs.end(), std::bind1st(
-            util::regexMatch(), &regexp)) != devs.end()) and
-            (with.empty() or meta.herd_exists(with))) or
-            (not regex and meta.dev_exists(criteria) and
-            (with.empty() or meta.herd_exists(with))))
+//        if ((regex and (std::find_if(devs.begin(), devs.end(), std::bind1st(
+//            util::regexMatch(), &regexp)) != devs.end()) and
+//            (with.empty() or meta.herd_exists(with))) or
+//            (not regex and meta.dev_exists(criteria) and
+//            (with.empty() or meta.herd_exists(with))))
+        if ((regex and (devs.find(regexp) != devs.end()) and
+            (with.empty() or (herds.find(with) != herds.end()))) or
+            (not regex and (devs.find(criteria) != devs.end()) and
+            (with.empty() or (herds.find(with) != herds.end()))))
             return true;
     }
     else
     {
-        if ((regex and std::find_if(herds.begin(), herds.end(), std::bind1st(
-            util::regexMatch(), &regexp)) != herds.end()) or (not regex and
-            meta.herd_exists(criteria)) or (criteria == "no-herd" and herds.empty()))
+//        if ((regex and std::find_if(herds.begin(), herds.end(), std::bind1st(
+//            util::regexMatch(), &regexp)) != herds.end()) or (not regex and
+//            meta.herd_exists(criteria)) or (criteria == "no-herd" and herds.empty()))
+        if ((regex and (herds.find(regexp) != herds.end())) or
+            (not regex and (herds.find(criteria) != herds.end())) or
+            (criteria == "no-herd" and herds.empty()))
         {
             if (with.empty())
                 return true;
@@ -104,12 +114,12 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
                 if (with() == "none")
                 {
                     if (devs.empty() or ((devs.size() == 1) and
-                        meta.dev_exists(criteria)
-                        or meta.dev_exists(criteria+"@gentoo.org")))
+                        (devs.find(criteria) != devs.end()) or
+                        (devs.find(criteria+"@gentoo.org") != devs.end())))
                         return true;
                 }
-                else if (meta.dev_exists(with) or
-                         meta.dev_exists(with()+"@gentoo.org"))
+                else if ((devs.find(with) != devs.end()) or
+                         (devs.find(with()+"@gentoo.org") != devs.end()))
                     return true;
             }
         }
@@ -136,15 +146,15 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
     {
         /* parse it's metadata.xml */
         const std::string path(portdir + "/" + *i + "/metadata.xml");
-        const metadata_xml_T mxml(path);
-        const metadata_T meta(mxml.data(portdir));
+        const metadata_xml mxml(path);
+        const metadata& meta(mxml);
 
         /* does it match the criteria? */
         if (not metadata_matches(meta, q.query))
             continue;
 
         /* yep, so save it */
-        q[meta.pkg] = meta.longdesc;
+        q[meta.pkg()] = meta.longdesc();
     }
 
     /* cache it */
@@ -174,21 +184,24 @@ action_pkg_handler_T::search(const opts_type &opts)
             /* does it match the criteria? */
             if (metadata_matches(*m, *i))
             {
-                debug_msg("Match found in %s.", m->path.c_str());
+//                debug_msg("Match found in %s.", m->path.c_str());
 
                 /* we've already inserted at least one package */
                 std::map<std::string, pkgQuery_T * >::iterator mpos;
                 if ((mpos = matches.find(*i)) != matches.end())
-                    (*(mpos->second))[m->pkg] = m->longdesc;
+                    (*(mpos->second))[m->pkg()] = m->longdesc();
                 /* nope, so create a new query object */
                 else
                 {
                     matches[*i] = new pkgQuery_T(*i, with(), dev);
                     matches[*i]->date = std::time(NULL);
-                    (*(matches[*i]))[m->pkg] = m->longdesc;
+                    (*(matches[*i]))[m->pkg()] = m->longdesc();
 
                     if (dev)
-                        matches[*i]->info = herds_xml.get_dev_info(*i);
+                    {
+                        matches[*i]->info.set_user(*i);
+                        herdsxml.fill_developer(matches[*i]->info);
+                    }
                 }
             }
             /* didn't match */
@@ -198,7 +211,10 @@ action_pkg_handler_T::search(const opts_type &opts)
                 matches[*i]->date = std::time(NULL);
 
                 if (dev)
-                    matches[*i]->info = herds_xml.get_dev_info(*i);
+                {
+                    matches[*i]->info.set_user(*i);
+                    herdsxml.fill_developer(matches[*i]->info);
+                }
             }
         }
     }
@@ -218,28 +234,31 @@ action_pkg_handler_T::display(pkgQuery_T *q)
 {
     assert(q);
 
+    const Herds& herds(herdsxml.herds());
+    Herds::const_iterator i;
+
     if (not quiet)
     {
         if (regex)
             output("Regex", q->query);
         else if (dev)
         {
-            if (q->info.name.empty())
+            if (q->info.name().empty())
                 output("Developer", q->query);
             else
                 output("Developer",
-                    q->info.name + " (" + q->query + ")");
+                    q->info.name() + " (" + q->query + ")");
 
             output("Email", q->query + "@gentoo.org");
         }
-        else if (herds_xml.exists(q->query))
+        else if ((i = herds.find(q->query)) != herds.end())
         {
             output("Herd", q->query);
-            if (not herds_xml[q->query]->mail.empty())
-                output("Email", herds_xml[q->query]->mail);
-            if (not herds_xml[q->query]->desc.empty())
+            if (not i->email().empty())
+                output("Email", i->email());
+            if (not i->desc().empty())
                 output("Description",
-                    util::tidy_whitespace(herds_xml[q->query]->desc));
+                    util::tidy_whitespace(i->desc()));
         }
         else
             output("Herd", q->query);
@@ -426,7 +445,10 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 matches[*i]->with  = with();
 
                 if (dev)
-                    matches[*i]->info = herds_xml.get_dev_info(*i);
+                {
+                    matches[*i]->info.set_user(*i);
+                    herdsxml.fill_developer(matches[*i]->info);
+                }
 
                 opts.erase(std::find(opts.begin(), opts.end(), *i));
             }
@@ -451,7 +473,11 @@ action_pkg_handler_T::operator() (opts_type &opts)
                         pkgQuery_T q(*i, with(), dev);
                         q.date = std::time(NULL);
                         q.with = with();
-                        if (dev) q.info = herds_xml.get_dev_info(*i);
+                        if (dev)
+                        {
+                            q.info.set_user(*i);
+                            herdsxml.fill_developer(q.info);
+                        }
 
                         search(pkgs, q);
                         opts.erase(std::find(opts.begin(), opts.end(), *i));
@@ -535,7 +561,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << std::setprecision(4)
             << (static_cast<float>(elapsed) / metacache.size())
             << " ms/metadata.xml)." << std::endl
-            << "Took " << herds_xml.elapsed() << "ms to parse herds.xml."
+            << "Took " << herdsxml.elapsed() << "ms to parse herds.xml."
             << std::endl;
     }
     else if (verbose and not quiet)

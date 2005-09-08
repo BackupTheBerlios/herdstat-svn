@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_pkg_handler.hh
- * $Id: action_pkg_handler.hh 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,6 +28,7 @@
 #endif
 
 #include <map>
+#include <herdstat/portage/metadata.hh>
 #include "metacache.hh"
 #include "pkgquery.hh"
 #include "querycache.hh"
@@ -55,7 +56,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         void display(pkgQuery_T *);
         void error(const std::string &) const;
         void cleanup();
-        bool metadata_matches(const metadata_T &, const std::string &);
+        bool metadata_matches(const portage::metadata &, const std::string &);
 
         std::map<opts_type::value_type, pkgQuery_T * > matches;
         opts_type not_found, packages;

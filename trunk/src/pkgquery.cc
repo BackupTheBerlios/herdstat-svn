@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/string.hh>
 #include <herdstat/portage/config.hh>
 #include "formatter.hh"
 #include "pkgquery.hh"

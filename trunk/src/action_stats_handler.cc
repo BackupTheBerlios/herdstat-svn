@@ -26,10 +26,14 @@
 
 #include <vector>
 #include <algorithm>
+#include <herdstat/util/string.hh>
+#include <herdstat/portage/herd.hh>
 
 #include "common.hh"
 #include "metacache.hh"
 #include "action_stats_handler.hh"
+
+using namespace portage;
 
 /*
  * Display statistics summary.
@@ -40,13 +44,14 @@ action_stats_handler_T::operator() (opts_type &null)
 {
     optset("quiet", bool, false);
 
-    herds_xml.fetch();
-    herds_xml.parse();
+    herdsxml.fetch(optget("herds.xml", std::string));
+    herdsxml.parse(optget("herds.xml", std::string));
+    const Herds& herds(herdsxml.herds());
 
     if (use_devaway)
     {
-        devaway.fetch();
-        devaway.parse();
+        devaway.fetch(optget("devaway.location", std::string));
+        devaway.parse(optget("devaway.location", std::string));
     }
 
     /* set format attributes */
@@ -56,30 +61,30 @@ action_stats_handler_T::operator() (opts_type &null)
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
-    herds_xml_T::const_iterator h;
-    herds_xml_T::herd_type::iterator d;
+    Herds::const_iterator h;
+    Herd::const_iterator d;
 
     float nherds = 0, ndevs = 0;
     std::vector<std::string> most_herds, least_herds, most_devs, least_devs;
     unsigned short biggest_dev = 0, smallest_dev = 1;
-    herds_xml_T::herd_type::size_type biggest_herd = 0, smallest_herd = 1;
+    Herd::size_type biggest_herd = 0, smallest_herd = 1;
     std::map<std::string, unsigned short> herds_per_dev;
 
     /* for each herd in herds.xml... */
-    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+    for (h = herds.begin() ; h != herds.end() ; ++h)
     {
-        ndevs += h->second->size();
+        ndevs += h->size();
 
         /* add one to the number of herds the current dev is in */
-        for (d = h->second->begin() ; d != h->second->end() ; ++d)
-            ++herds_per_dev[d->first];
+        for (d = h->begin() ; d != h->end() ; ++d)
+            ++herds_per_dev[d->name()];
 
         /* is the size of this herd bigger than the previous biggest herd */
-        if (h->second->size() > biggest_herd)
-            biggest_herd = h->second->size();
+        if (h->size() > biggest_herd)
+            biggest_herd = h->size();
 
-        if (h->second->size() <= smallest_herd)
-            smallest_herd = h->second->size();
+        if (h->size() <= smallest_herd)
+            smallest_herd = h->size();
     }
 
     /* for each developer in herds.xml */
@@ -97,12 +102,12 @@ action_stats_handler_T::operator() (opts_type &null)
     }
 
     /* we now have least/most devs, so find all devs with matching numbers */
-    for (h = herds_xml.begin() ; h != herds_xml.end() ; ++h)
+    for (h = herds.begin() ; h != herds.end() ; ++h)
     {
-        if (h->second->size() == biggest_herd)
-            most_devs.push_back(h->first);
-        else if (h->second->size() == smallest_herd)
-            least_devs.push_back(h->first);
+        if (h->size() == biggest_herd)
+            most_devs.push_back(h->name());
+        else if (h->size() == smallest_herd)
+            least_devs.push_back(h->name());
     }
 
     /* we now have least/most herds, so find all herds with matching numbers */
@@ -115,10 +120,10 @@ action_stats_handler_T::operator() (opts_type &null)
     }
 
     /* display it all */
-    output("Total herds", util::sprintf("%d", herds_xml.size()));
+    output("Total herds", util::sprintf("%d", herds.size()));
     output("Total devs", util::sprintf("%d", herds_per_dev.size()));
     output("Avg devs/herd", util::sprintf("%.2f",
-        ndevs / herds_xml.size()));
+        ndevs / herds.size()));
     output("Avg herds/dev", util::sprintf("%.2f",
         nherds / herds_per_dev.size()));
     output(util::sprintf("Herd(s) with most devs(%d)", biggest_herd),

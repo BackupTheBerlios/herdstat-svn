@@ -28,8 +28,8 @@
 #endif
 
 #include <map>
+#include <herdstat/portage/developer.hh>
 #include "common.hh"
-#include "herds_xml.hh"
 
 /*
  * Container for package query data.
@@ -50,7 +50,7 @@ class pkgQuery_T : public std::map<std::string, std::string>
         std::vector<std::string> pkgs() const;
 
         /* members */
-        herds_xml_T::devinfo_T info;
+        portage::Developer info;
         std::string query, with, portdir;
         std::vector<std::string> overlays;
         std::time_t date;
