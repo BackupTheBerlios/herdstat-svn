@@ -7,6 +7,7 @@ cc_sources = misc.cc \
 	     version.cc \
 	     find.cc \
 	     ebuild.cc \
+	     gentoo_email_address.cc \
 	     developer.cc \
 	     herd.cc \
 	     herds_xml.cc \
@@ -20,6 +21,7 @@ hh_sources = exceptions.hh \
 	     version.hh \
 	     find.hh \
 	     ebuild.hh \
+	     gentoo_email_address.hh \
 	     developer.hh \
 	     herd.hh \
 	     xmlbase.hh \

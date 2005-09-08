@@ -34,6 +34,7 @@
 
 #include <string>
 #include <vector>
+#include <herdstat/portage/gentoo_email_address.hh>
 
 namespace portage {
 
@@ -98,7 +99,7 @@ namespace portage {
 
         private:
             std::string _user;
-            std::string _email;
+            GentooEmailAddress _email;
             std::string _name;
             std::string _pgpkey;
             std::string _joined;
@@ -122,7 +123,7 @@ namespace portage {
     { return not (*this == that); }
 
     inline const std::string& Developer::user() const { return _user; }
-    inline const std::string& Developer::email() const { return _email; }
+    inline const std::string& Developer::email() const { return _email.str(); }
     inline const std::string& Developer::name() const { return _name; }
     inline const std::string& Developer::pgpkey() const { return _pgpkey; }
     inline const std::string& Developer::joined() const { return _joined; }

@@ -1,6 +1,6 @@
 /*
- * herdstat -- portage/developer.cc
- * $Id: developer.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * herdstat -- herdstat/email_address.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,30 +24,35 @@
 # include "config.h"
 #endif
 
-#include <herdstat/portage/developer.hh>
-
-namespace portage {
+#include <herdstat/exceptions.hh>
+#include <herdstat/email_address.hh>
 /****************************************************************************/
-Developer::Developer()
-    : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status("active"), _role(), _awaymsg(), _away(false), _herds()
+EmailAddress::EmailAddress()
+    : _email(), _user(), _domain()
 {
 }
 /****************************************************************************/
-Developer::Developer(const std::string &user, const std::string &email,
-                     const std::string &name)
-    : _user(user), _email(email.empty() ? _user : email),
-      _name(name), _pgpkey(), _joined(), _birth(), _status("active"),
-      _role(), _awaymsg(), _away(false), _herds()
+EmailAddress::EmailAddress(const std::string& email)
+    : _email(), _user(), _domain()
 {
-    /* chop everything after '@' if the caller
-     * gave an email addy instead of the user name.
-     */
-    std::string::size_type pos = _user.find('@');
-    if (pos != std::string::npos)
-        _user.erase(pos);
+    this->parse(email);
 }
 /****************************************************************************/
-} // namespace portage
+EmailAddress::EmailAddress(const std::string& user, const std::string& domain)
+    : _email(user+"@"+domain), _user(user), _domain(domain)
+{
+}
+/****************************************************************************/
+void
+EmailAddress::parse(const std::string& email)
+{
+    std::string::size_type pos = email.find('@');
+    if (pos == std::string::npos)
+        throw MalformedEmail(email);
 
+    _user.assign(email.substr(0, pos));
+    _domain.assign(email.substr(pos+1));
+    _email.assign(email);
+}
+/****************************************************************************/
 /* vim: set tw=80 sw=4 et : */

@@ -30,27 +30,15 @@ namespace portage {
 /****************************************************************************/
 Herd::Herd(const std::string &name,
            const std::string &email, const std::string &desc)
-    : _devs(), _name(name), _email(email.empty() ? name+"@gentoo.org" : email),
+    : _devs(), _name(name), _email(email.empty() ? name : email),
       _desc(desc)
 {
-
-}
-/****************************************************************************/
-void
-Herd::push_back(const std::string& email)
-{
-    std::string::size_type pos = email.find('@');
-    if (pos == std::string::npos)
-        _devs.push_back(Developer(email, email+"@gentoo.org"));
-    else
-        _devs.push_back(Developer(email.substr(0, pos), email));
-}
-/****************************************************************************/
-void
-Herd::set_email(const std::string& email)
-{
-    std::string::size_type pos = email.find('@');
-    _email.assign(pos == std::string::npos ? email+"@gentoo.org" : email);
+    /* chop everything after '@' if the caller
+     * gave the email addy instead of the herd name.
+     */
+    std::string::size_type pos = _name.find('@');
+    if (pos != std::string::npos)
+        _name.erase(pos);
 }
 /****************************************************************************/
 Herd&

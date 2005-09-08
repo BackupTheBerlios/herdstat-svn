@@ -1,6 +1,6 @@
 /*
- * herdstat -- portage/developer.cc
- * $Id: developer.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * herdstat -- portage/gentoo_email_address.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,28 +24,33 @@
 # include "config.h"
 #endif
 
-#include <herdstat/portage/developer.hh>
+#include <herdstat/exceptions.hh>
+#include <herdstat/portage/gentoo_email_address.hh>
 
 namespace portage {
 /****************************************************************************/
-Developer::Developer()
-    : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status("active"), _role(), _awaymsg(), _away(false), _herds()
+GentooEmailAddress::GentooEmailAddress()
+    : EmailAddress()
 {
 }
 /****************************************************************************/
-Developer::Developer(const std::string &user, const std::string &email,
-                     const std::string &name)
-    : _user(user), _email(email.empty() ? _user : email),
-      _name(name), _pgpkey(), _joined(), _birth(), _status("active"),
-      _role(), _awaymsg(), _away(false), _herds()
+GentooEmailAddress::GentooEmailAddress(const std::string& email)
+    : EmailAddress()
 {
-    /* chop everything after '@' if the caller
-     * gave an email addy instead of the user name.
-     */
-    std::string::size_type pos = _user.find('@');
-    if (pos != std::string::npos)
-        _user.erase(pos);
+    this->assign(email);
+}
+/****************************************************************************/
+void
+GentooEmailAddress::parse(const std::string& email)
+{
+    try
+    {
+        EmailAddress::parse(email);
+    }
+    catch (const MalformedEmail)
+    {
+        this->set_domain("gentoo.org");
+    }
 }
 /****************************************************************************/
 } // namespace portage

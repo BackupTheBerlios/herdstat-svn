@@ -1,6 +1,6 @@
 /*
  * herdstat -- herdstat/exceptions.hh
- * $Id$
+ * $Id: exceptions.hh 508 2005-09-03 11:30:08Z ka0ttic $
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -59,7 +59,7 @@ class Exception : public BaseException
             va_end(_v);
         }
         
-        Exception(const std::string &fmt, ...) : _buf(NULL), _v()
+        Exception(const std::string& fmt, ...) : _buf(NULL), _v()
         {
 #ifdef HAVE_GCC4
             va_start(_v, fmt);
@@ -98,7 +98,7 @@ class ErrnoException : public Exception
     public:
         ErrnoException() : _code(errno) { }
         ErrnoException(const char *msg) : Exception(msg), _code(errno) { }
-        ErrnoException(const std::string &msg) : Exception(msg), _code(errno) { }
+        ErrnoException(const std::string& msg) : Exception(msg), _code(errno) { }
 
         virtual const char *what() const throw()
         {
@@ -122,7 +122,7 @@ class FileException : public ErrnoException
     public:
         FileException() { }
         FileException(const char *msg) : ErrnoException(msg) { }
-        FileException(const std::string &msg) : ErrnoException(msg) { }
+        FileException(const std::string& msg) : ErrnoException(msg) { }
 };
 
 class BadCast : public Exception
@@ -130,7 +130,7 @@ class BadCast : public Exception
     public:
         BadCast() { }
         BadCast(const char *msg) : Exception(msg) { }
-        BadCast(const std::string &msg) : Exception(msg) { }
+        BadCast(const std::string& msg) : Exception(msg) { }
 };
 
 class BadRegex : public Exception
@@ -138,7 +138,7 @@ class BadRegex : public Exception
      public:
          BadRegex() : _err(0), _re(NULL) { }
          BadRegex(int e, const regex_t *re) : _err(e), _re(re) { }
-         BadRegex(const std::string &s) : Exception(s), _err(0), _re(NULL) { }
+         BadRegex(const std::string& s) : Exception(s), _err(0), _re(NULL) { }
 
          virtual const char *what() const throw()
          {
@@ -168,7 +168,15 @@ class FetchException : public Exception
     public:
         FetchException() { }
         FetchException(const char *msg) : Exception(msg) { }
-        FetchException(const std::string &msg) : Exception(msg) { }
+        FetchException(const std::string& msg) : Exception(msg) { }
+};
+
+class MalformedEmail : public Exception
+{
+    public:
+        MalformedEmail() { }
+        MalformedEmail(const char *msg) : Exception(msg) { }
+        MalformedEmail(const std::string& msg) : Exception(msg) { }
 };
 
 #endif /* _HAVE_HERDSTAT_EXCEPTIONS_HH */

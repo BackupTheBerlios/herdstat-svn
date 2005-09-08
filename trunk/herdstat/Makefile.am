@@ -4,13 +4,15 @@ include $(top_builddir)/Makefile.am.common
 
 SUBDIRS = util xml portage
 
-cc_sources = fetcher.cc
+cc_sources = fetcher.cc \
+	     email_address.cc
 hh_sources = exceptions.hh \
 	     noncopyable.hh \
 	     cachable.hh \
 	     fetcher.hh \
 	     fetchable.hh \
-	     parsable.hh
+	     parsable.hh \
+	     email_address.hh
 
 noinst_LTLIBRARIES = libherdstat.la
 # libherdstat_la_LDFLAGS = -release $(VERSION_MAJOR).$(VERSION_MINOR) -version-info $(LIBRARY_VERSION)

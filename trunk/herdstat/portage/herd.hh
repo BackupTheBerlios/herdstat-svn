@@ -106,7 +106,7 @@ namespace portage {
         private:
             container_type _devs;
             std::string _name;
-            std::string _email;
+            GentooEmailAddress _email;
             std::string _desc;
     };
 
@@ -122,7 +122,7 @@ namespace portage {
     inline bool Herd::operator!= (const Herd& herd) const
     { return (_name != herd._name); }
     inline const std::string& Herd::name() const { return _name; }
-    inline const std::string& Herd::email() const { return _email; }
+    inline const std::string& Herd::email() const { return _email.str(); }
     inline const std::string& Herd::desc() const { return _desc; }
     inline void Herd::set_name(const std::string &name) { _name.assign(name); }
     inline void Herd::set_desc(const std::string &desc) { _desc.assign(desc); }
@@ -134,6 +134,8 @@ namespace portage {
     inline bool Herd::empty() const { return _devs.empty(); }
     inline void Herd::clear() { return _devs.clear(); }
     inline void Herd::push_back(const Developer& dev) { _devs.push_back(dev); }
+    inline void Herd::push_back(const std::string& email)
+    { _devs.push_back(Developer(email)); }
 
     inline Herd::iterator Herd::find(const std::string& dev)
     { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
