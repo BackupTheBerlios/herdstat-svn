@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/developer.cc
- * $Id: developer.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -46,6 +46,35 @@ Developer::Developer(const std::string &user, const std::string &email,
     std::string::size_type pos = _user.find('@');
     if (pos != std::string::npos)
         _user.erase(pos);
+}
+/****************************************************************************/
+Developers::Developers()
+    : _devs()
+{
+}
+/****************************************************************************/
+Developers::Developers(const std::vector<std::string>& devs)
+    : _devs()
+{
+    *this = devs;
+}
+/****************************************************************************/
+Developers&
+Developers::operator= (const std::vector<std::string>& devs)
+{
+    std::vector<std::string>::const_iterator i;
+    for (i = devs.begin() ; i != devs.end() ; ++i)
+        _devs.push_back(Developer(*i));
+    return *this;
+}
+/****************************************************************************/
+Developers::operator
+std::vector<std::string>() const
+{
+    std::vector<std::string> v;
+    for (Developers::const_iterator i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->user());
+    return v;
 }
 /****************************************************************************/
 } // namespace portage

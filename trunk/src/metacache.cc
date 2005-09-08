@@ -222,7 +222,7 @@ metacache_T::load()
             std::string str;
             metadata meta;
             Herds& herds(meta.herds());
-            Herd&  devs(meta.devs());
+            Developers&  devs(meta.devs());
 
             std::vector<std::string> parts = util::split(i->second, ':', true);
             if (parts.empty())
@@ -294,7 +294,7 @@ metacache_T::dump()
          */
 
         const Herds& herds(ci->herds());
-        const Herd&  devs(ci->devs());
+        const Developers&  devs(ci->devs());
         std::string str;
         std::size_t n;
 
@@ -315,7 +315,7 @@ metacache_T::dump()
         
         /* developers */
         {
-            Herd::const_iterator i, end = devs.end();
+            Developers::const_iterator i, end = devs.end();
             for (i = devs.begin(), n = 1, str.clear() ; i != end ; ++i, ++n)
             {
                 str += *i;

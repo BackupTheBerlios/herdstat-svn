@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/metadata.hh
- * $Id: metadata.hh 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -52,15 +52,15 @@ namespace portage {
             void set_pkg(const std::string &pkg);
             void set_longdesc(const std::string &longdesc);
 
-            bool dev_exists(const std::string &dev) const;
-            bool dev_exists(const util::regex_T &re) const;
-            bool herd_exists(const std::string &herd) const;
-            bool herd_exists(const util::regex_T &re) const;
+//            bool dev_exists(const std::string &dev) const;
+//            bool dev_exists(const util::regex_T &re) const;
+//            bool herd_exists(const std::string &herd) const;
+//            bool herd_exists(const util::regex_T &re) const;
 
             const Herds& herds() const;
-            const Herd& devs() const;
+            const Developers& devs() const;
             Herds& herds();
-            Herd& devs();
+            Developers& devs();
 
         private:
             friend class metadata_xml;
@@ -69,7 +69,7 @@ namespace portage {
             std::string _longdesc;
             bool _cat;
             Herds _herds;
-            Herd _devs;
+            Developers _devs;
     };
 
     inline bool metadata::is_category() const { return _cat; }
@@ -80,9 +80,9 @@ namespace portage {
     inline void metadata::set_longdesc(const std::string &longdesc)
     { _longdesc.assign(longdesc); }
     inline const Herds& metadata::herds() const { return _herds; }
-    inline const Herd& metadata::devs() const { return _devs; }
+    inline const Developers& metadata::devs() const { return _devs; }
     inline Herds& metadata::herds() { return _herds; }
-    inline Herd& metadata::devs() { return _devs; }
+    inline Developers& metadata::devs() { return _devs; }
 
 } // namespace portage
 

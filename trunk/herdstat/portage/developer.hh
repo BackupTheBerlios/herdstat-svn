@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/developer.hh
- * $Id: developer.hh 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -34,6 +34,9 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <functional>
+#include <herdstat/util/regex.hh>
 #include <herdstat/portage/gentoo_email_address.hh>
 
 namespace portage {
@@ -161,6 +164,85 @@ namespace portage {
     inline void Developer::append_herd(const std::string& herd)
     { _herds.push_back(herd); }
     inline void Developer::set_away(const bool away) { _away = away; }
+
+    /**
+     * Developer container.
+     */
+
+    class Developers
+    {
+        public:
+            typedef std::vector<Developer> container_type;
+            typedef container_type::iterator iterator;
+            typedef container_type::const_iterator const_iterator;
+            typedef container_type::value_type value_type;
+            typedef container_type::size_type size_type;
+
+            Developers();
+            Developers(const std::vector<std::string>& v);
+            virtual ~Developers() { }
+
+            /// Implicit conversion to std::vector<std::string>.
+            operator std::vector<std::string>() const;
+
+            Developers& operator= (const std::vector<Developer>& v);
+            Developers& operator= (const std::vector<std::string>& v);
+
+            iterator begin();
+            const_iterator begin() const;
+            iterator end();
+            const_iterator end() const;
+            iterator find(const std::string& dev);
+            const_iterator find(const std::string& dev) const;
+            iterator find(const Developer& dev);
+            const_iterator find(const Developer& dev) const;
+            iterator find(const util::regex_T &regex);
+            const_iterator find(const util::regex_T &regex) const;
+            size_type size() const;
+            bool empty() const;
+            void clear();
+            void push_back(const Developer& dev);
+            void push_back(const std::string& email);
+            template <class In>
+            void insert(iterator pos, In begin, In end);
+            const value_type& operator[](size_type pos) const;
+
+        private:
+            container_type _devs;
+    };
+    inline Developers& Developers::operator= (const std::vector<Developer>& v)
+    { _devs = v; return *this; }
+    inline Developers::iterator Developers::begin() { return _devs.begin(); }
+    inline Developers::const_iterator Developers::begin() const { return _devs.begin(); }
+    inline Developers::iterator Developers::end() { return _devs.end(); }
+    inline Developers::const_iterator Developers::end() const { return _devs.end(); }
+    inline Developers::size_type Developers::size() const { return _devs.size(); }
+    inline bool Developers::empty() const { return _devs.empty(); }
+    inline void Developers::clear() { return _devs.clear(); }
+    inline void Developers::push_back(const Developer& dev) { _devs.push_back(dev); }
+    inline void Developers::push_back(const std::string& email)
+    { _devs.push_back(Developer(email)); }
+
+    inline Developers::iterator Developers::find(const std::string& dev)
+    { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
+    inline Developers::const_iterator Developers::find(const std::string& dev) const
+    { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
+    inline Developers::iterator Developers::find(const Developer& dev)
+    { return std::find(_devs.begin(), _devs.end(), dev); }
+    inline Developers::const_iterator Developers::find(const Developer& dev) const
+    { return std::find(_devs.begin(), _devs.end(), dev); }
+    inline Developers::iterator Developers::find(const util::regex_T &regex)
+    { return std::find_if(_devs.begin(), _devs.end(),
+            std::bind1st(util::regexMatch(), &regex)); }
+    inline Developers::const_iterator Developers::find(const util::regex_T &regex) const
+    { return std::find_if(_devs.begin(), _devs.end(),
+            std::bind1st(util::regexMatch(), &regex)); }
+    template <class In> inline void
+    Developers::insert(iterator pos, In begin, In end)
+    { _devs.insert(pos, begin, end); }
+    inline const Developers::value_type& Developers::operator[] (size_type pos) const
+    { return _devs[pos]; }
+
 
 } // namespace portage
 

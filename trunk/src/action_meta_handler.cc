@@ -34,6 +34,7 @@
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/ebuild.hh>
+#include <herdstat/portage/metadata.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
@@ -43,9 +44,100 @@
 using namespace portage;
 
 static void
-display_metadata(const metadata& meta)
+display_metadata(const metadata_data& data)
 {
-    formatter_T
+    const metadata_xml m(data.path);
+    const metadata& meta(m);
+    const Herds& herds(meta.herds());
+    const Developers& devs(meta.devs());
+    formatter_T output;
+    ebuild_T ebuild_vars;
+
+    if (not meta.is_category() and (herds.empty() or
+        (herds[0] == "no-herd")))
+        output("Herds(0)", "none");
+    else if (not herds.empty())
+        output(util::sprintf("Herds(%d)", herds.size()), herds);
+
+    if (optget("quiet", bool))
+    {
+        if (devs.size() >= 1)
+            output("", devs);
+        else if (not meta.is_category())
+            output("", "none");
+    }
+    else
+    {
+        if (devs.size() >= 1)
+            output(util::sprintf("Maintainers(%d)", devs.size()), devs);
+        
+        if (devs.size() > 1)
+        {
+            Developers::const_iterator d;
+            for (d = (devs.begin() + 1); d != devs.end() ; ++d)
+                output("", *d);
+        }
+        else if (not meta.is_category() and devs.empty())
+            output("Maintainers(0)", "none");
+    }
+
+    if (not meta.is_category())
+    {
+        std::string ebuild;
+        try
+        {
+            ebuild = ebuild_which(data.portdir, data.pkg);
+        }
+        catch (const NonExistentPkg)
+        {
+            ebuild = ebuild_which(optget("portage.config", config_T).portdir(),
+                    data.pkg);
+        }
+
+        assert(not ebuild.empty());
+
+        ebuild_vars.read(ebuild);
+
+        if (optget("quiet", bool) and ebuild_vars["HOMEPAGE"].empty())
+            ebuild_vars["HOMEPAGE"] = "none";
+
+        if (not ebuild_vars["HOMEPAGE"].empty())
+        {
+            /* it's possible to have more than one HOMEPAGE */
+            if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
+            {
+                std::vector<std::string> parts = util::split(ebuild_vars["HOMEPAGE"]);
+
+                if (parts.size() >= 1)
+                    output("Homepage", parts.front());
+
+                if (parts.size() > 1)
+                {
+                    std::vector<std::string>::iterator h;
+                    for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
+                        output("", *h);
+                }
+            }
+            else
+                output("Homepage", ebuild_vars["HOMEPAGE"]);
+        }
+    }
+
+    /* long description */
+    if (meta.longdesc().empty())
+    {
+        if (not meta.is_category())
+        {
+            if (ebuild_vars["DESCRIPTION"].empty())
+                ebuild_vars["DESCRIPTION"] = "none";
+
+            output("Description", ebuild_vars["DESCRIPTION"]);
+        }
+        else
+            output("Description", "none");
+    }
+    else
+        output("Description", util::tidy_whitespace(meta.longdesc()));
 }
 
 void
@@ -53,10 +145,7 @@ action_meta_handler_T::display(const metadata_data& data)
 {
     /* does the metadata.xml exist? */
     if (util::is_file(data.path))
-    {
-        const metadata_xml metadata(data.path);
-        display_metadata(metadata);
-    }
+        display_metadata(data);
     /* package or category exists, but metadata.xml doesn't */
     else
     {
@@ -241,7 +330,7 @@ action_meta_handler_T::operator() (opts_type &opts)
                                 m->second, &search_timer);
             else if (regex and not m->first.empty())
             {
-                data.dir = m->first;
+                data.portdir = m->first;
                 data.pkg = m->second;
             }
             else
@@ -249,7 +338,7 @@ action_meta_handler_T::operator() (opts_type &opts)
                 std::pair<std::string, std::string> p =
                     portage::find_package(config, m->second,
                     overlay, &search_timer);
-                data.dir = p.first;
+                data.portdir = p.first;
                 data.pkg = p.second;
             }
         }

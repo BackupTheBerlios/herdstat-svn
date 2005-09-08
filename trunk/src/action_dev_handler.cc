@@ -118,8 +118,7 @@ action_dev_handler_T::operator() (opts_type &devs)
     /* all target? */
     if (all)
     {
-        /* treat ALL developers in herds.xml as a single herd */
-        Herd all_devs;
+        Developers all_devs;
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
             /* for each developer in the herd... */
@@ -132,7 +131,7 @@ action_dev_handler_T::operator() (opts_type &devs)
             }
         }
 
-        display_herd(all_devs);
+        display_herd(Herd(all_devs));
         size = all_devs.size();
         flush();
         return EXIT_SUCCESS;

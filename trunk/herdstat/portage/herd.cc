@@ -30,7 +30,7 @@ namespace portage {
 /****************************************************************************/
 Herd::Herd(const std::string &name,
            const std::string &email, const std::string &desc)
-    : _devs(), _name(name), _email(email.empty() ? name : email),
+    : Developers(), _name(name), _email(email.empty() ? name : email),
       _desc(desc)
 {
     /* chop everything after '@' if the caller
@@ -41,22 +41,9 @@ Herd::Herd(const std::string &name,
         _name.erase(pos);
 }
 /****************************************************************************/
-Herd&
-Herd::operator= (const std::vector<std::string>& devs)
+Herd::Herd(const std::vector<std::string>& devs)
+    : Developers(devs), _name(), _email(), _desc()
 {
-    std::vector<std::string>::const_iterator i;
-    for (i = devs.begin() ; i != devs.end() ; ++i)
-        _devs.push_back(Developer(*i));
-    return *this;
-}
-/****************************************************************************/
-Herd::operator
-std::vector<std::string>() const
-{
-    std::vector<std::string> v;
-    for (Herd::const_iterator i = this->begin() ; i != this->end() ; ++i)
-        v.push_back(i->user());
-    return v;
 }
 /****************************************************************************/
 Herds&
@@ -66,6 +53,15 @@ Herds::operator= (const std::vector<std::string>& herds)
     for (i = herds.begin() ; i != herds.end() ; ++i)
         _herds.push_back(Herd(*i));
     return *this;
+}
+/****************************************************************************/
+Herds::operator
+std::vector<std::string>() const
+{
+    std::vector<std::string> v;
+    for (Herds::const_iterator i = this->begin() ; i != this->end() ; ++i)
+        v.push_back(i->name());
+    return v;
 }
 /****************************************************************************/
 } // namespace portage
