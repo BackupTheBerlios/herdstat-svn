@@ -40,7 +40,8 @@ _herdstat() {
         -F --fetch -c --count -n --nocolor --no-herd -m --metadata
         --with-herd -w --which --versions --no-overlay -r --regex
         -E --extended -f --find --qa --with-maintainer --no-maintainer
-        -a --away --nometacache -A --devaway -L --localstatedir"
+        -a --away --nometacache -A --devaway -L --localstatedir
+        -C --gentoo-cvs -U --userinfo"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -51,10 +52,10 @@ _herdstat() {
     fi
 
     case "${prev}" in
-	-H|--herdsxml|-o|--outfile|-A|--devaway)
+	-H|--herdsxml|-o|--outfile|-A|--devaway|-U|--userinfo)
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
 	    ;;
-        -L|--localstatedir)
+        -L|--localstatedir|-C|--gentoo-cvs)
             COMPREPLY=( $(compgen -d -- ${cur}) )
             ;;
 	-a|--away|-d|--dev)

@@ -22,8 +22,11 @@
         <note priority="veryhigh" time="1125826409">
             Have the -d flag also display info from userinfo.xml
         </note>
+        <note priority="high" time="1126271241">
+            Since we cannot fetch userinfo.xml, we can only use it if a) a full path to it is provided or b) a GENTOO_CVS env var exists or c) a gentoo.cvsdir config file option exists
+        </note>
     </note>
-    <note priority="medium" time="1125835328">
+    <note priority="verylow" time="1125835328">
         Idea: when -d is specified and /usr/share/fortune/gentoo-dev exists and the dev being requested has a quote in that file, randomly display one.
         <note priority="high" time="1125835699">
             of course this would only work for folks whose dev/irc nicks are equivelent.

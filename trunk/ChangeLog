@@ -1,5 +1,18 @@
 ChangeLog for herdstat
 
+2005-09-09 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/options.cc, src/rc.cc, src/herdstat.cc, doc/herdstat.1.in,
+	doc/herdstatrc.example, bashcomp: Added new options --gentoo-cvs and
+	--userinfo for specifying a Gentoo CVS directory and the location of
+	userinfo.xml respectively.
+	* herdstat/util/vars.cc, herdstat/util/vars.hh,
+	herdstat/portage/ebuild.cc: Make vars_T::set_defaults non-virtual and
+	instead define a new virtual do_set_defaults() that can be overridden
+	by derivatives (the default does nothing).  We now set a few defaults
+	in set_defaults such as ${HOME}, making it possible to use ${HOME} in
+	herdstatrc.
+
 2005-09-06 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/fetchable.hh, herdstat/fetcher.cc, herdstat/fetcher.hh: moved

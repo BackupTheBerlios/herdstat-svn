@@ -55,7 +55,7 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -79,8 +79,12 @@ static struct option long_opts[] =
     {"dev",	    no_argument,	0,  'd'},
     /* specify the location of a local herds.xml */
     {"herdsxml",    required_argument,	0,  'H'},
-    /* specify the location of devaway.html. */
+    /* specify the location of devaway.xml. */
     {"devaway",	    required_argument,	0,  'A'},
+    /* specify the location of userinfo.xml */
+    {"userinfo",    required_argument,  0,  'U'},
+    /* specify Gentoo CVS directory */
+    {"gentoo-cvs",  required_argument,  0,  'C'},
     /* specify local statedir */
     {"localstatedir", required_argument,0,  'L'},
     /* show package stats for the specified herds */
@@ -150,8 +154,11 @@ help()
 	<< " -r, --regex             Display results matching the specified regular" << std::endl
 	<< "                         expression." << std::endl
 	<< " -E, --extended          Use extended regular expressions. Implies --regex." << std::endl
+	<< " -C, --gentoo-cvs <dir>  Specify location of Gentoo CVS directory.  herds.xml and" << std::endl
+	<< "                         userinfo.xml will be looked up relative to this directory." << std::endl
 	<< " -H, --herdsxml <file>   Specify location of herds.xml." << std::endl
-	<< " -A, --devaway  <file>   Specify location of devaway.html." << std::endl
+	<< " -A, --devaway  <file>   Specify location of devaway.xml." << std::endl
+	<< " -U, --userinfo <file>   Specify location of userinfo.xml." << std::endl
 	<< " -o, --outfile  <file>   Send output to the specified file" << std::endl
 	<< "                         instead of stdout." << std::endl
 	<< " -L, --localstatedir <dir>" << std::endl
@@ -383,6 +390,14 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    /* --nocolor */
 	    case 'n':
 		optset("color", bool, false);
+		break;
+	    /* --gentoo-cvs */
+	    case 'C':
+		optset("gentoo.cvs", std::string, optarg);
+		break;
+	    /* --userinfo */
+	    case 'U':
+		optset("userinfo", std::string, optarg);
 		break;
 	    /* --herdsxml */
 	    case 'H':

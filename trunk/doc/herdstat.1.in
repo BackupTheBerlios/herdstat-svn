@@ -89,12 +89,19 @@ Display full package name (in category/package form) for the specified packages.
 .B "\-a, \-\-away"
 Display away information for the specified developer(s).
 .TP
+.B "\-C, \-\-gentoo-cvs \fI<dir>\fR"
+Specify the location of your Gentoo CVS directory (must be a developer).  herds.xml
+and userinfo.xml will be looked up relative to this location.
+.TP
 .B "\-H, \-\-herdsxml \fI<file>\fR"
 Specify the location of herds.xml.  See the \fBENVIRONMENT\fR section
 for an alternative way of setting the herds.xml location.
 .TP
 .B "\-A, \-\-devaway \fI<file>\fR"
-Specify the location of devaway.html.
+Specify the location of devaway.xml.
+.TP
+.B "\-U, \-\-userinfo \fI<file>\fR"
+Specify the location of userinfo.xml.
 .TP
 .B "\-o, \-\-outfile \fI<file>\fR"
 Send output to the specified file instead of stdout.  \fI<file>\fR can also be

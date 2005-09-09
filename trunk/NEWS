@@ -4,6 +4,18 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 1.1.2_alpha1:
     *Many* behind-the-scenes changes.  Mostly code refactoring/cleanup.
 
+    New features:
+     - Use userinfo.xml if available to provide more information when
+       specifying the -d flag.  This feature requires that the user be a Gentoo
+       developer, as this file is not publicly available and requires a CVS
+       checkout.  This led to two new command-line options: -C|--gentoo-cvs for
+       specifying a Gentoo CVS directory (lookups for herds.xml and
+       userinfo.xml will be relative to this location) and -U|--userinfo for
+       specifying a path to userinfo.xml.
+     - Configuration file now supports using variables such as ${HOME}.
+       Currently only ${HOME} is supported, however if you'd find it useful to
+       add others, just let me know.
+
 1.1.1_p7:
     Bug fixes:
      - Fixed segv when parsing metadata.xml's that are iso-8859-1 (or possibly

@@ -27,9 +27,17 @@ colors=true
 #   value can be one of: yes,no,true,false
 qa=false
 
+# Gentoo CVS directory
+#   value can be a path
+#gentoo.cvs=${HOME}/cvs
+
 # herds.xml location
 #   value can be a path or URL
 #herdsxml=/path/to/herds.xml
+
+# userinfo.xml location
+#   value can be a path.
+#userinfo=/path/to/userinfo.xml
 
 # use devaway?
 #   value can be one of: yes,no,true,false
@@ -39,7 +47,7 @@ use.devaway=true
 #   value can be a number (seconds)
 devaway.expire=86400
 
-# devaway.html location (defaults to ${localstatedir}/herdstat/devaway.html)/
+# devaway.xml location (defaults to ${localstatedir}/herdstat/devaway.xml)/
 #   value needs to be a path to a file that exists.
 #devaway.location=
 

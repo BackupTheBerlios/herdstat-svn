@@ -84,6 +84,10 @@ rc_T::set_options()
     }
     if (not vars["herdsxml"].empty())
 	optset("herds.xml", std::string, vars["herdsxml"]);
+    if (not vars["gentoo.cvs"].empty())
+        optset("gentoo.cvs", std::string, vars["gentoo.cvs"]);
+    if (not vars["userinfo"].empty())
+        optset("userinfo", std::string, vars["userinfo"]);
     if (not vars["use.devaway"].empty())
     {
 	s = vars["use.devaway"];
