@@ -72,7 +72,7 @@ options_T::option_map_T::set_defaults()
 
     insopt("localstatedir", std::string(LOCALSTATEDIR)+"/herdstat");
     insopt("herds.xml", std::string());
-    insopt("devaway.location", std::string(""));
+    insopt("devaway.location", std::string());
 
     insopt("with-herd", std::string());
     insopt("with-maintainer", std::string());

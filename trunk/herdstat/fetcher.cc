@@ -30,7 +30,7 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/fetcher.hh>
 
-fetcher::fetcher(const std::string &url,
+Fetcher::Fetcher(const std::string &url,
                  const std::string &path) throw(FetchException)
 {
     if (this->fetch(url, path) != EXIT_SUCCESS)
@@ -38,7 +38,7 @@ fetcher::fetcher(const std::string &url,
 }
 
 void
-fetcher::operator() (const std::string &url,
+Fetcher::operator() (const std::string &url,
                      const std::string &path) const throw(FetchException)
 {
     if (this->fetch(url, path) != EXIT_SUCCESS)
@@ -46,7 +46,7 @@ fetcher::operator() (const std::string &url,
 }
 
 int
-fetcher::fetch(const std::string &url,
+Fetcher::fetch(const std::string &url,
                const std::string &path) const throw(FetchException)
 {
     /* ensure we have write access to the directory */

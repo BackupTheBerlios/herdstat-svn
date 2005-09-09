@@ -80,7 +80,7 @@ display_herd(const Herd& herd)
 static void
 display_herds(const Herds& herds)
 {
-
+    throw Exception("not implemented yet!");
 }
 
 /*
@@ -91,14 +91,16 @@ display_herds(const Herds& herds)
 int
 action_herd_handler_T::operator() (opts_type &opts)
 {
-    herdsxml.fetch(optget("herds.xml", std::string));
-    herdsxml.parse(optget("herds.xml", std::string));
+    if (herdsxml_path.empty())
+        herdsxml.fetch();
+    herdsxml.parse(herdsxml_path);
     const Herds& herds(herdsxml.herds());
 
     if (use_devaway)
     {
-        devaway.fetch(optget("devaway.location", std::string));
-        devaway.parse(optget("devaway.location", std::string));
+        if (devaway_path.empty())
+            devaway.fetch();
+        devaway.parse(devaway_path);
     }
 
     /* set format attributes */

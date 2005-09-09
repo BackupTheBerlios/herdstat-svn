@@ -1,6 +1,6 @@
 /*
  * herdstat -- src/action_away_handler.cc
- * $Id: action_away_handler.cc 508 2005-09-03 11:30:08Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -55,8 +55,9 @@ action_away_handler_T::display(Herd::iterator dev)
 int
 action_away_handler_T::operator() (opts_type &opts)
 {
-    devaway.fetch(optget("devaway.location", std::string));
-    devaway.parse(optget("devaway.location", std::string));
+    if (devaway_path.empty())
+        devaway.fetch();
+    devaway.parse(devaway_path);
     Herd& devs(devaway.devs());
     Herd::iterator d;
 
@@ -89,9 +90,10 @@ action_away_handler_T::operator() (opts_type &opts)
         flush();
         return EXIT_SUCCESS;
     }
-        
-    herdsxml.fetch(optget("herds.xml", std::string));
-    herdsxml.parse(optget("herds.xml", std::string));
+    
+    if (herdsxml_path.empty())
+        herdsxml.fetch();
+    herdsxml.parse(herdsxml_path);
 
     if (regex and opts.size() > 1)
     {

@@ -33,11 +33,11 @@ action_fetch_handler_T::operator() (opts_type &null)
     {
         optset("verbose", bool, true);
 
-        herdsxml.fetch(optget("herds.xml", std::string));
-        herdsxml.parse(optget("herds.xml", std::string));
+        herdsxml.fetch(herdsxml_path);
+        herdsxml.parse(herdsxml_path);
 
         if (use_devaway)
-            devaway.fetch(optget("devaway.location", std::string));
+            devaway.fetch(devaway_path);
     }
     catch (const FetchException)
     {

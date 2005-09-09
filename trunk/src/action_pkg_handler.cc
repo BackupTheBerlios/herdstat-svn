@@ -406,14 +406,16 @@ action_pkg_handler_T::operator() (opts_type &opts)
 	throw FileException(portdir);
 
     /* fetch/parse herds.xml for info lookup */
-    herdsxml.fetch(optget("herds.xml", std::string));
-    herdsxml.parse(optget("herds.xml", std::string));
+    if (herdsxml_path.empty())
+        herdsxml.fetch();
+    herdsxml.parse(herdsxml_path);
 
     /* fetch/parse devaway for marking away devs */
     if (use_devaway)
     {
-        devaway.fetch(optget("devaway.location", std::string));
-        devaway.parse(optget("devaway.location", std::string));
+        if (devaway_path.empty())
+            devaway.fetch();
+        devaway.parse(devaway_path);
     }
 
     /* setup with regex */

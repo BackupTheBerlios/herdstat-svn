@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/devaway_xml.cc
- * $Id: devaway_xml.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/file.hh>
 #include <herdstat/portage/devaway_xml.hh>
 
 namespace portage {
@@ -57,19 +58,25 @@ devaway_xml::parse(const std::string& path)
     if (not path.empty())
         this->set_path(path);
     else if (this->path().empty())
-        this->set_path(this->_local_default);
+        this->set_path(_local_default);
+
+    if (not util::is_file(this->path()))
+        throw FileException(this->path());
 
     this->parse_file(this->path().c_str());
 }
 /****************************************************************************/
 void
-devaway_xml::do_fetch(const std::string& path) const
+devaway_xml::do_fetch(const std::string& path) const throw (FetchException)
 {
+    _fetch(_remote_default, (path.empty() ? _local_default : path));
 }
 /****************************************************************************/
 void
 devaway_xml::fill_developer(Developer& dev) const
 {
+    assert(not dev.user().empty());
+
     Herd::const_iterator d = _devs.find(dev);
     if (d != _devs.end())
     {

@@ -44,14 +44,16 @@ action_stats_handler_T::operator() (opts_type &null)
 {
     optset("quiet", bool, false);
 
-    herdsxml.fetch(optget("herds.xml", std::string));
-    herdsxml.parse(optget("herds.xml", std::string));
+    if (herdsxml_path.empty())
+        herdsxml.fetch();
+    herdsxml.parse(herdsxml_path);
     const Herds& herds(herdsxml.herds());
 
     if (use_devaway)
     {
-        devaway.fetch(optget("devaway.location", std::string));
-        devaway.parse(optget("devaway.location", std::string));
+        if (devaway_path.empty())
+            devaway.fetch();
+        devaway.parse(devaway_path);
     }
 
     /* set format attributes */

@@ -40,17 +40,17 @@
  * File fetcher.
  */
 
-class fetcher : private noncopyable
+class Fetcher : private noncopyable
 {
     public:
         /// Default constructor.
-        fetcher() { }
+        Fetcher() { }
 
         /** Constructor.
          * @param url Remote URL.
          * @param path Local path.
          */
-        fetcher(const std::string &url,
+        Fetcher(const std::string &url,
                 const std::string &path) throw (FetchException);
 
         /** Fetch remote url, saving as local path.
@@ -70,7 +70,7 @@ class fetcher : private noncopyable
 };
 
 inline void
-fetcher::set_options(const std::string &opts) const
+Fetcher::set_options(const std::string &opts) const
 {
     _opts.assign(opts);
 }

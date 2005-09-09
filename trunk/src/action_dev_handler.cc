@@ -97,15 +97,17 @@ action_dev_handler_T::display(const std::string &dev)
 int
 action_dev_handler_T::operator() (opts_type &devs)
 {
-    herdsxml.fetch(optget("herds.xml", std::string));
-    herdsxml.parse(optget("herds.xml", std::string));
+    if (herdsxml_path.empty())
+        herdsxml.fetch();
+    herdsxml.parse(herdsxml_path);
     const Herds& herds(herdsxml.herds());
     Herds::const_iterator h;
 
     if (use_devaway)
     {
-        devaway.fetch(optget("devaway.location", std::string));
-        devaway.parse(optget("devaway.location", std::string));
+        if (devaway_path.empty())
+            devaway.fetch();
+        devaway.parse(devaway_path);
     }
 
     /* set format attributes */

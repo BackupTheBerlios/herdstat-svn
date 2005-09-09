@@ -34,10 +34,14 @@
 
 #include <herdstat/fetcher.hh>
 
+/**
+ * Abstract base for fetchable things.
+ */
+
 class fetchable
 {
     public:
-        virtual void fetch(const std::string& path = "") const
+        void fetch(const std::string& path = "") const
         {
             if (this->_fetched)
                 return;
@@ -46,14 +50,19 @@ class fetchable
         }
 
         bool fetched() const { return _fetched; }
+        const Fetcher& fetcher() const { return _fetch; }
 
     protected:
         fetchable() : _fetch(), _fetched(false) { }
         virtual ~fetchable() { }
 
-        virtual void do_fetch(const std::string& path = "") const = 0;
+        /** Does the actual fetching.
+         * @param path local path to save.
+         */
+        virtual void do_fetch(const std::string& path = "") const
+            throw (FetchException) = 0;
 
-        const fetcher _fetch;
+        const Fetcher _fetch;
 
     private:
         mutable bool _fetched;

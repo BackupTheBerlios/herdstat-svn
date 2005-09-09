@@ -45,7 +45,7 @@ AM_INIT_AUTOMAKE(herdstat, $VERSION_FULL)
 
 test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
 test x$sysconfdir = "xNONE" && sysconfdir="$ac_default_sysconfdir"
-AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir", [Local state directory])
+AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir", [System configuration directory])
 
 AC_PATH_PROGS(_WGET, wget)

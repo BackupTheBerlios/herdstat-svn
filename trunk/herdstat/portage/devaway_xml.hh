@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/devaway_xml.hh
- * $Id: devaway_xml.hh 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -64,7 +64,8 @@ namespace portage {
             virtual bool end_element(const std::string& name);
             virtual bool text(const std::string& text);
 
-            virtual void do_fetch(const std::string& path = "") const;
+            virtual void do_fetch(const std::string& path = "") const
+                throw (FetchException);
 
         private:
             Herd _devs;

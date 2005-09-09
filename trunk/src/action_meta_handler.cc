@@ -217,8 +217,9 @@ action_meta_handler_T::operator() (opts_type &opts)
 
     if (use_devaway)
     {
-        devaway.fetch(optget("devaway.location", std::string));
-        devaway.parse(optget("devaway.location", std::string));
+        if (not devaway_path.empty())
+            devaway.fetch(devaway_path);
+        devaway.parse(devaway_path);
     }
 
     output.set_maxlabel(16);

@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/userinfo_xml.cc
- * $Id: userinfo_xml.cc 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/file.hh>
 #include <herdstat/portage/userinfo_xml.hh>
 
 namespace portage {
@@ -54,15 +55,15 @@ userinfo_xml::~userinfo_xml()
 void
 userinfo_xml::parse(const std::string& path)
 {
-    if (not path.empty())
-        this->set_path(path);
-
+    if (not path.empty()) this->set_path(path);
+    if (not util::is_file(this->path())) throw FileException(this->path());
     this->parse_file(this->path().c_str());
 }
 /****************************************************************************/
 void
 userinfo_xml::fill_developer(Developer& dev) const
 {
+    assert(not dev.user().empty());
     Herd::const_iterator d = this->_devs.find(dev);
     if (d != this->_devs.end())
     {

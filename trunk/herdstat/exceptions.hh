@@ -1,6 +1,6 @@
 /*
  * herdstat -- herdstat/exceptions.hh
- * $Id: exceptions.hh 508 2005-09-03 11:30:08Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -78,7 +78,8 @@ class Exception : public BaseException
 
         Exception &operator= (const Exception &that)
         {
-            _buf = strdup(that._buf);
+            if (that._buf)
+                _buf = strdup(that._buf);
             _v = that._v;
             return *this;
         }
