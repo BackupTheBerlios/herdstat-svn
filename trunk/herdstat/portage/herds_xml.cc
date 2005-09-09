@@ -31,6 +31,8 @@
 #include <herdstat/xml/document.hh>
 #include <herdstat/portage/herds_xml.hh>
 
+#define HERDSXML_EXPIRE     86400
+
 namespace {
 
 using namespace portage;
@@ -145,7 +147,22 @@ herds_xml::parse(const std::string& path)
 void
 herds_xml::do_fetch(const std::string& path) const throw (FetchException)
 {
-    _fetch(_remote_default, (path.empty() ? _local_default : path));
+    char *result = NULL;
+
+    if (not path.empty())
+        this->set_path(path);
+    else if ((result = std::getenv("HERDS")))
+        this->set_path(result);
+    else if (this->path().empty())
+        this->set_path(_local_default);
+
+    util::stat_T herdsxml(this->path());
+    if (herdsxml.exists() and
+        ((std::time(NULL) - herdsxml.mtime()) < HERDSXML_EXPIRE) and
+        (herdsxml.size() > 0))
+        return;
+
+    _fetch(_remote_default, this->path());
 }
 /****************************************************************************/
 void

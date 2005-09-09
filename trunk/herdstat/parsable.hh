@@ -49,11 +49,11 @@ class parsable
         timer_type::size_type elapsed() const { return _timer.elapsed(); }
 
     protected:
-        void set_path(const std::string &path) { _path.assign(path); }
+        void set_path(const std::string &path) const { _path.assign(path); }
         timer_type& timer() { return _timer; }
 
     private:
-        std::string _path;              /* path to file */
+        mutable std::string _path;      /* path to file */
         timer_type  _timer;             /* timer object */
 };
 

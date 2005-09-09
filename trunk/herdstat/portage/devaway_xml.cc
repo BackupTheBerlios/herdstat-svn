@@ -29,6 +29,8 @@
 #include <herdstat/util/file.hh>
 #include <herdstat/portage/devaway_xml.hh>
 
+#define DEVAWAY_EXPIRE  86400
+
 namespace portage {
 /*** static members *********************************************************/
 const char * const devaway_xml::_local_default = LOCALSTATEDIR"/devaway.xml";
@@ -69,7 +71,18 @@ devaway_xml::parse(const std::string& path)
 void
 devaway_xml::do_fetch(const std::string& path) const throw (FetchException)
 {
-    _fetch(_remote_default, (path.empty() ? _local_default : path));
+    if (not path.empty())
+        this->set_path(path);
+    else if (this->path().empty())
+        this->set_path(_local_default);
+
+    util::stat_T devaway(this->path());
+    if (devaway.exists() and
+        ((std::time(NULL) - devaway.mtime()) < DEVAWAY_EXPIRE) and
+        (devaway.size() > 0))
+        return;
+
+    _fetch(_remote_default, this->path());
 }
 /****************************************************************************/
 void
