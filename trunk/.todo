@@ -4,20 +4,8 @@
     </title>
     <note priority="veryhigh" time="1125826145">
         Finish fixing broken code that inherits from std containers
-        <note priority="medium" time="1125826155">
-            herd_T
-        </note>
-        <note priority="medium" time="1125826159">
-            herds_T
-        </note>
-        <note priority="medium" time="1125826164">
-            dev_attrs_T
-        </note>
         <note priority="medium" time="1125826170">
             querycache_T
-        </note>
-        <note priority="medium" time="1125826184">
-            devaway_T
         </note>
         <note priority="medium" time="1125826191">
             pkgQuery_T
@@ -29,17 +17,11 @@
             file_T/dir_T classes
         </note>
     </note>
-    <note priority="veryhigh" time="1125912438">
-        Move portage-specific stuff into libportage.
-    </note>
     <note priority="high" time="1125826378">
         Add a userinfo_xml class.
         <note priority="veryhigh" time="1125826409">
             Have the -d flag also display info from userinfo.xml
         </note>
-    </note>
-    <note priority="high" time="1125826980">
-        Update devaway class to use new devaway.xml instead of devaway.html
     </note>
     <note priority="medium" time="1125835328">
         Idea: when -d is specified and /usr/share/fortune/gentoo-dev exists and the dev being requested has a quote in that file, randomly display one.
