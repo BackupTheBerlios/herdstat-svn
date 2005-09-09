@@ -38,7 +38,7 @@ namespace portage {
 
     /**
      * Represents ebuild variables.  This is really identical to vars_T,
-     * except it re-defines set_defaults() and inserts variables that should
+     * except it defines do_set_defaults() and inserts variables that should
      * be pre-existing (${PN}, ${P}, etc).
      */
 
@@ -49,7 +49,8 @@ namespace portage {
             ebuild_T(const std::string &path);
             virtual ~ebuild_T() { }
 
-            virtual void set_defaults();
+        protected:
+            virtual void do_set_defaults();
     };
 
 } // namespace portage

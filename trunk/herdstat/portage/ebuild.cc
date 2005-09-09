@@ -41,7 +41,7 @@ ebuild_T::ebuild_T(const std::string &path) : util::vars_T(path)
 }
 /****************************************************************************/
 void
-ebuild_T::set_defaults()
+ebuild_T::do_set_defaults()
 {
     /* insert its variable components
      * (${P}, ${PN}, ${PV}, etc) into our map */

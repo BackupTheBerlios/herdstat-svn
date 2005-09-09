@@ -84,7 +84,7 @@ namespace util
             virtual void read(const std::string &p);
 
             /// Set default variables to be present before substitution.
-            virtual void set_defaults() { }
+            void set_defaults();
 
             iterator begin() { return _vars.begin(); }
             const_iterator begin() const { return _vars.begin(); }
@@ -106,6 +106,9 @@ namespace util
             void erase(iterator begin, iterator end)
             { return _vars.erase(begin, end); }
             void clear() { _vars.clear(); }
+
+        protected:
+            virtual void do_set_defaults() { }
 
         private:
             /** Perform elementary variable substitution.

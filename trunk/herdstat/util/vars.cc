@@ -29,21 +29,23 @@
 #include <cassert>
 
 #include <herdstat/exceptions.hh>
+#include <herdstat/util/misc.hh>
 #include <herdstat/util/vars.hh>
 
+namespace util {
 /****************************************************************************/
-util::vars_T::vars_T() : _depth(0)
+vars_T::vars_T() : _depth(0)
 {
 }
 /****************************************************************************/
-util::vars_T::vars_T(const std::string &path)
+vars_T::vars_T(const std::string &path)
     : base_file_T(path), _depth(0)
 {
     this->read();
 }
 /****************************************************************************/
 void
-util::vars_T::dump(std::ostream &stream) const
+vars_T::dump(std::ostream &stream) const
 {
     const_iterator i;
     for (i = this->begin() ; i != this->end() ; ++i)
@@ -51,10 +53,28 @@ util::vars_T::dump(std::ostream &stream) const
 }
 /****************************************************************************/
 void
-util::vars_T::read(const std::string &path)
+vars_T::read(const std::string &path)
 {
     this->stat().assign(path);
     this->read();
+}
+/****************************************************************************/
+void
+vars_T::set_defaults()
+{
+    char *result = std::getenv("HOME");
+    if (result)
+        this->insert(std::make_pair("HOME", result));
+    else
+    {
+        std::string home("/home/");
+        home += current_user();
+        if (is_dir(home))
+            this->insert(std::make_pair("HOME", home));
+    }
+
+    /* for derivatives to define their own defaults */
+    this->do_set_defaults();
 }
 /****************************************************************************
  * Read from our stream, saving any VARIABLE=["']value['"]
@@ -63,7 +83,7 @@ util::vars_T::read(const std::string &path)
  * scripts or VARIABLE=value-type configuration files.
  ****************************************************************************/
 void
-util::vars_T::read()
+vars_T::read()
 {
     if (not this->is_open())
         this->open();
@@ -122,7 +142,7 @@ util::vars_T::read()
  * recursively calling ourselves each time we find another occurrence.
  ****************************************************************************/
 void
-util::vars_T::subst(std::string &value)
+vars_T::subst(std::string &value)
 {
 
     std::vector<std::string> vars;
@@ -178,5 +198,7 @@ util::vars_T::subst(std::string &value)
             value.replace(pos, var.length(), subst, 0, subst.length());
     }
 }
+/****************************************************************************/
+} // namespace util
 
 /* vim: set tw=80 sw=4 et : */
