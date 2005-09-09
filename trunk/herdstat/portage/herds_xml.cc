@@ -162,6 +162,7 @@ herds_xml::fill_developer(Developer& dev) const
         {
             if (dev.name().empty() and not d->name().empty())
                 dev.set_name(d->name());
+            dev.set_email(d->email());
             dev.append_herd(h->name());
         }
     }
