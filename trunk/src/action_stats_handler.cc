@@ -79,7 +79,7 @@ action_stats_handler_T::operator() (opts_type &null)
 
         /* add one to the number of herds the current dev is in */
         for (d = h->begin() ; d != h->end() ; ++d)
-            ++herds_per_dev[d->name()];
+            ++herds_per_dev[d->user()];
 
         /* is the size of this herd bigger than the previous biggest herd */
         if (h->size() > biggest_herd)
