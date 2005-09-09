@@ -61,8 +61,13 @@ display_metadata(const metadata_data& data)
 
     if (optget("quiet", bool))
     {
+        std::vector<std::string> qdevs;
+        Developers::const_iterator d;
+        for (d = devs.begin() ; d != devs.end() ; ++d)
+            qdevs.push_back(d->email());
+
         if (devs.size() >= 1)
-            output("", devs);
+            output("", qdevs);
         else if (not meta.is_category())
             output("", "none");
     }

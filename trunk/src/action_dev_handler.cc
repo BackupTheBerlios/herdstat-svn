@@ -38,11 +38,15 @@ using namespace portage;
  */
 
 void
-action_dev_handler_T::display(const std::string &dev)
+action_dev_handler_T::display(const std::string &d)
 {
-    Developer d(dev);
-    herdsxml.fill_developer(d);
-    const std::vector<std::string>& herds(d.herds());
+    Developer dev(d);
+    herdsxml.fill_developer(dev);
+    devaway.fill_developer(dev);
+    userinfo.fill_developer(dev);
+    
+    std::vector<std::string> herds(dev.herds());
+    std::sort(herds.begin(), herds.end());
 
     /* was the dev in any of the herds? */
     if (herds.empty())
@@ -50,14 +54,15 @@ action_dev_handler_T::display(const std::string &dev)
 
     if (not quiet)
     {
-        if (d.name().empty())
-            output("Developer", dev);
+        if (dev.name().empty())
+            output("Developer", d);
         else
-            output("Developer", d.name() + " (" + dev + ")");
+            output("Developer", dev.name() + " (" + d + ")");
         
-        output("Email", d.email());
+        output("Email", dev.email());
     }
 
+    /* display herds */
     if (verbose and not quiet)
     {
         output(util::sprintf("Herds(%d)", herds.size()), "");
@@ -87,6 +92,24 @@ action_dev_handler_T::display(const std::string &dev)
         output(util::sprintf("Herds(%d)", herds.size()), herds);
 
     size += herds.size();
+
+    if (not quiet)
+    {
+        if (not dev.pgpkey().empty())
+            output("PGP Key ID", dev.pgpkey());
+        if (not dev.joined().empty())
+            output("Joined Date", dev.joined());
+        if (not dev.birthday().empty())
+            output("Birth Date", dev.birthday());
+        if (not dev.status().empty())
+            output("Status", dev.status());
+        if (not dev.role().empty())
+            output("Roles", dev.role());
+        if (not dev.location().empty())
+            output("Location", dev.location());
+        if (dev.is_away() and not dev.awaymsg().empty())
+            output("Devaway", dev.awaymsg());
+    }
 }
 
 /*
@@ -97,18 +120,25 @@ action_dev_handler_T::display(const std::string &dev)
 int
 action_dev_handler_T::operator() (opts_type &devs)
 {
+    /* herds.xml */
     if (herdsxml_path.empty())
         herdsxml.fetch();
     herdsxml.parse(herdsxml_path);
+
     const Herds& herds(herdsxml.herds());
     Herds::const_iterator h;
 
+    /* devaway.xml */
     if (use_devaway)
     {
         if (devaway_path.empty())
             devaway.fetch();
         devaway.parse(devaway_path);
     }
+
+    /* userinfo.xml */
+    if (not userinfo_path.empty())
+        userinfo.parse(userinfo_path);
 
     /* set format attributes */
     output.set_maxlabel(all ? 16 : 12);

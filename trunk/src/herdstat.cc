@@ -480,6 +480,17 @@ main(int argc, char **argv)
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
 	    throw argsException();
 
+	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
+	if (not optget("gentoo.cvs", std::string).empty())
+	{
+	    const std::string gentoocvs(optget("gentoo.cvs", std::string));
+	    if (not util::is_dir(gentoocvs))
+		throw FileException(gentoocvs);
+
+	    optset("herds.xml", std::string, gentoocvs+"/gentoo/misc/herds.xml");
+	    optset("userinfo", std::string, gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
+	}
+
 	/* initialize XML stuff */
 	xml::Init init(optget("qa", bool));
 

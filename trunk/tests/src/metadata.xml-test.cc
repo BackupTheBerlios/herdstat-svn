@@ -42,7 +42,7 @@ main(int argc, char **argv)
         std::string path(argv[1]);
         metadata_xml meta(path);
         const Herds& herds = meta.herds();
-        const Herd&  devs  = meta.devs();
+        const Developers&  devs  = meta.devs();
 
         std::cout << "herds: ";
         for (Herds::const_iterator i = herds.begin() ; i != herds.end() ; ++i)
@@ -50,7 +50,7 @@ main(int argc, char **argv)
         std::cout << std::endl;
 
         std::cout << "devs: ";
-        for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
+        for (Developers::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
             std::cout << i->user() << " ";
         std::cout << std::endl;
     }

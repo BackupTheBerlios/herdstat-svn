@@ -27,16 +27,20 @@
 # include "config.h"
 #endif
 
+#include <herdstat/portage/userinfo_xml.hh>
 #include "action_handler.hh"
 
 class action_dev_handler_T : public action_herds_xml_handler_T
 {
     public:
+        action_dev_handler_T() : userinfo_path(optget("userinfo", std::string)) { }
         virtual ~action_dev_handler_T() { }
         virtual int operator() (opts_type &);
 
     private:
         void display(const std::string &);
+        const std::string userinfo_path;
+        portage::userinfo_xml userinfo;
 };
 
 #endif

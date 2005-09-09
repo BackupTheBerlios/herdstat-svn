@@ -67,7 +67,10 @@ userinfo_xml::fill_developer(Developer& dev) const
     Herd::const_iterator d = this->_devs.find(dev);
     if (d != this->_devs.end())
     {
-        dev.set_status(d->status());
+        if (dev.email().empty() and not d->email().empty())
+            dev.set_email(d->email());
+
+        dev.set_status(d->status().empty() ? "active" : d->status());
         dev.set_location(d->location());
         dev.set_joined(d->joined());
         dev.set_birthday(d->birthday());
@@ -86,6 +89,11 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
             throw Exception("<user> tag with no username attribute!");
 
         Developer dev(pos->second);
+        if (dev.email().empty())
+            dev.set_email(pos->second+"@gentoo.org");
+        if (dev.status().empty())
+            dev.set_status("active");
+
         _devs.push_back(dev);
         _cur_dev = _devs.end() - 1;
         assert(_cur_dev != _devs.end());

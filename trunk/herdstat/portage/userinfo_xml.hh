@@ -1,6 +1,6 @@
 /*
  * herdstat -- portage/userinfo_xml.hh
- * $Id: userinfo_xml.hh 520 2005-09-05 11:59:58Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -51,7 +51,7 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const;
 
-            const Herd& devs() const;
+            const Developers& devs() const;
 
         protected:
             virtual bool start_element(const std::string& name,
@@ -60,7 +60,7 @@ namespace portage {
             virtual bool text(const std::string& text);
 
         private:
-            Herd _devs;
+            Developers _devs;
             static const char * const _local_default;
 
             bool in_user,
@@ -74,10 +74,10 @@ namespace portage {
                  in_status,
                  in_location;
 
-            Herd::iterator _cur_dev;
+            Developers::iterator _cur_dev;
     };
 
-    inline const Herd& userinfo_xml::devs() const { return _devs; }
+    inline const Developers& userinfo_xml::devs() const { return _devs; }
 
 } // namespace portage
 

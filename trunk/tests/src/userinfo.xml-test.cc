@@ -44,11 +44,11 @@ main(int argc, char **argv)
         std::string dev(argv[2]);
 
         userinfo_xml userinfo(path);
-        const Herd& devs = userinfo.devs();
+        const Developers& devs = userinfo.devs();
 
         std::cout << "Size: " << devs.size() << std::endl;
 
-        Herd::const_iterator i = devs.find(dev);
+        Developers::const_iterator i = devs.find(dev);
         if (i == devs.end())
             throw Exception(dev + " doesn't seem to exist.");
 
