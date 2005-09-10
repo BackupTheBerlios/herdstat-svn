@@ -40,7 +40,8 @@ display_herd(const Herd& herd)
     formatter_T out;
     util::color_map_T color;
 
-    std::string user(util::current_user());
+    Herd devs(herd);
+    std::sort(devs.begin(), devs.end());
 
     if (not optget("quiet", bool))
     {
@@ -57,30 +58,61 @@ display_herd(const Herd& herd)
 
     if (optget("verbose", bool) and not optget("quiet", bool))
     {
-        for (Herd::const_iterator i = herd.begin() ; i != herd.end() ; ++i)
+        const std::string user(util::current_user());
+
+        for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
         {
             if ((i->user() == user) or not optget("color", bool))
-                out("", i->user());
+                out("", i->email());
             else
-                out("", color[blue] + i->user() + color[none]);
+                out("", color[blue] + i->email() + color[none]);
 
-            /* FIXME: display attributes (role, etc) */
+            if (not i->name().empty())
+                out("", i->name());
+            if (not i->role().empty())
+                out("", i->role());
+            if (not i->name().empty() or not i->role().empty())
+                out.endl();
         }
     }
 
     if ((not optget("verbose", bool) and not optget("quiet", bool)) or
-        (optget("verbose", bool) and optget("quiet", bool) and not
+        (not optget("verbose", bool) and optget("quiet", bool) and not
          optget("count", bool)))
     {
-        std::vector<std::string> devs(herd);
-        out(util::sprintf("Developers(%d)", herd.size()), devs);
+        std::vector<std::string> dvec(devs);
+        out(util::sprintf("Developers(%d)", dvec.size()), dvec);
     }
 }
 
 static void
 display_herds(const Herds& herds)
 {
-    throw Exception("not implemented yet!");
+    util::color_map_T color;
+    formatter_T out;
+
+    if (optget("verbose", bool) and not optget("quiet", bool))
+    {
+        out(util::sprintf("Herds(%d)", herds.size()), "");
+
+        Herds::size_type n = 1;
+        Herds::const_iterator h;
+        for (h = herds.begin() ; h != herds.end() ; ++h)
+        {
+            if (optget("color", bool))
+                out("", color[blue] + h->name() + color[none]);
+            else
+                out("", h->name());
+
+            if (not h->desc().empty())
+                out("", h->desc());
+
+            if (not optget("count", bool) and n != herds.size())
+                out.endl();
+        }
+    }
+    else if (not optget("count", bool))
+        out(util::sprintf("Herds(%d)", herds.size()), herds);
 }
 
 /*
@@ -133,7 +165,6 @@ action_herd_handler_T::operator() (opts_type &opts)
         
         opts.clear();
 
-        /* FIXME: use copy_if() ? */
         Herds::const_iterator h;
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {

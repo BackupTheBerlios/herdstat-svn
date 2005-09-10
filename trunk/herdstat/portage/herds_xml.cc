@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/xml/document.hh>
@@ -142,6 +143,9 @@ herds_xml::parse(const std::string& path)
         throw FileException(this->path());
 
     this->parse_file(this->path().c_str());
+
+    if (not _herds.empty())
+        std::sort(_herds.begin(), _herds.end());
 }
 /****************************************************************************/
 void
@@ -245,7 +249,7 @@ herds_xml::text(const std::string& text)
         assert(_cur_herd != _herds.end());
     }
     else if (in_herd_desc)
-        _cur_herd->set_desc(text);
+        _cur_herd->set_desc(util::tidy_whitespace(text));
     else if (in_herd_email)
         _cur_herd->set_email(text);        
     else if (in_maintaining_prj)
@@ -299,8 +303,7 @@ herds_xml::text(const std::string& text)
             mpHandler *handler = xml.handler();
 
             _cur_herd->insert(_cur_herd->end(),
-                    handler->devs.begin() + handler->devs.size() / 2,
-                    handler->devs.end());
+                    handler->devs.begin(), handler->devs.end());
         }
     }
     else if (in_maintainer_email)

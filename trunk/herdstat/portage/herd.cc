@@ -49,9 +49,11 @@ Herd::Herd(const std::vector<std::string>& devs)
 Herds&
 Herds::operator= (const std::vector<std::string>& herds)
 {
+    _herds.clear();
     std::vector<std::string>::const_iterator i;
     for (i = herds.begin() ; i != herds.end() ; ++i)
         _herds.push_back(Herd(*i));
+    std::sort(_herds.begin(), _herds.end());
     return *this;
 }
 /****************************************************************************/

@@ -74,13 +74,19 @@ display_metadata(const metadata_data& data)
     else
     {
         if (devs.size() >= 1)
-            output(util::sprintf("Maintainers(%d)", devs.size()), devs);
+        {
+//            std::vector<std::string> dvec;
+//            Developers::const_iterator d;
+//            for (d = devs.begin() ; d != devs.end() ; ++d)
+//                dvec.push_back(d->email());
+            output(util::sprintf("Maintainers(%d)", devs.size()), devs.front().email());
+        }
         
         if (devs.size() > 1)
         {
             Developers::const_iterator d;
             for (d = (devs.begin() + 1); d != devs.end() ; ++d)
-                output("", *d);
+                output("", d->email());
         }
         else if (not meta.is_category() and devs.empty())
             output("Maintainers(0)", "none");

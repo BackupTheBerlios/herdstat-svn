@@ -59,10 +59,10 @@ querycache_T::operator() (const pkgQuery_T &q)
 
         debug_msg("old query exists for '%s', so removing it",
             q.query.c_str());
-        this->erase(i);
+        this->_queries.erase(i);
     }
 
-    this->push_back(q);
+    this->_queries.push_back(q);
 }
 
 /*
@@ -79,8 +79,10 @@ querycache_T::load()
     querycache_xml.parse(this->_path);
     querycacheXMLHandler_T *handler = querycache_xml.handler();
 
-    std::copy(handler->queries.begin(), handler->queries.end(),
-        std::back_inserter(*this));
+    _queries.insert(_queries.end(),
+            handler->queries.begin(),
+            handler->queries.end());
+
 }
 
 /*
@@ -88,16 +90,13 @@ querycache_T::load()
  */
 
 static bool
-is_greater(pkgQuery_T q1, pkgQuery_T q2)
-{
-    return q1.date < q2.date;
-}
+greater_date(pkgQuery_T q1, pkgQuery_T q2) { return q1.date < q2.date; }
 
 void
 querycache_T::sort_oldest_to_newest()
 {
     /* sort by date */
-    std::stable_sort(this->begin(), this->end(), is_greater);
+    std::stable_sort(this->begin(), this->end(), greater_date);
 }
 
 /*
@@ -112,7 +111,7 @@ querycache_T::purge_old()
 
     /* while > querycache_MAX, erase the first (oldest) query */
     while (this->size() > static_cast<size_type>(this->_max))
-        this->erase(this->begin());
+        this->_queries.erase(this->begin());
 }
 
 void
@@ -266,26 +265,6 @@ querycache_T::dump()
     {
         throw Exception("Failed to write xml file: %s", this->_path.c_str());
     }
-}
-
-/*
- * Has the specified pkgQuery_T object expired?
- */
-
-bool
-querycache_T::is_expired(const pkgQuery_T &q) const
-{
-    return ((std::time(NULL) - q.date) > this->_expire);
-}
-
-/*
- * Find a pkgQuery_T object.
- */
-
-querycache_T::iterator
-querycache_T::find(const pkgQuery_T &q)
-{
-    return std::find(this->begin(), this->end(), q);
 }
 
 /*

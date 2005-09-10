@@ -54,6 +54,11 @@ namespace portage {
             operator std::vector<Herd>() const;
 
             const Herds& herds() const;
+            Herds& herds();
+
+            /* convienence */
+            Herds::size_type size() const;
+            bool empty() const;
 
         protected:
             virtual bool start_element(const std::string &name,
@@ -86,6 +91,9 @@ namespace portage {
 
     inline herds_xml::operator std::vector<Herd>() const { return _herds; }
     inline const Herds& herds_xml::herds() const { return _herds; }
+    inline Herds& herds_xml::herds() { return _herds; }
+    inline bool herds_xml::empty() const { return _herds.empty(); }
+    inline Herds::size_type herds_xml::size() const { return _herds.size(); }
 
 } // namespace portage
 

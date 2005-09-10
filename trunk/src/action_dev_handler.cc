@@ -41,15 +41,16 @@ void
 action_dev_handler_T::display(const std::string &d)
 {
     Developer dev(d);
+
+    /* fill Developer object with data from each respective XML file */
     herdsxml.fill_developer(dev);
     devaway.fill_developer(dev);
     userinfo.fill_developer(dev);
     
     std::vector<std::string> herds(dev.herds());
-    std::sort(herds.begin(), herds.end());
 
-    /* was the dev in any of the herds? */
-    if (herds.empty())
+    /* bail if userinfo.xml wasn't used and dev is not in any herds */
+    if (userinfo.empty() and herds.empty())
         throw DevException();
 
     if (not quiet)
@@ -62,39 +63,51 @@ action_dev_handler_T::display(const std::string &d)
         output("Email", dev.email());
     }
 
-    /* display herds */
-    if (verbose and not quiet)
+    if (herds.empty())
     {
-        output(util::sprintf("Herds(%d)", herds.size()), "");
-
-        std::vector<std::string>::const_iterator i;
-        std::vector<std::string>::size_type nh = 1;
-        for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
-        {
-            /* display herd */
-            if (optget("color", bool))
-                output("", color[blue] + (*i) + color[none]);
-            else
-                output("", *i);
-                        
-            /* display herd info */
-            Herds::const_iterator h = herdsxml.herds().find(*i);
-            if (not h->email().empty())
-                output("", h->email());
-            if (not h->desc().empty())
-                output("", h->desc());
-
-            if (nh != herds.size())
-                output.endl();
-        }
+        if (not count)
+            output("Herds(0)", "none");
     }
-    else if (not count)
-        output(util::sprintf("Herds(%d)", herds.size()), herds);
+    else
+    {
+        std::sort(herds.begin(), herds.end());
 
-    size += herds.size();
+        if (verbose and not quiet)
+        {
+            output(util::sprintf("Herds(%d)", herds.size()), "");
+
+            std::vector<std::string>::const_iterator i;
+            std::vector<std::string>::size_type nh = 1;
+            for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
+            {
+                /* display herd */
+                if (optget("color", bool))
+                    output("", color[blue] + (*i) + color[none]);
+                else
+                    output("", *i);
+                        
+                /* display herd info */
+                Herds::const_iterator h = herdsxml.herds().find(*i);
+                if (not h->email().empty())
+                    output("", h->email());
+                if (not h->desc().empty())
+                    output("", h->desc());
+
+                if (nh != herds.size())
+                    output.endl();
+            }
+        }
+        else if (not count)
+            output(util::sprintf("Herds(%d)", herds.size()), herds);
+
+        size += herds.size();
+    }
 
     if (not quiet)
     {
+        if (not herds.empty() and verbose and not userinfo.empty())
+            output.endl();
+
         if (not dev.pgpkey().empty())
             output("PGP Key ID", dev.pgpkey());
         if (not dev.joined().empty())
@@ -118,7 +131,7 @@ action_dev_handler_T::display(const std::string &d)
  */
 
 int
-action_dev_handler_T::operator() (opts_type &devs)
+action_dev_handler_T::operator() (opts_type &opts)
 {
     /* herds.xml */
     if (herdsxml_path.empty())
@@ -163,12 +176,13 @@ action_dev_handler_T::operator() (opts_type &devs)
             }
         }
 
-        display_herd(Herd(all_devs));
-        size = all_devs.size();
+        Herd herd(all_devs);
+        display_herd(herd);
+        size = herd.size();
         flush();
         return EXIT_SUCCESS;
     }
-    else if (regex and devs.size() > 1)
+    else if (regex and opts.size() > 1)
     {
         std::cerr << "You may only specify one regular expression."
             << std::endl;
@@ -176,8 +190,8 @@ action_dev_handler_T::operator() (opts_type &devs)
     }
     else if (regex)
     {
-        util::regex_T::string_type re(devs.front());
-        devs.clear();
+        util::regex_T::string_type re(opts.front());
+        opts.clear();
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
@@ -189,24 +203,24 @@ action_dev_handler_T::operator() (opts_type &devs)
         {
             Herd::const_iterator d = h->find(regexp);
             if (d != h->end())
-                devs.push_back(d->user());
+                opts.push_back(d->user());
         }
 
-        if (devs.empty())
+        if (opts.empty())
         {
             std::cerr << "Failed to find any developers matching '" << re
                 << "'." << std::endl;
             return EXIT_FAILURE;
         }
 
-        std::sort(devs.begin(), devs.end());
-        devs.erase(std::unique(devs.begin(), devs.end()), devs.end());
+        std::sort(opts.begin(), opts.end());
+        opts.erase(std::unique(opts.begin(), opts.end()), opts.end());
     }
 
     /* for each specified dev... */
     opts_type::iterator dev;
     opts_type::size_type n = 1;
-    for (dev = devs.begin() ; dev != devs.end() ;  ++dev, ++n)
+    for (dev = opts.begin() ; dev != opts.end() ;  ++dev, ++n)
     {
         try
         {
@@ -217,14 +231,14 @@ action_dev_handler_T::operator() (opts_type &devs)
             std::cerr << "Developer '" << *dev << "' doesn't seem to "
                 << "belong to any herds." << std::endl;
 
-            if (devs.size() == 1)
+            if (opts.size() == 1)
                 return EXIT_FAILURE;
             else
                 continue;
         }
 
         /* skip a line if we're not displaying the last one */
-        if (not count and n != devs.size())
+        if (not count and n != opts.size())
             output.endl();
     }
 

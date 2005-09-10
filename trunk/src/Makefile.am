@@ -28,7 +28,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   action_versions_handler.hh action_versions_handler.cc \
 		   herdstat.cc
 
-herdstat_LDADD = $(top_builddir)/herdstat/libherdstat.la @xmlwrapp_LIBS@
+herdstat_LDADD = $(top_builddir)/herdstat/libherdstat.la
 
 if DEBUG
 bin_PROGRAMS += querycachectl
@@ -41,7 +41,7 @@ querycachectl_SOURCES = common.hh common.cc \
 			querycache.hh querycache.cc \
 			querycache_xml_handler.hh querycache_xml_handler.cc \
 			querycachectl.cc
-querycachectl_LDADD = $(top_builddir)/herdstat/libherdstat.la @xmlwrapp_LIBS@
+querycachectl_LDADD = $(top_builddir)/herdstat/libherdstat.la
 endif
 
 MAINTAINERCLEANFILES = Makefile.in *~

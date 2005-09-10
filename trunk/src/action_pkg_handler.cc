@@ -147,20 +147,21 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
         /* parse it's metadata.xml */
         const std::string path(portdir + "/" + *i + "/metadata.xml");
         const metadata_xml mxml(path);
-        const metadata& meta(mxml);
+        metadata meta(mxml);
+        meta.set_pkg(*i);
 
         /* does it match the criteria? */
         if (not metadata_matches(meta, q.query))
             continue;
 
         /* yep, so save it */
-        q[meta.pkg()] = meta.longdesc();
+        q.insert(std::make_pair(meta.pkg(), meta.longdesc()));
     }
 
     /* cache it */
     querycache(q);
     /* save it in results map */
-    matches[q.query] = new pkgQuery_T(q);
+    matches.insert(std::make_pair(q.query, new pkgQuery_T(q)));
 }
 
 /*
@@ -189,13 +190,13 @@ action_pkg_handler_T::search(const opts_type &opts)
                 /* we've already inserted at least one package */
                 std::map<std::string, pkgQuery_T * >::iterator mpos;
                 if ((mpos = matches.find(*i)) != matches.end())
-                    (*(mpos->second))[m->pkg()] = m->longdesc();
+                    mpos->second->insert(std::make_pair(m->pkg(), m->longdesc()));
                 /* nope, so create a new query object */
                 else
                 {
                     matches[*i] = new pkgQuery_T(*i, with(), dev);
                     matches[*i]->date = std::time(NULL);
-                    (*(matches[*i]))[m->pkg()] = m->longdesc();
+                    matches[*i]->insert(std::make_pair(m->pkg(), m->longdesc()));
 
                     if (dev)
                     {

@@ -70,7 +70,7 @@ options_T::option_map_T::set_defaults()
 
     insopt("maxcol", static_cast<std::size_t>(78));
 
-    insopt("localstatedir", std::string(LOCALSTATEDIR)+"/herdstat");
+    insopt("localstatedir", std::string(LOCALSTATEDIR));
     insopt("gentoo.cvs", std::string());
     insopt("herds.xml", std::string());
     insopt("userinfo", std::string());

@@ -69,9 +69,17 @@ namespace portage {
              * @returns True if user name is equivelent.
              */
             bool operator== (const std::string& user) const;
-            bool operator== (const Developer& that) const;
+            bool operator== (const Developer& dev) const;
             bool operator!= (const std::string& user) const;
-            bool operator!= (const Developer& that) const;
+            bool operator!= (const Developer& dev) const;
+            bool operator>  (const std::string& user) const;
+            bool operator>  (const Developer& dev) const;
+            bool operator>= (const std::string& user) const;
+            bool operator>= (const Developer& dev) const;
+            bool operator<  (const std::string& user) const;
+            bool operator<  (const Developer& dev) const;
+            bool operator<= (const std::string& user) const;
+            bool operator<= (const Developer& dev) const;
 
             const std::string& user() const;
             const std::string& email() const;
@@ -124,6 +132,22 @@ namespace portage {
     { return not (*this == user); }
     inline bool Developer::operator!= (const Developer& that) const
     { return not (*this == that); }
+    inline bool Developer::operator<  (const std::string& user) const
+    { return (_user < user); }
+    inline bool Developer::operator<  (const Developer& dev) const
+    { return (_user < dev._user); }
+    inline bool Developer::operator<= (const std::string& user) const
+    { return (_user <= user); }
+    inline bool Developer::operator<= (const Developer& dev) const
+    { return (_user <= dev._user); }
+    inline bool Developer::operator>  (const std::string& user) const
+    { return (_user > user); }
+    inline bool Developer::operator>  (const Developer& dev) const
+    { return (_user > dev._user); }
+    inline bool Developer::operator>= (const std::string& user) const
+    { return (_user >= user); }
+    inline bool Developer::operator>= (const Developer& dev) const
+    { return (_user >= dev._user); }
 
     inline const std::string& Developer::user() const { return _user; }
     inline const std::string& Developer::email() const { return _email.str(); }
@@ -177,6 +201,8 @@ namespace portage {
             typedef container_type::const_iterator const_iterator;
             typedef container_type::value_type value_type;
             typedef container_type::size_type size_type;
+            typedef container_type::reference reference;
+            typedef container_type::const_reference const_reference;
 
             Developers();
             Developers(const std::vector<std::string>& v);
@@ -192,6 +218,10 @@ namespace portage {
             const_iterator begin() const;
             iterator end();
             const_iterator end() const;
+            reference front();
+            const_reference front() const;
+            reference back();
+            const_reference back() const;
             iterator find(const std::string& dev);
             const_iterator find(const std::string& dev) const;
             iterator find(const Developer& dev);
@@ -205,7 +235,6 @@ namespace portage {
             void push_back(const std::string& email);
             template <class In>
             void insert(iterator pos, In begin, In end);
-            const value_type& operator[](size_type pos) const;
 
         private:
             container_type _devs;
@@ -216,6 +245,10 @@ namespace portage {
     inline Developers::const_iterator Developers::begin() const { return _devs.begin(); }
     inline Developers::iterator Developers::end() { return _devs.end(); }
     inline Developers::const_iterator Developers::end() const { return _devs.end(); }
+    inline Developers::reference Developers::front() { return _devs.front(); }
+    inline Developers::const_reference Developers::front() const { return _devs.front(); }
+    inline Developers::reference Developers::back() { return _devs.back(); }
+    inline Developers::const_reference Developers::back() const { return _devs.back(); }
     inline Developers::size_type Developers::size() const { return _devs.size(); }
     inline bool Developers::empty() const { return _devs.empty(); }
     inline void Developers::clear() { return _devs.clear(); }
@@ -240,8 +273,6 @@ namespace portage {
     template <class In> inline void
     Developers::insert(iterator pos, In begin, In end)
     { _devs.insert(pos, begin, end); }
-    inline const Developers::value_type& Developers::operator[] (size_type pos) const
-    { return _devs[pos]; }
 
 
 } // namespace portage

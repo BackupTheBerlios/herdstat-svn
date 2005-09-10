@@ -53,6 +53,10 @@ namespace portage {
 
             const Developers& devs() const;
 
+            /* convenience */
+            Developers::size_type size() const;
+            bool empty() const;
+
         protected:
             virtual bool start_element(const std::string& name,
                                        const attrs_type& attrs);
@@ -78,6 +82,8 @@ namespace portage {
     };
 
     inline const Developers& userinfo_xml::devs() const { return _devs; }
+    inline Developers::size_type userinfo_xml::size() const { return _devs.size(); }
+    inline bool userinfo_xml::empty() const { return _devs.empty(); }
 
 } // namespace portage
 

@@ -52,15 +52,10 @@ namespace portage {
             void set_pkg(const std::string &pkg);
             void set_longdesc(const std::string &longdesc);
 
-//            bool dev_exists(const std::string &dev) const;
-//            bool dev_exists(const util::regex_T &re) const;
-//            bool herd_exists(const std::string &herd) const;
-//            bool herd_exists(const util::regex_T &re) const;
-
-            const Herds& herds() const;
-            const Developers& devs() const;
             Herds& herds();
+            const Herds& herds() const;
             Developers& devs();
+            const Developers& devs() const;
 
         private:
             friend class metadata_xml;

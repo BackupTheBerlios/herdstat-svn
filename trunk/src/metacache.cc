@@ -174,12 +174,14 @@ metacache_T::fill()
             if (status)
                 ++progress;
 
-            std::string path(this->_portdir + "/" + (*p) + "/metadata.xml");
+            const std::string path(this->_portdir + "/" + (*p) + "/metadata.xml");
             if (util::is_file(path))
             {
                 /* parse it */
                 const metadata_xml meta(path);
-                this->push_back(meta);
+                metadata data(meta);
+                data.set_pkg(*p);
+                this->push_back(data);
             }
         }
     }
@@ -220,7 +222,7 @@ metacache_T::load()
                 continue;
 
             std::string str;
-            metadata meta;
+            metadata meta(i->first);
             Herds& herds(meta.herds());
             Developers&  devs(meta.devs());
 
@@ -294,7 +296,7 @@ metacache_T::dump()
          */
 
         const Herds& herds(ci->herds());
-        const Developers&  devs(ci->devs());
+        const Developers& devs(ci->devs());
         std::string str;
         std::size_t n;
 
@@ -318,7 +320,7 @@ metacache_T::dump()
             Developers::const_iterator i, end = devs.end();
             for (i = devs.begin(), n = 1, str.clear() ; i != end ; ++i, ++n)
             {
-                str += *i;
+                str += i->email();
                 if (n != devs.size())
                     str += ",";
             }

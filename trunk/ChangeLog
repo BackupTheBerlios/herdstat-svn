@@ -1,5 +1,27 @@
 ChangeLog for herdstat
 
+2005-09-10 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/portage/herd.hh, herdstat/portage/developer.hh: Added
+	operators for <, <=, >, and >= so we can use standard sorting algos.
+	* src/action_dev_handler.cc: Don't bail in display() if userinfo.xml
+	is used and the developer is not in any herds.  This allows us to show
+	info on devs that exist in userinfo.xml but not in herds.xml.
+	* src/action_herd_handler.cc: Finished implemented display_herds().
+	Also finished up display_herd() so that it once again displays extra
+	info if --verbose.
+	* src/action_pkg_handler.cc: Use insert() method of matches map
+	instead of operator[]=.
+	* src/action_meta_handler.cc: Fixed display_metadata() to show full
+	email address instead of just user name.
+	* src/metacache.cc: Fixed bug in dump() that caused the package name
+	to not be written correctly.  Also, cache the full email address
+	instead of just the username, otherwise the user name may be
+	incorrectly assumed to be a developer.
+	* src/querycache.cc, src/querycache.hh: Don't inherit from std::vector
+	since a) we now know that's a no-no, and b) it's implemented in terms
+	of a vector, not is-a vector.
+
 2005-09-09 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/options.cc, src/rc.cc, src/herdstat.cc, doc/herdstat.1.in,

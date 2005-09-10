@@ -67,6 +67,8 @@ userinfo_xml::fill_developer(Developer& dev) const
     Herd::const_iterator d = this->_devs.find(dev);
     if (d != this->_devs.end())
     {
+        if (dev.name().empty() and not d->name().empty())
+            dev.set_name(d->name());
         if (dev.email().empty() and not d->email().empty())
             dev.set_email(d->email());
 
@@ -108,6 +110,7 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
         in_pgpkey = true;
     else if (name == "email")
     {
+        /* we only care about gentoo.org email addy's */
         if (attrs.find("gentoo") != attrs.end())
             in_email = true;
     }

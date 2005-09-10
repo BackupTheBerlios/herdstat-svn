@@ -62,9 +62,11 @@ Developers::Developers(const std::vector<std::string>& devs)
 Developers&
 Developers::operator= (const std::vector<std::string>& devs)
 {
+    _devs.clear();
     std::vector<std::string>::const_iterator i;
     for (i = devs.begin() ; i != devs.end() ; ++i)
         _devs.push_back(Developer(*i));
+    std::sort(_devs.begin(), _devs.end());
     return *this;
 }
 /****************************************************************************/

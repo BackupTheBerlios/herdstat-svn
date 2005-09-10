@@ -62,6 +62,14 @@ namespace portage {
             bool operator== (const Herd& herd) const;
             bool operator!= (const std::string& name) const;
             bool operator!= (const Herd& herd) const;
+            bool operator<  (const std::string& name) const;
+            bool operator<  (const Herd& herd) const;
+            bool operator>  (const std::string& name) const;
+            bool operator>  (const Herd& herd) const;
+            bool operator<= (const std::string& name) const;
+            bool operator<= (const Herd& herd) const;
+            bool operator>= (const std::string& name) const;
+            bool operator>= (const Herd& herd) const;
 
             const std::string& name() const;
             const std::string& email() const;
@@ -85,6 +93,22 @@ namespace portage {
     { return (_name != name); }
     inline bool Herd::operator!= (const Herd& herd) const
     { return (_name != herd._name); }
+    inline bool Herd::operator< (const std::string& name) const
+    { return (_name < name); }
+    inline bool Herd::operator< (const Herd& herd) const
+    { return (_name < herd._name); }
+    inline bool Herd::operator> (const std::string& name) const
+    { return (_name > name); }
+    inline bool Herd::operator> (const Herd& herd) const
+    { return (_name > herd._name); }
+    inline bool Herd::operator<= (const std::string& name) const
+    { return (_name <= name); }
+    inline bool Herd::operator<= (const Herd& herd) const
+    { return (_name <= herd._name); }
+    inline bool Herd::operator>= (const std::string& name) const
+    { return (_name >= name); }
+    inline bool Herd::operator>= (const Herd& herd) const
+    { return (_name >= herd._name); }
     inline const std::string& Herd::name() const { return _name; }
     inline const std::string& Herd::email() const { return _email.str(); }
     inline const std::string& Herd::desc() const { return _desc; }
@@ -125,13 +149,10 @@ namespace portage {
             const_reference front() const;
             reference back();
             const_reference back() const;
-
             size_type size() const;
             bool empty() const;
-
             void clear();
             void push_back(const Herd& h);
-
             iterator find(const std::string &herd);
             iterator find(const Herd& h);
             iterator find(const util::regex_T &regex);
@@ -141,8 +162,6 @@ namespace portage {
 
             template <class In>
             void insert(iterator pos, In begin, In end);
-
-//            const value_type& operator[] (size_type pos) const;
 
         private:
             container_type _herds;
@@ -183,9 +202,6 @@ namespace portage {
     template <class In> inline void
     Herds::insert(iterator pos, In begin, In end)
     { _herds.insert(pos, begin, end); }
-
-//    const Herds::value_type& Herds::operator[] (size_type pos) const
-//    { return _herds[pos]; }
 
 } // namespace portage
 
