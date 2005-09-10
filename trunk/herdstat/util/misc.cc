@@ -219,6 +219,7 @@ std::time_t
 util::str2epoch(const char *str, const char *fmt)
 {
     struct tm t;
+    std::cout << "str == '" << str << "'." << std::endl;
     char *p = strptime(str, fmt, &t);
     if (not p or (*p != '\0'))
         throw BadDate(str);

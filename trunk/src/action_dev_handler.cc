@@ -33,6 +33,22 @@
 
 using namespace portage;
 
+static const std::string
+get_joined_elapsed(const std::string& joined)
+{
+    std::time_t now = std::time(NULL);
+    std::cout << "now == " << now << std::endl;
+
+    std::time_t joined_date = util::str2epoch(joined.c_str(), "%d %b %Y");
+    std::cout << "then == " << joined_date << std::endl;
+
+    double seconds = std::difftime(now, joined_date);
+    std::cout << "difftime == " << seconds << std::endl;
+    std::cout << "diff == " << (now - joined_date) << std::endl;
+    std::cout << "years == " << util::stringify<float>(seconds/3153600) << std::endl;
+    return (util::stringify<float>(seconds/3153600)+" yrs");
+}
+
 /*
  * Display data for the specified developer.
  */
@@ -111,9 +127,14 @@ action_dev_handler_T::display(const std::string &d)
         if (not dev.pgpkey().empty())
             output("PGP Key ID", dev.pgpkey());
         if (not dev.joined().empty())
-            output("Joined Date", dev.joined());
+        {
+            const std::string elapsed(get_joined_elapsed(dev.joined()));
+            output("Joined Date", dev.joined() + " ("+elapsed+")");
+        }
         if (not dev.birthday().empty())
+        {
             output("Birth Date", dev.birthday());
+        }
         if (not dev.status().empty())
             output("Status", dev.status());
         if (not dev.role().empty())
