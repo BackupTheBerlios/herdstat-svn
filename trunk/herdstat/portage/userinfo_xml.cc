@@ -72,7 +72,7 @@ userinfo_xml::fill_developer(Developer& dev) const
         if (dev.email().empty() and not d->email().empty())
             dev.set_email(d->email());
 
-        dev.set_status(d->status().empty() ? "active" : d->status());
+        dev.set_status(d->status().empty() ? "Active" : d->status());
         dev.set_location(d->location());
         dev.set_joined(d->joined());
         dev.set_birthday(d->birthday());
@@ -94,7 +94,7 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
         if (dev.email().empty())
             dev.set_email(pos->second+"@gentoo.org");
         if (dev.status().empty())
-            dev.set_status("active");
+            dev.set_status("Active");
 
         _devs.push_back(dev);
         _cur_dev = _devs.end() - 1;
