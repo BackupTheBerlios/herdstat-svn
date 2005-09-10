@@ -164,6 +164,14 @@ class BadRegex : public Exception
          const regex_t *_re;
 };
 
+class BadDate : public Exception
+{
+    public:
+        BadDate() { }
+        BadDate(const char *msg) : Exception(msg) { }
+        BadDate(const std::string& msg) : Exception(msg) { }
+};
+
 class FetchException : public Exception
 {
     public:

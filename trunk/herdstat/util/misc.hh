@@ -84,6 +84,13 @@ namespace util
     const std::string format_date(const std::string &t,
         const char *f = "%a %b %d %T %Z %Y");
 
+    /** Get time_t value from date string.
+     * @param str time string.
+     * @param fmt format of time string.
+     * @returns value as time_t.
+     */
+    std::time_t str2epoch(const char *str, const char *fmt);
+
     /**
      * Color map.
      */

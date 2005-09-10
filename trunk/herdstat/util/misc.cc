@@ -1,6 +1,6 @@
 /*
  * herdstat -- lib/misc.cc
- * $Id: misc.cc 508 2005-09-03 11:30:08Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -28,12 +28,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <ctime>
 #include <unistd.h>
 
+#include <herdstat/exceptions.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/misc.hh>
-#include <herdstat/exceptions.hh>
 
 #ifdef HAVE_NCURSES
 # include <curses.h>
@@ -214,5 +215,15 @@ util::format_date(const std::string &epoch, const char *fmt)
     return format_date(std::strtol(epoch.c_str(), NULL, 10), fmt);
 }
 /****************************************************************************/
+std::time_t
+util::str2epoch(const char *str, const char *fmt)
+{
+    struct tm t;
+    char *p = strptime(str, fmt, &t);
+    if (not p or (*p != '\0'))
+        throw BadDate(str);
 
+    return std::mktime(&t);
+}
+/****************************************************************************/
 /* vim: set tw=80 sw=4 et : */
