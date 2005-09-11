@@ -61,6 +61,17 @@ class FormatException : public Exception
         virtual ~FormatException() throw() { }
 };
 
+class CleanupException : public Exception
+{
+    public:
+        CleanupException(int code) : _code(code) { }
+        virtual ~CleanupException() throw() { }
+        int exit_code() const { return _code; }
+
+    private:
+        int _code;
+};
+
 /* action handler exceptions */
 class ActionException : public BaseException { };
 class HerdException   : public ActionException { };

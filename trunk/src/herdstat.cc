@@ -465,8 +465,10 @@ int
 main(int argc, char **argv)
 {
     options_T options;
+    std::map<options_action_T, action_handler_T * > handlers;
+    std::ostream *outstream = NULL;
 
-    /* try to determine current columns, otherwise use default */
+    /* save column width */
     optset("maxcol", std::size_t, util::getcols());
 
     try
@@ -487,8 +489,11 @@ main(int argc, char **argv)
 	    if (not util::is_dir(gentoocvs))
 		throw FileException(gentoocvs);
 
-	    optset("herds.xml", std::string, gentoocvs+"/gentoo/misc/herds.xml");
-	    optset("userinfo", std::string, gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
+	    /* only set if it wasnt specified on the command line */
+	    if (optget("herds.xml", std::string).empty())
+		optset("herds.xml", std::string, gentoocvs+"/gentoo/misc/herds.xml");
+	    if (optget("userinfo", std::string).empty())
+		optset("userinfo", std::string, gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
 	}
 
 	/* initialize XML stuff */
@@ -512,7 +517,6 @@ main(int argc, char **argv)
 	}
 
 	/* setup output stream */
-	std::ostream *outstream = NULL;
 	if (optget("outfile", std::string) != "stdout" and
 	    optget("outfile", std::string) != "stderr")
 	{
@@ -561,14 +565,6 @@ main(int argc, char **argv)
 	output.add_highlight(util::get_user_from_email(util::current_user()));
 	
 	/* user-defined highlights */
-//        {
-//            const std::vector<std::string> hv(optget("highlights",
-//                std::string).split());
-//            std::vector<std::string>::const_iterator i;
-//            for (i = hv.begin() ; i != hv.end() ; ++i)
-//                output.add_highlight(*i);
-//        }
-
 	{
 	    const std::vector<std::string> hv(util::split(optget("highlights",
 		std::string)));
@@ -584,7 +580,6 @@ main(int argc, char **argv)
 	    optset("action", options_action_T, action_herd);
 
 	/* setup action handlers */
-	std::map<options_action_T, action_handler_T * > handlers;
 	handlers[action_herd]     = new action_herd_handler_T();
 	handlers[action_dev]      = new action_dev_handler_T();
 	handlers[action_pkg]      = new action_pkg_handler_T();
@@ -617,6 +612,9 @@ main(int argc, char **argv)
 	if (outstream)
 	    delete outstream;
 
+	std::map<options_action_T, action_handler_T * >::iterator m;
+	for (m = handlers.begin() ; m != handlers.end() ; ++m)
+	    if (m->second) delete m->second;
     }
     catch (const xml::ParserException &e)
     {

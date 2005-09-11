@@ -23,6 +23,9 @@ ChangeLog for herdstat
 	* src/action_dev_handler.cc: When -d all is specified and userinfo.xml
 	was parsed, insert any devs that are not in herds.xml but are in
 	userinfo.xml into the to-be-displayed container.
+	* src/herdstat.cc: If a gentoo cvs directory is specified, only set
+	herds.xml and userinfo.xml locations if the respective options were
+	not explicitly specified on the command-line.
 
 2005-09-10 Aaron Walker <ka0ttic@gentoo.org>
 
