@@ -2,6 +2,7 @@ ChangeLog for herdstat
 
 2005-09-11 Aaron Walker <ka0ttic@gentoo.org>
 
+	* configure.ac: Update version (1.1.2_alpha1).
 	* herdstat/portage/devaway.cc, herdstat/portage/devaway.hh,
 	src/action_away_handler.cc, tests/src/devaway.xml-test.cc: Use
 	Developers class to represent away devs rather than the Herd class.
