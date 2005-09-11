@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/portage_find.cc
+ * herdstat -- herdstat/portage/portage_find.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/misc.cc
+ * herdstat -- herdstat/util/misc.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

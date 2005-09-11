@@ -28,6 +28,7 @@
 #endif
 
 #include <xmlwrapp/event_parser.h>
+#include <herdstat/noncopyable.hh>
 #include <herdstat/xml/exceptions.hh>
 
 namespace xml {
@@ -49,7 +50,7 @@ namespace xml {
      * SAX2 Parser.
      */
 
-    class saxparser
+    class saxparser : private noncopyable
     {
         public:
             /** Constructor.

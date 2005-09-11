@@ -98,6 +98,7 @@ class EmailAddress
         virtual void parse(const std::string& email);
 
     private:
+        void set_email();
         std::string _email, _user, _domain;
 };
 
@@ -111,12 +112,16 @@ inline void EmailAddress::assign(const char * const email) { this->parse(email);
 inline const std::string& EmailAddress::user() const { return _user; }
 inline const std::string& EmailAddress::domain() const { return _domain; }
 inline const std::string& EmailAddress::str() const { return _email; }
-inline void EmailAddress::set_user(const std::string& user) { _user.assign(user); }
-inline void EmailAddress::set_user(const char * const user) { _user.assign(user); }
+inline void EmailAddress::set_user(const std::string& user)
+{ _user.assign(user); set_email(); }
+inline void EmailAddress::set_user(const char * const user)
+{ _user.assign(user); set_email(); }
 inline void EmailAddress::set_domain(const std::string& domain)
-{ _domain.assign(domain); }
+{ _domain.assign(domain); set_email(); }
 inline void EmailAddress::set_domain(const char * const domain)
-{ _domain.assign(domain); }
+{ _domain.assign(domain); set_email(); }
+inline void EmailAddress::set_email()
+{ _email = _user+"@"+_domain; }
 
 #endif /* _HAVE_EMAIL_ADDRESS_HH */
 

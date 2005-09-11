@@ -28,5 +28,5 @@ run_test() {
 run_herdstat() {
     local lsd="${srcdir:-.}/localstatedir"
     run_test "$(get_caller ${1})" "${2}" "${srcdir:-.}/../src/herdstat" \
-	"-L ${lsd} -A ${lsd}/devaway.html -H ${lsd}/herds.xml ${3}"
+	"-L ${lsd} -A ${lsd}/devaway.xml -H ${lsd}/herds.xml ${3}"
 }

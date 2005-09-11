@@ -39,8 +39,8 @@ class parsable
     public:
         typedef util::timer_T timer_type;
 
-        parsable() { }
-        parsable(const std::string &p) : _path(p) { }
+        parsable() : _path(), _timer() { }
+        parsable(const std::string &p) : _path(p), _timer() { }
         virtual ~parsable() { }
 
         virtual void parse(const std::string & = "") = 0;

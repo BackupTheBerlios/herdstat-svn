@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/file.cc
+ * herdstat -- herdstat/util/file.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -84,7 +84,7 @@ util::stat_T::operator() ()
 }
 /*****************************************************************************/
 util::base_fileobject_T::base_fileobject_T()
-    : _opened(false)
+    : _stat(), _opened(false)
 {
 }
 /*****************************************************************************/
@@ -162,7 +162,7 @@ util::base_file_T::close()
 }
 /*****************************************************************************/
 util::file_T::file_T(const std::string &path, std::ios_base::openmode mode)
-    : base_file_T(path, mode)
+    : base_file_T(path, mode), _contents()
 {
     this->read();
 }

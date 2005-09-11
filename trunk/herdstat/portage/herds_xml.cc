@@ -41,11 +41,12 @@ using namespace portage;
 /* any path's found inside a <maintainingproject> tag will be sprintf'd
  * into this for fetching. */
 static const char *mpBaseURL = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain";
+static const char *mpBaseLocal = "%s/gentoo/xml/htdocs/%s";
 
 class mpHandler : public xml::saxhandler
 {
     public:
-        mpHandler() : in_dev(false) { }
+        mpHandler() : devs(), in_dev(false), _cur_role() { }
         virtual ~mpHandler() { }
 
         Herd devs;
@@ -88,11 +89,7 @@ mpHandler::text(const std::string& text)
 {
     if (in_dev)
     {
-        std::string s(util::lowercase(text));
-        if (s.find('@') == std::string::npos)
-            s.append("@gentoo.org");
-
-        Developer dev(s.substr(0, s.find('@')), s);
+        Developer dev(util::lowercase(text));
         if (not _cur_role.empty())
             dev.set_role(_cur_role);
 
@@ -110,7 +107,7 @@ const char * const herds_xml::_local_default = LOCALSTATEDIR"/herds.xml";
 const char * const herds_xml::_remote_default = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 /****************************************************************************/
 herds_xml::herds_xml()
-    : xmlBase(), _herds(), in_herd(false), in_herd_name(false),
+    : xmlBase(), _herds(), _cvsdir(), in_herd(false), in_herd_name(false),
       in_herd_email(false), in_herd_desc(false), in_maintainer(false),
       in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
@@ -119,7 +116,7 @@ herds_xml::herds_xml()
 }
 /****************************************************************************/
 herds_xml::herds_xml(const std::string& path)
-    : xmlBase(path), _herds(), in_herd(false), in_herd_name(false),
+    : xmlBase(path), _herds(), _cvsdir(), in_herd(false), in_herd_name(false),
       in_herd_email(false), in_herd_desc(false), in_maintainer(false),
       in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
@@ -260,55 +257,71 @@ herds_xml::text(const std::string& text)
          * container.
          */
 
-        std::string url(util::sprintf(mpBaseURL, text.c_str()));
         std::string path(std::string(util::dirname(this->path()))+"/"+
                 _cur_herd->name()+".xml"); 
-        util::stat_T mps(path);
 
-        try
+        if (_cvsdir.empty())
         {
-            if (not mps.exists() or
+            std::string url(util::sprintf(mpBaseURL, text.c_str()));
+            util::stat_T mps(path);
+
+            try
+            {
+                if (not mps.exists() or
                     (mps.exists() and ((std::time(NULL) - mps.mtime()) > 592200)) or
                     (mps.size() == 0))
-            {
-                if (mps.exists())
-                    util::copy_file(path, path+".bak");
+                {
+                    if (mps.exists())
+                        util::copy_file(path, path+".bak");
 
-                _fetch(url, path);
+                    _fetch(url, path);
+
+                    if (not mps() or (mps.size() == 0))
+                        throw FetchException();
+
+                    unlink((path+".bak").c_str());
+                }
+            }
+            catch (const FetchException)
+            {
+                if (util::is_file(path+".bak"))
+                    util::move_file(path+".bak", path);
 
                 if (not mps() or (mps.size() == 0))
-                    throw FetchException();
-
-                unlink((path+".bak").c_str());
+                {
+                    unlink(path.c_str());
+                    return true;
+                }
             }
-        }
-        catch (const FetchException)
-        {
-            if (util::is_file(path+".bak"))
-                util::move_file(path+".bak", path);
 
-            if (not mps() or (mps.size() == 0))
+            if (not mps())
+                std::cerr << "Failed to save '" << url << "' to" << std::endl
+                    << "'" << path << "'." << std::endl;
+            else
             {
-                unlink(path.c_str());
-                return true;
+                xml::Document<mpHandler> xml(path);
+                mpHandler *handler = xml.handler();
+
+                _cur_herd->insert(_cur_herd->end(),
+                    handler->devs.begin(), handler->devs.end());
             }
         }
-
-        if (not mps())
-            std::cerr << "Failed to save '" << url << "' to" << std::endl
-                << "'" << path << "'." << std::endl;
         else
         {
-            xml::Document<mpHandler> xml(path);
-            mpHandler *handler = xml.handler();
-
-            _cur_herd->insert(_cur_herd->end(),
-                    handler->devs.begin(), handler->devs.end());
+            std::string cvspath(util::sprintf(mpBaseLocal, _cvsdir.c_str(),
+                        text.c_str()));
+            if (util::is_file(cvspath))
+            {
+                xml::Document<mpHandler> xml(cvspath);
+                mpHandler *handler = xml.handler();
+                _cur_herd->insert(_cur_herd->end(),
+                        handler->devs.begin(), handler->devs.end());
+            }
         }
     }
     else if (in_maintainer_email)
     {
-        std::string s(util::lowercase(text));
+        const std::string s(util::lowercase(text));
         _cur_herd->push_back(s);
         _cur_dev = _cur_herd->find(s);
         assert(_cur_dev != _cur_herd->end());

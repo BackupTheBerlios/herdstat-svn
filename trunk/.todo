@@ -2,31 +2,13 @@
     <title>
         Todo list for herdstat
     </title>
-    <note priority="veryhigh" time="1125826145">
-        Finish fixing broken code that inherits from std containers
-        <note priority="medium" time="1125826170">
-            querycache_T
-        </note>
-        <note priority="medium" time="1125826191">
-            pkgQuery_T
-        </note>
-    </note>
     <note priority="veryhigh" time="1125826740">
         Add more tests
         <note priority="medium" time="1125826774">
             file_T/dir_T classes
         </note>
     </note>
-    <note priority="veryhigh" time="1126341630">
-        query cron, query slarti, query cron - causes querycache.xml to only contain cron
-    </note>
     <note priority="low" time="1125827409">
         Get make distcheck working.
-    </note>
-    <note priority="verylow" time="1125835328">
-        Idea: when -d is specified and /usr/share/fortune/gentoo-dev exists and the dev being requested has a quote in that file, randomly display one.
-        <note priority="high" time="1125835699">
-            of course this would only work for folks whose dev/irc nicks are equivelent.
-        </note>
     </note>
 </todo>

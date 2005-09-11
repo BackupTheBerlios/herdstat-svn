@@ -50,6 +50,8 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const;
 
+            void set_cvsdir(const std::string& path);
+
             /// Implicit conversion to std::vector<herd>.
             operator std::vector<Herd>() const;
 
@@ -71,6 +73,7 @@ namespace portage {
 
         private:
             Herds _herds;
+            std::string _cvsdir;
             static const char * const _local_default;
             static const char * const _remote_default;
 
@@ -94,6 +97,7 @@ namespace portage {
     inline Herds& herds_xml::herds() { return _herds; }
     inline bool herds_xml::empty() const { return _herds.empty(); }
     inline Herds::size_type herds_xml::size() const { return _herds.size(); }
+    inline void herds_xml::set_cvsdir(const std::string& path) { _cvsdir.assign(path); }
 
 } // namespace portage
 

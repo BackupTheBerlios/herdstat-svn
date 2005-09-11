@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/portage_exceptions.hh
+ * herdstat -- herdstat/portage/portage_exceptions.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -59,13 +59,10 @@ namespace portage
 
     class AmbiguousPkg : public Exception
     {
-        protected:
-            /// Ambiguous package name.
-            std::string _name;
-
         public:
-            AmbiguousPkg() { }
-            AmbiguousPkg(const std::vector<std::string> &v) : packages(v) { }
+            AmbiguousPkg() : packages() { }
+            AmbiguousPkg(const std::vector<std::string> &v)
+                : packages(v) { }
             virtual ~AmbiguousPkg() throw() { }
 
             virtual const std::string name() const

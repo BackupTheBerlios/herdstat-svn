@@ -1,5 +1,29 @@
 ChangeLog for herdstat
 
+2005-09-11 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/portage/devaway.cc, herdstat/portage/devaway.hh,
+	src/action_away_handler.cc, tests/src/devaway.xml-test.cc: Use
+	Developers class to represent away devs rather than the Herd class.
+	* herdstat/email_address.cc, herdstat/email_address.hh: when any of
+	the set_* member functions are called, make sure to update the _email
+	member so that it is correct.  This fixes the bug where no default
+	email address was assigned if just the user name was given.
+	* src/pkgquery.cc, src/pkgquery.hh: pkgQuery_T is implemented in terms
+	of std::map, not is-a std::map.
+	* src/action_meta_handler.cc: Fix errant negation causing devaway.xml
+	to be fetched when it shouldn't.
+	* tests/src/herds.xml-test.cc, tests/src/devaway.xml-test.cc: Don't
+	pass the path straight to the constructor or else the respective XML
+	file will attempt to be fetched; use parse() member instead.
+	* src/querycache.cc: remove herds_xml.hh include since it's no longer
+	used.
+	* src/querycachectl.cc, src/querycache_xml_handler.cc: Add missing
+	herdstat/util/string.hh includes.
+	* src/action_dev_handler.cc: When -d all is specified and userinfo.xml
+	was parsed, insert any devs that are not in herds.xml but are in
+	userinfo.xml into the to-be-displayed container.
+
 2005-09-10 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/exceptions.hh: Added BadDate exception.

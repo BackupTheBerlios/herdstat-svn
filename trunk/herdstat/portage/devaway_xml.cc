@@ -66,6 +66,8 @@ devaway_xml::parse(const std::string& path)
         throw FileException(this->path());
 
     this->parse_file(this->path().c_str());
+
+    std::sort(_devs.begin(), _devs.end());
 }
 /****************************************************************************/
 void
@@ -90,7 +92,7 @@ devaway_xml::fill_developer(Developer& dev) const
 {
     assert(not dev.user().empty());
 
-    Herd::const_iterator d = _devs.find(dev);
+    Developers::const_iterator d = _devs.find(dev);
     if (d != _devs.end())
     {
         dev.set_away(true);
@@ -102,8 +104,7 @@ const std::vector<std::string>
 devaway_xml::keys() const
 {
     std::vector<std::string> v;
-    Herd::const_iterator i;
-    for (i = _devs.begin() ; i != _devs.end() ; ++i)
+    for (Developers::const_iterator i = _devs.begin() ; i != _devs.end() ; ++i)
     {
         v.push_back(i->user());
         v.push_back(i->email());

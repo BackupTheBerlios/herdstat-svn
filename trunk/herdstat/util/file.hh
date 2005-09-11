@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/file.hh
+ * herdstat -- herdstat/util/file.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -137,8 +137,6 @@ namespace util
              */
             stat_T(const std::string &p, bool opened = false);
 
-            virtual ~stat_T() { }
-
             device_type device()   const { return this->st_dev; }
             inode_type  inode()    const { return this->st_ino; }
             mode_type   mode()     const { return this->st_mode; }
@@ -162,7 +160,7 @@ namespace util
             /** stat() wrapper.
              * @returns A boolean value (exists()).
              */
-            virtual bool operator() ();
+            bool operator() ();
 
         protected:
             std::string _path;

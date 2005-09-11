@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/regex.hh
+ * herdstat -- herdstat/util/regex.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

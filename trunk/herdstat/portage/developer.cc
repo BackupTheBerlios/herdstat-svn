@@ -30,7 +30,7 @@ namespace portage {
 /****************************************************************************/
 Developer::Developer()
     : _user(), _email(), _name(), _pgpkey(), _joined(), _birth(),
-      _status(), _role(), _awaymsg(), _away(false), _herds()
+      _status(), _role(), _location(), _awaymsg(), _away(false), _herds()
 {
 }
 /****************************************************************************/
@@ -38,7 +38,7 @@ Developer::Developer(const std::string &user, const std::string &email,
                      const std::string &name)
     : _user(user), _email(email.empty() ? _user : email),
       _name(name), _pgpkey(), _joined(), _birth(), _status(),
-      _role(), _awaymsg(), _away(false), _herds()
+      _role(), _location(), _awaymsg(), _away(false), _herds()
 {
     /* chop everything after '@' if the caller
      * gave an email addy instead of the user name.

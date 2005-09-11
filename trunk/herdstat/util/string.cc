@@ -1,6 +1,6 @@
 /*
- * herdstat -- lib/string.cc
- * $Id: string.cc 508 2005-09-03 11:30:08Z ka0ttic $
+ * herdstat -- herdstat/util/string.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.

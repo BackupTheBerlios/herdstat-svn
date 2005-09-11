@@ -39,7 +39,8 @@ main(int argc, char **argv)
         if (argc != 2)
             throw Exception("usage: herds.xml-test <path>");
 
-        herds_xml h(argv[1]);
+        herds_xml h;
+        h.parse(argv[1]);
         const Herds& herds(h.herds());
         assert(not herds.empty());
 

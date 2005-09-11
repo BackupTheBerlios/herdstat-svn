@@ -30,7 +30,6 @@
 #include <map>
 #include "common.hh"
 #include "pkgquery.hh"
-#include "herds_xml.hh"
 
 /*
  * Represents a package query results
@@ -48,11 +47,7 @@ class querycache_T
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        querycache_T()
-            : _max(optget("querycache.max", int)),
-              _expire(optget("querycache.expire", long)),
-              _path(optget("localstatedir", std::string)+"/querycache.xml")
-        { }
+        querycache_T();
 
         void operator() (const pkgQuery_T &);
         void load();

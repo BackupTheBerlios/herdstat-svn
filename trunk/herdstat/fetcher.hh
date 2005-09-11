@@ -44,7 +44,7 @@ class Fetcher : private noncopyable
 {
     public:
         /// Default constructor.
-        Fetcher() { }
+        Fetcher() : _opts() { }
 
         /** Constructor.
          * @param url Remote URL.

@@ -1,6 +1,6 @@
 /*
  * herdstat -- herdstat/util/glob.hh
- * $Id: glob.hh 515 2005-09-04 11:41:38Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.

@@ -33,12 +33,25 @@
 
 using namespace portage;
 
+/* given string in form of "10 January 2000", get elapsed number of years.
+ * returns empty string on any failure. */
 static const std::string
 get_elapsed_yrs(const std::string& joined)
 {
-    std::time_t now = std::time(NULL);
-    std::time_t joined_date = util::str2epoch(joined.c_str(), "%d %b %Y");
-    if (joined_date == static_cast<std::time_t>(-1))
+    std::time_t now, joined_date;
+
+    try
+    {
+        joined_date = util::str2epoch(joined.c_str(), "%d %b %Y");
+        if (joined_date == static_cast<std::time_t>(-1))
+            return std::string();
+    }
+    catch (const BadDate& e)
+    {
+        return std::string();
+    }
+
+    if ((now = std::time(NULL)) == static_cast<std::time_t>(-1))
         return std::string();
 
     double seconds = std::difftime(now, joined_date);
@@ -180,6 +193,7 @@ action_dev_handler_T::operator() (opts_type &opts)
     /* set format attributes */
     output.set_maxlabel(all ? 16 : 12);
     output.set_maxdata(maxcol - output.maxlabel());
+    /* set away devs (for use in marking them when they occur in output) */
     if (use_devaway)
         output.set_devaway(devaway.keys());
     output.set_attrs();
@@ -195,6 +209,18 @@ action_dev_handler_T::operator() (opts_type &opts)
             for (d = h->begin() ; d != h->end() ; ++d)
             {
                 /* if the developer is not already in our list, add it */
+                if (all_devs.find(*d) == all_devs.end())
+                    all_devs.push_back(*d);
+            }
+        }
+
+        /* insert those that exist in userinfo.xml but not herds.xml */
+        if (not userinfo.empty())
+        {
+            const Developers& devs(userinfo.devs());
+            Developers::const_iterator d;
+            for (d = devs.begin() ; d != devs.end() ; ++d)
+            {
                 if (all_devs.find(*d) == all_devs.end())
                     all_devs.push_back(*d);
             }
@@ -219,15 +245,28 @@ action_dev_handler_T::operator() (opts_type &opts)
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-        /* FIXME: use copy_if() and regexMatch() */
-
         /* loop through herds searching for devs who's username
          * matches the regular expression */
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            Herd::const_iterator d = h->find(regexp);
-            if (d != h->end())
-                opts.push_back(d->user());
+            Herd::const_iterator d;
+            for (d = h->begin() ; d != h->end() ; ++d)
+            {
+                if (regexp == d->user())
+                    opts.push_back(d->user());
+            }
+        }
+
+        /* also add those in userinfo.xml - dupes will be unique'd out below */
+        if (not userinfo.empty())
+        {
+            const Developers& devs(userinfo.devs());
+            Developers::const_iterator d;
+            for (d = devs.begin() ; d != devs.end() ; ++d)
+            {
+                if (regexp == d->user())
+                    opts.push_back(d->user());
+            }
         }
 
         if (opts.empty())
@@ -237,6 +276,7 @@ action_dev_handler_T::operator() (opts_type &opts)
             return EXIT_FAILURE;
         }
 
+        /* remove any dupes */
         std::sort(opts.begin(), opts.end());
         opts.erase(std::unique(opts.begin(), opts.end()), opts.end());
     }

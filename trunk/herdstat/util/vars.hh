@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/vars.hh
+ * herdstat -- herdstat/util/vars.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

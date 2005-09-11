@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/timer.hh
+ * herdstat -- herdstat/util/timer.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

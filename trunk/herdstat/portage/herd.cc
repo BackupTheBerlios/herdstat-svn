@@ -28,6 +28,11 @@
 
 namespace portage {
 /****************************************************************************/
+Herd::Herd()
+    : Developers(), _name(), _email(), _desc()
+{
+}
+/****************************************************************************/
 Herd::Herd(const std::string &name,
            const std::string &email, const std::string &desc)
     : Developers(), _name(name), _email(email.empty() ? name : email),

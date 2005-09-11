@@ -28,7 +28,7 @@
 
 namespace util {
 /****************************************************************************/
-glob_T::glob_T(const char *pattern)
+glob_T::glob_T(const char *pattern) : _glob(), _results()
 {
     int ret = glob(pattern, GLOB_ERR, NULL, &(this->_glob));
     if (ret != 0 and ret != GLOB_NOMATCH)

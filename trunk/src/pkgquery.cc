@@ -30,11 +30,10 @@
 #include "pkgquery.hh"
 
 pkgQuery_T::pkgQuery_T(const std::string &n, const std::string &w, bool dev)
-    : info(n), query(n), with(w), portdir(optget("portdir", std::string)),
+    : _pkgs(), info(n), query(n), with(w), portdir(optget("portdir", std::string)),
       overlays(optget("portage.config", portage::config_T).overlays()),
       type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
 {
-
 }
 
 void

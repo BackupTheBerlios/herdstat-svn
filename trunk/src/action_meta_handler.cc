@@ -228,8 +228,8 @@ action_meta_handler_T::operator() (opts_type &opts)
 
     if (use_devaway)
     {
-        if (not devaway_path.empty())
-            devaway.fetch(devaway_path);
+        if (devaway_path.empty())
+            devaway.fetch();
         devaway.parse(devaway_path);
     }
 

@@ -69,8 +69,8 @@ userinfo_xml::fill_developer(Developer& dev) const
     {
         if (dev.name().empty() and not d->name().empty())
             dev.set_name(d->name());
-        if (dev.email().empty() and not d->email().empty())
-            dev.set_email(d->email());
+//        if (dev.email().empty() and not d->email().empty())
+//            dev.set_email(d->email());
 
         dev.set_status(d->status().empty() ? "Active" : d->status());
         dev.set_location(d->location());
@@ -91,8 +91,8 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
             throw Exception("<user> tag with no username attribute!");
 
         Developer dev(pos->second);
-        if (dev.email().empty())
-            dev.set_email(pos->second+"@gentoo.org");
+//        if (dev.email().empty())
+//            dev.set_email(pos->second+"@gentoo.org");
         if (dev.status().empty())
             dev.set_status("Active");
 

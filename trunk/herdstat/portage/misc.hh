@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/portage_misc.hh
+ * herdstat -- herdstat/portage/portage_misc.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

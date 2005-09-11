@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/vars.cc
+ * herdstat -- herdstat/util/vars.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -34,12 +34,12 @@
 
 namespace util {
 /****************************************************************************/
-vars_T::vars_T() : _depth(0)
+vars_T::vars_T() : _depth(0), _vars()
 {
 }
 /****************************************************************************/
 vars_T::vars_T(const std::string &path)
-    : base_file_T(path), _depth(0)
+    : base_file_T(path), _depth(0), _vars()
 {
     this->read();
 }

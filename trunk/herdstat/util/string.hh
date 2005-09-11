@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/string.hh
+ * herdstat -- herdstat/util/string.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

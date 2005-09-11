@@ -34,8 +34,12 @@ using namespace portage;
 void
 action_away_handler_T::display(Herd::iterator dev)
 {
+    ++size;
+
+    if (count) return;
+
     if (quiet)
-        *stream << dev->user() << " - " << dev->awaymsg() << std::endl;
+        output("", dev->user() + " - " + dev->awaymsg());
     else
     {
         herdsxml.fill_developer(*dev);
@@ -48,8 +52,6 @@ action_away_handler_T::display(Herd::iterator dev)
         output("Email", dev->email());
         output("Away Message", dev->awaymsg());
     }
-
-    size += 1;
 }
 
 int
@@ -58,35 +60,24 @@ action_away_handler_T::operator() (opts_type &opts)
     if (devaway_path.empty())
         devaway.fetch();
     devaway.parse(devaway_path);
-    Herd& devs(devaway.devs());
-    Herd::iterator d;
+    Developers& devs(devaway.devs());
+    Developers::iterator d;
 
-    output.set_maxlabel(all ? 20 : 13);
+    output.set_maxlabel(13);
     output.set_maxdata(maxcol - output.maxlabel());
+    output.set_quiet(quiet, " ");
     output.set_attrs();
 
     if (all)
     {
-        output(util::sprintf("Away Developers(%d)", devs.size()), "");
         for (d = devs.begin() ; d != devs.end() ; ++d)
         {
-            /* FIXME: use display() */
+            display(d);
 
-            if (quiet)
-                *stream << d->user() << " - " << d->awaymsg() << std::endl;
-            else
-            {
-                if (optget("color", bool))
-                    output("", color[blue] + d->user() + color[none]);
-                else
-                    output("", d->user());
-
-                output("", d->awaymsg());
+            if (not quiet and ((d+1) != devs.end()))
                 output.endl();
-            }
         }
 
-        size = devs.size();
         flush();
         return EXIT_SUCCESS;
     }
@@ -109,8 +100,10 @@ action_away_handler_T::operator() (opts_type &opts)
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
         for (d = devs.begin() ; d != devs.end() ; ++d)
+        {
             if (regexp == d->user())
                 opts.push_back(d->user());
+        }
 
         if (opts.empty())
         {
@@ -143,7 +136,7 @@ action_away_handler_T::operator() (opts_type &opts)
                 return EXIT_FAILURE;
         }
 
-        if (not count and n != opts.size())
+        if (not quiet and n != opts.size())
             output.endl();
     }
 

@@ -38,7 +38,7 @@ namespace xml {
     class ParserException : public Exception
     {
         public:
-            ParserException() { }
+            ParserException() : _file(), _error() { }
             ParserException(const std::string &f, const std::string &e)
                 : _file(f), _error(e) { }
             virtual ~ParserException() throw() { }

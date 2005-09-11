@@ -45,7 +45,7 @@ namespace portage {
     class Herd : public Developers
     {
         public:
-            Herd() { }
+            Herd();
             Herd(const std::string &name,
                  const std::string &email = "",
                  const std::string &desc  = "");

@@ -32,6 +32,7 @@
 
 Fetcher::Fetcher(const std::string &url,
                  const std::string &path) throw(FetchException)
+    : _opts()
 {
     if (this->fetch(url, path) != EXIT_SUCCESS)
         throw FetchException();

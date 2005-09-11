@@ -48,7 +48,10 @@ EmailAddress::parse(const std::string& email)
 {
     std::string::size_type pos = email.find('@');
     if (pos == std::string::npos)
+    {
+        _user.assign(email);
         throw MalformedEmail(email);
+    }
 
     _user.assign(email.substr(0, pos));
     _domain.assign(email.substr(pos+1));

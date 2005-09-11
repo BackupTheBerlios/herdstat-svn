@@ -120,7 +120,10 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
 {
     public:
         action_herds_xml_handler_T() : herdsxml_path(optget("herds.xml", std::string))
-        { herdsxml.fetcher().set_options(optget("wget.options", std::string)); }
+        {
+            herdsxml.fetcher().set_options(optget("wget.options", std::string));
+            herdsxml.set_cvsdir(optget("gentoo.cvs", std::string));
+        }
         virtual ~action_herds_xml_handler_T() { }
 
     protected:

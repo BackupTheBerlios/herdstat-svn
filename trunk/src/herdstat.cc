@@ -34,12 +34,12 @@
 #endif
 
 #include <herdstat/exceptions.hh>
+#include <herdstat/util/string.hh>
 #include <herdstat/xml/init.hh>
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
 #include "rc.hh"
-#include "herds_xml.hh"
 #include "formatter.hh"
 #include "action_herd_handler.hh"
 #include "action_pkg_handler.hh"
@@ -624,12 +624,11 @@ main(int argc, char **argv)
 	    << std::endl;
 	return EXIT_FAILURE;
     }
-//    catch (const XMLWriter_E &e)
-//    {
-//        std::cerr << "Error writing '" << e.file() << "': " << e.error()
-//            << std::endl;
-//        return EXIT_FAILURE;
-//    }
+    catch (const BadDate& e)
+    {
+	std::cerr << "Error parsing date '" << e.what() << "'." << std::endl;
+	return EXIT_FAILURE;
+    }
     catch (const FormatException &e)
     {
 	std::cerr << e.what() << std::endl;

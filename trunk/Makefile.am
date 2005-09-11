@@ -33,6 +33,9 @@ srchtml:
 TODO: .todo
 	@test -x $(prefix)/bin/devtodo && devtodo all --TODO
 
+distcheck-hook:
+	@cp Makefile.am.common $(PACKAGE)-$(VERSION)/_build/
+
 dist-hook: TODO
 
 dist-sign: dist

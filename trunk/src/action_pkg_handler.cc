@@ -29,6 +29,8 @@
 #include <functional>
 #include <iterator>
 #include <map>
+
+#include <herdstat/util/string.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"

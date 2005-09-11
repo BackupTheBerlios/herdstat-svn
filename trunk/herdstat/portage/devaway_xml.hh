@@ -34,7 +34,7 @@
 
 #include <herdstat/fetchable.hh>
 #include <herdstat/portage/xmlbase.hh>
-#include <herdstat/portage/herd.hh>
+#include <herdstat/portage/developer.hh>
 
 namespace portage {
 
@@ -53,8 +53,8 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const;
 
-            const Herd& devs() const;
-            Herd& devs();
+            const Developers& devs() const;
+            Developers& devs();
 
             const std::vector<std::string> keys() const;
 
@@ -68,7 +68,7 @@ namespace portage {
                 throw (FetchException);
 
         private:
-            Herd _devs;
+            Developers _devs;
             static const char * const _local_default;
             static const char * const _remote_default;
 
@@ -76,11 +76,11 @@ namespace portage {
                  in_dev,
                  in_reason;
 
-            Herd::iterator _cur_dev;
+            Developers::iterator _cur_dev;
     };
 
-    inline Herd& devaway_xml::devs() { return _devs; }
-    inline const Herd& devaway_xml::devs() const { return _devs; }
+    inline Developers& devaway_xml::devs() { return _devs; }
+    inline const Developers& devaway_xml::devs() const { return _devs; }
 
 } // namespace portage
 

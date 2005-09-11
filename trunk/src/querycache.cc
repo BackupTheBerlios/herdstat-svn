@@ -28,6 +28,7 @@
 #include <functional>
 
 #include <herdstat/util/file.hh>
+#include <herdstat/util/string.hh>
 #include <herdstat/xml/document.hh>
 
 #include "common.hh"
@@ -40,6 +41,13 @@
 
 #include "querycache_xml_handler.hh"
 #include "querycache.hh"
+
+querycache_T::querycache_T()
+    : _max(optget("querycache.max", int)),
+      _expire(optget("querycache.expire", long)),
+      _path(optget("localstatedir", std::string)+"/querycache.xml")
+{
+}
 
 /*
  * Add a pkgQuery_T object to the cache, removing
@@ -57,8 +65,7 @@ querycache_T::operator() (const pkgQuery_T &q)
         if (not is_expired(*i) and (q.size() == i->size()))
             return;
 
-        debug_msg("old query exists for '%s', so removing it",
-            q.query.c_str());
+        debug_msg("old query exists for '%s', so removing it", q.query.c_str());
         this->_queries.erase(i);
     }
 
@@ -82,7 +89,6 @@ querycache_T::load()
     _queries.insert(_queries.end(),
             handler->queries.begin(),
             handler->queries.end());
-
 }
 
 /*

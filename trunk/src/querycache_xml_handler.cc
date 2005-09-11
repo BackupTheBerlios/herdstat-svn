@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/string.hh>
 #include "querycache_xml_handler.hh"
 
 bool

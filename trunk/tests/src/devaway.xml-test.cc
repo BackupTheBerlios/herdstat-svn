@@ -42,20 +42,20 @@ main(int argc, char **argv)
 
         std::string path(argv[1]);
         assert(util::is_file(path));
-        devaway_xml devaway(path);
+        devaway_xml devaway;
+        devaway.parse(path);
 
-        const Herd& devs = devaway.devs();
+        const Developers& devs = devaway.devs();
 
         std::cout << "Away developers(" << devs.size() << ")" << std::endl;
 
-        for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
+        Developers::const_iterator i;
+        for (i = devs.begin() ; i != devs.end() ; ++i)
             std::cout << i->user() << ": " << i->awaymsg() << std::endl;
 
         std::cout << std::endl;
 
-        Herd::const_iterator i = devs.find("lv");
-        assert(i != devs.end());
-
+        assert((i = devs.find("lv")) != devs.end());
         std::cout << i->user() << " - " << i->awaymsg() << std::endl;
     }
     catch (const BaseException &e)

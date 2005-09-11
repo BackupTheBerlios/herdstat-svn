@@ -1,5 +1,5 @@
 /*
- * herdstat -- lib/regex.cc
+ * herdstat -- herdstat/util/regex.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -38,12 +38,12 @@
 namespace util {
 /*****************************************************************************/
 regex_T::regex_T()
-    : _compiled(false), _cflags(0), _eflags(0)
+    : _str(), _compiled(false), _cflags(0), _eflags(0), _regex()
 {
 }
 /*****************************************************************************/
 regex_T::regex_T(const std::string &regex, int cflags, int eflags)
-    : _str(regex), _compiled(false), _cflags(cflags), _eflags(eflags)
+    : _str(regex), _compiled(false), _cflags(cflags), _eflags(eflags), _regex()
 {
     this->compile();
 }
