@@ -34,19 +34,15 @@
 using namespace portage;
 
 static const std::string
-get_joined_elapsed(const std::string& joined)
+get_elapsed_yrs(const std::string& joined)
 {
     std::time_t now = std::time(NULL);
-    std::cout << "now == " << now << std::endl;
-
     std::time_t joined_date = util::str2epoch(joined.c_str(), "%d %b %Y");
-    std::cout << "then == " << joined_date << std::endl;
+    if (joined_date == static_cast<std::time_t>(-1))
+        return std::string();
 
     double seconds = std::difftime(now, joined_date);
-    std::cout << "difftime == " << seconds << std::endl;
-    std::cout << "diff == " << (now - joined_date) << std::endl;
-    std::cout << "years == " << util::stringify<float>(seconds/3153600) << std::endl;
-    return (util::stringify<float>(seconds/3153600)+" yrs");
+    return (util::sprintf("%.2f", seconds/31536000)+" yrs");
 }
 
 /*
@@ -128,12 +124,19 @@ action_dev_handler_T::display(const std::string &d)
             output("PGP Key ID", dev.pgpkey());
         if (not dev.joined().empty())
         {
-            const std::string elapsed(get_joined_elapsed(dev.joined()));
-            output("Joined Date", dev.joined() + " ("+elapsed+")");
+            const std::string elapsed(get_elapsed_yrs(dev.joined()));
+            if (elapsed.empty())
+                output("Joined Date", dev.joined());
+            else
+                output("Joined Date", dev.joined() + " ("+elapsed+")");
         }
         if (not dev.birthday().empty())
         {
-            output("Birth Date", dev.birthday());
+            const std::string elapsed(get_elapsed_yrs(dev.birthday()));
+            if (elapsed.empty())
+                output("Birth Date", dev.birthday());
+            else
+                output("Birth Date", dev.birthday() + " ("+elapsed+")");
         }
         if (not dev.status().empty())
             output("Status", dev.status());

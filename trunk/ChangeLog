@@ -9,7 +9,9 @@ ChangeLog for herdstat
 	operators for <, <=, >, and >= so we can use standard sorting algos.
 	* src/action_dev_handler.cc: Don't bail in display() if userinfo.xml
 	is used and the developer is not in any herds.  This allows us to show
-	info on devs that exist in userinfo.xml but not in herds.xml.
+	info on devs that exist in userinfo.xml but not in herds.xml.  Also
+	added a function get_elapsed_yrs() for showing the elapsed number of
+	years when displaying joined/birth date from userinfo.xml.
 	* src/action_herd_handler.cc: Finished implemented display_herds().
 	Also finished up display_herd() so that it once again displays extra
 	info if --verbose.
