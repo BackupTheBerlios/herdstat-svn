@@ -1,0 +1,6 @@
+This is a python (and original) version of herdstat that I wrote when learing
+python.  While parsing herds.xml isn't all that slow with python, parsing every
+metadata.xml in the tree for package stats would be unbearable (if not unusable)
+in python.  I include this version strictly for shits and grins.
+
+-ka0ttic

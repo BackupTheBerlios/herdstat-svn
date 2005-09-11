@@ -1,0 +1,14 @@
+<todo version="0.1.19">
+    <title>
+        Todo list for herdstat
+    </title>
+    <note priority="veryhigh" time="1125826740">
+        Add more tests
+        <note priority="medium" time="1125826774">
+            file_T/dir_T classes
+        </note>
+    </note>
+    <note priority="low" time="1125827409">
+        Get make distcheck working.
+    </note>
+</todo>
