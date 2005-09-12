@@ -112,17 +112,10 @@ namespace util
      * Functor for using regex_T with standard algorithms.
      */
 
-    class regexMatch
-        : public std::binary_function<const regex_T *, std::string, bool>
+    struct regexMatch : std::binary_function<const regex_T *, std::string, bool>
     {
-        public:
-            /** Does regex match string?
-             * @param re Pointer to a regex_T object.
-             * @param s  String object.
-             * @returns  A boolean value.
-             */
-            bool operator() (const regex_T *re, const std::string& s) const
-            { return (*re == s); }
+        bool operator() (const regex_T *re, const std::string& s) const
+        { return (*re == s); }
     };
 }
 

@@ -34,25 +34,22 @@
 
 namespace util {
 
-    class DereferenceLess
+    struct DereferenceLess
     {
-        public:
-            template <typename Type>
-            bool operator() (Type p1, Type p2) const { return (*p1 < *p2); }
+        template <typename Type>
+        bool operator() (Type p1, Type p2) const { return (*p1 < *p2); }
     };
 
-    class DereferenceGreater
+    struct DereferenceGreater
     {
-        public:
-            template <typename Type>
-            bool operator() (Type p1, Type p2) const { return (*p2 < *p1); }
+        template <typename Type>
+        bool operator() (Type p1, Type p2) const { return (*p2 < *p1); }
     };
 
-    class DereferenceEqual
+    struct DereferenceEqual
     {
-        public:
-            template <typename Type>
-            bool operator() (Type p1, Type p2) const { return (*p1 == *p2); }
+        template <typename Type>
+        bool operator() (Type p1, Type p2) const { return (*p1 == *p2); }
     };
 
 } // namespace util

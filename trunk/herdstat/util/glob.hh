@@ -70,17 +70,11 @@ namespace util
      * fnmatch() functor interface.
      */
 
-    class patternMatch : public std::binary_function<std::string, std::string, bool>
+    struct patternMatch : std::binary_function<std::string, std::string, bool>
     {
-        public:
-            /** fnmatch() wrapper.
-             * @param pattern Glob pattern.
-             * @param path Path.
-             * @returns A boolean value (Does glob match pattern?).
-             */
-            bool operator() (const std::string& pattern,
-                             const std::string& path) const
-            { return (fnmatch(pattern.c_str(), path.c_str(), 0) == 0); }
+        bool operator() (const std::string& pattern,
+                         const std::string& path) const
+        { return (fnmatch(pattern.c_str(), path.c_str(), 0) == 0); }
     };
 }
 
