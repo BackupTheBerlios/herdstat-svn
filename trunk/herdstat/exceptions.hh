@@ -44,6 +44,8 @@ class Exception : public BaseException
     public:
         Exception() : _buf(NULL) { }
 
+        Exception(const Exception& that) : _buf(NULL) { *this = that; }
+
         Exception(const char *fmt, va_list v) : _buf(NULL)
         {
             vasprintf(&_buf, fmt, v);
@@ -65,6 +67,19 @@ class Exception : public BaseException
 #endif
             vasprintf(&_buf, fmt.c_str(), _v);
             va_end(_v);
+        }
+
+        Exception& operator= (const Exception& that)
+        {
+            if (_buf)
+            {
+                std::free(_buf);
+                _buf = NULL;
+            }
+            if (that._buf)
+                _buf = strdup(that._buf);
+
+            return *this;
         }
 
         virtual ~Exception() throw()
