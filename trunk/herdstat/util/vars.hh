@@ -57,18 +57,14 @@ namespace util
              */
             vars_T(const std::string &path);
 
-            virtual ~vars_T() { }
+            virtual ~vars_T();
 
             /** Overloaded operator[] since std::map doesn't provide
              * a const version.
              * @param k Key to look up.
              * @returns A std::string object (Value mapped to Key).
              */
-            std::string operator[] (const std::string &k) const
-            {
-                const_iterator i = this->find(k);
-                return (i == this->end() ? "" : i->second);
-            }
+            std::string operator[] (const std::string &k) const;
 
             /** Dump keys/values to specified stream.
              * @param s Output stream.
@@ -86,26 +82,22 @@ namespace util
             /// Set default variables to be present before substitution.
             void set_defaults();
 
-            iterator begin() { return _vars.begin(); }
-            const_iterator begin() const { return _vars.begin(); }
-            iterator end() { return _vars.end(); }
-            const_iterator end() const { return _vars.end(); }
-            size_type size() const { return _vars.size(); }
-            bool empty() const { return _vars.empty(); }
-            iterator find(const key_type &k) { return _vars.find(k); }
-            const_iterator find(const key_type &k) const { return _vars.find(k); }
-            mapped_type& operator[] (const key_type &k) { return _vars[k]; }
-            std::pair<iterator, bool> insert(const value_type &v)
-            { return _vars.insert(v); }
-            iterator insert(iterator hpos, const value_type &v)
-            { return _vars.insert(hpos, v); }
-            template <class In> void insert(In begin, In end)
-            { _vars.insert(begin, end); }
-            void erase(iterator pos) { _vars.erase(pos); }
-            size_type erase(const key_type &k) { return _vars.erase(k); }
-            void erase(iterator begin, iterator end)
-            { return _vars.erase(begin, end); }
-            void clear() { _vars.clear(); }
+            iterator begin();
+            const_iterator begin() const;
+            iterator end();
+            const_iterator end() const;
+            size_type size() const;
+            bool empty() const;
+            iterator find(const key_type &k);
+            const_iterator find(const key_type &k) const;
+            mapped_type& operator[] (const key_type &k);
+            std::pair<iterator, bool> insert(const value_type &v);
+            iterator insert(iterator hpos, const value_type &v);
+            template <class In> void insert(In begin, In end);
+            void erase(iterator pos);
+            size_type erase(const key_type &k);
+            void erase(iterator begin, iterator end);
+            void clear();
 
         protected:
             virtual void do_set_defaults() { }
@@ -121,6 +113,36 @@ namespace util
             /// variable container
             container_type _vars;
     };
+
+    inline std::string vars_T::operator[] (const key_type& k) const
+    {
+        const_iterator i = this->find(k);
+        return (i == this->end() ? "" : i->second);
+    }
+
+    inline vars_T::iterator vars_T::begin() { return _vars.begin(); }
+    inline vars_T::const_iterator vars_T::begin() const { return _vars.begin(); }
+    inline vars_T::iterator vars_T::end() { return _vars.end(); }
+    inline vars_T::const_iterator vars_T::end() const { return _vars.end(); }
+    inline vars_T::size_type vars_T::size() const { return _vars.size(); }
+    inline bool vars_T::empty() const { return _vars.empty(); }
+    inline vars_T::iterator vars_T::find(const key_type& k) { return _vars.find(k); }
+    inline vars_T::const_iterator vars_T::find(const key_type& k) const
+    { return _vars.find(k); }
+    inline vars_T::mapped_type& vars_T::operator[] (const key_type& k)
+    { return _vars[k]; }
+    inline std::pair<vars_T::iterator, bool> vars_T::insert(const value_type& v)
+    { return _vars.insert(v); }
+    inline vars_T::iterator vars_T::insert(iterator hpos, const value_type& v)
+    { return _vars.insert(hpos, v); }
+    template <class In> inline void vars_T::insert(In begin, In end)
+    { _vars.insert(begin, end); }
+    inline void vars_T::erase(iterator pos) { _vars.erase(pos); }
+    inline vars_T::size_type vars_T::erase(const key_type& k)
+    { return _vars.erase(k); }
+    inline void vars_T::erase(iterator begin, iterator end)
+    { _vars.erase(begin, end); }
+    inline void vars_T::clear() { _vars.clear(); }
 }
 
 #endif

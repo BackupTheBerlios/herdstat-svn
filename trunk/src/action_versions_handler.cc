@@ -36,6 +36,10 @@
 #include "formatter.hh"
 #include "action_versions_handler.hh"
 
+action_versions_handler_T::~action_versions_handler_T()
+{
+}
+
 int
 action_versions_handler_T::operator() (opts_type &opts)
 {

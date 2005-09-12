@@ -42,24 +42,21 @@ class BaseException : public std::exception { };
 class Exception : public BaseException
 {
     public:
-        Exception() : _buf(NULL), _v() { }
+        Exception() : _buf(NULL) { }
 
-        Exception(const Exception &that) : _buf(NULL), _v()
-        { *this = that; }
-        
-        Exception(const char *fmt, va_list v) : _buf(NULL), _v()
+        Exception(const char *fmt, va_list v) : _buf(NULL)
         {
             vasprintf(&_buf, fmt, v);
         }
         
-        Exception(const char *fmt, ...) : _buf(NULL), _v()
+        Exception(const char *fmt, ...) : _buf(NULL)
         {
             va_start(_v, fmt);
             vasprintf(&_buf, fmt, _v);
             va_end(_v);
         }
         
-        Exception(const std::string& fmt, ...) : _buf(NULL), _v()
+        Exception(const std::string& fmt, ...) : _buf(NULL)
         {
 #ifdef HAVE_GCC4
             va_start(_v, fmt);
@@ -74,14 +71,6 @@ class Exception : public BaseException
         {
             if (_buf)
                 std::free(_buf);
-        }
-
-        Exception &operator= (const Exception &that)
-        {
-            if (that._buf)
-                _buf = strdup(that._buf);
-            _v = that._v;
-            return *this;
         }
 
         virtual const char *what() const throw() { return _buf; }

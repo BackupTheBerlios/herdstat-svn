@@ -59,6 +59,10 @@ Developers::Developers(const std::vector<std::string>& devs)
     *this = devs;
 }
 /****************************************************************************/
+Developers::~Developers()
+{
+}
+/****************************************************************************/
 Developers&
 Developers::operator= (const std::vector<std::string>& devs)
 {

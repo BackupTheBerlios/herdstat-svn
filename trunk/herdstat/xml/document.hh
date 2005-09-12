@@ -62,7 +62,7 @@ namespace xml {
 
     template <class H>
     Document<H>::Document(const std::string &path)
-    : parsable(path), _handler(new H())
+        : parsable(path), _handler(new H())
     {
         if (not util::is_file(path))
             throw FileException(path);

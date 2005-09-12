@@ -52,7 +52,7 @@ namespace portage {
             GentooEmailAddress(const std::string& email);
 
             /// Destructor.
-            virtual ~GentooEmailAddress() { }
+            virtual ~GentooEmailAddress();
 
         protected:
             virtual void parse(const std::string& email);

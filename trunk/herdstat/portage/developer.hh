@@ -206,7 +206,7 @@ namespace portage {
 
             Developers();
             Developers(const std::vector<std::string>& v);
-            virtual ~Developers() { }
+            virtual ~Developers();
 
             /// Implicit conversion to std::vector<std::string>.
             operator std::vector<std::string>() const;

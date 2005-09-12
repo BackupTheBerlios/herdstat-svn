@@ -40,6 +40,10 @@ ebuild_T::ebuild_T(const std::string &path) : util::vars_T(path)
     assert(is_ebuild(path));
 }
 /****************************************************************************/
+ebuild_T::~ebuild_T()
+{
+}
+/****************************************************************************/
 void
 ebuild_T::do_set_defaults()
 {

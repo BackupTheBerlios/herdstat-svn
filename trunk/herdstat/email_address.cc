@@ -43,6 +43,10 @@ EmailAddress::EmailAddress(const std::string& user, const std::string& domain)
 {
 }
 /****************************************************************************/
+EmailAddress::~EmailAddress()
+{
+}
+/****************************************************************************/
 void
 EmailAddress::parse(const std::string& email)
 {

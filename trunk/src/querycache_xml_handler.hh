@@ -41,13 +41,8 @@ class querycacheXMLHandler_T : public xml::saxhandler
         typedef value_type::iterator iterator;
         typedef value_type::size_type size_type;
 
-        querycacheXMLHandler_T()
-        {
-            in_query = in_string = in_with = in_type =
-            in_results = in_pkg = in_portdir = in_overlays = false;
-        }
-
-        virtual ~querycacheXMLHandler_T() { }
+        querycacheXMLHandler_T();
+        virtual ~querycacheXMLHandler_T();
 
         value_type queries;
 

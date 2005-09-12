@@ -35,6 +35,10 @@
 
 using namespace portage;
 
+action_stats_handler_T::~action_stats_handler_T()
+{
+}
+
 /*
  * Display statistics summary.
  */

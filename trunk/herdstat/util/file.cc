@@ -33,20 +33,22 @@
 
 #include <herdstat/util/file.hh>
 #include <herdstat/exceptions.hh>
+
+namespace util {
 /*****************************************************************************/
-util::stat_T::stat_T()
+stat_T::stat_T()
     : _path(), _type(REGULAR), _exists(false), _opened(false)
 {
 }
 /*****************************************************************************/
-util::stat_T::stat_T(const std::string &p, bool opened)
+stat_T::stat_T(const std::string &p, bool opened)
     : _path(p), _type(REGULAR), _exists(false), _opened(opened)
 {
     this->operator()();
 }
 /*****************************************************************************/
 void
-util::stat_T::assign(const std::string &p, bool opened)
+stat_T::assign(const std::string &p, bool opened)
 {
     this->_opened = opened;
     this->_path.assign(p);
@@ -54,7 +56,7 @@ util::stat_T::assign(const std::string &p, bool opened)
 }
 /*****************************************************************************/
 bool
-util::stat_T::operator() ()
+stat_T::operator() ()
 {
     if (this->_opened)
     {
@@ -83,34 +85,38 @@ util::stat_T::operator() ()
     return this->_exists;
 }
 /*****************************************************************************/
-util::base_fileobject_T::base_fileobject_T()
+base_fileobject_T::base_fileobject_T()
     : _stat(), _opened(false)
 {
 }
 /*****************************************************************************/
-util::base_fileobject_T::base_fileobject_T(const std::string &path)
+base_fileobject_T::base_fileobject_T(const std::string &path)
     : _stat(path), _opened(false)
 {
 }
 /*****************************************************************************/
-util::base_file_T::base_file_T() : stream(NULL)
+base_fileobject_T::~base_fileobject_T()
 {
 }
 /*****************************************************************************/
-util::base_file_T::base_file_T(const std::string &path, std::ios_base::openmode mode)
+base_file_T::base_file_T() : stream(NULL)
+{
+}
+/*****************************************************************************/
+base_file_T::base_file_T(const std::string &path, std::ios_base::openmode mode)
     : base_fileobject_T(path), stream(NULL)
 {
     this->open(this->path().c_str(), mode);
 }
 /*****************************************************************************/
-util::base_file_T::~base_file_T()
+base_file_T::~base_file_T()
 {
     if (this->is_open())
         this->close();
 }
 /*****************************************************************************/
 void
-util::base_file_T::open(const char *n, std::ios_base::openmode mode)
+base_file_T::open(const char *n, std::ios_base::openmode mode)
 {
     if (this->is_open())
         return;
@@ -138,19 +144,19 @@ util::base_file_T::open(const char *n, std::ios_base::openmode mode)
 }
 /*****************************************************************************/
 void
-util::base_file_T::open()
+base_file_T::open()
 {
     this->open(this->path().c_str(), DEFAULT_MODE);
 }
 /*****************************************************************************/
 void
-util::base_file_T::open(std::ios_base::openmode mode)
+base_file_T::open(std::ios_base::openmode mode)
 {
     this->open(this->path().c_str(), mode);
 }
 /*****************************************************************************/
 void
-util::base_file_T::close()
+base_file_T::close()
 {
     if (not this->is_open())
         return;
@@ -161,14 +167,18 @@ util::base_file_T::close()
     this->set_open(false);
 }
 /*****************************************************************************/
-util::file_T::file_T(const std::string &path, std::ios_base::openmode mode)
+file_T::file_T(const std::string &path, std::ios_base::openmode mode)
     : base_file_T(path, mode), _contents()
 {
     this->read();
 }
 /*****************************************************************************/
+file_T::~file_T()
+{
+}
+/*****************************************************************************/
 void
-util::file_T::read()
+file_T::read()
 {
     assert(this->stream and this->stream->is_open());
 
@@ -178,7 +188,7 @@ util::file_T::read()
 }
 /*****************************************************************************/
 bool
-util::file_T::operator== (const file_T &that) const
+file_T::operator== (const file_T &that) const
 {
     if (this->bufsize() != that.bufsize())
         return false;
@@ -187,38 +197,38 @@ util::file_T::operator== (const file_T &that) const
 }
 /*****************************************************************************/
 void
-util::file_T::dump(std::ostream &os) const
+file_T::dump(std::ostream &os) const
 {
     std::copy(this->begin(), this->end(),
         std::ostream_iterator<value_type>(os, "\n"));
 }
 /*****************************************************************************/
 void
-util::file_T::write()
+file_T::write()
 {
     this->dump(*(this->stream));
     this->clear();
 }
 /*****************************************************************************/
-util::dir_T::dir_T() : _dirp(NULL), _contents()
+dir_T::dir_T() : _dirp(NULL), _contents()
 {
 }
 /*****************************************************************************/
-util::dir_T::dir_T(const std::string &path)
+dir_T::dir_T(const std::string &path)
     : base_fileobject_T(path), _dirp(NULL), _contents()
 {
     this->open();
     this->read();
 }
 /*****************************************************************************/
-util::dir_T::~dir_T()
+dir_T::~dir_T()
 {
     if (this->is_open())
         this->close();
 }
 /*****************************************************************************/
 void
-util::dir_T::close()
+dir_T::close()
 {
     if (not this->is_open())
         return;
@@ -234,7 +244,7 @@ util::dir_T::close()
 }
 /*****************************************************************************/
 void
-util::dir_T::open()
+dir_T::open()
 {
     if (this->is_open())
         return;
@@ -249,7 +259,7 @@ util::dir_T::open()
 }
 /*****************************************************************************/
 void
-util::dir_T::read()
+dir_T::read()
 {
     struct dirent *d = NULL;
     while ((d = readdir(this->_dirp)))
@@ -263,38 +273,38 @@ util::dir_T::read()
     }
 }
 /*****************************************************************************/
-util::dir_T::iterator
-util::dir_T::find(const std::string &base)
+dir_T::iterator
+dir_T::find(const std::string &base)
 {
     return std::find(this->begin(), this->end(),
         this->path() + "/" + base);
 }
 /*****************************************************************************/
-util::dir_T::iterator
-util::dir_T::find(const util::regex_T &regex)
+dir_T::iterator
+dir_T::find(const regex_T &regex)
 {
     return std::find_if(this->begin(), this->end(),
-        std::bind1st(util::regexMatch(), &regex));
+        std::bind1st(regexMatch(), &regex));
 }
 /*****************************************************************************/
-util::dir_T::const_iterator
-util::dir_T::find(const std::string &base) const
+dir_T::const_iterator
+dir_T::find(const std::string &base) const
 {
     return std::find(this->begin(), this->end(),
         this->path() + "/" + base);
 }
 /*****************************************************************************/
-util::dir_T::const_iterator
-util::dir_T::find(const util::regex_T &regex) const
+dir_T::const_iterator
+dir_T::find(const regex_T &regex) const
 {
     return std::find_if(this->begin(), this->end(),
-        std::bind1st(util::regexMatch(), &regex));
+        std::bind1st(regexMatch(), &regex));
 }
 /*****************************************************************************
  * general purpose file-related functions                                    *
  *****************************************************************************/
 const char *
-util::basename(const std::string &path)
+basename(const std::string &path)
 {
     std::string result(path);
     std::string::size_type pos;
@@ -310,7 +320,7 @@ util::basename(const std::string &path)
 }
 /*****************************************************************************/
 const char *
-util::dirname(const std::string &path)
+dirname(const std::string &path)
 {
     std::string result(path);
     std::string::size_type pos;
@@ -326,7 +336,7 @@ util::dirname(const std::string &path)
 }
 /*****************************************************************************/
 const char *
-util::chop_fileext(const std::string &path, unsigned short depth)
+chop_fileext(const std::string &path, unsigned short depth)
 {
     std::string result(path);
 
@@ -341,10 +351,10 @@ util::chop_fileext(const std::string &path, unsigned short depth)
 }
 /*****************************************************************************/
 void
-util::copy_file(const std::string &from, const std::string &to)
+copy_file(const std::string &from, const std::string &to)
 {
     /* remove to if it exists */
-    if (util::is_file(to) and (unlink(to.c_str()) != 0))
+    if (is_file(to) and (unlink(to.c_str()) != 0))
 	throw FileException(to);
 
     std::ifstream ffrom(from.c_str());
@@ -362,12 +372,13 @@ util::copy_file(const std::string &from, const std::string &to)
 }
 /*****************************************************************************/
 void
-util::move_file(const std::string &from, const std::string &to)
+move_file(const std::string &from, const std::string &to)
 {
-    util::copy_file(from, to);
+    copy_file(from, to);
     if (unlink(from.c_str()) != 0)
 	throw FileException(from);
 }
 /*****************************************************************************/
+} // namespace util
 
 /* vim: set tw=80 sw=4 et : */

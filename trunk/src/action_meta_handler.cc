@@ -151,6 +151,10 @@ display_metadata(const metadata_data& data)
         output("Description", util::tidy_whitespace(meta.longdesc()));
 }
 
+action_meta_handler_T::~action_meta_handler_T()
+{
+}
+
 void
 action_meta_handler_T::display(const metadata_data& data)
 {

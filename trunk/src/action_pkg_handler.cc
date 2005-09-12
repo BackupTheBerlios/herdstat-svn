@@ -39,6 +39,18 @@
 
 using namespace portage;
 
+action_pkg_handler_T::action_pkg_handler_T()
+    : action_herds_xml_handler_T(), metacache(portdir),
+      optsize(0), elapsed(0), dev(optget("dev", bool)),
+      meta(optget("meta", bool)), status(not quiet and not debug),
+      cache_is_valid(false), at_least_one_not_cached(false)
+{
+}
+
+action_pkg_handler_T::~action_pkg_handler_T()
+{
+}
+
 /*
  * Show search failure message.
  */

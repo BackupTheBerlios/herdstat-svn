@@ -183,7 +183,7 @@ namespace util
              */
             base_fileobject_T(const std::string &path);
 
-            virtual ~base_fileobject_T() { }
+            virtual ~base_fileobject_T();
 
             const std::string& path() const { return this->_stat.path(); }
             stat_T& stat() { return this->_stat; }
@@ -281,9 +281,10 @@ namespace util
              * @param path Path to file.
              * @param mode Open mode (defaults to DEFAULT_MODE).
              */
-            file_T(const std::string &path, std::ios_base::openmode mode = DEFAULT_MODE);
+            file_T(const std::string &path,
+                   std::ios_base::openmode mode = DEFAULT_MODE);
 
-            virtual ~file_T() { }
+            virtual ~file_T();
 
             /** File size.
              * @returns An unsigned integer value.

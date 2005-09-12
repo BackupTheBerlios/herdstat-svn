@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_find_handler.hh
+ * herdstat -- herdstat/util/functors.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,27 +20,43 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_FIND_HANDLER_HH
-#define HAVE_ACTION_FIND_HANDLER_HH 1
+#ifndef _HAVE_FUNCTORS_HH
+#define _HAVE_FUNCTORS_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+/**
+ * @file functors.hh
+ * @brief General purpose utility functors.
+ */
 
-class action_find_handler_T : public action_portage_find_handler_T
-{
-    public:
-        action_find_handler_T();
-        virtual ~action_find_handler_T();
+namespace util {
 
-        virtual int operator() (opts_type &);
+    class DereferenceLess
+    {
+        public:
+            template <typename Type>
+            bool operator() (Type p1, Type p2) const { return (*p1 < *p2); }
+    };
 
-    private:
-        const bool meta;
-};
+    class DereferenceGreater
+    {
+        public:
+            template <typename Type>
+            bool operator() (Type p1, Type p2) const { return (*p2 < *p1); }
+    };
 
-#endif
+    class DereferenceEqual
+    {
+        public:
+            template <typename Type>
+            bool operator() (Type p1, Type p2) const { return (*p1 == *p2); }
+    };
+
+} // namespace util
+
+#endif /* _HAVE_FUNCTORS_HH */
 
 /* vim: set tw=80 sw=4 et : */

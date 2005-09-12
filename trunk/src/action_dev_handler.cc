@@ -58,6 +58,15 @@ get_elapsed_yrs(const std::string& joined)
     return (util::sprintf("%.2f", seconds/31536000)+" yrs");
 }
 
+action_dev_handler_T::action_dev_handler_T()
+    : userinfo_path(optget("userinfo", std::string)), userinfo()
+{
+}
+
+action_dev_handler_T::~action_dev_handler_T()
+{
+}
+
 /*
  * Display data for the specified developer.
  */

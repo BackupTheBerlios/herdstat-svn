@@ -30,6 +30,10 @@
 #include "pkgcache.hh"
 #include "action_which_handler.hh"
 
+action_which_handler_T::~action_which_handler_T()
+{
+}
+
 int
 action_which_handler_T::operator() (opts_type &opts)
 {

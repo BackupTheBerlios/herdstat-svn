@@ -102,6 +102,10 @@ class action_fancy_handler_T : public action_handler_T
                 /* set false so the above isn't displayed more than once
                  * in cases where more than one action handler is run */
                 output.set_marked_away(false);
+
+                if (timer and not count)
+                    *stream << std::endl << "Took " << devaway.elapsed()
+                        << "ms to parse devaway.xml." << std::endl;
             }
         }
 
@@ -132,7 +136,7 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
             action_fancy_handler_T::flush();
 
             if (timer and not count)
-                *stream << std::endl << "Took " << herdsxml.elapsed()
+                *stream << "Took " << herdsxml.elapsed()
                     << "ms to parse herds.xml." << std::endl;
         }
 

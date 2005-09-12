@@ -37,16 +37,9 @@
 class action_pkg_handler_T : public action_herds_xml_handler_T
 {
     public:
-        action_pkg_handler_T() : action_herds_xml_handler_T(),
-                                 metacache(portdir),
-                                 optsize(0), elapsed(0),
-                                 dev(optget("dev", bool)),
-                                 meta(optget("meta", bool)),
-                                 status(not quiet and not debug),
-                                 cache_is_valid(false),
-                                 at_least_one_not_cached(false) { }
+        action_pkg_handler_T();
+        virtual ~action_pkg_handler_T();
 
-        virtual ~action_pkg_handler_T() { }
 	virtual int operator() (opts_type &);
 
     private:

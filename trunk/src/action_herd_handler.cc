@@ -115,6 +115,10 @@ display_herds(const Herds& herds)
         out(util::sprintf("Herds(%d)", herds.size()), herds);
 }
 
+action_herd_handler_T::~action_herd_handler_T()
+{
+}
+
 /*
  * Given a list of herds, display herd and developer
  * information.

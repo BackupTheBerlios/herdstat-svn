@@ -1,5 +1,28 @@
 ChangeLog for herdstat
 
+2005-09-12 Aaron Walker <ka0ttic@gentoo.org>
+
+	* Makefile.am.common: Added more warning flags: -Woverloaded-virtual
+	-Winline -Wredundant-decls.
+	* src/herds_xml.cc, src/devaway_xml.cc: Add back the missing fetch
+	logic I forgot to add when rewriting the herds_xml class, so that if
+	fetching fails, we can use the cached copy.
+	* herdstat/util/functors.hh: New source file for some general purpose
+	utility functors.
+	* herdstat/portage/version.hh: Tidy up a little bit.  Use new
+	DereferenceLess (stolen from Effective STL) template functor instead
+	of version_sort_T.  Also, there's no reason for versions_T to declare
+	virtual functions at this time.  Also fixed bug in operator> of all
+	classes (negating operator< gets you >= not >).  Also fixed bug in
+	versions_T::front() (we were dereferencing begin()+1 not begin()).
+	* herdstat/exceptions.hh: Remove Exception's copy constructor and
+	assignment operator as it was only added for correctness (it has
+	pointer members) and is (or should be) never used.  The main reason
+	for this is the different implementations of variable length
+	arguments.  Try to copy a va_list with '=' won't work on archs whose
+	glibc implement va_list as an array (amd64 fex).  Thanks to Diego
+	(Flameeyes) for pointing this out.
+
 2005-09-11 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.2_alpha1).

@@ -27,6 +27,16 @@
 #include <herdstat/util/string.hh>
 #include "querycache_xml_handler.hh"
 
+querycacheXMLHandler_T::querycacheXMLHandler_T()
+    : in_query(false), in_string(false), in_with(false), in_type(false),
+      in_results(false), in_pkg(false), in_portdir(false), in_overlays(false)
+{
+}
+
+querycacheXMLHandler_T::~querycacheXMLHandler_T()
+{
+}
+
 bool
 querycacheXMLHandler_T::start_element(const std::string &name,
                                     const attrs_type &attrs)

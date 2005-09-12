@@ -31,6 +31,10 @@
 
 using namespace portage;
 
+action_away_handler_T::~action_away_handler_T()
+{
+}
+
 void
 action_away_handler_T::display(Herd::iterator dev)
 {

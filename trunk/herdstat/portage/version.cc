@@ -45,11 +45,11 @@ std::vector<std::string> version_string_T::suffix_T::_suffixes;
 version_map_T::version_map_T(const std::string &path)
     : _verstr(util::chop_fileext(util::basename(path)))
 {
-    this->parse_verstr();
+    this->parse();
 }
 /****************************************************************************/
 void
-version_map_T::parse_verstr()
+version_map_T::parse()
 {
     /* append -r0 if necessary */
     std::string::size_type pos = this->_verstr.rfind("-r0");
@@ -80,18 +80,29 @@ version_map_T::parse_verstr()
     assert(parts.size() == 3);
 
     /* fill our map with the components */
-    this->_vmap.insert(std::make_pair("PN", parts[0]));
-    this->_vmap.insert(std::make_pair("PV", parts[1]));
-    this->_vmap.insert(std::make_pair("PR", parts[2]));
-    this->_vmap.insert(std::make_pair("P", (*this)["PN"] + "-" + (*this)["PV"]));
-    this->_vmap.insert(std::make_pair("PVR", (*this)["PV"] + "-" + (*this)["PR"]));
-    this->_vmap.insert(std::make_pair("PF", (*this)["PN"] + "-" + (*this)["PVR"]));
+    std::pair<iterator, bool> pn = _vmap.insert(value_type("PN", parts[0]));
+    std::pair<iterator, bool> pv = _vmap.insert(value_type("PV", parts[1]));
+    std::pair<iterator, bool> pr = _vmap.insert(value_type("PR", parts[2]));
+    assert(pn.second and pv.second and pr.second);
+    _vmap.insert(value_type("P", pn.first->second+"-"+pv.first->second));
+    std::pair<iterator, bool> pvr = _vmap.insert(value_type("PVR",
+        pv.first->second+"-"+pr.first->second));
+    _vmap.insert(value_type("PF", pn.first->second+"-"+pvr.first->second));
 }
 /*****************************************************************************
  * suffix_T                                                                  *
  *****************************************************************************/
+version_string_T::suffix_T::suffix_T()
+{
+}
+
+version_string_T::suffix_T::suffix_T(const std::string& pvr)
+{
+    this->parse(pvr);
+}
+
 void
-version_string_T::suffix_T::init(const string_type &s)
+version_string_T::suffix_T::parse(const std::string &pvr) const
 {
     /* valid suffixes (in order) */
     if (this->_suffixes.empty())
@@ -103,36 +114,42 @@ version_string_T::suffix_T::init(const string_type &s)
         this->_suffixes.push_back("p");
     }
 
-    string_type result(s);
-    string_type::size_type pos = result.rfind("-r");
-    if (pos != string_type::npos)
-        result = result.substr(0, pos);
+    this->_suffix.assign(pvr);
 
-    if ((pos = result.rfind('_')) != string_type::npos)
+    /* chop revision */
+    std::string::size_type pos = this->_suffix.rfind("-r");
+    if (pos != std::string::npos)
+        this->_suffix.erase(pos);
+
+    /* get suffix */
+    pos = this->_suffix.rfind('_');
+    if (pos != std::string::npos)
     {
-        this->_suffix = result.substr(pos + 1);
-        
-        /* chop any trailing suffix version */
+        this->_suffix.erase(0, pos+1);
+
+        /* get suffix version */
         pos = this->_suffix.find_first_of("0123456789");
-        if (pos != string_type::npos)
+        if (pos != std::string::npos)
         {
             this->_suffix_ver = this->_suffix.substr(pos);
-            this->_suffix = this->_suffix.substr(0, pos);
+            this->_suffix.erase(pos);
         }
 
-        /* valid suffix? */
-        if (std::find(this->_suffixes.begin(), this->_suffixes.end(),
-            this->_suffix) == this->_suffixes.end())
+        /* is suffix valid? */
+        if (std::find(_suffixes.begin(), _suffixes.end(),
+                    _suffix) == _suffixes.end())
             this->_suffix.clear();
     }
+    else
+        this->_suffix.clear();
 }
 /*****************************************************************************
  * Is this suffix less than that suffix?                                     *
  *****************************************************************************/
 bool
-version_string_T::suffix_T::operator< (suffix_T &that) const
+version_string_T::suffix_T::operator< (const suffix_T& that) const
 {
-    std::vector<string_type>::iterator ti, si;
+    std::vector<std::string>::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
         this->suffix());
@@ -173,9 +190,9 @@ version_string_T::suffix_T::operator< (suffix_T &that) const
  * Is this suffix equal to that suffix?                                      *
  *****************************************************************************/
 bool
-version_string_T::suffix_T::operator== (suffix_T &that) const
+version_string_T::suffix_T::operator== (const suffix_T& that) const
 {
-    std::vector<string_type>::iterator ti, si;
+    std::vector<std::string>::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
         this->suffix());
@@ -207,29 +224,39 @@ version_string_T::suffix_T::operator== (suffix_T &that) const
 /*****************************************************************************
  * nosuffix_T                                                                *
  *****************************************************************************/
-void
-version_string_T::nosuffix_T::init(const string_type &s)
+
+version_string_T::nosuffix_T::nosuffix_T()
 {
-    string_type PV(s);
+}
+
+version_string_T::nosuffix_T::nosuffix_T(const std::string& pv)
+{
+    this->parse(pv);
+}
+
+void
+version_string_T::nosuffix_T::parse(const std::string& pv) const
+{
+    this->_version.assign(pv);
 
     /* strip suffix */
-    string_type::size_type pos;
-    if ((pos = PV.find('_')) != string_type::npos)
-        PV = PV.substr(0, pos);
+    std::string::size_type pos = this->_version.find('_');
+    if (pos != std::string::npos)
+        this->_version.erase(pos);
 
-    if ((pos = PV.find_first_not_of("0123456789.")) != string_type::npos)
+    /* find first non-digit */
+    pos = this->_version.find_first_not_of("0123456789.");
+    if (pos != std::string::npos)
     {
-        this->_extra = PV.substr(pos);
-        PV = PV.substr(0, pos);
+        this->_extra = this->_version.substr(pos);
+        this->_version.erase(pos);
     }
-
-    this->_version = PV;
 }
 /*****************************************************************************
  * Is this version (minus suffix) less that that version (minus suffix)?     *
  *****************************************************************************/
 bool
-version_string_T::nosuffix_T::operator< (nosuffix_T &that) const
+version_string_T::nosuffix_T::operator< (const nosuffix_T& that) const
 {
     bool differ = false;
     bool result = false;
@@ -240,16 +267,16 @@ version_string_T::nosuffix_T::operator< (nosuffix_T &that) const
     else if (this->_version == that._version)
         return this->_extra < that._extra;
 
-    std::vector<string_type> thisparts = util::split(this->_version, '.');
-    std::vector<string_type> thatparts = util::split(that._version, '.');
-    std::vector<string_type>::size_type stoppos =
-        std::min<std::vector<string_type>::size_type>(thisparts.size(),
+    std::vector<std::string> thisparts = util::split(this->_version, '.');
+    std::vector<std::string> thatparts = util::split(that._version, '.');
+    std::vector<std::string>::size_type stoppos =
+        std::min<std::vector<std::string>::size_type>(thisparts.size(),
                                                        thatparts.size());
 
     /* TODO: if thisparts.size() and thatpart.size() == 1, convert to long
      * and compare */
 
-    std::vector<string_type>::iterator thisiter, thatiter;
+    std::vector<std::string>::iterator thisiter, thatiter;
     for (thisiter = thisparts.begin(), thatiter = thatparts.begin() ;
          stoppos != 0 ; ++thisiter, ++thatiter, --stoppos)
     {
@@ -266,7 +293,7 @@ version_string_T::nosuffix_T::operator< (nosuffix_T &that) const
         {
             /* 1 == 01 ? they're the same in comparison speak but 
              * absolutely not the same in version std::string speak */
-            if (*thisiter == (string_type("0") + *thatiter))
+            if (*thisiter == (std::string("0") + *thatiter))
                 same = true;
             else
                 continue;
@@ -286,7 +313,7 @@ version_string_T::nosuffix_T::operator< (nosuffix_T &that) const
  * Is this version (minus suffix) equal to that version (minus suffix)?      *
  *****************************************************************************/
 bool
-version_string_T::nosuffix_T::operator== (nosuffix_T &that) const
+version_string_T::nosuffix_T::operator== (const nosuffix_T& that) const
 {
     /* std::string comparison should be sufficient for == */
     return ((this->_version == that._version) and
@@ -295,11 +322,10 @@ version_string_T::nosuffix_T::operator== (nosuffix_T &that) const
 /*****************************************************************************
  * version_string_T                                                          *
  *****************************************************************************/
-version_string_T::version_string_T(const std::string &path)
-    : _ebuild(path), _v(path), _verstr(_v.version())
+version_string_T::version_string_T(const std::string& path)
+    : _ebuild(path), _v(path), _verstr(_v.version()),
+      _suffix(_v["PVR"]), _version(_v["PV"])
 {
-    this->_suffix.assign(this->_v["PVR"]);
-    this->_version.assign(this->_v["PV"]);
 }
 /*****************************************************************************
  * Display full version std::string (as portage would).                           *
@@ -308,8 +334,8 @@ version_string_T::operator
 std::string() const
 {
     /* chop -r0 if necessary */
-    string_type::size_type pos = this->_verstr.rfind("-r0");
-    if (pos != string_type::npos)
+    std::string::size_type pos = this->_verstr.rfind("-r0");
+    if (pos != std::string::npos)
         return this->_verstr.substr(0, pos);
 
     return this->_verstr;
@@ -318,7 +344,7 @@ std::string() const
  * Is this version less than that version?                                   *
  *****************************************************************************/
 bool
-version_string_T::operator< (version_string_T &that) const
+version_string_T::operator< (const version_string_T& that) const
 {
     if (this->_version < that._version)
         return true;
@@ -342,7 +368,7 @@ version_string_T::operator< (version_string_T &that) const
  * Is this version equal to that version?                                    *
  *****************************************************************************/
 bool
-version_string_T::operator== (version_string_T &that) const
+version_string_T::operator== (const version_string_T& that) const
 {
     return ( (this->_version == that._version) and
              (this->_suffix == that._suffix) and
@@ -351,7 +377,16 @@ version_string_T::operator== (version_string_T &that) const
 /*****************************************************************************
  * versions_T                                                                *
  *****************************************************************************/
-versions_T::versions_T(const std::vector<std::string> &paths)
+versions_T::versions_T()
+{
+}
+
+versions_T::versions_T(const std::string& path)
+{
+    this->assign(path);
+}
+
+versions_T::versions_T(const std::vector<std::string>& paths)
 {
     std::vector<std::string>::const_iterator i = paths.begin(),
                                               e = paths.end();
@@ -362,7 +397,7 @@ versions_T::versions_T(const std::vector<std::string> &paths)
  * each ebuild found.  clear()'s container first.                            *
  *****************************************************************************/
 void
-versions_T::assign(const std::string &path)
+versions_T::assign(const std::string& path)
 {
     this->_vs.clear();
 
@@ -382,7 +417,7 @@ versions_T::assign(const std::string &path)
  * Same as assign() but does not call clear().                               *
  *****************************************************************************/
 void
-versions_T::append(const std::string &path)
+versions_T::append(const std::string& path)
 {
     const util::dir_T pkgdir(path);
     util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
@@ -397,10 +432,19 @@ versions_T::append(const std::string &path)
  * find wrapper                                                              *
  *****************************************************************************/
 versions_T::iterator
-versions_T::find(const string_type &path)
+versions_T::find(const std::string& path)
 {
     version_string_T *v = new version_string_T(path);
-    versions_T::iterator i = this->_vs.find(v);
+    iterator i = this->_vs.find(v);
+    delete v;
+    return i;
+}
+
+versions_T::const_iterator
+versions_T::find(const std::string& path) const
+{
+    version_string_T *v = new version_string_T(path);
+    const_iterator i = this->_vs.find(v);
     delete v;
     return i;
 }
@@ -408,7 +452,7 @@ versions_T::find(const string_type &path)
  * insert wrapper                                                            *
  *****************************************************************************/
 bool
-versions_T::insert(const std::string &path)
+versions_T::insert(const std::string& path)
 {
     version_string_T *v = new version_string_T(path);
 

@@ -57,6 +57,8 @@ devaway_xml::~devaway_xml()
 void
 devaway_xml::parse(const std::string& path)
 {
+    this->timer().start();
+
     if (not path.empty())
         this->set_path(path);
     else if (this->path().empty())
@@ -67,7 +69,10 @@ devaway_xml::parse(const std::string& path)
 
     this->parse_file(this->path().c_str());
 
-    std::sort(_devs.begin(), _devs.end());
+    if (not _devs.empty())
+        std::sort(_devs.begin(), _devs.end());
+
+    this->timer().stop();
 }
 /****************************************************************************/
 void
@@ -79,12 +84,46 @@ devaway_xml::do_fetch(const std::string& path) const throw (FetchException)
         this->set_path(_local_default);
 
     util::stat_T devaway(this->path());
-    if (devaway.exists() and
-        ((std::time(NULL) - devaway.mtime()) < DEVAWAY_EXPIRE) and
-        (devaway.size() > 0))
-        return;
+    std::time_t now(std::time(NULL));
 
-    _fetch(_remote_default, this->path());
+    if ((now != static_cast<std::time_t>(-1)) and devaway.exists() and
+        ((now - devaway.mtime()) < DEVAWAY_EXPIRE) and (devaway.size() > 0))
+        return;
+    else if (devaway.exists() and (devaway.size() > 0))
+    {
+        /* back it up in case fetching fails */
+        util::copy_file(this->path(), this->path()+".bak");
+    }
+
+    try
+    {
+        _fetch(_remote_default, this->path());
+
+        /* double check */
+        if (not devaway() or (devaway.size() == 0))
+            throw FetchException();
+
+        /* remove backup */
+        unlink((this->path()+".bak").c_str());
+    }
+    catch (const FetchException& e)
+    {
+        std::cerr << "Error fetching " << _remote_default << std::endl;
+
+        if (util::is_file(this->path()+".bak"))
+        {
+            std::cerr << "Using cached copy..." << std::endl;
+            util::move_file(this->path()+".bak", this->path());
+        }
+
+        if (not devaway())
+            throw;
+        else if (devaway.size() == 0)
+        {
+            unlink(this->path().c_str());
+            throw;
+        }
+    }
 }
 /****************************************************************************/
 void

@@ -44,11 +44,14 @@ vars_T::vars_T(const std::string &path)
     this->read();
 }
 /****************************************************************************/
+vars_T::~vars_T()
+{
+}
+/****************************************************************************/
 void
 vars_T::dump(std::ostream &stream) const
 {
-    const_iterator i;
-    for (i = this->begin() ; i != this->end() ; ++i)
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
         stream << i->first << "=" << i->second << std::endl;
 }
 /****************************************************************************/
@@ -101,8 +104,7 @@ vars_T::read()
         if (line.length() < 1 or line[0] == '#')
             continue;
 
-        pos = line.find('=');
-        if (pos != std::string::npos)
+        if ((pos = line.find('=')) != std::string::npos)
         {
             std::string key = line.substr(0, pos);
             std::string val = line.substr(pos + 1);
@@ -146,7 +148,7 @@ vars_T::subst(std::string &value)
 {
 
     std::vector<std::string> vars;
-    std::vector<std::string>::iterator v, e;
+    std::vector<std::string>::iterator v;
     std::string::size_type lpos = 0;
 
     /* find variables that need substituting */
@@ -168,8 +170,7 @@ vars_T::subst(std::string &value)
     }
 
     /* for each variable we found */
-    e = vars.end();
-    for (v = vars.begin() ; v != e ; ++v)
+    for (v = vars.begin() ; v != vars.end() ; ++v)
     {
         std::string subst;
         std::string var("${"+(*v)+"}");

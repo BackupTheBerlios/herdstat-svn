@@ -40,6 +40,10 @@ GentooEmailAddress::GentooEmailAddress(const std::string& email)
     this->assign(email);
 }
 /****************************************************************************/
+GentooEmailAddress::~GentooEmailAddress()
+{
+}
+/****************************************************************************/
 void
 GentooEmailAddress::parse(const std::string& email)
 {

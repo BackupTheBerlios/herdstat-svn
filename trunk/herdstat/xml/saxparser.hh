@@ -39,6 +39,9 @@ namespace xml {
 
     class saxhandler : public ::xml::event_parser
     {
+        public:
+            virtual ~saxhandler();
+
         protected:
             virtual bool start_element(const std::string &,
                                        const attrs_type &) = 0;
@@ -59,7 +62,7 @@ namespace xml {
              */
             explicit saxparser(saxhandler *h);
 
-            virtual ~saxparser() { }
+            virtual ~saxparser();
 
             /** Parse file.
              * @param path Path.

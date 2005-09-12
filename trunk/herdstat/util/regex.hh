@@ -53,7 +53,7 @@ namespace util
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            regex_T(const std::string &r, int c = 0, int e = 0);
+            regex_T(const std::string& r, int c = 0, int e = 0);
 
             /// Destructor.
             ~regex_T();
@@ -63,26 +63,26 @@ namespace util
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            void assign(const std::string &r, int c = 0, int e = 0);
+            void assign(const std::string&r , int c = 0, int e = 0);
 
             /** Assign a new regular expression (no CFLAGS/EFLAGS).
              * @param s regular expression std::string.
              * @returns a regex_T object.
              */
-            regex_T &operator= (const std::string &s)
+            regex_T &operator= (const std::string& s)
             { this->assign(s); return *this; }
 
             /** Determine if this regex matches the specified std::string.
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator== (const std::string &cmp) const;
+            bool operator== (const std::string& cmp) const;
 
             /** Determine if this regex does not match the specified std::string.
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator!= (const std::string &cmp) const
+            bool operator!= (const std::string& cmp) const
             { return not (*this == cmp); }
 
             /** Get regular expression std::string.
@@ -101,15 +101,10 @@ namespace util
             /// Compile regex.
             void compile();
 
-            /// regular expression std::string
             std::string _str;
-            /// has our regex_t been compiled?
             bool        _compiled;
-            /// cflags
             int         _cflags;
-            /// eflags
             int         _eflags;
-            /// regex_t
             regex_t     _regex;
     };
 
@@ -117,15 +112,16 @@ namespace util
      * Functor for using regex_T with standard algorithms.
      */
 
-    class regexMatch : public std::binary_function<regex_T *, std::string, bool>
+    class regexMatch
+        : public std::binary_function<const regex_T *, std::string, bool>
     {
         public:
-            /** Does regex match std::string?
+            /** Does regex match string?
              * @param re Pointer to a regex_T object.
              * @param s  String object.
              * @returns  A boolean value.
              */
-            bool operator() (regex_T *re, std::string s) const
+            bool operator() (const regex_T *re, const std::string& s) const
             { return (*re == s); }
     };
 }

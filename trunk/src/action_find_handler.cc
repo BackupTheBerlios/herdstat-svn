@@ -36,6 +36,15 @@
 #include "action_meta_handler.hh"
 #include "action_find_handler.hh"
 
+action_find_handler_T::action_find_handler_T()
+    : action_portage_find_handler_T(), meta(optget("meta", bool))
+{
+}
+
+action_find_handler_T::~action_find_handler_T()
+{
+}
+
 int
 action_find_handler_T::operator() (opts_type &opts)
 {

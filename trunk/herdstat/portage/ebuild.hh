@@ -47,7 +47,7 @@ namespace portage {
         public:
             ebuild_T();
             ebuild_T(const std::string &path);
-            virtual ~ebuild_T() { }
+            virtual ~ebuild_T();
 
         protected:
             virtual void do_set_defaults();

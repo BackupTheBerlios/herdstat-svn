@@ -40,7 +40,7 @@ struct metadata_data
 class action_meta_handler_T : public action_portage_find_handler_T
 {
     public:
-        virtual ~action_meta_handler_T() { }
+        virtual ~action_meta_handler_T();
         virtual int operator() (opts_type &);
 
     private:
