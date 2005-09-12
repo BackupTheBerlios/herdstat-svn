@@ -78,8 +78,8 @@ namespace util
              * @param path Path.
              * @returns A boolean value (Does glob match pattern?).
              */
-            bool operator() (std::string pattern,
-                             std::string path) const
+            bool operator() (const std::string& pattern,
+                             const std::string& path) const
             { return (fnmatch(pattern.c_str(), path.c_str(), 0) == 0); }
     };
 }
