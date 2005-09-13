@@ -199,6 +199,11 @@ namespace portage {
     inline bool Herds::empty() const { return _herds.empty(); }
     inline void Herds::clear() { return _herds.clear(); }
     inline void Herds::push_back(const value_type h) { _herds.push_back(h); }
+    inline Herds::iterator Herds::insert(iterator pos, const value_type h)
+    { return _herds.insert(pos, h); }
+    template <class In> inline void
+    Herds::insert(iterator pos, In begin, In end)
+    { _herds.insert(pos, begin, end); }
 
     inline Herds::iterator Herds::find(const std::string& herd)
     { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
@@ -207,9 +212,11 @@ namespace portage {
     { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
         util::DereferenceStrEqual<Herd>(), herd)); }
     inline Herds::iterator Herds::find(const value_type h)
-    { return std::find(_herds.begin(), _herds.end(), h); }
+    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
+        util::DereferenceEqual<Herd>(), h)); }
     inline Herds::const_iterator Herds::find(const value_type h) const
-    { return std::find(_herds.begin(), _herds.end(), h); }
+    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
+        util::DereferenceEqual<Herd>(), h)); }
 
     struct HerdRegexMatch
         : std::binary_function<const util::regex_T *, const Herd *, bool>
@@ -224,12 +231,6 @@ namespace portage {
     inline Herds::const_iterator Herds::find(const util::regex_T &regex) const
     { return std::find_if(_herds.begin(), _herds.end(),
             std::bind1st(HerdRegexMatch(), &regex)); }
-
-    inline Herds::iterator Herds::insert(iterator pos, const value_type h)
-    { return _herds.insert(pos, h); }
-    template <class In> inline void
-    Herds::insert(iterator pos, In begin, In end)
-    { _herds.insert(pos, begin, end); }
 
 } // namespace portage
 

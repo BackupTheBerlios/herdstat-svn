@@ -291,7 +291,7 @@ namespace portage
     {
         public:
             typedef std::set<version_string_T *,
-                             util::DereferenceLess> container_type;
+                util::DereferenceLess<version_string_T> > container_type;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
             typedef container_type::size_type size_type;

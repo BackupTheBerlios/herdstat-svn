@@ -70,7 +70,8 @@ devaway_xml::parse(const std::string& path)
     this->parse_file(this->path().c_str());
 
     if (not _devs.empty())
-        std::sort(_devs.begin(), _devs.end(), util::DereferenceLess());
+        std::sort(_devs.begin(), _devs.end(),
+            util::DereferenceLess<Developer>());
 
     this->timer().stop();
 }

@@ -165,7 +165,7 @@ herds_xml::parse(const std::string& path)
     this->parse_file(this->path().c_str());
 
     if (not _herds.empty())
-        std::sort(_herds.begin(), _herds.end(), util::DereferenceLess());
+        std::sort(_herds.begin(), _herds.end(), util::DereferenceLess<Herd>());
 
     this->timer().stop();
 }
@@ -367,8 +367,8 @@ herds_xml::text(const std::string& text)
         }
         else
         {
-            std::string cvspath(util::sprintf(mpBaseLocal, _cvsdir.c_str(),
-                        text.c_str()));
+            const std::string cvspath(
+                util::sprintf(mpBaseLocal, _cvsdir.c_str(), text.c_str()));
             if (util::is_file(cvspath))
                 parse_mp_xml(*_cur_herd, cvspath);
         }

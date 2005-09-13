@@ -41,10 +41,11 @@ namespace util {
      * then calls operator<.
      */
 
+    template <typename T>
     struct DereferenceLess
+        : std::binary_function<const T*, const T*, bool>
     {
-        template <typename T>
-        bool operator() (T p1, T p2) const { return (*p1 < *p2); }
+        bool operator() (const T *p1, const T *p2) const { return (*p1 < *p2); }
     };
 
     /**
@@ -52,10 +53,11 @@ namespace util {
      * then calls operator<.
      */
 
+    template <typename T>
     struct DereferenceGreater
+        : std::binary_function<const T*, const T*, bool>
     {
-        template <typename T>
-        bool operator() (T p1, T p2) const { return (*p2 < *p1); }
+        bool operator() (const T *p1, const T *p2) const { return (*p2 < *p1); }
     };
 
     /**
@@ -114,9 +116,9 @@ namespace util {
      * it to NULL.
      */
 
-    template <typename T>
-    struct DeleteAndNullify : std::unary_function<T*, void>
+    struct DeleteAndNullify
     {
+        template <typename T>
         void operator()(T *p) const
         {
             if (p)

@@ -303,7 +303,6 @@ namespace portage {
         { return (*re == dev->user()); }
     };
 
-
     inline Developers::iterator Developers::find(const util::regex_T &regex)
     { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
         DeveloperRegexMatch(), &regex)); }

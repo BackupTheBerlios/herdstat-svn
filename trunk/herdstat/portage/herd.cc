@@ -92,8 +92,7 @@ Herds::Herds(const Herds& that)
 /****************************************************************************/
 Herds::~Herds()
 {
-    std::for_each(this->begin(), this->end(),
-        util::DeleteAndNullify<Herd>());
+    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
 }
 /****************************************************************************/
 Herds&
@@ -103,7 +102,7 @@ Herds::operator= (const std::vector<std::string>& herds)
     std::vector<std::string>::const_iterator i;
     for (i = herds.begin() ; i != herds.end() ; ++i)
         _herds.push_back(new Herd(*i));
-    std::sort(_herds.begin(), _herds.end(), util::DereferenceLess());
+    std::sort(_herds.begin(), _herds.end(), util::DereferenceLess<Herd>());
     return *this;
 }
 /****************************************************************************/
