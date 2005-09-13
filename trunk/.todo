@@ -5,19 +5,25 @@
     <note priority="veryhigh" time="1126517999">
         Perhaps make Developers/Herd/Herds a set instead of a vector?
     </note>
-    <note priority="veryhigh" time="1126617527">
-        Add test for ambiguous package.
+    <note priority="veryhigh" time="1126623915">
+        Tests
+        <note priority="high" time="1126623934">
+            Add test for ambiguous package.
+        </note>
+        <note priority="medium" time="1126623964">
+            Consolidate the -regex tests.
+        </note>
+        <note priority="medium" time="1126624020">
+            Test the 'all' target for action handlers that support it.
+        </note>
     </note>
     <note priority="high" time="1126510481">
         Write a debug class for writing debugging messages instead of using debug_msg().
     </note>
-    <note priority="high" time="1126604930">
-        TEST 'all' for each handler that supports it
-    </note>
-    <note priority="medium" time="1126518096">
-        Instead of having herds_xml::set_cvsdir() maybe just use util::dirname(this-&gt;path()) ?
-    </note>
     <note priority="low" time="1125827409">
         Get make distcheck working.
+    </note>
+    <note priority="verylow" time="1126623676">
+        Look into adding LDAP support for Gentoo's LDAP.
     </note>
 </todo>
