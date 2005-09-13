@@ -36,6 +36,12 @@
 
 namespace util {
 
+    struct Dereference
+    {
+        template <typename T>
+        const T& operator()(const T *p) const { return *p; }
+    };
+
     /**
      * Function object that dereferences the given pointers and
      * then calls operator<.

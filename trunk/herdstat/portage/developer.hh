@@ -277,14 +277,10 @@ namespace portage {
             template <class In>
             void insert(iterator pos, In begin, In end);
 
-        protected:
-            container_type& devs();
-
         private:
             container_type _devs;
     };
 
-    inline Developers::container_type& Developers::devs() { return _devs; }
     inline Developers& Developers::operator= (const Developers& that)
     { *this = that._devs; return *this; }
     inline Developers::iterator Developers::begin() { return _devs.begin(); }

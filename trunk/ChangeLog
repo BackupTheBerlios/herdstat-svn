@@ -2,6 +2,11 @@ ChangeLog for herdstat
 
 2005-09-13 Aaron Walker <ka0ttic@gentoo.org>
 
+	* herdstat/portage/herd.cc, herdstat/portage/developer.cc: Fixed copy
+	constructors (weren't copying all members) which was causing various
+	stuff to break.
+	* herdstat/util/functors.hh: Add Dereference functor.
+
 	* herdstat/portage/herd.cc, herdstat/portage/herd.hh,
 	herdstat/portage/developer.cc, herdstat/portage/developer.hh: Use
 	vector of pointers for our herd/developer containers.

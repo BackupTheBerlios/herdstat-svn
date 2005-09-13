@@ -69,8 +69,17 @@ Herd::~Herd()
 Herd&
 Herd::operator= (const Herd& that)
 {
+    _name.assign(that._name);
+    _email.assign(that._email);
+    _desc.assign(that._desc);
+
+    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
+    this->clear();
+    this->reserve(that.size());
+
     for (const_iterator i = that.begin() ; i != that.end() ; ++i)
-        devs().push_back(new Developer(**i));
+        this->push_back(new Developer(**i));
+    
     return *this;
 }
 /****************************************************************************/
@@ -98,10 +107,14 @@ Herds::~Herds()
 Herds&
 Herds::operator= (const std::vector<std::string>& herds)
 {
+    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
     _herds.clear();
+    _herds.reserve(herds.size());
+
     std::vector<std::string>::const_iterator i;
     for (i = herds.begin() ; i != herds.end() ; ++i)
         _herds.push_back(new Herd(*i));
+
     std::sort(_herds.begin(), _herds.end(), util::DereferenceLess<Herd>());
     return *this;
 }
@@ -109,8 +122,14 @@ Herds::operator= (const std::vector<std::string>& herds)
 Herds&
 Herds::operator= (const container_type& v)
 {
+    std::for_each(_herds.begin(), _herds.end(), util::DeleteAndNullify());
+    _herds.clear();
+    _herds.reserve(v.size());
+
     for (const_iterator i = v.begin() ; i != v.end() ; ++i)
         _herds.push_back(new Herd(**i));
+
+    std::sort(_herds.begin(), _herds.end(), util::DereferenceLess<Herd>());
     return *this;
 }
 /****************************************************************************/

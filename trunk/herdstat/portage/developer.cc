@@ -83,10 +83,14 @@ Developers::~Developers()
 Developers&
 Developers::operator= (const std::vector<std::string>& devs)
 {
+    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
     _devs.clear();
+    _devs.reserve(devs.size());
+
     std::vector<std::string>::const_iterator i;
     for (i = devs.begin() ; i != devs.end() ; ++i)
         _devs.push_back(new Developer(*i));
+
     std::sort(_devs.begin(), _devs.end(), util::DereferenceLess<Developer>());
     return *this;
 }
@@ -94,8 +98,14 @@ Developers::operator= (const std::vector<std::string>& devs)
 Developers&
 Developers::operator= (const container_type& v)
 {
+    std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
+    _devs.clear();
+    _devs.reserve(v.size());
+
     for (const_iterator i = v.begin() ; i != v.end() ; ++i)
         _devs.push_back(new Developer(**i));
+
+    std::sort(_devs.begin(), _devs.end(), util::DereferenceLess<Developer>());
     return *this;
 }
 /****************************************************************************/
