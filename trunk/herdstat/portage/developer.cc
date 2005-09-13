@@ -48,9 +48,25 @@ Developer::Developer(const std::string &user, const std::string &email,
         _user.erase(pos);
 }
 /****************************************************************************/
+Developer::~Developer()
+{
+}
+/****************************************************************************/
 Developers::Developers()
     : _devs()
 {
+}
+/****************************************************************************/
+Developers::Developers(const container_type& v)
+    : _devs()
+{
+    *this = v;
+}
+/****************************************************************************/
+Developers::Developers(const Developers& that)
+    : _devs()
+{
+    *this = that._devs;
 }
 /****************************************************************************/
 Developers::Developers(const std::vector<std::string>& devs)
@@ -61,6 +77,8 @@ Developers::Developers(const std::vector<std::string>& devs)
 /****************************************************************************/
 Developers::~Developers()
 {
+    std::for_each(this->begin(), this->end(),
+        util::DeleteAndNullify<Developer>());
 }
 /****************************************************************************/
 Developers&
@@ -69,8 +87,16 @@ Developers::operator= (const std::vector<std::string>& devs)
     _devs.clear();
     std::vector<std::string>::const_iterator i;
     for (i = devs.begin() ; i != devs.end() ; ++i)
-        _devs.push_back(Developer(*i));
+        _devs.push_back(new Developer(*i));
     std::sort(_devs.begin(), _devs.end());
+    return *this;
+}
+/****************************************************************************/
+Developers&
+Developers::operator= (const container_type& v)
+{
+    for (const_iterator i = v.begin() ; i != v.end() ; ++i)
+        _devs.push_back(new Developer(**i));
     return *this;
 }
 /****************************************************************************/
@@ -79,7 +105,7 @@ std::vector<std::string>() const
 {
     std::vector<std::string> v;
     for (Developers::const_iterator i = this->begin() ; i != this->end() ; ++i)
-        v.push_back(i->user());
+        v.push_back((*i)->user());
     return v;
 }
 /****************************************************************************/

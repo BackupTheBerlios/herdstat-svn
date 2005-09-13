@@ -32,24 +32,99 @@
  * @brief General purpose utility functors.
  */
 
+#include <functional>
+
 namespace util {
+
+    /**
+     * Function object that dereferences the given pointers and
+     * then calls operator<.
+     */
 
     struct DereferenceLess
     {
-        template <typename Type>
-        bool operator() (Type p1, Type p2) const { return (*p1 < *p2); }
+        template <typename T>
+        bool operator() (T p1, T p2) const { return (*p1 < *p2); }
     };
+
+    /**
+     * Function object that dereferences the given pointers and
+     * then calls operator<.
+     */
 
     struct DereferenceGreater
     {
-        template <typename Type>
-        bool operator() (Type p1, Type p2) const { return (*p2 < *p1); }
+        template <typename T>
+        bool operator() (T p1, T p2) const { return (*p2 < *p1); }
     };
 
+    /**
+     * Function object that dereferences the given pointers and
+     * then calls operator==.
+     */
+
+    template <typename T>
     struct DereferenceEqual
+        : std::binary_function<const T*, const T*, bool>
     {
-        template <typename Type>
-        bool operator() (Type p1, Type p2) const { return (*p1 == *p2); }
+        bool operator() (const T *p1, const T *p2) const { return (*p1 == *p2); }
+    };
+
+    /**
+     * Function object that dereferences the given pointer and
+     * calls operator< against the given string.  Assumes the
+     * pointer type defines operator<(std::string).
+     */
+
+    template <typename T>
+    struct DereferenceStrLess
+        : std::binary_function<const T*, std::string, bool>
+    {
+        bool operator()(const T *p, std::string s) const { return (*p < s); }
+    };
+
+    /**
+     * Function object that dereferences the given pointer and
+     * calls operator> against the given string.  Assumes the
+     * pointer type defines operator>(std::string).
+     */
+
+    template <typename T>
+    struct DereferenceStrGreater
+        : std::binary_function<const T*, std::string, bool>
+    {
+        bool operator()(const T *p, std::string s) const { return (*p > s); }
+    };
+
+    /**
+     * Function object that dereferences the given pointer and
+     * calls operator== against the given string.  Assumes the
+     * pointer type defines operator==(std::string).
+     */
+
+    template <typename T>
+    struct DereferenceStrEqual
+        : std::binary_function<const T*, std::string, bool>
+    {
+        bool operator()(const T *p, std::string s) const { return (*p == s); }
+    };
+
+    /**
+     * Function object that deletes the given pointer and sets
+     * it to NULL.
+     */
+
+    template <typename T>
+    struct DeleteAndNullify : std::unary_function<T*, void>
+    {
+        void operator()(T *p) const
+        {
+            if (p)
+            {
+                delete p;
+                p = NULL;
+            }
+        }
     };
 
 } // namespace util

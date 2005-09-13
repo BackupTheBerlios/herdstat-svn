@@ -120,18 +120,14 @@ bool
 metadata_xml::text(const std::string& text)
 {
     if (in_herd)
-        _data._herds.push_back(util::lowercase(text));
+        _data._herds.push_back(new Herd(text));
     else if (in_email)
-    {
-        std::string s(util::lowercase(text));
-        _data._devs.push_back(s);
-        _cur_dev = _data._devs.find(s);
-        assert(_cur_dev != _data._devs.end());
-    }
+        _cur_dev = _data._devs.insert(_data._devs.end(),
+            new Developer(util::lowercase(text)));
     else if (in_name)
-        _cur_dev->set_name(text);
+        (*_cur_dev)->set_name(text);
     else if (in_desc)
-        _cur_dev->set_role(text);
+        (*_cur_dev)->set_role(text);
     else if (in_longdesc)
         _data.set_longdesc(text);
 

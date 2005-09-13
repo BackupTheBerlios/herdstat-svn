@@ -43,6 +43,10 @@ namespace portage {
         public:
             metadata();
             metadata(const std::string &pkg);
+            metadata(const metadata& that);
+            ~metadata();
+
+            metadata& operator= (const metadata& that);
 
             bool is_category() const;
             const std::string& pkg() const;

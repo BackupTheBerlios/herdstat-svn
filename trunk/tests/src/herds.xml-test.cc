@@ -49,19 +49,9 @@ main(int argc, char **argv)
         Herds::const_iterator i = herds.find("shell-tools");
         assert(i != herds.end());
 
-        std::cout << i->name() << "(" << i->size() << ")" << std::endl;
-        for (Herd::const_iterator d = i->begin() ; d != i->end() ; ++d)
-            std::cout << "  " << d->user() << std::endl;
-
-//        Herds::iterator i;
-//        for (i = h.begin() ; i != h.end() ; ++i)
-//        {
-//            std::cout << i->name() << "(" << i->size() << ")" << std::endl;
-
-//            Herd::iterator h;
-//            for (h = i->begin() ; h != i->end() ; ++h)
-//                std::cout << "  " << h->user() << std::endl;
-//        }
+        std::cout << (*i)->name() << "(" << (*i)->size() << ")" << std::endl;
+        for (Herd::const_iterator d = (*i)->begin() ; d != (*i)->end() ; ++d)
+            std::cout << "  " << (*d)->user() << std::endl;
     }
     catch (const BaseException &e)
     {

@@ -35,7 +35,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <functional>
+
+#include <herdstat/util/functors.hh>
 #include <herdstat/util/regex.hh>
 #include <herdstat/portage/gentoo_email_address.hh>
 
@@ -59,6 +60,8 @@ namespace portage {
                       const std::string &email = "",
                       const std::string &name = "");
 
+            ~Developer();
+
             /** Implicit conversion to std::string.
              * @returns Developer user name.
              */
@@ -70,8 +73,10 @@ namespace portage {
              */
             bool operator== (const std::string& user) const;
             bool operator== (const Developer& dev) const;
+            bool operator== (const util::regex_T& re) const;
             bool operator!= (const std::string& user) const;
             bool operator!= (const Developer& dev) const;
+            bool operator!= (const util::regex_T& re) const;
             bool operator>  (const std::string& user) const;
             bool operator>  (const Developer& dev) const;
             bool operator>= (const std::string& user) const;
@@ -128,10 +133,14 @@ namespace portage {
     { return (_user == user); }
     inline bool Developer::operator== (const Developer& that) const
     { return (_user == that._user); }
+    inline bool Developer::operator== (const util::regex_T& re) const
+    { return (re == _user); }
     inline bool Developer::operator!= (const std::string& user) const
     { return not (*this == user); }
     inline bool Developer::operator!= (const Developer& that) const
     { return not (*this == that); }
+    inline bool Developer::operator!= (const util::regex_T& re) const
+    { return (re != _user); }
     inline bool Developer::operator<  (const std::string& user) const
     { return (_user < user); }
     inline bool Developer::operator<  (const Developer& dev) const
@@ -196,7 +205,7 @@ namespace portage {
     class Developers
     {
         public:
-            typedef std::vector<Developer> container_type;
+            typedef std::vector<Developer *> container_type;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
             typedef container_type::value_type value_type;
@@ -205,13 +214,16 @@ namespace portage {
             typedef container_type::const_reference const_reference;
 
             Developers();
+            Developers(const Developers& that);
+            Developers(const container_type& v);
             Developers(const std::vector<std::string>& v);
             virtual ~Developers();
 
             /// Implicit conversion to std::vector<std::string>.
             operator std::vector<std::string>() const;
 
-            Developers& operator= (const std::vector<Developer>& v);
+            Developers& operator= (const Developers& that);
+            Developers& operator= (const container_type& v);
             Developers& operator= (const std::vector<std::string>& v);
 
             iterator begin();
@@ -224,23 +236,31 @@ namespace portage {
             const_reference back() const;
             iterator find(const std::string& dev);
             const_iterator find(const std::string& dev) const;
-            iterator find(const Developer& dev);
-            const_iterator find(const Developer& dev) const;
+            iterator find(const value_type dev);
+            const_iterator find(const value_type dev) const;
             iterator find(const util::regex_T &regex);
             const_iterator find(const util::regex_T &regex) const;
             size_type size() const;
             bool empty() const;
             void clear();
-            void push_back(const Developer& dev);
+            void push_back(const value_type dev);
             void push_back(const std::string& email);
+            void reserve(size_type size);
+
+            iterator insert(iterator pos, const value_type dev);
             template <class In>
             void insert(iterator pos, In begin, In end);
+
+        protected:
+            container_type& devs();
 
         private:
             container_type _devs;
     };
-    inline Developers& Developers::operator= (const std::vector<Developer>& v)
-    { _devs = v; return *this; }
+
+    inline Developers::container_type& Developers::devs() { return _devs; }
+    inline Developers& Developers::operator= (const Developers& that)
+    { *this = that._devs; return *this; }
     inline Developers::iterator Developers::begin() { return _devs.begin(); }
     inline Developers::const_iterator Developers::begin() const { return _devs.begin(); }
     inline Developers::iterator Developers::end() { return _devs.end(); }
@@ -252,28 +272,44 @@ namespace portage {
     inline Developers::size_type Developers::size() const { return _devs.size(); }
     inline bool Developers::empty() const { return _devs.empty(); }
     inline void Developers::clear() { return _devs.clear(); }
-    inline void Developers::push_back(const Developer& dev) { _devs.push_back(dev); }
+    inline void Developers::push_back(const value_type dev)
+    { _devs.push_back(dev); }
     inline void Developers::push_back(const std::string& email)
-    { _devs.push_back(Developer(email)); }
-
-    inline Developers::iterator Developers::find(const std::string& dev)
-    { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
-    inline Developers::const_iterator Developers::find(const std::string& dev) const
-    { return std::find(_devs.begin(), _devs.end(), dev.substr(0, dev.find('@'))); }
-    inline Developers::iterator Developers::find(const Developer& dev)
-    { return std::find(_devs.begin(), _devs.end(), dev); }
-    inline Developers::const_iterator Developers::find(const Developer& dev) const
-    { return std::find(_devs.begin(), _devs.end(), dev); }
-    inline Developers::iterator Developers::find(const util::regex_T &regex)
-    { return std::find_if(_devs.begin(), _devs.end(),
-            std::bind1st(util::regexMatch(), &regex)); }
-    inline Developers::const_iterator Developers::find(const util::regex_T &regex) const
-    { return std::find_if(_devs.begin(), _devs.end(),
-            std::bind1st(util::regexMatch(), &regex)); }
+    { _devs.push_back(new Developer(email)); }
+    inline void Developers::reserve(size_type size) { _devs.reserve(size); }
+    inline Developers::iterator Developers::insert(iterator pos, const value_type dev)
+    { return _devs.insert(pos, dev); }
     template <class In> inline void
     Developers::insert(iterator pos, In begin, In end)
     { _devs.insert(pos, begin, end); }
 
+    inline Developers::iterator Developers::find(const std::string& dev)
+    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
+    inline Developers::const_iterator Developers::find(const std::string& dev) const
+    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
+    inline Developers::iterator Developers::find(const value_type dev)
+    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+        util::DereferenceEqual<Developer>(), dev)); }
+    inline Developers::const_iterator Developers::find(const value_type dev) const
+    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+        util::DereferenceEqual<Developer>(), dev)); }
+
+    struct DeveloperRegexMatch
+        : std::binary_function<const util::regex_T *, const Developer *, bool>
+    {
+        bool operator()(const util::regex_T *re, const Developer *dev) const
+        { return (*re == dev->user()); }
+    };
+
+
+    inline Developers::iterator Developers::find(const util::regex_T &regex)
+    { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
+        DeveloperRegexMatch(), &regex)); }
+    inline Developers::const_iterator Developers::find(const util::regex_T &regex) const
+    { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
+        DeveloperRegexMatch(), &regex)); }
 
 } // namespace portage
 

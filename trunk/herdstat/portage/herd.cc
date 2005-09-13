@@ -46,9 +46,54 @@ Herd::Herd(const std::string &name,
         _name.erase(pos);
 }
 /****************************************************************************/
+Herd::Herd(const Herd& that)
+    : Developers(), _name(), _email(), _desc()
+{
+    *this = that;
+}
+/****************************************************************************/
+Herd::Herd(const container_type& v)
+    : Developers(), _name(), _email(), _desc()
+{
+}
+/****************************************************************************/
 Herd::Herd(const std::vector<std::string>& devs)
     : Developers(devs), _name(), _email(), _desc()
 {
+}
+/****************************************************************************/
+Herd::~Herd()
+{
+}
+/****************************************************************************/
+Herd&
+Herd::operator= (const Herd& that)
+{
+    for (const_iterator i = that.begin() ; i != that.end() ; ++i)
+        devs().push_back(new Developer(**i));
+    return *this;
+}
+/****************************************************************************/
+Herds::Herds() : _herds()
+{
+}
+/****************************************************************************/
+Herds::Herds(const container_type& v)
+    : _herds()
+{
+    *this = v;
+}
+/****************************************************************************/
+Herds::Herds(const Herds& that)
+    : _herds()
+{
+    *this = that;
+}
+/****************************************************************************/
+Herds::~Herds()
+{
+    std::for_each(this->begin(), this->end(),
+        util::DeleteAndNullify<Herd>());
 }
 /****************************************************************************/
 Herds&
@@ -57,8 +102,16 @@ Herds::operator= (const std::vector<std::string>& herds)
     _herds.clear();
     std::vector<std::string>::const_iterator i;
     for (i = herds.begin() ; i != herds.end() ; ++i)
-        _herds.push_back(Herd(*i));
-    std::sort(_herds.begin(), _herds.end());
+        _herds.push_back(new Herd(*i));
+    std::sort(_herds.begin(), _herds.end(), util::DereferenceLess());
+    return *this;
+}
+/****************************************************************************/
+Herds&
+Herds::operator= (const container_type& v)
+{
+    for (const_iterator i = v.begin() ; i != v.end() ; ++i)
+        _herds.push_back(new Herd(**i));
     return *this;
 }
 /****************************************************************************/
@@ -67,7 +120,7 @@ std::vector<std::string>() const
 {
     std::vector<std::string> v;
     for (Herds::const_iterator i = this->begin() ; i != this->end() ; ++i)
-        v.push_back(i->name());
+        v.push_back((*i)->name());
     return v;
 }
 /****************************************************************************/

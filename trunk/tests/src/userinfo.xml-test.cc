@@ -56,14 +56,14 @@ main(int argc, char **argv)
 //        {
 //        if(*i == dev)
 //        {
-        std::cout << "Name:       " << i->name() << "(" << i->user() << ")" << std::endl;
-        std::cout << "Email:      " << i->email() << std::endl;
-        std::cout << "PGP Key ID: " << i->pgpkey() << std::endl;
-        std::cout << "Joined on:  " << i->joined() << std::endl;
-        std::cout << "Birthday:   " << i->birthday() << std::endl;
-        std::cout << "Status:     " << i->status() << std::endl;
-        std::cout << "Roles:      " << i->role() << std::endl;
-        std::cout << "Location:   " << i->location() << std::endl;
+        std::cout << "Name:       " << (*i)->name() << "(" << (*i)->user() << ")" << std::endl;
+        std::cout << "Email:      " << (*i)->email() << std::endl;
+        std::cout << "PGP Key ID: " << (*i)->pgpkey() << std::endl;
+        std::cout << "Joined on:  " << (*i)->joined() << std::endl;
+        std::cout << "Birthday:   " << (*i)->birthday() << std::endl;
+        std::cout << "Status:     " << (*i)->status() << std::endl;
+        std::cout << "Roles:      " << (*i)->role() << std::endl;
+        std::cout << "Location:   " << (*i)->location() << std::endl;
 //        }
 //        }
     }

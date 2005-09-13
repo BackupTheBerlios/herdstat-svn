@@ -161,7 +161,7 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
         /* parse it's metadata.xml */
         const std::string path(portdir + "/" + *i + "/metadata.xml");
         const metadata_xml mxml(path);
-        metadata meta(mxml);
+        metadata meta(mxml.data());
         meta.set_pkg(*i);
 
         /* does it match the criteria? */
@@ -269,11 +269,10 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         else if ((i = herds.find(q->query)) != herds.end())
         {
             output("Herd", q->query);
-            if (not i->email().empty())
-                output("Email", i->email());
-            if (not i->desc().empty())
-                output("Description",
-                    util::tidy_whitespace(i->desc()));
+            if (not (*i)->email().empty())
+                output("Email", (*i)->email());
+            if (not (*i)->desc().empty())
+                output("Description", (*i)->desc());
         }
         else
             output("Herd", q->query);

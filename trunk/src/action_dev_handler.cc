@@ -122,10 +122,10 @@ action_dev_handler_T::display(const std::string &d)
                         
                 /* display herd info */
                 Herds::const_iterator h = herdsxml.herds().find(*i);
-                if (not h->email().empty())
-                    output("", h->email());
-                if (not h->desc().empty())
-                    output("", h->desc());
+                if (not (*h)->email().empty())
+                    output("", (*h)->email());
+                if (not (*h)->desc().empty())
+                    output("", (*h)->desc());
 
                 if (nh != herds.size())
                     output.endl();
@@ -211,15 +211,16 @@ action_dev_handler_T::operator() (opts_type &opts)
     if (all)
     {
         Developers all_devs;
+        /* for each herd... */
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
             /* for each developer in the herd... */
             Herd::const_iterator d;
-            for (d = h->begin() ; d != h->end() ; ++d)
+            for (d = (*h)->begin() ; d != (*h)->end() ; ++d)
             {
                 /* if the developer is not already in our list, add it */
                 if (all_devs.find(*d) == all_devs.end())
-                    all_devs.push_back(*d);
+                    all_devs.push_back(new Developer(**d));
             }
         }
 
@@ -231,7 +232,7 @@ action_dev_handler_T::operator() (opts_type &opts)
             for (d = devs.begin() ; d != devs.end() ; ++d)
             {
                 if (all_devs.find(*d) == all_devs.end())
-                    all_devs.push_back(*d);
+                    all_devs.push_back(new Developer(**d));
             }
         }
 
@@ -259,10 +260,10 @@ action_dev_handler_T::operator() (opts_type &opts)
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
             Herd::const_iterator d;
-            for (d = h->begin() ; d != h->end() ; ++d)
+            for (d = (*h)->begin() ; d != (*h)->end() ; ++d)
             {
-                if (regexp == d->user())
-                    opts.push_back(d->user());
+                if (regexp == (*d)->user())
+                    opts.push_back((*d)->user());
             }
         }
 
@@ -273,8 +274,8 @@ action_dev_handler_T::operator() (opts_type &opts)
             Developers::const_iterator d;
             for (d = devs.begin() ; d != devs.end() ; ++d)
             {
-                if (regexp == d->user())
-                    opts.push_back(d->user());
+                if (regexp == (*d)->user())
+                    opts.push_back((*d)->user());
             }
         }
 

@@ -64,20 +64,20 @@ void
 userinfo_xml::fill_developer(Developer& dev) const
 {
     assert(not dev.user().empty());
-    Herd::const_iterator d = this->_devs.find(dev);
-    if (d != this->_devs.end())
+    Herd::const_iterator d = _devs.find(dev.user());
+    if (d != _devs.end())
     {
-        if (dev.name().empty() and not d->name().empty())
-            dev.set_name(d->name());
+        if (dev.name().empty() and not (*d)->name().empty())
+            dev.set_name((*d)->name());
 //        if (dev.email().empty() and not d->email().empty())
 //            dev.set_email(d->email());
 
-        dev.set_status(d->status().empty() ? "Active" : d->status());
-        dev.set_location(d->location());
-        dev.set_joined(d->joined());
-        dev.set_birthday(d->birthday());
-        dev.set_role(d->role());
-        dev.set_pgpkey(d->pgpkey());
+        dev.set_status((*d)->status().empty() ? "Active" : (*d)->status());
+        dev.set_location((*d)->location());
+        dev.set_joined((*d)->joined());
+        dev.set_birthday((*d)->birthday());
+        dev.set_role((*d)->role());
+        dev.set_pgpkey((*d)->pgpkey());
     }
 }
 /****************************************************************************/
@@ -90,15 +90,9 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
         if (pos == attrs.end())
             throw Exception("<user> tag with no username attribute!");
 
-        Developer dev(pos->second);
-//        if (dev.email().empty())
-//            dev.set_email(pos->second+"@gentoo.org");
-        if (dev.status().empty())
-            dev.set_status("Active");
-
-        _devs.push_back(dev);
-        _cur_dev = _devs.end() - 1;
-        assert(_cur_dev != _devs.end());
+        Developer *dev = new Developer(pos->second);
+        dev->set_status("Active");
+        _cur_dev = _devs.insert(_devs.end(), dev);
 
         in_user = true;
     }
@@ -148,23 +142,23 @@ bool
 userinfo_xml::text(const std::string& text)
 {
     if (in_firstname)
-        _cur_dev->set_name(_cur_dev->name() + text);
+        (*_cur_dev)->set_name((*_cur_dev)->name() + text);
     else if (in_familyname)
-        _cur_dev->set_name(_cur_dev->name() + " " + text);
+        (*_cur_dev)->set_name((*_cur_dev)->name() + " " + text);
     else if (in_pgpkey)
-        _cur_dev->set_pgpkey(text);
+        (*_cur_dev)->set_pgpkey(text);
     else if (in_email)
-        _cur_dev->set_email(text);
+        (*_cur_dev)->set_email(text);
     else if (in_joined)
-        _cur_dev->set_joined(text);
+        (*_cur_dev)->set_joined(text);
     else if (in_birth)
-        _cur_dev->set_birthday(text);
+        (*_cur_dev)->set_birthday(text);
     else if (in_roles)
-        _cur_dev->set_role(_cur_dev->role() + text);
+        (*_cur_dev)->set_role((*_cur_dev)->role() + text);
     else if (in_status)
-        _cur_dev->set_status(text);
+        (*_cur_dev)->set_status(text);
     else if (in_location)
-        _cur_dev->set_location(_cur_dev->location() + text);
+        (*_cur_dev)->set_location((*_cur_dev)->location() + text);
     return true;
 }
 /****************************************************************************/

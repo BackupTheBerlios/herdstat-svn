@@ -179,7 +179,7 @@ metacache_T::fill()
             {
                 /* parse it */
                 const metadata_xml meta(path);
-                metadata data(meta);
+                metadata data(meta.data());
                 data.set_pkg(*p);
                 this->push_back(data);
             }
@@ -307,7 +307,7 @@ metacache_T::dump()
             Herds::const_iterator i, end = herds.end();
             for (i = herds.begin(), n = 1 ; i != end ; ++i, ++n)
             {
-                str += i->name();
+                str += (*i)->name();
                 if (n != herds.size())
                     str += ",";
             }
@@ -320,7 +320,7 @@ metacache_T::dump()
             Developers::const_iterator i, end = devs.end();
             for (i = devs.begin(), n = 1, str.clear() ; i != end ; ++i, ++n)
             {
-                str += i->email();
+                str += (*i)->email();
                 if (n != devs.size())
                     str += ",";
             }

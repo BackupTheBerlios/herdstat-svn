@@ -1,5 +1,23 @@
 ChangeLog for herdstat
 
+2005-09-13 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/portage/herd.cc, herdstat/portage/herd.hh,
+	herdstat/portage/developer.cc, herdstat/portage/developer.hh: Use
+	vector of pointers for our herd/developer containers.
+	* herdstat/portage/metadata.xml.hh: Don't implicitly convert to
+	metadata as it looks like the copy constructor is invoked.  Added a
+	data() member instead that returns a const reference.
+	* herdstat/portage/herds_xml.cc, herdstat/portage/herds_xml.hh,
+	herdstat/portage/devaway_xml.cc, herdstat/portage/devaway_xml.hh,
+	herdstat/portage/metadata.cc, herdstat/portage/metadata.hh: Updated
+	with herd/developer design changes.
+	* herdstat/util/functors.hh: Added DereferenceStrLess,
+	DereferenceStrGreater, and DereferenceStrEqual template functors for
+	comparing a pointer of a certain type against a std::string.  Also
+	added DeleteAndNullify functor for cleaning up containers of pointers
+	with a simple std::for_each call.
+
 2005-09-12 Aaron Walker <ka0ttic@gentoo.org>
 
 	* Makefile.am.common: Added more warning flags: -Woverloaded-virtual

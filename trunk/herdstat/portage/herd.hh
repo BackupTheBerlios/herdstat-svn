@@ -49,7 +49,13 @@ namespace portage {
             Herd(const std::string &name,
                  const std::string &email = "",
                  const std::string &desc  = "");
+            Herd(const Herd& that);
+            Herd(const container_type& v);
             Herd(const std::vector<std::string>& v);
+
+            virtual ~Herd();
+
+            Herd& operator= (const Herd& that);
 
             /// Implicit conversion to std::string.
             operator std::string() const;
@@ -60,8 +66,10 @@ namespace portage {
              */
             bool operator== (const std::string& name) const;
             bool operator== (const Herd& herd) const;
+            bool operator== (const util::regex_T& re) const;
             bool operator!= (const std::string& name) const;
             bool operator!= (const Herd& herd) const;
+            bool operator!= (const util::regex_T& re) const;
             bool operator<  (const std::string& name) const;
             bool operator<  (const Herd& herd) const;
             bool operator>  (const std::string& name) const;
@@ -89,10 +97,14 @@ namespace portage {
     { return (_name == name); }
     inline bool Herd::operator== (const Herd& herd) const
     { return (_name == herd._name); }
+    inline bool Herd::operator== (const util::regex_T& re) const
+    { return (re == _name); }
     inline bool Herd::operator!= (const std::string& name) const
     { return (_name != name); }
     inline bool Herd::operator!= (const Herd& herd) const
     { return (_name != herd._name); }
+    inline bool Herd::operator!= (const util::regex_T& re) const
+    { return (re != _name); }
     inline bool Herd::operator< (const std::string& name) const
     { return (_name < name); }
     inline bool Herd::operator< (const Herd& herd) const
@@ -123,7 +135,7 @@ namespace portage {
     class Herds
     {
         public:
-            typedef std::vector<Herd> container_type;
+            typedef std::vector<Herd *> container_type;
             typedef container_type::value_type value_type;
             typedef container_type::reference reference;
             typedef container_type::const_reference const_reference;
@@ -131,15 +143,18 @@ namespace portage {
             typedef container_type::const_iterator const_iterator;
             typedef container_type::size_type size_type;
 
-            Herds() : _herds() { }
-            Herds(const std::vector<Herd>& v) : _herds(v) { }
+            Herds();
+            Herds(const container_type& v);
+            Herds(const Herds& that);
+            ~Herds();
 
             /// Implicit conversion to std::vector<herd>
-            operator std::vector<Herd>() const;
+            operator container_type() const;
             operator std::vector<std::string>() const;
 
-            Herds& operator= (const std::vector<Herd>& v);
+            Herds& operator= (const container_type& v);
             Herds& operator= (const std::vector<std::string>& v);
+            Herds& operator= (const Herds& that);
 
             iterator begin();
             const_iterator begin() const;
@@ -152,14 +167,15 @@ namespace portage {
             size_type size() const;
             bool empty() const;
             void clear();
-            void push_back(const Herd& h);
+            void push_back(const value_type h);
             iterator find(const std::string &herd);
-            iterator find(const Herd& h);
+            iterator find(const value_type h);
             iterator find(const util::regex_T &regex);
             const_iterator find(const std::string &herd) const;
-            const_iterator find(const Herd& h) const;
+            const_iterator find(const value_type h) const;
             const_iterator find(const util::regex_T &regex) const;
 
+            iterator insert(iterator pos, const value_type h);
             template <class In>
             void insert(iterator pos, In begin, In end);
 
@@ -167,9 +183,9 @@ namespace portage {
             container_type _herds;
     };
 
-    inline Herds::operator std::vector<Herd>() const { return _herds; }
-    inline Herds& Herds::operator= (const std::vector<Herd>& v)
-    { _herds = v; return *this; }
+    inline Herds::operator Herds::container_type() const { return _herds; }
+    inline Herds& Herds::operator= (const Herds& that)
+    { *this = that._herds; return *this; }
     inline Herds::iterator Herds::begin() { return _herds.begin(); }
     inline Herds::const_iterator Herds::begin() const { return _herds.begin(); }
     inline Herds::iterator Herds::end() { return _herds.end(); }
@@ -182,23 +198,35 @@ namespace portage {
     inline Herds::size_type Herds::size() const { return _herds.size(); }
     inline bool Herds::empty() const { return _herds.empty(); }
     inline void Herds::clear() { return _herds.clear(); }
-    inline void Herds::push_back(const Herd& h) { _herds.push_back(h); }
+    inline void Herds::push_back(const value_type h) { _herds.push_back(h); }
 
     inline Herds::iterator Herds::find(const std::string& herd)
-    { return std::find(_herds.begin(), _herds.end(), herd); }
+    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
+        util::DereferenceStrEqual<Herd>(), herd)); }
     inline Herds::const_iterator Herds::find(const std::string& herd) const
-    { return std::find(_herds.begin(), _herds.end(), herd); }
-    inline Herds::iterator Herds::find(const Herd& h)
+    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
+        util::DereferenceStrEqual<Herd>(), herd)); }
+    inline Herds::iterator Herds::find(const value_type h)
     { return std::find(_herds.begin(), _herds.end(), h); }
-    inline Herds::const_iterator Herds::find(const Herd& h) const
+    inline Herds::const_iterator Herds::find(const value_type h) const
     { return std::find(_herds.begin(), _herds.end(), h); }
+
+    struct HerdRegexMatch
+        : std::binary_function<const util::regex_T *, const Herd *, bool>
+    {
+        bool operator() (const util::regex_T *re, const Herd *herd) const
+        { return (*re == herd->name()); }
+    };
+
     inline Herds::iterator Herds::find(const util::regex_T &regex)
     { return std::find_if(_herds.begin(), _herds.end(),
-            std::bind1st(util::regexMatch(), &regex)); }
+            std::bind1st(HerdRegexMatch(), &regex)); }
     inline Herds::const_iterator Herds::find(const util::regex_T &regex) const
     { return std::find_if(_herds.begin(), _herds.end(),
-            std::bind1st(util::regexMatch(), &regex)); }
+            std::bind1st(HerdRegexMatch(), &regex)); }
 
+    inline Herds::iterator Herds::insert(iterator pos, const value_type h)
+    { return _herds.insert(pos, h); }
     template <class In> inline void
     Herds::insert(iterator pos, In begin, In end)
     { _herds.insert(pos, begin, end); }

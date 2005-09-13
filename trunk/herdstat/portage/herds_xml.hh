@@ -52,8 +52,8 @@ namespace portage {
 
             void set_cvsdir(const std::string& path);
 
-            /// Implicit conversion to std::vector<herd>.
-            operator std::vector<Herd>() const;
+            /// Implicit conversion to Herds::container_type
+            operator Herds::container_type() const;
 
             const Herds& herds() const;
             Herds& herds();
@@ -92,7 +92,7 @@ namespace portage {
             Herd::iterator  _cur_dev;
     };
 
-    inline herds_xml::operator std::vector<Herd>() const { return _herds; }
+    inline herds_xml::operator Herds::container_type() const { return _herds; }
     inline const Herds& herds_xml::herds() const { return _herds; }
     inline Herds& herds_xml::herds() { return _herds; }
     inline bool herds_xml::empty() const { return _herds.empty(); }

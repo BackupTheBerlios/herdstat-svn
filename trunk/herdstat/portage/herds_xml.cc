@@ -47,7 +47,7 @@ class mpHandler : public xml::saxhandler
 {
     public:
         mpHandler() : devs(), in_dev(false), _cur_role() { }
-        virtual ~mpHandler() { }
+        virtual ~mpHandler();
 
         Herd devs;
 
@@ -61,6 +61,10 @@ class mpHandler : public xml::saxhandler
         bool in_dev;
         std::string _cur_role;
 };
+
+mpHandler::~mpHandler()
+{
+}
 
 bool
 mpHandler::start_element(const std::string& name, const attrs_type& attrs)
@@ -89,14 +93,31 @@ mpHandler::text(const std::string& text)
 {
     if (in_dev)
     {
-        Developer dev(util::lowercase(text));
+        Developer *dev = new Developer(util::lowercase(text));
         if (not _cur_role.empty())
-            dev.set_role(_cur_role);
+            dev->set_role(_cur_role);
 
         devs.push_back(dev);
     }
 
     return true;
+}
+
+/* parse XML file listed in a <maintainingproject> tag */
+static void parse_mp_xml(Herd * const herd, const std::string& path)
+{
+    xml::Document<mpHandler> xml(path);
+    mpHandler *handler = xml.handler();
+    herd->reserve(herd->size() + handler->devs.size());
+//                (*_cur_herd)->insert((*_cur_herd)->end(),
+//                        handler->devs.begin(), handler->devs.end());
+            
+    /* unfortunately, we cannot use multi-range insert or std::copy,
+     * as we need to call the Developer copy constructor so that the
+     * pointer elements are just simply copied */
+    Herd::iterator i;
+    for (i = handler->devs.begin() ; i != handler->devs.end() ; ++i)
+        herd->push_back(new Developer(**i));
 }
 
 } // namespace anonymous
@@ -144,7 +165,7 @@ herds_xml::parse(const std::string& path)
     this->parse_file(this->path().c_str());
 
     if (not _herds.empty())
-        std::sort(_herds.begin(), _herds.end());
+        std::sort(_herds.begin(), _herds.end(), util::DereferenceLess());
 
     this->timer().stop();
 }
@@ -215,13 +236,13 @@ herds_xml::fill_developer(Developer& dev) const
     for (Herds::const_iterator h = _herds.begin() ; h != _herds.end() ; ++h)
     {
         /* is the developer in this herd? */
-        Herd::const_iterator d = h->find(dev);
-        if (d != h->end())
+        Herd::const_iterator d = (*h)->find(dev.user());
+        if (d != (*h)->end())
         {
-            if (dev.name().empty() and not d->name().empty())
-                dev.set_name(d->name());
-            dev.set_email(d->email());
-            dev.append_herd(h->name());
+            if (dev.name().empty() and not (*d)->name().empty())
+                dev.set_name((*d)->name());
+            dev.set_email((*d)->email());
+            dev.append_herd((*h)->name());
         }
     }
 }
@@ -280,26 +301,18 @@ bool
 herds_xml::text(const std::string& text)
 {
     if (in_herd_name)
-    {
-        _herds.push_back(Herd(text));
-        _cur_herd = _herds.find(text);
-        assert(_cur_herd != _herds.end());
-    }
+        _cur_herd = _herds.insert(_herds.end(), new Herd(text));
     else if (in_herd_desc)
-        _cur_herd->set_desc(util::tidy_whitespace(text));
+        (*_cur_herd)->set_desc(util::tidy_whitespace(text));
     else if (in_herd_email)
-        _cur_herd->set_email(text);        
+        (*_cur_herd)->set_email(text);        
     else if (in_maintainer_email)
-    {
-        const std::string s(util::lowercase(text));
-        _cur_herd->push_back(s);
-        _cur_dev = _cur_herd->find(s);
-        assert(_cur_dev != _cur_herd->end());
-    }
+        _cur_dev = (*_cur_herd)->insert((*_cur_herd)->end(),
+            new Developer(util::lowercase(text)));
     else if (in_maintainer_name)
-        _cur_dev->set_name(_cur_dev->name() + text);
+        (*_cur_dev)->set_name((*_cur_dev)->name() + text);
     else if (in_maintainer_role)
-        _cur_dev->set_role(text);
+        (*_cur_dev)->set_role(text);
 
     else if (in_maintaining_prj)
     {
@@ -310,7 +323,7 @@ herds_xml::text(const std::string& text)
          */
 
         std::string path(std::string(util::dirname(this->path()))+"/"+
-                _cur_herd->name()+".xml"); 
+                (*_cur_herd)->name()+".xml"); 
 
         if (_cvsdir.empty())
         {
@@ -350,25 +363,14 @@ herds_xml::text(const std::string& text)
                 std::cerr << "Failed to save '" << url << "' to" << std::endl
                     << "'" << path << "'." << std::endl;
             else
-            {
-                xml::Document<mpHandler> xml(path);
-                mpHandler *handler = xml.handler();
-
-                _cur_herd->insert(_cur_herd->end(),
-                    handler->devs.begin(), handler->devs.end());
-            }
+                parse_mp_xml(*_cur_herd, path);
         }
         else
         {
             std::string cvspath(util::sprintf(mpBaseLocal, _cvsdir.c_str(),
                         text.c_str()));
             if (util::is_file(cvspath))
-            {
-                xml::Document<mpHandler> xml(cvspath);
-                mpHandler *handler = xml.handler();
-                _cur_herd->insert(_cur_herd->end(),
-                        handler->devs.begin(), handler->devs.end());
-            }
+                parse_mp_xml(*_cur_herd, cvspath);
         }
     }
 

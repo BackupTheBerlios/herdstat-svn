@@ -36,7 +36,7 @@ action_away_handler_T::~action_away_handler_T()
 }
 
 void
-action_away_handler_T::display(Herd::iterator dev)
+action_away_handler_T::display(Developer * const dev)
 {
     ++size;
 
@@ -76,7 +76,7 @@ action_away_handler_T::operator() (opts_type &opts)
     {
         for (d = devs.begin() ; d != devs.end() ; ++d)
         {
-            display(d);
+            display(*d);
 
             if (not quiet and ((d+1) != devs.end()))
                 output.endl();
@@ -103,10 +103,11 @@ action_away_handler_T::operator() (opts_type &opts)
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
+        /* FIXME: use an algo */
         for (d = devs.begin() ; d != devs.end() ; ++d)
         {
-            if (regexp == d->user())
-                opts.push_back(d->user());
+            if (regexp == (*d)->user())
+                opts.push_back((*d)->user());
         }
 
         if (opts.empty())
@@ -129,7 +130,7 @@ action_away_handler_T::operator() (opts_type &opts)
             if (d == devs.end())
                 throw DevException();
 
-            display(d);
+            display(*d);
         }
         catch (const DevException)
         {

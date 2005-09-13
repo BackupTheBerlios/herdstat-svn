@@ -41,7 +41,7 @@ display_herd(const Herd& herd)
     util::color_map_T color;
 
     Herd devs(herd);
-    std::sort(devs.begin(), devs.end());
+    std::sort(devs.begin(), devs.end(), util::DereferenceLess());
 
     if (not optget("quiet", bool))
     {
@@ -62,16 +62,16 @@ display_herd(const Herd& herd)
 
         for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
         {
-            if ((i->user() == user) or not optget("color", bool))
-                out("", i->email());
+            if (((*i)->user() == user) or not optget("color", bool))
+                out("", (*i)->email());
             else
-                out("", color[blue] + i->email() + color[none]);
+                out("", color[blue] + (*i)->email() + color[none]);
 
-            if (not i->name().empty())
-                out("", i->name());
-            if (not i->role().empty())
-                out("", i->role());
-            if (not i->name().empty() or not i->role().empty())
+            if (not (*i)->name().empty())
+                out("", (*i)->name());
+            if (not (*i)->role().empty())
+                out("", (*i)->role());
+            if (not (*i)->name().empty() or not (*i)->role().empty())
                 out.endl();
         }
     }
@@ -100,12 +100,12 @@ display_herds(const Herds& herds)
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
             if (optget("color", bool))
-                out("", color[blue] + h->name() + color[none]);
+                out("", color[blue] + (*h)->name() + color[none]);
             else
-                out("", h->name());
+                out("", (*h)->name());
 
-            if (not h->desc().empty())
-                out("", h->desc());
+            if (not (*h)->desc().empty())
+                out("", (*h)->desc());
 
             if (not optget("count", bool) and n != herds.size())
                 out.endl();
@@ -172,8 +172,8 @@ action_herd_handler_T::operator() (opts_type &opts)
         Herds::const_iterator h;
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            if (regexp == h->name())
-                opts.push_back(h->name());
+            if (regexp == (*h)->name())
+                opts.push_back((*h)->name());
         }
     }
 
@@ -201,8 +201,8 @@ action_herd_handler_T::operator() (opts_type &opts)
                 throw HerdException();
         }
 
-        display_herd(*h);
-        size += h->size();
+        display_herd(**h);
+        size += (*h)->size();
 
         /* only skip a line if we're not displaying the last one */
         if (not count and n != opts.size())

@@ -70,7 +70,7 @@ devaway_xml::parse(const std::string& path)
     this->parse_file(this->path().c_str());
 
     if (not _devs.empty())
-        std::sort(_devs.begin(), _devs.end());
+        std::sort(_devs.begin(), _devs.end(), util::DereferenceLess());
 
     this->timer().stop();
 }
@@ -131,11 +131,11 @@ devaway_xml::fill_developer(Developer& dev) const
 {
     assert(not dev.user().empty());
 
-    Developers::const_iterator d = _devs.find(dev);
+    Developers::const_iterator d = _devs.find(dev.user());
     if (d != _devs.end())
     {
         dev.set_away(true);
-        dev.set_awaymsg(d->awaymsg());
+        dev.set_awaymsg((*d)->awaymsg());
     }
 }
 /****************************************************************************/
@@ -145,8 +145,8 @@ devaway_xml::keys() const
     std::vector<std::string> v;
     for (Developers::const_iterator i = _devs.begin() ; i != _devs.end() ; ++i)
     {
-        v.push_back(i->user());
-        v.push_back(i->email());
+        v.push_back((*i)->user());
+        v.push_back((*i)->email());
     }
     return v;
 }
@@ -165,10 +165,7 @@ devaway_xml::start_element(const std::string& name, const attrs_type& attrs)
             return false;
         }
 
-        Developer dev(pos->second);
-        _devs.push_back(dev);
-        _cur_dev = _devs.find(dev);
-        assert(_cur_dev != _devs.end());
+        _cur_dev = _devs.insert(_devs.end(), new Developer(pos->second));
 
         in_dev = true;
     }
@@ -192,8 +189,8 @@ bool
 devaway_xml::text(const std::string& text)
 {
     if (in_reason)
-        _cur_dev->set_awaymsg(util::tidy_whitespace(
-                    _cur_dev->awaymsg() + text));
+        (*_cur_dev)->set_awaymsg(util::tidy_whitespace(
+                    (*_cur_dev)->awaymsg() + text));
 
     return true;
 }
