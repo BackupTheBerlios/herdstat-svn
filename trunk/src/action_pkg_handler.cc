@@ -128,12 +128,10 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
                 if (with() == "none")
                 {
                     if (devs.empty() or ((devs.size() == 1) and
-                        (devs.find(criteria) != devs.end()) or
-                        (devs.find(criteria+"@gentoo.org") != devs.end())))
+                        (devs.find(criteria) != devs.end())))
                         return true;
                 }
-                else if ((devs.find(with) != devs.end()) or
-                         (devs.find(with()+"@gentoo.org") != devs.end()))
+                else if (devs.find(with) != devs.end())
                     return true;
             }
         }
@@ -197,20 +195,20 @@ action_pkg_handler_T::search(const opts_type &opts)
                 regexp.assign(*i, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
             /* does it match the criteria? */
-            if (metadata_matches(*m, *i))
+            if (metadata_matches(**m, *i))
             {
 //                debug_msg("Match found in %s.", m->path.c_str());
 
                 /* we've already inserted at least one package */
                 std::map<std::string, pkgQuery_T * >::iterator mpos;
                 if ((mpos = matches.find(*i)) != matches.end())
-                    mpos->second->insert(std::make_pair(m->pkg(), m->longdesc()));
+                    mpos->second->insert(std::make_pair((*m)->pkg(), (*m)->longdesc()));
                 /* nope, so create a new query object */
                 else
                 {
                     matches[*i] = new pkgQuery_T(*i, with(), dev);
                     matches[*i]->date = std::time(NULL);
-                    matches[*i]->insert(std::make_pair(m->pkg(), m->longdesc()));
+                    matches[*i]->insert(std::make_pair((*m)->pkg(), (*m)->longdesc()));
 
                     if (dev)
                     {

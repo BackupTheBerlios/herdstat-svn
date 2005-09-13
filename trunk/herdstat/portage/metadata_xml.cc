@@ -125,11 +125,11 @@ metadata_xml::text(const std::string& text)
         _cur_dev = _data._devs.insert(_data._devs.end(),
             new Developer(util::lowercase(text)));
     else if (in_name)
-        (*_cur_dev)->set_name(text);
+        (*_cur_dev)->set_name((*_cur_dev)->name() + text);
     else if (in_desc)
         (*_cur_dev)->set_role(text);
     else if (in_longdesc)
-        _data.set_longdesc(text);
+        _data.set_longdesc(util::tidy_whitespace(_data.longdesc() + text));
 
     return true;
 }

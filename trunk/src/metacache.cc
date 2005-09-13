@@ -48,6 +48,11 @@ metacache_T::metacache_T(const std::string &portdir)
 {
 }
 
+metacache_T::~metacache_T()
+{
+    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
+}
+
 /*
  * Is the cache valid?
  */
@@ -179,8 +184,8 @@ metacache_T::fill()
             {
                 /* parse it */
                 const metadata_xml meta(path);
-                metadata data(meta.data());
-                data.set_pkg(*p);
+                metadata *data = new metadata(meta.data());
+                data->set_pkg(*p);
                 this->push_back(data);
             }
         }
@@ -222,13 +227,16 @@ metacache_T::load()
                 continue;
 
             std::string str;
-            metadata meta(i->first);
-            Herds& herds(meta.herds());
-            Developers&  devs(meta.devs());
+            metadata *meta = new metadata(i->first);
+            Herds& herds(meta->herds());
+            Developers&  devs(meta->devs());
 
             std::vector<std::string> parts = util::split(i->second, ':', true);
             if (parts.empty())
+            {
+                delete meta;
                 throw Exception();
+            }
 
             /* get herds */
             str = parts.front();
@@ -257,7 +265,7 @@ metacache_T::load()
                     parts.erase(parts.begin());
                 }
 
-                meta.set_longdesc(str);
+                meta->set_longdesc(str);
             }
 
             this->push_back(meta);
@@ -295,12 +303,12 @@ metacache_T::dump()
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
-        const Herds& herds(ci->herds());
-        const Developers& devs(ci->devs());
+        const Herds& herds((*ci)->herds());
+        const Developers& devs((*ci)->devs());
         std::string str;
         std::size_t n;
 
-        f << ci->pkg() << "=";
+        f << (*ci)->pkg() << "=";
 
         /* herds */
         {
@@ -329,10 +337,10 @@ metacache_T::dump()
         f << str << ":";
 
         /* longdesc */
-        if (ci->longdesc().empty())
+        if ((*ci)->longdesc().empty())
             f << std::endl;
         else
-            f << util::tidy_whitespace(ci->longdesc()) << std::endl;
+            f << (*ci)->longdesc() << std::endl;
     }
 }
 
