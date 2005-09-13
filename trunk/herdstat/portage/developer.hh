@@ -213,16 +213,42 @@ namespace portage {
             typedef container_type::reference reference;
             typedef container_type::const_reference const_reference;
 
+            /// Default constructor.
             Developers();
+
+            /** Copy constructor.
+             * @param that Reference to another Developers object.
+             */
             Developers(const Developers& that);
+
+            /** Constructor. Assign a container_type.
+             * @param v A reference to a container_type.
+             */
             Developers(const container_type& v);
+
+            /** Instantiate a Developer for each developer nick in the given
+             * vector.
+             * @param v Reference to a std::vector<std::string> of developer
+             *          nicks (username).
+             */
             Developers(const std::vector<std::string>& v);
+
+            /// Destructor.
             virtual ~Developers();
 
             /// Implicit conversion to std::vector<std::string>.
             operator std::vector<std::string>() const;
 
+            /** Copy assignment operator.
+             * @param that Reference to another Developers object.
+             * @returns Reference to this.
+             */
             Developers& operator= (const Developers& that);
+
+            /** Assign a new container_type.
+             * @param v Reference to container_type.
+             * @returns Reference to this.
+             */
             Developers& operator= (const container_type& v);
             Developers& operator= (const std::vector<std::string>& v);
 

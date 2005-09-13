@@ -143,19 +143,47 @@ namespace portage {
             typedef container_type::const_iterator const_iterator;
             typedef container_type::size_type size_type;
 
+            /// Default constructor.
             Herds();
+
+            /** Constructor.  Initialize this herd with a container_type.
+             * @param v Reference to a container_type.
+             */
             Herds(const container_type& v);
+
+            /** Copy constructor.
+             * @param that Reference to another Herds object.
+             */
             Herds(const Herds& that);
+
+            /// Destructor.
             ~Herds();
 
-            /// Implicit conversion to std::vector<herd>
+            /// Implicit conversion to container_type.
             operator container_type() const;
+            /// Implicit conversion to std::vector<std::string>.
             operator std::vector<std::string>() const;
 
+            /** Assign a new container_type.
+             * @param v Reference to a container_type object.
+             * @returns Reference to this.
+             */
             Herds& operator= (const container_type& v);
+
+            /** Instantiate a Herd for each string in the given vector and
+             * insert it into our container.
+             * @param v Reference to a std::vector<std::string> of herd names.
+             * @returns Reference to this.
+             */
             Herds& operator= (const std::vector<std::string>& v);
+
+            /** Copy assignment operator.
+             * @param that Reference to another Herds object.
+             * @returns Reference to this.
+             */
             Herds& operator= (const Herds& that);
 
+            /* container_type subset */
             iterator begin();
             const_iterator begin() const;
             iterator end();
@@ -168,16 +196,16 @@ namespace portage {
             bool empty() const;
             void clear();
             void push_back(const value_type h);
+            iterator insert(iterator pos, const value_type h);
+            template <class In>
+            void insert(iterator pos, In begin, In end);
+
             iterator find(const std::string &herd);
             iterator find(const value_type h);
             iterator find(const util::regex_T &regex);
             const_iterator find(const std::string &herd) const;
             const_iterator find(const value_type h) const;
             const_iterator find(const util::regex_T &regex) const;
-
-            iterator insert(iterator pos, const value_type h);
-            template <class In>
-            void insert(iterator pos, In begin, In end);
 
         private:
             container_type _herds;
