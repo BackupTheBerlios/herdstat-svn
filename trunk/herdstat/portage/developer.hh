@@ -345,12 +345,6 @@ namespace portage {
     inline Developers::iterator Developers::find(const std::string& dev) const
     { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
         util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
-//    inline Developers::iterator Developers::find(const value_type dev)
-//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-//        util::DereferenceEqual<Developer>(), dev)); }
-//    inline Developers::const_iterator Developers::find(const value_type dev) const
-//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-//        util::DereferenceEqual<Developer>(), dev)); }
 
     struct DeveloperRegexMatch
         : std::binary_function<const util::regex_T *, const Developer *, bool>
@@ -362,9 +356,6 @@ namespace portage {
     inline Developers::iterator Developers::find(const util::regex_T &regex) const
     { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
         DeveloperRegexMatch(), &regex)); }
-//    inline Developers::const_iterator Developers::find(const util::regex_T &regex) const
-//    { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
-//        DeveloperRegexMatch(), &regex)); }
 
     inline Developers::value_type
     Developers::front()

@@ -297,15 +297,6 @@ namespace portage {
     inline Herds::iterator Herds::find(const std::string& herd) const
     { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
         util::DereferenceStrEqual<Herd>(), herd)); }
-//    inline Herds::const_iterator Herds::find(const std::string& herd) const
-//    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
-//        util::DereferenceStrEqual<Herd>(), herd)); }
-//    inline Herds::iterator Herds::find(const value_type h)
-//    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
-//        util::DereferenceEqual<Herd>(), h)); }
-//    inline Herds::const_iterator Herds::find(const value_type h) const
-//    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
-//        util::DereferenceEqual<Herd>(), h)); }
 
     struct HerdRegexMatch
         : std::binary_function<const util::regex_T *, const Herd *, bool>
@@ -317,9 +308,6 @@ namespace portage {
     inline Herds::iterator Herds::find(const util::regex_T &regex) const
     { return std::find_if(_herds.begin(), _herds.end(),
             std::bind1st(HerdRegexMatch(), &regex)); }
-//    inline Herds::const_iterator Herds::find(const util::regex_T &regex) const
-//    { return std::find_if(_herds.begin(), _herds.end(),
-//            std::bind1st(HerdRegexMatch(), &regex)); }
 
     inline Herds::value_type
     Herds::front()
