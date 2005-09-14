@@ -26,7 +26,6 @@
 
 #include <iostream>
 #include <cassert>
-#include <algorithm>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/xml/document.hh>
@@ -124,10 +123,9 @@ static void parse_mp_xml(Herd * const herd, const std::string& path)
 namespace portage {
 /*** static members *********************************************************/
 const char * const herds_xml::_local_default = LOCALSTATEDIR"/herds.xml";
-const char * const herds_xml::_remote_default = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain";
 /****************************************************************************/
 herds_xml::herds_xml()
-    : xmlBase(), _herds(), _cvsdir(), in_herd(false), in_herd_name(false),
+    : xmlBase(), _herds(), _cvsdir(), _fetch(), in_herd(false), in_herd_name(false),
       in_herd_email(false), in_herd_desc(false), in_maintainer(false),
       in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
@@ -136,13 +134,12 @@ herds_xml::herds_xml()
 }
 /****************************************************************************/
 herds_xml::herds_xml(const std::string& path)
-    : xmlBase(path), _herds(), _cvsdir(), in_herd(false), in_herd_name(false),
-      in_herd_email(false), in_herd_desc(false), in_maintainer(false),
-      in_maintainer_name(false), in_maintainer_email(false),
+    : xmlBase(path), _herds(), _cvsdir(), _fetch(), in_herd(false),
+      in_herd_name(false), in_herd_email(false), in_herd_desc(false),
+      in_maintainer(false), in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
       _cur_herd(), _cur_dev()
 {
-    this->fetch();
     this->parse();
 }
 /****************************************************************************/
@@ -166,61 +163,61 @@ herds_xml::parse(const std::string& path)
     this->timer().stop();
 }
 /****************************************************************************/
-void
-herds_xml::do_fetch(const std::string& path) const throw (FetchException)
-{
-    char *result = NULL;
+//void
+//herds_xml::do_fetch(const std::string& path) const throw (FetchException)
+//{
+//    char *result = NULL;
 
-    if (not path.empty())
-        this->set_path(path);
-    else if ((result = std::getenv("HERDS")))
-        this->set_path(result);
-    else if (this->path().empty())
-        this->set_path(_local_default);
+//    if (not path.empty())
+//        this->set_path(path);
+//    else if ((result = std::getenv("HERDS")))
+//        this->set_path(result);
+//    else if (this->path().empty())
+//        this->set_path(_local_default);
 
-    util::stat_T herdsxml(this->path());
-    std::time_t now(std::time(NULL));
-    if ((now != static_cast<std::time_t>(-1)) and herdsxml.exists() and
-        ((now - herdsxml.mtime()) < HERDSXML_EXPIRE) and (herdsxml.size() > 0))
-        return;
-    
-    /* exists but expired */
-    else if (herdsxml.exists() and (herdsxml.size() > 0))
-    {
-        /* back it up in case fetching fails */
-        util::copy_file(this->path(), this->path()+".bak");
-    }
+//    util::stat_T herdsxml(this->path());
+//    std::time_t now(std::time(NULL));
+//    if ((now != static_cast<std::time_t>(-1)) and herdsxml.exists() and
+//        ((now - herdsxml.mtime()) < HERDSXML_EXPIRE) and (herdsxml.size() > 0))
+//        return;
+//    
+//    /* exists but expired */
+//    else if (herdsxml.exists() and (herdsxml.size() > 0))
+//    {
+//        /* back it up in case fetching fails */
+//        util::copy_file(this->path(), this->path()+".bak");
+//    }
 
-    try
-    {
-        _fetch(_remote_default, this->path());
+//    try
+//    {
+//        _fetch(_remote_default, this->path());
 
-        /* double check */
-        if (not herdsxml() or (herdsxml.size() == 0))
-            throw FetchException();
+//        /* double check */
+//        if (not herdsxml() or (herdsxml.size() == 0))
+//            throw FetchException();
 
-        /* remove backup */
-        unlink((this->path()+".bak").c_str());
-    }
-    catch (const FetchException& e)
-    {
-        std::cerr << "Error fetching " << _remote_default << std::endl;
+//        /* remove backup */
+//        unlink((this->path()+".bak").c_str());
+//    }
+//    catch (const FetchException& e)
+//    {
+//        std::cerr << "Error fetching " << _remote_default << std::endl;
 
-        if (util::is_file(this->path()+".bak"))
-        {
-            std::cerr << "Using cached copy..." << std::endl;
-            util::move_file(this->path()+".bak", this->path());
-        }
+//        if (util::is_file(this->path()+".bak"))
+//        {
+//            std::cerr << "Using cached copy..." << std::endl;
+//            util::move_file(this->path()+".bak", this->path());
+//        }
 
-        if (not herdsxml())
-            throw;
-        else if (herdsxml.size() == 0)
-        {
-            unlink(this->path().c_str());
-            throw;
-        }
-    }
-}
+//        if (not herdsxml())
+//            throw;
+//        else if (herdsxml.size() == 0)
+//        {
+//            unlink(this->path().c_str());
+//            throw;
+//        }
+//    }
+//}
 /****************************************************************************/
 void
 herds_xml::fill_developer(Developer& dev) const

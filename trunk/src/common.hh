@@ -20,34 +20,24 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <cstddef>
-#include <cstdarg>
-#include <cassert>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
-
-#include "options.hh"
-#include "exceptions.hh"
-
 #ifndef HAVE_COMMON_HH
 #define HAVE_COMMON_HH 1
+
+#include <string>
+#include <vector>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #define USE_XMLWRAPP
-void debug_msg(const char *, ...);
-
-/* common defines */
 #define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
 
-/* common typedefs */
 typedef std::vector<std::string> opts_type;
+
+void debug_msg(const char *, ...);
+void fetch_herdsxml();
+void fetch_devawayxml();
 
 #endif
 

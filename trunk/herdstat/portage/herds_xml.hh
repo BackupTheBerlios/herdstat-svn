@@ -33,14 +33,13 @@
  */
 
 #include <algorithm>
-#include <herdstat/fetchable.hh>
+#include <herdstat/fetcher.hh>
 #include <herdstat/portage/xmlbase.hh>
 #include <herdstat/portage/herd.hh>
 
 namespace portage {
 
-    class herds_xml : public xmlBase,
-                      public fetchable
+    class herds_xml : public xmlBase
     {
         public:
             herds_xml();
@@ -68,14 +67,14 @@ namespace portage {
             virtual bool end_element(const std::string &name);
             virtual bool text(const std::string &text);
 
-            virtual void do_fetch(const std::string& path = "") const
-                throw (FetchException);
+//            virtual void do_fetch(const std::string& path = "") const
+//                throw (FetchException);
 
         private:
             Herds _herds;
             std::string _cvsdir;
+            Fetcher _fetch; /* for fetching <maintainingproject> XML's */
             static const char * const _local_default;
-            static const char * const _remote_default;
 
             /* internal state variables */
             bool in_herd,

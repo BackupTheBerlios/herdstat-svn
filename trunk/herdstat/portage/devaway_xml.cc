@@ -24,17 +24,13 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/portage/devaway_xml.hh>
 
-#define DEVAWAY_EXPIRE  86400
-
 namespace portage {
 /*** static members *********************************************************/
 const char * const devaway_xml::_local_default = LOCALSTATEDIR"/devaway.xml";
-const char * const devaway_xml::_remote_default = "http://dev.gentoo.org/devaway/xml/index.php";
 /****************************************************************************/
 devaway_xml::devaway_xml()
     : xmlBase(), _devs(), in_devaway(false),
@@ -46,7 +42,6 @@ devaway_xml::devaway_xml(const std::string &path)
     : xmlBase(path), _devs(), in_devaway(false),
       in_dev(false), in_reason(false), _cur_dev()
 {
-    this->fetch();
     this->parse();
 }
 /****************************************************************************/
@@ -72,56 +67,56 @@ devaway_xml::parse(const std::string& path)
     this->timer().stop();
 }
 /****************************************************************************/
-void
-devaway_xml::do_fetch(const std::string& path) const throw (FetchException)
-{
-    if (not path.empty())
-        this->set_path(path);
-    else if (this->path().empty())
-        this->set_path(_local_default);
+//void
+//devaway_xml::do_fetch(const std::string& path) const throw (FetchException)
+//{
+//    if (not path.empty())
+//        this->set_path(path);
+//    else if (this->path().empty())
+//        this->set_path(_local_default);
 
-    util::stat_T devaway(this->path());
-    std::time_t now(std::time(NULL));
+//    util::stat_T devaway(this->path());
+//    std::time_t now(std::time(NULL));
 
-    if ((now != static_cast<std::time_t>(-1)) and devaway.exists() and
-        ((now - devaway.mtime()) < DEVAWAY_EXPIRE) and (devaway.size() > 0))
-        return;
-    else if (devaway.exists() and (devaway.size() > 0))
-    {
-        /* back it up in case fetching fails */
-        util::copy_file(this->path(), this->path()+".bak");
-    }
+//    if ((now != static_cast<std::time_t>(-1)) and devaway.exists() and
+//        ((now - devaway.mtime()) < DEVAWAY_EXPIRE) and (devaway.size() > 0))
+//        return;
+//    else if (devaway.exists() and (devaway.size() > 0))
+//    {
+//        /* back it up in case fetching fails */
+//        util::copy_file(this->path(), this->path()+".bak");
+//    }
 
-    try
-    {
-        _fetch(_remote_default, this->path());
+//    try
+//    {
+//        _fetch(_remote_default, this->path());
 
-        /* double check */
-        if (not devaway() or (devaway.size() == 0))
-            throw FetchException();
+//        /* double check */
+//        if (not devaway() or (devaway.size() == 0))
+//            throw FetchException();
 
-        /* remove backup */
-        unlink((this->path()+".bak").c_str());
-    }
-    catch (const FetchException& e)
-    {
-        std::cerr << "Error fetching " << _remote_default << std::endl;
+//        /* remove backup */
+//        unlink((this->path()+".bak").c_str());
+//    }
+//    catch (const FetchException& e)
+//    {
+//        std::cerr << "Error fetching " << _remote_default << std::endl;
 
-        if (util::is_file(this->path()+".bak"))
-        {
-            std::cerr << "Using cached copy..." << std::endl;
-            util::move_file(this->path()+".bak", this->path());
-        }
+//        if (util::is_file(this->path()+".bak"))
+//        {
+//            std::cerr << "Using cached copy..." << std::endl;
+//            util::move_file(this->path()+".bak", this->path());
+//        }
 
-        if (not devaway())
-            throw;
-        else if (devaway.size() == 0)
-        {
-            unlink(this->path().c_str());
-            throw;
-        }
-    }
-}
+//        if (not devaway())
+//            throw;
+//        else if (devaway.size() == 0)
+//        {
+//            unlink(this->path().c_str());
+//            throw;
+//        }
+//    }
+//}
 /****************************************************************************/
 void
 devaway_xml::fill_developer(Developer& dev) const
