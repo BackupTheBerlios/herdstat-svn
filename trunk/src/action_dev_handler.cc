@@ -219,8 +219,8 @@ action_dev_handler_T::operator() (opts_type &opts)
             for (d = (*h)->begin() ; d != (*h)->end() ; ++d)
             {
                 /* if the developer is not already in our list, add it */
-                if (all_devs.find(*d) == all_devs.end())
-                    all_devs.push_back(new Developer(**d));
+//                if (all_devs.find(*d) == all_devs.end())
+                all_devs.insert(new Developer(**d));
             }
         }
 
@@ -231,8 +231,8 @@ action_dev_handler_T::operator() (opts_type &opts)
             Developers::const_iterator d;
             for (d = devs.begin() ; d != devs.end() ; ++d)
             {
-                if (all_devs.find(*d) == all_devs.end())
-                    all_devs.push_back(new Developer(**d));
+//                if (all_devs.find(*d) == all_devs.end())
+                    all_devs.insert(new Developer(**d));
             }
         }
 

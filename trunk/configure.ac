@@ -164,7 +164,10 @@ fi
 AC_SUBST(TERMCAP_LIBS)
 
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES(xmlwrapp, xmlwrapp >= 0.5.0)
+PKG_CHECK_MODULES(xmlwrapp, xmlwrapp >= 0.5.0,
+    [xmlwrapp_LIBS="-lxmlwrapp -lxslt -lxml2 -lz -lm"],
+    [AC_MSG_ERROR([xmlwrapp is required])])
+AC_SUBST(xmlwrapp_LIBS)
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile

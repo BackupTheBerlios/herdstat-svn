@@ -1,4 +1,7 @@
 #!/bin/bash
-rv=0
 source common.sh || exit 1
-run_herdstat "${0}" "metadata handler" "-mnq foo"
+run_herdstat "${0}" "metadata handler" "-mnq foo" || exit 1
+run_herdstat "metadata-regex-test" "metadata handler (regex)" "-mrq ." || exit 1
+run_herdstat "metadata-ambiguous-test" "metadata handler (ambigious)" \
+    "-mnq libfoo" "fail" || exit 1
+indent

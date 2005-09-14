@@ -55,7 +55,7 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:T";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -102,6 +102,7 @@ static struct option long_opts[] =
     {"extended",    no_argument,	0,  'E'},
     {"qa",	    no_argument,	0,  '\a'},
     {"nometacache",  no_argument,	0,  '\f'},
+    {"TEST",	    no_argument,	0,  'T'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -257,6 +258,8 @@ handle_opts(int argc, char **argv, opts_type *args)
 
 	switch (key)
 	{
+	    case 'T':
+		break;
 	    /* --dev */
 	    case 'd':
 		if (optget("action", options_action_T) != action_unspecified and
@@ -468,15 +471,21 @@ main(int argc, char **argv)
     std::map<options_action_T, action_handler_T * > handlers;
     std::ostream *outstream = NULL;
 
+    /* we need to know if -T or --TEST was specified before 
+     * we parse the command line options. */
+    const bool test = ((argc > 1) and
+		      ((std::strcmp(argv[1], "--TEST") == 0) or
+		       (std::strcmp(argv[1], "-T") == 0)));
+
     /* save column width */
-    optset("maxcol", std::size_t, util::getcols());
+    optset("maxcol", std::size_t, (test ? 80 : util::getcols()));
 
     try
     { 
 	opts_type nonopt_args;
 	
 	/* handle rc file(s) */
-	{ rc_T rc; }
+	if (not test) { rc_T rc; }
 
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)

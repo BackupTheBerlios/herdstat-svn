@@ -1,5 +1,39 @@
 ChangeLog for herdstat
 
+2005-09-14 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.2_alpha2).  Also, manually set
+	xmlwrapp_LIBS instead of using pkg-config, otherwise 6 unneeded libs
+	are linked in.  One really big advantage of this (besides resulting
+	executable size) is that we can now run valgrind on herdstat (before
+	we couldn't because of libgcrypt (required by libexslt)).
+	* herdstat/portage/developer.cc, herdstat/portage/developer.hh,
+	herdstat/portage/herd.cc, herdstat/portage/herd.hh: Use a std::set as
+	the underlying container of Developers/Herd/Herds classes rather than
+	a vector, so we can guarantee uniqueness and sort order.
+	* herdstat/portage/herds_xml.cc, herdstat/portage/devaway_xml.cc,
+	herdstat/portage/metadata_xml.cc, herdstat/portage/userinfo_xml.cc:
+	Updated to use insert member of Developers/Herd/Herds instead of
+	push_back.
+	* src/action_away_handler.cc, src/action_dev_handler.cc,
+	src/action_herd_handler.cc, src/action_meta_handler.cc: Update to use
+	operator++ of Developers/Herd/Herds::iterator instead of operator+
+	since the underlying set::iterator does not provide operator+.
+	* src/herdstat.cc: Add a -T|--TEST option for testing purposes.  If
+	it's specified (as the first flag) the config files will not be
+	parsed, thus avoiding possibil skewing of test results.  Also, if
+	specified, we do not attempt to determine column width as that also
+	could skew the results.  Instead we just default to 80.
+	* tests/common.sh: Add support to run_test() for expected failures.
+	* tests/pkg-test.sh: Added test for pkg action handler.
+	* tests/metadata-test.sh, tests/metadata-regex-test.sh,
+	tests/find-test.sh, tests/find-regex-test.sh: Consolidate the separate
+	-regex-test.sh files into their respective tests.
+	* tests/dev-test.sh, tests/herd-test.sh, tests/away-test.sh,
+	tests/which-test.sh: Added more test runs to test --regex and to test
+	the 'all' target.
+	* tests/metadata-test.sh: Added ambigious package test.
+
 2005-09-13 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/portage/herd.cc, herdstat/portage/developer.cc: Fixed copy

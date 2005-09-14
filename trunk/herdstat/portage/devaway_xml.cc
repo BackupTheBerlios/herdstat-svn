@@ -69,10 +69,6 @@ devaway_xml::parse(const std::string& path)
 
     this->parse_file(this->path().c_str());
 
-    if (not _devs.empty())
-        std::sort(_devs.begin(), _devs.end(),
-            util::DereferenceLess<Developer>());
-
     this->timer().stop();
 }
 /****************************************************************************/
@@ -166,8 +162,8 @@ devaway_xml::start_element(const std::string& name, const attrs_type& attrs)
             return false;
         }
 
-        _cur_dev = _devs.insert(_devs.end(), new Developer(pos->second));
-
+        std::pair<Developers::iterator, bool> p = _devs.insert(pos->second);
+        _cur_dev = p.first;
         in_dev = true;
     }
     else if (name == "reason" and in_dev)

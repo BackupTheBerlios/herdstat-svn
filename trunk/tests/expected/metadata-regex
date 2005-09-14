@@ -1,6 +1,6 @@
 app-lala/foomatic
-foo
-none
+bar fu
+slarti@gentoo.org
 none
 none
 
@@ -10,12 +10,19 @@ ka0ttic@gentoo.org
 http://www.foo.org
 none
 
-sys-ignore/fefifofum
+media-libs/libfoo
 No metadata.xml
 none
 none
 
+sys-ignore/fefifofum
+fu
+vapier@gentoo.org
+none
+SHORT USELESS LONG DESCRIPTION
+
 sys-libs/libfoo
-No metadata.xml
+fu
+none
 none
 none

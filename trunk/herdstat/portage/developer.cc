@@ -77,21 +77,19 @@ Developers::Developers(const std::vector<std::string>& devs)
 /****************************************************************************/
 Developers::~Developers()
 {
-    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
+    std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
 }
 /****************************************************************************/
 Developers&
 Developers::operator= (const std::vector<std::string>& devs)
 {
-    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
+    std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
     _devs.clear();
-    _devs.reserve(devs.size());
 
     std::vector<std::string>::const_iterator i;
     for (i = devs.begin() ; i != devs.end() ; ++i)
-        _devs.push_back(new Developer(*i));
+        _devs.insert(new Developer(*i));
 
-    std::sort(_devs.begin(), _devs.end(), util::DereferenceLess<Developer>());
     return *this;
 }
 /****************************************************************************/
@@ -100,12 +98,10 @@ Developers::operator= (const container_type& v)
 {
     std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
     _devs.clear();
-    _devs.reserve(v.size());
 
     for (const_iterator i = v.begin() ; i != v.end() ; ++i)
-        _devs.push_back(new Developer(**i));
+        _devs.insert(new Developer(**i));
 
-    std::sort(_devs.begin(), _devs.end(), util::DereferenceLess<Developer>());
     return *this;
 }
 /****************************************************************************/
@@ -116,6 +112,18 @@ std::vector<std::string>() const
     for (Developers::const_iterator i = this->begin() ; i != this->end() ; ++i)
         v.push_back((*i)->user());
     return v;
+}
+/****************************************************************************/
+std::pair<Developers::iterator, bool>
+Developers::insert(const std::string& dev)
+{
+    Developer *d = new Developer(dev);
+    std::pair<iterator, bool> p = _devs.insert(d);
+
+    if (not p.second)
+        delete d;
+
+    return p;
 }
 /****************************************************************************/
 } // namespace portage

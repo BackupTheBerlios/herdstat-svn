@@ -2,8 +2,10 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<herd>fu</herd>
-	<herd>bar</herd>
 	<maintainer>
-		<email>slarti@gentoo.org</email>
+		<email>vapier@gentoo.org</email>
 	</maintainer>
+	<longdescription lang="en">
+		SHORT USELESS LONG DESCRIPTION
+	</longdescription>
 </pkgmetadata>

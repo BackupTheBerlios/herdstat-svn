@@ -41,7 +41,6 @@ display_herd(const Herd& herd)
     util::color_map_T color;
 
     Herd devs(herd);
-    std::sort(devs.begin(), devs.end(), util::DereferenceLess<Developer>());
 
     if (not optget("quiet", bool))
     {

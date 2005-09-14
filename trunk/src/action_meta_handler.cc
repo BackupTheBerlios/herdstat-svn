@@ -85,7 +85,7 @@ display_metadata(const metadata_data& data)
         if (devs.size() > 1)
         {
             Developers::const_iterator d;
-            for (d = (devs.begin() + 1); d != devs.end() ; ++d)
+            for (d = ++devs.begin(); d != devs.end() ; ++d)
                 output("", (*d)->email());
         }
         else if (not meta.is_category() and devs.empty())

@@ -97,7 +97,7 @@ mpHandler::text(const std::string& text)
         if (not _cur_role.empty())
             dev->set_role(_cur_role);
 
-        devs.push_back(dev);
+        devs.insert(dev);
     }
 
     return true;
@@ -108,7 +108,6 @@ static void parse_mp_xml(Herd * const herd, const std::string& path)
 {
     xml::Document<mpHandler> xml(path);
     mpHandler *handler = xml.handler();
-    herd->reserve(herd->size() + handler->devs.size());
 //                (*_cur_herd)->insert((*_cur_herd)->end(),
 //                        handler->devs.begin(), handler->devs.end());
             
@@ -117,7 +116,7 @@ static void parse_mp_xml(Herd * const herd, const std::string& path)
      * pointer elements are just simply copied */
     Herd::iterator i;
     for (i = handler->devs.begin() ; i != handler->devs.end() ; ++i)
-        herd->push_back(new Developer(**i));
+        herd->insert(new Developer(**i));
 }
 
 } // namespace anonymous
@@ -163,9 +162,6 @@ herds_xml::parse(const std::string& path)
         throw FileException(this->path());
 
     this->parse_file(this->path().c_str());
-
-    if (not _herds.empty())
-        std::sort(_herds.begin(), _herds.end(), util::DereferenceLess<Herd>());
 
     this->timer().stop();
 }
@@ -301,14 +297,20 @@ bool
 herds_xml::text(const std::string& text)
 {
     if (in_herd_name)
-        _cur_herd = _herds.insert(_herds.end(), new Herd(text));
+    {
+        std::pair<Herds::iterator, bool> p = _herds.insert(new Herd(text));
+        _cur_herd = p.first;
+    }
     else if (in_herd_desc)
         (*_cur_herd)->set_desc(util::tidy_whitespace(text));
     else if (in_herd_email)
         (*_cur_herd)->set_email(text);        
     else if (in_maintainer_email)
-        _cur_dev = (*_cur_herd)->insert((*_cur_herd)->end(),
-            new Developer(util::lowercase(text)));
+    {
+        std::pair<Herd::iterator, bool> p =
+            (*_cur_herd)->insert(new Developer(util::lowercase(text)));
+        _cur_dev = p.first;
+    }
     else if (in_maintainer_name)
         (*_cur_dev)->set_name((*_cur_dev)->name() + text);
     else if (in_maintainer_role)
@@ -322,12 +324,11 @@ herds_xml::text(const std::string& text)
          * container.
          */
 
-        std::string path(std::string(util::dirname(this->path()))+"/"+
-                (*_cur_herd)->name()+".xml"); 
-
         if (_cvsdir.empty())
         {
-            std::string url(util::sprintf(mpBaseURL, text.c_str()));
+            const std::string path(util::sprintf("%s/%s.xml",
+                    util::dirname(this->path()), (*_cur_herd)->name().c_str()));
+            const std::string url(util::sprintf(mpBaseURL, text.c_str()));
             util::stat_T mps(path);
 
             try

@@ -10,13 +10,12 @@ tests = string \
 	metadata.xml \
 	versions \
 	metadata \
-	metadata-regex \
 	dev \
 	herd \
 	stats \
 	away \
 	find \
-	find-regex \
+	pkg \
 	which
 
 TESTS = $(foreach f, $(tests), $(f)-test.sh)

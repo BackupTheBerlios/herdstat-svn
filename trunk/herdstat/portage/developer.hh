@@ -33,6 +33,7 @@
  */
 
 #include <string>
+#include <set>
 #include <vector>
 #include <algorithm>
 
@@ -205,9 +206,12 @@ namespace portage {
     class Developers
     {
         public:
-            typedef std::vector<Developer *> container_type;
+            typedef std::set<Developer *,
+                    util::DereferenceLess<Developer> > container_type;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
+            typedef container_type::reverse_iterator reverse_iterator;
+            typedef container_type::const_reverse_iterator const_reverse_iterator;
             typedef container_type::value_type value_type;
             typedef container_type::size_type size_type;
             typedef container_type::reference reference;
@@ -250,32 +254,47 @@ namespace portage {
              * @returns Reference to this.
              */
             Developers& operator= (const container_type& v);
+
+            /** Instantiate a Developer object for each developer
+             * user name in the given vector.
+             * @param v vector of developer usernames.
+             * @returns Reference to this.
+             */
             Developers& operator= (const std::vector<std::string>& v);
 
             iterator begin();
             const_iterator begin() const;
             iterator end();
             const_iterator end() const;
-            reference front();
-            const_reference front() const;
-            reference back();
-            const_reference back() const;
-            iterator find(const std::string& dev);
-            const_iterator find(const std::string& dev) const;
-            iterator find(const value_type dev);
-            const_iterator find(const value_type dev) const;
-            iterator find(const util::regex_T &regex);
-            const_iterator find(const util::regex_T &regex) const;
+            reverse_iterator rbegin();
+            const_reverse_iterator rbegin() const;
+            reverse_iterator rend();
+            const_reverse_iterator rend() const;
+
+            value_type front();
+            const value_type front() const;
+            value_type back();
+            const value_type back() const;
+
+            iterator find(const std::string& dev) const;
+            iterator find(const value_type dev) const;
+            iterator find(const util::regex_T &regex) const;
+
             size_type size() const;
             bool empty() const;
             void clear();
-            void push_back(const value_type dev);
-            void push_back(const std::string& email);
-            void reserve(size_type size);
 
             iterator insert(iterator pos, const value_type dev);
+
             template <class In>
-            void insert(iterator pos, In begin, In end);
+            void insert(In begin, In end);
+
+            std::pair<iterator, bool> insert(const value_type v);
+            std::pair<iterator, bool> insert(const std::string& dev);
+
+            void erase(iterator pos);
+            size_type erase(const value_type v);
+            void erase(iterator begin, iterator end);
 
         private:
             container_type _devs;
@@ -287,36 +306,51 @@ namespace portage {
     inline Developers::const_iterator Developers::begin() const { return _devs.begin(); }
     inline Developers::iterator Developers::end() { return _devs.end(); }
     inline Developers::const_iterator Developers::end() const { return _devs.end(); }
-    inline Developers::reference Developers::front() { return _devs.front(); }
-    inline Developers::const_reference Developers::front() const { return _devs.front(); }
-    inline Developers::reference Developers::back() { return _devs.back(); }
-    inline Developers::const_reference Developers::back() const { return _devs.back(); }
+    inline Developers::reverse_iterator Developers::rbegin() { return _devs.rbegin(); }
+    inline Developers::const_reverse_iterator Developers::rbegin() const
+    { return _devs.rbegin(); }
+    inline Developers::reverse_iterator Developers::rend() { return _devs.rend(); }
+    inline Developers::const_reverse_iterator Developers::rend() const
+    { return _devs.rend(); }
+    
     inline Developers::size_type Developers::size() const { return _devs.size(); }
     inline bool Developers::empty() const { return _devs.empty(); }
     inline void Developers::clear() { return _devs.clear(); }
-    inline void Developers::push_back(const value_type dev)
-    { _devs.push_back(dev); }
-    inline void Developers::push_back(const std::string& email)
-    { _devs.push_back(new Developer(email)); }
-    inline void Developers::reserve(size_type size) { _devs.reserve(size); }
+
+    inline void Developers::erase(iterator pos) { _devs.erase(pos); }
+    inline Developers::size_type Developers::erase(const value_type v)
+    { return _devs.erase(v); }
+    inline void Developers::erase(iterator begin, iterator end)
+    { return _devs.erase(begin, end); }
     inline Developers::iterator Developers::insert(iterator pos, const value_type dev)
     { return _devs.insert(pos, dev); }
     template <class In> inline void
-    Developers::insert(iterator pos, In begin, In end)
-    { _devs.insert(pos, begin, end); }
+    Developers::insert(In begin, In end) { _devs.insert(begin, end); }
 
-    inline Developers::iterator Developers::find(const std::string& dev)
+    inline std::pair<Developers::iterator, bool>
+    Developers::insert(const value_type v)
+    {
+        std::pair<iterator, bool> p = _devs.insert(v);
+        if (not p.second)
+            delete v;
+        return p;
+    }
+
+    inline Developers::iterator Developers::find(const value_type dev) const
+    { return _devs.find(dev); }
+
+//    inline Developers::iterator Developers::find(const std::string& dev)
+//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+//        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
+    inline Developers::iterator Developers::find(const std::string& dev) const
     { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
         util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
-    inline Developers::const_iterator Developers::find(const std::string& dev) const
-    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
-    inline Developers::iterator Developers::find(const value_type dev)
-    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-        util::DereferenceEqual<Developer>(), dev)); }
-    inline Developers::const_iterator Developers::find(const value_type dev) const
-    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-        util::DereferenceEqual<Developer>(), dev)); }
+//    inline Developers::iterator Developers::find(const value_type dev)
+//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+//        util::DereferenceEqual<Developer>(), dev)); }
+//    inline Developers::const_iterator Developers::find(const value_type dev) const
+//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+//        util::DereferenceEqual<Developer>(), dev)); }
 
     struct DeveloperRegexMatch
         : std::binary_function<const util::regex_T *, const Developer *, bool>
@@ -325,12 +359,40 @@ namespace portage {
         { return (*re == dev->user()); }
     };
 
-    inline Developers::iterator Developers::find(const util::regex_T &regex)
+    inline Developers::iterator Developers::find(const util::regex_T &regex) const
     { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
         DeveloperRegexMatch(), &regex)); }
-    inline Developers::const_iterator Developers::find(const util::regex_T &regex) const
-    { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
-        DeveloperRegexMatch(), &regex)); }
+//    inline Developers::const_iterator Developers::find(const util::regex_T &regex) const
+//    { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
+//        DeveloperRegexMatch(), &regex)); }
+
+    inline Developers::value_type
+    Developers::front()
+    {
+        assert(not _devs.empty());
+        return *(_devs.begin());
+    }
+    
+    inline const Developers::value_type
+    Developers::front() const
+    {
+        assert(not _devs.empty());
+        return *(_devs.begin());
+    }
+
+    inline Developers::value_type
+    Developers::back()
+    {
+        assert(not _devs.empty());
+        return *(--_devs.end());
+    }
+    
+    inline const Developers::value_type
+    Developers::back() const
+    {
+        assert(not _devs.empty());
+        return *(--_devs.end());
+    }
 
 } // namespace portage
 

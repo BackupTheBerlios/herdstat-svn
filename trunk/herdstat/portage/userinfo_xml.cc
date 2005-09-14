@@ -90,10 +90,9 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
         if (pos == attrs.end())
             throw Exception("<user> tag with no username attribute!");
 
-        Developer *dev = new Developer(pos->second);
-        dev->set_status("Active");
-        _cur_dev = _devs.insert(_devs.end(), dev);
-
+        std::pair<Developers::iterator, bool> p = _devs.insert(pos->second);
+        _cur_dev = p.first;
+        (*_cur_dev)->set_status("Active");
         in_user = true;
     }
     else if (name == "firstname")
@@ -159,6 +158,7 @@ userinfo_xml::text(const std::string& text)
         (*_cur_dev)->set_status(text);
     else if (in_location)
         (*_cur_dev)->set_location((*_cur_dev)->location() + text);
+
     return true;
 }
 /****************************************************************************/

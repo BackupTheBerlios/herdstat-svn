@@ -74,11 +74,11 @@ action_away_handler_T::operator() (opts_type &opts)
 
     if (all)
     {
-        for (d = devs.begin() ; d != devs.end() ; ++d)
+        for (d = devs.begin() ; d != devs.end() ; )
         {
-            display(*d);
+            display(*d++);
 
-            if (not quiet and ((d+1) != devs.end()))
+            if (not quiet and (d != devs.end()))
                 output.endl();
         }
 

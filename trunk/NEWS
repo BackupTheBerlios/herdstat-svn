@@ -1,6 +1,19 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.2_alpha2:
+    Don't use pkg-config to set our xmlwrapp libs, as it links in 6 other libs
+    that are unneeded.  This should result in a slightly smaller executable.
+    It also allows us to run herdstat through valgrind now, which we could not
+    do before due to linking with libgcrypt (indirectly though libexslt).
+
+    Bug fixes:
+     - Don't attempt to initialize or copy a va_list in the Exception class'
+       copy constructor/assignment operator, as its implementation varies from
+       arch to arch making it nearly impossible to do so in a portable fashion.
+     - Added back missing fetch logic that I forgot to re-add after rewriting
+       most of the portage xml code.
+
 1.1.2_alpha1:
     *Many* behind-the-scenes changes.  Mostly code refactoring/cleanup.
 
