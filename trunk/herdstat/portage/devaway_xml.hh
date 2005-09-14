@@ -62,9 +62,6 @@ namespace portage {
             virtual bool end_element(const std::string& name);
             virtual bool text(const std::string& text);
 
-//            virtual void do_fetch(const std::string& path = "") const
-//                throw (FetchException);
-
         private:
             Developers _devs;
             static const char * const _local_default;

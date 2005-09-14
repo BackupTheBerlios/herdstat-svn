@@ -67,9 +67,6 @@ namespace portage {
             virtual bool end_element(const std::string &name);
             virtual bool text(const std::string &text);
 
-//            virtual void do_fetch(const std::string& path = "") const
-//                throw (FetchException);
-
         private:
             Herds _herds;
             std::string _cvsdir;
