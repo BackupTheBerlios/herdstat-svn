@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <algorithm>
 #include <herdstat/util/string.hh>
 
@@ -61,8 +62,7 @@ action_away_handler_T::display(Developer * const dev)
 int
 action_away_handler_T::operator() (opts_type &opts)
 {
-    if (devaway_path.empty())
-        devaway.fetch();
+    fetch_devawayxml();
     devaway.parse(devaway_path);
     Developers& devs(devaway.devs());
     Developers::iterator d;
@@ -86,8 +86,7 @@ action_away_handler_T::operator() (opts_type &opts)
         return EXIT_SUCCESS;
     }
     
-    if (herdsxml_path.empty())
-        herdsxml.fetch();
+    fetch_herdsxml();
     herdsxml.parse(herdsxml_path);
 
     if (regex and opts.size() > 1)

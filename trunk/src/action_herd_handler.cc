@@ -24,12 +24,11 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <fstream>
 #include <memory>
 #include <algorithm>
 #include <herdstat/util/string.hh>
-
-#include "common.hh"
 #include "action_herd_handler.hh"
 
 using namespace portage;
@@ -126,15 +125,13 @@ action_herd_handler_T::~action_herd_handler_T()
 int
 action_herd_handler_T::operator() (opts_type &opts)
 {
-    if (herdsxml_path.empty())
-        herdsxml.fetch();
+    fetch_herdsxml();
     herdsxml.parse(herdsxml_path);
     const Herds& herds(herdsxml.herds());
 
     if (use_devaway)
     {
-        if (devaway_path.empty())
-            devaway.fetch();
+        fetch_devawayxml();
         devaway.parse(devaway_path);
     }
 

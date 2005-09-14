@@ -30,6 +30,15 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/fetcher.hh>
 
+Fetcher::Fetcher() : _opts()
+{
+}
+
+Fetcher::Fetcher(const std::string& options)
+    : _opts(options)
+{
+}
+
 Fetcher::Fetcher(const std::string &url,
                  const std::string &path) throw(FetchException)
     : _opts()

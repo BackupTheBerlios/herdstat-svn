@@ -29,7 +29,6 @@
 
 #include <map>
 #include <herdstat/portage/developer.hh>
-#include "common.hh"
 
 /*
  * Container for package query data.

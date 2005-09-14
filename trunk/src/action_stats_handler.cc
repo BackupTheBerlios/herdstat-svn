@@ -48,15 +48,13 @@ action_stats_handler_T::operator() (opts_type &null)
 {
     optset("quiet", bool, false);
 
-    if (herdsxml_path.empty())
-        herdsxml.fetch();
+    fetch_herdsxml();
     herdsxml.parse(herdsxml_path);
     const Herds& herds(herdsxml.herds());
 
     if (use_devaway)
     {
-        if (devaway_path.empty())
-            devaway.fetch();
+        fetch_devawayxml();
         devaway.parse(devaway_path);
     }
 

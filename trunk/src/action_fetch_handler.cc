@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include "common.hh"
 #include "action_fetch_handler.hh"
 
 action_fetch_handler_T::~action_fetch_handler_T()
@@ -37,11 +38,13 @@ action_fetch_handler_T::operator() (opts_type &null)
     {
         optset("verbose", bool, true);
 
-        herdsxml.fetch(herdsxml_path);
+        fetch_herdsxml();
+        /* parse herds.xml so any xml files listed in <maintainingproject>
+         * tags will be fetched. */
         herdsxml.parse(herdsxml_path);
 
         if (use_devaway)
-            devaway.fetch(devaway_path);
+            fetch_devawayxml();
     }
     catch (const FetchException)
     {

@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/portage/devaway_xml.hh>

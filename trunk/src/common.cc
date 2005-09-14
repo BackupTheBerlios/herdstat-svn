@@ -24,12 +24,14 @@
 # include "config.h"
 #endif
 
-#include "options.hh"
-#include "common.hh"
-
+#include <iostream>
+#include <herdstat/exceptions.hh>
 #include <herdstat/fetcher.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
+
+#include "options.hh"
+#include "common.hh"
 
 #define HERDSXML_REMOTE "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"
 #define HERDSXML_LOCAL  LOCALSTATEDIR"/herds.xml"
@@ -61,8 +63,7 @@ debug_msg(const char *fmt, ...)
 static void
 do_fetch(const char * const url, const char * const file)
 {
-    const std::string path(file);
-    const util::stat_T xml(path);
+    util::stat_T xml(file);
     const std::time_t now(std::time(NULL));
     
     /* check if previously fetched copy is expired */
@@ -72,33 +73,35 @@ do_fetch(const char * const url, const char * const file)
     /* exists but expired */
     else if (xml.exists() and (xml.size() > 0))
         /* back it up in case fetching fais */
-        util::copy_file(path, path+".bak");
+        util::copy_file(xml.path(), xml.path()+".bak");
 
     try
     {
-        Fetcher fetch(url, path);
+        Fetcher fetch(optget("wget.options", std::string));
+            
+        fetch(url, xml.path());
 
         if (not xml() or (xml.size() == 0))
-            throw FetchException;
+            throw FetchException();
 
         /* remove backup */
-        unlink((path+".bak").c_str());
+        unlink((xml.path()+".bak").c_str());
     }
     catch (const FetchException& e)
     {
         std::cerr << "Error fetching " << url << std::endl;
 
-        if (util::is_file(path+".bak"))
+        if (util::is_file(xml.path()+".bak"))
         {
             std::cerr << "Using cached copy..." << std::endl;
-            util::move_file(path+".bak", path);
+            util::move_file(xml.path()+".bak", xml.path());
         }
 
         if (not xml())
             throw;
         else if (xml.size() == 0)
         {
-            unlink(path.c_str());
+            unlink(xml.path().c_str());
             throw;
         }
     }
@@ -107,7 +110,7 @@ do_fetch(const char * const url, const char * const file)
 void
 fetch_devawayxml()
 {
-    if (optget("devaway", std::string).empty())
+    if (optget("devaway.location", std::string).empty())
         do_fetch(DEVAWAYXML_REMOTE, DEVAWAYXML_LOCAL);
 }
 

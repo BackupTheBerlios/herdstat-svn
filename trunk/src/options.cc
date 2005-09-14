@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <locale>
 #include <utility>
 #include <sys/types.h>

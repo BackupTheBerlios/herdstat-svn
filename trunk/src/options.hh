@@ -32,8 +32,8 @@
 #include <typeinfo>
 #include <map>
 
-#include "common.hh"
 #include <herdstat/exceptions.hh>
+#include "exceptions.hh"
 
 enum options_action_T
 {

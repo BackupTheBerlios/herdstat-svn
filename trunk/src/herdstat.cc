@@ -631,6 +631,11 @@ main(int argc, char **argv)
 	    << std::endl;
 	return EXIT_FAILURE;
     }
+    catch (const BadOption& e)
+    {
+	std::cerr << e.what() << std::endl;
+	return EXIT_FAILURE;
+    }
     catch (const BadDate& e)
     {
 	std::cerr << "Error parsing date '" << e.what() << "'." << std::endl;

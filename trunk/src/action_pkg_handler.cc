@@ -24,16 +24,14 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <iomanip>
 #include <algorithm>
 #include <functional>
 #include <iterator>
 #include <map>
-
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/metadata_xml.hh>
-
-#include "common.hh"
 #include "action_meta_handler.hh"
 #include "action_pkg_handler.hh"
 
@@ -418,15 +416,13 @@ action_pkg_handler_T::operator() (opts_type &opts)
 	throw FileException(portdir);
 
     /* fetch/parse herds.xml for info lookup */
-    if (herdsxml_path.empty())
-        herdsxml.fetch();
+    fetch_herdsxml();
     herdsxml.parse(herdsxml_path);
 
     /* fetch/parse devaway for marking away devs */
     if (use_devaway)
     {
-        if (devaway_path.empty())
-            devaway.fetch();
+        fetch_devawayxml();
         devaway.parse(devaway_path);
     }
 

@@ -24,10 +24,10 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
 
-#include "common.hh"
 #include "rc.hh"
 #include "formatter.hh"
 #include "querycache.hh"

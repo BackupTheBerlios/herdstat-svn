@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <herdstat/util/string.hh>

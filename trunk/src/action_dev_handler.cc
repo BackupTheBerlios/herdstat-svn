@@ -24,10 +24,10 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <memory>
 #include <herdstat/util/string.hh>
 
-#include "common.hh"
 #include "action_herd_handler.hh"   /* for display_herd() */
 #include "action_dev_handler.hh"
 
@@ -180,8 +180,7 @@ int
 action_dev_handler_T::operator() (opts_type &opts)
 {
     /* herds.xml */
-    if (herdsxml_path.empty())
-        herdsxml.fetch();
+    fetch_herdsxml();
     herdsxml.parse(herdsxml_path);
 
     const Herds& herds(herdsxml.herds());
@@ -190,8 +189,7 @@ action_dev_handler_T::operator() (opts_type &opts)
     /* devaway.xml */
     if (use_devaway)
     {
-        if (devaway_path.empty())
-            devaway.fetch();
+        fetch_devawayxml();
         devaway.parse(devaway_path);
     }
 

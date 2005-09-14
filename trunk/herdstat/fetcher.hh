@@ -44,7 +44,12 @@ class Fetcher : private noncopyable
 {
     public:
         /// Default constructor.
-        Fetcher() : _opts() { }
+        Fetcher();
+
+        /** Constructor.
+         * @param opts fetcher options.
+         */
+        Fetcher(const std::string& opts) ;
 
         /** Constructor.
          * @param url Remote URL.
