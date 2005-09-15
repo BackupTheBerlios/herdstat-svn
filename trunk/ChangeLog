@@ -32,7 +32,8 @@ ChangeLog for herdstat
 	* tests/dev-test.sh, tests/herd-test.sh, tests/away-test.sh,
 	tests/which-test.sh: Added more test runs to test --regex and to test
 	the 'all' target.
-	* tests/metadata-test.sh: Added ambigious package test.
+	* tests/metadata-test.sh: Added ambigious package test.  Also added
+	category metadata.xml test.
 
 2005-09-13 Aaron Walker <ka0ttic@gentoo.org>
 
