@@ -265,11 +265,9 @@ herds_xml::text(const std::string& text)
         if (_cvsdir.empty())
         {
             const std::string path(util::sprintf("%s/%s.xml",
-                    util::dirname(this->path()), (*_cur_herd)->name().c_str()));
+                    LOCALSTATEDIR, (*_cur_herd)->name().c_str()));
             const std::string url(util::sprintf(mpBaseURL, text.c_str()));
             util::stat_T mps(path);
-
-            std::cout << "dirname == " << util::dirname(this->path()) << std::endl;
 
             try
             {

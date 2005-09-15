@@ -1,5 +1,12 @@
 ChangeLog for herdstat
 
+2005-09-15 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/portage/herds_xml.cc: Save projectxml files in
+	LOCALSTATEDIR regardless.
+	* herdstat/util/file.cc: Fixed dirname() to return "." if no "/" is
+	found in the argument.
+
 2005-09-14 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.2_alpha2).  Also, manually set
