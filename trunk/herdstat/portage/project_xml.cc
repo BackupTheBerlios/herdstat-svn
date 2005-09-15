@@ -121,7 +121,7 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
 {
     if (name == "task")
         in_task = true;
-    else if (name == "subproject");
+    else if (name == "subproject")
     {
         attrs_type::const_iterator pos = attrs.find("inheritmembers");
         if ((pos != attrs.end()) and (pos->second == "yes"))
@@ -133,7 +133,7 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
             }
         }
     }
-    if (name == "dev" and not in_task)
+    else if (name == "dev" and not in_task)
     {
         in_dev = true;
 
@@ -151,8 +151,8 @@ bool
 project_xml::end_element(const std::string& name)
 {
     if (name == "task") in_task = false;
-    if (name == "subproject") in_sub = false;
-    if (name == "dev") in_dev = false;
+    else if (name == "subproject") in_sub = false;
+    else if (name == "dev") in_dev = false;
     return true;
 }
 /****************************************************************************/
@@ -162,13 +162,13 @@ project_xml::text(const std::string& text)
     if (in_sub)
     {
         /* fetch file listed in ref attribute (saved in _cur_sub) */
-        project_xml mp(text, _cvsdir, _herd_name);
+        project_xml mp(_cur_sub, _cvsdir, _herd_name);
         const Herd& devs(mp.devs());
         Herd::const_iterator i;
         for (i = devs.begin() ; i != devs.end() ; ++i)
             _devs.insert(**i);
     }
-    if (in_dev)
+    else if (in_dev)
     {
         Developer *dev = new Developer(util::lowercase(text));
         if (not _cur_role.empty())
