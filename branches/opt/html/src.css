@@ -1,0 +1,12 @@
+.statement { color: #0cd900; font-weight: bold; }
+.special { color: #c515ff; }
+pre { color: #ffffff; background-color: #000038; }
+body { color: #ffffff; background-color: #000038; }
+.linenum { color: #3c87ae; background-color: #000038; }
+.comment { color: #3c87ae; }
+.preproc { color: #e9cb80; }
+.constant { color: #ffa0a0; }
+.type { color: #f6ff15; font-weight: bold; }
+.keyword { color: #0cd900; font-weight: bold; }
+.url { color: #0a0cfb; }
+.string { color: #ff9308; }
