@@ -269,6 +269,8 @@ herds_xml::text(const std::string& text)
             const std::string url(util::sprintf(mpBaseURL, text.c_str()));
             util::stat_T mps(path);
 
+            std::cout << "dirname == " << util::dirname(this->path()) << std::endl;
+
             try
             {
                 if (not mps.exists() or
