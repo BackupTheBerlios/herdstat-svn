@@ -330,7 +330,9 @@ dirname(const std::string &path)
 	result.erase(result.length() - 1);
 
     if ((pos = result.rfind('/')) != std::string::npos)
-	result = result.substr(0, pos);
+        result.erase(pos);
+    else
+        result.assign(".");
 
     return ( result.empty() ? "/" : result.c_str() );
 }
