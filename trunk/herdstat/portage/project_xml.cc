@@ -123,6 +123,10 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
         in_task = true;
     else if (name == "subproject")
     {
+        std::cout << "in <subproject> :: attrs.size() == " << attrs.size() << std::endl;
+        for (attrs_type::const_iterator i = attrs.begin() ; i != attrs.end() ; ++i)
+            std::cout << "  " << i->first << " = " << i->second << std::endl;
+
         attrs_type::const_iterator pos = attrs.find("inheritmembers");
         if ((pos != attrs.end()) and (pos->second == "yes"))
         {
