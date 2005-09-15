@@ -29,93 +29,94 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/xml/document.hh>
+#include <herdstat/portage/project_xml.hh>
 #include <herdstat/portage/herds_xml.hh>
 
 #define HERDSXML_EXPIRE     86400
 
-namespace {
+//namespace {
 
-using namespace portage;
+//using namespace portage;
 
 /* any path's found inside a <maintainingproject> tag will be sprintf'd
  * into this for fetching. */
-static const char *mpBaseURL = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain";
-static const char *mpBaseLocal = "%s/gentoo/xml/htdocs/%s";
+//static const char *mpBaseURL = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain";
+//static const char *mpBaseLocal = "%s/gentoo/xml/htdocs/%s";
 
-class mpHandler : public xml::saxhandler
-{
-    public:
-        mpHandler() : devs(), in_dev(false), _cur_role() { }
-        virtual ~mpHandler();
+//class mpHandler : public xml::saxhandler
+//{
+//    public:
+//        mpHandler() : devs(), in_dev(false), _cur_role() { }
+//        virtual ~mpHandler();
 
-        Herd devs;
+//        Herd devs;
 
-    protected:
-        virtual bool start_element(const std::string& name,
-                                   const attrs_type& attrs);
-        virtual bool end_element(const std::string& name);
-        virtual bool text(const std::string& text);
+//    protected:
+//        virtual bool start_element(const std::string& name,
+//                                   const attrs_type& attrs);
+//        virtual bool end_element(const std::string& name);
+//        virtual bool text(const std::string& text);
 
-    private:
-        bool in_dev;
-        std::string _cur_role;
-};
+//    private:
+//        bool in_dev;
+//        std::string _cur_role;
+//};
 
-mpHandler::~mpHandler()
-{
-}
+//mpHandler::~mpHandler()
+//{
+//}
 
-bool
-mpHandler::start_element(const std::string& name, const attrs_type& attrs)
-{
-    if (name == "dev")
-    {
-        in_dev = true;
-        attrs_type::const_iterator pos = attrs.find("description");
-        if (pos != attrs.end())
-            _cur_role = pos->second;
-        else if ((pos = attrs.find("role")) != attrs.end())
-            _cur_role = pos->second;
-    }
+//bool
+//mpHandler::start_element(const std::string& name, const attrs_type& attrs)
+//{
+//    if (name == "dev")
+//    {
+//        in_dev = true;
+//        attrs_type::const_iterator pos = attrs.find("description");
+//        if (pos != attrs.end())
+//            _cur_role = pos->second;
+//        else if ((pos = attrs.find("role")) != attrs.end())
+//            _cur_role = pos->second;
+//    }
 
-    return true;
-}
+//    return true;
+//}
 
-bool
-mpHandler::end_element(const std::string& name)
-{
-    if (name == "dev") in_dev = false;
+//bool
+//mpHandler::end_element(const std::string& name)
+//{
+//    if (name == "dev") in_dev = false;
 
-    return true;
-}
+//    return true;
+//}
 
-bool
-mpHandler::text(const std::string& text)
-{
-    if (in_dev)
-    {
-        Developer *dev = new Developer(util::lowercase(text));
-        if (not _cur_role.empty())
-            dev->set_role(_cur_role);
+//bool
+//mpHandler::text(const std::string& text)
+//{
+//    if (in_dev)
+//    {
+//        Developer *dev = new Developer(util::lowercase(text));
+//        if (not _cur_role.empty())
+//            dev->set_role(_cur_role);
 
-        devs.insert(dev);
-    }
+//        devs.insert(dev);
+//    }
 
-    return true;
-}
+//    return true;
+//}
 
-/* parse XML file listed in a <maintainingproject> tag */
-static void parse_mp_xml(Herd * const herd, const std::string& path)
-{
-    xml::Document<mpHandler> xml(path);
-    mpHandler *handler = xml.handler();
-            
-    Herd::iterator i;
-    for (i = handler->devs.begin() ; i != handler->devs.end() ; ++i)
-        herd->insert(new Developer(**i));
-}
+///* parse XML file listed in a <maintainingproject> tag */
+//static void parse_mp_xml(Herd * const herd, const std::string& path)
+//{
+//    xml::Document<mpHandler> xml(path);
+//    mpHandler *handler = xml.handler();
+//            
+//    Herd::iterator i;
+//    for (i = handler->devs.begin() ; i != handler->devs.end() ; ++i)
+//        herd->insert(new Developer(**i));
+//}
 
-} // namespace anonymous
+//} // namespace anonymous
 
 namespace portage {
 /*** static members *********************************************************/
@@ -262,55 +263,60 @@ herds_xml::text(const std::string& text)
          * container.
          */
 
-        if (_cvsdir.empty())
-        {
-            const std::string path(util::sprintf("%s/%s.xml",
-                    LOCALSTATEDIR, (*_cur_herd)->name().c_str()));
-            const std::string url(util::sprintf(mpBaseURL, text.c_str()));
-            util::stat_T mps(path);
+        project_xml mp(text, _cvsdir, (*_cur_herd)->name());
+        const Herd& devs(mp.devs());
+        for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
+            (*_cur_herd)->insert(new Developer(**i));
 
-            try
-            {
-                if (not mps.exists() or
-                    (mps.exists() and ((std::time(NULL) - mps.mtime()) > 592200)) or
-                    (mps.size() == 0))
-                {
-                    if (mps.exists())
-                        util::copy_file(path, path+".bak");
+//        if (_cvsdir.empty())
+//        {
+//            const std::string path(util::sprintf("%s/%s.xml",
+//                    LOCALSTATEDIR, (*_cur_herd)->name().c_str()));
+//            const std::string url(util::sprintf(mpBaseURL, text.c_str()));
+//            util::stat_T mps(path);
 
-                    _fetch(url, path);
+//            try
+//            {
+//                if (not mps.exists() or
+//                    (mps.exists() and ((std::time(NULL) - mps.mtime()) > 592200)) or
+//                    (mps.size() == 0))
+//                {
+//                    if (mps.exists())
+//                        util::copy_file(path, path+".bak");
 
-                    if (not mps() or (mps.size() == 0))
-                        throw FetchException();
+//                    _fetch(url, path);
 
-                    unlink((path+".bak").c_str());
-                }
-            }
-            catch (const FetchException)
-            {
-                if (util::is_file(path+".bak"))
-                    util::move_file(path+".bak", path);
+//                    if (not mps() or (mps.size() == 0))
+//                        throw FetchException();
 
-                if (not mps() or (mps.size() == 0))
-                {
-                    unlink(path.c_str());
-                    return true;
-                }
-            }
+//                    unlink((path+".bak").c_str());
+//                }
+//            }
+//            catch (const FetchException)
+//            {
+//                if (util::is_file(path+".bak"))
+//                    util::move_file(path+".bak", path);
 
-            if (not mps())
-                std::cerr << "Failed to save '" << url << "' to" << std::endl
-                    << "'" << path << "'." << std::endl;
-            else
-                parse_mp_xml(*_cur_herd, path);
-        }
-        else
-        {
-            const std::string cvspath(
-                util::sprintf(mpBaseLocal, _cvsdir.c_str(), text.c_str()));
-            if (util::is_file(cvspath))
-                parse_mp_xml(*_cur_herd, cvspath);
-        }
+//                if (not mps() or (mps.size() == 0))
+//                {
+//                    unlink(path.c_str());
+//                    return true;
+//                }
+//            }
+
+//            if (not mps())
+//                std::cerr << "Failed to save '" << url << "' to" << std::endl
+//                    << "'" << path << "'." << std::endl;
+//            else
+//                parse_mp_xml(*_cur_herd, path);
+//        }
+//        else
+//        {
+//            const std::string cvspath(
+//                util::sprintf(mpBaseLocal, _cvsdir.c_str(), text.c_str()));
+//            if (util::is_file(cvspath))
+//                parse_mp_xml(*_cur_herd, cvspath);
+//        }
     }
 
     return true;

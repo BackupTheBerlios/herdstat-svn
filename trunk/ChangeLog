@@ -2,6 +2,9 @@ ChangeLog for herdstat
 
 2005-09-15 Aaron Walker <ka0ttic@gentoo.org>
 
+	* herdstat/portage/project_xml.cc, herdstat/portage/project_xml.hh:
+	Added separate files for projectxml files (what used to be mpHandler
+	in herds_xml.cc) and make it responsible for fetching/parsing itself.
 	* herdstat/portage/herds_xml.cc: Save projectxml files in
 	LOCALSTATEDIR regardless.
 	* herdstat/util/file.cc: Fixed dirname() to return "." if no "/" is

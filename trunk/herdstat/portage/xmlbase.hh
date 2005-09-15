@@ -1,5 +1,5 @@
 /*
- * herdstat -- portage/xml.hh
+ * herdstat -- herdstat/portage/xmlbase.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_XML_HH
-#define _HAVE_XML_HH 1
+#ifndef _HAVE_XMLBASE_HH
+#define _HAVE_XMLBASE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -62,6 +62,6 @@ namespace portage {
 
 } // namespace portage
 
-#endif /* _HAVE_XML_HH */
+#endif /* _HAVE_XMLBASE_HH */
 
 /* vim: set tw=80 sw=4 et : */
