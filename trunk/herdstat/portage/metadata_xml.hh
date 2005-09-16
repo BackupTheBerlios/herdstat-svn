@@ -69,7 +69,8 @@ namespace portage {
                  in_email,
                  in_name,
                  in_desc,
-                 in_longdesc;
+                 in_longdesc,
+                 in_en_longdesc;
 
             Developers::iterator _cur_dev;
     };

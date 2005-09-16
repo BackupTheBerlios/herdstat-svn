@@ -34,14 +34,14 @@ namespace portage {
 metadata_xml::metadata_xml()
     : parsable(), _data(), in_herd(false), in_maintainer(false),
       in_email(false), in_name(false), in_desc(false), in_longdesc(false),
-      _cur_dev()
+      in_en_longdesc(false), _cur_dev()
 {
 }
 /****************************************************************************/
 metadata_xml::metadata_xml(const std::string& path)
     : parsable(path), _data(), in_herd(false), in_maintainer(false),
       in_email(false), in_name(false), in_desc(false), in_longdesc(false),
-      _cur_dev()
+      in_en_longdesc(false), _cur_dev()
 {
     this->parse();
 }
@@ -83,6 +83,12 @@ metadata_xml::start_element(const std::string& name, const attrs_type& attrs)
         if (i != attrs.end())
             value.assign(i->second);
 
+        if (value == "en")
+        {
+            in_en_longdesc = true;
+            return true;
+        }
+
         if (value.empty())
             in_longdesc = true;
         else
@@ -110,6 +116,8 @@ metadata_xml::end_element(const std::string& name)
         in_name = false;
     else if (name == "description")
         in_desc = false;
+    else if (name == "longdescription" and in_en_longdesc)
+        in_en_longdesc = false;
     else if (name == "longdescription")
         in_longdesc = false;
 
@@ -131,6 +139,8 @@ metadata_xml::text(const std::string& text)
         (*_cur_dev)->set_name((*_cur_dev)->name() + text);
     else if (in_desc)
         (*_cur_dev)->set_role(text);
+    else if (in_en_longdesc)
+        _data.set_longdesc(util::tidy_whitespace(_data.longdesc() + text));
     else if (in_longdesc)
         _data.set_longdesc(util::tidy_whitespace(_data.longdesc() + text));
 
