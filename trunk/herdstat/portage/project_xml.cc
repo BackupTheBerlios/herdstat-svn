@@ -45,7 +45,7 @@ project_xml::project_xml(const std::string& path, const std::string& cvsdir)
         assert(parts.size() > 1);
         this->set_path(util::sprintf("%s/%s.xml", LOCALSTATEDIR,
             (*(parts.end() - 2)).c_str()));
-        this->fetch();
+        this->fetch(path);
     }
     else
     {
@@ -66,10 +66,8 @@ project_xml::do_fetch(const std::string& p) const throw (FetchException)
     if (not _cvsdir.empty())
         return;
 
-    if (not p.empty())
-        this->set_path(p);
-
-    const std::string url(util::sprintf(_baseURL, this->path().c_str()));
+    assert(not p.empty());
+    const std::string url(util::sprintf(_baseURL, p.c_str()));
     util::stat_T mps(this->path());
 
     try
