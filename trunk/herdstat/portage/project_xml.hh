@@ -32,6 +32,7 @@
  * @brief Defines the interface for Gentoo projectxml files.
  */
 
+#include <set>
 #include <herdstat/fetchable.hh>
 #include <herdstat/portage/xmlbase.hh>
 #include <herdstat/portage/herd.hh>
@@ -66,6 +67,9 @@ namespace portage {
             std::string _cur_role;
             static const char * const _baseURL;
             static const char * const _baseLocal;
+            /* for keeping track of what we've parsed already
+             * to prevent infinite recursion. */
+            static std::set<std::string> _parsed;
     };
 
     inline const Herd& project_xml::devs() const { return _devs; }

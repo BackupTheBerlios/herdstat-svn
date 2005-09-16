@@ -33,12 +33,26 @@ namespace portage {
 /*** static members *********************************************************/
 const char * const project_xml::_baseURL = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain";
 const char * const project_xml::_baseLocal = "%s/gentoo/xml/htdocs/%s";
+std::set<std::string> project_xml::_parsed;
 /****************************************************************************/
 project_xml::project_xml(const std::string& path, const std::string& cvsdir)
     : xmlBase(), fetchable(), _devs(), _cvsdir(cvsdir), 
       in_sub(false), in_dev(false), in_task(false), _cur_role()
 {
-    this->fetch(path);
+    if (_cvsdir.empty())
+    {
+        std::vector<std::string> parts = util::split(path, '/');
+        assert(parts.size() > 1);
+        this->set_path(util::sprintf("%s/%s.xml", LOCALSTATEDIR,
+            (*(parts.end() - 2)).c_str()));
+        this->fetch();
+    }
+    else
+    {
+        this->set_path(util::sprintf(_baseLocal, _cvsdir.c_str(),
+            path.c_str()));
+    }
+
     this->parse();
 }
 /****************************************************************************/
@@ -50,19 +64,13 @@ void
 project_xml::do_fetch(const std::string& p) const throw (FetchException)
 {
     if (not _cvsdir.empty())
-    {
-        this->set_path(util::sprintf(_baseLocal, _cvsdir.c_str(), p.c_str()));
         return;
-    }
 
-    std::vector<std::string> parts = util::split(p, '/');
-    assert(parts.size() >= 2);
-    const std::string path(util::sprintf("%s/%s.xml", LOCALSTATEDIR,
-        (*(parts.end() - 2)).c_str()));
-    this->set_path(path);
-    const std::string url(util::sprintf(_baseURL, p.c_str()));
+    if (not p.empty())
+        this->set_path(p);
 
-    util::stat_T mps(path);
+    const std::string url(util::sprintf(_baseURL, this->path().c_str()));
+    util::stat_T mps(this->path());
 
     try
     {
@@ -71,31 +79,31 @@ project_xml::do_fetch(const std::string& p) const throw (FetchException)
             (mps.size() == 0))
         {
             if (mps.exists())
-                util::copy_file(path, path+".bak");
+                util::copy_file(this->path(), this->path()+".bak");
 
-            _fetch(url, path);
+            _fetch(url, this->path());
 
             if (not mps() or (mps.size() == 0))
                 throw FetchException();
 
-            unlink((path+".bak").c_str());
+            unlink((this->path()+".bak").c_str());
         }
     }
     catch (const FetchException)
     {
-        if (util::is_file(path+".bak"))
-            util::move_file(path+".bak", path);
+        if (util::is_file(this->path()+".bak"))
+            util::move_file(this->path()+".bak", this->path());
 
         if (not mps() or (mps.size() == 0))
         {
-            unlink(path.c_str());
+            unlink(this->path().c_str());
             return;
         }
     }
 
     if (not mps())
         std::cerr << "Failed to save '" << url << "' to" << std::endl
-            << "'" << path << "'." << std::endl;
+            << "'" << this->path() << "'." << std::endl;
 }
 /****************************************************************************/
 void
@@ -104,6 +112,11 @@ project_xml::parse(const std::string& path)
     if (not path.empty()) this->set_path(path);
     if (not util::is_file(this->path()))
         throw FileException(this->path());
+
+    /* if inserting into the set fails, we've already parsed it.
+     * this prevents recursively instantiating this class unneededly. */
+    if (not _parsed.insert(this->path()).second)
+        return;
 
     this->parse_file(this->path().c_str());
 }

@@ -5,6 +5,12 @@ ChangeLog for herdstat
 	* configure.ac: Update version (1.1.1_alpha3).
 	* herdstat/portage/project_xml.cc, herdstat/portage/project_xml.hh,
 	herdstat/portage/herds_xml.cc: Finishing touches on project_xml class.
+	Added a static std::set that keeps track of what's been parsed
+	already.  If inserting the path into the set fails, we know we've
+	parsed it already and just return.  This mitigates the risk of
+	unneeded recursive instantiation (since the project_xml class
+	instantiates itself if it finds a <subproject> tag with the 'ref'
+	attribute, referencing another projectxml file).
 
 2005-09-15 Aaron Walker <ka0ttic@gentoo.org>
 
