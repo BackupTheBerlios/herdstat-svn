@@ -42,19 +42,13 @@ namespace portage {
                         public fetchable
     {
         public:
-//            project_xml();
-            project_xml(const std::string& path,
-                        const std::string& cvsdir,
-                        const std::string& herd);
+            project_xml(const std::string& path, const std::string& cvsdir);
             virtual ~project_xml();
 
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const { }
 
             const Herd& devs() const;
-
-//            static const char * const baseURL() const;
-//            static const char * const baseLocal() const;
 
         protected:
             virtual bool start_element(const std::string& name,
@@ -68,9 +62,8 @@ namespace portage {
         private:
             Herd _devs;
             const std::string& _cvsdir;
-            const std::string& _herd_name;
             bool in_sub, in_dev, in_task;
-            std::string _cur_role, _cur_sub;
+            std::string _cur_role;
             static const char * const _baseURL;
             static const char * const _baseLocal;
     };

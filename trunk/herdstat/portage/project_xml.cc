@@ -34,15 +34,8 @@ namespace portage {
 const char * const project_xml::_baseURL = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain";
 const char * const project_xml::_baseLocal = "%s/gentoo/xml/htdocs/%s";
 /****************************************************************************/
-//project_xml::project_xml()
-//    : xmlBase(), fetchable(), _devs(), _cvsdir(""), in_sub(false),
-//      in_dev(false), in_task(false), _cur_role()
-//{
-//}
-/****************************************************************************/
-project_xml::project_xml(const std::string& path, const std::string& cvsdir,
-                         const std::string& herd)
-    : xmlBase(), fetchable(), _devs(), _cvsdir(cvsdir), _herd_name(herd), 
+project_xml::project_xml(const std::string& path, const std::string& cvsdir)
+    : xmlBase(), fetchable(), _devs(), _cvsdir(cvsdir), 
       in_sub(false), in_dev(false), in_task(false), _cur_role()
 {
     this->fetch(path);
@@ -53,9 +46,6 @@ project_xml::~project_xml()
 {
 }
 /****************************************************************************/
-//const char * const project_xml::baseURL() const { return _baseURL; }
-//const char * const project_xml::baseLocal() const { return _baseLocal; }
-/****************************************************************************/
 void
 project_xml::do_fetch(const std::string& p) const throw (FetchException)
 {
@@ -65,10 +55,12 @@ project_xml::do_fetch(const std::string& p) const throw (FetchException)
         return;
     }
 
-    const std::string url(util::sprintf(_baseURL, p.c_str()));
+    std::vector<std::string> parts = util::split(p, '/');
+    assert(parts.size() >= 2);
     const std::string path(util::sprintf("%s/%s.xml", LOCALSTATEDIR,
-        _herd_name.c_str()));
+        (*(parts.end() - 2)).c_str()));
     this->set_path(path);
+    const std::string url(util::sprintf(_baseURL, p.c_str()));
 
     util::stat_T mps(path);
 
@@ -123,9 +115,11 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
         in_task = true;
     else if (name == "subproject")
     {
-        std::cout << "in <subproject> :: attrs.size() == " << attrs.size() << std::endl;
-        for (attrs_type::const_iterator i = attrs.begin() ; i != attrs.end() ; ++i)
-            std::cout << "  " << i->first << " = " << i->second << std::endl;
+        /*
+         * If inheritmembers == "yes", fetch the file listed in the ref attr,
+         * and treat it as another projectxml, recursing into ourselves.
+         * TODO: should we add some kind of reference counting?
+         */
 
         attrs_type::const_iterator pos = attrs.find("inheritmembers");
         if ((pos != attrs.end()) and (pos->second == "yes"))
@@ -133,7 +127,11 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
             if ((pos = attrs.find("ref")) != attrs.end())
             {
                 in_sub = true;
-                _cur_sub.assign(pos->second);
+
+                project_xml mp(pos->second, _cvsdir);
+                Herd::const_iterator i;
+                for (i = mp.devs().begin() ; i != mp.devs().end() ; ++i)
+                    _devs.insert(new Developer(**i));
             }
         }
     }
@@ -154,25 +152,16 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
 bool
 project_xml::end_element(const std::string& name)
 {
-    if (name == "task") in_task = false;
-    else if (name == "subproject") in_sub = false;
-    else if (name == "dev") in_dev = false;
+    if (name == "task")             in_task = false;
+    else if (name == "subproject")  in_sub = false;
+    else if (name == "dev")         in_dev = false;
     return true;
 }
 /****************************************************************************/
 bool
 project_xml::text(const std::string& text)
 {
-    if (in_sub)
-    {
-        /* fetch file listed in ref attribute (saved in _cur_sub) */
-        project_xml mp(_cur_sub, _cvsdir, _herd_name);
-        const Herd& devs(mp.devs());
-        Herd::const_iterator i;
-        for (i = devs.begin() ; i != devs.end() ; ++i)
-            _devs.insert(**i);
-    }
-    else if (in_dev)
+    if (in_dev)
     {
         Developer *dev = new Developer(util::lowercase(text));
         if (not _cur_role.empty())

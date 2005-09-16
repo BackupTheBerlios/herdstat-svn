@@ -1,6 +1,14 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.2_alpha3:
+    Bug fixes:
+     - Fixed a bug in the dirname() function that was causing problems if the
+       -H flag specified a file in the current directory.
+     - Fixed bug that caused projectxml files to be fetched in the same dir as
+       herds.xml even if -H or -C was specified (they should go in
+       /var/lib/herdstat).
+
 1.1.2_alpha2:
     Don't use pkg-config to set our xmlwrapp libs, as it links in 6 other libs
     that are unneeded.  This should result in a slightly smaller executable.

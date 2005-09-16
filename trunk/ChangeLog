@@ -1,5 +1,11 @@
 ChangeLog for herdstat
 
+2005-09-16 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Update version (1.1.1_alpha3).
+	* herdstat/portage/project_xml.cc, herdstat/portage/project_xml.hh,
+	herdstat/portage/herds_xml.cc: Finishing touches on project_xml class.
+
 2005-09-15 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/portage/project_xml.cc, herdstat/portage/project_xml.hh:
