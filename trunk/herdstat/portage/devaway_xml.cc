@@ -107,8 +107,7 @@ devaway_xml::start_element(const std::string& name, const attrs_type& attrs)
             return false;
         }
 
-        std::pair<Developers::iterator, bool> p = _devs.insert(pos->second);
-        _cur_dev = p.first;
+        _cur_dev = _devs.insert(pos->second).first;
         in_dev = true;
     }
     else if (name == "reason" and in_dev)

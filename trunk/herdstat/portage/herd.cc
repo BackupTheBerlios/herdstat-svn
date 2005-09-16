@@ -103,24 +103,13 @@ Herds::~Herds()
     std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
 }
 /****************************************************************************/
-template <typename T>
-struct Instantiate : std::unary_function<const T*, T*>
-{
-    T* operator()(const T* p) const
-    {
-        return new T(*p);
-    }
-};
-
 Herds&
 Herds::operator= (const std::vector<std::string>& herds)
 {
     std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
     _herds.clear();
-
-    std::vector<std::string>::const_iterator i;
-    for (i = herds.begin() ; i != herds.end() ; ++i)
-        _herds.insert(new Herd(*i));
+    std::transform(herds.begin(), herds.end(), std::inserter(_herds, _herds.begin()),
+        util::InstantiateStr<Herd>());
 
     return *this;
 }
@@ -130,12 +119,8 @@ Herds::operator= (const container_type& v)
 {
     std::for_each(_herds.begin(), _herds.end(), util::DeleteAndNullify());
     _herds.clear();
-
-//    for (const_iterator i = v.begin() ; i != v.end() ; ++i)
-//        _herds.insert(new Herd(**i));
-
-    std::transform(v.begin(), v.end(), std::inserter(_herds, _herds.end()),
-        Instantiate<Herd>());
+    std::transform(v.begin(), v.end(), std::inserter(_herds, _herds.begin()),
+        util::Instantiate<Herd>());
 
     return *this;
 }

@@ -42,6 +42,24 @@ namespace util {
         const T& operator()(const T *p) const { return *p; }
     };
 
+    template <typename T>
+    struct Instantiate : std::unary_function<const T*, T*>
+    {
+        T* operator()(const T* p) const
+        {
+            return new T(*p);
+        }
+    };
+
+    template <typename T>
+    struct InstantiateStr : std::unary_function<std::string, T*>
+    {
+        T* operator()(const std::string& s) const
+        {
+            return new T(s);
+        }
+    };
+
     /**
      * Function object that dereferences the given pointers and
      * then calls operator<.

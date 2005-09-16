@@ -11,6 +11,14 @@ ChangeLog for herdstat
 	unneeded recursive instantiation (since the project_xml class
 	instantiates itself if it finds a <subproject> tag with the 'ref'
 	attribute, referencing another projectxml file).
+	* herdstat/util/functors.hh: Added Instantiate and InstantiateStr
+	template which returns a newly allocated pointer for the given
+	template argument passing a copy of the object or a string,
+	respectively, to the constructor.
+	* herdstat/portage/herds_xml.cc, herdstat/portage/developer.cc,
+	herdstat/portage/herd.cc, src/action_dev_handler.cc: Use
+	transform+inserter+Instantiate combo for copying Herd/Developer
+	members between containers.
 
 2005-09-15 Aaron Walker <ka0ttic@gentoo.org>
 

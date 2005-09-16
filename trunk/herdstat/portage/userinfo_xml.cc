@@ -90,8 +90,7 @@ userinfo_xml::start_element(const std::string& name, const attrs_type& attrs)
         if (pos == attrs.end())
             throw Exception("<user> tag with no username attribute!");
 
-        std::pair<Developers::iterator, bool> p = _devs.insert(pos->second);
-        _cur_dev = p.first;
+        _cur_dev = _devs.insert(pos->second).first;
         (*_cur_dev)->set_status("Active");
         in_user = true;
     }

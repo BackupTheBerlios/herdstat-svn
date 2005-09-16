@@ -212,26 +212,17 @@ action_dev_handler_T::operator() (opts_type &opts)
         /* for each herd... */
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            /* for each developer in the herd... */
-            Herd::const_iterator d;
-            for (d = (*h)->begin() ; d != (*h)->end() ; ++d)
-            {
-                /* if the developer is not already in our list, add it */
-//                if (all_devs.find(*d) == all_devs.end())
-                all_devs.insert(new Developer(**d));
-            }
+            std::transform((*h)->begin(), (*h)->end(),
+                std::inserter(all_devs, all_devs.end()),
+                util::Instantiate<Developer>());
         }
 
         /* insert those that exist in userinfo.xml but not herds.xml */
         if (not userinfo.empty())
         {
-            const Developers& devs(userinfo.devs());
-            Developers::const_iterator d;
-            for (d = devs.begin() ; d != devs.end() ; ++d)
-            {
-//                if (all_devs.find(*d) == all_devs.end())
-                    all_devs.insert(new Developer(**d));
-            }
+            std::transform(userinfo.devs().begin(), userinfo.devs().end(),
+                std::inserter(all_devs, all_devs.end()),
+                util::Instantiate<Developer>());
         }
 
         Herd herd(all_devs);

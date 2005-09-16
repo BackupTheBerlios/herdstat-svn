@@ -152,19 +152,15 @@ bool
 herds_xml::text(const std::string& text)
 {
     if (in_herd_name)
-    {
-        std::pair<Herds::iterator, bool> p = _herds.insert(new Herd(text));
-        _cur_herd = p.first;
-    }
+        _cur_herd = _herds.insert(new Herd(text)).first;
     else if (in_herd_desc)
         (*_cur_herd)->set_desc(util::tidy_whitespace(text));
     else if (in_herd_email)
         (*_cur_herd)->set_email(text);        
     else if (in_maintainer_email)
     {
-        std::pair<Herd::iterator, bool> p =
-            (*_cur_herd)->insert(new Developer(util::lowercase(text)));
-        _cur_dev = p.first;
+        _cur_dev = (*_cur_herd)->insert(
+                new Developer(util::lowercase(text))).first;
     }
     else if (in_maintainer_name)
         (*_cur_dev)->set_name((*_cur_dev)->name() + text);
@@ -180,9 +176,10 @@ herds_xml::text(const std::string& text)
          */
 
         project_xml mp(text, _cvsdir);
-        Herd::const_iterator i;
-        for (i = mp.devs().begin() ; i != mp.devs().end() ; ++i)
-            (*_cur_herd)->insert(new Developer(**i));
+
+        std::transform(mp.devs().begin(), mp.devs().end(),
+            std::inserter(**_cur_herd, (*_cur_herd)->begin()),
+            util::Instantiate<Developer>());
     }
 
     return true;

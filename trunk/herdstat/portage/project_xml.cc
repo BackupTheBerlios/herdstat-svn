@@ -164,8 +164,6 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
         attrs_type::const_iterator pos = attrs.find("description");
         if (pos != attrs.end())
             _cur_role.assign(pos->second);
-//        else if ((pos = attrs.find("role")) != attrs.end())
-//            _cur_role.assign(pos->second);
     }
 
     return true;

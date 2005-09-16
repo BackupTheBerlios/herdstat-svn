@@ -85,11 +85,8 @@ Developers::operator= (const std::vector<std::string>& devs)
 {
     std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
     _devs.clear();
-
-    std::vector<std::string>::const_iterator i;
-    for (i = devs.begin() ; i != devs.end() ; ++i)
-        _devs.insert(new Developer(*i));
-
+    std::transform(devs.begin(), devs.end(), std::inserter(_devs, _devs.begin()),
+        util::InstantiateStr<Developer>());
     return *this;
 }
 /****************************************************************************/
@@ -98,10 +95,8 @@ Developers::operator= (const container_type& v)
 {
     std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
     _devs.clear();
-
-    for (const_iterator i = v.begin() ; i != v.end() ; ++i)
-        _devs.insert(new Developer(**i));
-
+    std::transform(v.begin(), v.end(), std::inserter(_devs, _devs.begin()),
+        util::Instantiate<Developer>());
     return *this;
 }
 /****************************************************************************/
