@@ -343,8 +343,9 @@ namespace portage {
 //    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
 //        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
     inline Developers::iterator Developers::find(const std::string& dev) const
-    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
+    { Developer *d = new Developer(dev); iterator i = _devs.find(d); delete d; return i; }
+//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
+//        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
 
     struct DeveloperRegexMatch
         : std::binary_function<const util::regex_T *, const Developer *, bool>

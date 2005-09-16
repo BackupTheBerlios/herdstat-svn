@@ -274,8 +274,10 @@ namespace portage {
     inline void Herds::clear() { return _herds.clear(); }
     inline Herds::iterator Herds::insert(iterator pos, const value_type h)
     { return _herds.insert(pos, h); }
+
     template <class In> inline void
     Herds::insert(In begin, In end) { _herds.insert(begin, end); }
+
     inline std::pair<Herds::iterator, bool>
     Herds::insert(const value_type v)
     {
@@ -295,8 +297,9 @@ namespace portage {
     { return _herds.find(v); }
 
     inline Herds::iterator Herds::find(const std::string& herd) const
-    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
-        util::DereferenceStrEqual<Herd>(), herd)); }
+    { Herd *h = new Herd(herd); iterator i = _herds.find(h); delete h; return i; }
+//    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
+//        util::DereferenceStrEqual<Herd>(), herd)); }
 
     struct HerdRegexMatch
         : std::binary_function<const util::regex_T *, const Herd *, bool>

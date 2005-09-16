@@ -142,7 +142,18 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
                 project_xml mp(pos->second, _cvsdir);
                 Herd::const_iterator i;
                 for (i = mp.devs().begin() ; i != mp.devs().end() ; ++i)
-                    _devs.insert(new Developer(**i));
+                {
+                    Developer *d = new Developer(**i);
+                    Herd::iterator i = _devs.find(d);
+                    if (i == _devs.end())
+                        _devs.insert(d);
+                    else
+                    {
+                        if (not d->role().empty() and (*i)->role().empty())
+                            (*i)->set_role(d->role());
+                        delete d;
+                    }
+                }
             }
         }
     }
@@ -153,8 +164,8 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
         attrs_type::const_iterator pos = attrs.find("description");
         if (pos != attrs.end())
             _cur_role.assign(pos->second);
-        else if ((pos = attrs.find("role")) != attrs.end())
-            _cur_role.assign(pos->second);
+//        else if ((pos = attrs.find("role")) != attrs.end())
+//            _cur_role.assign(pos->second);
     }
 
     return true;
@@ -177,7 +188,16 @@ project_xml::text(const std::string& text)
         Developer *dev = new Developer(util::lowercase(text));
         if (not _cur_role.empty())
             dev->set_role(_cur_role);
-        _devs.insert(dev);
+
+        Herd::iterator i = _devs.find(dev);
+        if (i == _devs.end())
+            _devs.insert(dev);
+        else
+        {
+            if (not dev->role().empty() and (*i)->role().empty())
+                (*i)->set_role(dev->role());
+            delete dev;
+        }
     }
 
     return true;
