@@ -421,9 +421,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
      * and insert into our matches map if found */
     if (not querycache.empty())
     {
-        opts_type tmp(opts);
-        opts_type::iterator i;
-        for (i = tmp.begin() ; i != tmp.end() ; ++i)
+        for (opts_type::iterator i = opts.begin() ; i != opts.end() ; )
         {
             /* does a previously cached query that
              * matches our criteria exist? */
@@ -443,7 +441,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
                     herdsxml.fill_developer(matches[*i]->info);
                 }
 
-                opts.erase(std::find(opts.begin(), opts.end(), *i));
+                i = opts.erase(i);
             }
             /* is a wider-scoped query cached? */
             else if (qi == querycache.end() and not with.empty())
@@ -473,18 +471,17 @@ action_pkg_handler_T::operator() (opts_type &opts)
                         }
 
                         search(pkgs, q);
-                        opts.erase(std::find(opts.begin(), opts.end(), *i));
-                    }
-                }
-            }
+                        i = opts.erase(i);
+                    } else ++i;
+                } else ++i;
+            } else ++i;
         }
     }
 
     if (debug)
     {
         debug_msg("opts.size() after querycache search = %d", optsize);
-        opts_type::iterator i;
-        for (i = opts.begin() ; i != opts.end() ; ++i)
+        for (opts_type::iterator i = opts.begin() ; i != opts.end() ; ++i)
             std::cout << *i << std::endl;
     }
 
