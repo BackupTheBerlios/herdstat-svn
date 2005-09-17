@@ -29,6 +29,8 @@
 #include <herdstat/util/file.hh>
 #include <herdstat/portage/project_xml.hh>
 
+#define EXPIRE  169200
+
 namespace portage {
 /*** static members *********************************************************/
 const char * const project_xml::_baseURL = "http://www.gentoo.org/cgi-bin/viewcvs.cgi/*checkout*/xml/htdocs%s?rev=HEAD&root=gentoo&content-type=text/plain";
@@ -73,7 +75,7 @@ project_xml::do_fetch(const std::string& p) const throw (FetchException)
     try
     {
         if (not mps.exists() or
-            (mps.exists() and ((std::time(NULL) - mps.mtime()) > 592200)) or
+            (mps.exists() and ((std::time(NULL) - mps.mtime()) > EXPIRE)) or
             (mps.size() == 0))
         {
             if (mps.exists())
