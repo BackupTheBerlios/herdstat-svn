@@ -51,12 +51,12 @@ main(int argc, char **argv)
 
         Developers::const_iterator i;
         for (i = devs.begin() ; i != devs.end() ; ++i)
-            std::cout << (*i)->user() << ": " << (*i)->awaymsg() << std::endl;
+            std::cout << i->user() << ": " << i->awaymsg() << std::endl;
 
         std::cout << std::endl;
 
         assert((i = devs.find("lv")) != devs.end());
-        std::cout << (*i)->user() << " - " << (*i)->awaymsg() << std::endl;
+        std::cout << i->user() << " - " << i->awaymsg() << std::endl;
     }
     catch (const BaseException &e)
     {

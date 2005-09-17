@@ -27,6 +27,7 @@
 #include <iostream>
 #include <algorithm>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/algorithm.hh>
 
 #include "action_away_handler.hh"
 
@@ -37,25 +38,26 @@ action_away_handler_T::~action_away_handler_T()
 }
 
 void
-action_away_handler_T::display(Developer * const dev)
+action_away_handler_T::display(const Developer& dev)
 {
     ++size;
 
     if (count) return;
 
     if (quiet)
-        output("", dev->user() + " - " + dev->awaymsg());
+        output("", dev.user() + " - " + dev.awaymsg());
     else
     {
-        herdsxml.fill_developer(*dev);
+        Developer d(dev);
+        herdsxml.fill_developer(d);
 
-        if (dev->name().empty())
-            output("Developer", dev->user());
+        if (d.name().empty())
+            output("Developer", d.user());
         else
-            output("Developer", dev->name() + " (" + dev->user() + ")");
+            output("Developer", d.name() + " (" + d.user() + ")");
 
-        output("Email", dev->email());
-        output("Away Message", dev->awaymsg());
+        output("Email", d.email());
+        output("Away Message", d.awaymsg());
     }
 }
 
@@ -64,8 +66,8 @@ action_away_handler_T::operator() (opts_type &opts)
 {
     fetch_devawayxml();
     devaway.parse(devaway_path);
-    Developers& devs(devaway.devs());
-    Developers::iterator d;
+    const Developers& devs(devaway.devs());
+    Developers::const_iterator d;
 
     output.set_maxlabel(13);
     output.set_maxdata(maxcol - output.maxlabel());
@@ -102,12 +104,9 @@ action_away_handler_T::operator() (opts_type &opts)
 
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
-        /* FIXME: use an algo */
-        for (d = devs.begin() ; d != devs.end() ; ++d)
-        {
-            if (regexp == (*d)->user())
-                opts.push_back((*d)->user());
-        }
+        /* insert user names that match the regex into opts */
+        util::transform_if(devs.begin(), devs.end(), std::back_inserter(opts),
+            std::bind1st(UserRegexMatch<Developer>(), &regexp), User());
 
         if (opts.empty())
         {
@@ -125,8 +124,7 @@ action_away_handler_T::operator() (opts_type &opts)
     {
         try
         {
-            d = devs.find(*i);
-            if (d == devs.end())
+            if ((d = devs.find(*i)) == devs.end())
                 throw DevException();
 
             display(*d);

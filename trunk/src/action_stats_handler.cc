@@ -77,23 +77,18 @@ action_stats_handler_T::operator() (opts_type &null)
     /* for each herd in herds.xml... */
     for (h = herds.begin() ; h != herds.end() ; ++h)
     {
-        ndevs += (*h)->size();
-
-//        *stream << "in herd " << (*h)->name() << std::endl;
+        ndevs += h->size();
 
         /* add one to the number of herds the current dev is in */
-        for (d = (*h)->begin() ; d != (*h)->end() ; ++d)
-        {
-//            *stream << "++herds_per_dev[" << (*d)->user() << "]" << std::endl;
-            ++herds_per_dev[(*d)->user()];
-        }
+        for (d = h->begin() ; d != h->end() ; ++d)
+            ++herds_per_dev[d->user()];
 
         /* is the size of this herd bigger than the previous biggest herd */
-        if ((*h)->size() > biggest_herd)
-            biggest_herd = (*h)->size();
+        if (h->size() > biggest_herd)
+            biggest_herd = h->size();
 
-        if ((*h)->size() <= smallest_herd)
-            smallest_herd = (*h)->size();
+        if (h->size() <= smallest_herd)
+            smallest_herd = h->size();
     }
 
     /* for each developer in herds.xml */
@@ -113,10 +108,10 @@ action_stats_handler_T::operator() (opts_type &null)
     /* we now have least/most devs, so find all devs with matching numbers */
     for (h = herds.begin() ; h != herds.end() ; ++h)
     {
-        if ((*h)->size() == biggest_herd)
-            most_devs.push_back((*h)->name());
-        else if ((*h)->size() == smallest_herd)
-            least_devs.push_back((*h)->name());
+        if (h->size() == biggest_herd)
+            most_devs.push_back(h->name());
+        else if (h->size() == smallest_herd)
+            least_devs.push_back(h->name());
     }
 
     /* we now have least/most herds, so find all herds with matching numbers */

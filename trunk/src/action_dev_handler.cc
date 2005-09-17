@@ -25,8 +25,8 @@
 #endif
 
 #include <iostream>
-#include <memory>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/algorithm.hh>
 
 #include "action_herd_handler.hh"   /* for display_herd() */
 #include "action_dev_handler.hh"
@@ -81,11 +81,12 @@ action_dev_handler_T::display(const std::string &d)
     devaway.fill_developer(dev);
     userinfo.fill_developer(dev);
     
-    std::vector<std::string> herds(dev.herds());
-
     /* bail if userinfo.xml wasn't used and dev is not in any herds */
-    if (userinfo.empty() and herds.empty())
+    if (dev.herds().empty() and (userinfo.empty() or
+        (userinfo.devs().find(d) == userinfo.devs().end())))
         throw DevException();
+
+    const std::vector<std::string>& herds(dev.herds());
 
     if (not quiet)
     {
@@ -104,8 +105,6 @@ action_dev_handler_T::display(const std::string &d)
     }
     else
     {
-        std::sort(herds.begin(), herds.end());
-
         if (verbose and not quiet)
         {
             output(util::sprintf("Herds(%d)", herds.size()), "");
@@ -122,10 +121,10 @@ action_dev_handler_T::display(const std::string &d)
                         
                 /* display herd info */
                 Herds::const_iterator h = herdsxml.herds().find(*i);
-                if (not (*h)->email().empty())
-                    output("", (*h)->email());
-                if (not (*h)->desc().empty())
-                    output("", (*h)->desc());
+                if (not h->email().empty())
+                    output("", h->email());
+                if (not h->desc().empty())
+                    output("", h->desc());
 
                 if (nh != herds.size())
                     output.endl();
@@ -208,26 +207,18 @@ action_dev_handler_T::operator() (opts_type &opts)
     /* all target? */
     if (all)
     {
-        Developers all_devs;
+        Herd all_devs;
+
         /* for each herd... */
         for (h = herds.begin() ; h != herds.end() ; ++h)
-        {
-            std::transform((*h)->begin(), (*h)->end(),
-                std::inserter(all_devs, all_devs.end()),
-                util::Instantiate<Developer>());
-        }
+            all_devs.insert(h->begin(), h->end());
 
         /* insert those that exist in userinfo.xml but not herds.xml */
         if (not userinfo.empty())
-        {
-            std::transform(userinfo.devs().begin(), userinfo.devs().end(),
-                std::inserter(all_devs, all_devs.end()),
-                util::Instantiate<Developer>());
-        }
+            all_devs.insert(userinfo.devs().begin(), userinfo.devs().end());
 
-        Herd herd(all_devs);
-        display_herd(herd);
-        size = herd.size();
+        display_herd(all_devs);
+        size = all_devs.size();
         flush();
         return EXIT_SUCCESS;
     }
@@ -245,28 +236,16 @@ action_dev_handler_T::operator() (opts_type &opts)
         regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
 
         /* loop through herds searching for devs who's username
-         * matches the regular expression */
+         * matches the regular expression, inserting those that do into opts */
         for (h = herds.begin() ; h != herds.end() ; ++h)
-        {
-            Herd::const_iterator d;
-            for (d = (*h)->begin() ; d != (*h)->end() ; ++d)
-            {
-                if (regexp == (*d)->user())
-                    opts.push_back((*d)->user());
-            }
-        }
+            util::transform_if(h->begin(), h->end(), std::back_inserter(opts),
+                std::bind1st(UserRegexMatch<Developer>(), &regexp), User());
 
         /* also add those in userinfo.xml - dupes will be unique'd out below */
         if (not userinfo.empty())
-        {
-            const Developers& devs(userinfo.devs());
-            Developers::const_iterator d;
-            for (d = devs.begin() ; d != devs.end() ; ++d)
-            {
-                if (regexp == (*d)->user())
-                    opts.push_back((*d)->user());
-            }
-        }
+            util::transform_if(userinfo.devs().begin(), userinfo.devs().end(),
+                std::back_inserter(opts), std::bind1st(UserRegexMatch<Developer>(),
+                &regexp), User());
 
         if (opts.empty())
         {
@@ -292,7 +271,7 @@ action_dev_handler_T::operator() (opts_type &opts)
         catch (const DevException)
         {
             std::cerr << "Developer '" << *dev << "' doesn't seem to "
-                << "belong to any herds." << std::endl;
+                << "exist." << std::endl;
 
             if (opts.size() == 1)
                 return EXIT_FAILURE;

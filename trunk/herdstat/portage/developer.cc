@@ -77,26 +77,23 @@ Developers::Developers(const std::vector<std::string>& devs)
 /****************************************************************************/
 Developers::~Developers()
 {
-    std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
 }
 /****************************************************************************/
 Developers&
 Developers::operator= (const std::vector<std::string>& devs)
 {
-    std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
     _devs.clear();
-    std::transform(devs.begin(), devs.end(), std::inserter(_devs, _devs.begin()),
-        util::InstantiateStr<Developer>());
+    std::vector<std::string>::const_iterator i;
+    for (i = devs.begin() ; i != devs.end() ; ++i)
+        _devs.insert(Developer(*i));
     return *this;
 }
 /****************************************************************************/
 Developers&
 Developers::operator= (const container_type& v)
 {
-    std::for_each(_devs.begin(), _devs.end(), util::DeleteAndNullify());
     _devs.clear();
-    std::transform(v.begin(), v.end(), std::inserter(_devs, _devs.begin()),
-        util::Instantiate<Developer>());
+    _devs.insert(v.begin(), v.end());
     return *this;
 }
 /****************************************************************************/
@@ -104,21 +101,8 @@ Developers::operator
 std::vector<std::string>() const
 {
     std::vector<std::string> v;
-    for (Developers::const_iterator i = this->begin() ; i != this->end() ; ++i)
-        v.push_back((*i)->user());
+    std::transform(_devs.begin(), _devs.end(), std::back_inserter(v), User());
     return v;
-}
-/****************************************************************************/
-std::pair<Developers::iterator, bool>
-Developers::insert(const std::string& dev)
-{
-    Developer *d = new Developer(dev);
-    std::pair<iterator, bool> p = _devs.insert(d);
-
-    if (not p.second)
-        delete d;
-
-    return p;
 }
 /****************************************************************************/
 } // namespace portage

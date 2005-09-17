@@ -54,7 +54,7 @@ display_metadata(const metadata_data& data)
     ebuild_T ebuild_vars;
 
     if (not meta.is_category() and (herds.empty() or
-        (*(herds.front()) == "no-herd")))
+        (herds.front()) == "no-herd"))
         output("Herds(0)", "none");
     else if (not herds.empty())
         output(util::sprintf("Herds(%d)", herds.size()), herds);
@@ -64,7 +64,7 @@ display_metadata(const metadata_data& data)
         std::vector<std::string> qdevs;
         Developers::const_iterator d;
         for (d = devs.begin() ; d != devs.end() ; ++d)
-            qdevs.push_back((*d)->email());
+            qdevs.push_back(d->email());
 
         if (devs.size() >= 1)
             output("", qdevs);
@@ -74,19 +74,14 @@ display_metadata(const metadata_data& data)
     else
     {
         if (devs.size() >= 1)
-        {
-//            std::vector<std::string> dvec;
-//            Developers::const_iterator d;
-//            for (d = devs.begin() ; d != devs.end() ; ++d)
-//                dvec.push_back(d->email());
-            output(util::sprintf("Maintainers(%d)", devs.size()), devs.front()->email());
-        }
+            output(util::sprintf("Maintainers(%d)", devs.size()),
+                devs.front().email());
         
         if (devs.size() > 1)
         {
             Developers::const_iterator d;
             for (d = ++devs.begin(); d != devs.end() ; ++d)
-                output("", (*d)->email());
+                output("", d->email());
         }
         else if (not meta.is_category() and devs.empty())
             output("Maintainers(0)", "none");

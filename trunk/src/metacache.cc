@@ -30,6 +30,7 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/vars.hh>
 #include <herdstat/util/progress.hh>
+#include <herdstat/util/functional.hh>
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
@@ -316,7 +317,7 @@ metacache_T::dump()
             Herds::const_iterator i, end = herds.end();
             for (i = herds.begin(), n = 1 ; i != end ; ++i, ++n)
             {
-                str += (*i)->name();
+                str += i->name();
                 if (n != herds.size())
                     str += ",";
             }
@@ -329,7 +330,7 @@ metacache_T::dump()
             Developers::const_iterator i, end = devs.end();
             for (i = devs.begin(), n = 1, str.clear() ; i != end ; ++i, ++n)
             {
-                str += (*i)->email();
+                str += i->email();
                 if (n != devs.size())
                     str += ",";
             }

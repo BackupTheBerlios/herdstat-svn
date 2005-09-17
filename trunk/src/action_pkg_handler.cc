@@ -96,11 +96,6 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
 
     if (dev)
     {
-//        if ((regex and (std::find_if(devs.begin(), devs.end(), std::bind1st(
-//            util::regexMatch(), &regexp)) != devs.end()) and
-//            (with.empty() or meta.herd_exists(with))) or
-//            (not regex and meta.dev_exists(criteria) and
-//            (with.empty() or meta.herd_exists(with))))
         if ((regex and (devs.find(regexp) != devs.end()) and
             (with.empty() or (herds.find(with) != herds.end()))) or
             (not regex and (devs.find(criteria) != devs.end()) and
@@ -109,9 +104,6 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
     }
     else
     {
-//        if ((regex and std::find_if(herds.begin(), herds.end(), std::bind1st(
-//            util::regexMatch(), &regexp)) != herds.end()) or (not regex and
-//            meta.herd_exists(criteria)) or (criteria == "no-herd" and herds.empty()))
         if ((regex and (herds.find(regexp) != herds.end())) or
             (not regex and (herds.find(criteria) != herds.end())) or
             (criteria == "no-herd" and herds.empty()))
@@ -265,10 +257,10 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         else if ((i = herds.find(q->query)) != herds.end())
         {
             output("Herd", q->query);
-            if (not (*i)->email().empty())
-                output("Email", (*i)->email());
-            if (not (*i)->desc().empty())
-                output("Description", (*i)->desc());
+            if (not i->email().empty())
+                output("Email", i->email());
+            if (not i->desc().empty())
+                output("Description", i->desc());
         }
         else
             output("Herd", q->query);

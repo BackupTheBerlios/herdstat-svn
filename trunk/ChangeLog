@@ -1,8 +1,28 @@
 ChangeLog for herdstat
 
-2005-09-16 Aaron Walker <ka0ttic@gentoo.org>
+2005-09-17 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.1_alpha3).
+	* src/action_dev_handler.cc: Bail if user is not in herds.xml and not
+	in userinfo.xml.
+	* herdstat/portage/developer.cc, herdstat/portage/developer.hh,
+	herdstat/portage/herd.cc, herdstat/portage/herd.hh,
+	herdstat/portage/devaway_xml.cc, herdstat/portage/herds_xml.cc,
+	herdstat/portage/metadata_xml.cc, herdstat/portage/userinfo_xml.cc,
+	src/action_dev_handler.cc, src/action_herd_handler.cc,
+	src/action_meta_handler.cc, src/action_pkg_handler.cc: Having
+	Developers/Herd/Herds classes contain pointers ends up making
+	everything much more complicated than need be, so I've reverted the
+	changes.
+	* herdstat/util/functional.hh: Rename to functional.hh for consistency
+	with the standard.
+	* herdstat/util/algorithm.hh: Add new file for algo definitions.
+	Added transform_if() and copy_if().
+	* herdstat/portage/functional.hh: Added some generic function objects
+	for use with portage-specific code.
+
+2005-09-16 Aaron Walker <ka0ttic@gentoo.org>
+
 	* herdstat/portage/project_xml.cc, herdstat/portage/project_xml.hh,
 	herdstat/portage/herds_xml.cc: Finishing touches on project_xml class.
 	Added a static std::set that keeps track of what's been parsed

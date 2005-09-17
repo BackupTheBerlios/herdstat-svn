@@ -19,7 +19,8 @@ hh_sources = string.hh \
 	     glob.hh \
 	     timer.hh \
 	     progress.hh \
-	     functors.hh
+	     functional.hh \
+	     algorithm.hh
 
 noinst_LTLIBRARIES = libutil.la
 libutil_la_SOURCES = $(cc_sources) $(hh_sources)

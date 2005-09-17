@@ -46,12 +46,12 @@ main(int argc, char **argv)
 
         std::cout << "herds: ";
         for (Herds::const_iterator i = herds.begin() ; i != herds.end() ; ++i)
-            std::cout << (*i)->name() << " ";
+            std::cout << i->name() << " ";
         std::cout << std::endl;
 
         std::cout << "devs: ";
         for (Developers::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
-            std::cout << (*i)->user() << " ";
+            std::cout << i->user() << " ";
         std::cout << std::endl;
     }
     catch (const BaseException &e)

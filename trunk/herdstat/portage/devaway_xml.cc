@@ -73,11 +73,11 @@ devaway_xml::fill_developer(Developer& dev) const
 {
     assert(not dev.user().empty());
 
-    Developers::const_iterator d = _devs.find(dev.user());
+    Developers::const_iterator d = _devs.find(dev);
     if (d != _devs.end())
     {
         dev.set_away(true);
-        dev.set_awaymsg((*d)->awaymsg());
+        dev.set_awaymsg(d->awaymsg());
     }
 }
 /****************************************************************************/
@@ -87,8 +87,8 @@ devaway_xml::keys() const
     std::vector<std::string> v;
     for (Developers::const_iterator i = _devs.begin() ; i != _devs.end() ; ++i)
     {
-        v.push_back((*i)->user());
-        v.push_back((*i)->email());
+        v.push_back(i->user());
+        v.push_back(i->email());
     }
     return v;
 }
@@ -130,8 +130,8 @@ bool
 devaway_xml::text(const std::string& text)
 {
     if (in_reason)
-        (*_cur_dev)->set_awaymsg(util::tidy_whitespace(
-                    (*_cur_dev)->awaymsg() + text));
+        const_cast<Developer&>(*_cur_dev).set_awaymsg(
+            util::tidy_whitespace(_cur_dev->awaymsg() + text));
 
     return true;
 }

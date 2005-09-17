@@ -73,11 +73,8 @@ Herd::operator= (const Herd& that)
     _email.assign(that._email);
     _desc.assign(that._desc);
 
-    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
     this->clear();
-
-    for (const_iterator i = that.begin() ; i != that.end() ; ++i)
-        this->insert(new Developer(**i));
+    this->insert(that.begin(), that.end());
     
     return *this;
 }
@@ -100,28 +97,25 @@ Herds::Herds(const Herds& that)
 /****************************************************************************/
 Herds::~Herds()
 {
-    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
 }
 /****************************************************************************/
 Herds&
 Herds::operator= (const std::vector<std::string>& herds)
 {
-    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
     _herds.clear();
-    std::transform(herds.begin(), herds.end(), std::inserter(_herds, _herds.begin()),
-        util::InstantiateStr<Herd>());
-
+    
+    std::vector<std::string>::const_iterator i;
+    for (i = herds.begin() ; i != herds.end() ; ++i)
+        _herds.insert(Herd(*i));
+    
     return *this;
 }
 /****************************************************************************/
 Herds&
 Herds::operator= (const container_type& v)
 {
-    std::for_each(_herds.begin(), _herds.end(), util::DeleteAndNullify());
     _herds.clear();
-    std::transform(v.begin(), v.end(), std::inserter(_herds, _herds.begin()),
-        util::Instantiate<Herd>());
-
+    _herds.insert(v.begin(), v.end());
     return *this;
 }
 /****************************************************************************/
@@ -129,21 +123,8 @@ Herds::operator
 std::vector<std::string>() const
 {
     std::vector<std::string> v;
-    for (Herds::const_iterator i = this->begin() ; i != this->end() ; ++i)
-        v.push_back((*i)->name());
+    std::transform(_herds.begin(), _herds.end(), std::back_inserter(v), Name());
     return v;
-}
-/****************************************************************************/
-std::pair<Herds::iterator, bool>
-Herds::insert(const std::string& herd)
-{
-    Herd *h = new Herd(herd);
-    std::pair<iterator, bool> p = _herds.insert(h);
-
-    if (not p.second)
-        delete h;
-
-    return p;
 }
 /****************************************************************************/
 } // namespace portage

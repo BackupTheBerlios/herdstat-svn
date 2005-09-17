@@ -1,5 +1,5 @@
 /*
- * herdstat -- herdstat/util/functors.hh
+ * herdstat -- herdstat/util/functional.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,45 +20,21 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_FUNCTORS_HH
-#define _HAVE_FUNCTORS_HH 1
+#ifndef _HAVE_UTIL_FUNCTIONAL_HH
+#define _HAVE_UTIL_FUNCTIONAL_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 /**
- * @file functors.hh
+ * @file functional.hh
  * @brief General purpose utility functors.
  */
 
 #include <functional>
 
 namespace util {
-
-    struct Dereference
-    {
-        template <typename T>
-        const T& operator()(const T *p) const { return *p; }
-    };
-
-    template <typename T>
-    struct Instantiate : std::unary_function<const T*, T*>
-    {
-        T* operator()(const T* p) const
-        {
-            return new T(*p);
-        }
-    };
-
-    template <typename T>
-    struct InstantiateStr : std::unary_function<std::string, T*>
-    {
-        T* operator()(const std::string& s) const
-        {
-            return new T(s);
-        }
-    };
 
     /**
      * Function object that dereferences the given pointers and
@@ -155,6 +131,6 @@ namespace util {
 
 } // namespace util
 
-#endif /* _HAVE_FUNCTORS_HH */
+#endif /* _HAVE_UTIL_FUNCTIONAL_HH */
 
 /* vim: set tw=80 sw=4 et : */

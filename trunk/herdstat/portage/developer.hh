@@ -37,8 +37,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <herdstat/util/functors.hh>
-#include <herdstat/util/regex.hh>
+#include <herdstat/portage/functional.hh>
 #include <herdstat/portage/gentoo_email_address.hh>
 
 namespace portage {
@@ -206,8 +205,7 @@ namespace portage {
     class Developers
     {
         public:
-            typedef std::set<Developer *,
-                    util::DereferenceLess<Developer> > container_type;
+            typedef std::set<Developer> container_type;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
             typedef container_type::reverse_iterator reverse_iterator;
@@ -328,35 +326,19 @@ namespace portage {
     Developers::insert(In begin, In end) { _devs.insert(begin, end); }
 
     inline std::pair<Developers::iterator, bool>
-    Developers::insert(const value_type v)
-    {
-        std::pair<iterator, bool> p = _devs.insert(v);
-        if (not p.second)
-            delete v;
-        return p;
-    }
+    Developers::insert(const value_type v) { return _devs.insert(v); }
+    inline std::pair<Developers::iterator, bool>
+    Developers::insert(const std::string& d) { return _devs.insert(Developer(d)); }
 
     inline Developers::iterator Developers::find(const value_type dev) const
     { return _devs.find(dev); }
 
-//    inline Developers::iterator Developers::find(const std::string& dev)
-//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-//        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
     inline Developers::iterator Developers::find(const std::string& dev) const
-    { Developer *d = new Developer(dev); iterator i = _devs.find(d); delete d; return i; }
-//    { return std::find_if(_devs.begin(), _devs.end(), std::bind2nd(
-//        util::DereferenceStrEqual<Developer>(), dev.substr(0, dev.find('@')))); }
-
-    struct DeveloperRegexMatch
-        : std::binary_function<const util::regex_T *, const Developer *, bool>
-    {
-        bool operator()(const util::regex_T *re, const Developer *dev) const
-        { return (*re == dev->user()); }
-    };
+    { return _devs.find(Developer(dev)); }
 
     inline Developers::iterator Developers::find(const util::regex_T &regex) const
     { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
-        DeveloperRegexMatch(), &regex)); }
+        UserRegexMatch<Developer>(), &regex)); }
 
     inline Developers::value_type
     Developers::front()

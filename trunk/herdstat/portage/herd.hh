@@ -165,8 +165,7 @@ namespace portage {
     class Herds
     {
         public:
-            typedef std::set<Herd *,
-                    util::DereferenceLess<Herd> > container_type;
+            typedef std::set<Herd> container_type;
             typedef container_type::value_type value_type;
             typedef container_type::reference reference;
             typedef container_type::const_reference const_reference;
@@ -279,13 +278,9 @@ namespace portage {
     Herds::insert(In begin, In end) { _herds.insert(begin, end); }
 
     inline std::pair<Herds::iterator, bool>
-    Herds::insert(const value_type v)
-    {
-        std::pair<iterator, bool> p = _herds.insert(v);
-        if (not p.second)
-            delete v;
-        return p;
-    }
+    Herds::insert(const value_type v) { return _herds.insert(v); }
+    inline std::pair<Herds::iterator, bool>
+    Herds::insert(const std::string& h) { return _herds.insert(Herd(h)); }
 
     inline void Herds::erase(iterator pos) { _herds.erase(pos); }
     inline Herds::size_type Herds::erase(const value_type v)
@@ -296,21 +291,12 @@ namespace portage {
     inline Herds::iterator Herds::find(const value_type v) const
     { return _herds.find(v); }
 
-    inline Herds::iterator Herds::find(const std::string& herd) const
-    { Herd *h = new Herd(herd); iterator i = _herds.find(h); delete h; return i; }
-//    { return std::find_if(_herds.begin(), _herds.end(), std::bind2nd(
-//        util::DereferenceStrEqual<Herd>(), herd)); }
-
-    struct HerdRegexMatch
-        : std::binary_function<const util::regex_T *, const Herd *, bool>
-    {
-        bool operator() (const util::regex_T *re, const Herd *herd) const
-        { return (*re == herd->name()); }
-    };
-
+    inline Herds::iterator Herds::find(const std::string& h) const
+    { return _herds.find(Herd(h)); }
+    
     inline Herds::iterator Herds::find(const util::regex_T &regex) const
-    { return std::find_if(_herds.begin(), _herds.end(),
-            std::bind1st(HerdRegexMatch(), &regex)); }
+    { return std::find_if(_herds.begin(), _herds.end(), std::bind1st(
+            NameRegexMatch<Herd>(), &regex)); }
 
     inline Herds::value_type
     Herds::front()

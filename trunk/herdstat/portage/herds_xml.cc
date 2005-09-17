@@ -87,13 +87,13 @@ herds_xml::fill_developer(Developer& dev) const
     for (Herds::const_iterator h = _herds.begin() ; h != _herds.end() ; ++h)
     {
         /* is the developer in this herd? */
-        Herd::const_iterator d = (*h)->find(dev.user());
-        if (d != (*h)->end())
+        Herd::const_iterator d = h->find(dev);
+        if (d != h->end())
         {
-            if (dev.name().empty() and not (*d)->name().empty())
-                dev.set_name((*d)->name());
-            dev.set_email((*d)->email());
-            dev.append_herd((*h)->name());
+            if (dev.name().empty() and not d->name().empty())
+                dev.set_name(d->name());
+            dev.set_email(d->email());
+            dev.append_herd(h->name());
         }
     }
 }
@@ -152,20 +152,18 @@ bool
 herds_xml::text(const std::string& text)
 {
     if (in_herd_name)
-        _cur_herd = _herds.insert(new Herd(text)).first;
+        _cur_herd = _herds.insert(Herd(text)).first;
     else if (in_herd_desc)
-        (*_cur_herd)->set_desc(util::tidy_whitespace(text));
+        const_cast<Herd&>(*_cur_herd).set_desc(util::tidy_whitespace(text));
     else if (in_herd_email)
-        (*_cur_herd)->set_email(text);        
+        const_cast<Herd&>(*_cur_herd).set_email(text);        
     else if (in_maintainer_email)
-    {
-        _cur_dev = (*_cur_herd)->insert(
-                new Developer(util::lowercase(text))).first;
-    }
+        _cur_dev = const_cast<Herd&>(*_cur_herd).insert(
+                Developer(util::lowercase(text))).first;
     else if (in_maintainer_name)
-        (*_cur_dev)->set_name((*_cur_dev)->name() + text);
+        const_cast<Developer&>(*_cur_dev).set_name(_cur_dev->name() + text);
     else if (in_maintainer_role)
-        (*_cur_dev)->set_role(text);
+        const_cast<Developer&>(*_cur_dev).set_role(text);
 
     else if (in_maintaining_prj)
     {
@@ -176,10 +174,8 @@ herds_xml::text(const std::string& text)
          */
 
         project_xml mp(text, _cvsdir);
-
-        std::transform(mp.devs().begin(), mp.devs().end(),
-            std::inserter(**_cur_herd, (*_cur_herd)->begin()),
-            util::Instantiate<Developer>());
+        const_cast<Herd&>(*_cur_herd).insert(
+                mp.devs().begin(), mp.devs().end());
     }
 
     return true;

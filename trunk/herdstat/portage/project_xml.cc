@@ -143,16 +143,13 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
                 Herd::const_iterator i;
                 for (i = mp.devs().begin() ; i != mp.devs().end() ; ++i)
                 {
-                    Developer *d = new Developer(**i);
-                    Herd::iterator i = _devs.find(d);
-                    if (i == _devs.end())
-                        _devs.insert(d);
-                    else
-                    {
-                        if (not d->role().empty() and (*i)->role().empty())
-                            (*i)->set_role(d->role());
-                        delete d;
-                    }
+                    /* if dev doesn't exist, insert it */
+                    Herd::iterator d = _devs.find(*i);
+                    if (d == _devs.end())
+                        _devs.insert(*i);
+                    /* otherwise, set it's role if unset */
+                    else if (not i->role().empty() and d->role().empty())
+                        const_cast<Developer&>(*d).set_role(i->role());
                 }
             }
         }
@@ -183,19 +180,14 @@ project_xml::text(const std::string& text)
 {
     if (in_dev)
     {
-        Developer *dev = new Developer(util::lowercase(text));
-        if (not _cur_role.empty())
-            dev->set_role(_cur_role);
+        Developer dev(util::lowercase(text));
+        dev.set_role(_cur_role);
 
         Herd::iterator i = _devs.find(dev);
         if (i == _devs.end())
             _devs.insert(dev);
-        else
-        {
-            if (not dev->role().empty() and (*i)->role().empty())
-                (*i)->set_role(dev->role());
-            delete dev;
-        }
+        else if (not dev.role().empty() and i->role().empty())
+            const_cast<Developer&>(*i).set_role(dev.role());
     }
 
     return true;

@@ -74,10 +74,7 @@ action_which_handler_T::operator() (opts_type &opts)
             if (std::find(opts.begin(), opts.end(), m->second) == opts.end())
                 opts.push_back(m->second);
             else
-            {
-                matches.erase(m);
-                --m;
-            }
+                matches.erase(m--);
         }
     }
     else

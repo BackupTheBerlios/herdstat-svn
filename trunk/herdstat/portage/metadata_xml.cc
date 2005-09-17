@@ -128,17 +128,13 @@ bool
 metadata_xml::text(const std::string& text)
 {
     if (in_herd)
-        _data._herds.insert(new Herd(text));
+        _data._herds.insert(Herd(text));
     else if (in_email)
-    {
-        std::pair<Developers::iterator, bool> p =
-            _data._devs.insert(new Developer(util::lowercase(text)));
-        _cur_dev = p.first;
-    }
+        _cur_dev = _data._devs.insert(Developer(util::lowercase(text))).first;
     else if (in_name)
-        (*_cur_dev)->set_name((*_cur_dev)->name() + text);
+        const_cast<Developer&>(*_cur_dev).set_name(_cur_dev->name() + text);
     else if (in_desc)
-        (*_cur_dev)->set_role(text);
+        const_cast<Developer&>(*_cur_dev).set_role(text);
     else if (in_en_longdesc)
         _data.set_longdesc(util::tidy_whitespace(_data.longdesc() + text));
     else if (in_longdesc)

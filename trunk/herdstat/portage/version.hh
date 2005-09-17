@@ -36,7 +36,7 @@
 #include <cstdlib>
 #include <cassert>
 
-#include <herdstat/util/functors.hh>
+#include <herdstat/util/functional.hh>
 #include <herdstat/util/file.hh>
 
 namespace portage

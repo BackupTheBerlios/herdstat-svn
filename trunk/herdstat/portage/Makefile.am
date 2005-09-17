@@ -10,7 +10,7 @@ cc_sources = misc.cc \
 	     gentoo_email_address.cc \
 	     developer.cc \
 	     herd.cc \
-		 project_xml.cc \
+	     project_xml.cc \
 	     herds_xml.cc \
 	     metadata.cc \
 	     metadata_xml.cc \
@@ -25,8 +25,9 @@ hh_sources = exceptions.hh \
 	     gentoo_email_address.hh \
 	     developer.hh \
 	     herd.hh \
+	     functional.hh \
 	     xmlbase.hh \
-		 project_xml.hh \
+	     project_xml.hh \
 	     herds_xml.hh \
 	     metadata.hh \
 	     metadata_xml.hh \

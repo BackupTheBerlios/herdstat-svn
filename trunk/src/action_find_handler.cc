@@ -100,9 +100,7 @@ action_find_handler_T::operator() (opts_type &opts)
         catch (const portage::AmbiguousPkg &e)
         {
             /* ambiguous still matches */
-            std::copy(e.packages.begin(), e.packages.end(),
-                std::back_inserter(results));
-
+            results.insert(results.end(), e.packages.begin(), e.packages.end());
             continue;
         }
         catch (const portage::NonExistentPkg &e)

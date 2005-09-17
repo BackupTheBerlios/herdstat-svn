@@ -36,7 +36,7 @@ class action_away_handler_T : public action_herds_xml_handler_T
         virtual int operator() (opts_type &);
 
     private:
-        void display(portage::Developer * const);
+        void display(const portage::Developer&);
 };
 
 #endif
