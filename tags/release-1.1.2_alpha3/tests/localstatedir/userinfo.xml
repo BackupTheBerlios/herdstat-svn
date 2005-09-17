@@ -1,0 +1,5230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="/proj/en/devrel/roll-call/userinfo.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/proj/en/devrel/roll-call/userinfo-devlist.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/xsl/guide.xsl" type="text/xsl"?>
+<!DOCTYPE userlist SYSTEM "/dtd/userinfo.dtd">
+
+<!--
+  Please keep <joined/> dates in (Day) (Month) (Year) format, e.g (01) (January) (2005).
+-->
+
+<userlist>
+  <user username="a.sleep">
+    <realname fullname="Jeraimee Hughes">
+      <firstname>Jeraimee</firstname>
+      <familyname>Hughes</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">a.sleep@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="aaby">
+    <realname fullname="Arne Mejholm">
+      <firstname>Arne</firstname>
+      <familyname>Mejholm</familyname>
+    </realname>
+    <pgpkey>0xA314EE7E</pgpkey>
+    <email role="gentoo">aaby@gentoo.org</email>
+    <joined>19 November 2003</joined>
+    <birthday>14 February 1981</birthday>
+    <roles>Danish follow-up translator</roles>
+    <location>Denmark</location>
+  </user>
+  <user username="abhishek">
+    <realname fullname="Abhishek Amit">
+      <firstname>Abhishek</firstname>
+      <familyname>Amit</familyname>
+    </realname>
+    <pgpkey>0x98B1EECD</pgpkey>
+    <email role="gentoo">abhishek@gentoo.org</email>
+    <joined>2 June 2003</joined>
+    <birthday>11 November 1987</birthday>
+  </user>
+  <user username="absinthe">
+    <realname fullname="Dylan Carlson">
+      <firstname>Dylan</firstname>
+      <familyname>Carlson</familyname>
+    </realname>
+    <pgpkey>0x708E165F</pgpkey>
+    <email role="gentoo">absinthe@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64, Java</roles>
+    <location>Connecticut, USA</location>
+  </user>
+  <user username="achim">
+    <realname fullname="Achim Gottinger">
+      <firstname>Achim</firstname>
+      <familyname>Gottinger</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">achim@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+  </user>
+  <user username="acooks">
+    <realname fullname="Andrew Cooks">
+      <firstname>Andrew</firstname>
+      <familyname>Cooks</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">acooks@gentoo.org</email>
+    <joined>19 January 2004</joined>
+    <birthday>2 May 1981</birthday>
+    <status>Retired</status>
+  </user>
+  <user username="aescriva">
+    <realname fullname="Aida Escriva-Sammer">
+      <firstname>Aisa</firstname>
+      <familyname>Mobarak</familyname>
+    </realname>
+    <pgpkey>0x4D0D11EA</pgpkey>
+    <email role="gentoo">aescriva@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Security</roles>
+    <location>New York, USA</location>
+  </user>
+  <user username="aether">
+    <realname fullname="Jason Anthony Mobarak">
+      <firstname>Jason</firstname>
+      <familyname>Mobarak</familyname>
+    </realname>
+    <pgpkey>0x2EA8A676</pgpkey>
+    <email role="gentoo">aether@gentoo.org</email>
+    <joined>23 July 2003</joined>
+    <birthday>24 February 1984</birthday>
+    <status>Retired</status>
+    <roles>Java-config, Portage</roles>
+    <location>New Mexico</location>
+  </user>
+  <user username="agaffney">
+    <realname fullname="Andrew Gaffney">
+      <firstname>Andrew</firstname>
+      <familyname>Gaffney</familyname>
+    </realname>
+    <pgpkey>0x6A2D77EB</pgpkey>
+    <email role="gentoo">agaffney@gentoo.org</email>
+    <joined>1 November 2004</joined>
+    <birthday/>
+    <roles>Gentoo Installer</roles>
+    <location>Missouri</location>
+  </user>
+  <user username="agenkin">
+    <realname fullname="Arcady Genkin">
+      <firstname>Arcady</firstname>
+      <familyname>Genkin</familyname>
+    </realname>
+    <pgpkey>0x3C65FAFF</pgpkey>
+    <email role="gentoo">agenkin@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>ALSA, DVD and sound packages</roles>
+    <location>Toronto, ON, Canada</location>
+  </user>
+  <user username="agriffis">
+    <realname fullname="Aron Griffis">
+      <firstname>Aron</firstname>
+      <familyname>Griffis</familyname>
+    </realname>
+    <pgpkey>20104EB0</pgpkey>
+    <email role="gentoo">agriffis@gentoo.org</email>
+    <joined>1 August 2001</joined>
+    <birthday>0 January 1975</birthday>
+    <roles>Baselayout, Epm, Gentoo/Alpha, Gentoo/IA64, Keychain, Mozilla, Mutt, Vim</roles>
+    <location>USA</location>
+  </user>
+  <user username="aiken">
+    <realname fullname="James Boddington">
+      <firstname>James</firstname>
+      <familyname>Boddington</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">aiken@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="alexander">
+    <realname fullname="Alexander Plank">
+      <firstname>Alexander</firstname>
+      <familyname>Plank</familyname>
+    </realname>
+    <pgpkey>0x9447CE2D</pgpkey>
+    <email role="gentoo">alexander@gentoo.org</email>
+    <joined>22 July 2004</joined>
+    <birthday/>
+    <roles>Gentoo for Mac OS X</roles>
+    <location>Charlottesville, VA, USA</location>
+  </user>
+  <user username="allanonjl">
+    <realname fullname="John N. Laliberte">
+      <firstname>John</firstname>
+      <familyname>Laliberte</familyname>
+    </realname>
+    <pgpkey>0x3314EDFC</pgpkey>
+    <email role="gentoo">allanonjl@gentoo.org</email>
+    <joined>16 March 2005</joined>
+    <birthday>30 September 1983</birthday>
+    <roles>Installer, GNOME, GLSR, libconf</roles>
+    <location>Boston, Massachusetts</location>
+  </user>
+  <user username="alin">
+    <realname fullname="Alin Dobre">
+      <firstname>Alin</firstname>
+      <familyname>Dobre</familyname>
+    </realname>
+    <pgpkey>0x6E87BBD8</pgpkey>
+    <email role="gentoo">alin@gentoo.org</email>
+    <joined>8 February 2005</joined>
+    <birthday/>
+    <roles>Romanian Documentation Lead</roles>
+    <location>Bucharest, Romania</location>
+  </user>
+  <user username="aliz">
+    <realname fullname="Daniel Ahlberg">
+      <firstname>Daniel</firstname>
+      <familyname>Ahlberg</familyname>
+    </realname>
+    <pgpkey>0x1529A193</pgpkey>
+    <email role="gentoo">aliz@gentoo.org</email>
+    <joined>5 July 2002</joined>
+    <birthday>28 September 1979</birthday>
+    <roles>QA</roles>
+    <location>Sweden</location>
+  </user>
+  <user username="alron">
+    <realname fullname="Dean Bailey">
+      <firstname>Dean</firstname>
+      <familyname>Bailey</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">alron@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="amir">
+    <realname fullname="Amir Guindehi">
+      <firstname>Amir</firstname>
+      <familyname>Guindehi</familyname>
+    </realname>
+    <pgpkey>0xC912542C</pgpkey>
+    <email role="gentoo">amir@gentoo.org</email>
+    <joined>January 2004</joined>
+    <birthday/>
+    <roles>Miscellany - GFS, Quagga, SRRD et al.</roles>
+    <location>Switzerland, Zurich</location>
+  </user>
+  <user username="amne">
+    <realname fullname="Wernfried Haas">
+      <firstname>Wernfried</firstname>
+      <familyname>Haas</familyname>
+    </realname>
+    <pgpkey>0xBAC87090</pgpkey>
+    <email role="gentoo">amne@gentoo.org</email>
+    <joined>July 2005</joined>
+    <birthday/>
+    <roles>Forums</roles>
+    <location>Graz, Austria</location>
+  </user>
+  <user username="anarchy">
+    <realname fullname="Jory Pratt">
+      <firstname>Jory</firstname>
+      <familyname>Pratt</familyname>
+    </realname>
+    <pgpkey>0x48D93162</pgpkey>
+    <email role="gentoo">anarchy@gentoo.org</email>
+    <joined>2 April 2005</joined>
+    <birthday>13 Febuary 1980</birthday>
+    <roles>qmail, vpopmail</roles>
+    <location>Baton Rouge, Louisiana</location>
+  </user>
+  <user username="angusyoung">
+    <realname fullname="Otavio Rodolfo Piske">
+      <firstname>Otavio</firstname>
+      <familyname>Piske</familyname>
+    </realname>
+    <pgpkey>0x21A49E25</pgpkey>
+    <email role="gentoo">angusyoung@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/FreeBSD, app-dicts, netmon</roles>
+    <location>Mafra, Brazil</location>
+  </user>
+  <user username="anti">
+    <realname fullname="Ray Russell Reese III">
+      <firstname>Ray</firstname>
+      <familyname>Reese</familyname>
+    </realname>
+    <pgpkey>0x9040B9FA</pgpkey>
+    <email role="gentoo">anti@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64, VoIP, JEdit</roles>
+    <location>Washington, DC, USA</location>
+  </user>
+  <user username="antifa">
+    <realname fullname="Ken Nowack">
+      <firstname>Ken</firstname>
+      <familyname>Nowack</familyname>
+    </realname>
+    <pgpkey>0x92281585</pgpkey>
+    <email role="gentoo">antifa@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="anpereir">
+    <realname>
+      <firstname>Andres</firstname>
+      <familyname>Pereira</familyname>
+    </realname>
+    <pgpkey>AC2AD281</pgpkey>
+    <email role="gentoo">anpereir@gentoo.org</email>
+    <joined>2 February 2005</joined>
+    <birthday>11 February 1980</birthday>
+    <roles>Spanish GWN lead</roles>
+    <location>Santiago, Chile</location>
+  </user>
+  <user username="araujo">
+    <realname fullname="Luis Francisco Araujo">
+      <firstname>Luis</firstname>
+      <familyname>Araujo</familyname>
+    </realname>
+    <pgpkey>0xA2C0A9F1</pgpkey>
+    <email role="gentoo">araujo@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Haskell</roles>
+    <location>Maracaibo, Venezuela</location>
+  </user>
+  <user username="arj">
+    <realname fullname="Anders Rune Jensen">
+      <firstname>Anders Rune</firstname>
+      <familyname>Jensen</familyname>
+    </realname>
+    <pgpkey>0x62C2D7F0</pgpkey>
+    <email role="gentoo">arj@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>em8300/dxr3 and related packages</roles>
+    <location>Aalborg, Denmark</location>
+  </user>
+  <user username="archaelus">
+    <realname fullname="Geoff Cant">
+      <firstname>Geoff</firstname>
+      <familyname>Cant</familyname>
+    </realname>
+    <pgpkey>0x5797FF5B</pgpkey>
+    <email role="gentoo">archaelus@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Lisp</roles>
+    <location>Wellington, New Zealand</location>
+  </user>
+  <user username="arunbhanu">
+    <realname fullname="Arun Bhanu">
+      <firstname>Arun</firstname>
+      <familyname>Bhanu</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">arunbhanu@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="astinus">
+    <realname fullname="Alex Howells">
+      <firstname>Alex</firstname>
+      <familyname>Howells</familyname>
+    </realname>
+    <pgpkey>0x27457C13</pgpkey>
+    <email role="gentoo">astinus@gentoo.org</email>
+    <joined>27 Feb 2005</joined>
+    <birthday/>
+    <roles>Gentoo/AMD64, Developer Relations, PR</roles>
+    <location>Wales, UK</location>
+  </user>
+  <user username="augustus">
+    <realname fullname="Kristopher Kersey">
+      <firstname>Kristopher</firstname>
+      <familyname>Kersey</familyname>
+    </realname>
+    <pgpkey>0xA0116FD0</pgpkey>
+    <email role="gentoo">augustus@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64</roles>
+    <location>Atlanta, GA, USA</location>
+  </user>
+  <user username="avenj">
+    <realname fullname="Jon Portnoy">
+      <firstname>Jon</firstname>
+      <familyname>Portnoy</familyname>
+    </realname>
+    <pgpkey>0x880D02F1</pgpkey>
+    <email role="gentoo">avenj@gentoo.org</email>
+    <joined>7 December 2002</joined>
+    <birthday>24 February 1987</birthday>
+    <roles>Developer relations</roles>
+    <location>New Hampshire, USA</location>
+  </user>
+  <user username="axxo">
+    <realname fullname="Thomas Matthijs">
+      <firstname>Thomas</firstname>
+      <familyname>Matthijs</familyname>
+    </realname>
+    <pgpkey>0x682A3231</pgpkey>
+    <email role="gentoo">axxo@gentoo.org</email>
+    <joined>14 July 2004</joined>
+    <birthday/>
+    <roles>Java</roles>
+    <location>Gent, Belgium</location>
+  </user>
+  <user username="azarah">
+    <realname fullname="Martin Schlemmer">
+      <firstname>Martin</firstname>
+      <familyname>Schlemmer</familyname>
+    </realname>
+    <pgpkey>0xA68960B6</pgpkey>
+    <email role="gentoo">azarah@gentoo.org</email>
+    <joined>25 September 2001</joined>
+    <birthday/>
+    <roles>Base system</roles>
+    <location>South Africa</location>
+  </user>
+  <user username="bartelt">
+    <realname fullname="Ulf Bartelt">
+      <firstname>Ulf</firstname>
+      <familyname>Bartelt</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">bartelt@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="bass">
+    <realname fullname="Jose Alberto Suarez Lopez">
+      <firstname>Jose</firstname>
+      <familyname>Alberto Suarez Lopez</familyname>
+    </realname>
+    <pgpkey>0xF326EC24</pgpkey>
+    <email role="gentoo">bass@gentoo.org</email>
+    <joined>4 January 2002</joined>
+    <birthday/>
+    <roles>Games, Spanish editor</roles>
+    <location>Spain</location>
+  </user>
+  <user username="batlogg">
+    <realname fullname="Jodok Batlogg">
+      <firstname>Jodok</firstname>
+      <familyname>Batlogg</familyname>
+    </realname>
+    <pgpkey>0x0E57868B</pgpkey>
+    <email role="gentoo">batlogg@gentoo.org</email>
+    <email role="alias">jodok.batlogg@telesis.at</email>
+    <joined/>
+    <birthday/>
+    <roles>Plone and Zope</roles>
+    <location>Dornbirn, Austria</location>
+  </user>
+  <user username="battousai">
+    <realname fullname="Bryan Stine">
+      <firstname>Bryan</firstname>
+      <familyname>Stine</familyname>
+    </realname>
+    <pgpkey>0xE2B2534B</pgpkey>
+    <email role="gentoo">battousai@gentoo.org</email>
+    <joined>2 January 2004</joined>
+    <birthday>20 June 1984</birthday>
+    <roles>Gentoo/Hardened, XFree</roles>
+    <location>Northampton, PA, USA</location>
+  </user>
+  <user username="baz">
+    <realname fullname="Barry Shaw">
+      <firstname>Barry</firstname>
+      <familyname>Shaw</familyname>
+    </realname>
+    <pgpkey>0x928C176C</pgpkey>
+    <email role="gentoo">baz@gentoo.org</email>
+    <joined>November 2004</joined>
+    <birthday/>
+    <roles>Gentoo Server</roles>
+    <location>Hamilton, New Zealand</location>
+  </user>
+  <user username="bazik">
+    <realname fullname="Sven Blumenstein">
+      <firstname>Sven</firstname>
+      <familyname>Blumenstein</familyname>
+    </realname>
+    <pgpkey>0xCD2B8595</pgpkey>
+    <email role="gentoo">bazik@gentoo.org</email>
+    <joined>16 October 2003</joined>
+    <birthday>5 May 1984</birthday>
+    <roles>Gentoo/SPARC</roles>
+    <location>Frankfurt, Germany</location>
+  </user>
+  <user username="bcowan">
+    <realname fullname="Brad Teaford Cowan">
+      <firstname>Brad Teaford</firstname>
+      <familyname>Cowan</familyname>
+    </realname>
+    <pgpkey>0xB1F16A56</pgpkey>
+    <email role="gentoo">bcowan@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>XFCE, IceWM</roles>
+    <location>Dayton, Ohio</location>
+  </user>
+  <user username="beejay">
+    <realname fullname="Benjamin Judas">
+      <firstname>Benjamin</firstname>
+      <familyname>Judas</familyname>
+    </realname>
+    <pgpkey>0xC31DEDD8</pgpkey>
+    <email role="gentoo">beejay@gentoo.org</email>
+    <joined>December 2003</joined>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo/X86 Release manager</roles>
+    <location>Giessen, Germany</location>
+  </user>
+  <user username="bennyc">
+    <realname fullname="Benny Chuang">
+      <firstname>Benny</firstname>
+      <familyname>Chuang</familyname>
+    </realname>
+    <pgpkey>0xDB8FF979</pgpkey>
+    <email role="gentoo"/>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Follow-up traditional Chinese translator</roles>
+    <location>California, USA</location>
+  </user>
+  <user username="betelgeuse">
+    <realname fullname="Petteri Räty">
+      <firstname>Petteri</firstname>
+      <familyname>Räty</familyname>
+    </realname>
+    <pgpkey>0x8182B0B4</pgpkey>
+    <email role="gentoo">betelgeuse@gentoo.org</email>
+    <joined>25 July 2005</joined>
+    <birthday>28 October 1986</birthday>
+    <roles>Java</roles>
+    <location>Espoo, Finland</location>
+  </user>
+  <user username="beu">
+    <realname fullname="Elfyn McBratney">
+      <firstname>Elfyn</firstname>
+      <familyname>McBratney</familyname>
+    </realname>
+    <pgpkey>0x69DF17AD</pgpkey>
+    <email role="gentoo">beu@gentoo.org</email>
+    <joined>16 February 2005</joined>
+    <birthday>19 October 1984</birthday>
+    <roles>Webapps &amp; Perl</roles>
+    <location>London, UK</location>
+  </user>
+  <user username="bip">
+    <realname fullname="Bip Thelin">
+      <firstname>Bip</firstname>
+      <familyname>Thelin</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">Bip@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="bjb">
+    <realname fullname="Bjoern Brauel">
+      <firstname>Bjoern</firstname>
+      <familyname>Brauel</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">bjb@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="blackace">
+    <realname fullname="Nicholas D. Wolfwood">
+      <firstname>Nicholas</firstname>
+      <familyname>Wolfwood</familyname>
+    </realname>
+    <pgpkey>0x0A5F7D12</pgpkey>
+    <email role="gentoo">blackace@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>San Francisco, CA, USA</location>
+  </user>
+  <user username="blademan">
+    <realname fullname="Joe Kallar">
+      <firstname>Joe</firstname>
+      <familyname>Kallar</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">blademan@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo/SPARC Documentation</roles>
+  </user>
+  <user username="blauwers">
+    <realname fullname="Bart Lauwers">
+      <firstname>Bart</firstname>
+      <familyname>Lauwers</familyname>
+    </realname>
+    <pgpkey>0x9AA910A9</pgpkey>
+    <email role="gentoo">blauwers@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/SPARC</roles>
+    <location>Belgium</location>
+  </user>
+  <user username="blizzy">
+    <realname fullname="Maik Schreiber">
+      <firstname>Maik</firstname>
+      <familyname>Schreiber</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">blizzy@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Java, gentoo-stats</roles>
+    <location>Germany</location>
+  </user>
+  <user username="blocke">
+    <realname fullname="Bruce A. Locke">
+      <firstname>Bruce</firstname>
+      <familyname>A. Locke</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">blocke@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Documentation and Network Utilities</roles>
+    <location>USA</location>
+  </user>
+  <user username="blubb">
+    <realname>
+      <firstname>Simon</firstname>
+      <familyname>Stelling</familyname>
+    </realname>
+    <pgpkey>0x86CF12EA</pgpkey>
+    <email role="gentoo">blubb@gentoo.org</email>
+    <joined>25 August 2004</joined>
+    <birthday/>
+    <roles>Gentoo/AMD64</roles>
+    <location>Schaffhausen, Switzerland</location>
+  </user>
+  <user username="blubber">
+    <realname>
+      <firstname>Tiemo</firstname>
+      <familyname>Kieft</familyname>
+    </realname>
+    <pgpkey>0xE3E9E3A6</pgpkey>
+    <email role="gentoo"/>
+    <joined>17 August 2003</joined>
+    <birthday>1 February 1983</birthday>
+    <roles>Dutch translations</roles>
+  </user>
+  <user username="bonsaikitten">
+    <realname fullname="Patrick Lauer">
+      <firstname>Patrick</firstname>
+      <familyname>Lauer</familyname>
+    </realname>
+    <pgpkey>0xE52864CE</pgpkey>
+    <email role="gentoo">patrick@gentoo.org</email>
+    <joined>11 April 2004</joined>
+    <birthday/>
+    <roles>Cygwin, Gentoo/x86</roles>
+    <location>Aachen, Germany</location>
+  </user>
+  <user username="brad">
+    <realname fullname="Brad Laue">
+      <firstname>Brad</firstname>
+      <familyname>Laue</familyname>
+    </realname>
+    <pgpkey>0xA5CB58C4</pgpkey>
+    <email role="gentoo">brad@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Mozilla, New ebuilds, OpenOffice</roles>
+    <location>Oshawa, Ontario, Canada</location>
+  </user>
+  <user username="brad_mssw">
+    <realname fullname="Brad House">
+      <firstname>Brad</firstname>
+      <familyname>House</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">brad_mssw@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Gentoo/AMD64</roles>
+    <location>Gainesville, FL USA</location>
+  </user>
+  <user username="brain">
+    <realname fullname="Michele Balistreri">
+      <firstname>Michele</firstname>
+      <familyname>Balistreri</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">brain@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Inactive</status>
+    <roles>KDE</roles>
+    <location>Italy</location>
+  </user>
+  <user username="brandy">
+    <realname fullname="Brandy Westcott">
+      <firstname>Brandy</firstname>
+      <familyname>Westcott</familyname>
+    </realname>
+    <pgpkey>0x7802E611</pgpkey>
+    <email role="gentoo">brandy@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Bug wrangling, Developer relations, GCC-Porting</roles>
+    <location>Wellington, NZ</location>
+  </user>
+  <user username="brix">
+    <realname fullname="Henrik Brix Andersen">
+      <firstname>Henrik Brix</firstname>
+      <familyname>Andersen</familyname>
+    </realname>
+    <pgpkey>0x54E278F8</pgpkey>
+    <email role="gentoo">brix@gentoo.org</email>
+    <joined>31 August 2004</joined>
+    <birthday>20 March 1978</birthday>
+    <roles>net-wireless, app-laptop</roles>
+    <location>Aarhus, Denmark</location>
+  </user>
+  <user username="broeman">
+    <realname fullname="Jesper Brodersen">
+      <firstname>Jesper</firstname>
+      <familyname>Brodersen</familyname>
+    </realname>
+    <pgpkey>0x8EE09CB9</pgpkey>
+    <email role="gentoo">broeman@gentoo.org</email>
+    <joined>15 November 2003</joined>
+    <birthday>8 October 1978</birthday>
+    <roles>Danish lead translator</roles>
+  </user>
+  <user username="caleb">
+    <realname fullname="Caleb Tennis">
+      <firstname>Caleb</firstname>
+      <familyname>Tennis</familyname>
+    </realname>
+    <pgpkey>0x8F0A6315</pgpkey>
+    <email role="gentoo">Caleb@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>KDE</roles>
+    <location>Columbus, IN, USA</location>
+  </user>
+  <user username="cam">
+    <realname fullname="Camille Huot">
+      <firstname>Camille</firstname>
+      <familyname>Huot</familyname>
+    </realname>
+    <pgpkey>0x6949514A</pgpkey>
+    <email role="gentoo">cam@gentoo.org</email>
+    <ircalias>cam`</ircalias>
+    <joined>18 March 2004</joined>
+    <birthday>30 May 1980</birthday>
+    <roles>French Gentoo Documentation</roles>
+    <location>Paris, France</location>
+    <webpage>http://dev.gentoo.org/~cam/</webpage>
+  </user>
+  <user username="cardoe">
+    <realname fullname="Doug Goldstein">
+      <firstname>Doug</firstname>
+      <familyname>Goldstein</familyname>
+    </realname>
+    <pgpkey>0x179106D0</pgpkey>
+    <email role="gentoo">cardoe@gentoo.org</email>
+    <joined>Originally 2002, Returned Aug 2004</joined>
+    <birthday>8 May 1982</birthday>
+    <roles>Mobile, TCL/TK, Media-TV, assist QA</roles>
+    <location>Florida, USA</location>
+  </user>
+  <user username="carl">
+    <realname fullname="Carl Anderson">
+      <firstname>Carl</firstname>
+      <familyname>Anderson</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">carl@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="carlo">
+    <realname fullname="Carsten Lohrke">
+      <firstname>Carsten</firstname>
+      <familyname>Lohrke</familyname>
+    </realname>
+    <pgpkey>0xF18B496F</pgpkey>
+    <email role="gentoo">carlo@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>KDE, Python, Qt</roles>
+    <location>Hamburg, Germany</location>
+  </user>
+  <user username="carpaski">
+    <realname fullname="Nicholas Jones">
+      <firstname>Nicholas</firstname>
+      <familyname>Jones</familyname>
+    </realname>
+    <pgpkey>0xB31DFA34</pgpkey>
+    <email role="gentoo">carpaski@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Portage</roles>
+    <location>Chicago, IL, USA</location>
+  </user>
+  <user username="ccpz">
+    <realname fullname="YiDa Chiang">
+      <firstname>YiDa</firstname>
+      <familyname>Chiang</familyname>
+    </realname>
+    <pgpkey>0x78915A95</pgpkey>
+    <email role="gentoo">ccpz@gentoo.org</email>
+    <joined>24 August 2004</joined>
+    <birthday/>
+    <roles>Lead traditional Chinese translator</roles>
+    <location>Taiwan</location>
+  </user>
+  <user username="centic">
+    <realname fullname="Dominik Stadler">
+      <firstname>Dominik</firstname>
+      <familyname>Stadler</familyname>
+    </realname>
+    <pgpkey>0x0C751FED</pgpkey>
+    <email role="gentoo">centic@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>KDE</roles>
+    <location>Linz, Austria</location>
+  </user>
+  <user username="chadh">
+    <realname fullname="Chad Huneycutt">
+      <firstname>Chad</firstname>
+      <familyname>Huneycutt</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">chadh@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="chainsaw">
+    <realname fullname="Tony Vroon">
+      <firstname>Tony</firstname>
+      <familyname>Vroon</familyname>
+    </realname>
+    <pgpkey>0xB5058F9A</pgpkey>
+    <email role="gentoo">chainsaw@gentoo.org</email>
+    <joined>June 1 2004</joined>
+    <birthday/>
+    <roles>LILO, base system, Sound</roles>
+    <location>Dublin, Ireland</location>
+  </user>
+  <user username="chiguire">
+    <realname fullname="John Christian Stoddart">
+      <firstname>John</firstname>
+      <familyname>Christian Stoddart</familyname>
+    </realname>
+    <pgpkey>0x21B3F464</pgpkey>
+    <email role="gentoo">chiguire@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Documentation</roles>
+    <location>Venezuela</location>
+  </user>
+  <user username="citizen428">
+    <realname fullname="Michael Kohl">
+      <firstname>Michael</firstname>
+      <familyname>Kohl</familyname>
+    </realname>
+    <pgpkey>0x90CA09E3</pgpkey>
+    <email role="gentoo">citizen428@gentoo.org</email>
+    <joined>27 July 2004</joined>
+    <birthday/>
+    <roles>CJK, Games, Ruby, Gentoo/BSD</roles>
+    <location>Vienna, Austria</location>
+  </user>
+  <user username="chouser">
+    <realname fullname="Chris Houser">
+      <firstname>Chris</firstname>
+      <familyname>Houser</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">chouser@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Miscellaneous</roles>
+    <location>USA</location>
+  </user>
+  <user username="chotchki">
+    <realname fullname="Christopher Hotchkiss">
+      <firstname>Christopher</firstname>
+      <familyname>Hotchkiss</familyname>
+    </realname>
+    <pgpkey>0xE4E61428</pgpkey>
+    <email role="gentoo">chotchki@gentoo.org</email>
+    <joined>7 June 2005</joined>
+    <birthday>8 August 1985</birthday>
+    <roles>Gentoo Installer</roles>
+    <location>Tampa, FL</location>
+  </user>
+  <user username="chrb">
+    <realname fullname="Chris Bainbridge">
+      <firstname>Chris</firstname>
+      <familyname>Bainbridge</familyname>
+    </realname>
+    <pgpkey>0xC871249B</pgpkey>
+    <email role="gentoo">chrb@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/XBox</roles>
+    <location>Edinburgh, Scotland</location>
+  </user>
+  <user username="chriswhite">
+    <realname fullname="Chris White">
+      <firstname>Chris</firstname>
+      <familyname>White</familyname>
+    </realname>
+    <pgpkey>0x25B1942C</pgpkey>
+    <email role="gentoo">chriswhite@gentoo.org</email>
+    <joined>14 July 2004</joined>
+    <birthday/>
+    <roles>Sound, Video</roles>
+    <location>CA, USA</location>
+  </user>
+  <user username="ciaranm">
+    <realname fullname="Ciaran McCreesh">
+      <firstname>Ciaran</firstname>
+      <familyname>McCreesh</familyname>
+    </realname>
+    <pgpkey>0x352D5E11</pgpkey>
+    <email role="gentoo">ciaranm@gentoo.org</email>
+    <joined>6 November 2003</joined>
+    <birthday>7 February 1985</birthday>
+    <roles>Gentoo/MIPS, Gentoo/SPARC and Vim</roles>
+    <location>Edinburgh, UK</location>
+  </user>
+  <user username="cjr">
+    <realname fullname="Chris Russell">
+      <firstname>Chris</firstname>
+      <familyname>Russell</familyname>
+    </realname>
+    <pgpkey>0x7A5980EE</pgpkey>
+    <email role="gentoo">cjr@gentoo.org</email>
+    <joined>30 August 2002</joined>
+    <birthday>4 June 1970</birthday>
+    <roles>Gentoo/SPARC</roles>
+    <location>New Zealand</location>
+  </user>
+  <user username="codeman">
+    <realname fullname="Preston Cody">
+      <firstname>Preston</firstname>
+      <familyname>Cody</familyname>
+    </realname>
+    <pgpkey>0xE81D9EEB</pgpkey>
+    <email role="gentoo">codeman@gentoo.org</email>
+    <joined>18 October 2004</joined>
+    <birthday>4 July 1983</birthday>
+    <roles>Gentoo Installer</roles>
+    <location>Flemington, NJ, USA</location>
+  </user>
+  <user username="compnerd">
+    <realname fullname="Saleem Abdulrasool">
+      <firstname>Saleem</firstname>
+      <familyname>Abdulrasool</familyname>
+    </realname>
+    <pgpkey>0x2D5645E5</pgpkey>
+    <email role="gentoo">compnerd@gentoo.org</email>
+    <joined>3 January 2005</joined>
+    <birthday>1 april 1985</birthday>
+    <roles>Java</roles>
+    <location>Chicago, US</location>
+  </user>
+  <user username="condordes">
+    <realname fullname="Joshua J. Berry">
+      <firstname>Joshua</firstname>
+      <familyname>Berry</familyname>
+    </realname>
+    <pgpkey>0x540CB31B</pgpkey>
+    <email role="gentoo">condordes@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Security</roles>
+    <location>San Luis Obispo, CA, USA</location>
+  </user>
+  <user username="config">
+    <realname fullname="Benjamin Schindler">
+      <firstname>Benjamin</firstname>
+      <familyname>Schindler</familyname>
+    </realname>
+    <pgpkey>0x6FE97B24</pgpkey>
+    <email role="gentoo">config@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64, app-sci</roles>
+    <location>Zurich, Switzerland</location>
+  </user>
+  <user username="coredumb">
+    <realname fullname="Tal Peer">
+      <firstname>Tal</firstname>
+      <familyname>Peer</familyname>
+    </realname>
+    <pgpkey>0x253D2947</pgpkey>
+    <email role="gentoo">coredumb@gentoo.org</email>
+    <joined>March 2003</joined>
+    <birthday>14 June 1988</birthday>
+    <roles>PHP</roles>
+    <location>Neve Ilan, Israel</location>
+  </user>
+  <user username="coronalvr">
+    <realname fullname="Alex Veber">
+      <firstname>Alex</firstname>
+      <familyname>Veber</familyname>
+    </realname>
+    <pgpkey>0xD8A7253E</pgpkey>
+    <email role="gentoo">coronalvr@gentoo.org</email>
+    <joined/>
+    <birthday/>
+  </user>
+  <user username="corsair">
+    <realname fullname="Markus Rothe">
+      <firstname>Markus</firstname>
+      <familyname>Rothe</familyname>
+    </realname>
+    <pgpkey>0x04ABFC77</pgpkey>
+    <email role="gentoo">corsair@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/PPC64</roles>
+    <location>Meerbusch, Germany</location>
+  </user>
+  <user username="cretin">
+    <realname fullname="Stefan Jones">
+      <firstname>Stefan</firstname>
+      <familyname>Jones</familyname>
+    </realname>
+    <pgpkey>0xE25F92DA</pgpkey>
+    <email role="gentoo">cretin@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>xmingw, prelink, miscellaneous</roles>
+    <location>Santa Cruz, CA</location>
+  </user>
+  <user username="cryos">
+    <realname fullname="Marcus D. Hanwell">
+      <firstname>Marcus</firstname>
+      <familyname>Hanwell</familyname>
+    </realname>
+    <pgpkey>0x7D4117BD</pgpkey>
+    <email role="gentoo">cryos@gentoo.org</email>
+    <joined>28 December 2004</joined>
+    <birthday>26 January 1980</birthday>
+    <roles>Scientific Gentoo/AMD64</roles>
+    <location>Sheffield, UK</location>
+  </user>
+  <user username="cshields">
+    <realname fullname="Corey Shields">
+      <firstname>Corey</firstname>
+      <familyname>Shields</familyname>
+    </realname>
+    <pgpkey>0xA3041453</pgpkey>
+    <email role="gentoo">cshields@gentoo.org</email>
+    <joined>3 July 2003</joined>
+    <birthday>22 February 1979</birthday>
+    <roles>Developer relations, infrastructure [ Mirrors ]</roles>
+    <location>Bloomington, Indiana, USA</location>
+  </user>
+  <user username="curtis119">
+      <realname>
+          <firstname>Curtis</firstname>
+          <familyname>Napier</familyname>
+      </realname>
+      <pgpkey>9109E4D0</pgpkey>
+      <email role="gentoo">curtis119@gentoo.org</email>
+      <joined>04 July 2005</joined>
+      <birthday></birthday>
+      <roles>www-redesign</roles>
+      <location>Toledo, Ohio, USA</location>
+  </user>
+  <user username="cybersystem">
+    <realname fullname="Sascha Schwabbauer">
+      <firstname>Sascha</firstname>
+      <familyname>Schwabbauer</familyname>
+    </realname>
+    <pgpkey>0x84EA0C8F</pgpkey>
+    <email role="gentoo">cybersystem@gentoo.org</email>
+    <joined>2 July 2001</joined>
+    <birthday>17 November 1988</birthday>
+    <roles>Developer/User relations, Jabberadmin, Mailadmin</roles>
+    <location>Germany</location>
+    <address role="main">
+      <street>Ludwigstrasse</street>
+      <number>3</number>
+      <zipcode>58239</zipcode>
+      <city>Schwerte</city>
+      <country>Germany</country>
+    </address>
+  </user>
+  <user username="cyfred">
+    <realname fullname="Andrew Bevitt">
+      <firstname>Andrew</firstname>
+      <familyname>Bevitt</familyname>
+    </realname>
+    <pgpkey>0xD6B49EE8</pgpkey>
+    <email role="gentoo">cyfred@gentoo.org</email>
+    <email role="alias">andrew@volutin.net</email>
+    <joined>18 January 2004</joined>
+    <birthday>20 April 1984</birthday>
+    <roles>nVidia, Squid, XFree</roles>
+    <location>Newcastle, Australia</location>
+  </user>
+  <user username="dams">
+    <realname fullname="Damien Krotkine">
+      <firstname>Damien</firstname>
+      <familyname>Krotkine</familyname>
+    </realname>
+    <pgpkey>0x69047552</pgpkey>
+    <email role="gentoo">dams@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>libconf</roles>
+    <location>France</location>
+  </user>
+  <user username="danarmak">
+    <realname fullname="Dan Armak">
+      <firstname>Dan</firstname>
+      <familyname>Armak</familyname>
+    </realname>
+    <pgpkey>0x8D5F8951</pgpkey>
+    <email role="gentoo">danarmak@gentoo.org</email>
+    <joined>11 July 2001</joined>
+    <birthday>4 April 1984</birthday>
+  </user>
+  <user username="dang">
+    <realname fullname="Daniel Gryniewicz">
+      <firstname>Daniel</firstname>
+      <familyname>Gryniewicz</familyname>
+    </realname>
+    <pgpkey>0x5D119EB1</pgpkey>
+    <email role="gentoo">dang@gentoo.org</email>
+    <joined>19 May 2005</joined>
+    <birthday>23 February 1977</birthday>
+  </user>
+  <user username="darkspecter">
+    <realname fullname="Bartosch Pixa">
+      <firstname>Bartosch</firstname>
+      <familyname>Pixa</familyname>
+    </realname>
+    <pgpkey>0x524A87D6</pgpkey>
+    <email role="gentoo">darkspecter@gentoo.org</email>
+    <joined>9 February 2003</joined>
+    <birthday>25 February 1978</birthday>
+    <status>Retired</status>
+  </user>
+  <user username="datashark">
+    <realname fullname="António Meireles">
+      <firstname>António</firstname>
+      <familyname>Meireles</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">datashark@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="daybird">
+    <realname fullname="David Chamberlain">
+      <firstname>David</firstname>
+      <familyname>Chamberlain</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">daybird@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Gentoo/PPC documentation</roles>
+  </user>
+  <user username="dcoutts">
+    <realname fullname="Duncan Coutts">
+      <firstname>Duncan</firstname>
+      <familyname>Coutts</familyname>
+    </realname>
+    <pgpkey>0x383350B6</pgpkey>
+    <email role="gentoo">dcoutts@gentoo.org</email>
+    <joined>6 May 2005</joined>
+    <birthday>3 June 1981</birthday>
+    <roles>Haskell</roles>
+    <location>Oxford, UK</location>
+  </user>
+  <user username="deathwing00">
+      <realname>
+          <firstname>Ioannis</firstname>
+          <familyname>Aslanidis</familyname>
+      </realname>
+      <pgpkey>0xB9B11F4E</pgpkey>
+      <email role="gentoo">deathwing00@gentoo.org</email>
+      <joined>18 July 2005</joined>
+      <birthday>4 June 1983</birthday>
+      <status>active</status>
+      <roles>Forum moderator</roles>
+      <location>Tarragona, Spain</location>
+  </user>
+  <user username="dercorny">
+    <realname fullname="Stefan Cornelius">
+      <firstname>Stefan</firstname>
+      <familyname>Cornelius</familyname>
+    </realname>
+    <pgpkey>0x05726DC4</pgpkey>
+    <email role="gentoo">dercorny@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Security</roles>
+    <location>Oberhausen, Germany</location>
+  </user>
+  <user username="dertobi123">
+    <realname fullname="Tobias Scherbaum">
+      <firstname>Tobias</firstname>
+      <familyname>Scherbaum</familyname>
+    </realname>
+    <pgpkey>0x30C0F005</pgpkey>
+    <email role="gentoo">dertobi123@gentoo.org</email>
+    <joined>7 December 2003</joined>
+    <birthday>14 February 1981</birthday>
+    <roles>German translations, Gentoo/PPC, Gentoo/HPPA</roles>
+    <location>Oberhausen, Germany</location>
+  </user>
+  <user username="dholm">
+    <realname fullname="David Holm">
+      <firstname>David</firstname>
+      <familyname>Holm</familyname>
+    </realname>
+    <pgpkey>0x0228A97D</pgpkey>
+    <email role="gentoo">dholm@gentoo.org</email>
+    <joined>1 August 2003</joined>
+    <birthday>1 September 1980</birthday>
+    <roles>Ada, Gentoo/Pegasos, PPC kernels</roles>
+    <location>Sweden</location>
+  </user>
+  <user username="dju">
+    <realname fullname="Julien Allanos">
+      <firstname>Julien</firstname>
+      <familyname>Allanos</familyname>
+    </realname>
+    <pgpkey>0x1EC6C6C2</pgpkey>
+    <email role="gentoo">dju@gentoo.org</email>
+    <joined>15 June 2005</joined>
+    <birthday>26 December 1981</birthday>
+    <roles>Web-apps</roles>
+    <location>Rennes, France</location>
+  </user>
+  <user username="dmwaters">
+    <realname fullname="Deedra M. Waters">
+      <firstname>Deedra</firstname>
+      <familyname>Waters</familyname>
+    </realname>
+    <pgpkey>0xE4C635CF</pgpkey>
+    <email role="gentoo">dmwaters@gentoo.org</email>
+    <joined>15 December 2003</joined>
+    <birthday>15 March 1979</birthday>
+    <roles>Developer relations, accessibility and infrastructure [ Mail ]</roles>
+  </user>
+  <user username="doctomoe">
+    <realname fullname="Olivier Reisch">
+      <firstname>Olivier</firstname>
+      <familyname>Reisch</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">doctomoe@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo/PPC</roles>
+    <location>Montpellier, France</location>
+  </user>
+  <user username="dorileo">
+    <realname fullname="Leandro Dorileo">
+      <firstname>Leandro</firstname>
+      <familyname>Dorileo</familyname>
+    </realname>
+    <pgpkey>0x4747D9BE</pgpkey>
+    <email role="gentoo">dorileo@gentoo.org</email>
+    <email role="alias">leandro@inforagro.com.br</email>
+    <joined>23 January 2004</joined>
+    <birthday>13 October 1983</birthday>
+  </user>
+  <user username="dostrow">
+    <realname fullname="Daniel Ostrow">
+      <firstname>Daniel</firstname>
+      <familyname>Ostrow</familyname>
+    </realname>
+    <pgpkey>0x237C2E05</pgpkey>
+    <email role="gentoo">dostrow@gentoo.org</email>
+    <joined>13 May 2004</joined>
+    <birthday/>
+    <roles>Gentoo/PPC</roles>
+    <location>Dobbs Ferry, NY, USA</location>
+  </user>
+  <user username="dragon">
+    <realname fullname="Nicholas Wourms">
+      <firstname>Nicholas</firstname>
+      <familyname>Wourms</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">dragon@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="dragonheart">
+    <realname fullname="Daniel Black">
+      <firstname>Daniel</firstname>
+      <familyname>Black</familyname>
+    </realname>
+    <pgpkey>0x76677097</pgpkey>
+    <email role="gentoo">dragonheart@gentoo.org</email>
+    <joined>15 January 2004</joined>
+    <birthday>3 August 1975</birthday>
+    <roles>Crypto, dev-embedded, forensics, netmon, Gentoo/PPC</roles>
+    <location>Canberra, Australia</location>
+  </user>
+  <user username="drobbins">
+    <realname>
+      <firstname>Daniel</firstname>
+      <familyname>Robbins</familyname>
+    </realname>
+    <pgpkey>0x9F5657F2</pgpkey>
+    <email role="gentoo">drobbins@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Chief Architect</roles>
+    <location>New Mexico, USA</location>
+  </user>
+  <user username="dsd">
+    <realname fullname="Daniel Drake">
+      <firstname>Daniel</firstname>
+      <familyname>Drake</familyname>
+    </realname>
+    <pgpkey>0x3795694A</pgpkey>
+    <email role="gentoo">dsd@gentoo.org</email>
+    <ircalias>dsd_</ircalias>
+    <joined>9 April 2004</joined>
+    <birthday>25 August 1986</birthday>
+    <roles>User relations, kernel</roles>
+    <location>London, UK</location>
+  </user>
+  <user username="edolnx">
+    <realname fullname="Carl Perry">
+      <firstname>Carl</firstname>
+      <familyname>Perry</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">edolnx@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="eklipse">
+    <realname fullname="Matt Jarjoura">
+      <firstname>Matt</firstname>
+      <familyname>Jarjoura</familyname>
+    </realname>
+    <pgpkey>0x36FE41CE</pgpkey>
+    <email role="gentoo">eklipse@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/PPC and Gentoo for Mac OS X</roles>
+    <location>Baltimore, MD, USA</location>
+  </user>
+  <user username="eldad">
+    <realname fullname="Eldad Zack">
+      <firstname>Eldad</firstname>
+      <familyname>Zack</familyname>
+    </realname>
+    <pgpkey>0x96EA0A93</pgpkey>
+    <email role="gentoo">eldad@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Networking</roles>
+    <location>Israel</location>
+  </user>
+  <user username="enderson">
+    <realname fullname="Enderson Tadeu S. Maia">
+      <firstname>Enderson</firstname>
+      <familyname>Maia</familyname>
+    </realname>
+    <pgpkey>0x8B36AE49</pgpkey>
+    <email role="gentoo">enderson@gentoo.org</email>
+    <joined>8 June 2003</joined>
+    <birthday/>
+    <roles>Brazilian documentation developer</roles>
+    <location>Brazil</location>
+  </user>
+  <user username="eradicator">
+    <realname fullname="Jeremy Huddleston">
+      <firstname>Jeremy</firstname>
+      <familyname>Huddleston</familyname>
+    </realname>
+    <pgpkey>0x5FA03115</pgpkey>
+    <email role="gentoo">eradicator@gentoo.org</email>
+    <email role="alias">jeremyhu@eecs.berkeley.edu</email>
+    <joined>23 January 2004</joined>
+    <birthday>14 October 1980</birthday>
+    <roles>Developer Relations, media-sound, accessibility, Gentoo/AMD64, Gentoo/SPARC, Multilib Toolchain, Kernel</roles>
+    <location>Berkeley, CA, USA</location>
+  </user>
+  <user username="erik_swanson">
+    <realname fullname="Erik Swanson">
+      <firstname>Erik</firstname>
+      <familyname>Swanson</familyname>
+    </realname>
+    <pgpkey>0x4D4C4EFA</pgpkey>
+    <email role="gentoo">erik_swanson@gentoo.org</email>
+    <joined>22 July 2004</joined>
+    <birthday/>
+    <roles>Gentoo for Mac OS X</roles>
+    <location>Corvallis, OR, USA</location>
+  </user>
+  <user username="erwin">
+    <realname fullname="Erwin">
+      <firstname></firstname>
+      <familyname></familyname>
+    </realname>
+    <pgpkey>0xFC62B879</pgpkey>
+    <email role="gentoo">Erwin@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Indonesian documentation</roles>
+    <location>Singapore</location>
+  </user>
+  <user username="esammer">
+    <realname fullname="Eric Sammer">
+      <firstname>Eric</firstname>
+      <familyname>Sammer</familyname>
+    </realname>
+    <pgpkey>0x14201BBB</pgpkey>
+    <email role="gentoo">esammer@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Installer, Perl</roles>
+    <location>New York, USA</location>
+  </user>
+  <user username="fafhrd">
+    <realname fullname="Armando Di Cianno">
+      <firstname>Armando</firstname>
+      <familyname>Di Cianno</familyname>
+    </realname>
+    <pgpkey>0xB23DC617</pgpkey>
+    <email role="gentoo">fafhrd@gentoo.org</email>
+    <joined>14 July 2004</joined>
+    <birthday/>
+    <roles>GNUStep</roles>
+    <location/>
+  </user>
+  <user username="fava">
+    <realname fullname="Fred Van Andel">
+      <firstname>Fred</firstname>
+      <familyname>Van Andel</familyname>
+    </realname>
+    <pgpkey>0x99455482</pgpkey>
+    <email role="gentoo">fava@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>ufed</roles>
+    <location>Vancouver, BC, USA</location>
+  </user>
+  <user username="ferdy">
+    <realname fullname="Fernando J. Pereda">
+      <firstname>Fernando J.</firstname>
+      <familyname>Pereda</familyname>
+    </realname>
+    <pgpkey>0x60BD28D4</pgpkey>
+    <email role="gentoo">ferdy@gentoo.org</email>
+    <joined>24 January 2005</joined>
+    <birthday>29 November 1985</birthday>
+    <roles>net-mail</roles>
+    <location>Madrid, Spain</location>
+  </user>
+  <user username="ferringb">
+    <realname fullname="Brian Harring">
+      <firstname>Brian</firstname>
+      <familyname>Harring</familyname>
+    </realname>
+    <pgpkey>0x8037554D</pgpkey>
+    <email role="gentoo">ferringb@gentoo.org</email>
+    <email role="alias">bdharring@wisc.edu</email>
+    <joined>16 January 2004</joined>
+    <birthday>9 February 1982</birthday>
+    <roles>Portage</roles>
+    <location>WI, USA</location>
+  </user>
+  <user username="flameeyes">
+    <realname>
+      <firstname>Diego</firstname>
+      <familyname>Pettenò</familyname>
+    </realname>
+    <pgpkey>0x69875563</pgpkey>
+    <email role="gentoo">flameeyes@gentoo.org</email>
+    <joined>17 April 2005</joined>
+    <birthday>28 November 1985</birthday>
+    <roles>Gentoo/FreeBSD, Gentoo/AMD64, video, sound, PAM</roles>
+    <location>Italy</location>
+  </user>
+  <user username="flammie">
+    <realname fullname="Flammie Pirinen">
+      <firstname>Flammie</firstname>
+      <familyname>Pirinen</familyname>
+    </realname>
+    <pgpkey>0x07469AA9</pgpkey>
+    <email role="gentoo">flammie@gentoo.org</email>
+    <joined>31 August 2004</joined>
+    <birthday/>
+    <roles>Finnish lead translator</roles>
+    <location>Finland</location>
+  </user>
+  <user username="fmccor">
+    <realname fullname="Ferris McCormick">
+      <firstname>Ferris</firstname>
+      <familyname>McCormick</familyname>
+    </realname>
+    <pgpkey>0xE23FFFF7</pgpkey>
+    <email role="gentoo">fmccor@gentoo.org</email>
+    <joined>14 April 2004</joined>
+    <birthday/>
+    <roles>Gentoo/SPARC</roles>
+    <location>Manassas, Virginia, USA</location>
+  </user>
+  <user username="formula7">
+    <realname fullname="Jean-Francois Brunette">
+      <firstname>Jean-Francois</firstname>
+      <familyname>Brunette</familyname>
+    </realname>
+    <pgpkey>0x1571D69C</pgpkey>
+    <email role="gentoo">formula7@gentoo.org</email>
+    <joined>16 June 2005</joined>
+    <birthday>06 July 1986</birthday>
+    <roles>Security</roles>
+    <location>Valleyfield, Quebec, Canada</location>
+  </user>
+  <user username="foser">
+    <realname fullname="Marinus Schraal">
+      <firstname>Marinus</firstname>
+      <familyname>Schraal</familyname>
+    </realname>
+    <pgpkey>0x2686C433</pgpkey>
+    <email role="gentoo">foser@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>GNOME</roles>
+    <location>The Netherlands</location>
+  </user>
+  <user username="fox2mike">
+    <realname fullname="Shyam Mani">
+      <firstname>Shyam</firstname>
+      <familyname>Mani</familyname>
+    </realname>
+    <pgpkey>0xFDD0E345</pgpkey>
+    <email role="gentoo">fox2mike@gentoo.org</email>
+    <joined>06 June 2005</joined>
+    <birthday>24 March 1983</birthday>
+    <roles>Documentation</roles>
+    <location>Bangalore, India</location>
+  </user>
+  <user username="frogger">
+    <realname fullname="Matt Rickard">
+      <firstname>Matt</firstname>
+      <familyname>Rickard</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">frogger@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>ProPolice</roles>
+    <location>State College, PA, USA</location>
+  </user>
+  <user username="fserb">
+    <realname fullname="Fernando Serboncini">
+      <firstname>Serboncini</firstname>
+      <familyname>Serboncini</familyname>
+    </realname>
+    <pgpkey>0x77E89745</pgpkey>
+    <email role="gentoo">fserb@gentoo.org</email>
+    <joined>23 January 2005</joined>
+    <birthday>1981.10.07</birthday>
+    <roles>Python</roles>
+    <location>Sao Paulo, SP, Brasil</location>
+  </user>
+  <user username="fuzzyray">
+    <realname fullname="Paul Varner">
+      <firstname>Paul</firstname>
+      <familyname>Varner</familyname>
+    </realname>
+    <pgpkey>0x6B402757</pgpkey>
+    <email role="gentoo">fuzzyray@gentoo.org</email>
+    <joined>26 May 2005</joined>
+    <birthday>2 February 1966</birthday>
+    <roles>tools-portage</roles>
+    <location>Dallas, Texas, USA</location>
+  </user>
+  <user username="fvdpol">
+    <realname fullname="Frank van de Pol">
+      <firstname>Frank</firstname>
+      <familyname sort="Pol">van de Pol</familyname>
+    </realname>
+    <pgpkey>0xCD50BCC9</pgpkey>
+    <email role="gentoo">fvdpol@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Sound</roles>
+    <location>The Netherlands</location>
+  </user>
+  <user username="g2boojum">
+    <realname fullname="Grant Goodyear">
+      <firstname>Grant</firstname>
+      <familyname>Goodyear</familyname>
+    </realname>
+    <pgpkey>0xE0F65B76</pgpkey>
+    <email role="gentoo">g2boojum@gentoo.org</email>
+    <joined>2 April 2001</joined>
+    <birthday>23 September 1969</birthday>
+    <roles>Developer relations and GLEP</roles>
+    <location>South Carolina, USA</location>
+  </user>
+  <user username="ganymede">
+    <realname fullname="David Gumbel">
+      <firstname>David</firstname>
+      <familyname>Gumbel</familyname>
+    </realname>
+    <pgpkey>0x85E4FEEC</pgpkey>
+    <email role="gentoo">ganymede@gentoo.org</email>
+    <joined>14 February 2005</joined>
+    <birthday/>
+    <roles>Wine</roles>
+    <location>Germany</location>
+  </user>
+  <user username="gbevin">
+    <realname fullname="Geert Bevin">
+      <firstname>Geert</firstname>
+      <familyname>Bevin</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">gbevin@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Portage and sandbox development</roles>
+    <location>Belgium</location>
+  </user>
+  <user username="genone">
+    <realname fullname="Marius Mauch">
+      <firstname>Marius</firstname>
+      <familyname>Mauch</familyname>
+    </realname>
+    <pgpkey>0x933B48D7</pgpkey>
+    <email role="gentoo">genone@gentoo.org</email>
+    <joined>1 September 2003</joined>
+    <birthday>6 March 1981</birthday>
+    <roles>Portage</roles>
+    <location>Bremen, Germany</location>
+  </user>
+  <user username="genstef">
+    <realname fullname="Stefan Schweizer">
+      <firstname>Stefan</firstname>
+      <familyname>Schweizer</familyname>
+    </realname>
+    <pgpkey>0xE115F4DB</pgpkey>
+    <email role="gentoo">genstef@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Kernel</roles>
+    <location>Munich, Bavaria, Germany</location>
+  </user>
+  <user username="geoman">
+    <realname fullname="Stephen Becker">
+      <firstname>Stephen</firstname>
+      <familyname>Becker</familyname>
+    </realname>
+    <pgpkey>0xB393C856</pgpkey>
+    <email role="gentoo">geoman@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/MIPS</roles>
+    <location>Blacksburg, VA</location>
+  </user>
+  <user username="george">
+    <realname fullname="George Shapovalov">
+      <firstname>George</firstname>
+      <familyname>Shapovalov</familyname>
+    </realname>
+    <pgpkey>0x79B44E53</pgpkey>
+    <email role="gentoo">george@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>app-sci, dev-lang, Russian Documentation</roles>
+    <location>Switzerland/Ukraine</location>
+  </user>
+  <user username="gerk">
+    <realname fullname="Mark Guertin">
+      <firstname>Mark</firstname>
+      <familyname>Guertin</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">gerk@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Gentoo/PPC Project Lead</roles>
+    <location>Toronto, Canada</location>
+  </user>
+  <user username="gerrynjr">
+    <realname fullname="Gerald J. Normandin Jr.">
+      <firstname>Gerald</firstname>
+      <familyname>J. Normandin Jr.</familyname>
+    </realname>
+    <pgpkey>0xC1DBDF81</pgpkey>
+    <email role="gentoo">gerrynjr@gentoo.org</email>
+    <joined>31 July 2003</joined>
+    <birthday>14 November 1985</birthday>
+    <roles>Documentation, Gentoo/AMD64</roles>
+    <location>USA</location>
+  </user>
+  <user username="gmsoft">
+    <realname fullname="Guy Martin">
+      <firstname>Guy</firstname>
+      <familyname>Martin</familyname>
+    </realname>
+    <pgpkey>0x7A07E186</pgpkey>
+    <email role="gentoo">GMsoft@gentoo.org</email>
+    <joined>17 February 2003</joined>
+    <birthday>1 April 1983</birthday>
+    <roles>Gentoo/HPPA, IPv6</roles>
+    <location>Charleroi, Belgium</location>
+  </user>
+  <user username="gongloo">
+    <realname fullname="Hasan Khalil">
+      <firstname>Hasan</firstname>
+      <familyname>Khalil</familyname>
+    </realname>
+    <pgpkey>0x707B8F18</pgpkey>
+    <email role="gentoo">gongloo@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo for Mac OS X</roles>
+    <location>Storrs, Connecticut, USA</location>
+  </user>
+  <user username="gothgirl">
+    <realname fullname="Kathryn Kulick">
+      <firstname>Kathryn</firstname>
+      <familyname>Kulick</familyname>
+    </realname>
+    <pgpkey>0x2618F8AC</pgpkey>
+    <email role="gentoo">gothgirl@gentoo.org</email>
+    <joined>05 July 2005</joined>
+    <birthday>17 August 1976</birthday>
+    <roles>commonbox/net-im/x11-themes</roles>
+    <location>Baton Rouge, Louisiana</location>
+  </user>
+  <user username="grahl">
+    <realname fullname="Jan Hendrik Grahl">
+      <firstname>Jan Hendrik</firstname>
+      <familyname>Grahl</familyname>
+    </realname>
+    <pgpkey>0x6968E11A</pgpkey>
+    <email role="gentoo">grahl@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>GDP</roles>
+  </user>
+  <user username="greendisease">
+    <realname fullname="Jack Aboutboul">
+      <firstname>Jack</firstname>
+      <familyname>Aboutboul</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">greendisease@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="greg_g">
+    <realname fullname="Gregorio Guidi">
+      <firstname>Gregorio</firstname>
+      <familyname>Guidi</familyname>
+    </realname>
+    <pgpkey>0x7527AC21</pgpkey>
+    <email role="gentoo">greg_g@gentoo.org</email>
+    <joined>2004.12.17</joined>
+    <birthday>1980.07.21</birthday>
+    <roles>KDE</roles>
+    <location>Pisa, Italy</location>
+  </user>
+  <user username="gregf">
+    <realname fullname="Greg Fitzgerald">
+      <firstname>Greg</firstname>
+      <familyname>Fitzgerald</familyname>
+    </realname>
+    <pgpkey>0xBEAADC3A</pgpkey>
+    <email role="gentoo">gregf@gentoo.org</email>
+    <joined>21 July 2003</joined>
+    <birthday>5 August 1981</birthday>
+    <roles>net-irc, net-mail, net-print</roles>
+    <location>Maine, USA</location>
+  </user>
+  <user username="gregkh">
+    <realname fullname="Greg KH">
+      <firstname>Greg</firstname>
+      <familyname>KH</familyname>
+    </realname>
+    <pgpkey>0xDB2DFB29</pgpkey>
+    <email role="gentoo">gregkh@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Kernel</roles>
+    <location>USA</location>
+  </user>
+  <user username="griffon26">
+    <realname fullname="Maurice van der Pot">
+      <firstname>Maurice</firstname>
+      <familyname sort="Pot">van der Pot</familyname>
+    </realname>
+    <pgpkey>0xB79A871C</pgpkey>
+    <email role="gentoo">griffon26@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Coda, tpop3d, valgrind</roles>
+    <location>Eindhoven, The Netherlands</location>
+  </user>
+  <user username="grobian">
+    <realname fullname="Fabian Groffen">
+      <firstname>Fabian</firstname>
+      <familyname>Groffen</familyname>
+    </realname>
+    <pgpkey>0x1FCCCC42</pgpkey>
+    <email role="gentoo">grobian@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>OSX</roles>
+    <location>Amsterdam</location>
+  </user>
+  <user username="gurligebis">
+    <realname fullname="Bjarke Istrup Pedersen">
+      <firstname>Bjarke</firstname>
+      <familyname>Pedersen</familyname>
+    </realname>
+    <pgpkey>0x98BDACB1</pgpkey>
+    <email role="gentoo">gurligebis@gentoo.org</email>
+    <joined>18 July 2005</joined>
+    <birthday>1 May 1985</birthday>
+    <roles>Bugday</roles>
+    <location>Denmark</location>
+  </user>
+  <user username="gustavoz">
+    <realname fullname="Gustavo Zacarias">
+      <firstname>Gustavo</firstname>
+      <familyname>Zacarias</familyname>
+    </realname>
+    <pgpkey>0x10A7FC90</pgpkey>
+    <email role="gentoo">gustavoz@gentoo.org</email>
+    <joined>29 December 2003</joined>
+    <birthday>13 January 1973</birthday>
+    <roles>Gentoo/HPPA and Gentoo/SPARC</roles>
+    <location>Buenos Aires, Argentina</location>
+  </user>
+  <user username="hadfield">
+    <realname fullname="Scott Hadfield">
+      <firstname>Scott</firstname>
+      <familyname>Hadfield</familyname>
+    </realname>
+    <pgpkey>0x6A3ECABF</pgpkey>
+    <email role="gentoo">hadfield@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo Script Repository</roles>
+    <location>Vancouver, BC, Canada</location>
+  </user>
+  <user username="halcy0n">
+    <realname fullname="Mark Loeser">
+      <firstname>Mark</firstname>
+      <familyname>Loeser</familyname>
+    </realname>
+    <pgpkey>0x458BAE84</pgpkey>
+    <email role="gentoo">halcy0n@gentoo.org</email>
+    <joined>9 March 2005</joined>
+    <birthday>27 June 1984</birthday>
+    <roles>GCC Porting</roles>
+    <location>Freehold, NJ</location>
+  </user>
+  <user username="hallski">
+    <realname fullname="Mikael Hallendal">
+      <firstname>Mikael</firstname>
+      <familyname>Hallendal</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">Hallski@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>GNOME Lead</roles>
+    <location>Sweden</location>
+  </user>
+  <user username="hanno">
+    <realname fullname="Hanno Boeck">
+      <firstname>Hanno</firstname>
+      <familyname>Boeck</familyname>
+    </realname>
+    <pgpkey>0x3DBD3B20</pgpkey>
+    <email role="gentoo">hanno@gentoo.org</email>
+    <joined>2002-08-28</joined>
+    <birthday>1980-06-30</birthday>
+    <roles>ACPI, Laptops</roles>
+    <location>Germany</location>
+  </user>
+  <user username="hardave">
+    <realname fullname="Hardave Rior">
+      <firstname>Hardave</firstname>
+      <familyname>Rior</familyname>
+    </realname>
+    <pgpkey>0x56E08424</pgpkey>
+    <email role="gentoo">hardave@gentoo.org</email>
+    <email role="primary">Hardave.Riar@ualberta.ca</email>
+    <joined>30 June 2004</joined>
+    <birthday>10 April 1979</birthday>
+    <roles>Gentoo/MIPS</roles>
+    <location>Alberta, Canada</location>
+  </user>
+  <user username="hansmi">
+    <realname fullname="Michael Hanselmann">
+      <firstname>Michael</firstname>
+      <familyname>Hanselmann</familyname>
+    </realname>
+    <pgpkey>0x4A51BBEA</pgpkey>
+    <email role="gentoo">hansmi@gentoo.org</email>
+    <joined>27 May 2004</joined>
+    <birthday>1985</birthday>
+    <roles>Gentoo/PPC</roles>
+    <location>Switzerland</location>
+  </user>
+  <user username="hattya">
+    <realname fullname="Akinori Hattori">
+      <firstname>Akinori</firstname>
+      <familyname>Hattori</familyname>
+    </realname>
+    <pgpkey>0xEC917A6D</pgpkey>
+    <email role="gentoo">hattya@gentoo.org</email>
+    <joined>16 January 2004</joined>
+    <birthday>17 June 1983</birthday>
+    <location>Japan</location>
+  </user>
+  <user username="heim">
+    <realname fullname="Todd Heim">
+      <firstname>Todd</firstname>
+      <familyname>Heim</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">heim@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Gentoo/SPARC</roles>
+  </user>
+  <user username="herbs">
+    <realname fullname="Herbie Hopkins">
+      <firstname>Herbie</firstname>
+      <familyname>Hopkins</familyname>
+    </realname>
+    <pgpkey>0xCE08B2E4</pgpkey>
+    <email role="gentoo">herbs@gentoo.org</email>
+    <joined>16 April 2005</joined>
+    <birthday>3 June 1977</birthday>
+    <roles>Gentoo/AMD64</roles>
+    <location>London, UK</location>
+  </user>
+  <user username="hhg">
+    <realname fullname="Hallgrimur H. Gunnarsson">
+      <firstname>Hallgrimur</firstname>
+      <familyname>H. Gunnarsson</familyname>
+    </realname>
+    <pgpkey>0xFCEF8FC9</pgpkey>
+    <email role="gentoo">hhg@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>djb applications and net-mail</roles>
+    <location>Iceland</location>
+  </user>
+  <user username="hillster">
+    <realname fullname="Joel Hill">
+      <firstname>Joel</firstname>
+      <familyname>Hill</familyname>
+    </realname>
+    <pgpkey>0x7FCBD7CE</pgpkey>
+    <email role="gentoo">hillster@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Various ebuilds</roles>
+    <location>Florida, USA</location>
+  </user>
+  <user username="hollow">
+    <realname fullname="Benedikt Boehm">
+      <firstname>Benedikt</firstname>
+      <familyname>Boehm</familyname>
+    </realname>
+    <pgpkey>0xB5FAF161</pgpkey>
+    <email role="gentoo">hollow@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Apache, VServer</roles>
+    <location>Munich, Germany</location>
+  </user>
+  <user username="horton">
+    <realname fullname="horton">
+      <firstname/>
+      <familyname/>
+    </realname>
+    <pgpkey>0x3A90060A</pgpkey>
+    <email role="gentoo">horton@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>Savannah, GA, USA</location>
+  </user>
+  <user username="hparker">
+    <realname fullname="Homer Parker">
+      <firstname>Homer</firstname>
+      <familyname>Parker</familyname>
+    </realname>
+    <pgpkey>0x1D524429</pgpkey>
+    <email role="gentoo">hparker@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64</roles>
+    <location>Russell, Kansas, USA</location>
+  </user>
+  <user username="hsinhsin">
+    <realname fullname="Peter Bilitch">
+      <firstname>Peter</firstname>
+      <familyname>Bilitch</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">hsinhsin@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="humpback">
+    <realname fullname="Gustavo Felisberto">
+      <firstname>Gustavo</firstname>
+      <familyname>Felisberto</familyname>
+    </realname>
+    <pgpkey>0xB9F2D52A</pgpkey>
+    <email role="gentoo">humpback@gentoo.org</email>
+    <joined>22 January 2004</joined>
+    <birthday>13 July 1977</birthday>
+    <roles>net-im - Jabber, net-ftp, miscellaneous ebuilds</roles>
+    <location>Coimbra, Portugal</location>
+  </user>
+  <user username="hythloday">
+    <realname fullname="James Harlow">
+      <firstname>James</firstname>
+      <familyname>Harlow</familyname>
+    </realname>
+    <pgpkey>0x4EE3CE6C</pgpkey>
+    <email role="gentoo">hythloday@gentoo.org</email>
+    <joined>25 October 2003</joined>
+    <birthday>17 November 1979</birthday>
+    <roles>Jack of all trades</roles>
+    <location>UK</location>
+  </user>
+  <user username="ian">
+    <realname fullname="Christian Hartmann">
+      <firstname>Christian</firstname>
+      <familyname>Hartmann</familyname>
+    </realname>
+    <pgpkey>0x692A4865</pgpkey>
+    <email role="gentoo">ian@gentoo.org</email>
+    <joined>16 November 2003</joined>
+    <birthday>6 September 1979</birthday>
+    <roles>Forums</roles>
+    <location>Oberhausen, Germany</location>
+  </user>
+  <user username="idani">
+    <realname fullname="Shigehiro Idani">
+      <firstname>Shigehiro</firstname>
+      <familyname>Idani</familyname>
+    </realname>
+    <pgpkey>0x4FF9E3EF</pgpkey>
+    <email role="gentoo">idani@gentoo.org</email>
+    <joined>February 2005</joined>
+    <birthday>9 October 1973</birthday>
+    <roles>Japanese Follow-up Translator</roles>
+    <location>Osaka, Japan</location>
+  </user>
+  <user username="iggy">
+    <realname fullname="Brian Jackson">
+      <firstname>Brian</firstname>
+      <familyname>Jackson</familyname>
+    </realname>
+    <pgpkey>0x45C583E6</pgpkey>
+    <email role="gentoo">iggy@gentoo.org</email>
+    <joined>27 June 2003</joined>
+    <birthday>18 January 1981</birthday>
+    <roles>Gentoo/Embedded, Gentoo/Cluster, media-tv</roles>
+    <location>Montgomery, TX, USA</location>
+  </user>
+  <user username="iluxa">
+    <realname fullname="Ilya Volynets">
+      <firstname>Ilya</firstname>
+      <familyname>Volynets</familyname>
+    </realname>
+    <pgpkey>5166BA5A</pgpkey>
+    <email role="gentoo">iluxa@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/MIPS</roles>
+    <location>California, USA</location>
+  </user>
+  <user username="j4rg0n">
+    <realname fullname="Lina Pezzella">
+      <firstname>Lina</firstname>
+      <familyname>Pezzella</familyname>
+    </realname>
+    <pgpkey>0x091CCE57</pgpkey>
+    <email role="gentoo">j4rg0n@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Portage for Mac OS X</roles>
+    <location>Connecticut, USA</location>
+  </user>
+  <user username="jacques">
+    <realname fullname="Dwayne Jacques Fontenot">
+      <firstname>Dwayne</firstname>
+      <familyname>Jacques Fontenot</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">jacques@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="jakub">
+    <realname fullname="Jakub Moc">
+      <firstname>Jakub</firstname>
+      <familyname>Moc</familyname>
+    </realname>
+    <pgpkey>0xCEBA3D9E</pgpkey>
+    <email role="gentoo">jakub@gentoo.org</email>
+    <joined>17 Jun 2005</joined>
+    <birthday>06 May 1974</birthday>
+    <roles>Main Bug Wrangler</roles>
+    <location>Czech Republic</location>
+  </user>
+  <user username="jaervosz">
+    <realname fullname="Sune Kloppenborg Jeppesen">
+      <firstname>Sune</firstname>
+      <familyname>Jeppesen</familyname>
+    </realname>
+    <pgpkey>0xC1CEEAB9</pgpkey>
+    <email role="gentoo">jaervosz@gentoo.org</email>
+    <joined>27 May 2004</joined>
+    <birthday/>
+    <roles>Security</roles>
+    <location>Denmark</location>
+  </user>
+  <user username="jake">
+    <realname fullname="Blake Matheny">
+      <firstname>Blake</firstname>
+      <familyname>Matheny</familyname>
+    </realname>
+    <pgpkey>0x040FA502</pgpkey>
+    <email role="gentoo">jake@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Infrastructure, Language herds</roles>
+    <location>Indianapolis, IN, USA</location>
+  </user>
+  <user username="jayskwak">
+    <realname fullname="Jae Yang Kwak">
+      <firstname>Jae</firstname>
+      <familyname>Yang Kwak</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">jayskwak@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Korean Support</roles>
+    <location>Korea</location>
+  </user>
+  <user username="jbms">
+    <realname fullname="Jeremy Maitin-Shepard">
+      <firstname>Jeremy</firstname>
+      <familyname>Maitlin-Shepard</familyname>
+    </realname>
+    <pgpkey>0x0C086389</pgpkey>
+    <email role="gentoo">jbms@gentoo.org</email>
+    <joined>30 October 2003</joined>
+    <birthday>28 February 1982</birthday>
+    <roles>Emacs</roles>
+    <location>Massachusetts, USA</location>
+  </user>
+  <user username="jforman">
+    <realname fullname="Jeffrey Forman">
+      <firstname>Jeffrey</firstname>
+      <familyname>Forman</familyname>
+    </realname>
+    <pgpkey>0x1950DDD4</pgpkey>
+    <email role="gentoo">jforman@gentoo.org</email>
+    <joined>20 January 2004</joined>
+    <birthday>9 November 1981</birthday>
+    <roles>Infrastructure [ DNS, Mirrors, bugs.gentoo.org admin ] and Release Engineering</roles>
+    <location>Syracuse, NY, USA</location>
+  </user>
+  <user username="jfmuggs">
+    <realname fullname="Andrew D. Fant">
+      <firstname>Andrew</firstname>
+      <familyname>Fant</familyname>
+    </realname>
+    <pgpkey>0x9D80BCCD</pgpkey>
+    <email role="gentoo">jfmuggs@gentoo.org</email>
+    <joined>26 February 2005</joined>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>Woburn, MA, USA</location>
+  </user>
+  <user username="jhhudso">
+    <realname fullname="Jared H. Hudson">
+      <firstname>Jared</firstname>
+      <familyname>H.Hudson</familyname>
+    </realname>
+    <pgpkey>0x9BEAD722</pgpkey>
+    <email role="gentoo">jhhudso@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Stages, Testing and fixing</roles>
+    <location>Fayetteville, AR, USA</location>
+  </user>
+  <user username="jhuebel">
+    <realname fullname="Jason Huebel">
+      <firstname>Jason</firstname>
+      <familyname>Huebel</familyname>
+    </realname>
+    <pgpkey>0x9BA9E230</pgpkey>
+    <email role="gentoo">jhuebel@gentoo.org</email>
+    <joined/>
+    <birthday>26 October 1973</birthday>
+    <roles>Gentoo/AMD64 Strategic Lead, Developer Relations Lead, Gentoo Recruiter</roles>
+    <location>Orange, Texas, USA</location>
+  </user>
+  <user username="jje">
+    <realname fullname="John J. Ellis">
+      <firstname>John J.</firstname>
+      <familyname>Ellis</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">jje@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Sound</roles>
+    <location>Tokyo, Japan</location>
+  </user>
+  <user username="jkt">
+    <realname fullname="Jan Kundrát">
+      <firstname>Jan</firstname>
+      <familyname>Kundrát</familyname>
+    </realname>
+    <pgpkey>0x44722517</pgpkey>
+    <email role="gentoo">jkt@gentoo.org</email>
+    <joined>20 July 2005</joined>
+    <birthday>20 November 1986</birthday>
+    <roles>GDP, Czech Translation</roles>
+    <location>Prague, Czech republic</location>
+  </user>
+  <user username="jmaynard">
+    <realname fullname="Jay Maynard">
+      <firstname>Jay</firstname>
+      <familyname>Maynard</familyname>
+    </realname>
+    <pgpkey>0x324C3F67</pgpkey>
+    <email role="gentoo">jmaynard@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/Alpha</roles>
+    <location>Fairmont, Minnesota, USA</location>
+  </user>
+  <user username="jmglov">
+    <realname fullname="Josh Glover">
+      <firstname>Josh</firstname>
+      <familyname>Glover</familyname>
+    </realname>
+    <pgpkey>0xDE8A3103</pgpkey>
+    <email role="gentoo">jmglov@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>CJK, Miscellaneous ebuilds, Web-Applications</roles>
+    <location>Columbus, OH, USA</location>
+  </user>
+  <user username="jnc">
+    <realname fullname="Eric Shattow">
+      <firstname>Eric</firstname>
+      <familyname>Shattow</familyname>
+    </realname>
+    <pgpkey>0x25646BFD</pgpkey>
+    <email role="gentoo">jnc@gentoo.org</email>
+    <joined>2004.12.24</joined>
+    <birthday>1984.04.06</birthday>
+    <roles>Sound</roles>
+    <location>Northfield, IL, USA</location>
+  </user>
+  <user username="joem">
+    <realname fullname="Joe McCann">
+      <firstname>Joe</firstname>
+      <familyname>McCann</familyname>
+    </realname>
+    <pgpkey>0x1B1E9741</pgpkey>
+    <email role="gentoo">joem@gentoo.org</email>
+    <joined>2004.11.29</joined>
+    <birthday>1985.07.04</birthday>
+    <roles>Gnome</roles>
+    <location>Illinois, USA</location>
+  </user>
+  <user username="johnm">
+    <realname fullname="John Mylchreest">
+      <firstname>John</firstname>
+      <familyname>Mylchreest</familyname>
+    </realname>
+    <pgpkey>0x5A31FA7F</pgpkey>
+    <email role="gentoo">johnm@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Kernel, mirrorselect, network scripts, misc. ebuilds</roles>
+    <location>Isle of Man</location>
+  </user>
+  <user username="joker">
+    <realname fullname="Christian Birchinger">
+      <firstname>Christian</firstname>
+      <familyname>Birchinger</familyname>
+    </realname>
+    <pgpkey>0x608F6AEB</pgpkey>
+    <email role="gentoo">joker@gentoo.org</email>
+    <joined>1 November 2002</joined>
+    <birthday>30 November 1974</birthday>
+    <roles>Gentoo/SPARC</roles>
+    <location>Switzerland</location>
+  </user>
+  <user username="josejx">
+    <realname fullname="Joseph Jezak">
+      <firstname>Joseph</firstname>
+      <familyname>Jezak</familyname>
+    </realname>
+    <pgpkey>0xB2C045FA</pgpkey>
+    <email role="gentoo">josejx@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/PPC, Gentoo/OSX</roles>
+    <location>Lenox Dale, MA, USA</location>
+  </user>
+  <user username="joshuabaergen">
+    <realname fullname="Joshua Baergen">
+      <firstname>Joshua</firstname>
+      <familyname>Baergen</familyname>
+    </realname>
+    <pgpkey>0x6321BC43</pgpkey>
+    <email role="gentoo">joshuabaergen@gentoo.org</email>
+    <joined>28 June 2005</joined>
+    <birthday/>
+    <roles>X</roles>
+  </user>
+  <user username="jrinkovs">
+    <realname fullname="Joe Rinkovsky">
+      <firstname>Joe</firstname>
+      <familyname>Rinkovski</familyname>
+    </realname>
+    <pgpkey>0x86E1E83A</pgpkey>
+    <email role="gentoo">jrinkovs@gentoo.org</email>
+    <joined>20 January 2004</joined>
+    <birthday/>
+    <roles>Infrastructure</roles>
+  </user>
+  <user username="jrray">
+    <realname fullname="J Robert Ray">
+      <firstname>J</firstname>
+      <familyname>Robert Ray</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">jrray@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="jstubbs">
+    <realname fullname="Jason Stubbs">
+      <firstname>Jason</firstname>
+      <familyname>Stubbs</familyname>
+    </realname>
+   <pgpkey>0xC93F64FE</pgpkey>
+    <email role="gentoo">jstubbs@gentoo.org</email>
+    <joined>17 February 2004</joined>
+    <birthday>24 February 1979</birthday>
+    <roles>Portage bugs and modularization</roles>
+    <location>Tokyo, Japan</location>
+  </user>
+  <user username="ka0ttic">
+    <realname fullname="Aaron Walker">
+      <firstname>Aaron</firstname>
+      <familyname>Walker</familyname>
+    </realname>
+    <pgpkey>0xCB803470</pgpkey>
+    <email role="gentoo">ka0ttic@gentoo.org</email>
+    <joined>10 September 2004</joined>
+    <birthday>19 November 1983</birthday>
+    <roles>Gentoo/BSD, cron, commonbox, shell-tools, cvs-utils, forensics, netmon, vim, web-apps security, recruitment</roles>
+    <location>Daytona Beach, FL, USA</location>
+  </user>
+  <user username="kain">
+    <realname fullname="Bryon Roche">
+      <firstname>Bryon</firstname>
+      <familyname>Roche</familyname>
+    </realname>
+    <pgpkey>0x6878ABD5</pgpkey>
+    <email role="gentoo">kain@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/PPC and PPC kernels</roles>
+    <location>Friedberg, Germany</location>
+  </user>
+  <user username="kaiowas">
+    <realname fullname="Petre Rodan">
+      <firstname>Petre</firstname>
+      <familyname>Rodan</familyname>
+    </realname>
+    <pgpkey>0x055DEF31</pgpkey>
+    <email role="gentoo">kaiowas@gentoo.org</email>
+    <joined>21 September 2004</joined>
+    <birthday>24 January 1979</birthday>
+    <roles>Hardened, SELinux</roles>
+    <location>Bucharest, Romania</location>
+  </user>
+  <user username="kanaka">
+    <realname fullname="Joel Martin">
+      <firstname>Joel</firstname>
+      <familyname>Martin</familyname>
+    </realname>
+    <pgpkey>0xD0BD70B8</pgpkey>
+    <email role="gentoo">kanaka@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>media-gfx, media-video and media-sound</roles>
+    <location>New Hampshire, USA</location>
+  </user>
+  <user username="kang">
+    <realname fullname="Guillaume Destuynder">
+      <firstname>Guillaume</firstname>
+      <familyname>Destuynder</familyname>
+    </realname>
+    <pgpkey>0xE191835B</pgpkey>
+    <email role="gentoo">kang@gentoo.org</email>
+    <joined>2 June 2004</joined>
+    <birthday/>
+    <roles>Gentoo/Hardened (RSBAC) and net-p2p</roles>
+    <location>Gif Sur Yvette, France</location>
+  </user>
+  <user username="karltk">
+    <realname fullname="Karl Trygve Kalleberg">
+      <firstname>Karl</firstname>
+      <familyname>Trygve Kalleberg</familyname>
+    </realname>
+    <pgpkey>0xDCDE7E08</pgpkey>
+    <email role="gentoo">karltk@gentoo.org</email>
+    <joined>May 2001</joined>
+    <birthday>4 November 1978</birthday>
+    <roles>Cross-compilers, Java and Gentoolkit</roles>
+    <location>Norway</location>
+  </user>
+  <user username="katuyuki">
+    <realname fullname="Katsuyuki Konno">
+      <firstname>Katsuyuki</firstname>
+      <familyname>Konno</familyname>
+    </realname>
+    <pgpkey>0x57421777</pgpkey>
+    <email role="gentoo">katuyuki@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Japanese translation</roles>
+    <location>Japan</location>
+  </user>
+  <user username="kengland">
+    <realname fullname="Kyle England">
+      <firstname>Kyle</firstname>
+      <familyname>England</familyname>
+    </realname>
+    <pgpkey>0xC342D18B</pgpkey>
+    <email role="gentoo">kengland@gentoo.org</email>
+    <joined>15 January 2005</joined>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>Kentucky, USA</location>
+  </user>
+  <user username="kevquinn">
+    <realname fullname="Kevin F. Quinn">
+      <firstname>Kevin</firstname>
+      <familyname>Quinn</familyname>
+    </realname>
+    <pgpkey>0xD7A4706D</pgpkey>
+    <email role="gentoo">kevquinn@gentoo.org</email>
+    <joined>29 May 2005</joined>
+    <birthday>23 May 1969</birthday>
+    <roles>Hardened Gentoo</roles>
+    <location>Italy</location>
+  </user>
+  <user username="khai">
+    <realname fullname="Yi Qiang">
+      <firstname>Yi</firstname>
+      <familyname>Quang</familyname>
+    </realname>
+    <pgpkey>0xC7F79B97</pgpkey>
+    <email role="gentoo">khai@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>GNOME</roles>
+    <location>Washington, USA</location>
+  </user>
+  <user username="killerfox">
+    <realname fullname="René Nussbaumer">
+      <firstname>René</firstname>
+      <familyname>Nussbaumer</familyname>
+    </realname>
+    <pgpkey>0x354BFD9F</pgpkey>
+    <email role="gentoo">killerfox@gentoo.org</email>
+    <joined>06 May 2005</joined>
+    <birthday/>
+    <roles>Gentoo/HPPA</roles>
+    <location>Switzerland</location>
+  </user>
+  <user username="killsoft">
+    <realname fullname="Rob Romans">
+      <firstname>Rob</firstname>
+      <familyname>Romans</familyname>
+    </realname>
+    <pgpkey>0x14490987</pgpkey>
+    <email role="gentoo">killsoft@gentoo.org</email>
+    <joined>24 June 2004</joined>
+    <birthday/>
+    <roles>Amateur radio; media-radio</roles>
+    <location>Austin, TX</location>
+  </user>
+  <user username="kingtaco">
+    <realname fullname="Mike Doty">
+      <firstname>Mike</firstname>
+      <familyname>Doty</familyname>
+    </realname>
+    <pgpkey>0xA797C7A7</pgpkey>
+    <email role="gentoo">kingtaco@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64, Commfax, Developer relations</roles>
+    <location>Chicago, IL, USA</location>
+  </user>
+  <user username="kito">
+    <realname fullname="Kito Danya Dietrich">
+      <firstname>Kito</firstname>
+      <familyname>Dietrich</familyname>
+    </realname>
+    <pgpkey>0xFDCEC20B</pgpkey>
+    <email role="gentoo">kito@gentoo.org</email>
+    <joined>9 September 2004</joined>
+    <birthday>3 July 1974</birthday>
+    <roles>Gentoo/MacOS, Sound</roles>
+    <location>Austin, Texas</location>
+  </user>
+  <user username="klasikahl">
+    <realname fullname="Zack Gilburd">
+      <firstname>Zack</firstname>
+      <familyname>Gilburd</familyname>
+    </realname>
+    <pgpkey>0x8240AB6C</pgpkey>
+    <email role="gentoo">klasikahl@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/Hardened Documentation</roles>
+    <location>Paradise Valley, Arizona, USA</location>
+  </user>
+  <user username="klieber">
+    <realname fullname="Kurt Lieber">
+      <firstname>Kurt</firstname>
+      <familyname>Lieber</familyname>
+    </realname>
+    <pgpkey>0x27ED2046</pgpkey>
+    <email role="gentoo">klieber@gentoo.org</email>
+    <joined>17 April 2002</joined>
+    <birthday/>
+    <roles>Infrastructure, public relations and security</roles>
+    <location>New York, USA</location>
+  </user>
+  <user username="kloeri">
+    <realname fullname="Bryan Ostergaard">
+      <firstname>Bryan</firstname>
+      <familyname>Ostergaard</familyname>
+    </realname>
+    <pgpkey>0x9016EF50</pgpkey>
+    <email role="gentoo">kloeri@gentoo.org</email>
+    <joined>26 October 2003</joined>
+    <birthday>23 November 1974</birthday>
+    <roles>Bug wrangling, Gentoo/Alpha, Gentoo/ia64 and Python</roles>
+    <location>Denmark</location>
+  </user>
+  <user username="koon">
+    <realname fullname="Thierry Carrez">
+      <firstname>Thierry</firstname>
+      <familyname>Carrez</familyname>
+    </realname>
+    <pgpkey>0xB6A55F4F</pgpkey>
+    <email role="gentoo">koon@gentoo.org</email>
+    <joined>26 March 2004</joined>
+    <birthday/>
+    <roles>Security</roles>
+    <location>Paris, France</location>
+  </user>
+  <user username="kosmikus">
+    <realname fullname="Andres Loeh">
+      <firstname>Andres</firstname>
+      <familyname>Loeh</familyname>
+    </realname>
+    <pgpkey>0x52E54932</pgpkey>
+    <email role="gentoo">kosmikus@gentoo.org</email>
+    <joined>April 2 2003</joined>
+    <birthday>18 August 1976</birthday>
+    <roles>Haskell compilers and tools</roles>
+    <location>The Netherlands</location>
+  </user>
+  <user username="krispykringle">
+    <realname fullname="Dan Margolis">
+      <firstname>Dan</firstname>
+      <familyname>Margolis</familyname>
+    </realname>
+    <pgpkey>0xF57DA5DA</pgpkey>
+    <email role="gentoo">krispykringle@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Security</roles>
+    <location>Philadelphia, PA, USA</location>
+  </user>
+  <user username="kugelfang">
+    <realname fullname="Danny van Dyk">
+      <firstname>Danny</firstname>
+      <familyname>van Dyk</familyname>
+    </realname>
+    <pgpkey>0xDAED53A2</pgpkey>
+    <email role="gentoo">kugelfang@gentoo.org</email>
+    <joined>11 April 2004</joined>
+    <birthday>6 December 1982</birthday>
+    <roles>Gentoo/AMD64</roles>
+    <location>Witten, Germany</location>
+  </user>
+  <user username="kumba">
+    <realname fullname="Joshua Kinard">
+      <firstname>Joshua</firstname>
+      <familyname>Kinard</familyname>
+    </realname>
+    <pgpkey>0x339E0EE2</pgpkey>
+    <email role="gentoo">kumba@gentoo.org</email>
+    <ircalias>`Kumba</ircalias>
+    <ircalias>`K-[AFK]</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/MIPS, Gentoo/SPARC</roles>
+    <location>Waldorf, Maryland, USA</location>
+  </user>
+  <user username="kutsuya">
+    <realname fullname="Jason Shoemaker">
+      <firstname>Jason</firstname>
+      <familyname>Shoemaker</familyname>
+    </realname>
+    <pgpkey>0x83DE4927</pgpkey>
+    <email role="gentoo">kutsuya@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Python</roles>
+    <location>Oregon, USA</location>
+  </user>
+  <user username="kzimmerm">
+    <realname fullname="Kai Zimmermann">
+      <firstname>Kai</firstname>
+      <familyname>Zimmermann</familyname>
+    </realname>
+    <pgpkey>0xA3C7C5F1</pgpkey>
+    <email role="gentoo">kzimmerm@gentoo.org</email>
+    <joined>10 January 2005</joined>
+    <birthday>1979.04.23</birthday>
+    <roles>Sound, Video</roles>
+    <location>Germany</location>
+  </user>
+  <user username="lanius">
+    <realname fullname="Heinrich Wendel">
+      <firstname>Heinrich</firstname>
+      <familyname>Wendel</familyname>
+    </realname>
+    <pgpkey>0x5B5E7771</pgpkey>
+    <email role="gentoo">lanius@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>net-print</roles>
+    <location>Bonn, Germany</location>
+  </user>
+  <user username="langthang">
+    <realname fullname="Tuan Van">
+      <firstname>Tuan</firstname>
+      <familyname>Van</familyname>
+    </realname>
+    <pgpkey>0x6476B2FD</pgpkey>
+    <email role="gentoo">langthang@gentoo.org</email>
+    <email role="primary">langthang@vn21.homelinux.org</email>
+    <joined>30 June 2004</joined>
+    <birthday>22 October 1968</birthday>
+    <roles>net-mail</roles>
+    <location>California, USA</location>
+  </user>
+  <user username="latexer">
+    <realname fullname="Peter Johanson">
+      <firstname>Peter</firstname>
+      <familyname>Johanson</familyname>
+    </realname>
+    <pgpkey>0x6EFA3917</pgpkey>
+    <email role="gentoo">latexer@gentoo.org</email>
+    <joined>27 January 2003</joined>
+    <birthday>23 August 1982</birthday>
+    <roles>IPv6, net-wireless and Mono</roles>
+    <location>New York City, USA</location>
+  </user>
+  <user username="lcars">
+    <realname fullname="Andrea Barisani">
+      <firstname>Andrea</firstname>
+      <familyname>Barisani</familyname>
+    </realname>
+    <pgpkey>0x864C9B9E</pgpkey>
+    <email role="gentoo">lcars@gentoo.org</email>
+    <joined>9 July 2003</joined>
+    <birthday>7 January 1981</birthday>
+    <roles>Infrastructure</roles>
+    <location>Trieste, Italy</location>
+  </user>
+  <user username="leonardop">
+    <realname fullname="Leonardo Boshell">
+      <firstname>Leonardo</firstname>
+      <familyname>Boshell</familyname>
+    </realname>
+    <pgpkey>0x3AB00DC4</pgpkey>
+    <email role="gentoo">leonardop@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Accessibility, GNOME-Accessibility and GNOME</roles>
+    <location>Colombia</location>
+  </user>
+  <user username="lewk">
+    <realname fullname="Luke Macken">
+      <firstname>Luke</firstname>
+      <familyname>Macken</familyname>
+    </realname>
+    <pgpkey>0x390EBBB9</pgpkey>
+    <email role="gentoo">lewk@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Security</roles>
+    <location>Rochester, NY, USA</location>
+  </user>
+  <user username="liquidx">
+    <realname fullname="Alastair Tse">
+      <firstname>Alastair</firstname>
+      <familyname>Tse</familyname>
+    </realname>
+    <pgpkey>0x390714F6</pgpkey>
+    <email role="gentoo">liquidx@gentoo.org</email>
+    <joined>February 2003</joined>
+    <birthday>14 April 1980</birthday>
+    <roles>CJK, GNOME, Python</roles>
+    <location>Cambridge, UK</location>
+  </user>
+  <user username="lisa">
+    <realname fullname="Lisa M. Seelye">
+      <firstname>Lisa</firstname>
+      <familyname>M. Seelye</familyname>
+    </realname>
+    <pgpkey>0x1E496FC5</pgpkey>
+    <email role="gentoo">lisa@gentoo.org</email>
+    <joined>7 July 2003</joined>
+    <birthday>9 October 1980</birthday>
+    <roles>DistCC and Anjuta</roles>
+    <location>Rochester, NY</location>
+  </user>
+  <user username="livewire">
+    <realname fullname="Bob Johnson">
+      <firstname>Bob</firstname>
+      <familyname>Johnson</familyname>
+    </realname>
+    <pgpkey>0x2F49017D</pgpkey>
+    <email role="gentoo">livewire@gentoo.org</email>
+    <joined>15 December 2003</joined>
+    <birthday>3 February 1968</birthday>
+    <roles>Kernel and LiveCD work</roles>
+  </user>
+  <user username="lizb">
+    <realname fullname="Liz Blackwell">
+      <firstname>Liz</firstname>
+      <familyname>Blackwell</familyname>
+    </realname>
+    <pgpkey>0xC4D3FB7E</pgpkey>
+    <email role="gentoo">lizb@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Documentation for PPC, PPC64, and MacOS</roles>
+    <location>Evergreen, Colorado, USA</location>
+  </user>
+  <user username="lordvan">
+    <realname fullname="Thomas Raschbacher">
+      <firstname>Thomas</firstname>
+      <familyname>Raschbacher</familyname>
+    </realname>
+    <pgpkey>0x2BF3F258</pgpkey>
+    <email role="gentoo">lordvan@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>DVB, net-print and Python</roles>
+    <location>Austria</location>
+  </user>
+  <user username="lostlogic">
+    <realname fullname="Brandon Low">
+      <firstname>Brandon</firstname>
+      <familyname>Low</familyname>
+    </realname>
+    <pgpkey>0x1F012DC6</pgpkey>
+    <email role="gentoo">lostlogic@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>GCC3, Kernel</roles>
+    <location>USA</location>
+  </user>
+  <user username="lu_zero">
+    <realname fullname="Luca Barbato">
+      <firstname>Luca</firstname>
+      <familyname>Barbato</familyname>
+    </realname>
+    <pgpkey>0x84E90E34</pgpkey>
+    <email role="gentoo">lu_zero@gentoo.org</email>
+    <joined>29 November 2002</joined>
+    <birthday>23 August 1982</birthday>
+    <roles>ATI drivers, base-system, emulators, Gentoo/PPC, multimedia</roles>
+    <location>Torino, Italy</location>
+  </user>
+  <user username="lucass">
+    <realname fullname="Lukasz Strzygowski">
+      <firstname>Lukasz</firstname>
+      <familyname>Strzygowski</familyname>
+    </realname>
+    <pgpkey>0x618F676A</pgpkey>
+    <email role="gentoo">lucass@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Python</roles>
+    <location>Kielce, Poland</location>
+  </user>
+  <user username="luckyduck">
+    <realname fullname="Jan Brinkmann">
+      <firstname>Jan</firstname>
+      <familyname>Brinkmann</familyname>
+    </realname>
+    <pgpkey>0xE38C3BBF</pgpkey>
+    <email role="gentoo">luckyduck@gentoo.org</email>
+    <joined>02 January 2005</joined>
+    <birthday>1982.06.23</birthday>
+    <roles>Java, Sound, Video, Gentoo/AMD64</roles>
+    <location>Schlangen, Germany</location>
+  </user>
+  <user username="lude">
+    <realname fullname="David Olsen">
+      <firstname>David</firstname>
+      <familyname>Olsen</familyname>
+    </realname>
+    <pgpkey>0x7174C3D9</pgpkey>
+    <email role="gentoo">lude@gentoo.org</email>
+    <joined>14 January 2004</joined>
+    <birthday>21 September 1980</birthday>
+  </user>
+  <user username="luke-jr">
+    <realname fullname="Luke-Jr">
+      <firstname/>
+      <familyname/>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">luke-jr@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Qt Installer</roles>
+  </user>
+  <user username="lv">
+    <realname fullname="Travis Wayne Tilley">
+      <firstname>Travis</firstname>
+      <familyname>Tilley</familyname>
+    </realname>
+    <pgpkey>0xA2E3B84B</pgpkey>
+    <email role="gentoo">lv@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64 Operational Lead, GCC, Gentoo/Hardened on AMD64</roles>
+    <location>Waterbury, CT, USA</location>
+  </user>
+  <user username="m.mascherpa">
+    <!-- CVS == "mush" -->
+    <realname fullname="Marco Mascherpa">
+      <firstname>Marco</firstname>
+      <familyname>Mascherpa</familyname>
+    </realname>
+    <pgpkey>0xB9BCF21B</pgpkey>
+    <email role="gentoo">m.mascherpa@gentoo.org</email>
+    <ircalias>m_mascherpa</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Italian Lead Translator</roles>
+    <location>Italy</location>
+  </user>
+  <user username="malc">
+    <realname fullname="Malcolm Lashley">
+      <firstname>Malcolm</firstname>
+      <familyname>Lashley</familyname>
+    </realname>
+    <pgpkey>0x11C3441D</pgpkey>
+    <email role="gentoo">malc@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/AMD64, GCC</roles>
+    <location>Swindon, UK</location>
+  </user>
+  <user username="malverian">
+    <realname fullname="Philip Walls">
+      <firstname>Philip</firstname>
+      <familyname>Walls</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">malverian@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Distributed computing, media-gfx</roles>
+    <location>Orange Park, Florida</location>
+  </user>
+  <user username="marduk">
+    <realname fullname="Albert Hopkins">
+      <firstname>Albert</firstname>
+      <familyname>Hopkins</familyname>
+    </realname>
+    <pgpkey>0xD4B10828</pgpkey>
+    <email role="gentoo">marduk@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>packages.gentoo.org</roles>
+    <location>Dallas, TX</location>
+  </user>
+  <user username="marineam">
+    <realname fullname="Micheal Marineau">
+      <firstname>Michael</firstname>
+      <familyname>Marineau</familyname>
+    </realname>
+    <pgpkey>0xCB06CE30</pgpkey>
+    <email role="gentoo">marineam@gentoo.org</email>
+    <joined>23 November 2004</joined>
+    <birthday>9 October 1984</birthday>
+    <roles>Kernel</roles>
+    <location>Corvallis, OR</location>
+  </user>
+  <user username="martigen">
+    <realname fullname="Ashton Mills">
+      <firstname>Ashton</firstname>
+      <familyname>Mills</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">martigen@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="mattm">
+    <realname fullname="Matthew Marlow">
+      <firstname>Matthew</firstname>
+      <familyname>Marlowe</familyname>
+    </realname>
+    <pgpkey>0x1A86EBE4</pgpkey>
+    <email role="gentoo">mattm@gentoo.org</email>
+    <joined>24 December 2004</joined>
+    <birthday>3 June 1972</birthday>
+    <roles>dev-apache</roles>
+    <location>Oak Park, CA</location>
+  </user>
+  <user username="matsuu">
+    <realname fullname="Matsuu Takuto">
+      <firstname>Matsuu</firstname>
+      <familyname>Takuto</familyname>
+    </realname>
+    <pgpkey>0x0E8D3D16</pgpkey>
+    <email role="gentoo">matsuu@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>CJK</roles>
+    <location>Japan</location>
+  </user>
+  <user username="mattam">
+    <realname fullname="Matthieu Sozeau">
+      <firstname>Matthieu</firstname>
+      <familyname>Sozeau</familyname>
+    </realname>
+    <pgpkey>0x2D6F1A9A</pgpkey>
+    <email role="gentoo">mattam@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>dev-ml, Emacs</roles>
+    <location>Gif-sur-Yvette, France</location>
+  </user>
+  <user username="mattjf">
+    <realname fullname="Matthew J. Fanto">
+      <firstname>Matthew</firstname>
+      <familyname>J. Fanto</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">mattjf@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="max">
+    <realname fullname="Max Kalika">
+      <firstname>Max</firstname>
+      <familyname>Kalika</familyname>
+    </realname>
+    <pgpkey>0xCBC3AB79</pgpkey>
+    <email role="gentoo">max@gentoo.org</email>
+    <joined>July 15 2003</joined>
+    <birthday>23 November 1977</birthday>
+    <roles>MythTV and other various things</roles>
+    <location>Santa Barbara, California, USA</location>
+  </user>
+  <user username="mboman">
+    <realname fullname="Michael Boman">
+      <firstname>Michael</firstname>
+      <familyname>Boman</familyname>
+    </realname>
+    <pgpkey>0xDE4C2448</pgpkey>
+    <email role="gentoo">mboman@gentoo.org</email>
+    <joined>July 31 2003</joined>
+    <birthday>27 March 1977</birthday>
+  </user>
+  <user username="mcummings">
+    <realname fullname="Michael Cummings">
+      <firstname>Michael</firstname>
+      <familyname>Cummings</familyname>
+    </realname>
+    <pgpkey>0x9E7F4E2E</pgpkey>
+    <email role="gentoo">mcummings@gentoo.org</email>
+    <joined>1 June 2002</joined>
+    <birthday>17 March 1975</birthday>
+    <roles>Gentoo/Sparc and Perl</roles>
+    <location>USA</location>
+  </user>
+  <user username="merlin">
+    <realname fullname="Cory Visi">
+      <firstname>Cory</firstname>
+      <familyname>Visi</familyname>
+    </realname>
+    <pgpkey>0x97F32BE0</pgpkey>
+    <email role="gentoo">merlin@gentoo.org</email>
+    <email role="primary">visi@snurgle.org</email>
+    <joined>24 June 2004</joined>
+    <birthday>20 May 1978</birthday>
+    <roles>net-mail</roles>
+    <location>Connecticut, USA</location>
+  </user>
+  <user username="messer">
+    <realname fullname="Jaroslaw Swierad">
+      <firstname>Jaroslaw</firstname>
+      <familyname>Swierad</familyname>
+    </realname>
+    <pgpkey>0x97AA41AA</pgpkey>
+    <email role="gentoo">messer@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Polish GWN Translator</roles>
+    <location>Poland</location>
+  </user>
+  <user username="metalgod">
+    <realname fullname="Luis Medinas">
+      <firstname>Luis</firstname>
+      <familyname>Medinas</familyname>
+    </realname>
+    <pgpkey>0x29441D0A</pgpkey>
+    <email role="gentoo">metalgod@gentoo.org</email>
+    <joined>31 July 2005</joined>
+    <birthday>16 October 1984</birthday>
+    <roles>Gentoo/AMD64, net-print, app-cdr</roles>
+    <location>Aveiro, Portugal</location>
+  </user>
+  <user username="method">
+    <realname fullname="Joshua Brindle">
+      <firstname>Joshua</firstname>
+      <familyname>Brindle</familyname>
+    </realname>
+    <pgpkey>0x52BD03B8</pgpkey>
+    <email role="gentoo">method@gentoo.org</email>
+    <joined>August 6 2002</joined>
+    <birthday>May 12 1981</birthday>
+    <roles>Hardened Gentoo, Gentoo/SPARC</roles>
+    <location>Oklahoma City</location>
+  </user>
+  <user username="mglauche">
+    <realname fullname="Michael Glauche">
+      <firstname>Michael</firstname>
+      <familyname>Glauche</familyname>
+    </realname>
+    <pgpkey>0x63C3379B</pgpkey>
+    <email role="gentoo">mglauche@gentoo.org</email>
+    <joined>May 28 2004</joined>
+    <birthday/>
+    <roles>SAMBA</roles>
+    <location/>
+  </user>
+  <user username="mholzer">
+    <realname fullname="Martin Holzer">
+      <firstname>Martin</firstname>
+      <familyname>Holzer</familyname>
+    </realname>
+    <pgpkey>0x890133F1</pgpkey>
+    <email role="gentoo">mholzer@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Bug wrangler</roles>
+    <location>Austria</location>
+  </user>
+  <user username="ming">
+    <realname fullname="Ming Zhao">
+      <firstname>Ming</firstname>
+      <familyname>Zhao</familyname>
+    </realname>
+    <pgpkey>0x92914A48</pgpkey>
+    <email role="gentoo">ming@gentoo.org</email>
+    <joined>27 December 2004</joined>
+    <birthday>6 October 1982</birthday>
+    <roles>Tcl/Tk,gnome</roles>
+    <location>Bejing, China</location>
+  </user>
+  <user username="mjc">
+    <realname fullname="Michael J. Cohen">
+      <firstname>Michael</firstname>
+      <familyname>J. Cohen</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">mjc@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Inactive</status>
+    <roles>Kernel</roles>
+    <location>Florida, USA</location>
+  </user>
+  <user username="mkeadle">
+    <realname fullname="Matt Keadle">
+      <firstname>Matt</firstname>
+      <familyname>Keadle</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">mkeadle@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+  </user>
+  <user username="mkennedy">
+    <realname fullname="Matthew Kennedy">
+      <firstname>Matthew</firstname>
+      <familyname>Kennedy</familyname>
+    </realname>
+    <pgpkey>0x401903E0</pgpkey>
+    <email role="gentoo">mkennedy@gentoo.org</email>
+    <joined>20 February 2002</joined>
+    <birthday>1977</birthday>
+    <roles>GCC, GNOME</roles>
+    <location>USA</location>
+  </user>
+  <user username="mksoft">
+    <realname fullname="Meir Kriheili">
+      <firstname>Meir</firstname>
+      <familyname>Kriheili</familyname>
+    </realname>
+    <pgpkey>0x62B59999</pgpkey>
+    <email role="gentoo">mksoft@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo-stats and dev-db/firebird</roles>
+    <location>Natanya, Israel</location>
+  </user>
+  <user username="morfic">
+    <realname fullname="Daniel Goller">
+      <firstname>Daniel</firstname>
+      <familyname>Goller</familyname>
+    </realname>
+    <pgpkey>0x83DDA5B9</pgpkey>
+    <email role="gentoo">morfic@gentoo.org</email>
+    <joined>23 June 2004</joined>
+    <birthday/>
+    <roles>gcc-porting, IceWM</roles>
+    <location>San Antonio, Texas, USA</location>
+  </user>
+  <user username="motaboy">
+    <realname fullname="Simone Gotti">
+      <firstname>Simone</firstname>
+      <familyname>Gotti</familyname>
+    </realname>
+    <pgpkey>0x84B15FFF</pgpkey>
+    <email role="gentoo">motaboy@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>KDE</roles>
+    <location>Italy</location>
+  </user>
+  <user username="mr_bones_">
+    <realname fullname="Michael Sterrett">
+      <firstname>Michael</firstname>
+      <familyname>Sterrett</familyname>
+    </realname>
+    <pgpkey>0x22B40A2C</pgpkey>
+    <email role="gentoo">mr_bones_@gentoo.org</email>
+    <joined>22 April 2003</joined>
+    <birthday>25 June 1974</birthday>
+    <roles>C, Games, Perl, Sh</roles>
+    <location>New Hampshire, USA</location>
+  </user>
+  <user username="mrness">
+    <realname fullname="Alin Nastac">
+      <firstname>Alin</firstname>
+      <familyname>Nastac</familyname>
+    </realname>
+    <pgpkey>0x16B0BE2E</pgpkey>
+    <email role="gentoo">mrness@gentoo.org</email>
+    <joined>5 November 2004</joined>
+    <birthday>19 February 1973</birthday>
+    <roles>net-dialup, net-proxy</roles>
+    <location>Bucharest, Romania</location>
+  </user>
+  <user username="murray_b">
+    <realname fullname="Thomas Schutz">
+      <firstname>Thomas</firstname>
+      <familyname>Schutz</familyname>
+    </realname>
+    <pgpkey>0x145FDD3A</pgpkey>
+    <email role="gentoo">Murray_B@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="mutex">
+    <realname fullname="David Bryson">
+      <firstname>David</firstname>
+      <familyname>Bryson</familyname>
+    </realname>
+    <pgpkey>0x74B61620</pgpkey>
+    <email role="gentoo">mutex@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/Embedded</roles>
+    <location>San Jose, California, USA</location>
+  </user>
+  <user username="nakano">
+    <realname fullname="Masatomo Nakano">
+      <firstname>Masatomo</firstname>
+      <familyname>Nakano</familyname>
+    </realname>
+    <pgpkey>0x6C61958A</pgpkey>
+    <email role="gentoo">nakano@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>CJK, Japenese docs, Portage, PostgreSQL</roles>
+    <location>London, UK</location>
+  </user>
+  <user username="natey">
+    <realname fullname="Nate Underwood">
+      <firstname>Nate</firstname>
+      <familyname>Underwood</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">natey@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="naz">
+    <realname fullname="Michael Nazaroff">
+      <firstname>Michael</firstname>
+      <familyname>Nazaroff</familyname>
+    </realname>
+    <pgpkey>0xF33A9CEF</pgpkey>
+    <email role="gentoo">naz@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Bug fixing, DirectFB, Vim</roles>
+    <location>USA</location>
+  </user>
+  <user username="ndimiduk">
+    <realname fullname="Nick Dimiduk">
+      <firstname>Nick</firstname>
+      <familyname>Dimiduk</familyname>
+    </realname>
+    <pgpkey>0x82D54359</pgpkey>
+    <email role="gentoo">ndimiduk@gentoo.org</email>
+    <joined>24 August 2004</joined>
+    <birthday>20 November 1982</birthday>
+    <roles>Gentoo/MacOS, Gentoo/Darwin</roles>
+    <location>Columbus, OH, USA</location>
+  </user>
+  <user username="nerdboy">
+    <realname fullname="Steve Arnold">
+      <firstname>Steve</firstname>
+      <familyname>Arnold</familyname>
+    </realname>
+    <pgpkey>0x47D46D61</pgpkey>
+    <email role="gentoo">nerdboy@gentoo.org</email>
+    <joined>12 July 2003</joined>
+    <birthday>29 January 1960</birthday>
+    <roles>app-sci, comm-fax, dev-tools, kernels</roles>
+    <location>California, USA</location>
+  </user>
+  <user username="neysx">
+    <realname fullname="Xavier Neys">
+      <firstname>Xavier</firstname>
+      <familyname>Neys</familyname>
+    </realname>
+    <pgpkey>0x7A090902</pgpkey>
+    <email role="gentoo">neysx@gentoo.org</email>
+    <joined>October 2002</joined>
+    <birthday>5 June 1967</birthday>
+    <roles>Documentation, International &amp; French Lead</roles>
+    <location>Groningen</location>
+    <webpage>http://dev.gentoo.org/~neysx/</webpage>
+  </user>
+  <user username="nigoro">
+    <realname fullname="Yuta Satoh">
+      <firstname>Yuta</firstname>
+      <familyname>Satoh</familyname>
+    </realname>
+    <pgpkey>0x86A02009</pgpkey>
+    <email role="gentoo">nigoro@gentoo.org</email>
+    <joined>7 January 2005</joined>
+    <birthday/>
+    <roles>Gentoo/PPC64</roles>
+    <location>Niigata Prefecture, Japan</location>
+  </user>
+  <user username="nitro">
+    <realname fullname="Kyle Manna">
+      <firstname>Kyle</firstname>
+      <familyname>Manna</familyname>
+    </realname>
+    <pgpkey>0x258B2DA2</pgpkey>
+    <email role="gentoo">nitro@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo Forums Administrator</roles>
+    <location>Wisconsin, USA</location>
+  </user>
+  <user username="nixphoeni">
+    <realname fullname="Joe Sapp">
+      <firstname>Joe</firstname>
+      <familyname>Sapp</familyname>
+    </realname>
+    <pgpkey>0x3C224E8A</pgpkey>
+    <email role="gentoo">nixphoeni@gentoo.org</email>
+    <joined>2 April 2005</joined>
+    <birthday>11 April 1984</birthday>
+    <roles>gdesklets</roles>
+    <location>State College, PA, USA</location>
+  </user>
+  <user username="npmccallum">
+    <realname fullname="Nathaniel McCallum">
+      <firstname>Nathaniel</firstname>
+      <familyname>McCallum</familyname>
+    </realname>
+    <pgpkey>0x209B2B1E</pgpkey>
+    <email role="gentoo">npmccallum@gentoo.org</email>
+    <email role="alias">nathaniel_mccallum@asburyseminary.edu</email>
+    <joined>29 January 2004</joined>
+    <birthday>31 December 1979</birthday>
+    <roles>Installer</roles>
+    <location>Lexington, KY, USA</location>
+  </user>
+  <user username="obz">
+    <realname fullname="Mike Gardiner">
+      <firstname>Mike</firstname>
+      <familyname>Gardiner</familyname>
+    </realname>
+    <pgpkey>0xBB742D2F</pgpkey>
+    <email role="gentoo">obz@gentoo.org</email>
+    <joined>4 August 2003</joined>
+    <birthday>15 October 1982</birthday>
+    <roles>GNOME (x86 and ppc), Recruiters</roles>
+    <location>Perth, Western Australia</location>
+  </user>
+  <user username="omkhar">
+    <realname fullname="Omkhar Arasaratnam">
+      <firstname>Omkhar</firstname>
+      <familyname>Arasaratnam</familyname>
+    </realname>
+    <pgpkey>0x38769475</pgpkey>
+    <email role="gentoo">omkhar@gentoo.org</email>
+    <joined>2 May 2005</joined>
+    <birthday>26 April 1978</birthday>
+    <roles>Gentoo/PPC64</roles>
+    <location>Toronto, Canada</location>
+  </user>
+  <user username="pappy">
+    <realname fullname="Alexander Gabert">
+      <firstname>Alexander</firstname>
+      <familyname>Gabert</familyname>
+    </realname>
+    <pgpkey>0x4E161A71</pgpkey>
+    <email role="gentoo">pappy@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>ETDYN, Gentoo/Hardened, GrSecurity, PaX</roles>
+    <location>Dorfen near Munich, Germany</location>
+  </user>
+  <user username="pbienst">
+    <realname fullname="Peter Bienstman">
+      <firstname>Peter</firstname>
+      <familyname>Bienstman</familyname>
+    </realname>
+    <pgpkey>0x3A680371</pgpkey>
+    <email role="gentoo">pbienst@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>app-sci</roles>
+    <location>Belgium</location>
+  </user>
+  <user username="pkdawson">
+    <realname fullname="Patrick Dawson">
+      <firstname>Patrick</firstname>
+      <familyname>Dawson</familyname>
+    </realname>
+    <pgpkey>0x2A593E15</pgpkey>
+    <email role="gentoo">pdawson@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Sound, video, GCC</roles>
+    <location>Buffalo, NY, USA</location>
+  </user>
+  <user username="psi29a">
+    <realname fullname="Bret Curtis">
+      <firstname>Bret</firstname>
+      <familyname>Curtis</familyname>
+    </realname>
+    <pgpkey>0xE92DFC7D</pgpkey>
+    <email role="gentoo">psi29a@gentoo.org</email>
+    <ircalias>psi-stlkr</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/MIPS</roles>
+    <location>Fredericksburg, VA, US</location>
+  </user>
+  <user username="pauldv">
+    <realname>
+      <firstname>Paul</firstname>
+      <familyname sort="Vrieze">de Vrieze</familyname>
+    </realname>
+    <pgpkey>0x18D615DB</pgpkey>
+    <email role="gentoo">pauldv@gentoo.org</email>
+    <email role="primary">pauldv@cs.kun.nl</email>
+    <joined>22 April 2003</joined>
+    <birthday>30 September 1979</birthday>
+    <roles>Metastructure, OpenOffice, Subversion</roles>
+    <location>The Netherlands</location>
+    <webpage>http://www.cs.kun.nl/~pauldv</webpage>
+  </user>
+  <user username="pclouds">
+    <realname fullname="Nguyen Thai Ngoc Duy">
+      <firstname>Duy</firstname>
+      <familyname>Nguyen</familyname>
+    </realname>
+    <pgpkey>0x7855F895</pgpkey>
+    <email role="gentoo">pclouds@gentoo.org</email>
+    <email role="primary">pclouds@vnlinux.org</email>
+    <joined> 21 June 2004</joined>
+    <birthday>3 March 1982</birthday>
+    <roles>CJK, Text-Markup</roles>
+    <location>Vietnam</location>
+  </user>
+  <user username="pebenito">
+    <realname fullname="Chris PeBenito">
+      <firstname>Chris</firstname>
+      <familyname>PeBenito</familyname>
+    </realname>
+    <pgpkey>0xE6AF9243</pgpkey>
+    <email role="gentoo">pebenito@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/Embedded, Gentoo/Hardened</roles>
+    <location>Chicago, IL, USA</location>
+  </user>
+  <user username="peesh">
+    <realname fullname="Jorge Paulo">
+      <firstname>Jorge</firstname>
+      <familyname>Paulo</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">peesh@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Documentation</roles>
+    <location>Windsor, Canada</location>
+  </user>
+  <user username="peitolm">
+    <realname fullname="Colin Morey">
+      <firstname>Colin</firstname>
+      <familyname>Morey</familyname>
+    </realname>
+    <pgpkey>0x12204C44</pgpkey>
+    <email role="gentoo">peitolm@gentoo.org</email>
+    <joined>1 June 2002</joined>
+    <birthday>12 November 1978</birthday>
+    <roles>Documentation, Infrastructure [ Mail and DNS ] and Webmaster</roles>
+    <location>UK</location>
+  </user>
+  <user username="pfeifer">
+    <realname fullname="Jay Pfeifer">
+      <firstname>Jay</firstname>
+      <familyname>Pfeifer</familyname>
+    </realname>
+    <pgpkey>0xFD058638</pgpkey>
+    <email role="gentoo">pfeifer@gentoo.org</email>
+    <joined>1 February 2003</joined>
+    <birthday>22 September 1970</birthday>
+    <roles>Core system and kernel</roles>
+    <location>San Antonio</location>
+  </user>
+  <user username="phosphan">
+    <realname fullname="Patrick Kursawe">
+      <firstname>Patrick</firstname>
+      <familyname>Kursawe</familyname>
+    </realname>
+    <pgpkey>41A5670F</pgpkey>
+    <email role="gentoo">phosphan@gentoo.org</email>
+    <joined>9 March 2003</joined>
+    <birthday>10 May 1974</birthday>
+    <roles>Bug fixing</roles>
+    <location>Essen, Germany</location>
+  </user>
+  <user username="piglet">
+    <realname fullname="Tim Haynes">
+      <firstname>Tim</firstname>
+      <familyname>Haynes</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">piglet@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Mirrors</roles>
+  </user>
+  <user username="pjp">
+    <realname fullname="Peter Penkala">
+      <firstname>Peter</firstname>
+      <familyname>Penkala</familyname>
+    </realname>
+    <pgpkey>0x06627F19</pgpkey>
+    <email role="gentoo">pjp@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Forums administrator, Infrastructure</roles>
+    <location>Colorado, USA</location>
+  </user>
+  <user username="plasmaroo">
+    <realname fullname="Tim Yamin">
+      <firstname>Tim</firstname>
+      <familyname>Yamin</familyname>
+    </realname>
+    <pgpkey>0x2407BFBE</pgpkey>
+    <email role="gentoo">plasmaroo@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Developer relations, documentation, Gentoo/IA64, kernel, release engineering, and security</roles>
+    <location>UK</location>
+  </user>
+  <user username="plate">
+    <realname fullname="Ulrich Plate">
+      <firstname>Ulrich</firstname>
+      <familyname>Plate</familyname>
+    </realname>
+    <pgpkey>0xCF7D6206</pgpkey>
+    <email role="gentoo">plate@gentoo.org</email>
+    <ircalias>oya3un</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Forums, GWN, Public relations</roles>
+    <location>Frankfurt, Germany</location>
+  </user>
+  <user username="polvi">
+    <realname fullname="Alexander Polvi">
+      <firstname>Alexander</firstname>
+      <familyname>Polvi</familyname>
+    </realname>
+    <pgpkey>0xD92DD85C</pgpkey>
+    <email role="gentoo">polvi@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>Corvallis, Oregon, USA</location>
+  </user>
+  <user username="popsickle">
+    <realname fullname="Felix De Vliegher">
+      <firstname>Felix</firstname>
+      <familyname sort="Vliegher">de Vliegher</familyname>
+    </realname>
+    <pgpkey>0xF1D31B0A</pgpkey>
+    <email role="gentoo">Popsickle@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>KDE, LiveCDs</roles>
+    <location>Ghent, Belgium</location>
+  </user>
+  <user username="port001">
+    <realname fullname="Ian Leitch">
+      <firstname>Ian</firstname>
+      <familyname>Leitch</familyname>
+    </realname>
+    <pgpkey>0x60174462</pgpkey>
+    <email role="gentoo">port001@gentoo.org</email>
+    <joined>9 September 2003</joined>
+    <birthday>14 October 1984</birthday>
+    <roles>Miscellaneous desktop applications</roles>
+    <location>England</location>
+  </user>
+  <user username="prez">
+    <realname fullname="Preston A. Elder">
+      <firstname>Preston</firstname>
+      <familyname>A. Elder</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">prez@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Java, New packages, OpenOffice</roles>
+    <location>New York, USA</location>
+  </user>
+  <user username="puggy">
+    <realname fullname="Douglas Russell">
+      <firstname>Douglas</firstname>
+      <familyname>Russel</familyname>
+    </realname>
+    <pgpkey>0x5753A233</pgpkey>
+    <email role="gentoo">puggy@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Bug Fixing</roles>
+    <location>Reading, UK</location>
+  </user>
+  <user username="pvdabeel">
+    <realname fullname="Pieter van den Abeele">
+      <firstname>Pieter</firstname>
+      <familyname sort="Abeele">van den Abeele</familyname>
+    </realname>
+    <pgpkey>0xF238673E</pgpkey>
+    <email role="gentoo">pvdabeel@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/PPC, Gentoo/Alt</roles>
+    <location>Belgium</location>
+  </user>
+  <user username="pylon">
+    <realname fullname="Lars Weiler">
+      <firstname>Lars</firstname>
+      <familyname>Weiler</familyname>
+    </realname>
+    <pgpkey>0x475C474C</pgpkey>
+    <email role="gentoo">pylon@gentoo.org</email>
+    <joined>March 7 2003</joined>
+    <birthday/>
+    <roles>CVS Admin, German translations, Gentoo/PPC</roles>
+    <location>Krefeld, Germany</location>
+  </user>
+  <user username="pyrania">
+    <realname fullname="Markus Nigbur">
+      <firstname>Markus</firstname>
+      <familyname>Nigbur</familyname>
+    </realname>
+    <pgpkey>0x707DF8C1</pgpkey>
+    <email role="gentoo">pyrania@gentoo.org</email>
+    <joined>14 September 2003</joined>
+    <birthday>21 May 1984</birthday>
+    <roles>Bug wrangling, commonbox, desktop-dock, desktop-misc, distcc-config</roles>
+    <location>Wipperfuerth, Germany</location>
+  </user>
+  <user username="pythonhead">
+    <realname fullname="Rob Cakebread">
+      <firstname>Rob</firstname>
+      <familyname>Cakebread</familyname>
+    </realname>
+    <pgpkey>0x96BA679B</pgpkey>
+    <email role="gentoo">pythonhead@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Python, wxWidgets, Zope</roles>
+    <location>California, USA</location>
+  </user>
+  <user username="r2d2">
+    <realname>
+      <firstname>Robert</firstname>
+      <familyname>Paskowitz</familyname>
+    </realname>
+    <pgpkey>0xE0C8678A</pgpkey>
+    <email role="gentoo">r2d2@gentoo.org</email>
+    <joined>14 April 2005</joined>
+    <birthday>September 6 1985</birthday>
+    <location>Toronto, Canada</location>
+  </user>
+  <user username="r3pek">
+    <realname>
+      <firstname>Carlos</firstname>
+      <familyname>Silva</familyname>
+    </realname>
+    <pgpkey>0x076CE7D4</pgpkey>
+    <email role="gentoo">r3pek@gentoo.org</email>
+    <joined>March 12 2005</joined>
+    <birthday>Februari 17 1983</birthday>
+    <roles>Gentoo/amd64, kernel, mobile phone</roles>
+    <location>Lisbon, Portugal</location>
+  </user>
+  <user username="rac">
+    <realname fullname="Robert Coie">
+      <firstname>Robert</firstname>
+      <familyname>Coie</familyname>
+    </realname>
+    <pgpkey>0x3495178B</pgpkey>
+    <email role="gentoo">rac@gentoo.org</email>
+    <joined>1 February 2003</joined>
+    <birthday>19 November 1967</birthday>
+    <roles>Forums, Perl, XEmacs</roles>
+    <location>SF Bay Area, California</location>
+  </user>
+  <user username="radek">
+    <realname fullname="Radoslaw Stachowiak">
+      <firstname>Radoslaw</firstname>
+      <familyname>Stachowiak</familyname>
+    </realname>
+    <pgpkey>0x500EC195</pgpkey>
+    <email role="gentoo">radek@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Zope</roles>
+    <location>Krakow, Poland</location>
+  </user>
+  <user username="rajiv">
+    <realname fullname="Rajiv Aaron Manglani">
+      <firstname>Rajiv Aaron</firstname>
+      <familyname>Manglani</familyname>
+    </realname>
+    <pgpkey>0x302A3876</pgpkey>
+    <email role="gentoo">rajiv@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Infrastructure, PPC Documentation</roles>
+    <location>Boston, MA, USA</location>
+  </user>
+  <user username="raker">
+    <realname fullname="Nick Hadaway">
+      <firstname>Nick</firstname>
+      <familyname>Hadaway</familyname>
+    </realname>
+    <pgpkey>0xD4621868</pgpkey>
+    <email role="gentoo">raker@gentoo.org</email>
+    <joined/>
+    <birthday>22 June 1977</birthday>
+    <status>Retired</status>
+    <roles>net-mail, WINE, WindowMaker</roles>
+    <location>Milwaukee, WI, USA</location>
+  </user>
+  <user username="ramereth">
+    <realname fullname="Lance Albertson">
+      <firstname>Lance</firstname>
+      <familyname>Albertson</familyname>
+    </realname>
+    <pgpkey>0x27F4B742</pgpkey>
+    <email role="gentoo">ramereth@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>Kansas, USA</location>
+  </user>
+  <user username="randy">
+    <realname fullname="Michael McCabe">
+      <firstname>Michael</firstname>
+      <familyname>McCabe</familyname>
+    </realname>
+    <pgpkey>0x60932574</pgpkey>
+    <email role="gentoo">randy@gentoo.org</email>
+    <ircalias>__randy__</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/S390</roles>
+    <location>Buffalo, New York</location>
+  </user>
+  <user username="rane">
+    <realname fullname="Łukasz Damentko">
+      <firstname>Łukasz</firstname>
+      <familyname>Damentko</familyname>
+    </realname>
+    <pgpkey>0x18CE78B3</pgpkey>
+    <email role="gentoo">rane@gentoo.org</email>
+    <joined>12 August 2005</joined>
+    <birthday>13 September 1984</birthday>
+    <roles>Polish Lead Translator</roles>
+    <location>Warsaw, Poland</location>
+  </user>
+  <user username="ranger">
+    <realname fullname="Brent Baude">
+      <firstname>Brent</firstname>
+      <familyname>Baude</familyname>
+    </realname>
+    <pgpkey>0xA212AD7A</pgpkey>
+    <email role="gentoo">ranger@gentoo.org</email>
+    <joined>27 June 2005</joined>
+    <birthday>14 May 1972</birthday>
+    <roles>Gentoo/PPC64 and associated documentation</roles>
+    <location>Rochester, MN</location>
+  </user>
+  <user username="redhatter">
+    <realname fullname="Stuart Longland">
+      <firstname>Stuart</firstname>
+      <familyname>Longland</familyname>
+    </realname>
+    <pgpkey>0x63264AB9</pgpkey>
+    <email role="gentoo">redhatter@gentoo.org</email>
+    <joined>27 May 2005</joined>
+    <birthday>7 March 1984</birthday>
+    <roles>Gentoo/MIPS Documentation and Cobalt</roles>
+    <location>Brisbane, Australia</location>
+  </user>
+  <user username="rl03">
+    <realname fullname="Renat Lumpau">
+      <firstname>Renat</firstname>
+      <familyname>Lumpau</familyname>
+    </realname>
+    <pgpkey>0xC6A838DA</pgpkey>
+    <email role="gentoo">rl03@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Web-apps</roles>
+    <location>Cambridge, MA, USA</location>
+  </user>
+  <user username="ribosome">
+    <realname fullname="Olivier Fisette">
+      <firstname>Olivier</firstname>
+      <familyname>Fisette</familyname>
+    </realname>
+    <pgpkey>0x8B703AAA</pgpkey>
+    <email role="gentoo">ribosome@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>app-sci, French documentation translation</roles>
+    <location>Québec, Canada</location>
+  </user>
+  <user username="rizzo">
+    <realname fullname="Don Seiler">
+      <firstname>Don</firstname>
+      <familyname>Seiler</familyname>
+    </realname>
+    <pgpkey>0xFC87F041</pgpkey>
+    <email role="gentoo">rizzo@gentoo.org</email>
+    <joined>July 16 2003</joined>
+    <birthday>28 July 1976</birthday>
+    <roles>GAIM, Tora, Web Applications</roles>
+    <location>Wisconsin, USA</location>
+  </user>
+  <user username="robbat2">
+    <realname fullname="Robin H. Johnson">
+      <firstname>Robin H.</firstname>
+      <familyname>Johnson</familyname>
+    </realname>
+    <pgpkey>0x34884E85</pgpkey>
+    <email role="gentoo">robbat2@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>CVS Admin, PHP, MySQL, ufed</roles>
+    <location>Burnaby, BC, Canada</location>
+  </user>
+  <user username="robmoss">
+    <realname fullname="Robert Moss">
+      <firstname>Robert</firstname>
+      <familyname>Moss</familyname>
+    </realname>
+    <pgpkey>0x9A0F1F44</pgpkey>
+    <email role="gentoo">robmoss@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>GCC, GRUB</roles>
+    <location>UK</location>
+  </user>
+  <user username="rocket">
+    <realname fullname="Eric Edgar">
+      <firstname>Eric</firstname>
+      <familyname>Edgar</familyname>
+    </realname>
+    <pgpkey>0xC8476EE3</pgpkey>
+    <email role="gentoo">rocket@gentoo.org</email>
+    <joined>20 February 2005</joined>
+    <birthday/>
+    <roles>Release Engineering</roles>
+    <location>Minneapolis, USA</location>
+  </user>
+  <user username="roger55">
+    <realname fullname="Roger Miliker">
+      <firstname>Roger</firstname>
+      <familyname>Miliker</familyname>
+    </realname>
+    <pgpkey>0x14E02B9C</pgpkey>
+    <email role="gentoo">roger55@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Release Engineering</roles>
+    <location>Graz, Austria</location>
+  </user>
+  <user username="rphillips">
+    <realname fullname="Ryan Phillips">
+      <firstname>Ryan</firstname>
+      <familyname>Phillips</familyname>
+    </realname>
+    <pgpkey>0x9A11D435</pgpkey>
+    <email role="gentoo">rphillips@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Crypto, Ebuilds</roles>
+    <location>USA</location>
+  </user>
+  <user username="truedfx">
+    <realname>
+      <firstname>Harald</firstname>
+      <familyname>van Dijk</familyname>
+    </realname>
+    <pgpkey>0x2C28B87C</pgpkey>
+    <email role="gentoo">truedfx@gentoo.org</email>
+    <joined>May 04 2005</joined>
+    <birthday>December 5th, 1983</birthday>
+    <roles>ufed, portage</roles>
+    <location>Veghel, The netherlands</location>
+  </user>
+  <user username="s4t4n">
+    <realname fullname="Michele Noberasco">
+      <firstname>Michele</firstname>
+      <familyname>Noberasco</familyname>
+    </realname>
+    <pgpkey>0xADF2A3CA</pgpkey>
+    <email role="gentoo">s4t4n@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Dockapps</roles>
+    <location>Cisano sul Neva, Liguria, Italy</location>
+  </user>
+  <user username="samyron">
+    <realname fullname="Scott Myron">
+      <firstname>Scott</firstname>
+      <familyname>Myron</familyname>
+    </realname>
+    <pgpkey>0x9EA54A56</pgpkey>
+    <email role="gentoo">samyron@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Installer</roles>
+    <location>Bloomington, Indiana</location>
+  </user>
+  <user username="satai">
+    <realname fullname="Matthew Turk">
+      <firstname>Matthew</firstname>
+      <familyname>Turk</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">satai@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Inactive</status>
+    <roles>Evolution and LaTeX/TeTeX</roles>
+    <location>Evanston, IL</location>
+  </user>
+  <user username="satya">
+    <realname fullname="Christian Andreetta">
+      <firstname>Christian</firstname>
+      <familyname>Andreetta</familyname>
+    </realname>
+    <pgpkey>0x7A4DDB0A</pgpkey>
+    <email role="gentoo">satya@gentoo.org</email>
+    <joined>29 May 2004</joined>
+    <birthday/>
+    <roles>SAMBA</roles>
+    <location>Italy</location>
+  </user>
+  <user username="sbriesen">
+    <realname fullname="Stefan Briesenick">
+      <firstname>Stefan</firstname>
+      <familyname>Briesenick</familyname>
+    </realname>
+    <pgpkey>533DBE8D</pgpkey>
+    <email role="gentoo">sbriesen@gentoo.org</email>
+    <joined>14 Jun 2005</joined>
+    <birthday>23 October 1969</birthday>
+    <roles>net-dialup</roles>
+    <location>Gaggenau, Germany</location>
+  </user>
+  <user username="scandium">
+    <realname fullname="Rainer Groesslinger">
+      <firstname>Rainer</firstname>
+      <familyname>Groesslinger</familyname>
+    </realname>
+    <pgpkey>0x0807ADAA</pgpkey>
+    <email role="gentoo">Scandium@gentoo.org</email>
+    <joined>2 April 2003</joined>
+    <birthday>15 June 1985</birthday>
+    <status>Retired</status>
+    <roles>dev-dotnet</roles>
+    <location>Germany</location>
+  </user>
+  <user username="schlesi">
+    <realname fullname="Thomas Schlesinger">
+      <firstname>Thomas</firstname>
+      <familyname>Schlesinger</familyname>
+    </realname>
+    <pgpkey>0xA62076A0</pgpkey>
+    <email role="gentoo">schlesi@gentoo.org</email>
+    <joined>30 June 2004</joined>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo for Mac OS X, German translation and localization</roles>
+    <location>Austria</location>
+  </user>
+  <user username="scox">
+    <realname fullname="Andrea Luzzardi">
+      <firstname>Andrea</firstname>
+      <familyname>Luzzardi</familyname>
+    </realname>
+    <pgpkey>0x104F5F78</pgpkey>
+    <email role="gentoo">scox@gentoo.org</email>
+    <joined>14 November 2003</joined>
+    <birthday>11 July 1985</birthday>
+    <roles>Gentoo/Hardened</roles>
+    <location>France</location>
+  </user>
+  <user username="sebastian">
+    <realname fullname="Sebastian Bergmann">
+      <firstname>Sebastian</firstname>
+      <familyname>Bergmann</familyname>
+    </realname>
+    <pgpkey>0xB85B5D69</pgpkey>
+    <email role="gentoo">sebastian@gentoo.org</email>
+    <joined>12 February 2005</joined>
+    <birthday>1978.04.22</birthday>
+    <roles>PHP</roles>
+    <location>Siegburg, Germany</location>
+  </user>
+  <user username="sediener">
+    <realname fullname="Stephen Diener">
+      <firstname>Stephen</firstname>
+      <familyname>Diener</familyname>
+    </realname>
+    <pgpkey>0xD5DCBA18</pgpkey>
+    <email role="gentoo">sediener@gentoo.org</email>
+    <joined>May 15 2003</joined>
+    <birthday>17 October 1976</birthday>
+    <roles>app-sci</roles>
+    <location>North Carolina, USA</location>
+  </user>
+  <user username="seemant">
+    <realname fullname="Seemant Kulleen">
+      <firstname>Seemant</firstname>
+      <familyname>Kulleen</familyname>
+    </realname>
+    <pgpkey>0x3458780E</pgpkey>
+    <email role="gentoo">seemant@gentoo.org</email>
+    <joined>12 February 2002</joined>
+    <birthday>6 August 1973</birthday>
+    <roles>Developer relations, Gentoo/X86, QA</roles>
+    <location>California</location>
+  </user>
+  <user username="sekretarz">
+    <realname fullname="Karol Wojtaszek">
+      <firstname>Karol</firstname>
+      <familyname>Wojtaszek</familyname>
+    </realname>
+    <pgpkey>0xA3C247FA</pgpkey>
+    <email role="gentoo">sekretarz@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>net-p2p, net-im, gcc-porting, amd64</roles>
+    <location>Poland</location>
+  </user>
+  <user username="sejo">
+    <realname fullname="Jochen Maes">
+      <firstname>Jochen</firstname>
+      <familyname>Maes</familyname>
+    </realname>
+    <pgpkey>0xD3078660</pgpkey>
+    <email role="gentoo">sejo@gentoo.org</email>
+    <joined/>
+    <birthday>31 December 1978</birthday>
+    <roles>Gentoo/PPC, Java, devrel</roles>
+    <location>Leuven, Belguim</location>
+  </user>
+  <user username="seo">
+    <realname fullname="Jungmin Seo">
+      <firstname>Jungmin</firstname>
+      <familyname>Seo</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">seo@gentoo.org</email>
+    <joined>1 November 2002</joined>
+    <birthday>27 June 1979</birthday>
+    <status>Gone</status>
+    <roles>Documentation and CJK</roles>
+    <location>Korea and UK</location>
+  </user>
+  <user username="shallax">
+    <realname fullname="Thomas Pedley">
+      <firstname>Thomas</firstname>
+      <familyname>Pedley</familyname>
+    </realname>
+    <pgpkey>0xDFB84BEE</pgpkey>
+    <email role="gentoo">shallax@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo/XBox</roles>
+    <location>England</location>
+  </user>
+  <user username="slarti">
+    <realname fullname="Tom Martin">
+      <firstname>Tom</firstname>
+      <familyname>Martin</familyname>
+    </realname>
+    <pgpkey>0xB5C4FF89</pgpkey>
+    <email role="gentoo">slarti@gentoo.org</email>
+    <joined>7 July 2004</joined>
+    <birthday>17 January 1989</birthday>
+    <roles>Gentoo/AMD64, net-mail, shell-tools, recruiters, vim</roles>
+    <location>Guernsey, Channel Islands</location>
+  </user>
+  <user username="siggy">
+    <realname fullname="Luca Mercuri">
+      <firstname>Luca</firstname>
+      <familyname>Mercuri</familyname>
+    </realname>
+    <pgpkey>0xAD54279A</pgpkey>
+    <email role="gentoo">siggy@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Infrastructure</roles>
+    <location>Italy</location>
+  </user>
+  <user username="sindian">
+    <realname fullname="Arun Thomas">
+      <firstname>Arun</firstname>
+      <familyname>Thomas</familyname>
+    </realname>
+    <pgpkey>0x0FEB61BC</pgpkey>
+    <email role="gentoo">sindian@gentoo.org</email>
+    <joined>25 March 2003</joined>
+    <birthday>13 November 1980</birthday>
+    <roles>Gentoo/ARM, Gentoo/Hardened</roles>
+    <location>Charlottesville, VA, USA</location>
+  </user>
+  <user username="sj7trunks">
+    <realname fullname="Benjamin Coles">
+      <firstname>Benjamin</firstname>
+      <familyname>Coles</familyname>
+    </realname>
+    <pgpkey>0x34B61EA1</pgpkey>
+    <email role="gentoo">sj7trunks@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>net-fs</roles>
+  </user>
+  <user username="smark">
+    <realname fullname="Mark Dierolf">
+      <firstname>Mark</firstname>
+      <familyname>Dierolf</familyname>
+    </realname>
+    <pgpkey>0x66EAE719</pgpkey>
+    <email role="gentoo">smark@gentoo.org</email>
+    <joined>27 December 2004</joined>
+    <birthday>1982.14.15</birthday>
+    <roles>Apache</roles>
+    <location>San Francisco, CA, USA</location>
+  </user>
+  <user username="smithj">
+    <realname fullname="Jonathan Smith">
+      <firstname>Jonathan</firstname>
+      <familyname>Smith</familyname>
+    </realname>
+    <pgpkey>0x33E2528C</pgpkey>
+    <email role="gentoo">smithj@gentoo.org</email>
+    <joined>13 June 2005</joined>
+    <birthday/>
+    <roles>GDP, desktop-misc</roles>
+    <location>NC, USA</location>
+  </user>
+  <user username="so">
+    <realname fullname="Stefano Rossi">
+      <firstname>Stefano</firstname>
+      <familyname>Rossi</familyname>
+    </realname>
+    <pgpkey>0xB5330A9B</pgpkey>
+    <email role="gentoo">so@gentoo.org</email>
+    <joined>02 February 2005</joined>
+    <birthday>23 March 1979</birthday>
+    <roles>Documentation</roles>
+    <location>Rome, Italy</location>
+  </user>
+  <user username="solar">
+    <realname fullname="Ned Ludd">
+      <firstname>Ned</firstname>
+      <familyname>Ludd</familyname>
+    </realname>
+    <pgpkey>0x1E0A730C</pgpkey>
+    <email role="gentoo">solar@gentoo.org</email>
+    <joined>29 May 2003</joined>
+    <birthday>1 November 1973</birthday>
+    <roles>GrSecurity, PaX and Security</roles>
+    <location>Savannah, Georgia, USA</location>
+  </user>
+  <user username="spanky">
+    <!-- Keep in synch to username="vapier" ! -->
+    <realname fullname="Mike Frysinger">
+      <firstname>Mike</firstname>
+      <familyname>Frysinger</familyname>
+    </realname>
+    <pgpkey>0xE837F581</pgpkey>
+    <email role="gentoo">vapier@gentoo.org</email>
+    <joined>September 1 2002</joined>
+    <birthday>1 July 1982</birthday>
+    <roles>Games, QA, Base System, Embedded, Security</roles>
+    <location>Worcester, MA, USA</location>
+  </user>
+  <user username="spb">
+    <realname fullname="Stephen Bennett">
+      <firstname>Stephen</firstname>
+      <familyname>Bennett</familyname>
+    </realname>
+    <pgpkey>5EA2B2D9</pgpkey>
+    <email role="gentoo">spb@gentoo.org</email>
+    <email role="alias">spb42@cam.ac.uk</email>
+    <joined>18 October 2004</joined>
+    <birthday>18 February 1986</birthday>
+    <roles>BSD, Misc. Bug Fixes, Gentoo/MIPS</roles>
+    <location>Cambridge, UK</location>
+  </user>
+  <user username="spider">
+    <realname fullname="D.M.D. Ljungmark">
+      <firstname>D.M.D.</firstname>
+      <familyname>Ljungmark</familyname>
+    </realname>
+    <pgpkey>38B4DF79</pgpkey>
+    <email role="gentoo">spider@gentoo.org</email>
+    <joined>February 2002</joined>
+    <birthday/>
+    <roles>All of GNOME except Evolution, QA</roles>
+    <location>Sweden</location>
+  </user>
+  <user username="spock">
+    <realname fullname="Michael Januszewski">
+      <firstname>Michael</firstname>
+      <familyname>Januszewski</familyname>
+    </realname>
+    <pgpkey>0xA3947BE6</pgpkey>
+    <email role="gentoo">spock@gentoo.org</email>
+    <joined>15 January 2004</joined>
+    <birthday>23 September 1986</birthday>
+    <roles>x86-kernel, bootsplash, framebuffer related stuff</roles>
+    <location>Poland</location>
+  </user>
+  <user username="spyderous">
+    <realname fullname="Donnie Berkholz">
+      <firstname>Donnie</firstname>
+      <familyname>Berkholz</familyname>
+    </realname>
+    <pgpkey>0xB4B5AEDB</pgpkey>
+    <email role="gentoo">spyderous@gentoo.org</email>
+    <joined>25 June 2003</joined>
+    <birthday>18 November 1981</birthday>
+    <roles>Desktop lead, X, Developer relations, science, clustering</roles>
+    <location>Corvallis, OR, USA</location>
+  </user>
+  <user username="squash">
+    <realname fullname="Josh Grebe">
+      <firstname>Josh</firstname>
+      <familyname>Grebe</familyname>
+    </realname>
+    <pgpkey>0xBB7D2423</pgpkey>
+    <email role="gentoo">squash@gentoo.org</email>
+    <email role="alias">josh@brokedown.net</email>
+    <joined>May 5 2004</joined>
+    <birthday/>
+    <roles>Gentoo/SPARC</roles>
+    <location>St. Louis, MO, USA</location>
+  </user>
+  <user username="squinky86">
+    <realname fullname="Jon Hood">
+      <firstname>Jon</firstname>
+      <familyname>Hood</familyname>
+    </realname>
+    <pgpkey>0x2093ED60</pgpkey>
+    <email role="gentoo">squinky86@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Accessibility, net-p2p</roles>
+    <location>Huntsville, Alabama, USA</location>
+  </user>
+  <user username="st3vie">
+    <realname fullname="Senno During">
+      <firstname>Senno</firstname>
+      <familyname>During</familyname>
+    </realname>
+    <pgpkey>0x70A1CD98</pgpkey>
+    <email role="gentoo">st3vie@gentoo.org</email>
+    <joined>14 June 2005</joined>
+    <birthday>26 March 1977</birthday>
+    <roles>Dutch GWN Lead</roles>
+    <location>The Netherlands</location>
+  </user>
+  <user username="st_lim">
+    <realname fullname="Lim Swee Tat">
+      <firstname>Lim</firstname>
+      <familyname>Swee Tat</familyname>
+    </realname>
+    <pgpkey>0x4E8AB60D</pgpkey>
+    <email role="gentoo">st_lim@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Miscellany: quartz, hibernate, gammu, dspam, et al.</roles>
+    <location>Singapore</location>
+  </user>
+  <user username="steel300">
+    <realname fullname="Jason Cox">
+      <firstname>Jason</firstname>
+      <familyname>Cox</familyname>
+    </realname>
+    <pgpkey>0x9AF34424</pgpkey>
+    <email role="gentoo">steel300@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Kernels</roles>
+    <location>Ames, IA/Omaha, NE, USA</location>
+  </user>
+  <user username="stkn">
+    <realname fullname="Stefan Knoblich">
+      <firstname>Stefan</firstname>
+      <familyname>Knoblich</familyname>
+    </realname>
+    <pgpkey>0xAE2B614A</pgpkey>
+    <email role="gentoo">stkn@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>VoIP</roles>
+    <location>Germany</location>
+  </user>
+  <user username="stocke2">
+    <realname fullname="Eric Stockbridge">
+      <firstname>Eric</firstname>
+      <familyname>Stockbridge</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">stocke2@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+  </user>
+  <user username="strerror">
+    <realname fullname="Benjamin Smee">
+      <firstname>Benjamin</firstname>
+      <familyname>Smee</familyname>
+    </realname>
+    <pgpkey>0x48FF5BA1</pgpkey>
+    <email role="gentoo">strerror@gentoo.org</email>
+    <joined>21 May 2005</joined>
+    <birthday>7 April 1976</birthday>
+    <roles>net-mail</roles>
+  </user>
+  <user username="strider">
+    <realname fullname="Adrian Almenar">
+      <firstname>Adrian</firstname>
+      <familyname>Almenar</familyname>
+    </realname>
+    <pgpkey>0x71AABCB1</pgpkey>
+    <email role="gentoo">strider@gentoo.org</email>
+    <joined>November 4 2002</joined>
+    <birthday>17 May 1981</birthday>
+    <roles>Jakarta, Java</roles>
+    <location>Venezuela</location>
+  </user>
+  <user username="stuart">
+    <realname fullname="Stuart Herbert">
+      <firstname>Stuart</firstname>
+      <familyname>Herbert</familyname>
+    </realname>
+    <pgpkey>0xF9AFC57C</pgpkey>
+    <email role="gentoo">stuart@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>PHP</roles>
+    <location>Pontypridd, South Wales</location>
+  </user>
+  <user username="styx">
+    <realname fullname="Joachim Blaabjerg">
+      <firstname>Joachim</firstname>
+      <familyname>Blaabjerg</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">styx@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Security</roles>
+    <location>Norway</location>
+  </user>
+  <user username="suka">
+    <realname fullname="Andreas Proschofsky">
+      <firstname>Andreas</firstname>
+      <familyname>Proschofsky</familyname>
+    </realname>
+    <pgpkey>0xE79ED363</pgpkey>
+    <email role="gentoo">suka@gentoo.org</email>
+    <joined>15 Jan 2004</joined>
+    <birthday>8 August 1972</birthday>
+    <roles>OpenOffice.org</roles>
+    <location>Austria</location>
+  </user>
+  <user username="sunflare">
+    <realname fullname="Phil Bordelon">
+      <firstname>Phil</firstname>
+      <familyname>Bordelon</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">sunflare@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Documentation, man-pages and various ebuilds</roles>
+    <location>Baton Rouge, LA, USA</location>
+  </user>
+  <user username="superlag">
+    <realname fullname="Aaron Kulbe">
+      <firstname>Aaron</firstname>
+      <familyname>Kulbe</familyname>
+    </realname>
+    <pgpkey>0x7E2ECF8D</pgpkey>
+    <email role="gentoo">superlag@gentoo.org</email>
+    <joined>8 December 2004</joined>
+    <birthday>13 November 1973</birthday>
+    <roles>Gentoo/AMD64, commonbox</roles>
+    <location>Kansas City, MO</location>
+  </user>
+  <user username="svyatogor">
+    <realname fullname="Sergey Kuleshov">
+      <firstname>Sergey</firstname>
+      <familyname>Kuleshov</familyname>
+    </realname>
+    <pgpkey>0xA0C982C7</pgpkey>
+    <email role="gentoo">svyatogor@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Russian Documentation, WINE</roles>
+    <location>Cyprus</location>
+  </user>
+  <user username="swegener">
+    <realname fullname="Sven Wegener">
+      <firstname>Sven</firstname>
+      <familyname>Wegener</familyname>
+    </realname>
+    <pgpkey>0x36D3A5D8</pgpkey>
+    <email role="gentoo">swegener@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>net-irc, net-news</roles>
+    <location>Bad Muender, Germany</location>
+  </user>
+  <user username="swift">
+    <realname fullname="Sven Vermeulen">
+      <firstname>Sven</firstname>
+      <familyname>Vermeulen</familyname>
+    </realname>
+    <pgpkey>0xCDBA2FDB</pgpkey>
+    <email role="gentoo">swift@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Documentation</roles>
+    <location>Bruges, Belgium</location>
+  </user>
+  <user username="swtaylor">
+    <realname fullname="Scott W Taylor">
+      <firstname>Scott</firstname>
+      <familyname>Taylor</familyname>
+    </realname>
+    <pgpkey>0x38BC5C7A</pgpkey>
+    <email role="gentoo">swtaylor@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Courier-MTA, Gentoo/Hardened, Toolchain</roles>
+    <location>Berthoud, Colorado, USA</location>
+  </user>
+  <user username="tad">
+    <realname fullname="Troy Dack">
+      <firstname>Troy</firstname>
+      <familyname>Dack</familyname>
+    </realname>
+    <pgpkey>0x4D90BE3C</pgpkey>
+    <email role="gentoo">tad@gentoo.org</email>
+    <joined>05 December 2002</joined>
+    <birthday>11 July 1972</birthday>
+    <status>Retired</status>
+    <roles>Testing and Tweaking</roles>
+    <location>Australia</location>
+  </user>
+  <user username="tannewt">
+    <realname fullname="Scott Shawcroft">
+      <firstname>Scott</firstname>
+      <familyname>Shawcroft</familyname>
+    </realname>
+    <pgpkey>0xAAFC81D5</pgpkey>
+    <email role="gentoo">tannewt@gentoo.org</email>
+    <joined>10 July 2005</joined>
+    <birthday>15 July 1986</birthday>
+    <roles>Bugday</roles>
+    <location>Hansville, WA</location>
+  </user>
+  <user username="tantive">
+    <realname fullname="Michael Imhof">
+      <firstname>Michael</firstname>
+      <familyname>Imhof</familyname>
+    </realname>
+    <pgpkey>0x7EDC47B7</pgpkey>
+    <email role="gentoo">tantive@gentoo.org</email>
+    <joined>28 August 2002</joined>
+    <birthday>11 April 1978</birthday>
+    <roles>Gentoo/Cluster</roles>
+    <location>Germany</location>
+  </user>
+  <user username="taviso">
+    <realname fullname="Tavis Ormandy">
+      <firstname>Tavis</firstname>
+      <familyname>Ormandy</familyname>
+    </realname>
+    <pgpkey>0x05FF73D8</pgpkey>
+    <email role="gentoo">taviso@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/Alpha, Security</roles>
+    <location>South Wales, UK</location>
+  </user>
+  <user username="tberman">
+    <realname fullname="Todd Berman">
+      <firstname>Todd</firstname>
+      <familyname>Berman</familyname>
+    </realname>
+    <pgpkey>0xF35AF8AC</pgpkey>
+    <email role="gentoo">tberman@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Java, and net-mail</roles>
+    <location>Toronto, ON, CA</location>
+  </user>
+  <user username="tercel">
+    <realname fullname="Colin Kingsley">
+      <firstname>Colin</firstname>
+      <familyname>Kingsley</familyname>
+    </realname>
+    <pgpkey>0x4969DAF9</pgpkey>
+    <email role="gentoo">tercel@gentoo.org</email>
+    <joined>30 May 2005</joined>
+    <birthday/>
+    <roles>Mirrorselect, miscellaneous ebuilds</roles>
+    <location>New Rochelle, NY</location>
+  </user>
+  <user username="tester">
+    <realname fullname="Olivier Crête">
+      <firstname>Olivier</firstname>
+      <familyname>Crête</familyname>
+    </realname>
+    <pgpkey>0x3C7462D4</pgpkey>
+    <email role="gentoo">tester@gentoo.org</email>
+    <joined>1 July 2003</joined>
+    <birthday>11 December 1981</birthday>
+    <roles>Gentoo/AMD64, Gentoo/Cluster</roles>
+    <location>Montrêal, Canada</location>
+  </user>
+  <user username="tgall">
+    <realname fullname="Tom Gall">
+      <firstname>Tom</firstname>
+      <familyname>Gall</familyname>
+    </realname>
+    <pgpkey>0xA0568509</pgpkey>
+    <email role="gentoo">tgall@gentoo.org</email>
+    <email role="primary">tom_gall@mac.com</email>
+    <ircalias>tgall_foo</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/PPC64</roles>
+  </user>
+  <user username="ticho">
+    <realname fullname="Andrej Kacian">
+      <firstname>Andrej</firstname>
+      <familyname>Kacian</familyname>
+    </realname>
+    <pgpkey>0x7CD93FE2</pgpkey>
+    <email role="gentoo">ticho@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>net-mail</roles>
+    <location>Dubnica nad Vahom/Slovakia</location>
+  </user>
+  <user username="tigger">
+    <realname fullname="Rob Holland">
+      <firstname>Rob</firstname>
+      <familyname>Holland</familyname>
+    </realname>
+    <pgpkey>0xD91B4729</pgpkey>
+    <email role="gentoo">tigger@gentoo.org</email>
+    <joined>30 May 2003</joined>
+    <birthday>8 December 1981</birthday>
+    <roles>Gentoo/SPARC, Wasabi, Security</roles>
+    <location>Peterborough, UK</location>
+  </user>
+  <user username="tocharian">
+    <realname fullname="Adam Mondl">
+      <firstname>Adam</firstname>
+      <familyname>Mondl</familyname>
+    </realname>
+    <pgpkey>0x14530DC4</pgpkey>
+    <email role="gentoo">tocharian@gentoo.org</email>
+    <joined>7 January 2005</joined>
+    <birthday>12 May 1985</birthday>
+    <roles>Hardened Gentoo - X, Docs, Kernel, Releases</roles>
+    <location>Raleigh, NC</location>
+  </user>
+  <user username="tod">
+    <realname fullname="Tod Neidt">
+      <firstname>Tod</firstname>
+      <familyname>Neidt</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">tod@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>app-sci</roles>
+  </user>
+  <user username="todd">
+    <realname fullname="Todd Sunderlin">
+      <firstname>Todd</firstname>
+      <familyname>Sunderlin</familyname>
+    </realname>
+    <pgpkey>0x439170A0</pgpkey>
+    <email role="gentoo">todd@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <location>Niagara Falls, NY, USA</location>
+  </user>
+  <user username="tomk">
+    <realname fullname="Tom Knight">
+      <firstname>Tom</firstname>
+      <familyname>Knight</familyname>
+    </realname>
+    <pgpkey>0x37456BAC</pgpkey>
+    <email role="gentoo">tomk@gentoo.org</email>
+    <joined>14 July 2004</joined>
+    <birthday>5 July 1980</birthday>
+    <roles>Forums, net-mail, php</roles>
+    <location>Sheffield, UK</location>
+  </user>
+  <user username="torbenh">
+    <realname fullname="Torben Hohn">
+      <firstname>Torben</firstname>
+      <familyname>Hohn</familyname>
+    </realname>
+    <pgpkey>0x0D524056</pgpkey>
+    <email role="gentoo">torbenh@gentoo.org</email>
+    <joined>15 May 2003</joined>
+    <birthday>6 July 1976</birthday>
+    <status>Retired</status>
+  </user>
+  <user username="tove">
+    <realname fullname="Torsten Veller">
+      <firstname>Torsten</firstname>
+      <familyname>Veller</familyname>
+    </realname>
+    <pgpkey>0x9C67CD96</pgpkey>
+    <email role="gentoo">tove@gentoo.org</email>
+    <joined/>
+    <birthday>2 October 1974</birthday>
+    <roles>net-mail, net-dialup</roles>
+    <location>Germany</location>
+  </user>
+  <user username="trance">
+    <realname fullname="Kevyn Shortell">
+      <firstname>Kevyn</firstname>
+      <familyname>Shortell</familyname>
+    </realname>
+    <pgpkey>0x9AE3CF56</pgpkey>
+    <email role="gentoo">trance@gentoo.org</email>
+    <joined>February 2002</joined>
+    <birthday>12 June 1973</birthday>
+    <status>Retired</status>
+  </user>
+  <user username="trapni">
+    <realname fullname="Christian Parpart">
+      <firstname>Christian</firstname>
+      <familyname>Parpart</familyname>
+    </realname>
+    <pgpkey>0x60D584AD</pgpkey>
+    <email role="gentoo">trapni@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Apache, media-sound, media-video, www-apps</roles>
+    <location>Berlin, Germany</location>
+  </user>
+  <user username="tseng">
+    <realname fullname="Brandon Hale">
+      <firstname>Brandon</firstname>
+      <familyname>Hale</familyname>
+    </realname>
+    <pgpkey>0x/0388413F</pgpkey>
+    <email role="gentoo">tseng@gentoo.org</email>
+    <joined>15 August 2003</joined>
+    <birthday>21 October 1984</birthday>
+    <roles>Gentoo/Hardened, *box window-managers</roles>
+    <location>Pennsylvania, USA</location>
+  </user>
+  <user username="tuxus">
+    <realname fullname="Jan Seidel">
+      <firstname>Jan</firstname>
+      <familyname>Seidel</familyname>
+    </realname>
+    <pgpkey>0x1467B898</pgpkey>
+    <email role="gentoo">tuxus@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/MIPS</roles>
+    <location>Germany</location>
+  </user>
+  <user username="twp">
+    <realname fullname="Tom William Payne">
+      <firstname>Tom</firstname>
+      <familyname>Payne</familyname>
+    </realname>
+    <pgpkey>0xA18BCCFD</pgpkey>
+    <email role="gentoo">twp@gentoo.org</email>
+    <joined>18 March 2003</joined>
+    <birthday>15 August 1975</birthday>
+    <roles>phpMyAdmin, Ruby</roles>
+    <location>UK</location>
+  </user>
+  <user username="uberlord">
+    <realname fullname="Roy Marples">
+      <firstname>Roy</firstname>
+      <familyname>Marples</familyname>
+    </realname>
+    <pgpkey>0x1419D1FE</pgpkey>
+    <email role="gentoo">uberlord@gentoo.org</email>
+    <joined></joined>
+    <birthday>29 January 1973</birthday>
+    <roles>baselayout, networking</roles>
+    <location>Hampshire, UK</location>
+  </user>
+  <user username="urilith">
+    <realname fullname="Michael Tindal">
+      <firstname>Michael</firstname>
+      <familyname>Tindal</familyname>
+    </realname>
+    <pgpkey>0xC7B6B129</pgpkey>
+    <email role="gentoo">urilith@gentoo.org</email>
+    <joined>6 May 2005</joined>
+    <birthday>5 December 1983</birthday>
+    <roles>Apache, Dotnet, Python</roles>
+    <location>Clarksville, TN</location>
+  </user>
+  <user username="usata">
+    <realname fullname="Mamoru Komachi">
+      <firstname>Mamoru</firstname>
+      <familyname>Komachi</familyname>
+    </realname>
+    <pgpkey>0xACE78E88</pgpkey>
+    <email role="gentoo">usata@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>CJK, Emacs, Fonts, Ruby, text-markup [LaTeX]</roles>
+    <location>Tokyo, Japan</location>
+  </user>
+  <user username="utx">
+    <realname fullname="Stanislav Brabec">
+      <firstname>Stanislav</firstname>
+      <familyname>Brabec</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">utx@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="vanquirius">
+    <realname fullname="Marcelo Góes">
+      <firstname>Marcelo</firstname>
+      <familyname>Góes</familyname>
+    </realname>
+    <pgpkey>0x186499C5</pgpkey>
+    <email role="gentoo">vanquirius@gentoo.org</email>
+    <joined>March 20 2005</joined>
+    <birthday>May 7 1985</birthday>
+    <roles>Follow-Up Translator (pt_BR), netmon</roles>
+    <location>Sao Paulo, Brazil</location>
+  </user>
+  <user username="vapier">
+    <!-- Keep in synch to username="spanky" ! -->
+    <realname fullname="Mike Frysinger">
+      <firstname>Mike</firstname>
+      <familyname>Frysinger</familyname>
+    </realname>
+    <pgpkey>0xE837F581</pgpkey>
+    <email role="gentoo">vapier@gentoo.org</email>
+    <joined>September 1 2002</joined>
+    <birthday>1 July 1982</birthday>
+    <roles>Games, QA, Base System, *</roles>
+    <location>Worcester, MA, USA</location>
+  </user>
+  <user username="vericgar">
+    <realname fullname="Michael Stewart">
+      <firstname>Michael</firstname>
+      <familyname>Stewart</familyname>
+    </realname>
+    <pgpkey>0x08614788</pgpkey>
+    <email role="gentoo">vericgar@gentoo.org</email>
+    <joined>November 30 2004</joined>
+    <birthday>April 21 1983</birthday>
+    <roles>apache</roles>
+    <location>Spokane, WA, USA</location>
+  </user>
+  <user username="veszig">
+    <realname fullname="Gabor Veszi">
+      <firstname>Gabor</firstname>
+      <familyname>Veszi</familyname>
+    </realname>
+    <pgpkey>0xCB4A6186</pgpkey>
+    <email role="gentoo">veszig@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Infrastructure</roles>
+    <location>Budapest, Hungary</location>
+  </user>
+  <user username="vgarg">
+    <realname>
+      <firstname>Vibhav</firstname>
+      <familyname>Garg</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">vgarg@gentoo.org</email>
+    <joined>April 08 2005</joined>
+    <birthday>16 July 1974</birthday>
+    <roles>Gentoo/Java</roles>
+    <location>U.S.</location>
+  </user>
+  <user username="vitaminmoo">
+    <realname fullname="Graham Forest">
+      <firstname>Graham</firstname>
+      <familyname>Forest</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo"/>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Imagemagick, Gentoo/PPC</roles>
+    <location>Eugene, OR</location>
+  </user>
+  <user username="vivo">
+    <realname fullname="Francesco Riosa">
+      <firstname>Francesco</firstname>
+      <familyname>Riosa</familyname>
+    </realname>
+    <pgpkey>0xB54F32E0</pgpkey>
+    <email role="gentoo">vivo@gentoo.org</email>
+    <ircalias>vivo</ircalias>
+    <joined>19 June 2005</joined>
+    <birthday>19 April 1975</birthday>
+    <roles>MySQL</roles>
+    <location>Torino, Italy</location>
+  </user>
+  <user username="vorlon">
+    <realname fullname="Matthias Geerdsen">
+      <firstname>Matthias</firstname>
+      <familyname>Geerdsen</familyname>
+    </realname>
+    <pgpkey>0xB16A5183</pgpkey>
+    <email role="gentoo">vorlon@gentoo.org</email>
+    <ircalias>vorlon078</ircalias>
+    <joined/>
+    <birthday/>
+    <roles>Security</roles>
+    <location>Göttingen, Germany</location>
+  </user>
+  <user username="voxus">
+    <realname fullname="Konstantin V. Arkhipov">
+      <firstname>Konstantin</firstname>
+      <familyname>Arkhipov</familyname>
+    </realname>
+    <pgpkey>0x58FE49CA</pgpkey>
+    <email role="gentoo">voxus@gentoo.org</email>
+    <joined>19 May 2004</joined>
+    <birthday/>
+    <roles>OpenMOSIX-sources, migshm patchset</roles>
+    <location>Moscow, Russia</location>
+  </user>
+  <user username="warpzero">
+    <realname fullname="Joshua Charles Campbell">
+      <firstname>Joshua Charles</firstname>
+      <familyname>Campbell</familyname>
+    </realname>
+    <pgpkey>0x7EB1E072</pgpkey>
+    <email role="gentoo">warpzero@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Miscellaneous ebuilds</roles>
+    <location>Missoula, Montana, USA</location>
+  </user>
+  <user username="weeve">
+    <realname fullname="Jason Wever">
+      <firstname>Jason</firstname>
+      <familyname>Wever</familyname>
+    </realname>
+    <pgpkey>0x58A8AB6F</pgpkey>
+    <email role="gentoo">weeve@gentoo.org</email>
+    <joined>2 October 2002</joined>
+    <birthday>16 July 1979</birthday>
+    <roles>Gentoo/SPARC</roles>
+    <location>Broomfield, CO, USA</location>
+  </user>
+  <user username="wesolows">
+    <realname fullname="Keith Wesolowski">
+      <firstname>Keith</firstname>
+      <familyname>Wesolowski</familyname>
+    </realname>
+    <pgpkey>0xCCE2BE6E</pgpkey>
+    <email role="gentoo">wesolows@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Gentoo/SPARC</roles>
+    <location>USA</location>
+  </user>
+  <user username="williamh">
+    <realname fullname="William Hubbs">
+      <firstname>William</firstname>
+      <familyname>Hubbs</familyname>
+    </realname>
+    <pgpkey>0x30C46538</pgpkey>
+    <email role="gentoo">williamh@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Accessibility</roles>
+    <location>Irving, TX, USA</location>
+  </user>
+  <user username="wmertens">
+    <realname fullname="Wout Mertens">
+      <firstname>Wout</firstname>
+      <familyname>Mertens</familyname>
+    </realname>
+    <pgpkey>0xE30081AF</pgpkey>
+    <email role="gentoo">wmertens@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Jack of all trades</roles>
+    <location>Brussels, Belgium</location>
+  </user>
+  <user username="wolf31o2">
+    <realname fullname="Chris Gianelloni">
+      <firstname>Chris</firstname>
+      <familyname>Gianelloni</familyname>
+    </realname>
+    <pgpkey>0x84B7E981</pgpkey>
+    <email role="gentoo">wolf31o2@gentoo.org</email>
+    <joined>July 7 2003</joined>
+    <birthday>15 February 1978</birthday>
+    <roles>Games, LiveCDs</roles>
+    <location>South Carolina, USA</location>
+  </user>
+  <user username="woodchip">
+    <realname fullname="Donny Davies">
+      <firstname>Donny</firstname>
+      <familyname>Davies</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">woodchip@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Apache and system components</roles>
+    <location>Canada</location>
+  </user>
+  <user username="wormo">
+    <realname fullname="Stephanie J. Lockwood-Childs">
+      <firstname>Stephanie</firstname>
+      <familyname>Lockwood-Childs</familyname>
+    </realname>
+    <pgpkey>0xB16E355F</pgpkey>
+    <email role="gentoo">wormo@gentoo.org</email>
+    <joined>20050130</joined>
+    <birthday/>
+    <roles>Gentoo/PPC, Kernel, Hardened</roles>
+    <location>Santa Barbara County, CA</location>
+  </user>
+  <user username="wschlich">
+    <realname fullname="Wolfram Schlich">
+      <firstname>Wolfram</firstname>
+      <familyname>Schlich</familyname>
+    </realname>
+    <pgpkey>0xC1A30268</pgpkey>
+    <email role="gentoo">wschlich@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Antivirus, various ebuilds</roles>
+    <location>Germany</location>
+  </user>
+  <user username="wwoods">
+    <realname fullname="Will Woods">
+      <firstname>Will</firstname>
+      <familyname>Woods</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">wwoods@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Gentoo/Alpha applications</roles>
+    <location>New Hampshire, USA</location>
+  </user>
+  <user username="xmerlin">
+    <realname fullname="Christian Zoffoli">
+      <firstname>Christian</firstname>
+      <familyname>Zoffoli</familyname>
+    </realname>
+    <pgpkey>0xE75FF154</pgpkey>
+    <email role="gentoo">xmerlin@gentoo.org</email>
+    <joined>2004.12.31</joined>
+    <birthday>1976.12.13</birthday>
+    <roles>uclibc, cluster work</roles>
+    <location>Rimini, Italy</location>
+  </user>
+  <user username="xtv">
+    <realname fullname="Thomas Veith">
+      <firstname>Thomas</firstname>
+      <familyname>Veith</familyname>
+    </realname>
+    <pgpkey>0xF8BA2241</pgpkey>
+    <email role="gentoo">xtv@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>app-sci</roles>
+    <location>Duesseldorf, Germany</location>
+  </user>
+  <user username="yakina">
+    <realname fullname="Yamakura Makoto">
+      <firstname>Yamakura</firstname>
+      <familyname>Makoto</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">yakina@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Japanese documentation</roles>
+    <location>Japan</location>
+  </user>
+  <user username="yakmoose">
+    <realname fullname="John Lennard">
+      <firstname>John</firstname>
+      <familyname>Lennard</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">yakmoose@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="ykoehler">
+    <realname fullname="Yannik Koehler">
+      <firstname>Yannik</firstname>
+      <familyname>Koehler</familyname>
+    </realname>
+    <pgpkey>0xD34D4575</pgpkey>
+    <email role="gentoo">ykoehler@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+  </user>
+  <user username="yoswink">
+    <realname fullname="José Luis Rivero">
+      <firstname>José Luis</firstname>
+      <familyname>Rivero</familyname>
+    </realname>
+    <pgpkey>0xBFC72A72</pgpkey>
+    <email role="gentoo">yoswink@gentoo.org</email>
+    <joined>15 February 2005</joined>
+    <birthday>7 March 1982</birthday>
+    <roles>Documentation, Gentoo/Alpha</roles>
+    <location>Madrid, Spain</location>
+  </user>
+  <user username="zaheerm">
+    <realname fullname="Zaheer Abbas Merali">
+      <firstname>Zaheer Abbas</firstname>
+      <familyname>Merali</familyname>
+    </realname>
+    <pgpkey>0x0D467F43</pgpkey>
+    <email role="gentoo">zaheerm@gentoo.org</email>
+    <joined>27 August 2005</joined>
+    <birthday>undefined</birthday>
+    <roles>gstreamer</roles>
+    <location>London, UK</location>
+  </user>
+  <user username="zenkov">
+    <realname fullname="Ivan Zenkov">
+      <firstname>Ivan</firstname>
+      <familyname>Zenkov</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo">zenkov@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <status>Gone</status>
+    <roles>Russian documentation</roles>
+    <location>Sakhalin, Siberia, Russia</location>
+  </user>
+  <user username="zhen">
+    <realname fullname="John P. Davis">
+      <firstname>John</firstname>
+      <familyname>P. Davis</familyname>
+    </realname>
+    <pgpkey>0xE28141BB</pgpkey>
+    <email role="gentoo">zhen@gentoo.org</email>
+    <joined>August 8 2002</joined>
+    <birthday>28 April 1984</birthday>
+    <status>Retired</status>
+    <roles>Catalyst, Release Engineering</roles>
+    <location>Cleveland, Ohio, USA</location>
+  </user>
+  <user username="zhware">
+    <realname fullname="Stoyan Zhekov">
+      <firstname>Stoyan</firstname>
+      <familyname>Zhekov</familyname>
+    </realname>
+    <pgpkey>0x413951D2</pgpkey>
+    <email role="gentoo">zhware@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Documentation</roles>
+    <location>Japan, Osaka</location>
+  </user>
+  <user username="zul">
+    <realname fullname="Chuck Short">
+      <firstname>Chuck</firstname>
+      <familyname>Short</familyname>
+    </realname>
+    <pgpkey>0x8F29ED5C</pgpkey>
+    <email role="gentoo">zul@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Apache</roles>
+  </user>
+  <user username="zwelch">
+    <realname fullname="Zack Welch">
+      <firstname>Zack</firstname>
+      <familyname>Welch</familyname>
+    </realname>
+    <pgpkey/>
+    <email role="gentoo"/>
+    <joined/>
+    <birthday/>
+    <status>Retired</status>
+    <roles>Embedded</roles>
+    <location>OR, US</location>
+  </user>
+  <user username="zx">
+    <realname fullname="Chris Aniszczyk">
+      <firstname>Chris</firstname>
+      <familyname>Aniszczyk</familyname>
+    </realname>
+    <pgpkey>0x274A275F</pgpkey>
+    <email role="gentoo">zx@gentoo.org</email>
+    <joined>26 January 2004</joined>
+    <birthday/>
+    <roles>Accessibility, Gentoo/HPPA, Java</roles>
+    <location>Worcester, MA, USA</location>
+  </user>
+  <user username="zypher">
+    <realname fullname="Marc Hildebrand">
+      <firstname>Marc</firstname>
+      <familyname>Hildebrand</familyname>
+    </realname>
+    <pgpkey>0x03556F0E</pgpkey>
+    <email role="gentoo">zypher@gentoo.org</email>
+    <joined/>
+    <birthday/>
+    <roles>Bug wrangling, multimedia</roles>
+    <location>Cologne, Germany</location>
+  </user>
+  <user username="zzam">
+    <realname fullname="Matthias Schwarzott">
+      <firstname>Matthias</firstname>
+      <familyname>Schwarzott</familyname>
+    </realname>
+    <pgpkey>0x7BD574E7</pgpkey>
+    <email role="gentoo">zzam@gentoo.org</email>
+    <joined>18 June 2005</joined>
+    <birthday>28 October 1981</birthday>
+    <roles>VDR ebuilds</roles>
+    <location>Erlangen, Germany</location>
+  </user>
+</userlist>
+
+<!--
+vim:ai:et:sw=2:nowrap
+-*- Local Variables: -*-
+-*- coding: utf-8 -*-
+-*- End: -*-
+-->
