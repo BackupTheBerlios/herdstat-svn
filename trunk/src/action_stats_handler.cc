@@ -65,14 +65,14 @@ action_stats_handler_T::operator() (opts_type &null)
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
-    Herds::const_iterator h;
-    Herd::const_iterator d;
-
     float nherds = 0, ndevs = 0;
     std::vector<std::string> most_herds, least_herds, most_devs, least_devs;
     unsigned short biggest_dev = 0, smallest_dev = 1;
     Herd::size_type biggest_herd = 0, smallest_herd = 1;
     std::map<std::string, unsigned short> herds_per_dev;
+
+    Herds::const_iterator h;
+    Herd::const_iterator d;
 
     /* for each herd in herds.xml... */
     for (h = herds.begin() ; h != herds.end() ; ++h)
@@ -80,15 +80,10 @@ action_stats_handler_T::operator() (opts_type &null)
         ndevs += h->size();
 
         /* add one to the number of herds the current dev is in */
-        for (d = h->begin() ; d != h->end() ; ++d)
-            ++herds_per_dev[d->user()];
+        for (d = h->begin() ; d != h->end() ; ++d) ++herds_per_dev[d->user()];
 
-        /* is the size of this herd bigger than the previous biggest herd */
-        if (h->size() > biggest_herd)
-            biggest_herd = h->size();
-
-        if (h->size() <= smallest_herd)
-            smallest_herd = h->size();
+        if (h->size() > biggest_herd)   biggest_herd = h->size();
+        if (h->size() <= smallest_herd) smallest_herd = h->size();
     }
 
     /* for each developer in herds.xml */
@@ -96,22 +91,15 @@ action_stats_handler_T::operator() (opts_type &null)
     for (i = herds_per_dev.begin() ; i != herds_per_dev.end() ; ++i)
     {
         nherds += i->second;
-
-        /* is the no. of herds this dev is in bigger than previous biggest? */
-        if (i->second > biggest_dev)
-            biggest_dev = i->second;
-
-        if (i->second <= smallest_dev)
-            smallest_dev = i->second;
+        if (i->second > biggest_dev)    biggest_dev = i->second;
+        if (i->second <= smallest_dev)  smallest_dev = i->second;
     }
 
     /* we now have least/most devs, so find all devs with matching numbers */
     for (h = herds.begin() ; h != herds.end() ; ++h)
     {
-        if (h->size() == biggest_herd)
-            most_devs.push_back(h->name());
-        else if (h->size() == smallest_herd)
-            least_devs.push_back(h->name());
+        if (h->size() == biggest_herd)          most_devs.push_back(h->name());
+        else if (h->size() == smallest_herd)    least_devs.push_back(h->name());
     }
 
     /* we now have least/most herds, so find all herds with matching numbers */

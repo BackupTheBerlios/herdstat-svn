@@ -127,17 +127,6 @@ action_which_handler_T::operator() (opts_type &opts)
             continue;
         }
 
-//        try
-//        {
-//            /* try p.first (may be an overlay) first */
-//            ebuild = portage::ebuild_which(p.first, p.second);
-//        }
-//        catch (const portage::NonExistentPkg)
-//        {
-//            /* nope, so use real PORTDIR */
-//            ebuild = portage::ebuild_which(portdir, p.second);
-//        }
-
         if (regex)
             ebuild = portage::ebuild_which(config, p.second, overlay, NULL,
                 pkgcache.pkgs());

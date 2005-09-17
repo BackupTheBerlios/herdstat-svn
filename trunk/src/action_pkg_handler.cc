@@ -74,15 +74,6 @@ action_pkg_handler_T::error(const std::string &criteria) const
 }
 
 /*
- * binary predicate for searching metadata for
- * a regular expression via find_if().
- */
-
-//static bool
-//doesHerdMatch(metadata_T::herd_type::value_type m, util::regex_T *r)
-//{ return *r == util::get_user_from_email(m.first); }
-
-/*
  * Determine whether or not the metadata.xml matches our
  * search criteria.
  */
@@ -112,9 +103,9 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
                 return true;
             else
             {
-                /* --no-maintainer was specified.  It's true if there are
-                 * a) no maintainers, or b) the herd is listed as a maintainer.
-                 */
+                /* --no-maintainer was specified.  It's true if there
+                 * are a) no maintainers, or b) the herd is listed as
+                 * a maintainer. */
                 if (with() == "none")
                 {
                     if (devs.empty() or ((devs.size() == 1) and
