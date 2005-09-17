@@ -244,7 +244,6 @@ namespace portage {
             void insert(In begin, In end);
 
             std::pair<iterator, bool> insert(const value_type v);
-            std::pair<iterator, bool> insert(const std::string& herd);
 
             void erase(iterator pos);
             size_type erase(const value_type v);
@@ -279,8 +278,6 @@ namespace portage {
 
     inline std::pair<Herds::iterator, bool>
     Herds::insert(const value_type v) { return _herds.insert(v); }
-    inline std::pair<Herds::iterator, bool>
-    Herds::insert(const std::string& h) { return _herds.insert(Herd(h)); }
 
     inline void Herds::erase(iterator pos) { _herds.erase(pos); }
     inline Herds::size_type Herds::erase(const value_type v)

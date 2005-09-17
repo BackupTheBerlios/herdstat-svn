@@ -288,7 +288,6 @@ namespace portage {
             void insert(In begin, In end);
 
             std::pair<iterator, bool> insert(const value_type v);
-            std::pair<iterator, bool> insert(const std::string& dev);
 
             void erase(iterator pos);
             size_type erase(const value_type v);
@@ -327,8 +326,6 @@ namespace portage {
 
     inline std::pair<Developers::iterator, bool>
     Developers::insert(const value_type v) { return _devs.insert(v); }
-    inline std::pair<Developers::iterator, bool>
-    Developers::insert(const std::string& d) { return _devs.insert(Developer(d)); }
 
     inline Developers::iterator Developers::find(const value_type dev) const
     { return _devs.find(dev); }
@@ -337,8 +334,10 @@ namespace portage {
     { return _devs.find(Developer(dev)); }
 
     inline Developers::iterator Developers::find(const util::regex_T &regex) const
-    { return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
-        UserRegexMatch<Developer>(), &regex)); }
+    {
+        return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
+            UserRegexMatch<Developer>(), &regex));
+    }
 
     inline Developers::value_type
     Developers::front()
