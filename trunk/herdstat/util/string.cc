@@ -51,12 +51,8 @@ util::lowercase(const std::string &s)
         return s;
 
     std::string result;
-//    std::string::const_iterator i = s.begin(), e = s.end();
-//    for (; i != e ; ++i)
-//        result.push_back(util::tolower(*i));
-
-    std::transform(s.begin(), s.end(), std::back_inserter(result),
-        ToLower());
+    std::transform(s.begin(), s.end(),
+        std::back_inserter(result), ToLower());
     
     return result;
 }
@@ -77,22 +73,21 @@ util::tidy_whitespace(const std::string &s)
 	return s;
 
     std::string result;
+    std::string::size_type pos;
 
     /* collapse whitespace */
-    std::unique_copy(s.begin(), s.end(), std::back_inserter(result),
-        BothSpaces());
+    std::unique_copy(s.begin(), s.end(),
+        std::back_inserter(result), BothSpaces());
 
-    /* remove any leading whitespace */
-    std::string::size_type pos = result.find_first_not_of(" \t\n");
-    if (pos != std::string::npos)
-	result.erase(0, pos);
-
-    /* convert any newlines in the middle to a space */
+    /* replace all newlines to a space */
     std::replace(result.begin(), result.end(), '\n', ' ');
 
+    /* remove any leading whitespace */
+    if ((pos = result.find_first_not_of(" \t")) != std::string::npos)
+	result.erase(0, pos);
+
     /* remove any trailing whitespace */
-    pos = result.find_last_not_of(" \t\n");
-    if (pos != std::string::npos)
+    if ((pos = result.find_last_not_of(" \t")) != std::string::npos)
 	result.erase(++pos);
 	
     return result;
@@ -114,7 +109,7 @@ util::sprintf(const char *fmt, va_list v)
     char *buf;
     vasprintf(&buf, fmt, v);
     std::string s(buf);
-    free(buf);
+    std::free(buf);
     return s;
 }
 /*****************************************************************************
@@ -204,30 +199,29 @@ util::join(const std::vector<std::string> &v,
 }
 /*****************************************************************************/
 std::vector<std::string>
-util::split(const std::string &str, const std::string::value_type delim,
+util::split(const std::string& str, const std::string::value_type delim,
             bool append_empty)
 {
-    std::vector<std::string> vec;
+    std::vector<std::string> v;
     std::string::size_type pos, lpos = 0;
     
     while (true)
     {
 	if ((pos = str.find(delim, lpos)) == std::string::npos)
 	{
-	    vec.push_back(str.substr(lpos));
+	    v.push_back(str.substr(lpos));
 	    break;
 	}
 
-	/* don't append empty std::strings (two
+	/* don't append empty strings (two
 	 * delimiters in a row were encountered) */
-	if (str.substr(lpos, pos - lpos).length() > 0)
-	    vec.push_back(str.substr(lpos, pos - lpos));
-        else if (append_empty)
-            vec.push_back("");
+        const char * const sub(str.substr(lpos, pos - lpos).c_str());
+	if (std::strlen(sub) > 0 or append_empty)
+	    v.push_back(sub);
 
 	lpos = ++pos;
     }
-    return vec;
+    return v;
 }
 /*****************************************************************************/
 template <>
