@@ -38,8 +38,8 @@ metadata_xml::metadata_xml()
 {
 }
 /****************************************************************************/
-metadata_xml::metadata_xml(const std::string& path)
-    : parsable(path), _data(), in_herd(false), in_maintainer(false),
+metadata_xml::metadata_xml(const std::string& path, const std::string& pkg)
+    : parsable(path), _data(pkg), in_herd(false), in_maintainer(false),
       in_email(false), in_name(false), in_desc(false), in_longdesc(false),
       in_en_longdesc(false), _cur_dev()
 {
@@ -54,7 +54,7 @@ void
 metadata_xml::parse(const std::string& path)
 {
     if (not path.empty()) this->set_path(path);
-    if (not util::is_file(this->path())) throw FileException(this->path());
+    if (not util::file_exists(this->path())) throw FileException(this->path());
     this->parse_file(this->path().c_str());
 }
 /****************************************************************************/

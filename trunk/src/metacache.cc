@@ -52,7 +52,6 @@ metacache_T::metacache_T(const std::string &portdir)
 
 metacache_T::~metacache_T()
 {
-    std::for_each(this->begin(), this->end(), util::DeleteAndNullify());
 }
 
 /*
@@ -181,14 +180,16 @@ metacache_T::fill()
             if (status)
                 ++progress;
 
-            const std::string path(this->_portdir + "/" + (*p) + "/metadata.xml");
-            if (util::is_file(path))
+//            const std::string path(this->_portdir + "/" + (*p) + "/metadata.xml");
+
+            const char * const path(util::sprintf("%s/%s/metadata.xml",
+                _portdir.c_str(), p->c_str()).c_str());
+
+            if (util::file_exists(path))
             {
                 /* parse it */
-                const metadata_xml meta(path);
-                metadata *data = new metadata(meta.data());
-                data->set_pkg(*p);
-                this->push_back(data);
+                const metadata_xml meta(path, *p);
+                _metadatas.push_back(meta.data());
             }
         }
     }
@@ -217,9 +218,9 @@ metacache_T::load()
 
         /* reserve to prevent tons of reallocations */
         if (cache["size"].empty() or cache["size"] == "0")
-            this->reserve(METACACHE_RESERVE);
+            _metadatas.reserve(METACACHE_RESERVE);
         else
-            this->reserve(util::destringify<int>(cache["size"]));
+            _metadatas.reserve(util::destringify<int>(cache["size"]));
 
         util::vars_T::const_iterator i, e = cache.end();
         for (i = cache.begin() ; i != e ; ++i)
@@ -229,16 +230,13 @@ metacache_T::load()
                 continue;
 
             std::string str;
-            metadata *meta = new metadata(i->first);
-            Herds& herds(meta->herds());
-            Developers&  devs(meta->devs());
+            metadata meta(i->first);
+            Herds& herds(meta.herds());
+            Developers&  devs(meta.devs());
 
             std::vector<std::string> parts = util::split(i->second, ':', true);
             if (parts.empty())
-            {
-                delete meta;
                 throw Exception();
-            }
 
             /* get herds */
             str = parts.front();
@@ -267,10 +265,10 @@ metacache_T::load()
                     parts.erase(parts.begin());
                 }
 
-                meta->set_longdesc(str);
+                meta.set_longdesc(str);
             }
 
-            this->push_back(meta);
+            _metadatas.push_back(meta);
         }
     }
     catch (const Exception)
@@ -305,12 +303,12 @@ metacache_T::dump()
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
-        const Herds& herds((*ci)->herds());
-        const Developers& devs((*ci)->devs());
+        const Herds& herds(ci->herds());
+        const Developers& devs(ci->devs());
         std::string str;
         std::size_t n;
 
-        f << (*ci)->pkg() << "=";
+        f << ci->pkg() << "=";
 
         /* herds */
         {
@@ -339,10 +337,10 @@ metacache_T::dump()
         f << str << ":";
 
         /* longdesc */
-        if ((*ci)->longdesc().empty())
+        if (ci->longdesc().empty())
             f << std::endl;
         else
-            f << (*ci)->longdesc() << std::endl;
+            f << util::tidy_whitespace(ci->longdesc()) << std::endl;
     }
 }
 

@@ -95,7 +95,7 @@ class EmailAddress
         void set_domain(const std::string& domain);
 
     protected:
-        virtual void parse(const std::string& email);
+        virtual bool parse(const std::string& email);
 
     private:
         void set_email();

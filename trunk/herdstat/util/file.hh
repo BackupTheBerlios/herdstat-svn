@@ -45,6 +45,12 @@
 
 namespace util
 {
+    inline bool
+    file_exists(const std::string& path)
+    {
+        return (access(path.c_str(), F_OK) == 0);
+    }
+
     /** Is the given path a directory?
      * @param p Path.
      * @returns A boolean value.

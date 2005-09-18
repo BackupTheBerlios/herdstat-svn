@@ -47,19 +47,21 @@ EmailAddress::~EmailAddress()
 {
 }
 /****************************************************************************/
-void
+bool
 EmailAddress::parse(const std::string& email)
 {
     std::string::size_type pos = email.find('@');
     if (pos == std::string::npos)
     {
         _user.assign(email);
-        throw MalformedEmail(email);
+        return false;
     }
 
     _user.assign(email.substr(0, pos));
     _domain.assign(email.substr(pos+1));
     _email.assign(email);
+    
+    return true;
 }
 /****************************************************************************/
 /* vim: set tw=80 sw=4 et : */

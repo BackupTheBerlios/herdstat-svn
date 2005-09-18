@@ -55,7 +55,7 @@ namespace portage {
             virtual ~GentooEmailAddress();
 
         protected:
-            virtual void parse(const std::string& email);
+            virtual bool parse(const std::string& email);
     };
 
 } // namespace portage

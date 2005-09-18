@@ -44,17 +44,12 @@ GentooEmailAddress::~GentooEmailAddress()
 {
 }
 /****************************************************************************/
-void
+bool
 GentooEmailAddress::parse(const std::string& email)
 {
-    try
-    {
-        EmailAddress::parse(email);
-    }
-    catch (const MalformedEmail)
-    {
+    if (not EmailAddress::parse(email))
         this->set_domain("gentoo.org");
-    }
+    return true;
 }
 /****************************************************************************/
 } // namespace portage

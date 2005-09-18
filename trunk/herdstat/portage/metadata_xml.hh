@@ -43,7 +43,8 @@ namespace portage {
     {
         public:
             metadata_xml();
-            metadata_xml(const std::string& path);
+            metadata_xml(const std::string& path,
+                         const std::string& pkg = "");
             virtual ~metadata_xml();
 
             virtual void parse(const std::string& path = "");

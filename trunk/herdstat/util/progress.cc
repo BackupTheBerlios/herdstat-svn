@@ -55,19 +55,19 @@ progress_T::start(unsigned m)
     std::printf("  0%%");
 }
 /****************************************************************************/
-void
-progress_T::operator++ ()
-{
-    if (not this->_started)
-        return;
+//void
+//progress_T::operator++ ()
+//{
+//    if (not this->_started)
+//        return;
 
-    int inc = static_cast<int>(this->_cur += this->_step);
-    if (inc < 10)       std::printf("\b\b%.1d%%", inc);
-    else if (inc < 100) std::printf("\b\b\b%.2d%%", inc);
-    else                std::printf("\b\b\b\b%.3d%%", inc);
+//    int inc = static_cast<int>(this->_cur += this->_step);
+//    if (inc < 10)       std::printf("\b\b%.1d%%", inc);
+//    else if (inc < 100) std::printf("\b\b\b%.2d%%", inc);
+//    else                std::printf("\b\b\b\b%.3d%%", inc);
 
-    std::fflush(stdout);
-}
+//    std::fflush(stdout);
+//}
 /****************************************************************************/
 } // namespace util
 

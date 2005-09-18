@@ -38,7 +38,7 @@
 class metacache_T : public cachable
 {
     public:
-        typedef std::vector<portage::metadata *> container_type;
+        typedef std::vector<portage::metadata> container_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
@@ -60,9 +60,6 @@ class metacache_T : public cachable
         bool empty() const;
 
     private:
-        void reserve(size_type size);
-        void push_back(const value_type v);
-
         std::string _portdir;
         std::vector<std::string> _overlays;
         container_type _metadatas;
@@ -102,18 +99,6 @@ inline bool
 metacache_T::empty() const
 {
     return _metadatas.empty();
-}
-
-inline void
-metacache_T::reserve(size_type size)
-{
-    _metadatas.reserve(size);
-}
-
-inline void
-metacache_T::push_back(const value_type v)
-{
-    _metadatas.push_back(v);
 }
 
 #endif
