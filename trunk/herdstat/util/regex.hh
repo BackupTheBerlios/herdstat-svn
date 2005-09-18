@@ -40,37 +40,45 @@ namespace util
      * POSIX Regular Expressions interface.
      */
 
-    class regex_T
+    class Regex
     {
         public:
-            typedef std::string string_type;
+            enum cflags { };
+            enum eflags { };
+
+            static const cflags extended;
+            static const cflags icase;
+            static const cflags nosub;
+            static const cflags newline;
+
+            static const eflags notbol;
+            static const eflags noteol;
 
             /// Default constructor.
-            regex_T();
+            Regex();
 
             /** Constructor.
              * @param r regular expression std::string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            regex_T(const std::string& r, int c = 0, int e = 0);
+            Regex(const std::string& r, int c = 0, int e = 0);
 
             /// Destructor.
-            ~regex_T();
+            ~Regex();
 
             /** Assign a new regular expression.
              * @param r regular expression std::string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            void assign(const std::string&r , int c = 0, int e = 0);
+            void assign(const std::string& r , int c = 0, int e = 0);
 
             /** Assign a new regular expression (no CFLAGS/EFLAGS).
              * @param s regular expression std::string.
-             * @returns a regex_T object.
+             * @returns a Regex object.
              */
-            regex_T &operator= (const std::string& s)
-            { this->assign(s); return *this; }
+            Regex &operator= (const std::string& s);
 
             /** Determine if this regex matches the specified std::string.
              * @param cmp Comparison std::string.
@@ -82,18 +90,17 @@ namespace util
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator!= (const std::string& cmp) const
-            { return not (*this == cmp); }
+            bool operator!= (const std::string& cmp) const;
 
             /** Get regular expression std::string.
              * @returns A std::string object.
              */
-            const std::string& operator()() const { return this->_str; }
+            const std::string& operator()() const;
 
             /** Is this regular expression std::string empty?
              * @returns A boolean value.
              */
-            bool empty() const { return this->_str.empty(); }
+            bool empty() const;
 
         private:
             /// Clean up compiled regex_t
@@ -108,17 +115,48 @@ namespace util
             regex_t     _regex;
     };
 
+    inline Regex&
+    Regex::operator= (const std::string& re)
+    {
+        this->assign(re);
+        return *this;
+    }
+
+    inline bool
+    Regex::operator== (const std::string& cmp) const
+    {
+        return (regexec(&_regex, cmp.c_str(), 0, NULL, _eflags) == 0);
+    }
+
+    inline bool
+    Regex::operator!= (const std::string& cmp) const
+    {
+        return not (*this == cmp);
+    }
+
+    inline const std::string&
+    Regex::operator()() const
+    {
+        return _str;
+    }
+
+    inline bool
+    Regex::empty() const
+    {
+        return _str.empty();
+    }
+
     /**
-     * Functor for using regex_T with standard algorithms.
+     * Functor for using Regex with standard algorithms.
      */
 
-    struct regexMatch : std::binary_function<const regex_T *, std::string, bool>
+    struct regexMatch : std::binary_function<const Regex *, std::string, bool>
     {
-        bool operator() (const regex_T *re, const std::string& s) const
+        bool operator() (const Regex *re, const std::string& s) const
         { return (*re == s); }
     };
 }
 
-#endif
+#endif /* HAVE_REGEX_HH */
 
 /* vim: set tw=80 sw=4 et : */

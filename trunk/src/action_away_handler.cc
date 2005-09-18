@@ -25,13 +25,11 @@
 #endif
 
 #include <iostream>
-#include <algorithm>
-#include <herdstat/util/string.hh>
 #include <herdstat/util/algorithm.hh>
-
 #include "action_away_handler.hh"
 
 using namespace portage;
+using namespace util;
 
 action_away_handler_T::~action_away_handler_T()
 {
@@ -42,7 +40,8 @@ action_away_handler_T::display(const Developer& dev)
 {
     ++size;
 
-    if (count) return;
+    if (count)
+        return;
 
     if (quiet)
         output("", dev.user() + " - " + dev.awaymsg());
@@ -62,24 +61,26 @@ action_away_handler_T::display(const Developer& dev)
 }
 
 int
-action_away_handler_T::operator() (opts_type &opts)
+action_away_handler_T::operator()(opts_type& opts)
 {
-    fetch_devawayxml();
-    devaway.parse(devaway_path);
-    const Developers& devs(devaway.devs());
-    Developers::const_iterator d;
-
     output.set_maxlabel(13);
     output.set_maxdata(maxcol - output.maxlabel());
     output.set_quiet(quiet, " ");
     output.set_attrs();
+
+    fetch_devawayxml();
+    devaway.parse(devaway_path);
+    fetch_herdsxml();
+    herdsxml.parse(herdsxml_path);
+
+    const Developers& devs(devaway.devs());
+    Developers::const_iterator d;
 
     if (all)
     {
         for (d = devs.begin() ; d != devs.end() ; )
         {
             display(*d++);
-
             if (not quiet and (d != devs.end()))
                 output.endl();
         }
@@ -88,39 +89,28 @@ action_away_handler_T::operator() (opts_type &opts)
         return EXIT_SUCCESS;
     }
     
-    fetch_herdsxml();
-    herdsxml.parse(herdsxml_path);
-
-    if (regex and opts.size() > 1)
+    if (regex)
     {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return  EXIT_FAILURE;
-    }
-    else if (regex)
-    {
-        util::regex_T::string_type re(opts.front());
+        const std::string re(opts.front());
         opts.clear();
+        regexp.assign(re, eregex ? Regex::extended|Regex::icase :
+                                   Regex::icase);
 
-        regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
-
-        /* insert user names that match the regex into opts */
-        util::transform_if(devs.begin(), devs.end(), std::back_inserter(opts),
+        /* insert developer user names that match the regex into opts */
+        transform_if(devs.begin(), devs.end(), std::back_inserter(opts),
             std::bind1st(UserRegexMatch<Developer>(), &regexp), User());
 
         if (opts.empty())
         {
-            std::cerr << "Failed to find any developers matching '" << re
-                << "'." << std::endl;
+            std::cerr << "Failed to find any developers matching '"
+                << re << "'." << std::endl;
             return EXIT_FAILURE;
         }
 
         std::sort(opts.begin(), opts.end());
     }
 
-    opts_type::iterator i;
-    opts_type::size_type n = 1;
-    for (i = opts.begin() ; i != opts.end() ; ++i, ++n)
+    for (opts_type::iterator i = opts.begin() ; i != opts.end() ; ++i)
     {
         try
         {
@@ -138,7 +128,7 @@ action_away_handler_T::operator() (opts_type &opts)
                 return EXIT_FAILURE;
         }
 
-        if (not quiet and n != opts.size())
+        if (not quiet and ((i+1) != opts.end()))
             output.endl();
     }
 

@@ -15,5 +15,6 @@ portdir/app-misc/foo/foo-1.2.ebuild
 portdir/media-libs/libfoo/libfoo-0.98_rc2.ebuild
 portdir/sys-ignore/fefifofum/fefifofum-0.1_pre99.ebuild
 portdir/sys-libs/libfoo/libfoo-1.9.ebuild
+portdir/sys-libs/pfft/pfft-0.1.ebuild
 
 The pattern '*foo-1.10*' appears 4 times in the output above.

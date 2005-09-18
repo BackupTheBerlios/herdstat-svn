@@ -90,10 +90,10 @@ namespace portage {
              */
             bool operator== (const std::string& name) const;
             bool operator== (const Herd& herd) const;
-            bool operator== (const util::regex_T& re) const;
+            bool operator== (const util::Regex& re) const;
             bool operator!= (const std::string& name) const;
             bool operator!= (const Herd& herd) const;
-            bool operator!= (const util::regex_T& re) const;
+            bool operator!= (const util::Regex& re) const;
             bool operator<  (const std::string& name) const;
             bool operator<  (const Herd& herd) const;
             bool operator>  (const std::string& name) const;
@@ -127,13 +127,13 @@ namespace portage {
     { return (_name == name); }
     inline bool Herd::operator== (const Herd& herd) const
     { return (_name == herd._name); }
-    inline bool Herd::operator== (const util::regex_T& re) const
+    inline bool Herd::operator== (const util::Regex& re) const
     { return (re == _name); }
     inline bool Herd::operator!= (const std::string& name) const
     { return (_name != name); }
     inline bool Herd::operator!= (const Herd& herd) const
     { return (_name != herd._name); }
-    inline bool Herd::operator!= (const util::regex_T& re) const
+    inline bool Herd::operator!= (const util::Regex& re) const
     { return (re != _name); }
     inline bool Herd::operator< (const std::string& name) const
     { return (_name < name); }
@@ -232,7 +232,7 @@ namespace portage {
 
             iterator find(const std::string &herd) const;
             iterator find(const value_type h) const;
-            iterator find(const util::regex_T &regex) const;
+            iterator find(const util::Regex &regex) const;
 
             size_type size() const;
             bool empty() const;
@@ -291,7 +291,7 @@ namespace portage {
     inline Herds::iterator Herds::find(const std::string& h) const
     { return _herds.find(Herd(h)); }
     
-    inline Herds::iterator Herds::find(const util::regex_T &regex) const
+    inline Herds::iterator Herds::find(const util::Regex &regex) const
     { return std::find_if(_herds.begin(), _herds.end(), std::bind1st(
             NameRegexMatch<Herd>(), &regex)); }
 

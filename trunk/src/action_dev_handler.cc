@@ -32,6 +32,7 @@
 #include "action_dev_handler.hh"
 
 using namespace portage;
+using namespace util;
 
 /* given string in form of "10 January 2000", get elapsed number of years.
  * returns empty string on any failure. */
@@ -178,21 +179,18 @@ action_dev_handler_T::display(const std::string &d)
 int
 action_dev_handler_T::operator() (opts_type &opts)
 {
-    /* herds.xml */
     fetch_herdsxml();
     herdsxml.parse(herdsxml_path);
 
     const Herds& herds(herdsxml.herds());
     Herds::const_iterator h;
 
-    /* devaway.xml */
     if (use_devaway)
     {
         fetch_devawayxml();
         devaway.parse(devaway_path);
     }
 
-    /* userinfo.xml */
     if (not userinfo_path.empty())
         userinfo.parse(userinfo_path);
 
@@ -222,18 +220,13 @@ action_dev_handler_T::operator() (opts_type &opts)
         flush();
         return EXIT_SUCCESS;
     }
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
     else if (regex)
     {
-        util::regex_T::string_type re(opts.front());
+        const std::string re(opts.front());
         opts.clear();
 
-        regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
+        regexp.assign(re, eregex ? Regex::extended|Regex::icase :
+                                   Regex::icase);
 
         /* loop through herds searching for devs who's username
          * matches the regular expression, inserting those that do into opts */
@@ -260,17 +253,15 @@ action_dev_handler_T::operator() (opts_type &opts)
     }
 
     /* for each specified dev... */
-    opts_type::iterator dev;
-    opts_type::size_type n = 1;
-    for (dev = opts.begin() ; dev != opts.end() ;  ++dev, ++n)
+    for (opts_type::iterator i = opts.begin() ; i != opts.end() ;  ++i)
     {
         try
         {
-            display(*dev);
+            display(*i);
         }
         catch (const DevException)
         {
-            std::cerr << "Developer '" << *dev << "' doesn't seem to "
+            std::cerr << "Developer '" << *i << "' doesn't seem to "
                 << "exist." << std::endl;
 
             if (opts.size() == 1)
@@ -280,7 +271,7 @@ action_dev_handler_T::operator() (opts_type &opts)
         }
 
         /* skip a line if we're not displaying the last one */
-        if (not count and n != opts.size())
+        if (not count and ((i+1) != opts.end()))
             output.endl();
     }
 

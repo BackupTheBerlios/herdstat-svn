@@ -1,5 +1,27 @@
 ChangeLog for herdstat
 
+2005-09-18 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/util/regex.cc, herdstat/util/regex.hh: Renamed class from
+	regex_T to Regex.  Also added static const CFLAG/EFLAG members such as
+	Regex::cflags::extended (REG_EXTENDED), so that clients can use those
+	instead of the flags themselves.  Also moved operator== into the
+	header and inline'd it.
+	* src/pkgcache.hh: Instead of pkgs() member function that returns a
+	const reference to the pkg vector, use operator for implicit
+	conversion to vector<string>.
+	* src/herdstat.cc: Add check for regex-mode and if non options
+	arguments > 1, bail instead of having the check in each action handler.
+	* tests/Makefile.am, tests/algo-test.sh, tests/expected/algo,
+	tests/src/algo-test.cc, tests/src/Makefile.am: Added new test,
+	algo-test, for testing algorithms defined in
+	herdstat/util/algorithm.hh.
+	* tests/pkg-test.sh, tests/expected/pkg-dev-nh: Added pkg sub-test for
+	testing dev/no-herd.
+	* src/action_pkg_handler.cc: Fixed long-time bug that caused
+	metadata.xml's with no herds (not even "no-herd") to not be
+	interpreted as no-herd.
+
 2005-09-17 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Update version (1.1.1_alpha3).

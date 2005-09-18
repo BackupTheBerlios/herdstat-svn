@@ -35,9 +35,23 @@
 
 namespace util
 {
-    std::string::value_type tolower(const std::string::value_type c);
-    std::string::value_type toupper(const std::string::value_type c);
-    bool isdigit(const std::string::value_type c);
+    inline std::string::value_type
+    tolower(const std::string::value_type c)
+    {
+        return std::tolower(c, std::locale(""));
+    }
+
+    inline std::string::value_type
+    toupper(const std::string::value_type c)
+    {
+        return std::toupper(c, std::locale(""));
+    }
+
+    inline bool
+    isdigit(const std::string::value_type c)
+    {
+        return std::isdigit(c, std::locale(""));
+    }
 
     /** Convert std::string to all lowercase.
      * @param s String object.

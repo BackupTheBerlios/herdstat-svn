@@ -508,6 +508,13 @@ main(int argc, char **argv)
 	/* initialize XML stuff */
 	xml::Init init(optget("qa", bool));
 
+	if (optget("regex", bool) and nonopt_args.size() > 1)
+	{
+	    std::cerr << "You may only specify one regular expression."
+		<< std::endl;
+	    return EXIT_FAILURE;
+	}
+
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output */
 	std::sort(nonopt_args.begin(), nonopt_args.end());
@@ -517,8 +524,9 @@ main(int argc, char **argv)
 	    nonopt_args.erase(pos);
 
 	/* did the user specify the all target? */
-	if (std::find(nonopt_args.begin(),
-		nonopt_args.end(), "all") != nonopt_args.end())
+	if (not optget("regex", bool) and
+	    (std::find(nonopt_args.begin(),
+		       nonopt_args.end(), "all") != nonopt_args.end()))
 	{
 	    optset("all", bool, true);
 	    nonopt_args.clear();

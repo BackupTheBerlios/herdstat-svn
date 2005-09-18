@@ -39,7 +39,7 @@ portage::is_pkg_dir(const std::string &path)
     if (not util::is_dir(path))
         return false;
 
-    const util::regex_T regex("\\.ebuild$");
+    const util::Regex regex("\\.ebuild$");
     const util::dir_T dir(path);
     return dir.find(regex) != dir.end();
 }

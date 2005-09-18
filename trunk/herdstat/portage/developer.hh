@@ -73,10 +73,10 @@ namespace portage {
              */
             bool operator== (const std::string& user) const;
             bool operator== (const Developer& dev) const;
-            bool operator== (const util::regex_T& re) const;
+            bool operator== (const util::Regex& re) const;
             bool operator!= (const std::string& user) const;
             bool operator!= (const Developer& dev) const;
-            bool operator!= (const util::regex_T& re) const;
+            bool operator!= (const util::Regex& re) const;
             bool operator>  (const std::string& user) const;
             bool operator>  (const Developer& dev) const;
             bool operator>= (const std::string& user) const;
@@ -133,13 +133,13 @@ namespace portage {
     { return (_user == user); }
     inline bool Developer::operator== (const Developer& that) const
     { return (_user == that._user); }
-    inline bool Developer::operator== (const util::regex_T& re) const
+    inline bool Developer::operator== (const util::Regex& re) const
     { return (re == _user); }
     inline bool Developer::operator!= (const std::string& user) const
     { return not (*this == user); }
     inline bool Developer::operator!= (const Developer& that) const
     { return not (*this == that); }
-    inline bool Developer::operator!= (const util::regex_T& re) const
+    inline bool Developer::operator!= (const util::Regex& re) const
     { return (re != _user); }
     inline bool Developer::operator<  (const std::string& user) const
     { return (_user < user); }
@@ -276,7 +276,7 @@ namespace portage {
 
             iterator find(const std::string& dev) const;
             iterator find(const value_type dev) const;
-            iterator find(const util::regex_T &regex) const;
+            iterator find(const util::Regex &regex) const;
 
             size_type size() const;
             bool empty() const;
@@ -333,7 +333,7 @@ namespace portage {
     inline Developers::iterator Developers::find(const std::string& dev) const
     { return _devs.find(Developer(dev)); }
 
-    inline Developers::iterator Developers::find(const util::regex_T &regex) const
+    inline Developers::iterator Developers::find(const util::Regex &regex) const
     {
         return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
             UserRegexMatch<Developer>(), &regex));

@@ -276,26 +276,27 @@ dir_T::read()
 dir_T::iterator
 dir_T::find(const std::string &base)
 {
-    return std::find(this->begin(), this->end(),
-        this->path() + "/" + base);
-}
-/*****************************************************************************/
-dir_T::iterator
-dir_T::find(const regex_T &regex)
-{
-    return std::find_if(this->begin(), this->end(),
-        std::bind1st(regexMatch(), &regex));
+    const std::string path(this->path()+"/"+base);
+    return std::find(this->begin(), this->end(), path);
 }
 /*****************************************************************************/
 dir_T::const_iterator
 dir_T::find(const std::string &base) const
 {
-    return std::find(this->begin(), this->end(),
-        this->path() + "/" + base);
+    const std::string path(this->path()+"/"+base);
+    return std::find(this->begin(), this->end(), path);
 }
 /*****************************************************************************/
+dir_T::iterator
+dir_T::find(const Regex &regex)
+{
+    return std::find_if(this->begin(), this->end(),
+        std::bind1st(regexMatch(), &regex));
+}
+
+/*****************************************************************************/
 dir_T::const_iterator
-dir_T::find(const regex_T &regex) const
+dir_T::find(const Regex &regex) const
 {
     return std::find_if(this->begin(), this->end(),
         std::bind1st(regexMatch(), &regex));

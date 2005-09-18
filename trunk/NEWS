@@ -1,6 +1,12 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.2_alpha4:
+    Bug fixes:
+     - Fixed long time bug in pkg handler (-p) that caused metadata.xml's that
+       don't list a herd (not even "no-herd") to not show up when --no-herd is
+       specified.
+
 1.1.2_alpha3:
     Bug fixes:
      - Fixed a bug in the dirname() function that was causing problems if the

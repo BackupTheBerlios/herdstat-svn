@@ -34,6 +34,7 @@
 #include "action_herd_handler.hh"
 
 using namespace portage;
+using namespace util;
 
 void
 display_herd(const Herd& herd)
@@ -152,15 +153,11 @@ action_herd_handler_T::operator() (opts_type &opts)
         flush();
         return EXIT_SUCCESS;
     }
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
     else if (regex)
     {
-        regexp.assign(opts.front(), eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
+        regexp.assign(opts.front(),
+            eregex ? Regex::extended|Regex::icase :
+                     Regex::icase);
         opts.clear();
 
         util::transform_if(herds.begin(), herds.end(), std::back_inserter(opts),

@@ -62,7 +62,7 @@ class action_handler_T
         virtual void flush() { if (count) *stream << size << std::endl; }
 
         std::ostream *stream;               /* output stream */
-        util::regex_T regexp;               /* regular expression */
+        util::Regex regexp;               /* regular expression */
         util::color_map_T color;            /* color map */
         portage::config_T config;           /* portage configuration */
         const std::string portdir;         /* PORTDIR */

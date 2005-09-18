@@ -30,6 +30,8 @@
 #include "pkgcache.hh"
 #include "action_which_handler.hh"
 
+using namespace util;
+
 action_which_handler_T::~action_which_handler_T()
 {
 }
@@ -46,21 +48,16 @@ action_which_handler_T::operator() (opts_type &opts)
             << std::endl;
         return EXIT_FAILURE;
     }
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
     else if (regex)
     {
-        util::regex_T::string_type re(opts.front());
+        const std::string re(opts.front());
         opts.clear();
 
         pkgcache.init(portdir);
-        regexp.assign(re, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
+        regexp.assign(re, eregex? Regex::extended|Regex::icase :
+                                  Regex::icase);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer, pkgcache.pkgs());
+                    overlay, &search_timer, pkgcache);
 
         if (matches.empty())
         {
@@ -129,7 +126,7 @@ action_which_handler_T::operator() (opts_type &opts)
 
         if (regex)
             ebuild = portage::ebuild_which(config, p.second, overlay, NULL,
-                pkgcache.pkgs());
+                pkgcache);
         else
             ebuild = portage::ebuild_which(config, p.second, overlay, NULL);
 

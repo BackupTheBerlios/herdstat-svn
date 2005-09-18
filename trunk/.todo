@@ -7,9 +7,6 @@
         <note priority="veryhigh" time="1126950870">
             Add test for project_xml class.
         </note>
-        <note priority="high" time="1126950858">
-            Add test for copy_if and transform_if
-        </note>
     </note>
     <note priority="veryhigh" time="1126962481">
         Fetch stuff programatically.

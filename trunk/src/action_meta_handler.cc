@@ -42,6 +42,7 @@
 #include "action_meta_handler.hh"
 
 using namespace portage;
+using namespace util;
 
 static void
 display_metadata(const metadata_data& data)
@@ -112,7 +113,7 @@ display_metadata(const metadata_data& data)
             /* it's possible to have more than one HOMEPAGE */
             if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
             {
-                std::vector<std::string> parts = util::split(ebuild_vars["HOMEPAGE"]);
+                std::vector<std::string> parts(util::split(ebuild_vars["HOMEPAGE"]));
 
                 if (parts.size() >= 1)
                     output("Homepage", parts.front());
@@ -270,18 +271,15 @@ action_meta_handler_T::operator() (opts_type &opts)
 
         /* Loop, trimming each directory from the end until depth == 0 */
         std::string leftover;
-        std::string path = util::getcwd();
+        std::string path(util::getcwd());
         while (depth > 0)
         {
             std::string::size_type pos = path.rfind('/');
             if (pos != std::string::npos)
             {
-                if (leftover.empty())
-                    leftover = path.substr(pos + 1);
-                else
-                    leftover = path.substr(pos + 1) + "/" + leftover;
-
-                path = path.substr(0, pos);
+                leftover = (leftover.empty() ? path.substr(pos + 1) :
+                                               path.substr(pos + 1)+"/"+leftover);
+                path.erase(pos);
             }
             --depth;
         }
@@ -295,18 +293,13 @@ action_meta_handler_T::operator() (opts_type &opts)
         debug_msg("set portdir to '%s'", dir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
     }
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
     else if (regex)
     {
-        util::regex_T::string_type re(opts.front());
+        const std::string re(opts.front());
         opts.clear();
 
-        regexp.assign(re, eregex ? REG_EXTENDED|REG_ICASE : REG_ICASE);
+        regexp.assign(re, eregex ?
+            Regex::extended|Regex::icase : Regex::icase);
 
         matches = portage::find_package_regex(config,
                     regexp, overlay, &search_timer);

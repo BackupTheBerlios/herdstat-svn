@@ -59,7 +59,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         util::timer_T::size_type elapsed;
         const bool dev, meta, status;
         bool cache_is_valid, at_least_one_not_cached;
-        util::regex_T with;
+        util::Regex with;
 };
 
 #endif

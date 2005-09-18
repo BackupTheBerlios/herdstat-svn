@@ -31,72 +31,56 @@
 #include <cstdarg>
 #include <cstring>
 #include <locale>
+#include <functional>
 
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
 
 /*****************************************************************************
- * Convert the given character to (lower|upper)case                          *
+ * Convert the given string to all lowercase.                                *
  *****************************************************************************/
-std::string::value_type
-util::tolower(const std::string::value_type c)
+struct ToLower
 {
-    return std::tolower(c, std::locale(""));
-}
-std::string::value_type
-util::toupper(const std::string::value_type c)
-{
-    return std::toupper(c, std::locale(""));
-}
-bool
-util::isdigit(const std::string::value_type c)
-{
-    return std::isdigit(c, std::locale(""));
-}
-/*****************************************************************************
- * Convert the given std::string to all lowercase.                                *
- *****************************************************************************/
+    char operator()(char c) const { return std::tolower(c); }
+};
+
 std::string
 util::lowercase(const std::string &s)
 {
     if (s.empty())
-	return "";
+        return s;
 
     std::string result;
-    std::string::const_iterator i = s.begin(), e = s.end();
-    for (; i != e ; ++i)
-        result.push_back(util::tolower(*i));
+//    std::string::const_iterator i = s.begin(), e = s.end();
+//    for (; i != e ; ++i)
+//        result.push_back(util::tolower(*i));
+
+    std::transform(s.begin(), s.end(), std::back_inserter(result),
+        ToLower());
     
     return result;
 }
 /*****************************************************************************
- * Clean up the whitespace of the given std::string (collapse whitespace, remove  *
+ * Clean up the whitespace of the given string (collapse whitespace, remove  *
  * trailing/leading whitespace, and convert any \n's to spaces).             *
  *****************************************************************************/
-static bool
-bothspaces(std::string::value_type c1,
-           std::string::value_type c2)
+struct BothSpaces
 {
-/* NOTE: ideally we should use the below commented out code,
- * however, it is EXTREMELY FSCKING SLOW. */
-
-//    std::locale loc("");
-//    return std::isspace(c1, loc) and std::isspace(c2, loc);
-
-    return std::isspace(c1) and std::isspace(c2);
-}
+    bool operator()(char c1, char c2) const
+    { return (std::isspace(c1) and std::isspace(c2)); }
+};
 
 std::string
 util::tidy_whitespace(const std::string &s)
 {
     if (s.empty())
-	return "";
+	return s;
 
     std::string result;
 
     /* collapse whitespace */
     std::unique_copy(s.begin(), s.end(), std::back_inserter(result),
-        bothspaces);
+        BothSpaces());
 
     /* remove any leading whitespace */
     std::string::size_type pos = result.find_first_not_of(" \t\n");
@@ -104,17 +88,14 @@ util::tidy_whitespace(const std::string &s)
 	result.erase(0, pos);
 
     /* convert any newlines in the middle to a space */
-    std::string result2;
-    std::string::iterator i = result.begin(), e = result.end();
-    for (; i != e ; ++i)
-        result2.push_back(*i == '\n' ? ' ' : *i);
+    std::replace(result.begin(), result.end(), '\n', ' ');
 
     /* remove any trailing whitespace */
-    pos = result2.find_last_not_of(" \t\n");
+    pos = result.find_last_not_of(" \t\n");
     if (pos != std::string::npos)
-	result2.erase(++pos);
+	result.erase(++pos);
 	
-    return result2;
+    return result;
 }
 /*****************************************************************************/
 std::string

@@ -30,11 +30,13 @@
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/version.hh>
-#include "common.hh"
+
 #include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "formatter.hh"
 #include "action_versions_handler.hh"
+
+using namespace util;
 
 action_versions_handler_T::~action_versions_handler_T()
 {
@@ -74,18 +76,16 @@ action_versions_handler_T::operator() (opts_type &opts)
         /* Loop, trimming each directory from the end until depth == 0 */
         unsigned short depth = 2;
         std::string leftover;
-        std::string path = util::getcwd();
+        std::string path(util::getcwd());
+
         while (depth > 0)
         {
             std::string::size_type pos = path.rfind('/');
             if (pos != std::string::npos)
             {
-                if (leftover.empty())
-                    leftover = path.substr(pos + 1);
-                else
-                    leftover = path.substr(pos + 1) + "/" + leftover;
-
-                path = path.substr(0, pos);
+                leftover = (leftover.empty() ? path.substr(pos + 1) :
+                                               path.substr(pos + 1)+"/"+leftover);
+                path.erase(pos);
             }
             --depth;
         }
@@ -99,24 +99,17 @@ action_versions_handler_T::operator() (opts_type &opts)
         debug_msg("set portdir to '%s'", dir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
     }
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression." << std::endl;
-        return EXIT_FAILURE;
-    }
     else if (regex)
     {
-        util::regex_T::string_type re(opts.front());
+        const std::string re(opts.front());
         opts.clear();
         
-        if (eregex)
-            regexp.assign(re, REG_EXTENDED|REG_ICASE);
-        else
-            regexp.assign(re, REG_ICASE);
+        regexp.assign(re, eregex ? Regex::extended|Regex::icase :
+                                   Regex::icase);
         
         pkgcache_T pkgcache(portdir);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer, pkgcache.pkgs());
+                    overlay, &search_timer, pkgcache);
         
         if (matches.empty())
         {
@@ -127,8 +120,7 @@ action_versions_handler_T::operator() (opts_type &opts)
 
     }
 
-    opts_type::iterator i;
-    for (i = opts.begin() ; i != opts.end() ; ++i)
+    for (opts_type::iterator i = opts.begin() ; i != opts.end() ; ++i)
         matches.insert(std::make_pair("", *i));
 
     std::multimap<std::string, std::string>::iterator m;
@@ -136,8 +128,6 @@ action_versions_handler_T::operator() (opts_type &opts)
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         std::string package;
-
-//        std::cout << m->first << " : " << m->second << std::endl;
 
         try
         {
@@ -205,13 +195,13 @@ action_versions_handler_T::operator() (opts_type &opts)
                 << " is ambiguous. Possible matches are: "
                 << std::endl << std::endl;
 
-            std::vector<std::string>::const_iterator x;
-            for (x = e.packages.begin() ; x != e.packages.end() ; ++x)
+            opts_type::const_iterator i;
+            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
                 if (quiet or not optget("color", bool))
-                    std::cerr << *x << std::endl;
+                    std::cerr << *i << std::endl;
                 else
-                    std::cerr << color[green] << *x << color[none] << std::endl;
+                    std::cerr << color[green] << *i << color[none] << std::endl;
             }
 
             if (matches.size() == 1)

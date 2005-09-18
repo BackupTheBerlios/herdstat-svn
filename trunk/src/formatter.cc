@@ -138,7 +138,7 @@ formatter_T::highlight(const std::vector<string_type> &data)
             }
             else if (pos != string_type::npos)
             {
-                util::regex_T regex(h->first.substr(pos+3));
+                util::Regex regex(h->first.substr(pos+3));
                 if (regex == *i)
                 {
                     highlight = true;
@@ -298,7 +298,7 @@ formatter_T::append(const string_type &label, const string_type &data)
                         }
                         else if (pos != string_type::npos)
                         {
-                            util::regex_T regex(h->first.substr(pos+3));
+                            util::Regex regex(h->first.substr(pos+3));
                             if (regex == *i)
                             {
                                 highlight_found = true;

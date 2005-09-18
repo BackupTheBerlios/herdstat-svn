@@ -4,6 +4,7 @@ SUBDIRS = src
 
 tests = string \
 	glob \
+	algo \
 	herds.xml \
 	devaway.xml \
 	userinfo.xml \

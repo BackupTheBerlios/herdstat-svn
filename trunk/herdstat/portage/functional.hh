@@ -51,17 +51,17 @@ namespace portage {
 
     template <typename T>
     struct UserRegexMatch
-        : std::binary_function<const util::regex_T *, T, bool>
+        : std::binary_function<const util::Regex *, T, bool>
     {
-        bool operator()(const util::regex_T *re, const T &t) const
+        bool operator()(const util::Regex *re, const T &t) const
         { return (*re == t.user()); }
     };
 
     template <typename T>
     struct NameRegexMatch
-        : std::binary_function<const util::regex_T *, T, bool>
+        : std::binary_function<const util::Regex *, T, bool>
     {
-        bool operator()(const util::regex_T *re, const T& t) const
+        bool operator()(const util::Regex *re, const T& t) const
         { return (*re == t.name()); }
     };
 

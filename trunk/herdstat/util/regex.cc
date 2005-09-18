@@ -36,51 +36,46 @@
 #include <herdstat/exceptions.hh>
 
 namespace util {
+/*** static members **********************************************************/
+const Regex::cflags Regex::extended = Regex::cflags(REG_EXTENDED);
+const Regex::cflags Regex::icase = Regex::cflags(REG_ICASE);
+const Regex::cflags Regex::nosub = Regex::cflags(REG_NOSUB);
+const Regex::cflags Regex::newline = Regex::cflags(REG_NEWLINE);
+const Regex::eflags Regex::notbol = Regex::eflags(REG_NOTBOL);
+const Regex::eflags Regex::noteol = Regex::eflags(REG_NOTEOL);
 /*****************************************************************************/
-regex_T::regex_T()
+Regex::Regex()
     : _str(), _compiled(false), _cflags(0), _eflags(0), _regex()
 {
 }
 /*****************************************************************************/
-regex_T::regex_T(const std::string &regex, int cflags, int eflags)
-    : _str(regex), _compiled(false), _cflags(cflags), _eflags(eflags), _regex()
+Regex::Regex(const std::string &regex, int c, int e)
+    : _str(regex), _compiled(false), _cflags(c), _eflags(e), _regex()
 {
     this->compile();
 }
 /*****************************************************************************/
-regex_T::~regex_T()
+Regex::~Regex()
 {
     if (this->_compiled)
         this->cleanup();
 }
 /*****************************************************************************/
-bool
-regex_T::operator== (const std::string &cmp) const
-{
-    assert(this->_compiled);
-
-    int ret = regexec(&(this->_regex), cmp.c_str(), 0, NULL, this->_eflags);
-    if (ret == REG_ESPACE)
-        throw BadRegex(ret, &(this->_regex));
-
-    return (ret == 0);
-}
-/*****************************************************************************/
 void
-regex_T::assign(const std::string &regex, int cflags, int eflags)
+Regex::assign(const std::string &regex, int c, int e)
 {
     if (this->_compiled)
         this->cleanup();
 
     this->_str    = regex;
-    this->_cflags = cflags;
-    this->_eflags = eflags;
+    this->_cflags = c;
+    this->_eflags = e;
 
     this->compile();
 }
 /*****************************************************************************/
 void
-regex_T::compile()
+Regex::compile()
 {
     if (this->_compiled)
         this->cleanup();
@@ -93,7 +88,7 @@ regex_T::compile()
 }
 /*****************************************************************************/
 void
-regex_T::cleanup()
+Regex::cleanup()
 {
     regfree(&(this->_regex));
     this->_compiled = false;

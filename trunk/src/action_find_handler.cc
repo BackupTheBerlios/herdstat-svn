@@ -36,6 +36,8 @@
 #include "action_meta_handler.hh"
 #include "action_find_handler.hh"
 
+using namespace util;
+
 action_find_handler_T::action_find_handler_T()
     : action_portage_find_handler_T(), meta(optget("meta", bool))
 {
@@ -57,19 +59,15 @@ action_find_handler_T::operator() (opts_type &opts)
             << std::endl;
         return EXIT_FAILURE;
     }
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
     else if (regex)
     {
-        regexp.assign(opts.front(), eregex ? REG_EXTENDED|REG_ICASE : 
-                                             REG_ICASE);
+        regexp.assign(opts.front(),
+            eregex ? Regex::extended|Regex::icase :
+                     Regex::icase);
 
         matches = portage::find_package_regex(config,
-                    regexp, overlay, &search_timer, pkgcache.pkgs());
+                    regexp, overlay, &search_timer, pkgcache);
+
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '"
@@ -95,7 +93,7 @@ action_find_handler_T::operator() (opts_type &opts)
                 p = *m;
             else
                 p = portage::find_package(config, m->second,
-                        overlay, &search_timer, pkgcache.pkgs());
+                        overlay, &search_timer, pkgcache);
         }
         catch (const portage::AmbiguousPkg &e)
         {

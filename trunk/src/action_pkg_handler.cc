@@ -36,6 +36,7 @@
 #include "action_pkg_handler.hh"
 
 using namespace portage;
+using namespace util;
 
 action_pkg_handler_T::action_pkg_handler_T()
     : action_herds_xml_handler_T(), metacache(portdir),
@@ -87,10 +88,18 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
 
     if (dev)
     {
+//        if ((regex and (devs.find(regexp) != devs.end()) and
+//            (with.empty() or (herds.find(with) != herds.end()))) or
+//            (not regex and (devs.find(criteria) != devs.end()) and
+//            (with.empty() or (herds.find(with) != herds.end()))))
+//            return true;
+   
         if ((regex and (devs.find(regexp) != devs.end()) and
-            (with.empty() or (herds.find(with) != herds.end()))) or
+            (with.empty() or (herds.find(with) != herds.end()) or
+            (with() == "no-herd" and herds.empty()))) or
             (not regex and (devs.find(criteria) != devs.end()) and
-            (with.empty() or (herds.find(with) != herds.end()))))
+            (with.empty() or (herds.find(with) != herds.end()) or
+            (with() == "no-herd" and herds.empty()))))
             return true;
     }
     else
@@ -130,12 +139,11 @@ void
 action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
 {
     if (regex)
-        regexp.assign(q.query,
-            eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
+        regexp.assign(q.query, eregex ?
+            Regex::extended|Regex::icase : Regex::icase);
 
     /* for each package in the vector */
-    opts_type::const_iterator i;
-    for (i = pkgs.begin() ; i != pkgs.end() ; ++i)
+    for (opts_type::const_iterator i = pkgs.begin() ; i != pkgs.end() ; ++i)
     {
         /* parse it's metadata.xml */
         const std::string path(portdir + "/" + *i + "/metadata.xml");
@@ -165,31 +173,33 @@ void
 action_pkg_handler_T::search(const opts_type &opts)
 {
     /* for each metadata.xml */
-    metacache_T::const_iterator m;
-    for (m = metacache.begin() ; m != metacache.end() ; ++m)
+    for (metacache_T::const_iterator m = metacache.begin() ;
+         m != metacache.end() ; ++m)
     {
         /* for each specified herd/dev */
-        opts_type::const_iterator i;
-        for (i = opts.begin() ; i != opts.end() ; ++i)
+        for (opts_type::const_iterator i = opts.begin() ; i != opts.end() ; ++i)
         {
             if (regex)
-                regexp.assign(*i, eregex? REG_EXTENDED|REG_ICASE : REG_ICASE);
+                regexp.assign(*i, eregex?
+                    Regex::extended|Regex::icase :
+                    Regex::icase);
 
             /* does it match the criteria? */
             if (metadata_matches(**m, *i))
             {
-//                debug_msg("Match found in %s.", m->path.c_str());
-
                 /* we've already inserted at least one package */
                 std::map<std::string, pkgQuery_T * >::iterator mpos;
                 if ((mpos = matches.find(*i)) != matches.end())
-                    mpos->second->insert(std::make_pair((*m)->pkg(), (*m)->longdesc()));
+                    mpos->second->insert(std::make_pair((*m)->pkg(),
+                                                        (*m)->longdesc()));
                 /* nope, so create a new query object */
                 else
                 {
-                    matches[*i] = new pkgQuery_T(*i, with(), dev);
+                    matches.insert(std::make_pair(*i,
+                                   new pkgQuery_T(*i, with(), dev)));
                     matches[*i]->date = std::time(NULL);
-                    matches[*i]->insert(std::make_pair((*m)->pkg(), (*m)->longdesc()));
+                    matches[*i]->insert(std::make_pair((*m)->pkg(),
+                                                       (*m)->longdesc()));
 
                     if (dev)
                     {
@@ -201,7 +211,8 @@ action_pkg_handler_T::search(const opts_type &opts)
             /* didn't match */
             else if (matches.find(*i) == matches.end())
             {
-                matches[*i] = new pkgQuery_T(*i, with(), dev);
+                matches.insert(std::make_pair(*i,
+                               new pkgQuery_T(*i, with(), dev)));
                 matches[*i]->date = std::time(NULL);
 
                 if (dev)
@@ -271,10 +282,9 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         output("", q->begin()->first);
 
     /* display the category/package */
-    pkgQuery_T::const_iterator p = q->begin();
-    if (not q->empty()) ++p;
+    pkgQuery_T::const_iterator p;
     pkgQuery_T::size_type pn = 1;
-    for ( ; p != q->end() ; ++p, ++pn)
+    for (p = ++(q->begin()) ; p != q->end() ; ++p, ++pn)
     {
         std::string longdesc;
             
@@ -386,13 +396,6 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << std::endl;
         return EXIT_FAILURE;
     }
-    /* only 1 regex allowed at a time */
-    else if (regex and opts.size() > 1)
-    {
-        std::cerr << "You may only specify one regular expression."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
 
     /* check PORTDIR */
     if (not util::is_dir(portdir))
@@ -411,7 +414,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     /* setup with regex */
     with.assign(dev? optget("with-herd", std::string) :
-                     optget("with-maintainer", std::string), REG_ICASE);
+                     optget("with-maintainer", std::string),
+                     Regex::icase);
 
     /* load previously cached results */
     if (optget("querycache", bool))

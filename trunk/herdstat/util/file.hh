@@ -373,10 +373,10 @@ namespace util
             virtual iterator find(const value_type &p);
 
             /** Find element that matches the specified regular expression.
-             * @param r Reference to a util::regex_T object.
+             * @param r Reference to a util::Regex object.
              * @returns An iterator to the element (or end() if not found).
              */
-            virtual iterator find(const regex_T &r);
+            virtual iterator find(const Regex &r);
 
             /** Find element with the specified name.
              * @param p Path.
@@ -385,10 +385,10 @@ namespace util
             virtual const_iterator find(const value_type &p) const;
 
             /** Find element that matches the specified regular expression.
-             * @param r Reference to a util::regex_T object.
+             * @param r Reference to a util::Regex object.
              * @returns A const_iterator to the element (or end() if not found).
              */
-            virtual const_iterator find(const regex_T &r) const;
+            virtual const_iterator find(const Regex &r) const;
 
             iterator begin() { return _contents.begin(); }
             const_iterator begin() const { return _contents.begin(); }
