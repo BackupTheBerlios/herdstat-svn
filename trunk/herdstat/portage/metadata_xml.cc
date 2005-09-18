@@ -136,9 +136,9 @@ metadata_xml::text(const std::string& text)
     else if (in_desc)
         const_cast<Developer&>(*_cur_dev).set_role(text);
     else if (in_en_longdesc)
-        _data.set_longdesc(util::tidy_whitespace(_data.longdesc() + text));
+        _data.set_longdesc(_data.longdesc() + text);
     else if (in_longdesc)
-        _data.set_longdesc(util::tidy_whitespace(_data.longdesc() + text));
+        _data.set_longdesc(_data.longdesc() + text);
 
     return true;
 }

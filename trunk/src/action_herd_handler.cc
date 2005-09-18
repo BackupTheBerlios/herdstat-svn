@@ -51,7 +51,7 @@ display_herd(const Herd& herd)
         if (not herd.email().empty())
             out("Email", herd.email());
         if (not herd.desc().empty())
-            out("Description", herd.desc());
+            out("Description", util::tidy_whitespace(herd.desc()));
 
         if (optget("verbose", bool))
             out(util::sprintf("Developers(%d)", herd.size()), "");
@@ -106,7 +106,7 @@ display_herds(const Herds& herds)
                 out("", h->name());
 
             if (not h->desc().empty())
-                out("", h->desc());
+                out("", util::tidy_whitespace(h->desc()));
 
             if (not optget("count", bool) and n != herds.size())
                 out.endl();

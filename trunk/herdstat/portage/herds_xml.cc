@@ -154,7 +154,7 @@ herds_xml::text(const std::string& text)
     if (in_herd_name)
         _cur_herd = _herds.insert(Herd(text)).first;
     else if (in_herd_desc)
-        const_cast<Herd&>(*_cur_herd).set_desc(util::tidy_whitespace(text));
+        const_cast<Herd&>(*_cur_herd).set_desc(text);
     else if (in_herd_email)
         const_cast<Herd&>(*_cur_herd).set_email(text);        
     else if (in_maintainer_email)

@@ -27,10 +27,12 @@
 #include <iostream>
 #include <cstdlib>
 #include <herdstat/exceptions.hh>
+#include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/portage/devaway_xml.hh>
 
 using namespace portage;
+using namespace util;
 
 int
 main(int argc, char **argv)
@@ -51,12 +53,14 @@ main(int argc, char **argv)
 
         Developers::const_iterator i;
         for (i = devs.begin() ; i != devs.end() ; ++i)
-            std::cout << i->user() << ": " << i->awaymsg() << std::endl;
+            std::cout << i->user() << ": " << tidy_whitespace(i->awaymsg())
+                << std::endl;
 
         std::cout << std::endl;
 
         assert((i = devs.find("lv")) != devs.end());
-        std::cout << i->user() << " - " << i->awaymsg() << std::endl;
+        std::cout << i->user() << " - " << tidy_whitespace(i->awaymsg())
+            << std::endl;
     }
     catch (const BaseException &e)
     {

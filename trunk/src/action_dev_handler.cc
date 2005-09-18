@@ -137,6 +137,7 @@ action_dev_handler_T::display(const std::string &d)
         size += herds.size();
     }
 
+    /* display userinfo.xml stuff */
     if (not quiet)
     {
         if (not herds.empty() and verbose and not userinfo.empty())
@@ -167,7 +168,7 @@ action_dev_handler_T::display(const std::string &d)
         if (not dev.location().empty())
             output("Location", dev.location());
         if (dev.is_away() and not dev.awaymsg().empty())
-            output("Devaway", dev.awaymsg());
+            output("Devaway", util::tidy_whitespace(dev.awaymsg()));
     }
 }
 

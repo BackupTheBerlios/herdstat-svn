@@ -21,6 +21,14 @@ ChangeLog for herdstat
 	* src/action_pkg_handler.cc: Fixed long-time bug that caused
 	metadata.xml's with no herds (not even "no-herd") to not be
 	interpreted as no-herd.
+	* herdstat/portage/metadata_xml.cc, herdstat/portage/devaway_xml.cc,
+	herdstat/portage/herds_xml.cc, src/action_dev_handler.cc,
+	src/action_herd_handler.cc, src/action_away_handler.cc: Call
+	tidy_whitespace on descriptions and the like only when displaying, not
+	when storing internally.  Doing so prevents the need to do a ton of
+	string manipulations each time we parse an xml file.  It's especially
+	noticeble when generating the metadata.xml cache since there's so
+	many.
 
 2005-09-17 Aaron Walker <ka0ttic@gentoo.org>
 

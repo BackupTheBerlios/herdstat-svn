@@ -25,6 +25,7 @@
 #endif
 
 #include <iostream>
+#include <herdstat/util/string.hh>
 #include <herdstat/util/algorithm.hh>
 #include "action_away_handler.hh"
 
@@ -56,7 +57,7 @@ action_away_handler_T::display(const Developer& dev)
             output("Developer", d.name() + " (" + d.user() + ")");
 
         output("Email", d.email());
-        output("Away Message", d.awaymsg());
+        output("Away Message", util::tidy_whitespace(d.awaymsg()));
     }
 }
 

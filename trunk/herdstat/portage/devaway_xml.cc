@@ -130,8 +130,7 @@ bool
 devaway_xml::text(const std::string& text)
 {
     if (in_reason)
-        const_cast<Developer&>(*_cur_dev).set_awaymsg(
-            util::tidy_whitespace(_cur_dev->awaymsg() + text));
+        const_cast<Developer&>(*_cur_dev).set_awaymsg(_cur_dev->awaymsg()+text);
 
     return true;
 }
