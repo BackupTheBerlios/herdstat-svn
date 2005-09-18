@@ -1,6 +1,0 @@
-noinst_PROGRAMS = string-test
-string_test_SOURCES = string-test.cc
-string_test_LDADD = $(top_builddir)/lib/libutil.la
-AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast
-INCLUDES = -I$(top_builddir)/lib
-MAINTAINERCLEANFILES = Makefile.in *~
