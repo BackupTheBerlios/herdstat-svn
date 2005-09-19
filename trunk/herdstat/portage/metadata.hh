@@ -43,23 +43,20 @@ namespace portage {
         public:
             metadata();
             metadata(const std::string &pkg);
-//            metadata(const metadata& that);
             ~metadata();
 
-//            metadata& operator= (const metadata& that);
+            inline bool is_category() const;
+            inline const std::string& pkg() const;
+            inline const std::string& longdesc() const;
 
-            bool is_category() const;
-            const std::string& pkg() const;
-            const std::string& longdesc() const;
+            inline void set_category(bool cat);
+            inline void set_pkg(const std::string &pkg);
+            inline void set_longdesc(const std::string &longdesc);
 
-            void set_category(bool cat);
-            void set_pkg(const std::string &pkg);
-            void set_longdesc(const std::string &longdesc);
-
-            Herds& herds();
-            const Herds& herds() const;
-            Developers& devs();
-            const Developers& devs() const;
+            inline Herds& herds();
+            inline const Herds& herds() const;
+            inline Developers& devs();
+            inline const Developers& devs() const;
 
         private:
             friend class metadata_xml;
@@ -75,8 +72,8 @@ namespace portage {
     inline const std::string& metadata::pkg() const { return _pkg; }
     inline const std::string& metadata::longdesc() const { return _longdesc; }
     inline void metadata::set_category(bool cat) { _cat = cat; }
-    inline void metadata::set_pkg(const std::string &pkg) { _pkg.assign(pkg); }
-    inline void metadata::set_longdesc(const std::string &longdesc)
+    inline void metadata::set_pkg(const std::string& pkg) { _pkg.assign(pkg); }
+    inline void metadata::set_longdesc(const std::string& longdesc)
     { _longdesc.assign(longdesc); }
     inline const Herds& metadata::herds() const { return _herds; }
     inline const Developers& metadata::devs() const { return _devs; }

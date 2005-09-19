@@ -31,34 +31,12 @@
 #include <vector>
 #include <sstream>
 #include <cstdarg>
+#include <cerrno>
+#include <cctype>
 #include <herdstat/exceptions.hh>
 
 namespace util
 {
-    inline std::string::value_type
-    tolower(const std::string::value_type c)
-    {
-        return std::tolower(c, std::locale(""));
-    }
-
-    inline std::string::value_type
-    toupper(const std::string::value_type c)
-    {
-        return std::toupper(c, std::locale(""));
-    }
-
-    inline bool
-    isdigit(const std::string::value_type c)
-    {
-        return std::isdigit(c, std::locale(""));
-    }
-
-    /** Convert std::string to all lowercase.
-     * @param s String object.
-     * @returns Resulting std::string object.
-     */
-    std::string lowercase(const std::string &s);
-
     /** Tidy whitespace of the given std::string.
      * @param s String object
      * @returns Resulting std::string object.
@@ -86,26 +64,6 @@ namespace util
     std::string join(const std::vector<std::string> &v,
                      const std::string::value_type d = ' ');
 
-    /** Convert a type to a std::string.
-     * @param v Value of type T.
-     * @returns A std::string object.
-     */
-    template <typename T> std::string stringify(const T &v);
-
-    /** Convert a std::string to a type.
-     * @param s A std::string object.
-     * @returns Value of type T.
-     */
-    template <typename T> T destringify(const std::string &s);
-
-    // destringify specializations
-    template <> int destringify<int>(const std::string &s);
-    template <> long destringify<long>(const std::string &s);
-    template <> unsigned long destringify<unsigned long>(const std::string &s);
-    template <> double destringify<double>(const std::string &s);
-    template <> float destringify<float>(const std::string &s);
-    template <> bool destringify<bool>(const std::string &s);
-
     /** Replace any unfriendly characters in the given std::string to their
      * HTML counterparts.
      * @param s String object.
@@ -121,6 +79,29 @@ namespace util
     std::string unhtmlify(const std::string &s);
 
     /************************************************************************/
+    /** Convert string to all lowercase.
+     * @param s String object.
+     * @returns Resulting string object.
+     */
+    inline std::string
+    lowercase(const std::string& s)
+    {
+        std::string result;
+        std::transform(s.begin(), s.end(),
+            std::back_inserter(result), ::tolower);
+        return result;
+    }
+
+    inline void
+    lowercase_inplace(std::string& s)
+    {
+        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    }
+    /************************************************************************/
+    /** Convert a type to a std::string.
+     * @param v Value of type T.
+     * @returns A std::string object.
+     */
     template <typename T>
     std::string
     stringify(const T &v)
@@ -130,6 +111,10 @@ namespace util
         return os.str();
     }
     /************************************************************************/
+    /** Convert a std::string to a type.
+     * @param s A std::string object.
+     * @returns Value of type T.
+     */
     template <typename T>
     T
     destringify(const std::string &s)
@@ -145,8 +130,72 @@ namespace util
         return v;
     }
     /************************************************************************/
-}
+    template <>
+    inline int
+    destringify<int>(const std::string &s)
+    {
+        char *invalid;
+        int result = std::strtol(s.c_str(), &invalid, 10);
+        if (*invalid)
+            throw BadCast("Failed to cast '"+s+"' to int.");
+        return result;
+    }
+    /************************************************************************/
+    template <>
+    inline long
+    destringify<long>(const std::string &s)
+    {
+        char *invalid;
+        long result = std::strtol(s.c_str(), &invalid, 10);
+        if (*invalid)
+            throw BadCast("Failed to cast '"+s+"' to long.");
+        return result;
+    }
+    /************************************************************************/
+    template <>
+    inline unsigned long
+    destringify<unsigned long>(const std::string &s)
+    {
+        char *invalid;
+        unsigned long result = std::strtoul(s.c_str(), &invalid, 10);
+        if (*invalid or ((result == ULONG_MAX) and (errno == ERANGE)))
+            throw BadCast("Failed to cast '"+s+"' to unsigned long.");
+        return result;
+    }
+    /************************************************************************/
+    template <>
+    inline double
+    destringify<double>(const std::string &s)
+    {
+        char *invalid;
+        double result = std::strtod(s.c_str(), &invalid);
+        if (*invalid)
+            throw BadCast("Failed to cast '"+s+"' to double.");
+        return result;
+    }
+    /************************************************************************/
+    template <>
+    inline float
+    destringify<float>(const std::string &s)
+    {
+        char *invalid;
+        float result = std::strtod(s.c_str(), &invalid);
+        if (*invalid)
+            throw BadCast("Failed to cast '"+s+"' to float.");
+        return result;
+    }
+    /************************************************************************/
+    template <>
+    inline bool
+    destringify<bool>(const std::string &s)
+    {
+        if (s == "true" or s == "yes" or s == "on")  return true;
+        if (s == "false" or s == "no" or s == "off") return false;
+        return destringify<int>(s);
+    }
+    /************************************************************************/
+} // namespace util
 
-#endif
+#endif /* HAVE_STRING_HH */
 
 /* vim: set tw=80 sw=4 et : */

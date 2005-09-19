@@ -221,7 +221,7 @@ namespace portage {
             /** Copy constructor.
              * @param that Reference to another Developers object.
              */
-            Developers(const Developers& that);
+//            Developers(const Developers& that);
 
             /** Constructor. Assign a container_type.
              * @param v A reference to a container_type.
@@ -245,7 +245,7 @@ namespace portage {
              * @param that Reference to another Developers object.
              * @returns Reference to this.
              */
-            Developers& operator= (const Developers& that);
+//            Developers& operator= (const Developers& that);
 
             /** Assign a new container_type.
              * @param v Reference to container_type.
@@ -269,36 +269,36 @@ namespace portage {
             reverse_iterator rend();
             const_reverse_iterator rend() const;
 
-            value_type front();
-            const value_type front() const;
-            value_type back();
-            const value_type back() const;
+            value_type& front();
+            const value_type& front() const;
+            value_type& back();
+            const value_type& back() const;
 
             iterator find(const std::string& dev) const;
-            iterator find(const value_type dev) const;
+            iterator find(const value_type& dev) const;
             iterator find(const util::Regex &regex) const;
 
             size_type size() const;
             bool empty() const;
             void clear();
 
-            iterator insert(iterator pos, const value_type dev);
+            iterator insert(iterator pos, const value_type& dev);
 
             template <class In>
             void insert(In begin, In end);
 
-            std::pair<iterator, bool> insert(const value_type v);
+            std::pair<iterator, bool> insert(const value_type& v);
 
             void erase(iterator pos);
-            size_type erase(const value_type v);
+            size_type erase(const value_type& v);
             void erase(iterator begin, iterator end);
 
         private:
             container_type _devs;
     };
 
-    inline Developers& Developers::operator= (const Developers& that)
-    { *this = that._devs; return *this; }
+//    inline Developers& Developers::operator= (const Developers& that)
+//    { *this = that._devs; return *this; }
     inline Developers::iterator Developers::begin() { return _devs.begin(); }
     inline Developers::const_iterator Developers::begin() const { return _devs.begin(); }
     inline Developers::iterator Developers::end() { return _devs.end(); }
@@ -315,56 +315,58 @@ namespace portage {
     inline void Developers::clear() { return _devs.clear(); }
 
     inline void Developers::erase(iterator pos) { _devs.erase(pos); }
-    inline Developers::size_type Developers::erase(const value_type v)
+    inline Developers::size_type Developers::erase(const value_type& v)
     { return _devs.erase(v); }
     inline void Developers::erase(iterator begin, iterator end)
     { return _devs.erase(begin, end); }
-    inline Developers::iterator Developers::insert(iterator pos, const value_type dev)
+    inline Developers::iterator Developers::insert(iterator pos, const value_type& dev)
     { return _devs.insert(pos, dev); }
     template <class In> inline void
     Developers::insert(In begin, In end) { _devs.insert(begin, end); }
 
     inline std::pair<Developers::iterator, bool>
-    Developers::insert(const value_type v) { return _devs.insert(v); }
+    Developers::insert(const value_type& v) { return _devs.insert(v); }
 
-    inline Developers::iterator Developers::find(const value_type dev) const
+    inline Developers::iterator Developers::find(const value_type& dev) const
     { return _devs.find(dev); }
 
     inline Developers::iterator Developers::find(const std::string& dev) const
     { return _devs.find(Developer(dev)); }
 
-    inline Developers::iterator Developers::find(const util::Regex &regex) const
+    inline Developers::iterator Developers::find(const util::Regex& regex) const
     {
         return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
             UserRegexMatch<Developer>(), &regex));
     }
 
-    inline Developers::value_type
+    inline Developers::value_type&
     Developers::front()
     {
         assert(not _devs.empty());
-        return *(_devs.begin());
+        return const_cast<value_type&>(*_devs.begin());
     }
     
-    inline const Developers::value_type
+    inline const Developers::value_type&
     Developers::front() const
     {
         assert(not _devs.empty());
         return *(_devs.begin());
     }
 
-    inline Developers::value_type
+    inline Developers::value_type&
     Developers::back()
     {
         assert(not _devs.empty());
-        return *(--_devs.end());
+        iterator i(_devs.end());
+        return const_cast<value_type&>(*(--i));
     }
     
-    inline const Developers::value_type
+    inline const Developers::value_type&
     Developers::back() const
     {
         assert(not _devs.empty());
-        return *(--_devs.end());
+        iterator i(_devs.end());
+        return *(--i);
     }
 
 } // namespace portage

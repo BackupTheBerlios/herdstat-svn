@@ -30,32 +30,13 @@
 #include <map>
 #include <cstdarg>
 #include <cstring>
+#include <cctype>
 #include <locale>
 #include <functional>
 
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
 
-/*****************************************************************************
- * Convert the given string to all lowercase.                                *
- *****************************************************************************/
-struct ToLower
-{
-    char operator()(char c) const { return std::tolower(c); }
-};
-
-std::string
-util::lowercase(const std::string &s)
-{
-    if (s.empty())
-        return s;
-
-    std::string result;
-    std::transform(s.begin(), s.end(),
-        std::back_inserter(result), ToLower());
-    
-    return result;
-}
 /*****************************************************************************
  * Clean up the whitespace of the given string (collapse whitespace, remove  *
  * trailing/leading whitespace, and convert any \n's to spaces).             *
@@ -79,7 +60,7 @@ util::tidy_whitespace(const std::string &s)
     std::unique_copy(s.begin(), s.end(),
         std::back_inserter(result), BothSpaces());
 
-    /* replace all newlines to a space */
+    /* replace all newlines with a space */
     std::replace(result.begin(), result.end(), '\n', ' ');
 
     /* remove any leading whitespace */
@@ -182,16 +163,15 @@ util::unhtmlify(const std::string &str)
  *****************************************************************************/
 std::string
 util::join(const std::vector<std::string> &v,
-                const std::string::value_type delim)
+           const std::string::value_type delim)
 {
     std::string result;
 
-    std::vector<std::string>::const_iterator i = v.begin(), e = v.end();
-    for (; i != e ; ++i)
+    std::vector<std::string>::const_iterator i, end;
+    for (i = v.begin(), end = v.end(); i != end ; ++i)
     {
         result += *i;
-
-        if ((i+1) != e)
+        if ((i+1) != end)
             result += delim;
     }
 
@@ -222,77 +202,6 @@ util::split(const std::string& str, const std::string::value_type delim,
 	lpos = ++pos;
     }
     return v;
-}
-/*****************************************************************************/
-template <>
-int
-util::destringify<int>(const std::string &s)
-{
-    char *invalid;
-    int result = std::strtol(s.c_str(), &invalid, 10);
-    if (*invalid)
-        throw BadCast("Failed to cast '"+s+"' to int.");
-
-    return result;
-}
-/*****************************************************************************/
-template <>
-long
-util::destringify<long>(const std::string &s)
-{
-    char *invalid;
-    long result = std::strtol(s.c_str(), &invalid, 10);
-    if (*invalid)
-        throw BadCast("Failed to cast '"+s+"' to long.");
-
-    return result;
-}
-/*****************************************************************************/
-template <>
-unsigned long
-util::destringify<unsigned long>(const std::string &s)
-{
-    char *invalid;
-    unsigned long result = std::strtoul(s.c_str(), &invalid, 10);
-    if (*invalid or ((result == ULONG_MAX) and (errno == ERANGE)))
-        throw BadCast("Failed to cast '"+s+"' to unsigned long.");
-
-    return result;
-}
-/*****************************************************************************/
-template <>
-double
-util::destringify<double>(const std::string &s)
-{
-    char *invalid;
-    double result = std::strtod(s.c_str(), &invalid);
-    if (*invalid)
-        throw BadCast("Failed to cast '"+s+"' to double.");
-
-    return result;
-}
-/*****************************************************************************/
-template <>
-float
-util::destringify<float>(const std::string &s)
-{
-    char *invalid;
-    float result = std::strtod(s.c_str(), &invalid);
-    if (*invalid)
-        throw BadCast("Failed to cast '"+s+"' to float.");
-
-    return result;
-}
-/*****************************************************************************/
-template <>
-bool
-util::destringify<bool>(const std::string &s)
-{
-    if (s == "true" or s == "yes" or s == "on")
-        return true;
-    if (s == "false" or s == "no" or s == "off")
-        return false;
-    return destringify<int>(s);
 }
 /*****************************************************************************/
 /* vim: set tw=80 sw=4 et : */

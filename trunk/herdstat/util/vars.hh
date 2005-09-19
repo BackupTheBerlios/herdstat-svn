@@ -64,7 +64,7 @@ namespace util
              * @param k Key to look up.
              * @returns A std::string object (Value mapped to Key).
              */
-            std::string operator[] (const std::string &k) const;
+            inline std::string operator[] (const std::string &k) const;
 
             /** Dump keys/values to specified stream.
              * @param s Output stream.
@@ -82,22 +82,22 @@ namespace util
             /// Set default variables to be present before substitution.
             void set_defaults();
 
-            iterator begin();
-            const_iterator begin() const;
-            iterator end();
-            const_iterator end() const;
-            size_type size() const;
-            bool empty() const;
-            iterator find(const key_type &k);
-            const_iterator find(const key_type &k) const;
-            mapped_type& operator[] (const key_type &k);
-            std::pair<iterator, bool> insert(const value_type &v);
-            iterator insert(iterator hpos, const value_type &v);
-            template <class In> void insert(In begin, In end);
-            void erase(iterator pos);
-            size_type erase(const key_type &k);
-            void erase(iterator begin, iterator end);
-            void clear();
+            inline iterator begin();
+            inline const_iterator begin() const;
+            inline iterator end();
+            inline const_iterator end() const;
+            inline size_type size() const;
+            inline bool empty() const;
+            inline iterator find(const key_type &k);
+            inline const_iterator find(const key_type &k) const;
+            inline mapped_type& operator[] (const key_type &k);
+            inline std::pair<iterator, bool> insert(const value_type &v);
+            inline iterator insert(iterator hpos, const value_type &v);
+            template <class In> inline void insert(In begin, In end);
+            inline void erase(iterator pos);
+            inline size_type erase(const key_type &k);
+            inline void erase(iterator begin, iterator end);
+            inline void clear();
 
         protected:
             virtual void do_set_defaults() { }

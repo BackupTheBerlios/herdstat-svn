@@ -60,7 +60,7 @@ namespace portage {
             /** Copy constructor.
              * @param that Reference to another Herd object.
              */
-            Herd(const Herd& that);
+//            Herd(const Herd& that);
 
             /** Constructor.  Assign a container_type.
              * @param v Reference to a container_type.
@@ -186,7 +186,7 @@ namespace portage {
             /** Copy constructor.
              * @param that Reference to another Herds object.
              */
-            Herds(const Herds& that);
+//            Herds(const Herds& that);
 
             /// Destructor.
             ~Herds();
@@ -213,7 +213,7 @@ namespace portage {
              * @param that Reference to another Herds object.
              * @returns Reference to this.
              */
-            Herds& operator= (const Herds& that);
+//            Herds& operator= (const Herds& that);
 
             /* container_type subset */
             iterator begin();
@@ -225,28 +225,28 @@ namespace portage {
             reverse_iterator rend();
             const_reverse_iterator rend() const;
 
-            value_type front();
-            const value_type front() const;
-            value_type back();
-            const value_type back() const;
+            value_type& front();
+            const value_type& front() const;
+            value_type& back();
+            const value_type& back() const;
 
-            iterator find(const std::string &herd) const;
-            iterator find(const value_type h) const;
-            iterator find(const util::Regex &regex) const;
+            iterator find(const std::string& herd) const;
+            iterator find(const value_type& h) const;
+            iterator find(const util::Regex& regex) const;
 
             size_type size() const;
             bool empty() const;
             void clear();
 
-            iterator insert(iterator pos, const value_type h);
+            iterator insert(iterator pos, const value_type& h);
 
             template <class In>
             void insert(In begin, In end);
 
-            std::pair<iterator, bool> insert(const value_type v);
+            std::pair<iterator, bool> insert(const value_type& v);
 
             void erase(iterator pos);
-            size_type erase(const value_type v);
+            size_type erase(const value_type& v);
             void erase(iterator begin, iterator end);
 
         private:
@@ -254,8 +254,8 @@ namespace portage {
     };
 
     inline Herds::operator Herds::container_type() const { return _herds; }
-    inline Herds& Herds::operator= (const Herds& that)
-    { *this = that._herds; return *this; }
+//    inline Herds& Herds::operator= (const Herds& that)
+//    { *this = that._herds; return *this; }
     inline Herds::iterator Herds::begin() { return _herds.begin(); }
     inline Herds::const_iterator Herds::begin() const { return _herds.begin(); }
     inline Herds::iterator Herds::end() { return _herds.end(); }
@@ -270,57 +270,59 @@ namespace portage {
     inline Herds::size_type Herds::size() const { return _herds.size(); }
     inline bool Herds::empty() const { return _herds.empty(); }
     inline void Herds::clear() { return _herds.clear(); }
-    inline Herds::iterator Herds::insert(iterator pos, const value_type h)
+    inline Herds::iterator Herds::insert(iterator pos, const value_type& h)
     { return _herds.insert(pos, h); }
 
     template <class In> inline void
     Herds::insert(In begin, In end) { _herds.insert(begin, end); }
 
     inline std::pair<Herds::iterator, bool>
-    Herds::insert(const value_type v) { return _herds.insert(v); }
+    Herds::insert(const value_type& v) { return _herds.insert(v); }
 
     inline void Herds::erase(iterator pos) { _herds.erase(pos); }
-    inline Herds::size_type Herds::erase(const value_type v)
+    inline Herds::size_type Herds::erase(const value_type& v)
     { return _herds.erase(v); }
     inline void Herds::erase(iterator begin, iterator end)
     { _herds.erase(begin, end); }
 
-    inline Herds::iterator Herds::find(const value_type v) const
+    inline Herds::iterator Herds::find(const value_type& v) const
     { return _herds.find(v); }
 
     inline Herds::iterator Herds::find(const std::string& h) const
     { return _herds.find(Herd(h)); }
     
-    inline Herds::iterator Herds::find(const util::Regex &regex) const
+    inline Herds::iterator Herds::find(const util::Regex& regex) const
     { return std::find_if(_herds.begin(), _herds.end(), std::bind1st(
             NameRegexMatch<Herd>(), &regex)); }
 
-    inline Herds::value_type
+    inline Herds::value_type&
     Herds::front()
     {
         assert(not _herds.empty());
-        return *(_herds.begin());
+        return const_cast<value_type&>(*_herds.begin());
     }
     
-    inline const Herds::value_type
+    inline const Herds::value_type&
     Herds::front() const
     {
         assert(not _herds.empty());
         return *(_herds.begin());
     }
 
-    inline Herds::value_type
+    inline Herds::value_type&
     Herds::back()
     {
         assert(not _herds.empty());
-        return *(--_herds.end());
+        iterator i(_herds.end());
+        return const_cast<value_type&>(*(--i));
     }
     
-    inline const Herds::value_type
+    inline const Herds::value_type&
     Herds::back() const
     {
         assert(not _herds.empty());
-        return *(--_herds.end());
+        iterator i(_herds.end());
+        return *(--i);
     }
 
 } // namespace portage

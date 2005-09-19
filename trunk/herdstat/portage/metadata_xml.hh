@@ -49,12 +49,12 @@ namespace portage {
 
             virtual void parse(const std::string& path = "");
 
-            const metadata& data() const;
+            inline const metadata& data() const;
 
             /* for convenience */
-            const std::string& longdesc() const;
-            const Herds& herds() const;
-            const Developers&  devs()  const;
+            inline const std::string& longdesc() const;
+            inline const Herds& herds() const;
+            inline const Developers&  devs()  const;
 
         protected:
             virtual bool start_element(const std::string& name,

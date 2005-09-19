@@ -33,31 +33,13 @@ metadata::metadata() : _pkg(), _longdesc(), _cat(false), _herds(), _devs()
 }
 /****************************************************************************/
 metadata::metadata(const std::string &pkg)
-    : _pkg(pkg), _longdesc(), _cat((pkg.find('/') == std::string::npos)),
-      _herds(), _devs()
+    : _pkg(pkg), _longdesc(), _cat(false), _herds(), _devs()
 {
 }
-/****************************************************************************/
-//metadata::metadata(const metadata& that)
-//    : _pkg(), _longdesc(), _cat(), _herds(), _devs()
-//{
-//    *this = that;
-//}
 /****************************************************************************/
 metadata::~metadata()
 {
 }
-/****************************************************************************/
-//metadata&
-//metadata::operator= (const metadata& that)
-//{
-//    _pkg = that._pkg;
-//    _longdesc = that._longdesc;
-//    _cat = that._cat;
-//    _herds = that._herds;
-//    _devs = that._devs;
-//    return *this;
-//}
 /****************************************************************************/
 } // namespace portage
 

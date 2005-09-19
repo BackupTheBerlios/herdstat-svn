@@ -75,29 +75,20 @@ metadata_xml::start_element(const std::string& name, const attrs_type& attrs)
         in_desc = true;
     else if (name == "longdescription")
     {
-        /* determine in_longdesc based on locale */
-
-        std::string value, locale(std::locale("").name());
-
         attrs_type::const_iterator i = attrs.find("lang");
         if (i != attrs.end())
-            value.assign(i->second);
-
-        if (value == "en")
         {
-            in_en_longdesc = true;
-            return true;
+            if (i->second.empty() or (i->second == "en"))
+            {
+                in_en_longdesc = true;
+                return true;
+            }
+        
+            if (i->second == std::locale("").name().substr(0, 2))
+                in_longdesc = true;
         }
-
-        if (value.empty())
-            in_longdesc = true;
         else
-        {
-            if (value == locale.substr(0, 2))
-                in_longdesc = true;
-            else if ((locale == "C" or locale == "POSIX") and value == "en")
-                in_longdesc = true;
-        }
+            in_en_longdesc = true;
     }
 
     return true;
@@ -135,11 +126,8 @@ metadata_xml::text(const std::string& text)
         const_cast<Developer&>(*_cur_dev).set_name(_cur_dev->name() + text);
     else if (in_desc)
         const_cast<Developer&>(*_cur_dev).set_role(text);
-    else if (in_en_longdesc)
+    else if (in_en_longdesc or in_longdesc)
         _data.set_longdesc(_data.longdesc() + text);
-    else if (in_longdesc)
-        _data.set_longdesc(_data.longdesc() + text);
-
     return true;
 }
 /****************************************************************************/
