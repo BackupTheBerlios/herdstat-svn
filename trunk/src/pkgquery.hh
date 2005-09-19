@@ -36,7 +36,7 @@
 
 enum query_type { QUERYTYPE_DEV, QUERYTYPE_HERD };
 
-class pkgQuery_T : public std::map<std::string, std::string>
+class pkgQuery_T
 {
     public:
         typedef std::map<std::string, std::string> container_type;
@@ -55,25 +55,25 @@ class pkgQuery_T : public std::map<std::string, std::string>
         bool operator== (const pkgQuery_T &) const;
         std::vector<std::string> pkgs() const;
 
-        iterator begin();
-        const_iterator begin() const;
-        iterator end();
-        const_iterator end() const;
+        inline iterator begin();
+        inline const_iterator begin() const;
+        inline iterator end();
+        inline const_iterator end() const;
 
-        size_type size() const;
-        bool empty() const;
+        inline size_type size() const;
+        inline bool empty() const;
 
-        mapped_type& operator[] (const key_type& k);
+        inline mapped_type& operator[] (const key_type& k);
 
-        std::pair<iterator, bool> insert(const value_type& v);
-        template <class In> void insert(In begin, In end);
+        inline std::pair<iterator, bool> insert(const value_type& v);
+        template <class In> inline void insert(In begin, In end);
 
-        void erase(iterator pos);
-        void erase(iterator begin, iterator end);
-        size_type erase(const key_type& k);
+        inline void erase(iterator pos);
+        inline void erase(iterator begin, iterator end);
+        inline size_type erase(const key_type& k);
 
-        iterator find(const key_type& k);
-        const_iterator find(const key_type& k) const;
+        inline iterator find(const key_type& k);
+        inline const_iterator find(const key_type& k) const;
 
         container_type _pkgs;
         portage::Developer info;
