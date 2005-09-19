@@ -29,11 +29,6 @@
 
 #include <exception>
 #include <stdexcept>
-#include <string>
-#include <cstdlib>
-#include <cstring>
-#include <cstdarg>
-#include <cerrno>
 #include <sys/types.h>
 #include <regex.h>
 
@@ -42,53 +37,16 @@ class BaseException : public std::exception { };
 class Exception : public BaseException
 {
     public:
-        Exception() : _buf(NULL) { }
+        Exception();
+        Exception(const Exception& that);
+        Exception(const char *fmt, va_list v);
+        Exception(const char *fmt, ...);
+        Exception(const std::string& fmt, ...);
 
-        Exception(const Exception& that) : _buf(NULL) { *this = that; }
+        Exception& operator= (const Exception& that);
 
-        Exception(const char *fmt, va_list v) : _buf(NULL)
-        {
-            vasprintf(&_buf, fmt, v);
-        }
-        
-        Exception(const char *fmt, ...) : _buf(NULL)
-        {
-            va_start(_v, fmt);
-            vasprintf(&_buf, fmt, _v);
-            va_end(_v);
-        }
-        
-        Exception(const std::string& fmt, ...) : _buf(NULL)
-        {
-#ifdef HAVE_GCC4
-            va_start(_v, fmt);
-#else
-            va_start(_v, fmt.c_str());
-#endif
-            vasprintf(&_buf, fmt.c_str(), _v);
-            va_end(_v);
-        }
-
-        Exception& operator= (const Exception& that)
-        {
-            if (_buf)
-            {
-                std::free(_buf);
-                _buf = NULL;
-            }
-            if (that._buf)
-                _buf = strdup(that._buf);
-
-            return *this;
-        }
-
-        virtual ~Exception() throw()
-        {
-            if (_buf)
-                std::free(_buf);
-        }
-
-        virtual const char *what() const throw() { return _buf; }
+        virtual ~Exception() throw();
+        virtual const char *what() const throw();
 
     protected:
         const char *message() const { return _buf; }
@@ -101,20 +59,12 @@ class Exception : public BaseException
 class ErrnoException : public Exception
 {
     public:
-        ErrnoException() : _code(errno) { }
-        ErrnoException(const char *msg) : Exception(msg), _code(errno) { }
-        ErrnoException(const std::string& msg) : Exception(msg), _code(errno) { }
+        ErrnoException();
+        ErrnoException(const char *msg);
+        ErrnoException(const std::string& msg);
+        virtual ~ErrnoException() throw() { }
 
-        virtual const char *what() const throw()
-        {
-            std::string s(this->message());
-            std::string e(std::strerror(_code));
-            if (s.empty())
-                return e.c_str();
-            if (e.empty())
-                return s.c_str();
-            return (s + ": " + e).c_str();
-        }
+        virtual const char *what() const throw();
 
         int code() const { return _code; }
 
@@ -125,44 +75,30 @@ class ErrnoException : public Exception
 class FileException : public ErrnoException
 {
     public:
-        FileException() { }
-        FileException(const char *msg) : ErrnoException(msg) { }
-        FileException(const std::string& msg) : ErrnoException(msg) { }
+        FileException();
+        FileException(const char *msg);
+        FileException(const std::string& msg);
+        virtual ~FileException() throw() { }
 };
 
 class BadCast : public Exception
 {
     public:
-        BadCast() { }
-        BadCast(const char *msg) : Exception(msg) { }
-        BadCast(const std::string& msg) : Exception(msg) { }
+        BadCast();
+        BadCast(const char *msg);
+        BadCast(const std::string& msg);
+        virtual ~BadCast() throw() { }
 };
 
 class BadRegex : public Exception
 {
      public:
-         BadRegex() : _err(0), _re(NULL) { }
-         BadRegex(int e, const regex_t *re) : _err(e), _re(re) { }
-         BadRegex(const std::string& s) : Exception(s), _err(0), _re(NULL) { }
+         BadRegex();
+         BadRegex(int e, const regex_t *re);
+         BadRegex(const std::string& s);
+         virtual ~BadRegex() throw() { }
+         virtual const char *what() const throw();
 
-         virtual const char *what() const throw()
-         {
-             if (not this->message() and (not _re or (_err == 0)))
-                 return "";
-
-             if (this->message())
-             {
-                 std::size_t len(regerror(_err, _re, NULL, 0));
-                 char *buf = new char(len);
-                 regerror(_err, _re, buf, len);
-                 std::string s(buf);
-                 delete buf;
-                 return s.c_str();
-             }
-             
-             return "";
-         }
-         
      private:
          int _err;
          const regex_t *_re;
@@ -171,25 +107,28 @@ class BadRegex : public Exception
 class BadDate : public Exception
 {
     public:
-        BadDate() { }
-        BadDate(const char *msg) : Exception(msg) { }
-        BadDate(const std::string& msg) : Exception(msg) { }
+        BadDate();
+        BadDate(const char *msg);
+        BadDate(const std::string& msg);
+        virtual ~BadDate() throw() { }
 };
 
 class FetchException : public Exception
 {
     public:
-        FetchException() { }
-        FetchException(const char *msg) : Exception(msg) { }
-        FetchException(const std::string& msg) : Exception(msg) { }
+        FetchException();
+        FetchException(const char *msg);
+        FetchException(const std::string& msg);
+        virtual ~FetchException() throw() { }
 };
 
 class MalformedEmail : public Exception
 {
     public:
-        MalformedEmail() { }
-        MalformedEmail(const char *msg) : Exception(msg) { }
-        MalformedEmail(const std::string& msg) : Exception(msg) { }
+        MalformedEmail();
+        MalformedEmail(const char *msg);
+        MalformedEmail(const std::string& msg);
+        virtual ~MalformedEmail() throw() { }
 };
 
 #endif /* _HAVE_HERDSTAT_EXCEPTIONS_HH */
