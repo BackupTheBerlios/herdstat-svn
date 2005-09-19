@@ -51,8 +51,8 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const;
 
-            const Developers& devs() const;
-            Developers& devs();
+            inline const Developers& devs() const;
+            inline Developers& devs();
 
             const std::vector<std::string> keys() const;
 

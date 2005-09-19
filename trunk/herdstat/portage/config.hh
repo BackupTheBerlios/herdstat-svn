@@ -44,8 +44,6 @@ namespace portage
     class config_T : public util::vars_T
     {
         public:
-            typedef std::string string_type;
-
             /** Default constructor.
              * Opens and reads make.conf and make.globals.
              */
@@ -62,12 +60,12 @@ namespace portage
             /** Determine PORTDIR.
              * @returns A std::string object.
              */
-            const string_type portdir() const;
+            const std::string portdir() const;
 
             /** Determine PORTDIR_OVERLAY.
              * @returns A vector of std::string objects.
              */
-            const std::vector<string_type> overlays() const;
+            const std::vector<std::string> overlays() const;
     };
 }
 

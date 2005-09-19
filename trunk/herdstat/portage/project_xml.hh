@@ -49,7 +49,7 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const { }
 
-            const Herd& devs() const;
+            inline const Herd& devs() const;
 
         protected:
             virtual bool start_element(const std::string& name,

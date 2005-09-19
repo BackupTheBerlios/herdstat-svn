@@ -65,53 +65,53 @@ namespace portage {
             /** Implicit conversion to std::string.
              * @returns Developer user name.
              */
-            operator std::string() const;
+            inline operator std::string() const;
 
             /** Determine if this developer is equal to that developer.
              * @param user user name.
              * @returns True if user name is equivelent.
              */
-            bool operator== (const std::string& user) const;
-            bool operator== (const Developer& dev) const;
-            bool operator== (const util::Regex& re) const;
-            bool operator!= (const std::string& user) const;
-            bool operator!= (const Developer& dev) const;
-            bool operator!= (const util::Regex& re) const;
-            bool operator>  (const std::string& user) const;
-            bool operator>  (const Developer& dev) const;
-            bool operator>= (const std::string& user) const;
-            bool operator>= (const Developer& dev) const;
-            bool operator<  (const std::string& user) const;
-            bool operator<  (const Developer& dev) const;
-            bool operator<= (const std::string& user) const;
-            bool operator<= (const Developer& dev) const;
+            inline bool operator== (const std::string& user) const;
+            inline bool operator== (const Developer& dev) const;
+            inline bool operator== (const util::Regex& re) const;
+            inline bool operator!= (const std::string& user) const;
+            inline bool operator!= (const Developer& dev) const;
+            inline bool operator!= (const util::Regex& re) const;
+            inline bool operator>  (const std::string& user) const;
+            inline bool operator>  (const Developer& dev) const;
+            inline bool operator>= (const std::string& user) const;
+            inline bool operator>= (const Developer& dev) const;
+            inline bool operator<  (const std::string& user) const;
+            inline bool operator<  (const Developer& dev) const;
+            inline bool operator<= (const std::string& user) const;
+            inline bool operator<= (const Developer& dev) const;
 
-            const std::string& user() const;
-            const std::string& email() const;
-            const std::string& name() const;
-            const std::string& pgpkey() const;
-            const std::string& joined() const;
-            const std::string& birthday() const;
-            const std::string& status() const;
-            const std::string& role() const;
-            const std::string& location() const;
-            const std::string& awaymsg() const;
-            const std::vector<std::string>& herds() const;
-            bool is_away() const;
+            inline const std::string& user() const;
+            inline const std::string& email() const;
+            inline const std::string& name() const;
+            inline const std::string& pgpkey() const;
+            inline const std::string& joined() const;
+            inline const std::string& birthday() const;
+            inline const std::string& status() const;
+            inline const std::string& role() const;
+            inline const std::string& location() const;
+            inline const std::string& awaymsg() const;
+            inline const std::vector<std::string>& herds() const;
+            inline bool is_away() const;
 
-            void set_user(const std::string& user);
-            void set_email(const std::string& email);
-            void set_name(const std::string& name);
-            void set_pgpkey(const std::string& pgpkey);
-            void set_joined(const std::string& date);
-            void set_birthday(const std::string& date);
-            void set_status(const std::string& status);
-            void set_role(const std::string& role);
-            void set_location(const std::string& location);
-            void set_awaymsg(const std::string& msg);
-            void set_herds(const std::vector<std::string>& herds);
-            void append_herd(const std::string& herd);
-            void set_away(const bool away);
+            inline void set_user(const std::string& user);
+            inline void set_email(const std::string& email);
+            inline void set_name(const std::string& name);
+            inline void set_pgpkey(const std::string& pgpkey);
+            inline void set_joined(const std::string& date);
+            inline void set_birthday(const std::string& date);
+            inline void set_status(const std::string& status);
+            inline void set_role(const std::string& role);
+            inline void set_location(const std::string& location);
+            inline void set_awaymsg(const std::string& msg);
+            inline void set_herds(const std::vector<std::string>& herds);
+            inline void append_herd(const std::string& herd);
+            inline void set_away(const bool away);
 
         private:
             std::string _user;
@@ -260,38 +260,38 @@ namespace portage {
              */
             Developers& operator= (const std::vector<std::string>& v);
 
-            iterator begin();
-            const_iterator begin() const;
-            iterator end();
-            const_iterator end() const;
-            reverse_iterator rbegin();
-            const_reverse_iterator rbegin() const;
-            reverse_iterator rend();
-            const_reverse_iterator rend() const;
+            inline iterator begin();
+            inline const_iterator begin() const;
+            inline iterator end();
+            inline const_iterator end() const;
+            inline reverse_iterator rbegin();
+            inline const_reverse_iterator rbegin() const;
+            inline reverse_iterator rend();
+            inline const_reverse_iterator rend() const;
 
-            value_type& front();
-            const value_type& front() const;
-            value_type& back();
-            const value_type& back() const;
+            inline value_type& front();
+            inline const value_type& front() const;
+            inline value_type& back();
+            inline const value_type& back() const;
 
-            iterator find(const std::string& dev) const;
-            iterator find(const value_type& dev) const;
-            iterator find(const util::Regex &regex) const;
+            inline iterator find(const std::string& dev) const;
+            inline iterator find(const value_type& dev) const;
+            inline iterator find(const util::Regex &regex) const;
 
-            size_type size() const;
-            bool empty() const;
-            void clear();
+            inline size_type size() const;
+            inline bool empty() const;
+            inline void clear();
 
-            iterator insert(iterator pos, const value_type& dev);
+            inline iterator insert(iterator pos, const value_type& dev);
 
             template <class In>
-            void insert(In begin, In end);
+            inline void insert(In begin, In end);
 
-            std::pair<iterator, bool> insert(const value_type& v);
+            inline std::pair<iterator, bool> insert(const value_type& v);
 
-            void erase(iterator pos);
-            size_type erase(const value_type& v);
-            void erase(iterator begin, iterator end);
+            inline void erase(iterator pos);
+            inline size_type erase(const value_type& v);
+            inline void erase(iterator begin, iterator end);
 
         private:
             container_type _devs;

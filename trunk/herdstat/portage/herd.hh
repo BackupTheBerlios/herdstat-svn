@@ -82,39 +82,39 @@ namespace portage {
             Herd& operator= (const Herd& that);
 
             /// Implicit conversion to std::string.
-            operator std::string() const;
+            inline operator std::string() const;
 
             /** Determine if this herd is equal to that herd.
              * @param name herd name.
              * @returns True if herd names are equivelent.
              */
-            bool operator== (const std::string& name) const;
-            bool operator== (const Herd& herd) const;
-            bool operator== (const util::Regex& re) const;
-            bool operator!= (const std::string& name) const;
-            bool operator!= (const Herd& herd) const;
-            bool operator!= (const util::Regex& re) const;
-            bool operator<  (const std::string& name) const;
-            bool operator<  (const Herd& herd) const;
-            bool operator>  (const std::string& name) const;
-            bool operator>  (const Herd& herd) const;
-            bool operator<= (const std::string& name) const;
-            bool operator<= (const Herd& herd) const;
-            bool operator>= (const std::string& name) const;
-            bool operator>= (const Herd& herd) const;
+            inline bool operator== (const std::string& name) const;
+            inline bool operator== (const Herd& herd) const;
+            inline bool operator== (const util::Regex& re) const;
+            inline bool operator!= (const std::string& name) const;
+            inline bool operator!= (const Herd& herd) const;
+            inline bool operator!= (const util::Regex& re) const;
+            inline bool operator<  (const std::string& name) const;
+            inline bool operator<  (const Herd& herd) const;
+            inline bool operator>  (const std::string& name) const;
+            inline bool operator>  (const Herd& herd) const;
+            inline bool operator<= (const std::string& name) const;
+            inline bool operator<= (const Herd& herd) const;
+            inline bool operator>= (const std::string& name) const;
+            inline bool operator>= (const Herd& herd) const;
 
             /// Get herd name.
-            const std::string& name() const;
+            inline const std::string& name() const;
             /// Get herd email address.
-            const std::string& email() const;
+            inline const std::string& email() const;
             /// Get herd description.
-            const std::string& desc() const;
+            inline const std::string& desc() const;
             /// Set herd name.
-            void set_name(const std::string &name);
+            inline void set_name(const std::string &name);
             /// Set herd email address.
-            void set_email(const std::string &email);
+            inline void set_email(const std::string &email);
             /// Set herd description.
-            void set_desc(const std::string &desc);
+            inline void set_desc(const std::string &desc);
 
         private:
             std::string _name;
@@ -192,7 +192,7 @@ namespace portage {
             ~Herds();
 
             /// Implicit conversion to container_type.
-            operator container_type() const;
+            inline operator container_type() const;
             /// Implicit conversion to std::vector<std::string>.
             operator std::vector<std::string>() const;
 
@@ -216,38 +216,38 @@ namespace portage {
 //            Herds& operator= (const Herds& that);
 
             /* container_type subset */
-            iterator begin();
-            const_iterator begin() const;
-            iterator end();
-            const_iterator end() const;
-            reverse_iterator rbegin();
-            const_reverse_iterator rbegin() const;
-            reverse_iterator rend();
-            const_reverse_iterator rend() const;
+            inline iterator begin();
+            inline const_iterator begin() const;
+            inline iterator end();
+            inline const_iterator end() const;
+            inline reverse_iterator rbegin();
+            inline const_reverse_iterator rbegin() const;
+            inline reverse_iterator rend();
+            inline const_reverse_iterator rend() const;
 
-            value_type& front();
-            const value_type& front() const;
-            value_type& back();
-            const value_type& back() const;
+            inline value_type& front();
+            inline const value_type& front() const;
+            inline value_type& back();
+            inline const value_type& back() const;
 
-            iterator find(const std::string& herd) const;
-            iterator find(const value_type& h) const;
-            iterator find(const util::Regex& regex) const;
+            inline iterator find(const std::string& herd) const;
+            inline iterator find(const value_type& h) const;
+            inline iterator find(const util::Regex& regex) const;
 
-            size_type size() const;
-            bool empty() const;
-            void clear();
+            inline size_type size() const;
+            inline bool empty() const;
+            inline void clear();
 
-            iterator insert(iterator pos, const value_type& h);
+            inline iterator insert(iterator pos, const value_type& h);
 
             template <class In>
-            void insert(In begin, In end);
+            inline void insert(In begin, In end);
 
-            std::pair<iterator, bool> insert(const value_type& v);
+            inline std::pair<iterator, bool> insert(const value_type& v);
 
-            void erase(iterator pos);
-            size_type erase(const value_type& v);
-            void erase(iterator begin, iterator end);
+            inline void erase(iterator pos);
+            inline size_type erase(const value_type& v);
+            inline void erase(iterator begin, iterator end);
 
         private:
             container_type _herds;

@@ -78,29 +78,29 @@ namespace util
              * @param s regular expression std::string.
              * @returns a Regex object.
              */
-            Regex &operator= (const std::string& s);
+            inline Regex &operator= (const std::string& s);
 
             /** Determine if this regex matches the specified std::string.
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator== (const std::string& cmp) const;
+            inline bool operator== (const std::string& cmp) const;
 
             /** Determine if this regex does not match the specified std::string.
              * @param cmp Comparison std::string.
              * @returns   A boolean value.
              */
-            bool operator!= (const std::string& cmp) const;
+            inline bool operator!= (const std::string& cmp) const;
 
             /** Get regular expression std::string.
              * @returns A std::string object.
              */
-            const std::string& operator()() const;
+            inline const std::string& operator()() const;
 
             /** Is this regular expression std::string empty?
              * @returns A boolean value.
              */
-            bool empty() const;
+            inline bool empty() const;
 
         private:
             /// Clean up compiled regex_t

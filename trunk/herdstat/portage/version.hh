@@ -328,10 +328,10 @@ namespace portage
             bool empty() const { return _vs.empty(); }
             void clear() { _vs.clear(); }
 
-            version_string_T *front();
-            const version_string_T * const front() const;
-            version_string_T *back();
-            const version_string_T * const back() const;
+            inline version_string_T *front();
+            inline const version_string_T * const front() const;
+            inline version_string_T *back();
+            inline const version_string_T * const back() const;
 
             /** Instantiate and insert a version_string_T object with the
              * specified path.

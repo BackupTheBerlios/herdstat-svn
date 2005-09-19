@@ -48,7 +48,7 @@ namespace util {
 	    void start(unsigned m);
 
             /// Increment progress.
-	    void operator++ ();
+	    inline void operator++ ();
 
 	private:
             /// Current progress.

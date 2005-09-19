@@ -34,13 +34,17 @@
 const char *
 portage::portdir()
 {
-    portage::config_T config;
-    std::string portdir = config["PORTDIR"];
+    std::string portdir;
 
     /* environment overrides all */
     char *result = std::getenv("PORTDIR");
     if (result)
-	portdir = result;
+	    portdir.assign(result);
+    else
+    {
+        config_T config;
+        portdir.assign(config["PORTDIR"]);
+    }
 
     return (portdir.empty() ? "/usr/portage" : portdir.c_str());
 }
@@ -49,15 +53,17 @@ portage::portdir()
  * Determine PORTDIR
  */
 
-const portage::config_T::string_type
+const std::string
 portage::config_T::portdir() const
 {
-    std::string portdir = (*this)["PORTDIR"];
+    const_iterator i;
+    std::string portdir;
 
-    /* environment overrides all */
     char *result = std::getenv("PORTDIR");
     if (result)
-	portdir = result;
+        portdir.assign(result);
+    else if ((i = this->find("PORTDIR")) != this->end())
+        portdir.assign(i->second);
 
     return (portdir.empty() ? "/usr/portage" : portdir);
 }
@@ -66,14 +72,17 @@ portage::config_T::portdir() const
  * Determine PORTDIR_OVERLAY
  */
 
-const std::vector<portage::config_T::string_type>
+const std::vector<std::string>
 portage::config_T::overlays() const
 {
-    string_type overlays = (*this)["PORTDIR_OVERLAY"];
+    const_iterator i;
+    std::string overlays;
 
     char *result = std::getenv("PORTDIR_OVERLAY");
     if (result)
-        overlays = result;
+        overlays.assign(result);
+    else if ((i = this->find("PORTDIR_OVERLAY")) != this->end())
+        overlays.assign(i->second);
 
     return util::split(overlays);
 }

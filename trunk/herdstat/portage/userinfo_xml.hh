@@ -51,11 +51,11 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const;
 
-            const Developers& devs() const;
+            inline const Developers& devs() const;
 
             /* convenience */
-            Developers::size_type size() const;
-            bool empty() const;
+            inline Developers::size_type size() const;
+            inline bool empty() const;
 
         protected:
             virtual bool start_element(const std::string& name,

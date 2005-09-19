@@ -37,7 +37,8 @@ namespace util {
     /**
      * tranform_if
      * Like std::transform, but only "transforms" if UnaryPred
-     * returns true.
+     * returns true.  For times where replace_copy_if is not
+     * appropriate.
      */
 
     template <typename InputIterator, typename OutputIterator,

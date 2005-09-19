@@ -52,15 +52,15 @@ namespace util {
             /** Is the timer running?
              * @returns A boolean value.
              */
-            bool is_running() const;
+            inline bool is_running() const;
 
             /** How long has the timer been running?
              * @returns An long integer value.
              */
-            size_type elapsed() const;
+            inline size_type elapsed() const;
 
             /// Reset elapsed value.
-            void reset();
+            inline void reset();
 
         private:
 	    timeval _begin, _end;

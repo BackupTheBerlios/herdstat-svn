@@ -49,17 +49,17 @@ namespace portage {
             virtual void parse(const std::string& path = "");
             virtual void fill_developer(Developer& dev) const;
 
-            void set_cvsdir(const std::string& path);
+            inline void set_cvsdir(const std::string& path);
 
             /// Implicit conversion to Herds::container_type
-            operator Herds::container_type() const;
+            inline operator Herds::container_type() const;
 
-            const Herds& herds() const;
-            Herds& herds();
+            inline const Herds& herds() const;
+            inline Herds& herds();
 
             /* convienence */
-            Herds::size_type size() const;
-            bool empty() const;
+            inline Herds::size_type size() const;
+            inline bool empty() const;
 
         protected:
             virtual bool start_element(const std::string &name,

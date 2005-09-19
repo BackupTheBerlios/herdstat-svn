@@ -52,7 +52,7 @@ namespace util
      * @param d Delimiter.
      * @returns Vector of sub-strings.
      */
-    std::vector<std::string> split(const std::string &s,
+    std::vector<std::string> split(const std::string& s,
                               const std::string::value_type d = ' ',
                               bool append_only = false);
 
@@ -61,7 +61,7 @@ namespace util
      * @param d Delimiter.
      * @returns Resulting std::string object.
      */
-    std::string join(const std::vector<std::string> &v,
+    std::string join(const std::vector<std::string>& v,
                      const std::string::value_type d = ' ');
 
     /** Replace any unfriendly characters in the given std::string to their
