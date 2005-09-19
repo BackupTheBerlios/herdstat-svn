@@ -174,21 +174,20 @@ metacache_T::fill()
         }
 
         /* for each pkg */
-        pkgcache_T::iterator p, e = pkgcache.end();
-        for (p = pkgcache.begin() ; p != e ; ++p)
+        pkgcache_T::iterator i, end = pkgcache.end();
+        for (i = pkgcache.begin() ; i != end ; ++i)
         {
             if (status)
                 ++progress;
 
-//            const std::string path(this->_portdir + "/" + (*p) + "/metadata.xml");
-
-            const char * const path(util::sprintf("%s/%s/metadata.xml",
-                _portdir.c_str(), p->c_str()).c_str());
+            char *path;
+            asprintf(&path, "%s/%s/metadata.xml",
+                _portdir.c_str(), i->c_str());
 
             if (util::file_exists(path))
             {
                 /* parse it */
-                const metadata_xml meta(path, *p);
+                const metadata_xml meta(path, *i);
                 _metadatas.push_back(meta.data());
             }
         }
@@ -294,30 +293,31 @@ metacache_T::dump()
     f << "overlays=" << util::join(this->_overlays, ':') << std::endl;
     f << "size=" << this->size() << std::endl;
 
-    /* for each metadata_T object */
-    iterator ci, ce;
-    for (ci = this->begin(), ce = this->end()  ; ci != ce ; ++ci)
+    std::string str;
+    std::size_t n, size;
+
+    /* for each metadata object */
+    iterator ci, cend;
+    for (ci = _metadatas.begin(), cend = _metadatas.end() ;
+         ci != cend ; ++ci)
     {
         /*
          * format is the form of:
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
-        const Herds& herds(ci->herds());
-        const Developers& devs(ci->devs());
-        std::string str;
-        std::size_t n;
-
         f << ci->pkg() << "=";
 
         /* herds */
         {
-            Herds::const_iterator i, end = herds.end();
-            for (i = herds.begin(), n = 1 ; i != end ; ++i, ++n)
+            Herds::const_iterator i, end;
+            for (i = ci->herds().begin(), end = ci->herds().end(),
+                 n = 1, size = ci->herds().size(), str.clear() ;
+                 i != end ; ++i, ++n)
             {
-                str += i->name();
-                if (n != herds.size())
-                    str += ",";
+                str.append(i->name());
+                if (n != size)
+                    str.append(",");
             }
         }
 
@@ -325,22 +325,19 @@ metacache_T::dump()
         
         /* developers */
         {
-            Developers::const_iterator i, end = devs.end();
-            for (i = devs.begin(), n = 1, str.clear() ; i != end ; ++i, ++n)
+            Developers::const_iterator i, end;
+            for (i = ci->devs().begin(), end = ci->devs().end(),
+                 n = 1, size = ci->devs().size(), str.clear() ;
+                 i != end ; ++i, ++n)
             {
-                str += i->email();
-                if (n != devs.size())
-                    str += ",";
+                str.append(i->email());
+                if (n != size)
+                    str.append(",");
             }
         }
 
-        f << str << ":";
-
         /* longdesc */
-        if (ci->longdesc().empty())
-            f << std::endl;
-        else
-            f << util::tidy_whitespace(ci->longdesc()) << std::endl;
+        f << str << ":" << util::tidy_whitespace(ci->longdesc()) << std::endl;
     }
 }
 

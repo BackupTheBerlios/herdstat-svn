@@ -52,12 +52,12 @@ class metacache_T : public cachable
         virtual void load();
         virtual void dump();
 
-        iterator begin();
-        const_iterator begin() const;
-        iterator end();
-        const_iterator end() const;
-        size_type size() const;
-        bool empty() const;
+        inline iterator begin();
+        inline const_iterator begin() const;
+        inline iterator end();
+        inline const_iterator end() const;
+        inline size_type size() const;
+        inline bool empty() const;
 
     private:
         std::string _portdir;
