@@ -5,11 +5,9 @@ include $(top_builddir)/Makefile.am.common
 SUBDIRS = util xml portage
 
 cc_sources = exceptions.cc \
-	     debug.cc \
 	     fetcher.cc \
 	     email_address.cc
 hh_sources = exceptions.hh \
-	     debug.hh \
 	     noncopyable.hh \
 	     cachable.hh \
 	     fetcher.hh \
