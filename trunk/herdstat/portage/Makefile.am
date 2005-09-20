@@ -5,6 +5,7 @@ include $(top_builddir)/Makefile.am.common
 cc_sources = misc.cc \
 	     config.cc \
 	     version.cc \
+	     categories.cc \
 	     find.cc \
 	     ebuild.cc \
 	     gentoo_email_address.cc \
@@ -19,6 +20,7 @@ cc_sources = misc.cc \
 hh_sources = exceptions.hh \
 	     misc.hh \
 	     config.hh \
+	     categories.hh \
 	     version.hh \
 	     find.hh \
 	     ebuild.hh \

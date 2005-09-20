@@ -24,17 +24,17 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/regex.hh>
+#include <herdstat/util/file.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/misc.hh>
 
-bool portage::categories_T::_init = false;
-portage::categories_T::value_type portage::categories_T::_s;
-
+namespace portage {
 /*****************************************************************************
  * Given path a package directory?                                           *
  *****************************************************************************/
 bool
-portage::is_pkg_dir(const std::string &path)
+is_pkg_dir(const std::string &path)
 {
     if (not util::is_dir(path))
         return false;
@@ -44,54 +44,6 @@ portage::is_pkg_dir(const std::string &path)
     return dir.find(regex) != dir.end();
 }
 /*****************************************************************************/
-void
-portage::categories_T::init()
-{
-    if (this->_init)
-        return;
-
-    /* read categories from real PORTDIR */
-    std::string line;
-    {
-        std::ifstream stream((this->_portdir + CATEGORIES).c_str());
-        if (not stream.is_open())
-            throw FileException(this->_portdir + CATEGORIES);
-
-        std::size_t n = 0;
-        while (std::getline(stream, line))
-        {
-            /* virtual isn't a real category */
-            if (line == "virtual")
-                continue;
-
-            /* choke if validate mode is enabled */
-            if (this->_validate and ++n and 
-                not util::is_dir(this->_portdir + "/" + line))
-            {
-                std::cerr << "QA Violation: " << this->_portdir
-                    << CATEGORIES << ":" << n << std::endl
-                    << "category '" << line << "' is listed but does not exist."
-                    << std::endl;
-                throw portage::QAException();
-            }
-
-            this->_s.insert(line);
-        }
-    }
-
-    /* read user category file */
-    if (util::is_file(CATEGORIES_USER))
-    {
-        std::ifstream stream(CATEGORIES_USER);
-        if (not stream.is_open())
-            throw FileException(CATEGORIES_USER);
-
-        while (std::getline(stream, line))
-            this->_s.insert(line);
-    }
-
-    this->_init = true;
-}
-/*****************************************************************************/
+} // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

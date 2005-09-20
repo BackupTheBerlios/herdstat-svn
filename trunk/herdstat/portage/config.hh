@@ -31,11 +31,6 @@
 
 namespace portage
 {
-    /** Get PORTDIR.
-     * @returns A pointer of type char.
-     */
-    const char *portdir();
-
     /**
      * Represents the current portage configuration.  Reads make.conf and
      * make.globals and stores variables in key/value pairs.
@@ -47,27 +42,29 @@ namespace portage
             /** Default constructor.
              * Opens and reads make.conf and make.globals.
              */
-            config_T()
-            {
-                /* read default config */
-                this->read("/etc/make.globals");
-                this->close();
-                /* read make.conf overriding any defined settings */
-                this->read("/etc/make.conf");
-                this->close();
-            }
+            config_T();
 
             /** Determine PORTDIR.
              * @returns A std::string object.
              */
-            const std::string portdir() const;
+            inline static const std::string& portdir();
 
             /** Determine PORTDIR_OVERLAY.
              * @returns A vector of std::string objects.
              */
-            const std::vector<std::string> overlays() const;
+            inline static const std::vector<std::string>& overlays();
+
+        private:
+            static bool _init;
+            static std::string _portdir;
+            static std::vector<std::string> _overlays;
     };
-}
+
+    inline const std::string& config_T::portdir() { assert(_init); return _portdir; }
+    inline const std::vector<std::string>& config_T::overlays()
+    { assert(_init); return _overlays; }
+
+} // namespace portage
 
 /// operator<< for portage::config_T
 template<class charT, class traits>

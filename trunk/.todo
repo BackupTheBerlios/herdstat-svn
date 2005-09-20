@@ -14,6 +14,21 @@
             curl?
         </note>
     </note>
+    <note priority="veryhigh" time="1127204962">
+        TODO
+        <note priority="high" time="1127205681">
+            Rewrite options_T so that the get functions return references instead of copies.
+        </note>
+        <note priority="medium" time="1127204977">
+            Clean up portage::config_T.
+        </note>
+        <note priority="medium" time="1127204991">
+            Move categories_T to its own source file.
+        </note>
+        <note priority="medium" time="1127205004">
+            Rewrite portage find code.
+        </note>
+    </note>
     <note priority="high" time="1126510481">
         Write a debug class for writing debugging messages instead of using debug_msg().
     </note>

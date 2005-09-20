@@ -27,64 +27,44 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/config.hh>
 
-/*
- * Determine PORTDIR
- */
-
-const char *
-portage::portdir()
+namespace portage {
+/*** static members *********************************************************/
+bool config_T::_init = false;
+std::string config_T::_portdir;
+std::vector<std::string> config_T::_overlays;
+/****************************************************************************/
+config_T::config_T()
 {
-    std::string portdir;
+    if (_init)
+        return;
 
-    /* environment overrides all */
-    char *result = std::getenv("PORTDIR");
-    if (result)
-	    portdir.assign(result);
+    /* read default config */
+    this->read("/etc/make.globals");
+    this->close();
+    /* read make.conf overriding any defined settings */
+    this->read("/etc/make.conf");
+    this->close();
+
+    iterator x;
+    char *result = NULL;
+
+    /* PORTDIR */
+    if ((result = std::getenv("PORTDIR")))
+        _portdir.assign(result);
+    else if ((x = this->find("PORTDIR")) != this->end())
+        _portdir.assign(x->second);
     else
-    {
-        config_T config;
-        portdir.assign(config["PORTDIR"]);
-    }
+        _portdir.assign("/usr/portage");
 
-    return (portdir.empty() ? "/usr/portage" : portdir.c_str());
+    /* PORTDIR_OVERLAY */
+    if ((result = std::getenv("PORTDIR_OVERLAY")))
+        _overlays = util::split(result);
+    else if ((x = this->find("PORTDIR_OVERLAY")) != this->end())
+        _overlays = util::split(x->second);
+
+    _init = true;
 }
-
-/*
- * Determine PORTDIR
- */
-
-const std::string
-portage::config_T::portdir() const
-{
-    const_iterator i;
-    std::string portdir;
-
-    char *result = std::getenv("PORTDIR");
-    if (result)
-        portdir.assign(result);
-    else if ((i = this->find("PORTDIR")) != this->end())
-        portdir.assign(i->second);
-
-    return (portdir.empty() ? "/usr/portage" : portdir);
-}
-
-/*
- * Determine PORTDIR_OVERLAY
- */
-
-const std::vector<std::string>
-portage::config_T::overlays() const
-{
-    const_iterator i;
-    std::string overlays;
-
-    char *result = std::getenv("PORTDIR_OVERLAY");
-    if (result)
-        overlays.assign(result);
-    else if ((i = this->find("PORTDIR_OVERLAY")) != this->end())
-        overlays.assign(i->second);
-
-    return util::split(overlays);
-}
+/****************************************************************************/
+} // namespace portage
 
 /* vim: set tw=80 sw=4 et : */

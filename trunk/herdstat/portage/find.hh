@@ -45,7 +45,7 @@ namespace portage
      * @returns  A constant std::string object (path to ebuild).
      */
     const std::string
-    ebuild_which(const portage::config_T &c, const std::string &p,
+    ebuild_which(const config_T &c, const std::string &p,
         bool o = true, util::timer_T *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
@@ -96,7 +96,7 @@ namespace portage
      * @returns  A std::pair containing PORTDIR and category/package.
      */
     std::pair<std::string, std::string>
-    find_package(const portage::config_T &c, const std::string &p,
+    find_package(const config_T &c, const std::string &p,
         bool o = true, util::timer_T *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
@@ -111,7 +111,7 @@ namespace portage
      *           each match found.
      */
     std::multimap<std::string, std::string>
-    find_package_regex(const portage::config_T &c, const util::Regex &r,
+    find_package_regex(const config_T &c, const util::Regex &r,
         bool o = true, util::timer_T *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 }
