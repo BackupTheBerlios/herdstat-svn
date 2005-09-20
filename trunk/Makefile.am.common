@@ -2,6 +2,6 @@
 
 INCLUDES = -I$(top_builddir)
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
-AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast -Woverloaded-virtual -Winline -Wredundant-decls
+AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast -Woverloaded-virtual -Wredundant-decls
 
 # vim: set ft=automake :
