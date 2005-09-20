@@ -181,7 +181,7 @@ int
 action_dev_handler_T::operator() (opts_type &opts)
 {
     fetch_herdsxml();
-    herdsxml.parse(options::devawayxml());
+    herdsxml.parse(options::herdsxml());
 
     const Herds& herds(herdsxml.herds());
     Herds::const_iterator h;
