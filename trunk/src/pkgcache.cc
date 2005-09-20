@@ -30,8 +30,8 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/util/timer.hh>
-#include <herdstat/portage/misc.hh>
 #include <herdstat/portage/config.hh>
+#include <herdstat/portage/categories.hh>
 #include "pkgcache.hh"
 
 #define PKGCACHE                    /*LOCALSTATEDIR*/"/pkgcache"
@@ -39,7 +39,9 @@
 
 pkgcache_T::pkgcache_T()
     : cachable(optget("localstatedir", std::string)+PKGCACHE),
-      _overlays(optget("portage.config", portage::config_T).overlays()) { }
+      _overlays(optget("portage.config", portage::config_T).overlays())
+{
+}
 
 pkgcache_T::pkgcache_T(const std::string &portdir)
     : cachable(optget("localstatedir", std::string)+PKGCACHE),
@@ -141,8 +143,8 @@ pkgcache_T::fill()
     if (optget("timer", bool))
         timer.start();
 
-    const portage::categories_T categories(this->_portdir,
-        optget("qa", bool));
+    const portage::Categories
+        categories(this->_portdir, optget("qa", bool));
 
     std::vector<std::string> dirs = 
         optget("portage.config", portage::config_T).overlays();
@@ -150,7 +152,7 @@ pkgcache_T::fill()
     std::vector<std::string>::iterator i, e = dirs.end();
 
     /* for each category */
-    portage::categories_T::const_iterator c, ce = categories.end();
+    portage::Categories::const_iterator c, ce = categories.end();
     for (c = categories.begin() ; c != ce ; ++c)
     {
         /* for each portdir */
@@ -196,8 +198,13 @@ pkgcache_T::load()
     std::getline(stream, line);
     std::getline(stream, line);
 
-    std::copy(std::istream_iterator<std::string>(stream),
-        std::istream_iterator<std::string>(), std::back_inserter(this->_pkgs));
+//    std::copy(std::istream_iterator<std::string>(stream),
+//        std::istream_iterator<std::string>(),
+//        std::back_inserter(this->_pkgs));
+
+    _pkgs.insert(_pkgs.end(),
+        std::istream_iterator<std::string>(stream),
+        std::istream_iterator<std::string>());
 }
 
 /*
