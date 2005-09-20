@@ -262,171 +262,171 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --dev */
 	    case 'd':
-		if (optget("action", options_action_T) != action_unspecified and
-		    optget("action", options_action_T) != action_pkg and
-		    optget("action", options_action_T) != action_meta)
+		if (options::action() != action_unspecified and
+		    options::action() != action_pkg and
+		    options::action() != action_meta)
 		    throw argsOneActionOnly();
-		if (optget("action", options_action_T) == action_pkg or
-		    optget("action", options_action_T) == action_meta)
-		    optset("dev", bool, true);
+		if (options::action() == action_pkg or
+		    options::action() == action_meta)
+		    options::set_dev(true);
 		else
-		    optset("action", options_action_T, action_dev);
+		    options::set_action(action_dev);
 		break;
 	    /* --package */
 	    case 'p':
-		if (optget("action", options_action_T) != action_unspecified and
-		    optget("action", options_action_T) != action_dev and
-		    optget("action", options_action_T) != action_meta)
+		if (options::action() != action_unspecified and
+		    options::action() != action_dev and
+		    options::action() != action_meta)
 		    throw argsOneActionOnly();
-		if (optget("action", options_action_T) == action_dev)
-		    optset("dev", bool, true);
-		if (optget("action", options_action_T) == action_meta)
-		    optset("meta", bool, true);
-		optset("action", options_action_T, action_pkg);
+		if (options::action() == action_dev)
+		    options::set_dev(true);
+		if (options::action() == action_meta)
+		    options::set_meta(true);
+		options::set_action(action_pkg);
 		break;
 	    /* --metadata */
 	    case 'm':
-		if (optget("action", options_action_T) != action_unspecified and
-		    optget("action", options_action_T) != action_pkg and
-		    optget("action", options_action_T) != action_dev and
-		    optget("action", options_action_T) != action_find)
+		if (options::action() != action_unspecified and
+		    options::action() != action_pkg and
+		    options::action() != action_dev and
+		    options::action() != action_find)
 		    throw argsOneActionOnly();
 
-		if (optget("action", options_action_T) == action_pkg or
-		    optget("action", options_action_T) == action_dev or
-		    optget("action", options_action_T) == action_find)
-		    optset("meta", bool, true);
+		if (options::action() == action_pkg or
+		    options::action() == action_dev or
+		    options::action() == action_find)
+		    options::set_meta(true);
 		else
-		    optset("action", options_action_T, action_meta);
+		    options::set_action(action_meta);
 		break;
 	    /* --which */
 	    case 'w':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (options::action() != action_unspecified)
 		    throw argsOneActionOnly();
-		optset("action", options_action_T, action_which);
+		options::set_action(action_which);
 		break;
 	    /* --find */
 	    case 'f':
-		if (optget("action", options_action_T) != action_unspecified and
-		    optget("action", options_action_T) != action_meta)
+		if (options::action() != action_unspecified and
+		    options::action() != action_meta)
 		    throw argsOneActionOnly();
-		if (optget("action", options_action_T) == action_meta)
-		    optset("meta", bool, true);
-		optset("action", options_action_T, action_find);
+		if (options::action() == action_meta)
+		    options::set_meta(true);
+		options::set_action(action_find);
 		break;
 	    /* --versions */
 	    case '\b':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (options::action() != action_unspecified)
 		    throw argsOneActionOnly();
-		optset("action", options_action_T, action_versions);
+		options::set_action(action_versions);
 		break;
 	    /* --away */
 	    case 'a':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (options::action() != action_unspecified)
 		    throw argsOneActionOnly();
-		optset("action", options_action_T, action_away);
+		options::set_action(action_away);
 		break;
 	    /* --fetch */
 	    case 'F':
-		if (optget("action", options_action_T) != action_unspecified)
+		if (options::action() != action_unspecified)
 		    throw argsOneActionOnly();
-		optset("action", options_action_T, action_fetch);
+		options::set_action(action_fetch);
 		break;
 	    /* --no-overlay */
 	    case 'N':
-		optset("overlay", bool, false);
+		options::set_overlay(false);
 		break;
 	    /* --outfile */
 	    case 'o':
 		if (strcmp(optarg, "stdout") != 0)
 		{
 		    if (strcmp(optarg, "stderr") == 0)
-			optset("outstream", std::ostream *, &std::cerr);
-		    optset("outfile", std::string, optarg);
-		    optset("quiet", bool, true);
-		    optset("timer", bool, false);
+			options::set_outstream(&std::cerr);
+		    options::set_outfile(optarg);
+		    options::set_quiet(true);
+		    options::set_timer(false);
 		}
 		break;
 	    /* --regex */
 	    case 'r':
-		optset("regex", bool, true);
+		options::set_regex(true);
 		break;
 	    /* --extended */
 	    case 'E':
-		optset("regex", bool, true);
-		optset("eregex", bool, true);
+		options::set_regex(true);
+		options::set_eregex(true);
 		break;
 	    /* --no-herd */
 	    case '\n':
-		optset("with-herd", std::string, "no-herd");
+		options::set_with_herd("no-herd");
 		break;
 	    /* --with-herd */
 	    case '\v':
-		optset("with-herd", std::string, optarg);
+		options::set_with_herd(optarg);
 		break;
 	    /* --no-maintainer */
 	    case '\r':
-		optset("with-maintainer", std::string, "none");
+		options::set_with_dev("none");
 		break;
 	    /* --with-maintainer */
 	    case '\t':
-		optset("with-maintainer", std::string, optarg);
+		options::set_with_dev(optarg);
 		break;
 	    /* --noquerycache */
 	    case '\f':
-		optset("metacache", bool, false);
+		options::set_metacache(false);
 		break;
 	    /* --verbose */
 	    case 'v':
-		optset("verbose", bool, true);
+		options::set_verbose(true);
 		break;
 	    /* --quiet */
 	    case 'q':
-		optset("quiet", bool, true);
-		optset("color", bool, false);
+		options::set_quiet(true);
+		options::set_color(false);
 		break;
 	    /* --count */
 	    case 'c':
-		optset("count", bool, true);
-		optset("quiet", bool, true);
+		options::set_count(true);
+		options::set_quiet(true);
 		break;
 	    /* --nocolor */
 	    case 'n':
-		optset("color", bool, false);
+		options::set_color(false);
 		break;
 	    /* --gentoo-cvs */
 	    case 'C':
-		optset("gentoo.cvs", std::string, optarg);
+		options::set_cvsdir(optarg);
 		break;
 	    /* --userinfo */
 	    case 'U':
-		optset("userinfo", std::string, optarg);
+		options::set_userinfoxml(optarg);
 		break;
 	    /* --herdsxml */
 	    case 'H':
-		optset("herds.xml", std::string, optarg);
+		options::set_herdsxml(optarg);
 		break;
 	    /* --devaway */
 	    case 'A':
-		optset("devaway.location", std::string, optarg);
+		options::set_devawayxml(optarg);
 		break;
 	    /* --localstatedir */
 	    case 'L':
-		optset("localstatedir", std::string, optarg);
+		options::set_localstatedir(optarg);
 		break;
 	    /* --debug */
 	    case 'D':
-		optset("timer", bool, true);
-		optset("debug", bool, true);
+		options::set_timer(true);
+		options::set_debug(true);
 		break;
 	    /* --timer */
 	    case 't':
-		if (optget("outfile", std::string) == "stdout")
-		    optset("timer", bool, true);
+		if (options::outfile() == "stdout")
+		    options::set_timer(true);
 		break;
 	    /* --qa */
 	    case '\a':
-		optset("qa", bool, true);
+		options::set_qa(true);
 		break;
 	    /* --version */
 	    case 'V':
@@ -453,7 +453,7 @@ handle_opts(int argc, char **argv, opts_type *args)
     else
     {
 	/* actions that are allowed to have 0 non-option args */
-	options_action_T action = optget("action", options_action_T);
+	options_action_T action = options::action();
 	if (action != action_unspecified and
 	    action != action_meta and
 	    action != action_versions and
@@ -467,7 +467,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 int
 main(int argc, char **argv)
 {
-    options_T options;
+    options opts;
     std::map<options_action_T, action_handler_T * > handlers;
     std::ostream *outstream = NULL;
 
@@ -478,7 +478,7 @@ main(int argc, char **argv)
 		       (std::strcmp(argv[1], "-T") == 0)));
 
     /* save column width */
-    optset("maxcol", std::size_t, (test ? 80 : util::getcols()));
+    options::set_maxcol((test ? 80 : util::getcols()));
 
     try
     { 
@@ -492,23 +492,23 @@ main(int argc, char **argv)
 	    throw argsException();
 
 	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
-	if (not optget("gentoo.cvs", std::string).empty())
+	if (not options::cvsdir().empty())
 	{
-	    const std::string gentoocvs(optget("gentoo.cvs", std::string));
+	    const std::string gentoocvs(options::cvsdir());
 	    if (not util::is_dir(gentoocvs))
 		throw FileException(gentoocvs);
 
 	    /* only set if it wasnt specified on the command line */
-	    if (optget("herds.xml", std::string).empty())
-		optset("herds.xml", std::string, gentoocvs+"/gentoo/misc/herds.xml");
-	    if (optget("userinfo", std::string).empty())
-		optset("userinfo", std::string, gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
+	    if (options::herdsxml().empty())
+		options::set_herdsxml(gentoocvs+"/gentoo/misc/herds.xml");
+	    if (options::userinfoxml().empty())
+		options::set_userinfoxml(gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
 	}
 
 	/* initialize XML stuff */
-	xml::Init init(optget("qa", bool));
+	xml::Init init(options::qa());
 
-	if (optget("regex", bool) and nonopt_args.size() > 1)
+	if (options::regex() and nonopt_args.size() > 1)
 	{
 	    std::cerr << "You may only specify one regular expression."
 		<< std::endl;
@@ -524,30 +524,29 @@ main(int argc, char **argv)
 	    nonopt_args.erase(pos);
 
 	/* did the user specify the all target? */
-	if (not optget("regex", bool) and
+	if (not options::regex() and
 	    (std::find(nonopt_args.begin(),
 		       nonopt_args.end(), "all") != nonopt_args.end()))
 	{
-	    optset("all", bool, true);
+	    options::set_all(true);
 	    nonopt_args.clear();
 	    nonopt_args.push_back("all");
 	}
 
 	/* setup output stream */
-	if (optget("outfile", std::string) != "stdout" and
-	    optget("outfile", std::string) != "stderr")
+	if (options::outfile() != "stdout" and options::outfile() != "stderr")
 	{
-	    outstream = new std::ofstream(optget("outfile", std::string).c_str());
+	    outstream = new std::ofstream(options::outfile().c_str());
 	    if (not *outstream)
-		throw FileException(optget("outfile", std::string));
-	    optset("outstream", std::ostream *, outstream);
+		throw FileException(options::outfile());
+	    options::set_outstream(outstream);
 	}
 	else
 	{
 	    /* save locale name */
 	    try
 	    {
-		optset("locale", std::string, std::locale("").name());
+		options::set_locale(std::locale("").name());
 	    }
 	    catch (const std::runtime_error)
 	    {
@@ -561,20 +560,19 @@ main(int argc, char **argv)
 	}
 
 	/* dump options */
-	if (optget("debug", bool))
-	    options.dump(*optget("outstream", std::ostream *));	
+//        if (options::debug())
+//            options.dump(*options::outstream());	
 
 	/* set locale */
-	optget("outstream", std::ostream *)->imbue
-	    (std::locale(optget("locale", std::string).c_str()));
+	options::outstream()->imbue(std::locale(options::locale().c_str()));
 
 	/* set common format attributes */
 	util::color_map_T color;
 	formatter_T output;
-	output.set_colors(optget("color", bool));
-	output.set_quiet(optget("quiet", bool));
-	output.set_labelcolor(color[optget("label.color", std::string)]);
-	output.set_highlightcolor(color[optget("highlight.color", std::string)]);
+	output.set_colors(options::color());
+	output.set_quiet(options::quiet());
+	output.set_labelcolor(color[options::labelcolor()]);
+	output.set_highlightcolor(color[options::hlcolor()]);
 	output.set_devaway_color(color[red]);
 
 	/* add highlights */
@@ -583,18 +581,16 @@ main(int argc, char **argv)
 	
 	/* user-defined highlights */
 	{
-	    const std::vector<std::string> hv(util::split(optget("highlights",
-		std::string)));
+	    const std::vector<std::string> hv(util::split(options::highlights()));
 	    output.add_highlights(hv);
 	}
 
 	/* set default action */
-	if (optget("action", options_action_T) == action_unspecified
-	    and nonopt_args.empty())
-	    optset("action", options_action_T, action_stats);
-	else if (optget("action", options_action_T) == action_unspecified
-	    and not nonopt_args.empty())
-	    optset("action", options_action_T, action_herd);
+	if (options::action() == action_unspecified and nonopt_args.empty())
+	    options::set_action(action_stats);
+	else if (options::action() == action_unspecified and
+		not nonopt_args.empty())
+	    options::set_action(action_herd);
 
 	/* setup action handlers */
 	handlers[action_herd]     = new action_herd_handler_T();
@@ -608,8 +604,7 @@ main(int argc, char **argv)
 	handlers[action_away]     = new action_away_handler_T();
 	handlers[action_fetch]    = new action_fetch_handler_T();
 
-	action_handler_T *action_handler =
-	    handlers[optget("action", options_action_T)];
+	action_handler_T *action_handler = handlers[options::action()];
 
 	if (action_handler)
 	{

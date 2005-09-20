@@ -43,9 +43,9 @@
 #include "querycache.hh"
 
 querycache_T::querycache_T()
-    : _max(optget("querycache.max", int)),
-      _expire(optget("querycache.expire", long)),
-      _path(optget("localstatedir", std::string)+"/querycache.xml")
+    : _max(options::querycache_max()),
+      _expire(options::querycache_expire()),
+      _path(options::localstatedir()+"/querycache.xml")
 {
 }
 

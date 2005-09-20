@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include "options.hh"
+#include "exceptions.hh"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

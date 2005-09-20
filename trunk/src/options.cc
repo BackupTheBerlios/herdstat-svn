@@ -26,90 +26,65 @@
 
 #include <iostream>
 #include <locale>
-#include <utility>
-#include <sys/types.h>
 #include <herdstat/portage/config.hh>
+
 #include "options.hh"
 
-options_T::option_map_T options_T::optmap;
+std::ostream * options::_outstream = &std::cout;
+std::string options::_outfile("stdout");
 
-#define insopt(k,v) insert(std::make_pair(k, new option_type_T(v)))
+bool options::_init = false;
+bool options::_verbose = false;
+bool options::_quiet = false;
+bool options::_debug = false;
+bool options::_timer = false;
+bool options::_all = false;
+bool options::_dev = false;
+bool options::_count = false;
+bool options::_color = true;
+bool options::_overlay = true;
+bool options::_eregex = false;
+bool options::_regex = false;
+bool options::_qa = false;
+bool options::_meta = false;
+bool options::_metacache = true;
+bool options::_querycache = true;
+bool options::_devaway = true;
 
-/*
- * Set default options here.
- * This is the only place where new options need to be added.
- */
+int options::_querycache_max = 100;
+long options::_querycache_expire = 84600;
+long options::_devaway_expire = 84600;
+std::size_t options::_maxcol = 78;
 
-void
-options_T::option_map_T::set_defaults()
+std::string options::_cvsdir;
+std::string options::_herdsxml;
+std::string options::_devawayxml;
+std::string options::_userinfoxml;
+std::string options::_with_herd;
+std::string options::_with_dev;
+std::string options::_localstatedir(LOCALSTATEDIR);
+std::string options::_wgetopts("-rq -t3 -T15");
+std::string options::_labelcolor("green");
+std::string options::_hlcolor("yellow");
+std::string options::_metacache_expire("lastsync");
+std::string options::_highlights;
+std::string options::_locale(std::locale::classic().name());
+
+options_action_T options::_action = action_unspecified;
+
+std::string options::_portdir;
+std::vector<std::string> options::_overlays;
+
+options::options()
 {
-    insopt("verbose", false);
-    insopt("quiet", false);
-    insopt("debug", false);
-    insopt("timer", false);
-    insopt("all", false);
-    insopt("dev", false);
-    insopt("count", false);
-    insopt("color", true);
-    insopt("overlay", true);
-    insopt("eregex", false);
-    insopt("regex", false);
-    insopt("qa", false);
-    insopt("meta", false);
-    insopt("metacache", true);
-    insopt("querycache", true);
-    insopt("devaway", true);
-
-    insopt("label.color", std::string("green"));
-    insopt("highlight.color", std::string("yellow"));
-
-    insopt("metacache.expire", std::string("lastsync"));
-    insopt("querycache.max", 100);
-    insopt("querycache.expire", static_cast<long>(84600));
-    insopt("wget.options", std::string("-rq -t3 -T15"));
-    insopt("devaway.expire", static_cast<long>(84600));
-
-    insopt("maxcol", static_cast<std::size_t>(78));
-
-    insopt("localstatedir", std::string(LOCALSTATEDIR));
-    insopt("gentoo.cvs", std::string());
-    insopt("herds.xml", std::string());
-    insopt("userinfo", std::string());
-    insopt("devaway.location", std::string());
-
-    insopt("with-herd", std::string());
-    insopt("with-maintainer", std::string());
-    insopt("outfile", std::string("stdout"));
-    insopt("outstream", &std::cout);
-
-    insopt("highlights", std::string());
-
-    insopt("action",
-        static_cast<options_action_T>(action_unspecified));
-
-    insopt("locale", std::string(std::locale::classic().name()));
+    if (_init)
+        return;
 
     portage::config_T config;
-    insopt("portage.config", config);
-    insopt("portdir", config.portdir());
-}
+    _portdir = config.portdir();
+    _overlays = config.overlays();
 
-void
-options_T::dump(std::ostream &stream)
-{
-    stream << "******************** options ********************" << std::endl;
-    option_map_T::iterator i;
-    for (i = optmap.begin() ; i != optmap.end() ; ++i)
-    {
-        std::string s(i->first);
-	while(s.size() < 20)
-	    s.append(" ");
-	stream << s;
-	i->second->dump(stream);
-	stream << std::endl;
-    }
-    stream << "*************************************************" << std::endl;
-    stream << std::endl;
+    _init = true;
 }
 
 /* vim: set tw=80 sw=4 et : */

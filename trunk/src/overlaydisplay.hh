@@ -51,7 +51,7 @@ class OverlayDisplay_T
 
         const string_type operator[] (const std::string &s) const
         {
-            if (optget("quiet", bool))
+            if (options::quiet())
                 return "";
 
             iterator i;
@@ -69,7 +69,7 @@ class OverlayDisplay_T
 
             std::ostringstream os;
             color_type color;
-            if (optget("color", bool))
+            if (options::color())
                 os << color[cyan] << "[" << n << "]" << color[none];
             else
                 os << "[" << n << "]";
@@ -103,16 +103,15 @@ class OverlayDisplay_T
 
         ~OverlayDisplay_T()
         {
-            if (optget("quiet", bool) or this->_oset.empty())
+            if (options::quiet() or this->_oset.empty())
                 return;
 
-            std::ostream *stream = optget("outstream", std::ostream *);
-            *stream << std::endl << "Portage overlays:" << std::endl;
+            *(options::outstream()) << std::endl << "Portage overlays:" << std::endl;
 
             iterator i;
             for (i = this->_oset.begin() ; i != this->_oset.end() ; ++i)
-                *stream << " " << (*this)[i->first] << " " << i->first
-                    << std::endl;
+                *(options::outstream()) << " " << this->operator[](i->first)
+                    << " " << i->first << std::endl;
         }
 
     private:

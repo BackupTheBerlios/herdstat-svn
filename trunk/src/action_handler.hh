@@ -42,35 +42,22 @@
 class action_handler_T
 {
     public:
-        action_handler_T() : stream(optget("outstream", std::ostream *)),
-                             config(optget("portage.config", portage::config_T)),
-                             portdir(optget("portdir", std::string)),
-                             size(0),
-                             quiet(optget("quiet", bool)),
-                             verbose(optget("verbose", bool)),
-                             regex(optget("regex", bool)),
-                             eregex(optget("eregex", bool)), 
-                             all(optget("all", bool)),
-                             debug(optget("debug", bool)),
-                             timer(optget("timer", bool)),
-                             count(optget("count", bool))  { }
+        action_handler_T() : stream(options::outstream()),
+                             portdir(options::portdir()),
+                             size(0) { }
 
         virtual ~action_handler_T() { }
-        virtual int operator() (opts_type &) { return EXIT_FAILURE; }
+        virtual int operator() (opts_type &) = 0;
 
     protected:
-        virtual void flush() { if (count) *stream << size << std::endl; }
+        virtual void flush() { if (options::count()) *stream << size << std::endl; }
 
         std::ostream *stream;               /* output stream */
         util::Regex regexp;               /* regular expression */
         util::color_map_T color;            /* color map */
         portage::config_T config;           /* portage configuration */
-        const std::string portdir;         /* PORTDIR */
+        const std::string& portdir;         /* PORTDIR */
         std::size_t size;                   /* number of results */
-
-        const bool quiet, verbose, regex, eregex,
-                   all, debug;
-        bool timer, count;
 };
 
 /* 
@@ -80,10 +67,6 @@ class action_handler_T
 class action_fancy_handler_T : public action_handler_T
 {
     public:
-        action_fancy_handler_T() : action_handler_T(),
-                                   devaway_path(optget("devaway.location", std::string)),
-                                   maxcol(optget("maxcol", std::size_t)),
-                                   use_devaway(optget("devaway", bool)) { }
         virtual ~action_fancy_handler_T() { }
 
     protected:
@@ -92,7 +75,7 @@ class action_fancy_handler_T : public action_handler_T
             output.flush(*stream);
             action_handler_T::flush();            
 
-            if (output.marked_away() and not count)
+            if (output.marked_away() and not options::count())
             {
                 *stream << std::endl << output.devaway_color()
                     << "*" << color[none] << " Currently away"
@@ -102,17 +85,14 @@ class action_fancy_handler_T : public action_handler_T
                  * in cases where more than one action handler is run */
                 output.set_marked_away(false);
 
-                if (timer and not count)
+                if (options::timer() and not options::count())
                     *stream << std::endl << "Took " << devaway.elapsed()
                         << "ms to parse devaway.xml." << std::endl;
             }
         }
 
         portage::devaway_xml devaway;
-        const std::string devaway_path;
         formatter_T output;                 /* output formatter */
-        const std::size_t maxcol;           /* columns of current terminal */
-        const bool use_devaway;
 };
 
 /*
@@ -122,10 +102,7 @@ class action_fancy_handler_T : public action_handler_T
 class action_herds_xml_handler_T : public action_fancy_handler_T
 {
     public:
-        action_herds_xml_handler_T() : herdsxml_path(optget("herds.xml", std::string))
-        {
-            herdsxml.set_cvsdir(optget("gentoo.cvs", std::string));
-        }
+        action_herds_xml_handler_T() { herdsxml.set_cvsdir(options::cvsdir()); }
         virtual ~action_herds_xml_handler_T() { }
 
     protected:
@@ -133,13 +110,12 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
         {
             action_fancy_handler_T::flush();
 
-            if (timer and not count)
+            if (options::timer() and not options::count())
                 *stream << "Took " << herdsxml.elapsed()
                     << "ms to parse herds.xml." << std::endl;
         }
 
         portage::herds_xml herdsxml;
-        const std::string herdsxml_path;
 };
 
 /*
@@ -149,8 +125,6 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
 class action_portage_find_handler_T : public action_fancy_handler_T
 {
     public:
-        action_portage_find_handler_T() : action_fancy_handler_T(),
-                                          overlay(optget("overlay", bool)) { }
         virtual ~action_portage_find_handler_T() { }
 
     protected:
@@ -158,14 +132,13 @@ class action_portage_find_handler_T : public action_fancy_handler_T
         {
             action_fancy_handler_T::flush();
 
-            if (timer and not count)
+            if (options::timer() and not options::count())
                 *stream << std::endl << "Took " << search_timer.elapsed()
                     << "ms to perform search." << std::endl;
         }
 
         std::multimap<std::string, std::string> matches;
         util::timer_T search_timer;
-        const bool overlay;
 };
 
 #endif

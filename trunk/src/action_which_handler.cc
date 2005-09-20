@@ -42,22 +42,22 @@ action_which_handler_T::operator() (opts_type &opts)
     pkgcache_T pkgcache;
     std::multimap<std::string, std::string>::iterator m;
 
-    if (all)
+    if (options::all())
     {
         std::cerr << "which action handler does not support the 'all' target."
             << std::endl;
         return EXIT_FAILURE;
     }
-    else if (regex)
+    else if (options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
 
-        pkgcache.init(portdir);
-        regexp.assign(re, eregex? Regex::extended|Regex::icase :
-                                  Regex::icase);
+        pkgcache.init();
+        regexp.assign(re, options::eregex() ?
+                Regex::extended|Regex::icase : Regex::icase);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer, pkgcache);
+                    options::overlay(), &search_timer, pkgcache);
 
         if (matches.empty())
         {
@@ -88,11 +88,11 @@ action_which_handler_T::operator() (opts_type &opts)
 
         try
         {
-            if (regex)
+            if (options::regex())
                 p = *m;
             else
                 p = portage::find_package(config, m->second,
-                    overlay, &search_timer);
+                    options::overlay(), &search_timer);
         }
         catch (const portage::AmbiguousPkg &e)
         {
@@ -103,7 +103,7 @@ action_which_handler_T::operator() (opts_type &opts)
             std::vector<std::string>::const_iterator i;
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
-                if (optget("quiet", bool) or not optget("color", bool))
+                if (options::quiet() or not options::color())
                     std::cerr << *i << std::endl;
                 else
                     std::cerr << color[green] << *i << color[none] << std::endl;
@@ -124,13 +124,13 @@ action_which_handler_T::operator() (opts_type &opts)
             continue;
         }
 
-        if (regex)
-            ebuild = portage::ebuild_which(config, p.second, overlay, NULL,
+        if (options::regex())
+            ebuild = portage::ebuild_which(config, p.second, options::overlay(), NULL,
                 pkgcache);
         else
-            ebuild = portage::ebuild_which(config, p.second, overlay, NULL);
+            ebuild = portage::ebuild_which(config, p.second, options::overlay(), NULL);
 
-        if (not count)
+        if (not options::count())
             *stream << ebuild << std::endl;
     }
 

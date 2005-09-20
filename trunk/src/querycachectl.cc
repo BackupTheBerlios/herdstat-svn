@@ -124,7 +124,7 @@ doaction(querycache_T &querycache, const std::string &action)
     {
         formatter_T out;
         out.set_maxlabel(15);
-        out.set_maxdata(optget("maxcol", std::size_t) - out.maxlabel());
+        out.set_maxdata(options::maxcol() - out.maxlabel());
         out.set_attrs();
 
         out("Size", util::sprintf("%d", querycache.size()));

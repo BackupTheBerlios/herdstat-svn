@@ -27,13 +27,8 @@
 # include "config.h"
 #endif
 
-#include <sstream>
-#include <algorithm>
-#include <typeinfo>
-#include <map>
-
-#include <herdstat/exceptions.hh>
-#include "exceptions.hh"
+#include <string>
+#include <vector>
 
 enum options_action_T
 {
@@ -50,170 +45,135 @@ enum options_action_T
     action_fetch
 };
 
-/*
- * Generic type container for storing option values internally as their
- * actual type (bool, string, etc).
- */
-
-class option_type_T
+class options
 {
     public:
-	option_type_T() : value(NULL) { }
+        options();
 
-	template<typename T> 
-	option_type_T(const T &v) : value(new option_type_holder<T>(v)) { }
-	
-        option_type_T(const option_type_T &ot)
-	    : value(ot.value ? ot.value->clone() : NULL) { }
-	
-        ~option_type_T() { if (value) delete value; }
+        static bool verbose() { return _verbose; }
+        static void set_verbose(bool v) { _verbose = v; }
+        static bool quiet() { return _quiet; }
+        static void set_quiet(bool v) { _quiet = v; }
+        static bool debug() { return _debug; }
+        static void set_debug(bool v) { _debug = v; }
+        static bool timer() { return _timer; }
+        static void set_timer(bool v) { _timer = v; }
+        static bool all() { return _all; }
+        static void set_all(bool v) { _all = v; }
+        static bool dev() { return _dev; }
+        static void set_dev(bool v) { _dev = v; }
+        static bool count() { return _count; }
+        static void set_count(bool v) { _count = v; }
+        static bool color() { return _color; }
+        static void set_color(bool v) { _color = v; }
+        static bool overlay() { return _overlay; }
+        static void set_overlay(bool v) { _overlay = v; }
+        static bool eregex() { return _eregex; }
+        static void set_eregex(bool v) { _eregex = v; }
+        static bool regex() { return _regex; }
+        static void set_regex(bool v) { _regex = v; }
+        static bool qa() { return _qa; }
+        static void set_qa(bool v) { _qa = v; }
+        static bool meta() { return _meta; }
+        static void set_meta(bool v) { _meta = v; }
+        static bool metacache() { return _metacache; }
+        static void set_metacache(bool v) { _metacache = v; }
+        static bool querycache() { return _querycache; }
+        static void set_querycache(bool v) { _querycache = v; }
+        static bool devaway() { return _devaway; }
+        static void set_devaway(bool v)  { _devaway = v; }
+        
+        static int querycache_max() { return _querycache_max; }
+        static void set_querycache_max(int v) { _querycache_max = v; }
+        static long querycache_expire() { return _querycache_expire; }
+        static void set_querycache_expire(long v) { _querycache_expire = v; }
+        static long devaway_expire() { return _devaway_expire; }
+        static void set_devaway_expire(long v) { _devaway_expire = v; }
+        static size_t maxcol() { return _maxcol; }
+        static void set_maxcol(size_t v) { _maxcol = v; }
 
-	template<typename T>
-	option_type_T &operator= (const T &t)
-	{
-	    option_type_T(t).swap(*this);
-	    return *this;
-	}
+        static std::ostream * const outstream() { return _outstream; }
+        static void set_outstream(std::ostream *s) { _outstream = s; }
+        static const std::string& outfile() { return _outfile; }
+        static void set_outfile(const std::string& v) { _outfile.assign(v); }
+        static const std::string& cvsdir() { return _cvsdir; }
+        static void set_cvsdir(const std::string& v) { _cvsdir.assign(v); }
+        static const std::string& herdsxml() { return _herdsxml; }
+        static void set_herdsxml(const std::string& v) { _herdsxml.assign(v); }
+        static const std::string& devawayxml() { return _devawayxml; }
+        static void set_devawayxml(const std::string& v) { _devawayxml.assign(v); }
+        static const std::string& userinfoxml() { return _userinfoxml; }
+        static void set_userinfoxml(const std::string& v) { _userinfoxml.assign(v); }
+        static const std::string& with_herd() { return _with_herd; }
+        static void set_with_herd(const std::string& v) { _with_herd.assign(v); }
+        static const std::string& with_dev() { return _with_dev; }
+        static void set_with_dev(const std::string& v) { _with_dev.assign(v); }
+        static const std::string& localstatedir() { return _localstatedir; }
+        static void set_localstatedir(const std::string& v) { _localstatedir.assign(v); }
+        static const std::string& wget_options() { return _wgetopts; }
+        static void set_wget_options(const std::string& v) { _wgetopts.assign(v); }
+        static const std::string& labelcolor() { return _labelcolor; }
+        static void set_labelcolor(const std::string& v) { _labelcolor.assign(v); }
+        static const std::string& hlcolor() { return _hlcolor; }
+        static void set_hlcolor(const std::string& v) { _hlcolor.assign(v); }
+        static const std::string& metacache_expire() { return _metacache_expire; }
+        static void set_metacache_expire(const std::string& v) { _metacache_expire.assign(v); }
+        static const std::string& highlights() { return _highlights; }
+        static void set_highlights(const std::string& v) { _highlights.assign(v); }
+        static const std::string& locale() { return _locale; }
+        static void set_locale(const std::string& v) { _locale.assign(v); }
 
-	option_type_T &operator= (const option_type_T &ot)
-	{
-	    option_type_T(ot).swap(*this);
-	    return *this;
-	}
+        static options_action_T action() { return _action; }
+        static void set_action(options_action_T v) { _action = v; }
 
-	option_type_T &swap(option_type_T &ot)
-	{
-	    std::swap(value, ot.value);
-	    return *this;
-	}
-
-	void dump(std::ostream &stream) const { value->dump(stream); }
-
-	bool empty() const { return (not value); }
-
-	const std::type_info &type() const 
-	{ return value ? value->type() : typeid(void); }
-
-	/* abstract base for option_type_holder */
-	class option_type_holder_base
-	{
-	    public:
-		virtual ~option_type_holder_base() { }
-		virtual const std::type_info &type() const = 0;
-		virtual option_type_holder_base *clone() const = 0;
-		virtual void dump(std::ostream &stream) const = 0;
-	};
-
-	template<typename T>
-	class option_type_holder : public option_type_holder_base
-	{
-	    public:
-		option_type_holder(const T &val) : v(val) { }
-                virtual ~option_type_holder() { }
-
-		virtual const std::type_info &type() const
-		{ return typeid(T); }
-		
-                virtual option_type_holder_base *clone() const
-		{ return new option_type_holder(v); }
-		
-                /* T must have a valid operator<< */
-                virtual void dump(std::ostream &stream) const
-		{ stream << v; }
-		
-                T v;
-	};
-
-	option_type_holder_base *value;
-};
-
-template<typename T>
-inline T *
-option_cast(option_type_T *opt)
-{
-    return opt && opt->type() == typeid(T) ?
-	&static_cast<option_type_T::option_type_holder<T> *>(opt->value)->v : 0;
-}
-
-template<typename T>
-inline const T *
-option_cast(const option_type_T *opt)
-{
-    return option_cast<T>(const_cast<option_type_T * >(opt));
-}
-
-template<typename T>
-T option_cast(const option_type_T &opt)
-{
-    const T *result = option_cast<T>(&opt);
-    if (not result)
-	throw BadCast();
-    return *result;
-}
-
-class options_T
-{
-    public:
-        static bool exists(const std::string &id)
-        { return optmap.find(id) != optmap.end(); }
-
-	/* get option with specified name */
-	template<typename T>
-	static const T get(const std::string &id);
-
-	/* set specified option name to specified value */
-	template <typename T>
-	static void set(const std::string &id, const T &t);
-
-	/* dump all the options to the specified stream */
-	static void dump(std::ostream &stream);
-
-	/* convenience */
-#	define optset(key,type,value)   options_T::set<type>(key, value)
-#	define optget(key,type)         options_T::get<type>(key)
-#       define optexists(key)           options_T::exists(key)
+        /* read-only */
+        static const std::string& portdir() { return _portdir; }
+        static const std::vector<std::string>& overlays() { return _overlays; }
 
     private:
-	class option_map_T : public std::map<std::string, option_type_T * >
-	{
-	    public:
-		option_map_T() { set_defaults(); }
-		~option_map_T()
-		{
-		    for (iterator i = begin() ; i != end() ; ++i)
-			delete i->second;
-		}
+        static bool _init;
+        static bool _verbose;
+        static bool _quiet;
+        static bool _debug;
+        static bool _timer;
+        static bool _all;
+        static bool _dev;
+        static bool _count;
+        static bool _color;
+        static bool _overlay;
+        static bool _eregex;
+        static bool _regex;
+        static bool _qa;
+        static bool _meta;
+        static bool _metacache;
+        static bool _querycache;
+        static bool _devaway;
 
-		/* set_defaults() is defined in the source file ; that way the only
-		 * thing we have to do when adding a new option, is set it there. */
-		void set_defaults();
-	};
+        static int _querycache_max;
+        static long _querycache_expire;
+        static long _devaway_expire;
+        static size_t _maxcol;
 
-	static option_map_T optmap;
+        static std::ostream *_outstream;
+        static std::string _outfile;
+        static std::string _cvsdir;
+        static std::string _herdsxml;
+        static std::string _devawayxml;
+        static std::string _userinfoxml;
+        static std::string _with_herd;
+        static std::string _with_dev;
+        static std::string _localstatedir;
+        static std::string _wgetopts;
+        static std::string _labelcolor;
+        static std::string _hlcolor;
+        static std::string _metacache_expire;
+        static std::string _highlights;
+        static std::string _locale;
+
+        static options_action_T _action;
+        static std::string _portdir;
+        static std::vector<std::string> _overlays;
 };
-
-template <typename T>
-inline const T
-options_T::get(const std::string &id)
-{
-    if (not optmap[id])
-        throw BadOption(id);
-    return option_cast<T>(*(optmap[id]));
-}
-
-template <typename T>
-void
-options_T::set(const std::string &id, const T &t)
-{
-    option_map_T::iterator i = optmap.find(id);
-    if (i != optmap.end())
-    {
-        if (i->second)
-            delete i->second;
-	optmap.erase(i);
-    }
-    optmap.insert(std::make_pair(id, new option_type_T(t)));
-}
 
 #endif
 

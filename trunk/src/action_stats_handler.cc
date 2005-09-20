@@ -46,22 +46,21 @@ action_stats_handler_T::~action_stats_handler_T()
 int
 action_stats_handler_T::operator() (opts_type &null)
 {
-    optset("quiet", bool, false);
-
+    options::set_quiet(false);
     fetch_herdsxml();
-    herdsxml.parse(herdsxml_path);
+    herdsxml.parse(options::herdsxml());
     const Herds& herds(herdsxml.herds());
 
-    if (use_devaway)
+    if (options::devaway())
     {
         fetch_devawayxml();
-        devaway.parse(devaway_path);
+        devaway.parse(options::devawayxml());
     }
 
     /* set format attributes */
     output.set_maxlabel(35);
-    output.set_maxdata(maxcol - output.maxlabel());
-    if (use_devaway)
+    output.set_maxdata(options::maxcol() - output.maxlabel());
+    if (options::devaway())
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
@@ -127,7 +126,7 @@ action_stats_handler_T::operator() (opts_type &null)
     output(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
         least_herds);
 
-    count = false;
+    options::set_count(false);
     flush();
     return EXIT_SUCCESS;
 }

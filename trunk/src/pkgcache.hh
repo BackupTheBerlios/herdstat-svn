@@ -41,28 +41,26 @@ class pkgcache_T : public cachable
 
         pkgcache_T();
         pkgcache_T(const std::string &portdir);
-        void init(const std::string &portdir);
-
-        /// Implicit conversion to container_type
-        operator const container_type&() const;
+        void init();
 
         virtual bool valid() const;
         virtual void fill();
         virtual void load();
         virtual void dump();
 
-        iterator begin();
-        const_iterator begin() const;
-        iterator end();
-        const_iterator end() const;
-        size_type size() const;
-        bool empty() const;
+        /// Implicit conversion to container_type
+        inline operator const container_type&() const;
+
+        inline iterator begin();
+        inline const_iterator begin() const;
+        inline iterator end();
+        inline const_iterator end() const;
+        inline size_type size() const;
+        inline bool empty() const;
 
     private:
-        void push_back(const value_type &v);
-
-        std::string _portdir;
-        std::vector<std::string> _overlays;
+        const std::string& _portdir;
+        const std::vector<std::string>& _overlays;
         std::vector<std::string> _pkgs;
 };
 
@@ -100,12 +98,6 @@ inline bool
 pkgcache_T::empty() const
 {
     return _pkgs.empty();
-}
-
-inline void
-pkgcache_T::push_back(const value_type &v)
-{
-    _pkgs.push_back(v);
 }
 
 inline pkgcache_T::operator

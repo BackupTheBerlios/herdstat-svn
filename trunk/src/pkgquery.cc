@@ -31,9 +31,8 @@
 #include "options.hh"
 
 pkgQuery_T::pkgQuery_T(const std::string &n, const std::string &w, bool dev)
-    : _pkgs(), info(n), query(n), with(w), portdir(optget("portdir", std::string)),
-      overlays(optget("portage.config", portage::config_T).overlays()),
-      type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
+    : _pkgs(), info(n), query(n), with(w), portdir(options::portdir()),
+      overlays(options::overlays()), type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
 {
 }
 
@@ -42,7 +41,7 @@ pkgQuery_T::dump(std::ostream &stream) const
 {
     formatter_T out;
     out.set_maxlabel(16);
-    out.set_maxdata(optget("maxcol", std::size_t) - out.maxlabel());
+    out.set_maxdata(options::maxcol() - out.maxlabel());
     out.set_attrs();
     
     out("Query string", this->query);

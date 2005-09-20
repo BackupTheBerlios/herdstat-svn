@@ -42,7 +42,7 @@
 void
 debug_msg(const char *fmt, ...)
 {
-    if (not optget("debug", bool))
+    if (not options::debug())
 	return;
     
     va_list v;
@@ -56,7 +56,7 @@ debug_msg(const char *fmt, ...)
     if (pos != std::string::npos)
 	s.erase(pos, 1);
 
-    *(optget("outstream", std::ostream *)) << "!!! " << s << std::endl;
+    *(options::outstream()) << "!!! " << s << std::endl;
     va_end(v);
 }
 
@@ -67,7 +67,7 @@ do_fetch(const char * const url, const char * const file)
     const std::time_t now(std::time(NULL));
     
     /* check if previously fetched copy is expired */
-    if ((optget("action", options_action_T) != action_fetch) and
+    if ((options::action() != action_fetch) and
         (now != static_cast<std::time_t>(-1)) and xml.exists() and
         ((now - xml.mtime()) < EXPIRE) and (xml.size() > 0))
         return;
@@ -78,7 +78,7 @@ do_fetch(const char * const url, const char * const file)
 
     try
     {
-        Fetcher fetch(optget("wget.options", std::string));
+        Fetcher fetch(options::wget_options());
             
         fetch(url, xml.path());
 
@@ -111,14 +111,14 @@ do_fetch(const char * const url, const char * const file)
 void
 fetch_devawayxml()
 {
-    if (optget("devaway.location", std::string).empty())
+    if (options::devawayxml().empty())
         do_fetch(DEVAWAYXML_REMOTE, DEVAWAYXML_LOCAL);
 }
 
 void
 fetch_herdsxml()
 {
-    if (optget("herds.xml", std::string).empty())
+    if (options::herdsxml().empty())
         do_fetch(HERDSXML_REMOTE, HERDSXML_LOCAL);
 }
 

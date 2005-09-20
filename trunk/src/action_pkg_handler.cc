@@ -40,8 +40,8 @@ using namespace util;
 
 action_pkg_handler_T::action_pkg_handler_T()
     : action_herds_xml_handler_T(), metacache(portdir),
-      optsize(0), elapsed(0), dev(optget("dev", bool)),
-      meta(optget("meta", bool)), status(not quiet and not debug),
+      optsize(0), elapsed(0),
+      status(not options::quiet() and not options::debug()),
       cache_is_valid(false), at_least_one_not_cached(false)
 {
 }
@@ -57,7 +57,7 @@ action_pkg_handler_T::~action_pkg_handler_T()
 void
 action_pkg_handler_T::error(const std::string &criteria) const
 {
-    if (quiet)
+    if (options::quiet())
         return;
 
     std::cerr
@@ -70,7 +70,7 @@ action_pkg_handler_T::error(const std::string &criteria) const
         return;
     }
     
-    std::cerr << " with " << (dev? "herd":"developer") << " '"
+    std::cerr << " with " << (options::dev() ? "herd":"developer") << " '"
         << with() << "'." << std::endl;
 }
 
@@ -86,7 +86,7 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
     const Herds& herds(meta.herds());
     const Developers& devs(meta.devs());
 
-    if (dev)
+    if (options::dev())
     {
 //        if ((regex and (devs.find(regexp) != devs.end()) and
 //            (with.empty() or (herds.find(with) != herds.end()))) or
@@ -94,18 +94,18 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
 //            (with.empty() or (herds.find(with) != herds.end()))))
 //            return true;
    
-        if ((regex and (devs.find(regexp) != devs.end()) and
+        if ((options::regex() and (devs.find(regexp) != devs.end()) and
             (with.empty() or (herds.find(with) != herds.end()) or
             (with() == "no-herd" and herds.empty()))) or
-            (not regex and (devs.find(criteria) != devs.end()) and
+            (not options::regex() and (devs.find(criteria) != devs.end()) and
             (with.empty() or (herds.find(with) != herds.end()) or
             (with() == "no-herd" and herds.empty()))))
             return true;
     }
     else
     {
-        if ((regex and (herds.find(regexp) != herds.end())) or
-            (not regex and (herds.find(criteria) != herds.end())) or
+        if ((options::regex() and (herds.find(regexp) != herds.end())) or
+            (not options::regex() and (herds.find(criteria) != herds.end())) or
             (criteria == "no-herd" and herds.empty()))
         {
             if (with.empty())
@@ -138,8 +138,8 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
 void
 action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
 {
-    if (regex)
-        regexp.assign(q.query, eregex ?
+    if (options::regex())
+        regexp.assign(q.query, options::eregex() ?
             Regex::extended|Regex::icase : Regex::icase);
 
     /* for each package in the vector */
@@ -178,8 +178,8 @@ action_pkg_handler_T::search(const opts_type &opts)
         /* for each specified herd/dev */
         for (opts_type::const_iterator i = opts.begin() ; i != opts.end() ; ++i)
         {
-            if (regex)
-                regexp.assign(*i, eregex?
+            if (options::regex())
+                regexp.assign(*i, options::eregex() ?
                     Regex::extended|Regex::icase :
                     Regex::icase);
 
@@ -195,12 +195,12 @@ action_pkg_handler_T::search(const opts_type &opts)
                 else
                 {
                     matches.insert(std::make_pair(*i,
-                                   new pkgQuery_T(*i, with(), dev)));
+                                   new pkgQuery_T(*i, with(), options::dev())));
                     matches[*i]->date = std::time(NULL);
                     matches[*i]->insert(std::make_pair(m->pkg(),
                                                        m->longdesc()));
 
-                    if (dev)
+                    if (options::dev())
                     {
                         matches[*i]->info.set_user(*i);
                         herdsxml.fill_developer(matches[*i]->info);
@@ -211,10 +211,10 @@ action_pkg_handler_T::search(const opts_type &opts)
             else if (matches.find(*i) == matches.end())
             {
                 matches.insert(std::make_pair(*i,
-                               new pkgQuery_T(*i, with(), dev)));
+                               new pkgQuery_T(*i, with(), options::dev())));
                 matches[*i]->date = std::time(NULL);
 
-                if (dev)
+                if (options::dev())
                 {
                     matches[*i]->info.set_user(*i);
                     herdsxml.fill_developer(matches[*i]->info);
@@ -241,11 +241,11 @@ action_pkg_handler_T::display(pkgQuery_T *q)
     const Herds& herds(herdsxml.herds());
     Herds::const_iterator i;
 
-    if (not quiet)
+    if (not options::quiet())
     {
-        if (regex)
+        if (options::regex())
             output("Regex", q->query);
-        else if (dev)
+        else if (options::dev())
         {
             if (q->info.name().empty())
                 output("Developer", q->query);
@@ -270,14 +270,14 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         if (q->empty())
             output("Packages(0)", "none");
         /* display first package on same line */
-        else if (verbose and optget("color", bool))
+        else if (options::verbose() and options::color())
             output(util::sprintf("Packages(%d)", q->size()),
                 color[blue] + q->begin()->first + color[none]);
         else
             output(util::sprintf("Packages(%d)", q->size()),
                 q->begin()->first);
     }
-    else if (not q->empty() and not count)
+    else if (not q->empty() and not options::count())
         output("", q->begin()->first);
 
     /* display the category/package */
@@ -290,12 +290,13 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         if (not p->second.empty())
             longdesc = util::tidy_whitespace(p->second);
 
-        if ((verbose and not quiet) and not longdesc.empty())
+        if ((options::verbose() and not options::quiet()) and
+                not longdesc.empty())
         {
             if (output.size() > 1 and output.peek() != "")
                 output.endl();
 
-            if (optget("color", bool))
+            if (options::color())
                 output("", color[blue] + p->first + color[none]);
             else
                 output("", p->first);
@@ -307,14 +308,14 @@ action_pkg_handler_T::display(pkgQuery_T *q)
             if (pn != q->size())
                 output.endl();
         }
-        else if (verbose and not quiet)
+        else if (options::verbose() and not options::quiet())
         {
-            if (optget("color", bool))
+            if (options::color())
                 output("", color[blue] + p->first + color[none]);
             else
                 output("", p->first);
         }
-        else if (not count)
+        else if (not options::count())
             output("", p->first);
     }
 }
@@ -328,11 +329,11 @@ void
 action_pkg_handler_T::display()
 {
     /* set format attributes */
-    if (not meta)
+    if (not options::meta())
     {
         output.set_maxlabel(16);
-        output.set_maxdata(maxcol - output.maxlabel());
-        if (use_devaway)
+        output.set_maxdata(options::maxcol() - output.maxlabel());
+        if (options::devaway())
             output.set_devaway(devaway.keys());
         output.set_attrs();
     }
@@ -360,7 +361,7 @@ action_pkg_handler_T::display()
         /* was --metadata also specified? if so, construct the package
          * list.  When we're all done, the list will be passed to
          * action_meta_handler_T::operator(). */
-        if (meta and not count)
+        if (options::meta() and not options::count())
         {
             /* we're only interested in the package names */
             pkgQuery_T::iterator p;
@@ -372,8 +373,8 @@ action_pkg_handler_T::display()
             display(m->second);
             
             /* only skip a line if we're not on the last one */
-            if (not count and n != matches.size())
-                if (not quiet) //or (quiet and m->second->size() > 0))
+            if (not options::count() and n != matches.size())
+                if (not options::quiet()) //or (quiet and m->second->size() > 0))
                     output.endl();
         }
     }
@@ -389,7 +390,7 @@ int
 action_pkg_handler_T::operator() (opts_type &opts)
 {
     /* action_pkg_handler doesn't support the all target */
-    if (all)
+    if (options::all())
     {
         std::cerr << "Package action handler does not support the 'all' target."
             << std::endl;
@@ -402,22 +403,22 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     /* fetch/parse herds.xml for info lookup */
     fetch_herdsxml();
-    herdsxml.parse(herdsxml_path);
+    herdsxml.parse(options::herdsxml());
 
     /* fetch/parse devaway for marking away devs */
-    if (use_devaway)
+    if (options::devaway())
     {
         fetch_devawayxml();
-        devaway.parse(devaway_path);
+        devaway.parse(options::devawayxml());
     }
 
     /* setup with regex */
-    with.assign(dev? optget("with-herd", std::string) :
-                     optget("with-maintainer", std::string),
-                     Regex::icase);
+    with.assign(options::dev() ? options::with_herd() :
+                                 options::with_dev(),
+                                 Regex::icase);
 
     /* load previously cached results */
-    if (optget("querycache", bool))
+    if (options::querycache())
         querycache.load();
 
     /* search previously cached results for current queries
@@ -429,7 +430,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             /* does a previously cached query that
              * matches our criteria exist? */
             querycache_T::iterator qi =
-                querycache.find(pkgQuery_T(*i, with(), dev));
+                querycache.find(pkgQuery_T(*i, with(), options::dev()));
             if (qi != querycache.end() and not querycache.is_expired(*qi))
             {
                 debug_msg("found '%s' in query cache", i->c_str());
@@ -438,7 +439,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 matches[*i]->query = *i;
                 matches[*i]->with  = with();
 
-                if (dev)
+                if (options::dev())
                 {
                     matches[*i]->info.set_user(*i);
                     herdsxml.fill_developer(matches[*i]->info);
@@ -451,7 +452,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             {
                 /* If so, use the results to narrow down what we need and
                  * partially load the metadata cache */
-                qi = querycache.find(pkgQuery_T(*i, "", dev));
+                qi = querycache.find(pkgQuery_T(*i, "", options::dev()));
                 if (qi != querycache.end() and not querycache.is_expired(*qi))
                 {
                     /* 
@@ -464,10 +465,11 @@ action_pkg_handler_T::operator() (opts_type &opts)
                     const opts_type pkgs(qi->pkgs());
                     if (pkgs.size() < 100)
                     {
-                        pkgQuery_T q(*i, with(), dev);
+                        pkgQuery_T q(*i, with(), options::dev());
                         q.date = std::time(NULL);
                         q.with = with();
-                        if (dev)
+
+                        if (options::dev())
                         {
                             q.info.set_user(*i);
                             herdsxml.fill_developer(q.info);
@@ -475,13 +477,14 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
                         search(pkgs, q);
                         i = opts.erase(i);
+
                     } else ++i;
                 } else ++i;
             } else ++i;
         }
     }
 
-    if (debug)
+    if (options::debug())
     {
         debug_msg("opts.size() after querycache search = %d", optsize);
         for (opts_type::iterator i = opts.begin() ; i != opts.end() ; ++i)
@@ -489,7 +492,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     at_least_one_not_cached = (not opts.empty());
-    cache_is_valid = (optget("metacache", bool) and metacache.valid());
+    cache_is_valid = (options::metacache() and metacache.valid());
 
     if (cache_is_valid and at_least_one_not_cached)
     {
@@ -516,17 +519,17 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     display();
 
-    if (count)
+    if (options::count())
     {
         output("", util::sprintf("%d", size));
-        count = false; /* otherwise flush() will display size again */
+        options::set_count(false); /* otherwise flush() will display size again */
     }
-    else if (meta)
+    else if (options::meta())
     {
         /* disable stuff we've handled already */
-        optset("regex", bool, false);
-        optset("eregex", bool, false);
-        optset("timer", bool, false);
+        options::set_regex(false);
+        options::set_eregex(false);
+        options::set_timer(false);
 
         /* get rid of any package dupes */
         std::sort(packages.begin(), packages.end());
@@ -547,7 +550,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (not not_found.empty())
         std::cerr << std::endl;
 
-    if (timer)
+    if (options::timer())
     {
         *stream << std::endl << "Took " << elapsed << "ms to parse "
             << metacache.size() << " metadata.xml's ("
@@ -557,17 +560,17 @@ action_pkg_handler_T::operator() (opts_type &opts)
             << "Took " << herdsxml.elapsed() << "ms to parse herds.xml."
             << std::endl;
     }
-    else if (verbose and not quiet)
+    else if (options::verbose() and not options::quiet())
     {
         *stream << std::endl
             << "Parsed " << metacache.size() << " metadata.xml's." << std::endl;
     }
 
-    if (optget("querycache", bool))
+    if (options::querycache())
         querycache.dump();
 
     /* we handler timer here */
-    timer = false;
+    options::set_timer(false);
 
     flush();
     cleanup();

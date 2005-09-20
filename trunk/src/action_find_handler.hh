@@ -32,13 +32,8 @@
 class action_find_handler_T : public action_portage_find_handler_T
 {
     public:
-        action_find_handler_T();
         virtual ~action_find_handler_T();
-
         virtual int operator() (opts_type &);
-
-    private:
-        const bool meta;
 };
 
 #endif

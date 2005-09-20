@@ -44,7 +44,7 @@ display_herd(const Herd& herd)
 
     Herd devs(herd);
 
-    if (not optget("quiet", bool))
+    if (not options::quiet())
     {
         if (not herd.name().empty())
             out("Herd", herd.name());
@@ -53,17 +53,17 @@ display_herd(const Herd& herd)
         if (not herd.desc().empty())
             out("Description", util::tidy_whitespace(herd.desc()));
 
-        if (optget("verbose", bool))
+        if (options::verbose())
             out(util::sprintf("Developers(%d)", herd.size()), "");
     }
 
-    if (optget("verbose", bool) and not optget("quiet", bool))
+    if (options::verbose() and not options::quiet())
     {
         const std::string user(util::current_user());
 
         for (Herd::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
         {
-            if ((i->user() == user) or not optget("color", bool))
+            if ((i->user() == user) or not options::color())
                 out("", i->email());
             else
                 out("", color[blue] + i->email() + color[none]);
@@ -77,9 +77,8 @@ display_herd(const Herd& herd)
         }
     }
 
-    if ((not optget("verbose", bool) and not optget("quiet", bool)) or
-        (not optget("verbose", bool) and optget("quiet", bool) and not
-         optget("count", bool)))
+    if ((not options::verbose() and not options::quiet()) or
+        (not options::verbose() and options::quiet() and not options::count()))
     {
         std::vector<std::string> dvec(devs);
         out(util::sprintf("Developers(%d)", dvec.size()), dvec);
@@ -92,7 +91,7 @@ display_herds(const Herds& herds)
     util::color_map_T color;
     formatter_T out;
 
-    if (optget("verbose", bool) and not optget("quiet", bool))
+    if (options::verbose() and not options::quiet())
     {
         out(util::sprintf("Herds(%d)", herds.size()), "");
 
@@ -100,7 +99,7 @@ display_herds(const Herds& herds)
         Herds::const_iterator h;
         for (h = herds.begin() ; h != herds.end() ; ++h)
         {
-            if (optget("color", bool))
+            if (options::color())
                 out("", color[blue] + h->name() + color[none]);
             else
                 out("", h->name());
@@ -108,11 +107,11 @@ display_herds(const Herds& herds)
             if (not h->desc().empty())
                 out("", util::tidy_whitespace(h->desc()));
 
-            if (not optget("count", bool) and n != herds.size())
+            if (not options::count() and n != herds.size())
                 out.endl();
         }
     }
-    else if (not optget("count", bool))
+    else if (not options::count())
         out(util::sprintf("Herds(%d)", herds.size()), herds);
 }
 
@@ -129,35 +128,34 @@ int
 action_herd_handler_T::operator() (opts_type &opts)
 {
     fetch_herdsxml();
-    herdsxml.parse(herdsxml_path);
+    herdsxml.parse(options::herdsxml());
     const Herds& herds(herdsxml.herds());
 
-    if (use_devaway)
+    if (options::devaway())
     {
         fetch_devawayxml();
-        devaway.parse(devaway_path);
+        devaway.parse(options::devawayxml());
     }
 
     /* set format attributes */
-    output.set_maxlabel(all ? 11 : 15);
-    output.set_maxdata(maxcol - output.maxlabel());
-    if (use_devaway)
+    output.set_maxlabel(options::all() ? 11 : 15);
+    output.set_maxdata(options::maxcol() - output.maxlabel());
+    if (options::devaway())
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
     /* was the all target specified? */
-    if (all)
+    if (options::all())
     {
         display_herds(herds);
         size = herds.size();
         flush();
         return EXIT_SUCCESS;
     }
-    else if (regex)
+    else if (options::regex())
     {
-        regexp.assign(opts.front(),
-            eregex ? Regex::extended|Regex::icase :
-                     Regex::icase);
+        regexp.assign(opts.front(), options::eregex() ?
+                Regex::extended|Regex::icase : Regex::icase);
         opts.clear();
 
         util::transform_if(herds.begin(), herds.end(), std::back_inserter(opts),
@@ -192,7 +190,7 @@ action_herd_handler_T::operator() (opts_type &opts)
         size += h->size();
 
         /* only skip a line if we're not displaying the last one */
-        if (not count and n != opts.size())
+        if (not options::count() and n != opts.size())
             output.endl();
     }
 

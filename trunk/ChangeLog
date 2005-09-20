@@ -1,5 +1,19 @@
 ChangeLog for herdstat
 
+2005-09-20 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/options.cc, src/options.hh: Trash the options template setup and
+	replace it with the good ol' singleton.  It's faster and even better,
+	returns references instead of copies.
+	* src/action_away_handler.cc, src/action_dev_handler.cc,
+	src/action_find_handler.cc, src/action_herd_handler.cc,
+	src/action_fetch_handler.cc, src/action_which_handler.cc,
+	src/action_versions_handler.cc, src/action_pkg_handler.cc,
+	src/action_meta_handler.cc, src/action_handler.hh, src/common.cc,
+	src/common.hh, src/rc.cc, src/pkgcache.cc, src/pkgcache.hh,
+	src/pkgquery.cc, src/metacache.cc, src/metacache.hh,
+	src/querycache.cc: Update with new options setup.
+
 2005-09-18 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/util/regex.cc, herdstat/util/regex.hh: Renamed class from

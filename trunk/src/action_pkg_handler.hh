@@ -57,7 +57,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         querycache_T querycache;
         opts_type::size_type optsize;
         util::timer_T::size_type elapsed;
-        const bool dev, meta, status;
+        const bool status;
         bool cache_is_valid, at_least_one_not_cached;
         util::Regex with;
 };

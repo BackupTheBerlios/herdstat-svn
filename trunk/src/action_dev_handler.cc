@@ -28,6 +28,7 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/algorithm.hh>
 
+#include "exceptions.hh"
 #include "action_herd_handler.hh"   /* for display_herd() */
 #include "action_dev_handler.hh"
 
@@ -60,7 +61,6 @@ get_elapsed_yrs(const std::string& joined)
 }
 
 action_dev_handler_T::action_dev_handler_T()
-    : userinfo_path(optget("userinfo", std::string)), userinfo()
 {
 }
 
@@ -89,7 +89,7 @@ action_dev_handler_T::display(const std::string &d)
 
     const std::vector<std::string>& herds(dev.herds());
 
-    if (not quiet)
+    if (not options::quiet())
     {
         if (dev.name().empty())
             output("Developer", d);
@@ -101,12 +101,12 @@ action_dev_handler_T::display(const std::string &d)
 
     if (herds.empty())
     {
-        if (not count)
+        if (not options::count())
             output("Herds(0)", "none");
     }
     else
     {
-        if (verbose and not quiet)
+        if (options::verbose() and not options::quiet())
         {
             output(util::sprintf("Herds(%d)", herds.size()), "");
 
@@ -115,7 +115,7 @@ action_dev_handler_T::display(const std::string &d)
             for (i = herds.begin() ; i != herds.end() ; ++i, ++nh)
             {
                 /* display herd */
-                if (optget("color", bool))
+                if (options::color())
                     output("", color[blue] + (*i) + color[none]);
                 else
                     output("", *i);
@@ -131,16 +131,16 @@ action_dev_handler_T::display(const std::string &d)
                     output.endl();
             }
         }
-        else if (not count)
+        else if (not options::count())
             output(util::sprintf("Herds(%d)", herds.size()), herds);
 
         size += herds.size();
     }
 
     /* display userinfo.xml stuff */
-    if (not quiet)
+    if (not options::quiet())
     {
-        if (not herds.empty() and verbose and not userinfo.empty())
+        if (not herds.empty() and options::verbose() and not userinfo.empty())
             output.endl();
 
         if (not dev.pgpkey().empty())
@@ -181,30 +181,30 @@ int
 action_dev_handler_T::operator() (opts_type &opts)
 {
     fetch_herdsxml();
-    herdsxml.parse(herdsxml_path);
+    herdsxml.parse(options::devawayxml());
 
     const Herds& herds(herdsxml.herds());
     Herds::const_iterator h;
 
-    if (use_devaway)
+    if (options::devaway())
     {
         fetch_devawayxml();
-        devaway.parse(devaway_path);
+        devaway.parse(options::devawayxml());
     }
 
-    if (not userinfo_path.empty())
-        userinfo.parse(userinfo_path);
+    if (not options::userinfoxml().empty())
+        userinfo.parse(options::userinfoxml());
 
     /* set format attributes */
-    output.set_maxlabel(all ? 16 : 12);
-    output.set_maxdata(maxcol - output.maxlabel());
+    output.set_maxlabel(options::all() ? 16 : 12);
+    output.set_maxdata(options::maxcol() - output.maxlabel());
     /* set away devs (for use in marking them when they occur in output) */
-    if (use_devaway)
+    if (options::devaway())
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
     /* all target? */
-    if (all)
+    if (options::all())
     {
         Herd all_devs;
 
@@ -221,13 +221,13 @@ action_dev_handler_T::operator() (opts_type &opts)
         flush();
         return EXIT_SUCCESS;
     }
-    else if (regex)
+    else if (options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
 
-        regexp.assign(re, eregex ? Regex::extended|Regex::icase :
-                                   Regex::icase);
+        regexp.assign(re, options::eregex() ?
+                Regex::extended|Regex::icase : Regex::icase);
 
         /* loop through herds searching for devs who's username
          * matches the regular expression, inserting those that do into opts */
@@ -272,7 +272,7 @@ action_dev_handler_T::operator() (opts_type &opts)
         }
 
         /* skip a line if we're not displaying the last one */
-        if (not count and ((i+1) != opts.end()))
+        if (not options::count() and ((i+1) != opts.end()))
             output.endl();
     }
 

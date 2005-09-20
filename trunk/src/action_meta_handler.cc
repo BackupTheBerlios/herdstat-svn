@@ -60,7 +60,7 @@ display_metadata(const metadata_data& data)
     else if (not herds.empty())
         output(util::sprintf("Herds(%d)", herds.size()), herds);
 
-    if (optget("quiet", bool))
+    if (options::quiet())
     {
         std::vector<std::string> qdevs;
         Developers::const_iterator d;
@@ -97,15 +97,14 @@ display_metadata(const metadata_data& data)
         }
         catch (const NonExistentPkg)
         {
-            ebuild = ebuild_which(optget("portage.config", config_T).portdir(),
-                    data.pkg);
+            ebuild = ebuild_which(options::portdir(), data.pkg);
         }
 
         assert(not ebuild.empty());
 
         ebuild_vars.read(ebuild);
 
-        if (optget("quiet", bool) and ebuild_vars["HOMEPAGE"].empty())
+        if (options::quiet() and ebuild_vars["HOMEPAGE"].empty())
             ebuild_vars["HOMEPAGE"] = "none";
 
         if (not ebuild_vars["HOMEPAGE"].empty())
@@ -160,7 +159,7 @@ action_meta_handler_T::display(const metadata_data& data)
     /* package or category exists, but metadata.xml doesn't */
     else
     {
-        if (quiet or not optget("color", bool))
+        if (options::quiet() or not options::color())
             output("", "No metadata.xml");
         else
             output("", color[red] + "No metadata.xml." + color[none]);
@@ -180,7 +179,7 @@ action_meta_handler_T::display(const metadata_data& data)
                 
             portage::ebuild_T ebuild_vars(ebuild);
 
-            if (quiet and ebuild_vars["HOMEPAGE"].empty())
+            if (options::quiet() and ebuild_vars["HOMEPAGE"].empty())
                 ebuild_vars["HOMEPAGE"] = "none";
 
             if (not ebuild_vars["HOMEPAGE"].empty())
@@ -204,7 +203,7 @@ action_meta_handler_T::display(const metadata_data& data)
                     output("Homepage", ebuild_vars["HOMEPAGE"]);
             }
 
-            if (quiet and ebuild_vars["DESCRIPTION"].empty())
+            if (options::quiet() and ebuild_vars["DESCRIPTION"].empty())
                 ebuild_vars["DESCRIPTION"] = "none";
 
             if (not ebuild_vars["DESCRIPTION"].empty())
@@ -226,23 +225,23 @@ action_meta_handler_T::operator() (opts_type &opts)
     bool pwd = false;
     std::string dir;
 
-    if (use_devaway)
+    if (options::devaway())
     {
         fetch_devawayxml();
-        devaway.parse(devaway_path);
+        devaway.parse(options::devawayxml());
     }
 
     output.set_maxlabel(16);
-    output.set_maxdata(maxcol - output.maxlabel());
-    output.set_quiet(quiet, " ");
-    if (use_devaway)
+    output.set_maxdata(options::maxcol() - output.maxlabel());
+    output.set_quiet(options::quiet(), " ");
+    if (options::devaway())
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
     /* we dont care about these */
-    count = false;
+    options::set_count(false);
 
-    if (all)
+    if (options::all())
     {
         std::cerr << "Metadata action handler does not support the 'all' target."
             << std::endl;
@@ -293,16 +292,16 @@ action_meta_handler_T::operator() (opts_type &opts)
         debug_msg("set portdir to '%s'", dir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
     }
-    else if (regex)
+    else if (options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
 
-        regexp.assign(re, eregex ?
+        regexp.assign(re, options::eregex() ?
             Regex::extended|Regex::icase : Regex::icase);
 
         matches = portage::find_package_regex(config,
-                    regexp, overlay, &search_timer);
+                    regexp, options::overlay(), &search_timer);
 
         if (matches.empty())
         {
@@ -331,7 +330,7 @@ action_meta_handler_T::operator() (opts_type &opts)
             if (pwd)
                 data.pkg = portage::find_package_in(data.portdir,
                                 m->second, &search_timer);
-            else if (regex and not m->first.empty())
+            else if (options::regex() and not m->first.empty())
             {
                 data.portdir = m->first;
                 data.pkg = m->second;
@@ -340,7 +339,7 @@ action_meta_handler_T::operator() (opts_type &opts)
             {
                 std::pair<std::string, std::string> p =
                     portage::find_package(config, m->second,
-                    overlay, &search_timer);
+                    options::overlay(), &search_timer);
                 data.portdir = p.first;
                 data.pkg = p.second;
             }
@@ -354,7 +353,7 @@ action_meta_handler_T::operator() (opts_type &opts)
             std::vector<std::string>::const_iterator i;
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
-                if (quiet or not optget("color", bool))
+                if (options::quiet() or not options::color())
                     std::cerr << *i << std::endl;
                 else
                     std::cerr << color[green] << *i << color[none] << std::endl;

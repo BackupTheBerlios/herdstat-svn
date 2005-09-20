@@ -60,8 +60,8 @@ class metacache_T : public cachable
         inline bool empty() const;
 
     private:
-        std::string _portdir;
-        std::vector<std::string> _overlays;
+        const std::string& _portdir;
+        const std::vector<std::string>& _overlays;
         container_type _metadatas;
 };
 

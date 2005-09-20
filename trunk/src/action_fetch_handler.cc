@@ -36,14 +36,14 @@ action_fetch_handler_T::operator() (opts_type &null)
 {
     try
     {
-        optset("verbose", bool, true);
+        options::set_verbose(true);
 
         fetch_herdsxml();
         /* parse herds.xml so any xml files listed in <maintainingproject>
          * tags will be fetched. */
-        herdsxml.parse(herdsxml_path);
+        herdsxml.parse(options::herdsxml());
 
-        if (use_devaway)
+        if (options::devaway())
             fetch_devawayxml();
     }
     catch (const FetchException)

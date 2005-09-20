@@ -50,11 +50,11 @@ action_versions_handler_T::operator() (opts_type &opts)
     bool pwd = false;
 
     output.set_maxlabel(8);
-    output.set_maxdata(maxcol - output.maxlabel());
-    output.set_quiet(quiet);
+    output.set_maxdata(options::maxcol() - output.maxlabel());
+    output.set_quiet(options::quiet());
     output.set_attrs();
 
-    if (all)
+    if (options::all())
     {
         std::cerr << "Versions action handler does not support the 'all' target."
             << std::endl;
@@ -99,17 +99,17 @@ action_versions_handler_T::operator() (opts_type &opts)
         debug_msg("set portdir to '%s'", dir.c_str());
         debug_msg("added '%s' to opts.", leftover.c_str());
     }
-    else if (regex)
+    else if (options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
         
-        regexp.assign(re, eregex ? Regex::extended|Regex::icase :
-                                   Regex::icase);
+        regexp.assign(re, options::eregex() ?
+                Regex::extended|Regex::icase : Regex::icase);
         
         pkgcache_T pkgcache(portdir);
         matches = portage::find_package_regex(config, regexp,
-                    overlay, &search_timer, pkgcache);
+                    options::overlay(), &search_timer, pkgcache);
         
         if (matches.empty())
         {
@@ -134,7 +134,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             if (pwd)
                 package = portage::find_package_in(dir,
                             m->second, &search_timer);
-            else if (regex and not m->first.empty())
+            else if (options::regex() and not m->first.empty())
             {
                 dir = m->first;
                 package = m->second;
@@ -143,7 +143,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             {
                 std::pair<std::string, std::string> p =
                     portage::find_package(config, m->second,
-                    overlay, &search_timer);
+                    options::overlay(), &search_timer);
                 dir = p.first;
                 package = p.second;
             }
@@ -160,7 +160,7 @@ action_versions_handler_T::operator() (opts_type &opts)
 
             size += versions.size();
 
-            if (not quiet)
+            if (not options::quiet())
             {
                 if (dir == portdir or pwd)
                     output("Package", package);
@@ -170,7 +170,7 @@ action_versions_handler_T::operator() (opts_type &opts)
                 output.endl();
             }
 
-            if (not count)
+            if (not options::count())
             {
                 portage::versions_T::iterator v;
                 for (v = versions.begin() ; v != versions.end() ; ++v)
@@ -186,7 +186,7 @@ action_versions_handler_T::operator() (opts_type &opts)
                 }
             }
 
-            if (not count and (n != matches.size()))
+            if (not options::count() and (n != matches.size()))
                 output.endl();
         }
         catch (const portage::AmbiguousPkg &e)
@@ -198,7 +198,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             opts_type::const_iterator i;
             for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
             {
-                if (quiet or not optget("color", bool))
+                if (options::quiet() or not options::color())
                     std::cerr << *i << std::endl;
                 else
                     std::cerr << color[green] << *i << color[none] << std::endl;

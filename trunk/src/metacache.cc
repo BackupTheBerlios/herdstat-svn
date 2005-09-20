@@ -44,9 +44,9 @@
 using namespace portage;
 
 metacache_T::metacache_T(const std::string &portdir)
-    : cachable(optget("localstatedir", std::string)+METACACHE),
+    : cachable(options::localstatedir()+METACACHE),
       _portdir(portdir),
-      _overlays(optget("portage.config", portage::config_T).overlays())
+      _overlays(options::overlays())
 {
 }
 
@@ -64,8 +64,8 @@ metacache_T::valid() const
     const util::stat_T metacache(this->path());
     bool valid = false;
 
-    const std::string expire(optget("metacache.expire", std::string));
-    const std::string lastsync(optget("localstatedir", std::string)+LASTSYNC);
+    const std::string expire(options::metacache_expire());
+    const std::string lastsync(options::localstatedir()+LASTSYNC);
 
     if (metacache.exists())
     {
@@ -79,7 +79,7 @@ metacache_T::valid() const
             {
                 util::file_T t(path), l(lastsync);
 
-                if (optget("debug", bool))
+                if (options::debug())
                 {
                     debug_msg("Checking timestamps...");
                     t.dump(std::cout);
@@ -160,7 +160,7 @@ metacache_T::valid() const
 void
 metacache_T::fill()
 {
-    const bool status = not optget("quiet", bool) and not optget("debug", bool);
+    const bool status = not options::quiet() and not options::debug();
     {
         util::progress_T progress;
         pkgcache_T pkgcache(this->_portdir);
@@ -168,7 +168,7 @@ metacache_T::fill()
 
         if (status)
         {
-            *(optget("outstream", std::ostream *))
+            *(options::outstream())
                 << "Generating metadata.xml cache: ";
             progress.start(pkgcache.size());
         }
@@ -194,7 +194,7 @@ metacache_T::fill()
     }
 
     if (status)
-        *(optget("outstream", std::ostream *)) << std::endl;
+        *(options::outstream()) << std::endl;
 }
 
 /*
@@ -211,9 +211,9 @@ metacache_T::load()
     {
         const util::vars_T cache(this->path());
 
-        this->_portdir = cache["portdir"];
-        if (this->_portdir.empty())
-            throw Exception();
+//        this->_portdir = cache["portdir"];
+//        if (this->_portdir.empty())
+//            throw Exception();
 
         /* reserve to prevent tons of reallocations */
         if (cache["size"].empty() or cache["size"] == "0")

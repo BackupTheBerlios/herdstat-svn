@@ -25,6 +25,7 @@
 #endif
 
 #include <string>
+#include <herdstat/util/string.hh>
 #include "common.hh"
 #include "rc.hh"
 
@@ -63,73 +64,39 @@ rc_T::set_options()
     std::string s;
 
     if (not vars["colors"].empty())
-    {
-	s = vars["colors"];
-	if (s == "no" or s == "false")
-	    optset("color", bool, false);
-	else if (s == "yes" or s == "true")
-	    optset("color", bool, true);
-    }
+        options::set_color(util::destringify<bool>(vars["colors"]));
     if (not vars["label.color"].empty())
-	optset("label.color", std::string, vars["label.color"]);
+	options::set_labelcolor(vars["label.color"]);
     if (not vars["highlight.color"].empty())
-	optset("highlight.color", std::string, vars["highlight.color"]);
+	options::set_hlcolor(vars["highlight.color"]);
     if (not vars["qa"].empty())
-    {
-	s = vars["qa"];
-	if (s == "no" or s == "false")
-	    optset("qa", bool, false);
-	else if (s == "yes" or s == "true")
-	    optset("qa", bool, true);
-    }
+        options::set_qa(util::destringify<bool>(vars["qa"]));
     if (not vars["herdsxml"].empty())
-	optset("herds.xml", std::string, vars["herdsxml"]);
+	options::set_herdsxml(vars["herdsxml"]);
     if (not vars["gentoo.cvs"].empty())
-        optset("gentoo.cvs", std::string, vars["gentoo.cvs"]);
+        options::set_cvsdir(vars["gentoo.cvs"]);
     if (not vars["userinfo"].empty())
-        optset("userinfo", std::string, vars["userinfo"]);
+        options::set_userinfoxml(vars["userinfo"]);
     if (not vars["use.devaway"].empty())
-    {
-	s = vars["use.devaway"];
-	if (s == "no" or s == "false")
-	    optset("devaway", bool, false);
-	else if (s == "yes" or s == "true")
-	    optset("devaway", bool, true);
-    }
+        options::set_devaway(util::destringify<bool>(vars["use.devaway"]));
     if (not vars["devaway.expire"].empty())
-	optset("devaway.expire", long,
-	    std::strtol(vars["devaway.expire"].c_str(), NULL, 10));
+        options::set_devaway_expire(util::destringify<long>(vars["devaway.expire"]));
     if (not vars["devaway.location"].empty())
-        optset("devaway.location", std::string, vars["devaway.location"]);
+        options::set_devawayxml(vars["devaway.location"]);
     if (not vars["use.metacache"].empty())
-    {
-	s = vars["use.metacache"];
-	if (s == "no" or s == "false")
-	    optset("metacache", bool, false);
-	else if (s == "yes" or s == "true")
-	    optset("metacache", bool, true);
-    }
+        options::set_metacache(util::destringify<bool>(vars["devaway.location"]));
     if (not vars["metacache.expire"].empty())
-	optset("metacache.expire", std::string, vars["metacache.expire"]);
+	options::set_metacache_expire(vars["metacache.expire"]);
     if (not vars["use.querycache"].empty())
-    {
-	s = vars["use.querycache"];
-	if (s == "no" or s == "false")
-	    optset("querycache", bool, false);
-	else if (s == "yes" or s == "true")
-	    optset("querycache", bool, true);
-    }
+        options::set_querycache(util::destringify<bool>(vars["use.querycache"]));
     if (not vars["querycache.max"].empty())
-	optset("querycache.max", int,
-	    std::atoi(vars["querycache.max"].c_str()));
+        options::set_querycache_max(util::destringify<int>(vars["querycache.max"]));
     if (not vars["querycache.expire"].empty())
-	optset("querycache.expire", long,
-	    std::strtol(vars["querycache.expire"].c_str(), NULL, 10));
+        options::set_querycache_expire(util::destringify<long>(vars["querycache.expire"]));
     if (not vars["wget.options"].empty())
-	optset("wget.options", std::string, vars["wget.options"]);
-
+	options::set_wget_options(vars["wget.options"]);
     if (not vars["highlights"].empty())
-        optset("highlights", std::string, vars["highlights"]);
+        options::set_highlights(vars["highlights"]);
 }
 
 /* vim: set tw=80 sw=4 et : */

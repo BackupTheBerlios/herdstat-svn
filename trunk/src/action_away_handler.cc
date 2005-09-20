@@ -27,6 +27,8 @@
 #include <iostream>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/algorithm.hh>
+
+#include "exceptions.hh"
 #include "action_away_handler.hh"
 
 using namespace portage;
@@ -41,10 +43,10 @@ action_away_handler_T::display(const Developer& dev)
 {
     ++size;
 
-    if (count)
+    if (options::count())
         return;
 
-    if (quiet)
+    if (options::quiet())
         output("", dev.user() + " - " + dev.awaymsg());
     else
     {
@@ -65,24 +67,24 @@ int
 action_away_handler_T::operator()(opts_type& opts)
 {
     output.set_maxlabel(13);
-    output.set_maxdata(maxcol - output.maxlabel());
-    output.set_quiet(quiet, " ");
+    output.set_maxdata(options::maxcol() - output.maxlabel());
+    output.set_quiet(options::quiet(), " ");
     output.set_attrs();
 
     fetch_devawayxml();
-    devaway.parse(devaway_path);
+    devaway.parse(options::devawayxml());
     fetch_herdsxml();
-    herdsxml.parse(herdsxml_path);
+    herdsxml.parse(options::herdsxml());
 
     const Developers& devs(devaway.devs());
     Developers::const_iterator d;
 
-    if (all)
+    if (options::all())
     {
         for (d = devs.begin() ; d != devs.end() ; )
         {
             display(*d++);
-            if (not quiet and (d != devs.end()))
+            if (not options::quiet() and (d != devs.end()))
                 output.endl();
         }
 
@@ -90,12 +92,12 @@ action_away_handler_T::operator()(opts_type& opts)
         return EXIT_SUCCESS;
     }
     
-    if (regex)
+    if (options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
-        regexp.assign(re, eregex ? Regex::extended|Regex::icase :
-                                   Regex::icase);
+        regexp.assign(re, options::eregex() ?
+            Regex::extended|Regex::icase : Regex::icase);
 
         /* insert developer user names that match the regex into opts */
         transform_if(devs.begin(), devs.end(), std::back_inserter(opts),
@@ -129,7 +131,7 @@ action_away_handler_T::operator()(opts_type& opts)
                 return EXIT_FAILURE;
         }
 
-        if (not quiet and ((i+1) != opts.end()))
+        if (not options::quiet() and ((i+1) != opts.end()))
             output.endl();
     }
 

@@ -52,13 +52,13 @@ Categories::Categories(const std::string& portdir, bool validate)
     this->fill();
 }
 /****************************************************************************/
-// for QA - bails if given category is invalid
+// for QA - bails if given category does not exist
 struct BailIfInvalid : std::binary_function<std::string, std::string, void>
 {
-    void operator()(const std::string& s, const std::string& portdir) const
+    void operator()(const std::string& cat, const std::string& portdir) const
     {
-        if (not util::is_dir(portdir+"/"+s))
-            throw QAException("invalid category '"+s+"'.");
+        if (not util::is_dir(portdir+"/"+cat))
+            throw QAException("invalid category '"+cat+"'.");
     }
 };
 

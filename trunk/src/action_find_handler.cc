@@ -38,11 +38,6 @@
 
 using namespace util;
 
-action_find_handler_T::action_find_handler_T()
-    : action_portage_find_handler_T(), meta(optget("meta", bool))
-{
-}
-
 action_find_handler_T::~action_find_handler_T()
 {
 }
@@ -53,20 +48,19 @@ action_find_handler_T::operator() (opts_type &opts)
     opts_type results;
     pkgcache_T pkgcache(portdir);
 
-    if (all)
+    if (options::all())
     {
         std::cerr << "find handler does not support the 'all' target."
             << std::endl;
         return EXIT_FAILURE;
     }
-    else if (regex)
+    else if (options::regex())
     {
-        regexp.assign(opts.front(),
-            eregex ? Regex::extended|Regex::icase :
-                     Regex::icase);
+        regexp.assign(opts.front(), options::eregex() ?
+                Regex::extended|Regex::icase : Regex::icase);
 
         matches = portage::find_package_regex(config,
-                    regexp, overlay, &search_timer, pkgcache);
+                    regexp, options::overlay(), &search_timer, pkgcache);
 
         if (matches.empty())
         {
@@ -89,11 +83,11 @@ action_find_handler_T::operator() (opts_type &opts)
 
         try
         {
-            if (regex)
+            if (options::regex())
                 p = *m;
             else
                 p = portage::find_package(config, m->second,
-                        overlay, &search_timer, pkgcache);
+                        options::overlay(), &search_timer, pkgcache);
         }
         catch (const portage::AmbiguousPkg &e)
         {
@@ -121,16 +115,16 @@ action_find_handler_T::operator() (opts_type &opts)
             results.end());
     }
 
-    if (meta)
+    if (options::meta())
     {
         /* disable stuff we've already handled */
-        optset("regex", bool, false);
-        optset("eregex", bool, false);
+        options::set_regex(false);
+        options::set_eregex(false);
         
         action_meta_handler_T mhandler;
         mhandler(results);
     }
-    else if (not count)
+    else if (not options::count())
     {
         if (results.size() == 1)
             *stream << results.front() << std::endl;

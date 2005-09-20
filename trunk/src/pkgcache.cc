@@ -38,23 +38,23 @@
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
 pkgcache_T::pkgcache_T()
-    : cachable(optget("localstatedir", std::string)+PKGCACHE),
-      _overlays(optget("portage.config", portage::config_T).overlays())
+    : cachable(options::localstatedir()+PKGCACHE),
+      _portdir(options::portdir()),
+      _overlays(options::overlays())
 {
 }
 
 pkgcache_T::pkgcache_T(const std::string &portdir)
-    : cachable(optget("localstatedir", std::string)+PKGCACHE),
+    : cachable(options::localstatedir()+PKGCACHE),
       _portdir(portdir),      
-      _overlays(optget("portage.config", portage::config_T).overlays())
+      _overlays(options::overlays())
 {
     this->logic();
 }
 
 void
-pkgcache_T::init(const std::string &portdir)
+pkgcache_T::init()
 {
-    this->_portdir.assign(portdir);
     this->logic();
 }
 
@@ -68,8 +68,8 @@ pkgcache_T::valid() const
     const util::stat_T pkgcache(this->path());
     bool valid = false;
 
-    const std::string expire(optget("metacache.expire", std::string));
-    const std::string lastsync(optget("localstatedir", std::string)+LASTSYNC);
+    const std::string expire(options::metacache_expire());
+    const std::string lastsync(options::localstatedir()+LASTSYNC);
 
     if (pkgcache.exists())
     {
@@ -140,14 +140,13 @@ pkgcache_T::fill()
 {
     util::timer_T timer;
 
-    if (optget("timer", bool))
+    if (options::timer())
         timer.start();
 
     const portage::Categories
-        categories(this->_portdir, optget("qa", bool));
+        categories(this->_portdir, options::qa());
 
-    std::vector<std::string> dirs = 
-        optget("portage.config", portage::config_T).overlays();
+    std::vector<std::string> dirs(options::overlays());
     dirs.insert(dirs.begin(), this->_portdir);
     std::vector<std::string>::iterator i, e = dirs.end();
 
@@ -169,13 +168,13 @@ pkgcache_T::fill()
             {
                 std::string pkg(util::sprintf("%s/%s", c->c_str(), util::basename(*d)));
                 if ((*i == this->_portdir) or 
-                    (std::find(this->begin(), this->end(), pkg) == this->end()))
-                    this->push_back(pkg);
+                    (std::find(_pkgs.begin(), _pkgs.end(), pkg) == _pkgs.end()))
+                    _pkgs.push_back(pkg);
             }
         }
     }
 
-    if (optget("timer", bool))
+    if (options::timer())
     {
         timer.stop();
         debug_msg("Took %ldms to fill package cache.", timer.elapsed());

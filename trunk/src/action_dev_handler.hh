@@ -40,7 +40,6 @@ class action_dev_handler_T : public action_herds_xml_handler_T
     private:
         void display(const std::string &);
 
-        const std::string userinfo_path;
         portage::userinfo_xml userinfo;
 };
 
