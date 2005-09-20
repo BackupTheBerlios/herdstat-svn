@@ -177,6 +177,7 @@ find_package_in(const std::string &portdir, const std::string &pkg,
     }
     else
     {
+        /* FIXME: we need a way to copy_if this */
         std::string::size_type pos;
         std::vector<std::string>::const_iterator i, e;
         for (i = pkgcache.begin(), e = pkgcache.end() ; i != e ; ++i)
@@ -207,11 +208,12 @@ std::vector<std::string>
 find_package_regex_in(const std::string &portdir, const util::Regex &regex,
                 util::timer_T *timer, const std::vector<std::string> &pkgcache)
 {
+    std::vector<std::string> matches;
     const std::string path(portdir+"/");
 
     /* if it looks like a category was specified, and no
      * regex-like metacharacters are present, only search
-     * the category */
+     * the category.  yes this is an optimization hack */
     bool knowncat = false, onlyonce = false;
     std::string cat;
     std::string::size_type pos = regex().find('/');
@@ -227,8 +229,6 @@ find_package_regex_in(const std::string &portdir, const util::Regex &regex,
 
     if (timer and not timer->is_running())
         timer->start();
-
-    std::vector<std::string> matches;
 
     if (pkgcache.empty())
     {
@@ -268,6 +268,7 @@ find_package_regex_in(const std::string &portdir, const util::Regex &regex,
     }
     else
     {
+        /* FIXME: we need a way to copy_if this */
         std::string::size_type pos;
         std::vector<std::string>::const_iterator i, e;
         for (i = pkgcache.begin(), e = pkgcache.end() ; i != e ; ++i)

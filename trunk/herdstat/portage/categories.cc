@@ -26,6 +26,8 @@
 
 #include <fstream>
 #include <iterator>
+#include <algorithm>
+#include <functional>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/categories.hh>
@@ -50,39 +52,39 @@ Categories::Categories(const std::string& portdir, bool validate)
     this->fill();
 }
 /****************************************************************************/
+// for QA - bails if given category is invalid
+struct BailIfInvalid : std::binary_function<std::string, std::string, void>
+{
+    void operator()(const std::string& s, const std::string& portdir) const
+    {
+        if (not util::is_dir(portdir+"/"+s))
+            throw QAException("invalid category '"+s+"'.");
+    }
+};
+
 void
 Categories::fill()
 {
     if (_init)
         return;
 
-    std::string line;
     /* read main categories file */
     {
         std::ifstream stream((_portdir+CATEGORIES).c_str());
         if (not stream)
             throw FileException(_portdir+CATEGORIES);
 
-        std::size_t n = 0;
-        while (std::getline(stream, line))
-        {
-            /* virtual isn't a real category */
-            if (line == "virtual")
-                continue;
-
-            /* bail if validate mode is enabled and
-             * the category does not exist. */
-            if (_validate and not util::is_dir(_portdir+"/"+line))
-            {
-                std::cerr << "QA Violation: " << _portdir << CATEGORIES
-                    << ":" << ++n << std::endl << "category '" << line
-                    << "' is listed but does not exist." << std::endl;
-                throw QAException();
-            }
-
-            _s.insert(line);
-        }
+        _s.insert(std::istream_iterator<std::string>(stream),
+                  std::istream_iterator<std::string>());
     }
+
+    /* virtual isn't really a category */
+    _s.erase("virtual");
+
+    /* validate if requested */
+    if (_validate)
+        std::for_each(_s.begin(), _s.end(),
+            std::bind2nd(BailIfInvalid(), _portdir));
 
     /* read user categories file */
     if (util::is_file(CATEGORIES_USER))

@@ -633,7 +633,12 @@ main(int argc, char **argv)
 	for (m = handlers.begin() ; m != handlers.end() ; ++m)
 	    if (m->second) delete m->second;
     }
-    catch (const xml::ParserException &e)
+    catch (const portage::QAException& e)
+    {
+	std::cerr << "QA Violation: " << e.what() << std::endl;
+	return EXIT_FAILURE;
+    }
+    catch (const xml::ParserException& e)
     {
 	std::cerr << "Error parsing '" << e.file() << "': " << e.error()
 	    << std::endl;
@@ -656,8 +661,6 @@ main(int argc, char **argv)
     }
     catch (const FetchException)
     { return EXIT_FAILURE; }
-    catch (const portage::QAException)
-    { return EXIT_FAILURE; }
     catch (const BadRegex)
     {
 	std::cerr << "Bad regular expression." << std::endl;
@@ -673,11 +676,6 @@ main(int argc, char **argv)
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-//    catch (const timer_E &e)
-//    {
-//        std::cout
-//            << "Took " << e.what() << "ms to parse herds.xml." << std::endl;
-//    }
     catch (const argsHelp)
     {
 	help();
@@ -698,11 +696,7 @@ main(int argc, char **argv)
 	usage();
 	return EXIT_FAILURE;
     }
-//    catch (const rcException)
-//    {
-//        return EXIT_FAILURE;
-//    }
-    catch (const BaseException &e)
+    catch (const BaseException& e)
     {
 	std::cerr << "Unhandled exception: " << e.what() << std::endl;
 	return EXIT_FAILURE;
