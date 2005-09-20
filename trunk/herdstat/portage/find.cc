@@ -253,7 +253,7 @@ find_package_regex_in(const std::string &portdir, const util::Regex &regex,
 
             for (d = category.begin(), e = category.end() ; d != e ; ++d)
             {
-                std::string base(util::basename(*d));
+                const std::string base(util::basename(*d));
                 if (base[0] == '.' or base == "CVS" or not util::is_dir(*d))
                     continue;
 
