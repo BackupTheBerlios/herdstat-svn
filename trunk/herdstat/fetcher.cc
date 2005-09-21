@@ -60,7 +60,7 @@ Fetcher::fetch(const std::string &url,
                const std::string &path) const throw(FetchException)
 {
     /* ensure we have write access to the directory */
-    const char * const dir = util::dirname(path);
+    const char * const dir = util::dirname(path).c_str();
     if (access(dir, W_OK) != 0)
         throw FileException(dir);
 

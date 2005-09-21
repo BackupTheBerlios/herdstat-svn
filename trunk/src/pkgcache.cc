@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <algorithm>
 #include <iterator>
 
@@ -140,7 +141,7 @@ pkgcache_T::valid() const
 struct CatSlashPkg : std::binary_function<std::string, std::string, std::string>
 {
     std::string operator()(const std::string& cat, const std::string& path) const
-    { return (cat + "/" + util::basename(path)); }
+    { return (cat+"/"+util::basename(path)); }
 };
 
 void
@@ -215,10 +216,6 @@ pkgcache_T::load()
     std::string line;
     std::getline(stream, line);
     std::getline(stream, line);
-
-//    std::copy(std::istream_iterator<std::string>(stream),
-//        std::istream_iterator<std::string>(),
-//        std::back_inserter(this->_pkgs));
 
     _pkgs.insert(_pkgs.end(),
         std::istream_iterator<std::string>(stream),

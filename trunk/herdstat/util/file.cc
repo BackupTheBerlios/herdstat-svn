@@ -304,7 +304,7 @@ dir_T::find(const Regex &regex) const
 /*****************************************************************************
  * general purpose file-related functions                                    *
  *****************************************************************************/
-const char *
+std::string
 basename(const std::string &path)
 {
     std::string result(path);
@@ -317,10 +317,10 @@ basename(const std::string &path)
     if ((pos = result.rfind('/')) != std::string::npos)
 	result = result.substr(pos + 1);
 
-    return ( result.empty() ? "/" : result.c_str() );
+    return ( result.empty() ? std::string("/") : result );
 }
 /*****************************************************************************/
-const char *
+std::string
 dirname(const std::string &path)
 {
     std::string result(path);
@@ -335,7 +335,7 @@ dirname(const std::string &path)
     else
         result.assign(".");
 
-    return ( result.empty() ? "/" : result.c_str() );
+    return ( result.empty() ? std::string("/") : result );
 }
 /*****************************************************************************/
 const char *

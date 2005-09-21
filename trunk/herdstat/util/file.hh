@@ -87,15 +87,13 @@ namespace util
 
     /** Return the basename of the given path.
      * @param p Path.
-     * @returns A pointer of type char.
      */
-    const char *basename(const std::string &p);
+    std::string basename(const std::string &p);
     
     /** Return the directory name the given path is located in.
      * @param p Path.
-     * @returns A pointer of type char.
      */
-    const char *dirname(const std::string &p);
+    std::string dirname(const std::string &p);
 
     /** Chop file extension from the given path.
      * @param p Path.
