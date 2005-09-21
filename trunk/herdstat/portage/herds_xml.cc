@@ -39,7 +39,8 @@ namespace portage {
 const char * const herds_xml::_local_default = LOCALSTATEDIR"/herds.xml";
 /****************************************************************************/
 herds_xml::herds_xml()
-    : xmlBase(), _herds(), _cvsdir(), _fetch(), in_herd(false), in_herd_name(false),
+    : xmlBase(), _herds(), _cvsdir(), _force_fetch(false), _fetch(),
+      in_herd(false), in_herd_name(false),
       in_herd_email(false), in_herd_desc(false), in_maintainer(false),
       in_maintainer_name(false), in_maintainer_email(false),
       in_maintainer_role(false), in_maintaining_prj(false),
@@ -48,10 +49,10 @@ herds_xml::herds_xml()
 }
 /****************************************************************************/
 herds_xml::herds_xml(const std::string& path)
-    : xmlBase(path), _herds(), _cvsdir(), _fetch(), in_herd(false),
-      in_herd_name(false), in_herd_email(false), in_herd_desc(false),
-      in_maintainer(false), in_maintainer_name(false), in_maintainer_email(false),
-      in_maintainer_role(false), in_maintaining_prj(false),
+    : xmlBase(path), _herds(), _cvsdir(), _force_fetch(false), _fetch(),
+      in_herd(false), in_herd_name(false), in_herd_email(false),
+      in_herd_desc(false), in_maintainer(false), in_maintainer_name(false),
+      in_maintainer_email(false), in_maintainer_role(false), in_maintaining_prj(false),
       _cur_herd(), _cur_dev()
 {
     this->parse();
@@ -173,7 +174,7 @@ herds_xml::text(const std::string& text)
          * container.
          */
 
-        project_xml mp(text, _cvsdir);
+        project_xml mp(text, _cvsdir, _force_fetch);
         const_cast<Herd&>(*_cur_herd).insert(
                 mp.devs().begin(), mp.devs().end());
     }

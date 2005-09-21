@@ -1,7 +1,34 @@
 ChangeLog for herdstat
 
+2005-09-21 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/util/vars.cc, herdstat/util/vars.hh,
+	herdstat/portage/config.cc, herdstat/portage/config.hh,
+	herdstat/portage/ebuild.cc, herdstat/portage/ebuild.hh,
+	src/metacache.cc, src/rc.hh: s/vars_T/vars/g, s/ebuild_T/ebuild/g,
+	s/config_T/config/g.
+	* herdstat/portage/find.cc, herdstat/portage/find.hh: No need to pass
+	a reference to a config object any more, as the members we need are
+	now static.
+	* src/action_which_handler.cc, src/action_versions_handler.cc,
+	src/action_find_handler.cc: Don't pass config_T reference to
+	portage::find* functions.
+	* src/rc.cc: Fix typo that caused the metacache to be regerated each
+	run.
+	* src/action_handler.cc, src/action_handler.hh: Added source file for
+	action_handler.hh.  All constructors and virtual functions are now
+	defined here as they should be.
+	* src/action_pkg_handler.cc, src/action_pkg_handler.hh: Removed
+	error() member.  Instead, I added an Error function object which we
+	can call with std::for_each().
+
 2005-09-20 Aaron Walker <ka0ttic@gentoo.org>
 
+	* herdstat/portage/config.cc, herdstat/portage/config.hh: Rewrote
+	config_T.  Members portdir() and overlays() are now static and return
+	a const reference to the actual data.  Because of this, we now can
+	keep const references to this data and not have to copy it each time
+	we need it.
 	* src/options.cc, src/options.hh: Trash the options template setup and
 	replace it with the good ol' singleton.  It's faster and even better,
 	returns references instead of copies.

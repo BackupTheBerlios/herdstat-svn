@@ -37,6 +37,8 @@
 #define PKGCACHE                    /*LOCALSTATEDIR*/"/pkgcache"
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
+using namespace portage;
+
 pkgcache_T::pkgcache_T()
     : cachable(options::localstatedir()+PKGCACHE),
       _portdir(options::portdir()),
@@ -135,6 +137,12 @@ pkgcache_T::valid() const
  * Traverse PORTDIR looking for all packages.
  */
 
+struct CatSlashPkg : std::binary_function<std::string, std::string, std::string>
+{
+    std::string operator()(const std::string& cat, const std::string& path) const
+    { return (cat + "/" + util::basename(path)); }
+};
+
 void
 pkgcache_T::fill()
 {
@@ -143,35 +151,46 @@ pkgcache_T::fill()
     if (options::timer())
         timer.start();
 
-    const portage::Categories
-        categories(this->_portdir, options::qa());
-
-    std::vector<std::string> dirs(options::overlays());
-    dirs.insert(dirs.begin(), this->_portdir);
-    std::vector<std::string>::iterator i, e = dirs.end();
+    const Categories categories(_portdir, options::qa());
+    Categories::const_iterator ci, cend;
 
     /* for each category */
-    portage::Categories::const_iterator c, ce = categories.end();
-    for (c = categories.begin() ; c != ce ; ++c)
+    for (ci = categories.begin(), cend = categories.end() ; ci != cend ; ++ci)
     {
-        /* for each portdir */
-        for (i = dirs.begin() ; i != e ; ++i)
-        {
-            const std::string cat(*i + "/" + (*c));
-            if (not util::is_dir(cat))
-                continue;
+        const std::string path(_portdir+"/"+(*ci));
+        if (not util::is_dir(path))
+            continue;
 
-            /* for each directory in category */
-            const util::dir_T category(cat);
-            util::dir_T::const_iterator d , de = category.end();
-            for (d = category.begin() ; d != de ; ++d)
+        /* for each pkg in category, insert "cat/pkg" */
+        const util::dir_T cat(path);
+        std::transform(cat.begin(), cat.end(), std::back_inserter(_pkgs),
+            std::bind1st(CatSlashPkg(), *ci));
+    }
+
+    const std::vector<std::string>& overlays(options::overlays());
+    if (not overlays.empty())
+    {
+        /* for each category */
+        std::vector<std::string>::const_iterator oi, oend = overlays.end();
+        for (ci = categories.begin() ; ci != cend ; ++ci)
+        {
+            /* for each overlay */
+            for (oi = overlays.begin() ; oi != oend ; ++oi)
             {
-                std::string pkg(util::sprintf("%s/%s", c->c_str(), util::basename(*d)));
-                if ((*i == this->_portdir) or 
-                    (std::find(_pkgs.begin(), _pkgs.end(), pkg) == _pkgs.end()))
-                    _pkgs.push_back(pkg);
+                const std::string path(*oi+"/"+(*ci));
+                if (not util::is_dir(path))
+                    continue;
+
+                /* for each pkg in category, insert "cat/pkg" */
+                const util::dir_T cat(path);
+                std::transform(cat.begin(), cat.end(), std::back_inserter(_pkgs),
+                    std::bind1st(CatSlashPkg(), *ci));
             }
         }
+
+        /* remove any duplicates that were also present in a overlay */
+        std::sort(_pkgs.begin(), _pkgs.end());
+        _pkgs.erase(std::unique(_pkgs.begin(), _pkgs.end()));
     }
 
     if (options::timer())

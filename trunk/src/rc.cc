@@ -61,8 +61,6 @@ rc_T::rc_T()
 void
 rc_T::set_options()
 {
-    std::string s;
-
     if (not vars["colors"].empty())
         options::set_color(util::destringify<bool>(vars["colors"]));
     if (not vars["label.color"].empty())
@@ -84,7 +82,7 @@ rc_T::set_options()
     if (not vars["devaway.location"].empty())
         options::set_devawayxml(vars["devaway.location"]);
     if (not vars["use.metacache"].empty())
-        options::set_metacache(util::destringify<bool>(vars["devaway.location"]));
+        options::set_metacache(util::destringify<bool>(vars["use.metacache"]));
     if (not vars["metacache.expire"].empty())
 	options::set_metacache_expire(vars["metacache.expire"]);
     if (not vars["use.querycache"].empty())

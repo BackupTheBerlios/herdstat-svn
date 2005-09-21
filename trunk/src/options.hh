@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <herdstat/portage/config.hh>
 
 enum options_action_T
 {
@@ -83,13 +84,13 @@ class options
         static bool devaway() { return _devaway; }
         static void set_devaway(bool v)  { _devaway = v; }
         
-        static int querycache_max() { return _querycache_max; }
+        static int& querycache_max() { return _querycache_max; }
         static void set_querycache_max(int v) { _querycache_max = v; }
-        static long querycache_expire() { return _querycache_expire; }
+        static long& querycache_expire() { return _querycache_expire; }
         static void set_querycache_expire(long v) { _querycache_expire = v; }
-        static long devaway_expire() { return _devaway_expire; }
+        static long& devaway_expire() { return _devaway_expire; }
         static void set_devaway_expire(long v) { _devaway_expire = v; }
-        static size_t maxcol() { return _maxcol; }
+        static size_t& maxcol() { return _maxcol; }
         static void set_maxcol(size_t v) { _maxcol = v; }
 
         static std::ostream * const outstream() { return _outstream; }
@@ -171,8 +172,10 @@ class options
         static std::string _locale;
 
         static options_action_T _action;
-        static std::string _portdir;
-        static std::vector<std::string> _overlays;
+
+        static portage::config _config;
+        static const std::string& _portdir;
+        static const std::vector<std::string>& _overlays;
 };
 
 #endif

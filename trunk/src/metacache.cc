@@ -209,7 +209,7 @@ metacache_T::load()
 
     try
     {
-        const util::vars_T cache(this->path());
+        const util::vars cache(this->path());
 
 //        this->_portdir = cache["portdir"];
 //        if (this->_portdir.empty())
@@ -221,7 +221,7 @@ metacache_T::load()
         else
             _metadatas.reserve(util::destringify<int>(cache["size"]));
 
-        util::vars_T::const_iterator i, e = cache.end();
+        util::vars::const_iterator i, e = cache.end();
         for (i = cache.begin() ; i != e ; ++i)
         {
             /* not a category/package, so skip it */

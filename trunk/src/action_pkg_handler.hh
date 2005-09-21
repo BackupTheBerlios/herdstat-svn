@@ -47,15 +47,13 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         void search(const opts_type &);
         void display();
         void display(pkgQuery_T *);
-        void error(const std::string &) const;
         void cleanup();
         bool metadata_matches(const portage::metadata &, const std::string &);
 
-        std::map<opts_type::value_type, pkgQuery_T * > matches;
+        std::map<std::string, pkgQuery_T * > matches;
         opts_type not_found, packages;
         metacache_T metacache;
         querycache_T querycache;
-        opts_type::size_type optsize;
         util::timer_T::size_type elapsed;
         const bool status;
         bool cache_is_valid, at_least_one_not_cached;

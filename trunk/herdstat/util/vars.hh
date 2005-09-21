@@ -38,7 +38,7 @@ namespace util
      * stored in key,value pairs.
      */
 
-    class vars_T : public base_file_T
+    class vars : public base_file_T
     {
         public:
             typedef std::map<std::string, std::string> container_type;
@@ -50,14 +50,14 @@ namespace util
             typedef container_type::size_type size_type;
 
             /// Default constructor.
-            vars_T();
+            vars();
 
             /** Constructor.
              * @param path Path.
              */
-            vars_T(const std::string &path);
+            vars(const std::string &path);
 
-            virtual ~vars_T();
+            virtual ~vars();
 
             /** Overloaded operator[] since std::map doesn't provide
              * a const version.
@@ -114,35 +114,35 @@ namespace util
             container_type _vars;
     };
 
-    inline std::string vars_T::operator[] (const key_type& k) const
+    inline std::string vars::operator[] (const key_type& k) const
     {
         const_iterator i = this->find(k);
         return (i == this->end() ? "" : i->second);
     }
 
-    inline vars_T::iterator vars_T::begin() { return _vars.begin(); }
-    inline vars_T::const_iterator vars_T::begin() const { return _vars.begin(); }
-    inline vars_T::iterator vars_T::end() { return _vars.end(); }
-    inline vars_T::const_iterator vars_T::end() const { return _vars.end(); }
-    inline vars_T::size_type vars_T::size() const { return _vars.size(); }
-    inline bool vars_T::empty() const { return _vars.empty(); }
-    inline vars_T::iterator vars_T::find(const key_type& k) { return _vars.find(k); }
-    inline vars_T::const_iterator vars_T::find(const key_type& k) const
+    inline vars::iterator vars::begin() { return _vars.begin(); }
+    inline vars::const_iterator vars::begin() const { return _vars.begin(); }
+    inline vars::iterator vars::end() { return _vars.end(); }
+    inline vars::const_iterator vars::end() const { return _vars.end(); }
+    inline vars::size_type vars::size() const { return _vars.size(); }
+    inline bool vars::empty() const { return _vars.empty(); }
+    inline vars::iterator vars::find(const key_type& k) { return _vars.find(k); }
+    inline vars::const_iterator vars::find(const key_type& k) const
     { return _vars.find(k); }
-    inline vars_T::mapped_type& vars_T::operator[] (const key_type& k)
+    inline vars::mapped_type& vars::operator[] (const key_type& k)
     { return _vars[k]; }
-    inline std::pair<vars_T::iterator, bool> vars_T::insert(const value_type& v)
+    inline std::pair<vars::iterator, bool> vars::insert(const value_type& v)
     { return _vars.insert(v); }
-    inline vars_T::iterator vars_T::insert(iterator hpos, const value_type& v)
+    inline vars::iterator vars::insert(iterator hpos, const value_type& v)
     { return _vars.insert(hpos, v); }
-    template <class In> inline void vars_T::insert(In begin, In end)
+    template <class In> inline void vars::insert(In begin, In end)
     { _vars.insert(begin, end); }
-    inline void vars_T::erase(iterator pos) { _vars.erase(pos); }
-    inline vars_T::size_type vars_T::erase(const key_type& k)
+    inline void vars::erase(iterator pos) { _vars.erase(pos); }
+    inline vars::size_type vars::erase(const key_type& k)
     { return _vars.erase(k); }
-    inline void vars_T::erase(iterator begin, iterator end)
+    inline void vars::erase(iterator begin, iterator end)
     { _vars.erase(begin, end); }
-    inline void vars_T::clear() { _vars.clear(); }
+    inline void vars::clear() { _vars.clear(); }
 }
 
 #endif

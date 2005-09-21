@@ -31,29 +31,31 @@
 
 namespace portage {
 /****************************************************************************/
-ebuild_T::ebuild_T()
+ebuild::ebuild()
 {
 }
 /****************************************************************************/
-ebuild_T::ebuild_T(const std::string &path) : util::vars_T(path)
+ebuild::ebuild(const std::string &path) : util::vars(path)
 {
     assert(is_ebuild(path));
 }
 /****************************************************************************/
-ebuild_T::~ebuild_T()
+ebuild::~ebuild()
 {
 }
 /****************************************************************************/
 void
-ebuild_T::do_set_defaults()
+ebuild::do_set_defaults()
 {
     /* insert its variable components
      * (${P}, ${PN}, ${PV}, etc) into our map */
     version_map_T version(this->path());
-    version_map_T::iterator v = version.begin(),
-                            e = version.end();
+    this->insert(version.begin(), version.end());
 
-    for (; v != e ; ++v) this->insert(*v);
+//    version_map_T::iterator v = version.begin(),
+//                            e = version.end();
+
+//    for (; v != e ; ++v) this->insert(*v);
 }
 /****************************************************************************/
 } // namespace portage

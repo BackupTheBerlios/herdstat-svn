@@ -34,36 +34,36 @@
 
 namespace util {
 /****************************************************************************/
-vars_T::vars_T() : _depth(0), _vars()
+vars::vars() : _depth(0), _vars()
 {
 }
 /****************************************************************************/
-vars_T::vars_T(const std::string &path)
+vars::vars(const std::string &path)
     : base_file_T(path), _depth(0), _vars()
 {
     this->read();
 }
 /****************************************************************************/
-vars_T::~vars_T()
+vars::~vars()
 {
 }
 /****************************************************************************/
 void
-vars_T::dump(std::ostream &stream) const
+vars::dump(std::ostream &stream) const
 {
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)
         stream << i->first << "=" << i->second << std::endl;
 }
 /****************************************************************************/
 void
-vars_T::read(const std::string &path)
+vars::read(const std::string &path)
 {
     this->stat().assign(path);
     this->read();
 }
 /****************************************************************************/
 void
-vars_T::set_defaults()
+vars::set_defaults()
 {
     char *result = std::getenv("HOME");
     if (result)
@@ -86,7 +86,7 @@ vars_T::set_defaults()
  * scripts or VARIABLE=value-type configuration files.
  ****************************************************************************/
 void
-vars_T::read()
+vars::read()
 {
     if (not this->is_open())
         this->open();
@@ -144,7 +144,7 @@ vars_T::read()
  * recursively calling ourselves each time we find another occurrence.
  ****************************************************************************/
 void
-vars_T::subst(std::string &value)
+vars::subst(std::string &value)
 {
 
     std::vector<std::string> vars;

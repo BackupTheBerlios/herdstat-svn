@@ -26,7 +26,6 @@
 
 #include <iostream>
 #include <locale>
-#include <herdstat/portage/config.hh>
 
 #include "options.hh"
 
@@ -72,17 +71,14 @@ std::string options::_locale(std::locale::classic().name());
 
 options_action_T options::_action = action_unspecified;
 
-std::string options::_portdir;
-std::vector<std::string> options::_overlays;
+portage::config options::_config;
+const std::string& options::_portdir = portage::config::portdir();
+const std::vector<std::string>& options::_overlays = portage::config::overlays();
 
 options::options()
 {
     if (_init)
         return;
-
-    portage::config_T config;
-    _portdir = config.portdir();
-    _overlays = config.overlays();
 
     _init = true;
 }

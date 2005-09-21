@@ -52,7 +52,7 @@ display_metadata(const metadata_data& data)
     const Herds& herds(meta.herds());
     const Developers& devs(meta.devs());
     formatter_T output;
-    ebuild_T ebuild_vars;
+    ebuild ebuild_vars;
 
     if (not meta.is_category() and (herds.empty() or
         (herds.front()) == "no-herd"))
@@ -167,17 +167,17 @@ action_meta_handler_T::display(const metadata_data& data)
         /* at least show ebuild DESCRIPTION and HOMEPAGE */
         if (not data.is_category)
         {
-            std::string ebuild;
+            std::string e;
             try
             {
-                ebuild = portage::ebuild_which(data.portdir, data.pkg);
+                e = portage::ebuild_which(data.portdir, data.pkg);
             }
             catch (const portage::NonExistentPkg)
             {
-                ebuild = portage::ebuild_which(portdir, data.pkg);
+                e = portage::ebuild_which(options::portdir(), data.pkg);
             }
                 
-            portage::ebuild_T ebuild_vars(ebuild);
+            ebuild ebuild_vars(e);
 
             if (options::quiet() and ebuild_vars["HOMEPAGE"].empty())
                 ebuild_vars["HOMEPAGE"] = "none";
@@ -300,8 +300,8 @@ action_meta_handler_T::operator() (opts_type &opts)
         regexp.assign(re, options::eregex() ?
             Regex::extended|Regex::icase : Regex::icase);
 
-        matches = portage::find_package_regex(config,
-                    regexp, options::overlay(), &search_timer);
+        matches = portage::find_package_regex(regexp, options::overlay(),
+                    &search_timer);
 
         if (matches.empty())
         {
@@ -338,8 +338,8 @@ action_meta_handler_T::operator() (opts_type &opts)
             else
             {
                 std::pair<std::string, std::string> p =
-                    portage::find_package(config, m->second,
-                    options::overlay(), &search_timer);
+                    portage::find_package(m->second, options::overlay(),
+                        &search_timer);
                 data.portdir = p.first;
                 data.pkg = p.second;
             }
@@ -377,7 +377,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         data.path = data.portdir + "/" + data.pkg + "/metadata.xml";
 
         /* are we in an overlay? */
-        if (data.portdir != portdir and not pwd)
+        if (data.portdir != options::portdir() and not pwd)
             od.insert(data.portdir);
 
         /* if no '/' exists, assume it's a category */
@@ -386,7 +386,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         if (n != 1)
             output.endl();
 
-        if (data.portdir == portdir or pwd)
+        if (data.portdir == options::portdir() or pwd)
             output(data.is_category ? "Category" : "Package", data.pkg);
 
         /* it's in an overlay, so show a little thinggy to mark it as such */

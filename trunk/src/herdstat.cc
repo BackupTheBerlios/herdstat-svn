@@ -372,7 +372,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    case '\t':
 		options::set_with_dev(optarg);
 		break;
-	    /* --noquerycache */
+	    /* --nometacache */
 	    case '\f':
 		options::set_metacache(false);
 		break;

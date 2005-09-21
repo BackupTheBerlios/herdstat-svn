@@ -37,8 +37,9 @@ const char * const project_xml::_baseURL = "http://www.gentoo.org/cgi-bin/viewcv
 const char * const project_xml::_baseLocal = "%s/gentoo/xml/htdocs/%s";
 std::set<std::string> project_xml::_parsed;
 /****************************************************************************/
-project_xml::project_xml(const std::string& path, const std::string& cvsdir)
-    : xmlBase(), fetchable(), _devs(), _cvsdir(cvsdir), 
+project_xml::project_xml(const std::string& path, const std::string& cvsdir,
+                         bool force_fetch)
+    : xmlBase(), fetchable(), _devs(), _cvsdir(cvsdir), _force_fetch(force_fetch),
       in_sub(false), in_dev(false), in_task(false), _cur_role()
 {
     if (_cvsdir.empty())
@@ -74,9 +75,9 @@ project_xml::do_fetch(const std::string& p) const throw (FetchException)
 
     try
     {
-        if (not mps.exists() or
+        if (not mps.exists() or (mps.size() == 0) or
             (mps.exists() and ((std::time(NULL) - mps.mtime()) > EXPIRE)) or
-            (mps.size() == 0))
+            _force_fetch)
         {
             if (mps.exists())
                 util::copy_file(this->path(), this->path()+".bak");
@@ -141,7 +142,7 @@ project_xml::start_element(const std::string& name, const attrs_type& attrs)
             {
                 in_sub = true;
 
-                project_xml mp(pos->second, _cvsdir);
+                project_xml mp(pos->second, _cvsdir, _force_fetch);
                 Herd::const_iterator i;
                 for (i = mp.devs().begin() ; i != mp.devs().end() ; ++i)
                 {

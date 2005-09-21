@@ -39,8 +39,8 @@ using namespace portage;
 using namespace util;
 
 action_pkg_handler_T::action_pkg_handler_T()
-    : action_herds_xml_handler_T(), metacache(portdir),
-      optsize(0), elapsed(0),
+    : action_herds_xml_handler_T(), metacache(options::portdir()),
+      elapsed(0),
       status(not options::quiet() and not options::debug()),
       cache_is_valid(false), at_least_one_not_cached(false)
 {
@@ -54,25 +54,27 @@ action_pkg_handler_T::~action_pkg_handler_T()
  * Show search failure message.
  */
 
-void
-action_pkg_handler_T::error(const std::string &criteria) const
+struct Error : std::binary_function<std::string, const util::Regex *, void>
 {
-    if (options::quiet())
-        return;
-
-    std::cerr
-        << "Failed to find any packages maintained by '"
-        << criteria << "'";
-
-    if (with.empty())
+    void operator()(const std::string& criteria, const util::Regex *with) const
     {
-        std::cerr << "." << std::endl;
-        return;
-    }
+        if (options::quiet())
+            return;
+
+        std::cerr
+            << "Failed to find any packages maintained by '"
+            << criteria << "'";
+
+        if (with->empty())
+        {
+            std::cerr << "." << std::endl;
+            return;
+        }
     
-    std::cerr << " with " << (options::dev() ? "herd":"developer") << " '"
-        << with() << "'." << std::endl;
-}
+        std::cerr << " with " << (options::dev() ? "herd":"developer") << " '"
+            << (*with)() << "'." << std::endl;
+    }
+};
 
 /*
  * Determine whether or not the metadata.xml matches our
@@ -88,12 +90,6 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
 
     if (options::dev())
     {
-//        if ((regex and (devs.find(regexp) != devs.end()) and
-//            (with.empty() or (herds.find(with) != herds.end()))) or
-//            (not regex and (devs.find(criteria) != devs.end()) and
-//            (with.empty() or (herds.find(with) != herds.end()))))
-//            return true;
-   
         if ((options::regex() and (devs.find(regexp) != devs.end()) and
             (with.empty() or (herds.find(with) != herds.end()) or
             (with() == "no-herd" and herds.empty()))) or
@@ -146,7 +142,7 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
     for (opts_type::const_iterator i = pkgs.begin() ; i != pkgs.end() ; ++i)
     {
         /* parse it's metadata.xml */
-        const std::string path(portdir + "/" + *i + "/metadata.xml");
+        const std::string path(options::portdir() + "/" + *i + "/metadata.xml");
         const metadata_xml mxml(path, *i);
         const metadata& meta(mxml.data());
 
@@ -347,7 +343,8 @@ action_pkg_handler_T::display()
             --n;
             if (matches.size() == 1)
             {
-                error(m->first);
+                Error error;
+                error(m->first, &with);
                 cleanup();
                 throw ActionException();
             }
@@ -398,8 +395,8 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     /* check PORTDIR */
-    if (not util::is_dir(portdir))
-	throw FileException(portdir);
+    if (not util::is_dir(options::portdir()))
+	throw FileException(options::portdir());
 
     /* fetch/parse herds.xml for info lookup */
     fetch_herdsxml();
@@ -486,7 +483,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     if (options::debug())
     {
-        debug_msg("opts.size() after querycache search = %d", optsize);
+        debug_msg("opts.size() after querycache search = %d", opts.size());
         for (opts_type::iterator i = opts.begin() ; i != opts.end() ; ++i)
             std::cout << *i << std::endl;
     }
@@ -543,12 +540,11 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     output.flush(*stream);
 
-    opts_type::iterator i;
-    for (i = not_found.begin() ; i != not_found.end() ; ++i)
-        error(*i);
-
     if (not not_found.empty())
-        std::cerr << std::endl;
+    {
+        std::for_each(not_found.begin(), not_found.end(),
+            std::bind2nd(Error(), &with));
+    }
 
     if (options::timer())
     {

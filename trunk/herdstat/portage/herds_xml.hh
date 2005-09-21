@@ -50,6 +50,7 @@ namespace portage {
             virtual void fill_developer(Developer& dev) const;
 
             inline void set_cvsdir(const std::string& path);
+            inline void set_force_fetch(bool force);
 
             /// Implicit conversion to Herds::container_type
             inline operator Herds::container_type() const;
@@ -70,6 +71,7 @@ namespace portage {
         private:
             Herds _herds;
             std::string _cvsdir;
+            bool _force_fetch;
             Fetcher _fetch; /* for fetching <maintainingproject> XML's */
             static const char * const _local_default;
 
@@ -94,6 +96,7 @@ namespace portage {
     inline bool herds_xml::empty() const { return _herds.empty(); }
     inline Herds::size_type herds_xml::size() const { return _herds.size(); }
     inline void herds_xml::set_cvsdir(const std::string& path) { _cvsdir.assign(path); }
+    inline void herds_xml::set_force_fetch(bool v) { _force_fetch = v; }
 
 } // namespace portage
 

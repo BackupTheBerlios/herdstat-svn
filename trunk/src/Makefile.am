@@ -1,4 +1,4 @@
-# $Id: Makefile.am 243 2005-04-22 13:30:17Z ka0ttic $
+# $Id$
 
 include $(top_builddir)/Makefile.am.common
 
@@ -15,7 +15,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   querycache_xml_handler.hh querycache_xml_handler.cc \
 		   formatter.hh formatter.cc \
 		   overlaydisplay.hh \
-		   action_handler.hh \
+		   action_handler.hh action_handler.cc \
 		   action_away_handler.hh action_away_handler.cc \
 		   action_dev_handler.hh action_dev_handler.cc \
 		   action_herd_handler.hh action_herd_handler.cc \

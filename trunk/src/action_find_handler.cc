@@ -46,7 +46,7 @@ int
 action_find_handler_T::operator() (opts_type &opts)
 {
     opts_type results;
-    pkgcache_T pkgcache(portdir);
+    pkgcache_T pkgcache(options::portdir());
 
     if (options::all())
     {
@@ -59,8 +59,8 @@ action_find_handler_T::operator() (opts_type &opts)
         regexp.assign(opts.front(), options::eregex() ?
                 Regex::extended|Regex::icase : Regex::icase);
 
-        matches = portage::find_package_regex(config,
-                    regexp, options::overlay(), &search_timer, pkgcache);
+        matches = portage::find_package_regex(regexp, options::overlay(),
+                    &search_timer, pkgcache);
 
         if (matches.empty())
         {
@@ -86,8 +86,8 @@ action_find_handler_T::operator() (opts_type &opts)
             if (options::regex())
                 p = *m;
             else
-                p = portage::find_package(config, m->second,
-                        options::overlay(), &search_timer, pkgcache);
+                p = portage::find_package(m->second, options::overlay(),
+                        &search_timer, pkgcache);
         }
         catch (const portage::AmbiguousPkg &e)
         {

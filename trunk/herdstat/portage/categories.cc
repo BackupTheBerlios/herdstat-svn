@@ -41,7 +41,7 @@ bool Categories::_init = false;
 Categories::container_type Categories::_s;
 /****************************************************************************/
 Categories::Categories(bool validate)
-    : _portdir(config_T::portdir()), _validate(validate)
+    : _portdir(config::portdir()), _validate(validate)
 {
     this->fill();
 }

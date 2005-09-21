@@ -56,8 +56,8 @@ action_which_handler_T::operator() (opts_type &opts)
         pkgcache.init();
         regexp.assign(re, options::eregex() ?
                 Regex::extended|Regex::icase : Regex::icase);
-        matches = portage::find_package_regex(config, regexp,
-                    options::overlay(), &search_timer, pkgcache);
+        matches = portage::find_package_regex(regexp, options::overlay(),
+                    &search_timer, pkgcache);
 
         if (matches.empty())
         {
@@ -91,8 +91,8 @@ action_which_handler_T::operator() (opts_type &opts)
             if (options::regex())
                 p = *m;
             else
-                p = portage::find_package(config, m->second,
-                    options::overlay(), &search_timer);
+                p = portage::find_package(m->second, options::overlay(),
+                        &search_timer);
         }
         catch (const portage::AmbiguousPkg &e)
         {
@@ -125,10 +125,10 @@ action_which_handler_T::operator() (opts_type &opts)
         }
 
         if (options::regex())
-            ebuild = portage::ebuild_which(config, p.second, options::overlay(), NULL,
+            ebuild = portage::ebuild_which(p.second, options::overlay(), NULL,
                 pkgcache);
         else
-            ebuild = portage::ebuild_which(config, p.second, options::overlay(), NULL);
+            ebuild = portage::ebuild_which(p.second, options::overlay(), NULL);
 
         if (not options::count())
             *stream << ebuild << std::endl;

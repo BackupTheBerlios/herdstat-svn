@@ -27,8 +27,6 @@
 # include "config.h"
 #endif
 
-#include <ostream>
-#include <herdstat/portage/config.hh>
 #include <herdstat/portage/herds_xml.hh>
 #include <herdstat/portage/devaway_xml.hh>
 
@@ -42,22 +40,17 @@
 class action_handler_T
 {
     public:
-        action_handler_T() : stream(options::outstream()),
-                             portdir(options::portdir()),
-                             size(0) { }
-
+        action_handler_T();
         virtual ~action_handler_T() { }
         virtual int operator() (opts_type &) = 0;
 
     protected:
-        virtual void flush() { if (options::count()) *stream << size << std::endl; }
+        virtual void flush();
 
-        std::ostream *stream;               /* output stream */
-        util::Regex regexp;               /* regular expression */
-        util::color_map_T color;            /* color map */
-        portage::config_T config;           /* portage configuration */
-        const std::string& portdir;         /* PORTDIR */
-        std::size_t size;                   /* number of results */
+        std::ostream *stream;       /* output stream */
+        util::Regex regexp;         /* regular expression */
+        util::color_map_T color;    /* color map */
+        std::size_t size;           /* number of results (for --count) */
 };
 
 /* 
@@ -70,26 +63,7 @@ class action_fancy_handler_T : public action_handler_T
         virtual ~action_fancy_handler_T() { }
 
     protected:
-        virtual void flush()
-        {
-            output.flush(*stream);
-            action_handler_T::flush();            
-
-            if (output.marked_away() and not options::count())
-            {
-                *stream << std::endl << output.devaway_color()
-                    << "*" << color[none] << " Currently away"
-                    << std::endl;
-
-                /* set false so the above isn't displayed more than once
-                 * in cases where more than one action handler is run */
-                output.set_marked_away(false);
-
-                if (options::timer() and not options::count())
-                    *stream << std::endl << "Took " << devaway.elapsed()
-                        << "ms to parse devaway.xml." << std::endl;
-            }
-        }
+        virtual void flush();
 
         portage::devaway_xml devaway;
         formatter_T output;                 /* output formatter */
@@ -102,18 +76,11 @@ class action_fancy_handler_T : public action_handler_T
 class action_herds_xml_handler_T : public action_fancy_handler_T
 {
     public:
-        action_herds_xml_handler_T() { herdsxml.set_cvsdir(options::cvsdir()); }
+        action_herds_xml_handler_T();
         virtual ~action_herds_xml_handler_T() { }
 
     protected:
-        virtual void flush()
-        {
-            action_fancy_handler_T::flush();
-
-            if (options::timer() and not options::count())
-                *stream << "Took " << herdsxml.elapsed()
-                    << "ms to parse herds.xml." << std::endl;
-        }
+        virtual void flush();
 
         portage::herds_xml herdsxml;
 };
@@ -128,14 +95,7 @@ class action_portage_find_handler_T : public action_fancy_handler_T
         virtual ~action_portage_find_handler_T() { }
 
     protected:
-        virtual void flush()
-        {
-            action_fancy_handler_T::flush();
-
-            if (options::timer() and not options::count())
-                *stream << std::endl << "Took " << search_timer.elapsed()
-                    << "ms to perform search." << std::endl;
-        }
+        virtual void flush();
 
         std::multimap<std::string, std::string> matches;
         util::timer_T search_timer;

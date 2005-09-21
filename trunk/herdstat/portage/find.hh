@@ -37,7 +37,6 @@
 namespace portage
 {
     /** Determine path to latest ebuild for specified package.
-     * @param c  Reference to a portage::config_T object.
      * @param p  Package name.
      * @param o  Search overlays?
      * @param t  Pointer to a util::timer_T object (defaults to NULL).
@@ -45,8 +44,7 @@ namespace portage
      * @returns  A constant std::string object (path to ebuild).
      */
     const std::string
-    ebuild_which(const config_T &c, const std::string &p,
-        bool o = true, util::timer_T *t = NULL,
+    ebuild_which(const std::string &p, bool o = true, util::timer_T *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
     /** Determine path to latest ebuild for specified package.
@@ -88,7 +86,6 @@ namespace portage
 
     /** Find full category/package specification (and PORTDIR it is located
      * in) for the specified package name.
-     * @param c  Reference to a portage::config_T object.
      * @param p  Package name.
      * @param o  Search overlays?
      * @param t  Pointer to util::timer_T object (Defaults to NULL).
@@ -96,13 +93,11 @@ namespace portage
      * @returns  A std::pair containing PORTDIR and category/package.
      */
     std::pair<std::string, std::string>
-    find_package(const config_T &c, const std::string &p,
-        bool o = true, util::timer_T *t = NULL,
+    find_package(const std::string &p, bool o = true, util::timer_T *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 
     /** Find full category/package specification (and PORTDIR it is located
      * in) for the specified regular expression.
-     * @param c  Reference to a portage::config_T object.
      * @param r  Reference to a util::Regex object.
      * @param o  Search overlays?
      * @param t  Pointer to util::timer_T object (Defaults to NULL).
@@ -111,8 +106,7 @@ namespace portage
      *           each match found.
      */
     std::multimap<std::string, std::string>
-    find_package_regex(const config_T &c, const util::Regex &r,
-        bool o = true, util::timer_T *t = NULL,
+    find_package_regex(const util::Regex &r, bool o = true, util::timer_T *t = NULL,
         const std::vector<std::string> &pc = std::vector<std::string>());
 }
 

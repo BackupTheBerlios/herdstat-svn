@@ -107,9 +107,9 @@ action_versions_handler_T::operator() (opts_type &opts)
         regexp.assign(re, options::eregex() ?
                 Regex::extended|Regex::icase : Regex::icase);
         
-        pkgcache_T pkgcache(portdir);
-        matches = portage::find_package_regex(config, regexp,
-                    options::overlay(), &search_timer, pkgcache);
+        pkgcache_T pkgcache(options::portdir());
+        matches = portage::find_package_regex(regexp, options::overlay(),
+                    &search_timer, pkgcache);
         
         if (matches.empty())
         {
@@ -142,13 +142,14 @@ action_versions_handler_T::operator() (opts_type &opts)
             else
             {
                 std::pair<std::string, std::string> p =
-                    portage::find_package(config, m->second,
-                    options::overlay(), &search_timer);
+                    portage::find_package(m->second, options::overlay(),
+                        &search_timer);
+
                 dir = p.first;
                 package = p.second;
             }
 
-            if (dir != portdir and not pwd)
+            if (dir != options::portdir() and not pwd)
                 od.insert(dir);
 
             portage::versions_T versions(dir + "/" + package);
@@ -156,13 +157,13 @@ action_versions_handler_T::operator() (opts_type &opts)
             /* versions would be empty if the directory exists, but no
              * ebuilds are there - in this case, use real PORTDIR. */
             if (versions.empty())
-                versions.assign(portdir + "/" + package);
+                versions.assign(options::portdir() + "/" + package);
 
             size += versions.size();
 
             if (not options::quiet())
             {
-                if (dir == portdir or pwd)
+                if (dir == options::portdir() or pwd)
                     output("Package", package);
                 else
                     output("Package", package + od[dir]);

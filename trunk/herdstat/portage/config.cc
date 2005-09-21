@@ -29,11 +29,11 @@
 
 namespace portage {
 /*** static members *********************************************************/
-bool config_T::_init = false;
-std::string config_T::_portdir;
-std::vector<std::string> config_T::_overlays;
+bool config::_init = false;
+std::string config::_portdir;
+std::vector<std::string> config::_overlays;
 /****************************************************************************/
-config_T::config_T()
+config::config()
 {
     if (_init)
         return;

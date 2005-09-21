@@ -36,13 +36,13 @@ namespace portage
      * make.globals and stores variables in key/value pairs.
      */
 
-    class config_T : public util::vars_T
+    class config : public util::vars
     {
         public:
             /** Default constructor.
              * Opens and reads make.conf and make.globals.
              */
-            config_T();
+            config();
 
             /** Determine PORTDIR.
              * @returns A std::string object.
@@ -60,8 +60,8 @@ namespace portage
             static std::vector<std::string> _overlays;
     };
 
-    inline const std::string& config_T::portdir() { assert(_init); return _portdir; }
-    inline const std::vector<std::string>& config_T::overlays()
+    inline const std::string& config::portdir() { assert(_init); return _portdir; }
+    inline const std::vector<std::string>& config::overlays()
     { assert(_init); return _overlays; }
 
 } // namespace portage
@@ -70,10 +70,10 @@ namespace portage
 template<class charT, class traits>
 std::basic_ostream<charT, traits> &
 operator<< (std::basic_ostream<charT, traits> &stream,
-            const portage::config_T &that)
+            const portage::config &that)
 {
     stream << std::endl;
-    portage::config_T::const_iterator i;
+    portage::config::const_iterator i;
     for (i = that.begin() ; i != that.end() ; ++i)
     {
         std::string s;

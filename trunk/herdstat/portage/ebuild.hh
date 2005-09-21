@@ -42,12 +42,12 @@ namespace portage {
      * be pre-existing (${PN}, ${P}, etc).
      */
 
-    class ebuild_T : public util::vars_T
+    class ebuild : public util::vars
     {
         public:
-            ebuild_T();
-            ebuild_T(const std::string &path);
-            virtual ~ebuild_T();
+            ebuild();
+            ebuild(const std::string &path);
+            virtual ~ebuild();
 
         protected:
             virtual void do_set_defaults();

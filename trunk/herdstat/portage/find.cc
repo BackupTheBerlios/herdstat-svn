@@ -66,12 +66,11 @@ ebuild_which(const std::string &portdir, const std::string &pkg,
  * searches overlays if overlays is true.                                    *
  *****************************************************************************/
 const std::string
-ebuild_which(const config_T &config, const std::string &pkg,
-             bool overlays, util::timer_T *timer,
+ebuild_which(const std::string &pkg, bool overlays, util::timer_T *timer,
              const std::vector<std::string> &pkgcache)
 {
     std::pair<std::string, std::string> p =
-        find_package(config, pkg, overlays, timer, pkgcache);
+        find_package(pkg, overlays, timer, pkgcache);
 
     /*
      * Check if the portdir returned is the real portdir.  If not we need to
@@ -80,7 +79,7 @@ ebuild_which(const config_T &config, const std::string &pkg,
      */
 
     std::string ebuild;
-    const std::string& portdir(config.portdir());
+    const std::string& portdir(config::portdir());
     if (p.first != portdir)
     {
         std::string ebuild1, ebuild2;
@@ -327,12 +326,12 @@ search_overlays(const std::vector<std::string> &overlays,
  * to search all the overlays if do_overlays == true.                        *
  *****************************************************************************/
 std::pair<std::string, std::string>
-find_package(const config_T &config, const std::string &pkg, bool do_overlays,
-             util::timer_T *timer, const std::vector<std::string> &pkgcache)
+find_package(const std::string &pkg, bool do_overlays, util::timer_T *timer,
+             const std::vector<std::string> &pkgcache)
 {
     std::string package;
-    std::string portdir(config.portdir());
-    const std::vector<std::string>& overlays(config.overlays());
+    std::string portdir(config::portdir());
+    const std::vector<std::string>& overlays(config::overlays());
     std::pair<std::string, std::string> p;
 
     try
@@ -406,12 +405,11 @@ search_overlays_regex(const std::vector<std::string> &overlays,
  * a package std::string.                                                         *
  *****************************************************************************/
 std::multimap<std::string, std::string>
-find_package_regex(const config_T &config, const util::Regex &regex,
-                   bool do_overlays, util::timer_T *timer,
-                   const std::vector<std::string> &pkgcache)
+find_package_regex(const util::Regex &regex, bool do_overlays,
+                   util::timer_T *timer, const std::vector<std::string> &pkgcache)
 {
-    std::string portdir(config.portdir());
-    const std::vector<std::string>& overlays(config.overlays());
+    std::string portdir(config::portdir());
+    const std::vector<std::string>& overlays(config::overlays());
     std::vector<std::string> result;
     std::vector<std::string>::iterator r, re;
     std::multimap<std::string, std::string> matches;
