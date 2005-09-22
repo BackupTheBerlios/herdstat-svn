@@ -38,8 +38,7 @@
 #include <herdstat/util/string.hh>
 
 /*****************************************************************************
- * Clean up the whitespace of the given string (collapse whitespace, remove  *
- * trailing/leading whitespace, and convert any \n's to spaces).             *
+ * Clean up the whitespace of the given string.                              *
  *****************************************************************************/
 struct BothSpaces
 {
