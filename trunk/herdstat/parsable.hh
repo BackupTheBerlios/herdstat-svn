@@ -53,8 +53,8 @@ class parsable
         timer_type& timer() { return _timer; }
 
     private:
-        mutable std::string _path;      /* path to file */
-        timer_type  _timer;             /* timer object */
+        mutable std::string _path;
+        timer_type  _timer;
 };
 
 #endif
