@@ -57,6 +57,6 @@ class parsable
         timer_type  _timer;
 };
 
-#endif
+#endif /* HAVE_PARSABLE_HH */
 
 /* vim: set tw=80 sw=4 et : */
