@@ -191,7 +191,7 @@ pkgcache_T::fill()
 
         /* remove any duplicates that were also present in a overlay */
         std::sort(_pkgs.begin(), _pkgs.end());
-        _pkgs.erase(std::unique(_pkgs.begin(), _pkgs.end()));
+        _pkgs.erase(std::unique(_pkgs.begin(), _pkgs.end()), _pkgs.end());
     }
 
     if (options::timer())
