@@ -2,8 +2,7 @@
 
 include $(top_builddir)/Makefile.am.common
 
-cc_sources = misc.cc \
-	     config.cc \
+cc_sources = config.cc \
 	     version.cc \
 	     categories.cc \
 	     find.cc \

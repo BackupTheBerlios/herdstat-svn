@@ -26,6 +26,7 @@
 
 #include <herdstat/util/regex.hh>
 #include <herdstat/util/file.hh>
+#include <herdstat/util/timer.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/misc.hh>
 
@@ -33,16 +34,15 @@ namespace portage {
 /*****************************************************************************
  * Given path a package directory?                                           *
  *****************************************************************************/
-bool
-is_pkg_dir(const std::string &path)
-{
-    if (not util::is_dir(path))
-        return false;
+//bool
+//is_pkg_dir(const std::string &path)
+//{
+//    if (not util::is_dir(path))
+//        return false;
 
-    const util::Regex regex("\\.ebuild$");
-    const util::dir_T dir(path);
-    return dir.find(regex) != dir.end();
-}
+//    const util::dir_T dir(path);
+//    return (dir.find(util::Regex("\\.ebuild$")) != dir.end());
+//}
 /*****************************************************************************/
 } // namespace portage
 

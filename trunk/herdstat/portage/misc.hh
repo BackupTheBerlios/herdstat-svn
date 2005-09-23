@@ -28,6 +28,8 @@
 #endif
 
 #include <herdstat/util/misc.hh>
+#include <herdstat/util/regex.hh>
+#include <herdstat/util/file.hh>
 
 //#define CATEGORIES "/profiles/categories"
 //#define CATEGORIES_USER "/etc/portage/categories"
@@ -38,7 +40,15 @@ namespace portage
      * @param p Path.
      * @returns A boolean value.
      */
-    bool is_pkg_dir(const std::string &p);
+    inline bool
+    is_pkg_dir(const std::string& path)
+    {
+        if (not util::is_dir(path))
+            return false;
+
+        const util::dir_T dir(path);
+        return (dir.find(util::Regex("\\.ebuild$")) != dir.end());
+    }
 
     /** Are we inside a package directory?
      * @returns A boolean value.
