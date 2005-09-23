@@ -63,12 +63,6 @@ Developers::Developers(const container_type& v)
     *this = v;
 }
 /****************************************************************************/
-//Developers::Developers(const Developers& that)
-//    : _devs()
-//{
-//    *this = that._devs;
-//}
-/****************************************************************************/
 Developers::Developers(const std::vector<std::string>& devs)
     : _devs()
 {

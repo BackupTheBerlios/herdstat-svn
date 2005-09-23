@@ -49,13 +49,8 @@ ebuild::do_set_defaults()
 {
     /* insert its variable components
      * (${P}, ${PN}, ${PV}, etc) into our map */
-    version_map version(this->path());
-    this->insert(version.begin(), version.end());
-
-//    version_map::iterator v = version.begin(),
-//                            e = version.end();
-
-//    for (; v != e ; ++v) this->insert(*v);
+    version_map vmap(this->path());
+    this->insert(vmap.begin(), vmap.end());
 }
 /****************************************************************************/
 } // namespace portage

@@ -57,11 +57,6 @@ namespace portage {
                  const std::string &email = "",
                  const std::string &desc  = "");
 
-            /** Copy constructor.
-             * @param that Reference to another Herd object.
-             */
-//            Herd(const Herd& that);
-
             /** Constructor.  Assign a container_type.
              * @param v Reference to a container_type.
              */
@@ -183,11 +178,6 @@ namespace portage {
              */
             Herds(const container_type& v);
 
-            /** Copy constructor.
-             * @param that Reference to another Herds object.
-             */
-//            Herds(const Herds& that);
-
             /// Destructor.
             ~Herds();
 
@@ -208,12 +198,6 @@ namespace portage {
              * @returns Reference to this.
              */
             Herds& operator= (const std::vector<std::string>& v);
-
-            /** Copy assignment operator.
-             * @param that Reference to another Herds object.
-             * @returns Reference to this.
-             */
-//            Herds& operator= (const Herds& that);
 
             /* container_type subset */
             inline iterator begin();
@@ -254,8 +238,6 @@ namespace portage {
     };
 
     inline Herds::operator Herds::container_type() const { return _herds; }
-//    inline Herds& Herds::operator= (const Herds& that)
-//    { *this = that._herds; return *this; }
     inline Herds::iterator Herds::begin() { return _herds.begin(); }
     inline Herds::const_iterator Herds::begin() const { return _herds.begin(); }
     inline Herds::iterator Herds::end() { return _herds.end(); }

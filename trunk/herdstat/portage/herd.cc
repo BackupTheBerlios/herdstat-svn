@@ -46,12 +46,6 @@ Herd::Herd(const std::string &name,
         _name.erase(pos);
 }
 /****************************************************************************/
-//Herd::Herd(const Herd& that)
-//    : Developers(), _name(), _email(), _desc()
-//{
-//    *this = that;
-//}
-/****************************************************************************/
 Herd::Herd(const container_type& v)
     : Developers(v), _name(), _email(), _desc()
 {
@@ -66,19 +60,6 @@ Herd::~Herd()
 {
 }
 /****************************************************************************/
-//Herd&
-//Herd::operator= (const Herd& that)
-//{
-//    _name.assign(that._name);
-//    _email.assign(that._email);
-//    _desc.assign(that._desc);
-
-//    this->clear();
-//    this->insert(that.begin(), that.end());
-//    
-//    return *this;
-//}
-/****************************************************************************/
 Herds::Herds() : _herds()
 {
 }
@@ -88,12 +69,6 @@ Herds::Herds(const container_type& v)
 {
     *this = v;
 }
-/****************************************************************************/
-//Herds::Herds(const Herds& that)
-//    : _herds()
-//{
-//    *this = that;
-//}
 /****************************************************************************/
 Herds::~Herds()
 {
