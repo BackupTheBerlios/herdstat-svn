@@ -49,10 +49,10 @@ ebuild::do_set_defaults()
 {
     /* insert its variable components
      * (${P}, ${PN}, ${PV}, etc) into our map */
-    version_map_T version(this->path());
+    version_map version(this->path());
     this->insert(version.begin(), version.end());
 
-//    version_map_T::iterator v = version.begin(),
+//    version_map::iterator v = version.begin(),
 //                            e = version.end();
 
 //    for (; v != e ; ++v) this->insert(*v);

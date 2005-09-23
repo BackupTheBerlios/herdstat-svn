@@ -40,16 +40,16 @@
 
 namespace portage {
 /*** static members *********************************************************/
-std::vector<std::string> version_string_T::suffix_T::_suffixes;
+std::vector<std::string> version_string::suffix::_suffixes;
 /****************************************************************************/
-version_map_T::version_map_T(const std::string &path)
+version_map::version_map(const std::string &path)
     : _verstr(util::chop_fileext(util::basename(path)))
 {
     this->parse();
 }
 /****************************************************************************/
 void
-version_map_T::parse()
+version_map::parse()
 {
     /* append -r0 if necessary */
     std::string::size_type pos = this->_verstr.rfind("-r0");
@@ -90,19 +90,19 @@ version_map_T::parse()
     _vmap.insert(value_type("PF", pn.first->second+"-"+pvr.first->second));
 }
 /*****************************************************************************
- * suffix_T                                                                  *
+ * suffix                                                                  *
  *****************************************************************************/
-version_string_T::suffix_T::suffix_T()
+version_string::suffix::suffix()
 {
 }
 
-version_string_T::suffix_T::suffix_T(const std::string& pvr)
+version_string::suffix::suffix(const std::string& pvr)
 {
     this->parse(pvr);
 }
 
 void
-version_string_T::suffix_T::parse(const std::string &pvr) const
+version_string::suffix::parse(const std::string &pvr) const
 {
     /* valid suffixes (in order) */
     if (this->_suffixes.empty())
@@ -147,14 +147,14 @@ version_string_T::suffix_T::parse(const std::string &pvr) const
  * Is this suffix less than that suffix?                                     *
  *****************************************************************************/
 bool
-version_string_T::suffix_T::operator< (const suffix_T& that) const
+version_string::suffix::operator< (const suffix& that) const
 {
     std::vector<std::string>::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
-        this->suffix());
+        this->str());
     si = std::find(this->_suffixes.begin(), this->_suffixes.end(),
-        that.suffix());
+        that.str());
 
     /* both have a suffix */
     if ((ti != this->_suffixes.end()) and (si != this->_suffixes.end()))
@@ -190,14 +190,14 @@ version_string_T::suffix_T::operator< (const suffix_T& that) const
  * Is this suffix equal to that suffix?                                      *
  *****************************************************************************/
 bool
-version_string_T::suffix_T::operator== (const suffix_T& that) const
+version_string::suffix::operator== (const suffix& that) const
 {
     std::vector<std::string>::iterator ti, si;
 
     ti = std::find(this->_suffixes.begin(), this->_suffixes.end(),
-        this->suffix());
+        this->str());
     si = std::find(this->_suffixes.begin(), this->_suffixes.end(),
-        that.suffix());
+        that.str());
 
     /* both have a suffix */
     if ((ti != this->_suffixes.end()) and (si != this->_suffixes.end()))
@@ -222,20 +222,20 @@ version_string_T::suffix_T::operator== (const suffix_T& that) const
     return true;
 }
 /*****************************************************************************
- * nosuffix_T                                                                *
+ * nosuffix                                                                *
  *****************************************************************************/
 
-version_string_T::nosuffix_T::nosuffix_T()
+version_string::nosuffix::nosuffix()
 {
 }
 
-version_string_T::nosuffix_T::nosuffix_T(const std::string& pv)
+version_string::nosuffix::nosuffix(const std::string& pv)
 {
     this->parse(pv);
 }
 
 void
-version_string_T::nosuffix_T::parse(const std::string& pv) const
+version_string::nosuffix::parse(const std::string& pv) const
 {
     this->_version.assign(pv);
 
@@ -256,7 +256,7 @@ version_string_T::nosuffix_T::parse(const std::string& pv) const
  * Is this version (minus suffix) less that that version (minus suffix)?     *
  *****************************************************************************/
 bool
-version_string_T::nosuffix_T::operator< (const nosuffix_T& that) const
+version_string::nosuffix::operator< (const nosuffix& that) const
 {
     bool differ = false;
     bool result = false;
@@ -313,16 +313,16 @@ version_string_T::nosuffix_T::operator< (const nosuffix_T& that) const
  * Is this version (minus suffix) equal to that version (minus suffix)?      *
  *****************************************************************************/
 bool
-version_string_T::nosuffix_T::operator== (const nosuffix_T& that) const
+version_string::nosuffix::operator== (const nosuffix& that) const
 {
     /* std::string comparison should be sufficient for == */
     return ((this->_version == that._version) and
             (this->_extra   == that._extra));
 }
 /*****************************************************************************
- * version_string_T                                                          *
+ * version_string                                                          *
  *****************************************************************************/
-version_string_T::version_string_T(const std::string& path)
+version_string::version_string(const std::string& path)
     : _ebuild(path), _v(path), _verstr(_v.version()),
       _suffix(_v["PVR"]), _version(_v["PV"])
 {
@@ -330,7 +330,7 @@ version_string_T::version_string_T(const std::string& path)
 /*****************************************************************************
  * Display full version std::string (as portage would).                           *
  *****************************************************************************/
-version_string_T::operator
+version_string::operator
 std::string() const
 {
     /* chop -r0 if necessary */
@@ -344,7 +344,7 @@ std::string() const
  * Is this version less than that version?                                   *
  *****************************************************************************/
 bool
-version_string_T::operator< (const version_string_T& that) const
+version_string::operator< (const version_string& that) const
 {
     if (this->_version < that._version)
         return true;
@@ -368,36 +368,36 @@ version_string_T::operator< (const version_string_T& that) const
  * Is this version equal to that version?                                    *
  *****************************************************************************/
 bool
-version_string_T::operator== (const version_string_T& that) const
+version_string::operator== (const version_string& that) const
 {
     return ( (this->_version == that._version) and
              (this->_suffix == that._suffix) and
              (this->_v["PR"] == that._v["PR"]) );
 }
 /*****************************************************************************
- * versions_T                                                                *
+ * versions                                                                *
  *****************************************************************************/
-versions_T::versions_T()
+versions::versions()
 {
 }
 
-versions_T::versions_T(const std::string& path)
+versions::versions(const std::string& path)
 {
     this->assign(path);
 }
 
-versions_T::versions_T(const std::vector<std::string>& paths)
+versions::versions(const std::vector<std::string>& paths)
 {
     std::vector<std::string>::const_iterator i = paths.begin(),
                                               e = paths.end();
     for (; i != e ; ++i) this->append(*i);
 }
 /*****************************************************************************
- * Given a path to a package directory, insert a new version_string_T for    *
+ * Given a path to a package directory, insert a new version_string for    *
  * each ebuild found.  clear()'s container first.                            *
  *****************************************************************************/
 void
-versions_T::assign(const std::string& path)
+versions::assign(const std::string& path)
 {
     this->_vs.clear();
 
@@ -417,7 +417,7 @@ versions_T::assign(const std::string& path)
  * Same as assign() but does not call clear().                               *
  *****************************************************************************/
 void
-versions_T::append(const std::string& path)
+versions::append(const std::string& path)
 {
     const util::dir_T pkgdir(path);
     util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
@@ -431,19 +431,19 @@ versions_T::append(const std::string& path)
 /*****************************************************************************
  * find wrapper                                                              *
  *****************************************************************************/
-versions_T::iterator
-versions_T::find(const std::string& path)
+versions::iterator
+versions::find(const std::string& path)
 {
-    version_string_T *v = new version_string_T(path);
+    version_string *v = new version_string(path);
     iterator i = this->_vs.find(v);
     delete v;
     return i;
 }
 
-versions_T::const_iterator
-versions_T::find(const std::string& path) const
+versions::const_iterator
+versions::find(const std::string& path) const
 {
-    version_string_T *v = new version_string_T(path);
+    version_string *v = new version_string(path);
     const_iterator i = this->_vs.find(v);
     delete v;
     return i;
@@ -452,11 +452,11 @@ versions_T::find(const std::string& path) const
  * insert wrapper                                                            *
  *****************************************************************************/
 bool
-versions_T::insert(const std::string& path)
+versions::insert(const std::string& path)
 {
-    version_string_T *v = new version_string_T(path);
+    version_string *v = new version_string(path);
 
-//    std::cout << "versions_T::insert ===> trying to insert "
+//    std::cout << "versions::insert ===> trying to insert "
 //        << (*v)() << std::endl;
     
     std::pair<iterator, bool> p = this->_vs.insert(v);
@@ -464,7 +464,7 @@ versions_T::insert(const std::string& path)
     if (not p.second)
         delete v;
 
-//    std::cout << "versions_T::insert ===> successfully inserted "
+//    std::cout << "versions::insert ===> successfully inserted "
 //        << (*v)() << std::endl;
 
     return p.second;
@@ -472,7 +472,7 @@ versions_T::insert(const std::string& path)
 /*****************************************************************************
  * clean up                                                                  *
  *****************************************************************************/
-versions_T::~versions_T()
+versions::~versions()
 {
     iterator i = this->_vs.begin(), e = this->_vs.end();
     for (; i != e ; ++i) delete *i;

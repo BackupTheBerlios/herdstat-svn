@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-09-23 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/portage/version.cc, herdstat/portage/version.hh,
+	herdstat/portage/find.cc, herdstat/portage/ebuild.cc,
+	src/action_versions_handler.cc, tests/src/glob-test.cc:
+	s/version_map_T/version_map/g, s/version_string_T/version_string/g,
+	s/versions_T/versions/g.
+
 2005-09-21 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/util/vars.cc, herdstat/util/vars.hh,

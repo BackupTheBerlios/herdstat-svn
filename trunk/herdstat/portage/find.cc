@@ -41,7 +41,7 @@ ebuild_which(const std::string &portdir, const std::string &pkg,
              util::timer_T *timer, const std::vector<std::string> &pkgcache)
 {
     std::string package(pkg);
-    versions_T versions;
+    versions versions;
 
     if (timer and not timer->is_running())
         timer->start();
@@ -99,7 +99,7 @@ ebuild_which(const std::string &pkg, bool overlays, util::timer_T *timer,
         else
         {
             /* pick which one is greater */
-            version_string_T ver1(ebuild1), ver2(ebuild2);
+            version_string ver1(ebuild1), ver2(ebuild2);
             ebuild = ((ver1 > ver2) ? ver1.ebuild() : ver2.ebuild());
         }
     }

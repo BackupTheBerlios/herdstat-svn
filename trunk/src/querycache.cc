@@ -95,14 +95,17 @@ querycache_T::load()
  * Sort queries oldest to newest.
  */
 
-static bool
-greater_date(pkgQuery_T q1, pkgQuery_T q2) { return q1.date < q2.date; }
+struct LessDate
+{
+    bool operator()(const pkgQuery_T &q1, const pkgQuery_T &q2) const
+    { return (q1.date < q2.date); }
+};
 
 void
 querycache_T::sort_oldest_to_newest()
 {
     /* sort by date */
-    std::stable_sort(this->begin(), this->end(), greater_date);
+    std::stable_sort(this->begin(), this->end(), LessDate());
 }
 
 /*

@@ -152,7 +152,7 @@ action_versions_handler_T::operator() (opts_type &opts)
             if (dir != options::portdir() and not pwd)
                 od.insert(dir);
 
-            portage::versions_T versions(dir + "/" + package);
+            portage::versions versions(dir + "/" + package);
 
             /* versions would be empty if the directory exists, but no
              * ebuilds are there - in this case, use real PORTDIR. */
@@ -173,10 +173,10 @@ action_versions_handler_T::operator() (opts_type &opts)
 
             if (not options::count())
             {
-                portage::versions_T::iterator v;
+                portage::versions::iterator v;
                 for (v = versions.begin() ; v != versions.end() ; ++v)
                 {
-                    const portage::version_map_T &vmap = (*v)->components();
+                    const portage::version_map &vmap = (*v)->components();
 
                     std::string s(vmap["PVR"]);
                     std::string::size_type pos = s.rfind("-r0");
