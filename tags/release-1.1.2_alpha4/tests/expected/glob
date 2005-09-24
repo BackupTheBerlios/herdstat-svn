@@ -1,0 +1,20 @@
+portdir/app-lala/foomatic/foomatic-1000.ebuild
+portdir/app-misc/foo/foo-1.0a.ebuild
+portdir/app-misc/foo/foo-1.0a_alpha1.ebuild
+portdir/app-misc/foo/foo-1.0a_beta1.ebuild
+portdir/app-misc/foo/foo-1.0a_p1.ebuild
+portdir/app-misc/foo/foo-1.0a_pre1.ebuild
+portdir/app-misc/foo/foo-1.0a_rc1.ebuild
+portdir/app-misc/foo/foo-1.0b.ebuild
+portdir/app-misc/foo/foo-1.0e.ebuild
+portdir/app-misc/foo/foo-1.10.20040629.ebuild
+portdir/app-misc/foo/foo-1.10.20050629-r1.ebuild
+portdir/app-misc/foo/foo-1.10.20050629.ebuild
+portdir/app-misc/foo/foo-1.10.ebuild
+portdir/app-misc/foo/foo-1.2.ebuild
+portdir/media-libs/libfoo/libfoo-0.98_rc2.ebuild
+portdir/sys-ignore/fefifofum/fefifofum-0.1_pre99.ebuild
+portdir/sys-libs/libfoo/libfoo-1.9.ebuild
+portdir/sys-libs/pfft/pfft-0.1.ebuild
+
+The pattern '*foo-1.10*' appears 4 times in the output above.

@@ -1,0 +1,34 @@
+app-lala/foomatic
+bar fu
+slarti@gentoo.org
+none
+none
+
+app-misc/foo
+foo
+ka0ttic@gentoo.org
+http://www.foo.org
+none
+
+media-libs/libfoo
+No metadata.xml
+none
+none
+
+sys-ignore/fefifofum
+fu
+vapier@gentoo.org
+none
+SHORT USELESS LONG DESCRIPTION
+
+sys-libs/pfft
+none
+ka0ttic@gentoo.org
+none
+
+
+sys-libs/libfoo
+fu
+none
+none
+none
