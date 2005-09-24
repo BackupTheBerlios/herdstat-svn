@@ -12,7 +12,6 @@ herdstat_SOURCES = common.hh common.cc \
 		   pkgcache.hh pkgcache.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
-		   querycache_xml_handler.hh querycache_xml_handler.cc \
 		   formatter.hh formatter.cc \
 		   overlaydisplay.hh \
 		   action_handler.hh action_handler.cc \
@@ -39,7 +38,6 @@ querycachectl_SOURCES = common.hh common.cc \
 			formatter.hh formatter.cc \
 			pkgquery.hh pkgquery.cc \
 			querycache.hh querycache.cc \
-			querycache_xml_handler.hh querycache_xml_handler.cc \
 			querycachectl.cc
 querycachectl_LDADD = $(top_builddir)/herdstat/libherdstat.la
 endif

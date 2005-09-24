@@ -55,7 +55,7 @@ class querycache_T
         void dump(std::ostream &);
 
         bool is_expired(const pkgQuery_T &) const;
-        void sort_oldest_to_newest();
+        void sort();
         std::vector<std::string> queries() const;
 
         iterator begin();

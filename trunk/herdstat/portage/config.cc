@@ -53,14 +53,22 @@ config::config()
         _portdir.assign(result);
     else if ((x = this->find("PORTDIR")) != this->end())
         _portdir.assign(x->second);
-    else
+    
+    /* default to /usr/portage */
+    if (_portdir.empty())
         _portdir.assign("/usr/portage");
 
     /* PORTDIR_OVERLAY */
     if ((result = std::getenv("PORTDIR_OVERLAY")))
-        _overlays = util::split(result);
+    {
+        if (std::strlen(result) > 0)
+            _overlays = util::split(result);
+    }
     else if ((x = this->find("PORTDIR_OVERLAY")) != this->end())
-        _overlays = util::split(x->second);
+    {
+        if (not x->second.empty())
+            _overlays = util::split(x->second);
+    }
 
     _init = true;
 }

@@ -61,7 +61,7 @@ class pkgcache_T : public cachable
     private:
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
-        std::vector<std::string> _pkgs;
+        container_type _pkgs;
 };
 
 inline pkgcache_T::iterator

@@ -26,21 +26,136 @@
 
 #include <algorithm>
 #include <functional>
+#include <xmlwrapp/xmlwrapp.h>
 
 #include <herdstat/util/file.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/xml/saxparser.hh>
 #include <herdstat/xml/document.hh>
 
 #include "common.hh"
-
-#ifdef USE_LIBXMLPP
-# include <libxml++/libxml++.h>
-#else
-# include <xmlwrapp/xmlwrapp.h>
-#endif /* USE_LIBXMLPP */
-
-#include "querycache_xml_handler.hh"
 #include "querycache.hh"
+
+/*
+ * Content Handler for our internal querycache.xml
+ */
+
+class querycacheXMLHandler_T : public xml::saxhandler
+{
+    public:
+        querycacheXMLHandler_T();
+        virtual ~querycacheXMLHandler_T();
+
+        std::vector<pkgQuery_T> queries;
+
+    protected:
+        /* callbacks */
+        virtual bool start_element(const std::string&, const attrs_type&);
+        virtual bool end_element(const std::string&);
+        virtual bool text(const std::string&);
+
+    private:
+        /* internal state variables */
+        bool in_query, in_string, in_with, in_type, in_results, in_pkg,
+             in_portdir, in_overlays;
+        std::string cur_pkg, cur_date;
+};
+
+querycacheXMLHandler_T::querycacheXMLHandler_T()
+    : in_query(false), in_string(false), in_with(false), in_type(false),
+      in_results(false), in_pkg(false), in_portdir(false), in_overlays(false)
+{
+}
+
+querycacheXMLHandler_T::~querycacheXMLHandler_T()
+{
+}
+
+bool
+querycacheXMLHandler_T::start_element(const std::string &name,
+                                    const attrs_type &attrs)
+{
+    if (name == "query")
+    {
+        in_query = true;
+
+        attrs_type::const_iterator pos = attrs.find("date");
+        if (pos != attrs.end())
+            cur_date.assign(pos->second);
+    }
+    else if (name == "string" and in_query)
+        in_string = true;
+    else if (name == "with" and in_query)
+        in_with = true;
+    else if (name == "type" and in_query)
+        in_type = true;
+    else if (name == "portdir" and in_query)
+        in_portdir = true;
+    else if (name == "overlays" and in_query)
+        in_overlays = true;
+    else if (name == "results" and in_query)
+        in_results = true;
+    else if (name == "pkg" and in_results)
+    {
+        in_pkg = true;
+
+        attrs_type::const_iterator pos = attrs.find("name");
+        if (pos != attrs.end())
+            cur_pkg.assign(pos->second);
+
+        queries.back().insert(std::make_pair(cur_pkg, ""));
+    }
+
+    return true;
+}
+
+bool
+querycacheXMLHandler_T::end_element(const std::string &name)
+{
+    if (name == "query")
+        in_query = false;
+    else if (name == "string")
+        in_string = false;
+    else if (name == "with")
+        in_with = false;
+    else if (name == "type")
+        in_type = false;
+    else if (name == "portdir")
+        in_portdir = false;
+    else if (name == "overlays")
+        in_overlays = false;
+    else if (name == "results")
+        in_results = false;
+    else if (name == "pkg")
+        in_pkg = false;
+
+    return true;
+}
+
+bool
+querycacheXMLHandler_T::text(const std::string &text)
+{
+    if (in_string)
+    {
+        queries.push_back(pkgQuery_T(text));
+        queries.back().date = util::destringify<long>(cur_date);
+    }
+    else if (in_with)
+        queries.back().with = text;
+    else if (in_type)
+        queries.back().type =
+            (text == "dev" ? QUERYTYPE_DEV : QUERYTYPE_HERD);
+    else if (in_portdir)
+        queries.back().portdir = text;
+    else if (in_overlays)
+        queries.back().overlays = util::split(text, ':');
+    else if (in_pkg)
+        (queries.back())[cur_pkg] = text;
+
+    return true;
+}
+
+/****************************************************************************/
 
 querycache_T::querycache_T()
     : _max(options::querycache_max()),
@@ -102,10 +217,10 @@ struct LessDate
 };
 
 void
-querycache_T::sort_oldest_to_newest()
+querycache_T::sort()
 {
     /* sort by date */
-    std::stable_sort(this->begin(), this->end(), LessDate());
+    std::stable_sort(_queries.begin(), _queries.end(), LessDate());
 }
 
 /*
@@ -119,17 +234,17 @@ querycache_T::purge_old()
         this->_max);
 
     /* while > querycache_MAX, erase the first (oldest) query */
-    while (this->size() > static_cast<size_type>(this->_max))
-        this->_queries.erase(this->begin());
+    while (_queries.size() > static_cast<size_type>(this->_max))
+        _queries.erase(_queries.begin());
 }
 
 void
 querycache_T::dump(std::ostream &stream)
 {
-    stream << "Query cache (size: " << this->size()
+    stream << "Query cache (size: " << _queries.size()
         << "/" << this->_max << ")" << std::endl << std::endl;
 
-    for (iterator i = this->begin() ; i != this->end() ; ++i)
+    for (iterator i = _queries.begin() ; i != _queries.end() ; ++i)
     {
         i->dump(stream);
         stream << std::endl;
@@ -143,70 +258,26 @@ querycache_T::dump(std::ostream &stream)
 void
 querycache_T::dump()
 {
-    this->sort_oldest_to_newest();
+    this->sort();
 
     /* trim if needed */
-    if (this->size() > static_cast<size_type>(this->_max))
+    if (_queries.size() > static_cast<size_type>(this->_max))
         this->purge_old();
 
     /* generate XML */
     try
     {
-#ifdef USE_LIBXMLPP
-        xmlpp::Document doc;
-        xmlpp::Element *root = doc.create_root_node("queries");
-        root->set_attribute("total", util::sprintf("%d", this->size()));
-#else
-//        xml::init init;
         ::xml::document doc("queries");
         doc.set_encoding("UTF-8");
 
         ::xml::node &root = doc.get_root_node();
         root.get_attributes().insert("total",
-            util::sprintf("%d", this->size()).c_str());
-#endif /* USE_LIBXMLPP */
+            util::sprintf("%d", _queries.size()).c_str());
 
         /* for each query */
-        iterator i, e = this->end();
-        size_type n = 1;
-        for (i = this->begin() ; i != e ; ++i, ++n)
+        iterator i, e;
+        for (i = _queries.begin(), e = _queries.end() ; i != e ; ++i)
         {
-#ifdef USE_LIBXMLPP
-            /* <query id="n"> */
-            xmlpp::Element *query_node = root->add_child("query");
-            query_node->set_attribute("date",
-                util::sprintf("%lu", static_cast<unsigned long>(i->date)));
-
-            /* <criteria> */
-            xmlpp::Element *criteria_node = query_node->add_child("criteria");
-
-            /* <std::string> */
-            xmlpp::Element *query_string_node = criteria_node->add_child("string");
-            query_string_node->set_child_text(i->query);
-
-            /* <with> */
-            xmlpp::Element *with_string_node = criteria_node->add_child("with");
-            with_string_node->set_child_text(i->with);
-
-            /* <type> */
-            xmlpp::Element *type_node = criteria_node->add_child("type");
-            type_node->set_child_text(i->type == QUERYTYPE_DEV ? "dev":"herd");
-
-            /* <portdir> */
-            xmlpp::Element *pd_node = criteria_node->add_child("portdir");
-            pd_node->set_child_text(i->portdir);
-
-            /* <overlays> */
-            xmlpp::Element *ov_node = criteria_node->add_child("overlays");
-            ov_node->set_child_text(util::join(i->overlays, ':'));
-
-            /* <results> */
-            xmlpp::Element *results_node = query_node->add_child("results");
-            results_node->set_attribute("total",
-                util::sprintf("%d", i->size()));
-
-#else
-
             ::xml::node query("query");
             query.get_attributes().insert("date",
                 util::sprintf("%lu", static_cast<unsigned long>(i->date)).c_str());
@@ -227,50 +298,21 @@ querycache_T::dump()
             results.get_attributes().insert("total",
                 util::sprintf("%d", i->size()).c_str());
 
-#endif /* USE_LIBXMLPP */
-
             /* for each package in query results */
-            pkgQuery_T::const_iterator p, pe = i->end();
-            for (p = i->begin() ; p != pe ; ++p)
+            pkgQuery_T::const_iterator pi, pe;
+            for (pi = i->begin(), pe = i->end() ; pi != pe ; ++pi)
             {
-
-#ifdef USE_LIBXMLPP
-
-                /* <pkg> */
-                xmlpp::Element *pkg_node = results_node->add_child("pkg");
-                pkg_node->set_attribute("name", p->first);
-                pkg_node->set_child_text(p->second);
-
-#else
-
-                ::xml::node pkg("pkg", p->second.c_str());
-                pkg.get_attributes().insert("name", p->first.c_str());
+                ::xml::node pkg("pkg", pi->second.c_str());
+                pkg.get_attributes().insert("name", pi->first.c_str());
                 results.push_back(pkg);
-
-#endif /* USE_LIBXMLPP */
             }
 
-#ifdef USE_XMLWRAPP
             it->push_back(results);
-#endif /* USE_XMLWRAPP */
-
         }
 
-#ifdef USE_LIBXMLPP
-#ifdef DEBUG
-        doc.write_to_file_formatted(this->_path, "UTF-8");
-#else /* DEBUG */
-        doc.write_to_file(this->_path, "UTF-8");
-#endif /* DEBUG */
-#else /* USE_LIBXMLPP */
         doc.save_to_file(this->_path.c_str(), 0);
-#endif /* USE_LIBXMLPP */
     }
-#ifdef USE_LIBXMLPP
-    catch (const xmlpp::exception &e)
-#else
     catch (const std::exception &e)
-#endif /* USE_LIBXMLPP */
     {
         throw Exception("Failed to write xml file: %s", this->_path.c_str());
     }

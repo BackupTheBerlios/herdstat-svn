@@ -2,6 +2,15 @@ This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.2_alpha4:
+    Lots of behind-the-scenes changes that should decrease the amount of time
+    herdstat runs in ALL cases (although in most cases the difference is not
+    noticable).  I ditched herdstat's global options template setup in favor
+    of the good ol' singleton.  The convenience of the template setup did not
+    overweigh the performance consequences.  This means the access functions
+    now return references to the data, instead of copies.  Another result of
+    this is that herdstat should now use less memory as well, although usually
+    that is not an issue since in most cases herdstat will exit immediately.
+
     Bug fixes:
      - Fixed long time bug in pkg handler (-p) that caused metadata.xml's that
        don't list a herd (not even "no-herd") to not show up when --no-herd is

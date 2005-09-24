@@ -131,7 +131,7 @@ doaction(querycache_T &querycache, const std::string &action)
 
         if (querycache.size() > 1)
         {
-            querycache.sort_oldest_to_newest();
+            querycache.sort();
 
             std::string oldest(querycache.front().query);
             std::string newest(querycache.back().query);

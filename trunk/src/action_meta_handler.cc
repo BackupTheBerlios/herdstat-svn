@@ -44,22 +44,69 @@
 using namespace portage;
 using namespace util;
 
-static void
-display_metadata(const metadata_data& data)
+static std::string
+parse_license(const std::string& str)
 {
+    std::string result(str);
+
+    result.erase(std::remove(result.begin(), result.end(), '|'), result.end());
+    result.erase(std::remove(result.begin(), result.end(), '('), result.end());
+    result.erase(std::remove(result.begin(), result.end(), ')'), result.end());
+
+    /* extract FOO from lines like "foo? ( FOO )" */
+    std::string::size_type pos;
+    while ((pos = result.find('?')) != std::string::npos)
+    {
+	std::string::size_type lpos = pos;
+
+	while ((result.at(lpos) != ' '))
+	{
+	    result.erase(lpos, 1);
+
+            /* there may not be a ' ' as 'foo?' is at the beginning */
+	    if (lpos == 0)
+		break;
+
+	    --lpos;
+	}
+    }
+
+    result = tidy_whitespace(result);
+
+    /* if in QA-mode, make sure the license is valid (ie it exists) */
+    if (options::qa())
+    {
+        std::vector<std::string> parts = util::split(result);
+        std::vector<std::string>::iterator i;
+        for (i = parts.begin() ; i != parts.end() ; ++i)
+        {
+            if (not util::is_file(options::portdir()+"/licenses/"+(*i)))
+                throw QAException(*i);
+        }
+    }
+
+    return result;
+}
+
+static void
+display_metadata(const metadata_data& data, std::string& longdesc)
+{
+    /* parse it */
     const metadata_xml m(data.path);
     const metadata& meta(m.data());
     const Herds& herds(meta.herds());
     const Developers& devs(meta.devs());
-    formatter_T output;
-    ebuild ebuild_vars;
 
-    if (not meta.is_category() and (herds.empty() or
-        (herds.front()) == "no-herd"))
+    formatter_T output;
+
+    /* display herds */
+    if (not meta.is_category() and
+            (herds.empty() or (herds.front()) == "no-herd"))
         output("Herds(0)", "none");
     else if (not herds.empty())
         output(util::sprintf("Herds(%d)", herds.size()), herds);
 
+    /* display maintainers */
     if (options::quiet())
     {
         std::vector<std::string> qdevs;
@@ -88,21 +135,70 @@ display_metadata(const metadata_data& data)
             output("Maintainers(0)", "none");
     }
 
-    if (not meta.is_category())
+    /* display long description or ebuild DESCRIPTION */
+    if (not meta.longdesc().empty())
+        longdesc.assign(meta.longdesc());
+}
+
+action_meta_handler_T::~action_meta_handler_T()
+{
+}
+
+void
+action_meta_handler_T::display(const metadata_data& data)
+{
+    std::string longdesc;
+    ebuild ebuild_vars;
+
+    /* does the metadata.xml exist? */
+    if (util::is_file(data.path))
+        display_metadata(data, longdesc);
+    /* package or category exists, but metadata.xml doesn't */
+    else
     {
-        std::string ebuild;
+        if (options::quiet() or not options::color())
+            output("", "No metadata.xml");
+        else
+            output("", color[red] + "No metadata.xml." + color[none]);
+    }    
+
+    /* at least show ebuild DESCRIPTION and HOMEPAGE */
+    if (not data.is_category)
+    {
+        std::string e;
         try
         {
-            ebuild = ebuild_which(data.portdir, data.pkg);
+            e = portage::ebuild_which(data.portdir, data.pkg);
         }
-        catch (const NonExistentPkg)
+        catch (const portage::NonExistentPkg)
         {
-            ebuild = ebuild_which(options::portdir(), data.pkg);
+            e = portage::ebuild_which(options::portdir(), data.pkg);
         }
 
-        assert(not ebuild.empty());
+        assert(not e.empty());
 
-        ebuild_vars.read(ebuild);
+        ebuild_vars.read(e);
+        
+            /* display LICENSE */
+//            if (options::quiet() and ebuild_vars["LICENSE"].empty())
+//                ebuild_vars["LICENSE"] = "none";
+
+//            if (not ebuild_vars["LICENSE"].empty())
+//            {
+//                try
+//                {
+//                    const std::string license(parse_license(ebuild_vars["LICENSE"]));
+//                    output("License", license);
+//                }
+//                catch (const QAException& e)
+//                {
+//                    std::string error("Invalid license '");
+//                    error += e.what();
+//                    error += "' for " + data.pkg;
+
+//                    throw QAException(error);
+//                }
+//            }
 
         if (options::quiet() and ebuild_vars["HOMEPAGE"].empty())
             ebuild_vars["HOMEPAGE"] = "none";
@@ -112,7 +208,7 @@ display_metadata(const metadata_data& data)
             /* it's possible to have more than one HOMEPAGE */
             if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
             {
-                std::vector<std::string> parts(util::split(ebuild_vars["HOMEPAGE"]));
+                std::vector<std::string> parts = util::split(ebuild_vars["HOMEPAGE"]);
 
                 if (parts.size() >= 1)
                     output("Homepage", parts.front());
@@ -127,88 +223,24 @@ display_metadata(const metadata_data& data)
             else
                 output("Homepage", ebuild_vars["HOMEPAGE"]);
         }
-    }
 
-    /* long description */
-    if (meta.longdesc().empty())
-    {
-        if (not meta.is_category())
+        if (longdesc.empty())
         {
-            if (ebuild_vars["DESCRIPTION"].empty())
-                ebuild_vars["DESCRIPTION"] = "none";
-
-            output("Description", ebuild_vars["DESCRIPTION"]);
-        }
-        else
-            output("Description", "none");
-    }
-    else
-        output("Description", util::tidy_whitespace(meta.longdesc()));
-}
-
-action_meta_handler_T::~action_meta_handler_T()
-{
-}
-
-void
-action_meta_handler_T::display(const metadata_data& data)
-{
-    /* does the metadata.xml exist? */
-    if (util::is_file(data.path))
-        display_metadata(data);
-    /* package or category exists, but metadata.xml doesn't */
-    else
-    {
-        if (options::quiet() or not options::color())
-            output("", "No metadata.xml");
-        else
-            output("", color[red] + "No metadata.xml." + color[none]);
-            
-        /* at least show ebuild DESCRIPTION and HOMEPAGE */
-        if (not data.is_category)
-        {
-            std::string e;
-            try
-            {
-                e = portage::ebuild_which(data.portdir, data.pkg);
-            }
-            catch (const portage::NonExistentPkg)
-            {
-                e = portage::ebuild_which(options::portdir(), data.pkg);
-            }
-                
-            ebuild ebuild_vars(e);
-
-            if (options::quiet() and ebuild_vars["HOMEPAGE"].empty())
-                ebuild_vars["HOMEPAGE"] = "none";
-
-            if (not ebuild_vars["HOMEPAGE"].empty())
-            {
-                /* it's possible to have more than one HOMEPAGE */
-                if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
-                {
-                    std::vector<std::string> parts = util::split(ebuild_vars["HOMEPAGE"]);
-
-                    if (parts.size() >= 1)
-                        output("Homepage", parts.front());
-
-                    if (parts.size() > 1)
-                    {
-                        std::vector<std::string>::iterator h;
-                        for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
-                            output("", *h);
-                    }
-                }
-                else
-                    output("Homepage", ebuild_vars["HOMEPAGE"]);
-            }
-
             if (options::quiet() and ebuild_vars["DESCRIPTION"].empty())
                 ebuild_vars["DESCRIPTION"] = "none";
 
             if (not ebuild_vars["DESCRIPTION"].empty())
                 output("Description", ebuild_vars["DESCRIPTION"]);
         }
+        else
+            output("Description", util::tidy_whitespace(longdesc));
+    }
+    else
+    {
+        if (longdesc.empty())
+            output("Description", "none");
+        else
+            output("Description", util::tidy_whitespace(longdesc));
     }
 }
 

@@ -103,9 +103,12 @@ pkgcache_T::valid() const
             else
                 valid = ((std::time(NULL) - pkgcache.mtime()) < PKGCACHE_EXPIRE);
         }
+        /* if expire option isn't "lastsync", treat it as a long integer */
         else
-            valid = ((std::time(NULL) - pkgcache.mtime()) <
-                    std::strtol(expire.c_str(), NULL, 10));
+        {
+            long ex(util::destringify<long>(expire));
+            valid = ((std::time(NULL) - pkgcache.mtime()) < ex);
+        }
 
         /* only valid if size > 0 */
         if (valid)
@@ -114,14 +117,21 @@ pkgcache_T::valid() const
 
     if (valid)
     {
+        /*
+         * read the first two lines checking portdir and overlays to see
+         * if they're the same as what they were when the cache was created.
+         */
+
         std::ifstream stream(this->path().c_str());
         if (not stream)
             throw FileException(this->path());
 
+        /* only valid if saved portdir equals current portdir */
         std::string line;
         valid = (std::getline(stream, line) and
                 (line == (std::string("portdir=")+this->_portdir)));
 
+        /* only valid if saved overlays equal current overlays */
         if (valid)
         {
             valid = (std::getline(stream, line) and
@@ -140,6 +150,8 @@ pkgcache_T::valid() const
 
 struct CatSlashPkg : std::binary_function<std::string, std::string, std::string>
 {
+    /* given a category string and a full path to a package directory,
+     * return a string in the form of "cat/pkg". */
     std::string operator()(const std::string& cat, const std::string& path) const
     { return (cat+"/"+util::basename(path)); }
 };
@@ -168,6 +180,7 @@ pkgcache_T::fill()
             std::bind1st(CatSlashPkg(), *ci));
     }
 
+    /* search overlays, if any */
     const std::vector<std::string>& overlays(options::overlays());
     if (not overlays.empty())
     {

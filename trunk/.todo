@@ -2,25 +2,22 @@
     <title>
         Todo list for herdstat
     </title>
-    <note priority="veryhigh" time="1126950844">
-        Tests
-        <note priority="veryhigh" time="1126950870">
-            Add test for project_xml class.
+    <note priority="veryhigh" time="1127553006">
+        TODO before 1.1.2 final
+        <note priority="high" time="1127553021">
+            Full projectxml support.
         </note>
-    </note>
-    <note priority="veryhigh" time="1126962481">
-        Fetch stuff programatically.
-        <note priority="medium" time="1126962490">
-            curl?
-        </note>
-    </note>
-    <note priority="veryhigh" time="1127204962">
-        TODO
-        <note priority="high" time="1127294300">
-            Get rid of that damn std::find() call in pkgcache_T::fill().
-        </note>
-        <note priority="medium" time="1127205004">
+        <note priority="medium" time="1127553041">
             Rewrite portage find code.
+        </note>
+        <note priority="medium" time="1127553059">
+            Fetch files programatically instead of using wget.
+            <note priority="low" time="1127553079">
+                libcurl
+            </note>
+            <note priority="low" time="1127553089">
+                libwww
+            </note>
         </note>
     </note>
     <note priority="high" time="1126510481">
@@ -31,5 +28,8 @@
     </note>
     <note priority="verylow" time="1126623676">
         Look into adding LDAP support for Gentoo's LDAP.
+    </note>
+    <note priority="verylow" time="1127553279">
+        Readline support.
     </note>
 </todo>
