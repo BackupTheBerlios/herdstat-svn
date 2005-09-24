@@ -6,6 +6,9 @@
         TODO before 1.1.2 final
         <note priority="high" time="1127553021">
             Full projectxml support.
+            <note priority="veryhigh" time="1127566254">
+                figure out a way to fill in names of devs listed in &lt;dev&gt; tags
+            </note>
         </note>
         <note priority="medium" time="1127553041">
             Rewrite portage find code.
