@@ -211,10 +211,6 @@ metacache_T::load()
     {
         const util::vars cache(this->path());
 
-//        this->_portdir = cache["portdir"];
-//        if (this->_portdir.empty())
-//            throw Exception();
-
         /* reserve to prevent tons of reallocations */
         if (cache["size"].empty() or cache["size"] == "0")
             _metadatas.reserve(METACACHE_RESERVE);

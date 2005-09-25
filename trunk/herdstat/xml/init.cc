@@ -33,6 +33,8 @@ namespace xml {
 Init::Init(bool validate)
 {
     _init.remove_whitespace(true);
+    _init.substitute_entities(true);
+    _init.load_external_subsets(true);
     _init.validate_xml(validate);
 }
 /****************************************************************************/

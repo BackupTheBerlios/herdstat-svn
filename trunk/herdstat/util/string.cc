@@ -194,8 +194,8 @@ util::split(const std::string& str, const std::string::value_type delim,
 
 	/* don't append empty strings (two
 	 * delimiters in a row were encountered) */
-        const char * const sub(str.substr(lpos, pos - lpos).c_str());
-	if (std::strlen(sub) > 0 or append_empty)
+        const std::string sub(str.substr(lpos, pos - lpos));
+	if (not sub.empty() or append_empty)
 	    v.push_back(sub);
 
 	lpos = ++pos;

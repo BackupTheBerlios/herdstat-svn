@@ -635,7 +635,7 @@ main(int argc, char **argv)
     }
     catch (const xml::ParserException& e)
     {
-	std::cerr << "Error parsing '" << e.file() << "': " << e.error()
+	std::cerr << "Error parsing " << e.file() << ": " << e.error()
 	    << std::endl;
 	return EXIT_FAILURE;
     }

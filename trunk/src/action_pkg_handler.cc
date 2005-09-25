@@ -432,7 +432,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             {
                 debug_msg("found '%s' in query cache", i->c_str());
 
-                matches[*i] = new pkgQuery_T(*qi);
+                matches.insert(std::make_pair(*i, new pkgQuery_T(*qi)));
                 matches[*i]->query = *i;
                 matches[*i]->with  = with();
 

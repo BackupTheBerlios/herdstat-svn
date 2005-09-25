@@ -1,5 +1,18 @@
 ChangeLog for herdstat
 
+2005-09-25 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/util/string.cc: Revert change in util::split where we used
+	a const char * to save a string::substr() back to using a std::string,
+	as the old method seems to somehow alter the string.
+	* herdstat/util/file.hh: There's currently no need to have dir_T::find
+	functions declared virtual.
+	* src/querycache.cc: Fix bug where longdescs (in <pkg> tag) were
+	assigned instead of appended, causing the previous longdesc chunk to
+	be overwritten in cases where the callback is called twice for the
+	same longdesc, truncating the description.  Also, call tidy_whitespace
+	on those longdescs before writing to querycache.xml.
+
 2005-09-24 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.2_alpha4).

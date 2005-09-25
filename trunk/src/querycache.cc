@@ -59,11 +59,13 @@ class querycacheXMLHandler_T : public xml::saxhandler
         bool in_query, in_string, in_with, in_type, in_results, in_pkg,
              in_portdir, in_overlays;
         std::string cur_pkg, cur_date;
+        pkgQuery_T::iterator cur_query;
 };
 
 querycacheXMLHandler_T::querycacheXMLHandler_T()
     : in_query(false), in_string(false), in_with(false), in_type(false),
-      in_results(false), in_pkg(false), in_portdir(false), in_overlays(false)
+      in_results(false), in_pkg(false), in_portdir(false), in_overlays(false),
+      cur_pkg(), cur_date(), cur_query()
 {
 }
 
@@ -100,10 +102,9 @@ querycacheXMLHandler_T::start_element(const std::string &name,
         in_pkg = true;
 
         attrs_type::const_iterator pos = attrs.find("name");
-        if (pos != attrs.end())
-            cur_pkg.assign(pos->second);
-
-        queries.back().insert(std::make_pair(cur_pkg, ""));
+        assert(pos != attrs.end());
+        cur_pkg.assign(pos->second);
+        cur_query = queries.back().insert(std::make_pair(cur_pkg, "")).first;
     }
 
     return true;
@@ -150,7 +151,7 @@ querycacheXMLHandler_T::text(const std::string &text)
     else if (in_overlays)
         queries.back().overlays = util::split(text, ':');
     else if (in_pkg)
-        (queries.back())[cur_pkg] = text;
+        cur_query->second += text;
 
     return true;
 }
@@ -302,7 +303,8 @@ querycache_T::dump()
             pkgQuery_T::const_iterator pi, pe;
             for (pi = i->begin(), pe = i->end() ; pi != pe ; ++pi)
             {
-                ::xml::node pkg("pkg", pi->second.c_str());
+                const std::string longdesc(util::tidy_whitespace(pi->second));
+                ::xml::node pkg("pkg", longdesc.c_str());
                 pkg.get_attributes().insert("name", pi->first.c_str());
                 results.push_back(pkg);
             }

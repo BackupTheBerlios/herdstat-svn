@@ -304,13 +304,13 @@ namespace util
              * @param f file_T object.
              * @returns A boolean value.
              */
-            virtual bool operator== (const file_T &f) const;
+            bool operator== (const file_T &f) const;
 
             /** Determine if two files are not equal.
              * @param f file_T object.
              * @returns A boolean value.
              */
-            virtual bool operator!= (const file_T &f) const
+            bool operator!= (const file_T &f) const
             { return not (*this == f); }
 
             /// Load file into internal container.
@@ -374,25 +374,25 @@ namespace util
              * @param p Path.
              * @returns An iterator to the element (or end() if not found).
              */
-            virtual iterator find(const value_type &p);
+            iterator find(const value_type &p);
 
             /** Find element that matches the specified regular expression.
              * @param r Reference to a util::Regex object.
              * @returns An iterator to the element (or end() if not found).
              */
-            virtual iterator find(const Regex &r);
+            iterator find(const Regex &r);
 
             /** Find element with the specified name.
              * @param p Path.
              * @returns A const_iterator to the element (or end() if not found).
              */
-            virtual const_iterator find(const value_type &p) const;
+            const_iterator find(const value_type &p) const;
 
             /** Find element that matches the specified regular expression.
              * @param r Reference to a util::Regex object.
              * @returns A const_iterator to the element (or end() if not found).
              */
-            virtual const_iterator find(const Regex &r) const;
+            const_iterator find(const Regex &r) const;
 
             iterator begin() { return _contents.begin(); }
             const_iterator begin() const { return _contents.begin(); }

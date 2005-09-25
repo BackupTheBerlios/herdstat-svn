@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <herdstat/exceptions.hh>
+#include <herdstat/util/string.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
 using namespace portage;
@@ -53,6 +54,13 @@ main(int argc, char **argv)
         for (Developers::const_iterator i = devs.begin() ; i != devs.end() ; ++i)
             std::cout << i->user() << " ";
         std::cout << std::endl;
+
+        if (not meta.longdesc().empty())
+        {
+            std::cout << "longdesc: " << meta.longdesc() << std::endl;
+            std::cout << "tidy longdesc: "
+                << util::tidy_whitespace(meta.longdesc()) << std::endl;
+        }
     }
     catch (const BaseException &e)
     {

@@ -1,6 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.2_alpha5:
+    Bug fixes:
+     - Fixed bug where longdesc's (in <pkg> tag of querycache.xml) were being
+       assigned instead of appended, causing certain longdescriptions (those
+       requiring >1 callback per <longdescription>) to be truncated, and thus
+       invalid cache results.
+
 1.1.2_alpha4:
     Lots of behind-the-scenes changes that should decrease the amount of time
     herdstat runs in ALL cases (although in most cases the difference is not
