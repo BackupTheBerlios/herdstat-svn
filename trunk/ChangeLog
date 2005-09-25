@@ -12,6 +12,8 @@ ChangeLog for herdstat
 	be overwritten in cases where the callback is called twice for the
 	same longdesc, truncating the description.  Also, call tidy_whitespace
 	on those longdescs before writing to querycache.xml.
+	* src/action_dev_handler.cc: Don't display certain userinfo.xml fields
+	if they're set to "undefined".
 
 2005-09-24 Aaron Walker <ka0ttic@gentoo.org>
 

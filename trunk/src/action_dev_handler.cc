@@ -143,9 +143,11 @@ action_dev_handler_T::display(const std::string &d)
         if (not herds.empty() and options::verbose() and not userinfo.empty())
             output.endl();
 
-        if (not dev.pgpkey().empty())
+#define DEFINED(x) ((not dev.x().empty() and (dev.x() != "undefined")))
+
+        if (DEFINED(pgpkey))
             output("PGP Key ID", dev.pgpkey());
-        if (not dev.joined().empty())
+        if (DEFINED(joined))
         {
             const std::string elapsed(get_elapsed_yrs(dev.joined()));
             if (elapsed.empty())
@@ -153,7 +155,7 @@ action_dev_handler_T::display(const std::string &d)
             else
                 output("Joined Date", dev.joined() + " ("+elapsed+")");
         }
-        if (not dev.birthday().empty())
+        if (DEFINED(birthday))
         {
             const std::string elapsed(get_elapsed_yrs(dev.birthday()));
             if (elapsed.empty())
@@ -161,12 +163,15 @@ action_dev_handler_T::display(const std::string &d)
             else
                 output("Birth Date", dev.birthday() + " ("+elapsed+")");
         }
-        if (not dev.status().empty())
+        if (DEFINED(status))
             output("Status", dev.status());
-        if (not dev.role().empty())
+        if (DEFINED(role))
             output("Roles", dev.role());
-        if (not dev.location().empty())
+        if (DEFINED(location))
             output("Location", dev.location());
+
+#undef DEFINED
+
         if (dev.is_away() and not dev.awaymsg().empty())
             output("Devaway", util::tidy_whitespace(dev.awaymsg()));
     }
