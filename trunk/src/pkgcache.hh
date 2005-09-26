@@ -28,7 +28,7 @@
 #endif
 
 #include <herdstat/cachable.hh>
-#include "common.hh"
+#include <herdstat/portage/package_list.hh>
 
 class pkgcache_T : public cachable
 {
@@ -59,9 +59,10 @@ class pkgcache_T : public cachable
         inline bool empty() const;
 
     private:
+        int _reserve;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
-        container_type _pkgs;
+        portage::PackageList _pkgs;
 };
 
 inline pkgcache_T::iterator

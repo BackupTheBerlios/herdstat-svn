@@ -1,6 +1,6 @@
 /*
  * herdstat -- tests/src/glob-test.cc
- * $Id: glob-test.cc 515 2005-09-04 11:41:38Z ka0ttic $
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -43,7 +43,7 @@ int main()
 
         /* test patternMatch functor */
         util::glob_T::size_type n = std::count_if(results.begin(), results.end(),
-                std::bind1st(util::patternMatch(), "*foo-1.10*"));
+                std::bind2nd(util::patternMatch(), "*foo-1.10*"));
         if (n == 0)
             throw Exception("*foo-1.10* not found in results vector.");
 

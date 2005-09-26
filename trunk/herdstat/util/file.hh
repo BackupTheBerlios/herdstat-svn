@@ -51,6 +51,12 @@ namespace util
         return (access(path.c_str(), F_OK) == 0);
     }
 
+    struct FileExists
+    {
+        bool operator()(const std::string& path) const
+        { return (access(path.c_str(), F_OK) == 0); }
+    };
+
     /** Is the given path a directory?
      * @param p Path.
      * @returns A boolean value.
@@ -61,6 +67,15 @@ namespace util
         struct stat s;
         return ((stat(p.c_str(), &s) == 0) ? S_ISDIR(s.st_mode) : false);
     }
+
+    struct IsDir
+    {
+        bool operator()(const std::string& path) const
+        {
+            struct stat s;
+            return ((stat(path.c_str(), &s) == 0) ? S_ISDIR(s.st_mode) : false);
+        }
+    };
 
     /** Is the file associated with the given stat structure a directory?
      * @param s Reference to a struct stat.
@@ -78,6 +93,15 @@ namespace util
         struct stat s;
         return ((stat(p.c_str(), &s) == 0) ? S_ISREG(s.st_mode) : false);
     }
+
+    struct IsFile
+    {
+        bool operator()(const std::string& path) const
+        {
+            struct stat s;
+            return ((stat(path.c_str(), &s) == 0) ? S_ISREG(s.st_mode) : false);
+        }
+    };
 
     /** Is the file associated with the given stat structure a regular file?
      * @param s Reference to a struct stat.

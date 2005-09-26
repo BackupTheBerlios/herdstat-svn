@@ -33,6 +33,8 @@
 #include <herdstat/util/timer.hh>
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/categories.hh>
+
+#include "common.hh"
 #include "pkgcache.hh"
 
 #define PKGCACHE                    /*LOCALSTATEDIR*/"/pkgcache"
@@ -41,16 +43,16 @@
 using namespace portage;
 
 pkgcache_T::pkgcache_T()
-    : cachable(options::localstatedir()+PKGCACHE),
-      _portdir(options::portdir()),
-      _overlays(options::overlays())
+    : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
+      _portdir(options::portdir()), _overlays(options::overlays()),
+      _pkgs(_portdir, _overlays)
 {
 }
 
 pkgcache_T::pkgcache_T(const std::string &portdir)
-    : cachable(options::localstatedir()+PKGCACHE),
-      _portdir(portdir),      
-      _overlays(options::overlays())
+    : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
+      _portdir(portdir), _overlays(options::overlays()),
+      _pkgs(_portdir, _overlays)
 {
     this->logic();
 }
@@ -144,18 +146,6 @@ pkgcache_T::valid() const
     return valid;
 }
 
-/*
- * Traverse PORTDIR looking for all packages.
- */
-
-struct CatSlashPkg : std::binary_function<std::string, std::string, std::string>
-{
-    /* given a category string and a full path to a package directory,
-     * return a string in the form of "cat/pkg". */
-    std::string operator()(const std::string& cat, const std::string& path) const
-    { return (cat+"/"+util::basename(path)); }
-};
-
 void
 pkgcache_T::fill()
 {
@@ -164,48 +154,7 @@ pkgcache_T::fill()
     if (options::timer())
         timer.start();
 
-    const Categories categories(_portdir, options::qa());
-    Categories::const_iterator ci, cend;
-
-    /* for each category */
-    for (ci = categories.begin(), cend = categories.end() ; ci != cend ; ++ci)
-    {
-        const std::string path(_portdir+"/"+(*ci));
-        if (not util::is_dir(path))
-            continue;
-
-        /* for each pkg in category, insert "cat/pkg" */
-        const util::dir_T cat(path);
-        std::transform(cat.begin(), cat.end(), std::back_inserter(_pkgs),
-            std::bind1st(CatSlashPkg(), *ci));
-    }
-
-    /* search overlays, if any */
-    const std::vector<std::string>& overlays(options::overlays());
-    if (not overlays.empty())
-    {
-        /* for each category */
-        std::vector<std::string>::const_iterator oi, oend = overlays.end();
-        for (ci = categories.begin() ; ci != cend ; ++ci)
-        {
-            /* for each overlay */
-            for (oi = overlays.begin() ; oi != oend ; ++oi)
-            {
-                const std::string path(*oi+"/"+(*ci));
-                if (not util::is_dir(path))
-                    continue;
-
-                /* for each pkg in category, insert "cat/pkg" */
-                const util::dir_T cat(path);
-                std::transform(cat.begin(), cat.end(), std::back_inserter(_pkgs),
-                    std::bind1st(CatSlashPkg(), *ci));
-            }
-        }
-
-        /* remove any duplicates that were also present in a overlay */
-        std::sort(_pkgs.begin(), _pkgs.end());
-        _pkgs.erase(std::unique(_pkgs.begin(), _pkgs.end()), _pkgs.end());
-    }
+    _pkgs.fill();
 
     if (options::timer())
     {
@@ -225,11 +174,18 @@ pkgcache_T::load()
     if (not stream)
         throw FileException(this->path());
 
-    /* ignore first two lines, it's just used for validating the cache */
+    /* ignore first two lines; it's just used for validating the cache */
     std::string line;
     std::getline(stream, line);
     std::getline(stream, line);
+    
+    /* get cached size for reserve() */
+    std::getline(stream, line);
+    std::string::size_type pos = line.find('=');
+    if (pos != std::string::npos)
+        _reserve = util::destringify<int>(line.substr(++pos));
 
+    _pkgs.reserve(_reserve);
     _pkgs.insert(_pkgs.end(),
         std::istream_iterator<std::string>(stream),
         std::istream_iterator<std::string>());
@@ -249,8 +205,9 @@ pkgcache_T::dump()
     /* this cache came from this->_portdir */
     stream << "portdir=" << this->_portdir << std::endl;
     stream << "overlays=" << util::join(this->_overlays, ':') << std::endl;
+    stream << "size=" << _pkgs.size() << std::endl;
 
-    std::copy(this->begin(), this->end(),
+    std::copy(_pkgs.begin(), _pkgs.end(),
         std::ostream_iterator<std::string>(stream, "\n"));
 }
 

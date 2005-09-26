@@ -1,5 +1,22 @@
 ChangeLog for herdstat
 
+2005-09-26 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/util/file.hh: Added functor equivelents of is_file(),
+	is_dir(), and file_exists().
+	* herdstat/util/misc.hh: Added functor equivelent of is_pkg_dir() and
+	is_ebuild().  Modified is_ebuild to use fnmatch() as it's much faster
+	than using std::string::length and std::string::operator==.  Also
+	added function and functor, get_pkg_from_path() which retrieves the
+	"cat/pkg" from an absolute path to a package directory.
+	* herdstat/portage/package_list.cc, herdstat/portage/package_list.hh:
+	Moved pkgcache_T functionality (except the cache part) to a new class,
+	PackageList.
+	* src/pkgcache.cc, src/pkgcache.hh: Updated to use PackageList.
+	pkgcache_T is now soley responsible for the cache part.  Also, we now
+	cache PackageList::size() for use with PackageList::reserve() when
+	loading the cache.
+
 2005-09-25 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/util/string.cc: Revert change in util::split where we used

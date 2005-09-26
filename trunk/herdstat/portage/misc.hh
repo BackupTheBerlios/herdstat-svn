@@ -27,15 +27,30 @@
 # include "config.h"
 #endif
 
+#include <fnmatch.h>
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/regex.hh>
 #include <herdstat/util/file.hh>
 
-//#define CATEGORIES "/profiles/categories"
-//#define CATEGORIES_USER "/etc/portage/categories"
-
 namespace portage
 {
+    /** Is the specified path an ebuild?
+     * @param p Path.
+     * @returns A boolean value.
+     */
+    inline bool is_ebuild(const std::string &path)
+    {
+        return (fnmatch("*.ebuild", path.c_str(), 0) == 0);
+    }
+
+    struct IsEbuild
+    {
+        bool operator()(const std::string& path) const
+        {
+            return (fnmatch("*.ebuild", path.c_str(), 0) == 0);
+        }
+    };
+
     /** Is the specified path a package directory?
      * @param p Path.
      * @returns A boolean value.
@@ -46,24 +61,52 @@ namespace portage
         if (not util::is_dir(path))
             return false;
 
-        const util::dir_T dir(path);
-        return (dir.find(util::Regex("\\.ebuild$")) != dir.end());
+        /* consider it a package directory if an ebuild exists */
+        const util::dir_T pkgdir(path);
+        return (std::find_if(pkgdir.begin(),
+                    pkgdir.end(), IsEbuild()) != pkgdir.end());
     }
+
+    struct IsPkgDir
+    {
+        bool operator()(const std::string& path) const
+        {
+            if (not util::is_dir(path))
+                return false;
+
+            /* consider it a package directory if an ebuild exists */
+            const util::dir_T pkgdir(path);
+            return (std::find_if(pkgdir.begin(),
+                        pkgdir.end(), IsEbuild()) != pkgdir.end());
+        }
+    };
 
     /** Are we inside a package directory?
      * @returns A boolean value.
      */
     inline bool in_pkg_dir() { return is_pkg_dir(util::getcwd()); }
 
-    /** Is the specified path an ebuild?
-     * @param p Path.
-     * @returns A boolean value.
+    /** Get category/package from absolute path.
+     * @param path Path to package directory.
+     * @returns "cat/pkg" string.
      */
-    inline bool is_ebuild(const std::string &path)
+    inline std::string
+    get_pkg_from_path(const std::string& path)
     {
-        return ( (path.length() > 7) and
-                 (path.substr(path.length() - 7) == ".ebuild") );
+        std::string::size_type pos = path.rfind('/');
+        pos = path.rfind('/', --pos);
+        return path.substr(++pos);
     }
+
+    struct GetPkgFromPath
+    {
+        std::string operator()(const std::string& path) const
+        {
+            std::string::size_type pos = path.rfind('/');
+            pos = path.rfind('/', --pos);
+            return path.substr(++pos);
+        }
+    };
 
 } // namespace portage
 

@@ -72,8 +72,8 @@ namespace util
 
     struct patternMatch : std::binary_function<std::string, std::string, bool>
     {
-        bool operator() (const std::string& pattern,
-                         const std::string& path) const
+        bool operator() (const std::string& path,
+                         const std::string& pattern) const
         { return (fnmatch(pattern.c_str(), path.c_str(), 0) == 0); }
     };
 }

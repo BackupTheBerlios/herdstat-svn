@@ -34,6 +34,7 @@
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
+#include "common.hh"
 #include "pkgcache.hh"
 #include "metacache.hh"
 
