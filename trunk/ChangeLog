@@ -1,5 +1,10 @@
 ChangeLog for herdstat
 
+2005-09-27 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/herdstat.cc: When --version is specified, also show the
+	date/time herdstat was built.
+
 2005-09-26 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/util/file.hh: Added functor equivelents of is_file(),

@@ -111,6 +111,7 @@ static void
 version()
 {
     std::cout << PACKAGE << "-" << VERSION << std::endl;
+    std::cout << "Built: " << __DATE__ << " " << __TIME__ << std::endl;
 }
 
 static void

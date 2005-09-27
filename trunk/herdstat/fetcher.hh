@@ -49,7 +49,7 @@ class Fetcher : private noncopyable
         /** Constructor.
          * @param opts fetcher options.
          */
-        Fetcher(const std::string& opts) ;
+        Fetcher(const std::string& opts);
 
         /** Constructor.
          * @param url Remote URL.
