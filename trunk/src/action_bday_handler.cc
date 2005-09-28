@@ -46,6 +46,9 @@ struct IsBdayDev : std::binary_function<Developer, const util::Regex *, bool>
 static void
 display(const Developer& dev)
 {
+    if (options::count())
+        return;
+
     formatter_T out;
 
     if (options::quiet())
@@ -78,7 +81,7 @@ action_bday_handler_T::~action_bday_handler_T()
 }
 
 int
-action_bday_handler_T::operator()(opts_type &null)
+action_bday_handler_T::operator()(opts_type &opts)
 {
     if (options::userinfoxml().empty())
     {
@@ -103,9 +106,13 @@ action_bday_handler_T::operator()(opts_type &null)
         output.set_devaway(devaway.keys());
     output.set_attrs();
 
-    const util::Regex monthre(util::format_date(std::time(NULL), "%B"));
-    Developers bday_devs;
+    /* if no opts were specified, use current month */
+    const util::Regex monthre(opts.empty() ?
+        util::format_date(std::time(NULL), "%B") : opts.front());
 
+    Developers bday_devs;
+    
+    /* copy the birthday devs */
     util::copy_if(userinfo.devs().begin(), userinfo.devs().end(),
         std::inserter(bday_devs, bday_devs.end()),
         std::bind2nd(IsBdayDev(), &monthre));
@@ -118,6 +125,7 @@ action_bday_handler_T::operator()(opts_type &null)
     }
 
     std::for_each(bday_devs.begin(), bday_devs.end(), display);
+    size = bday_devs.size();
 
     flush();
     return EXIT_SUCCESS;
