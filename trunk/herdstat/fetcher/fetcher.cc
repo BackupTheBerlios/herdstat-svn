@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <unistd.h>
 
 #include <herdstat/exceptions.hh>
@@ -75,6 +76,9 @@ Fetcher::operator()(const std::string& url, const std::string& path)
     const char * const dir = util::dirname(path).c_str();
     if (access(dir, W_OK) != 0)
         throw FileException(dir);
+
+    if (_imp->opts.verbose)
+        std::cerr << "Fetching " << url << std::endl;
 
     if (not _imp->fetch(url, path))
         throw FetchException();

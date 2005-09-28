@@ -47,6 +47,7 @@ class FetcherImp
         virtual bool fetch(const std::string& url, const std::string& path) = 0;
 
     protected:
+        friend class Fetcher;
         FetcherOptions opts;
 };
 
