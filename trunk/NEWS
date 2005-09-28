@@ -2,6 +2,11 @@ This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.2_alpha5:
+    New features:
+     - libcurl support - cleaner fetching implementation
+     - Another semi-useless action handler for --birthday, that shows
+       developers whose birthday occurs during the current month.
+
     Bug fixes:
      - Fixed bug where longdesc's (in <pkg> tag of querycache.xml) were being
        assigned instead of appended, causing certain longdescriptions (those

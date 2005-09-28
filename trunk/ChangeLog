@@ -1,5 +1,27 @@
 ChangeLog for herdstat
 
+2005-09-28 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Add libcurl checks.
+	* herdstat/fetcher.cc, herdstat/fetcher.hh, herdstat/Makefile.am:
+	removed in leu of libfetcher convenience lib.
+	* herdstat/fetcher/fetcher.cc, herdstat/fetcher/fetcher.hh,
+	herdstat/fetcher/fetcherimp.hh, herdstat/fetcher/wgetfetcher.cc,
+	herdstat/fetcher/wgetfetcher.hh, herdstat/fetcher/curlfetcher.cc,
+	herdstat/fetcher/curlfetcher.hh, herdstat/fetcher/Makefile.am: Add new
+	libfetcher convenience lib. The Fetcher interface remains intact,
+	however it now uses the bridge pattern for different fetcher
+	implementations.  In addition to wget, we now support libcurl as well.
+	* herdstat/portage/herds_xml.hh, src/common.cc: Update fetcher.hh
+	include path.
+	* herdstat/util/misc.cc, herdstat/util/misc.hh,
+	src/action_dev_handler.cc: Move get_elapsed_yrs helper function to
+	util namespace as it's needed by the new action_bday_handler.
+	* src/herdstat.cc, src/Makefile.am, src/action_bday_handler.cc,
+	src/action_bday_handler.hh: Boredom yields another semi-useless
+	feature; action handler (for --birthday) that shows developers whose
+	birthday occurs during the current month.
+
 2005-09-27 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/herdstat.cc: When --version is specified, also show the

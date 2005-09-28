@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <herdstat/exceptions.hh>
-#include <herdstat/fetcher.hh>
+#include <herdstat/fetcher/fetcher.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 
@@ -78,7 +78,11 @@ do_fetch(const char * const url, const char * const file)
 
     try
     {
-        Fetcher fetch(options::wget_options());
+        FetcherOptions fetchopts;
+        fetchopts.verbose = options::verbose();
+        fetchopts.debug   = options::debug();
+
+        Fetcher fetch(fetchopts);
             
         fetch(url, xml.path());
 

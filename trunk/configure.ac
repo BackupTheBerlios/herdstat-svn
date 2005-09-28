@@ -48,12 +48,6 @@ test x$sysconfdir = "xNONE" && sysconfdir="$ac_default_sysconfdir"
 AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir", [System configuration directory])
 
-AC_PATH_PROGS(_WGET, wget)
-if test x$_WGET = "x"; then
-    AC_MSG_ERROR([wget is required])
-fi
-AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
-
 dnl build API docs?
 AC_MSG_CHECKING([whether to build API docs for libherdstat])
 AC_ARG_ENABLE(doc,
@@ -163,6 +157,33 @@ fi
     
 AC_SUBST(TERMCAP_LIBS)
 
+AC_MSG_CHECKING([fetch method])
+AC_ARG_WITH(curl,
+    AC_HELP_STRING([--with-curl],[Use libcurl for fetching]),
+    [WITH_CURL=$withval],[WITH_CURL=yes])
+
+if test "$WITH_CURL" = "yes" ; then
+    AC_MSG_RESULT([libcurl])
+    AC_CHECK_LIB(curl, curl_easy_init, [CURL_LIBS="-lcurl"])
+    AC_CHECK_HEADERS([curl/curl.h])
+
+    if ! test -z "$CURL_LIBS" ; then
+	AC_DEFINE(FETCH_METHOD_CURL, 1, [Use libcurl for fetching])
+    fi
+fi
+    
+if test "$WITH_CURL" != "yes" -o -z "$CURL_LIBS" ; then
+    AC_MSG_RESULT([wget])
+    AC_PATH_PROGS(_WGET, wget)
+    if test x$_WGET = "x"; then
+	AC_MSG_ERROR([wget is required])
+    fi
+    AC_DEFINE(WGET, "$_WGET", [wget location])
+    AC_DEFINE(FETCH_METHOD_WGET, 1, [Use wget for fetching])
+fi
+
+AC_SUBST(CURL_LIBS)
+
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(xmlwrapp, xmlwrapp >= 0.5.0,
     [xmlwrapp_LIBS="-lxmlwrapp -lxslt -lxml2 -lz -lm"],
@@ -174,6 +195,7 @@ AC_OUTPUT(Makefile
 	  doc/Makefile
 	  herdstat/Makefile
 	  herdstat/util/Makefile
+	  herdstat/fetcher/Makefile
 	  herdstat/xml/Makefile
 	  herdstat/portage/Makefile
 	  src/Makefile

@@ -33,7 +33,7 @@
  */
 
 #include <algorithm>
-#include <herdstat/fetcher.hh>
+#include <herdstat/fetcher/fetcher.hh>
 #include <herdstat/portage/xmlbase.hh>
 #include <herdstat/portage/herd.hh>
 

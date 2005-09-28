@@ -32,7 +32,7 @@
  * @brief Defines the abstract fetchable interface.
  */
 
-#include <herdstat/fetcher.hh>
+#include <herdstat/fetcher/fetcher.hh>
 
 /**
  * Abstract base for fetchable things.
@@ -62,7 +62,7 @@ class fetchable
         virtual void do_fetch(const std::string& path = "") const
             throw (FetchException) = 0;
 
-        const Fetcher _fetch;
+        mutable Fetcher _fetch;
 
     private:
         mutable bool _fetched;

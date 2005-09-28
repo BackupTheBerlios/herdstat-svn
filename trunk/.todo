@@ -2,29 +2,17 @@
     <title>
         Todo list for herdstat
     </title>
-    <note priority="veryhigh" time="1127553006">
-        TODO before 1.1.2 final
-        <note priority="high" time="1127553021">
-            Full projectxml support.
-            <note priority="veryhigh" time="1127566254">
-                figure out a way to fill in names of devs listed in &lt;dev&gt; tags
-            </note>
-        </note>
-        <note priority="medium" time="1127553041">
-            Rewrite portage find code.
-        </note>
-        <note priority="medium" time="1127553059">
-            Fetch files programatically instead of using wget.
-            <note priority="low" time="1127553079">
-                libcurl
-            </note>
-            <note priority="low" time="1127553089">
-                libwww
-            </note>
-        </note>
+    <note priority="veryhigh" time="1127895852">
+        Add a --birthday option.
     </note>
     <note priority="high" time="1126510481">
         Write a debug class for writing debugging messages instead of using debug_msg().
+    </note>
+    <note priority="high" time="1127895723">
+        Full projectxml support
+        <note priority="medium" time="1127895761">
+            Figure out a way to fill in names of devs listed in &lt;dev&gt; tags
+        </note>
     </note>
     <note priority="low" time="1125827409">
         Get make distcheck working.
