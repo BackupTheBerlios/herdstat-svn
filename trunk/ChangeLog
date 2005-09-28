@@ -17,10 +17,9 @@ ChangeLog for herdstat
 	* herdstat/util/misc.cc, herdstat/util/misc.hh,
 	src/action_dev_handler.cc: Move get_elapsed_yrs helper function to
 	util namespace as it's needed by the new action_bday_handler.
-	* src/herdstat.cc, src/Makefile.am, src/action_bday_handler.cc,
-	src/action_bday_handler.hh: Boredom yields another semi-useless
-	feature; action handler (for --birthday) that shows developers whose
-	birthday occurs during the current month.
+	* src/herdstat.cc, src/options.cc, src/options.hh,
+	src/action_dev_handler.cc: Added new option --field which allows you
+	to look up developers by some field other than their username.
 
 2005-09-27 Aaron Walker <ka0ttic@gentoo.org>
 

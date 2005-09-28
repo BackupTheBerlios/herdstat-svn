@@ -51,12 +51,11 @@
 #include "action_versions_handler.hh"
 #include "action_away_handler.hh"
 #include "action_fetch_handler.hh"
-#include "action_bday_handler.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TbX:";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -104,7 +103,6 @@ static struct option long_opts[] =
     {"qa",	    no_argument,	0,  '\a'},
     {"nometacache",  no_argument,	0,  '\f'},
     {"TEST",	    no_argument,	0,  'T'},
-    {"birthday",    no_argument,	0,  'b'},
     {"field",	    required_argument,	0,  'X'},
     { 0, 0, 0, 0 }
 };
@@ -340,14 +338,9 @@ handle_opts(int argc, char **argv, opts_type *args)
 		    throw argsOneActionOnly();
 		options::set_action(action_fetch);
 		break;
-	    /* --birthday */
-	    case 'b':
-		if (options::action() != action_unspecified)
-		    throw argsOneActionOnly();
-		options::set_action(action_bday);
-		break;
+	    /* --field */
 	    case 'X':
-		options::set_field(optarg);
+		options::add_field(optarg);
 		break;
 	    /* --no-overlay */
 	    case 'N':
@@ -475,7 +468,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    action != action_meta and
 	    action != action_versions and
 	    action != action_fetch and
-	    action != action_bday)
+	    action != action_dev)
 	    throw argsUsage();
     }
 
@@ -621,7 +614,6 @@ main(int argc, char **argv)
 	handlers[action_find]     = new action_find_handler_T();
 	handlers[action_away]     = new action_away_handler_T();
 	handlers[action_fetch]    = new action_fetch_handler_T();
-	handlers[action_bday]     = new action_bday_handler_T();
 
 	action_handler_T *action_handler = handlers[options::action()];
 

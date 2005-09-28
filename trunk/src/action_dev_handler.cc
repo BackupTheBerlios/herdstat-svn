@@ -51,6 +51,9 @@ action_dev_handler_T::~action_dev_handler_T()
 void
 action_dev_handler_T::display(const std::string &d)
 {
+    if (not options::fields().empty() and options::count())
+        return;
+
     Developer dev(d);
 
     /* fill Developer object with data from each respective XML file */
@@ -64,6 +67,13 @@ action_dev_handler_T::display(const std::string &d)
         throw DevException();
 
     const std::vector<std::string>& herds(dev.herds());
+
+    /* temporarily disable quiet */
+    if (not options::fields().empty())
+    {
+        options::set_quiet(false);
+        output.set_quiet(false);
+    }
 
     if (not options::quiet())
     {
@@ -110,7 +120,7 @@ action_dev_handler_T::display(const std::string &d)
         else if (not options::count())
             output(util::sprintf("Herds(%d)", herds.size()), herds);
 
-        if (options::field().empty())
+        if (options::fields().empty())
             size += herds.size();
     }
 
@@ -203,7 +213,7 @@ action_dev_handler_T::operator() (opts_type &opts)
         flush();
         return EXIT_SUCCESS;
     }
-    else if (options::field().empty() and options::regex())
+    else if (options::fields().empty() and options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
@@ -236,51 +246,71 @@ action_dev_handler_T::operator() (opts_type &opts)
     }
 
     /* --field=X */
+    const std::vector<std::string>& fields(options::fields());
 
-    const std::string& field(options::field());
-    const bool regex(options::regex());
+//    const std::string& field(options::field());
+//    const bool regex(options::regex());
 
-    if (not field.empty() and userinfo.empty())
+    if (not fields.empty() and userinfo.empty())
     {
         std::cerr << "--field requires userinfo.xml." << std::endl;
         return EXIT_FAILURE;
     }
 
-    if (not field.empty())
+    if (not fields.empty())
     {
-        const std::string query(opts.front());
-        const Regex queryre(query, options::eregex() ?
-                Regex::extended|Regex::icase : Regex::icase);
-        opts.clear();
-
-#define SAVE_USER_IF_FIELD_IS(x) \
-            if (field == #x) { \
-                if ((regex and queryre == d->x()) or \
-                    (not regex and query == d->x())) \
-                        opts.push_back(d->user()); \
-            }
+#define MARK_MATCHES(x) \
+        if (parts[0] == #x) { \
+            matches = (queryre == d->x()); \
+        }
 
         const Developers& devs(userinfo.devs());
         Developers::const_iterator d;
         for (d = devs.begin() ; d != devs.end() ; ++d)
         {
-            SAVE_USER_IF_FIELD_IS(name)
-            else SAVE_USER_IF_FIELD_IS(birthday)
-            else SAVE_USER_IF_FIELD_IS(joined)
-            else SAVE_USER_IF_FIELD_IS(status)
-            else SAVE_USER_IF_FIELD_IS(location)
-            else
+            bool matches = false;
+
+            std::vector<std::string>::const_iterator f;
+            for (f = fields.begin() ; f != fields.end() ; ++f)
             {
-                std::cerr << "Unrecognized --field argument '" << field << "'."
-                    << std::endl;
-                return EXIT_FAILURE;
+                std::vector<std::string> parts(util::split(*f, ','));
+                if (parts.size() != 2)
+                {
+                    std::cerr << "Format for --field is \"--field=field,criteria\"." << std::endl
+                        << "For example: --field=status,active" << std::endl;
+                    return EXIT_FAILURE;
+                }
+
+                const Regex queryre(parts[1], options::eregex() ?
+                        Regex::extended|Regex::icase : Regex::icase);
+
+                MARK_MATCHES(name)
+                else MARK_MATCHES(location)
+                else MARK_MATCHES(status)
+                else MARK_MATCHES(birthday)
+                else MARK_MATCHES(joined)
+                else
+                {
+                    std::cerr << "Unrecognized --field argument '" << parts[0] << "'."
+                        << std::endl;
+                    return EXIT_FAILURE;
+                }
+
+                /* no point going to the next iteration
+                 * if this one doesnt match */
+                if (not matches)
+                    break;
+
+                /* we're on the last field, meaning all previous ones matched
+                 * as well, so save it finally */
+                if ((f+1) == fields.end())
+                    opts.push_back(d->user());
             }
         }
 
-#undef SAVE_USER_IF_FIELD_IS
+#undef MARK_MATCHES
 
         size = opts.size();
-
     }
 
     /* for each specified dev... */

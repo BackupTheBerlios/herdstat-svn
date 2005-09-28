@@ -4,8 +4,15 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 1.1.2_alpha5:
     New features:
      - libcurl support - cleaner fetching implementation
-     - Another semi-useless action handler for --birthday, that shows
-       developers whose birthday occurs during the current month.
+     - The --dev option now supports a sub-option, --field which allows
+       lookup of developers by a field other than their username.  For example,
+       it is now possible to show all developers who were born in 1983 and who
+       have the first name Michael with:
+
+	    herdstat -d --field=birthday,1983 --field=name,^Michael
+
+	The criteria, "1983", and "^Michael" respectively are treated as regular
+	expressions.
 
     Bug fixes:
      - Fixed bug where longdesc's (in <pkg> tag of querycache.xml) were being
