@@ -70,14 +70,14 @@ Fetcher::newFetcherImp()
 }
 
 void
-Fetcher::operator()(const std::string& url, const std::string& path)
+Fetcher::operator()(const std::string& url, const std::string& path) const
 {
     /* ensure we have write access to the directory */
     const char * const dir = util::dirname(path).c_str();
     if (access(dir, W_OK) != 0)
         throw FileException(dir);
 
-    if (_imp->opts.verbose)
+    if (_imp->options().verbose())
         std::cerr << "Fetching " << url << std::endl;
 
     if (not _imp->fetch(url, path))

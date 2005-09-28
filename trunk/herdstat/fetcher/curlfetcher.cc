@@ -35,7 +35,7 @@
 #include <herdstat/fetcher/curlfetcher.hh>
 
 bool
-CurlFetcher::fetch(const std::string& url, const std::string& path)
+CurlFetcher::fetch(const std::string& url, const std::string& path) const
 {
 #ifdef FETCH_METHOD_CURL
     FILE *fp = NULL;
@@ -53,9 +53,9 @@ CurlFetcher::fetch(const std::string& url, const std::string& path)
         /* set curl options */
         curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, fp);
-        curl_easy_setopt(handle, CURLOPT_NOPROGRESS, not opts.verbose);
+        curl_easy_setopt(handle, CURLOPT_NOPROGRESS, not options().verbose());
         curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
-        curl_easy_setopt(handle, CURLOPT_VERBOSE, opts.debug);
+        curl_easy_setopt(handle, CURLOPT_VERBOSE, options().debug());
         curl_easy_setopt(handle, CURLOPT_USERAGENT, PACKAGE);
 
         if (curl_easy_perform(handle) != 0)

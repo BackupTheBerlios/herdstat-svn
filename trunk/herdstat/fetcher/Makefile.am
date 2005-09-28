@@ -6,7 +6,8 @@ cc_sources = wgetfetcher.cc \
 	     curlfetcher.cc \
 	     fetcher.cc
 
-hh_sources = fetcherimp.hh \
+hh_sources = options.hh \
+	     fetcherimp.hh \
 	     wgetfetcher.hh \
 	     curlfetcher.hh \
 	     fetcher.hh

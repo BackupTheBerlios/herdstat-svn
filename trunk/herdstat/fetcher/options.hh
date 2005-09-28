@@ -1,5 +1,5 @@
 /*
- * herdstat -- herdstat/fetcher/fetcherimp.hh
+ * herdstat -- fetcher/options.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,35 +20,39 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_FETCHERIMP_HH
-#define _HAVE_FETCHERIMP_HH 1
+#ifndef _HAVE_OPTIONS_HH
+#define _HAVE_OPTIONS_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <string>
-#include <herdstat/fetcher/options.hh>
+/**
+ * @file options.hh
+ * @brief Defines the FetcherOptions class.
+ */
 
-class FetcherImp
+class FetcherOptions
 {
     public:
-        FetcherImp() { }
-        virtual ~FetcherImp() { }
+        FetcherOptions() : _verbose(false), _debug(false) { }
 
-        inline const FetcherOptions& options() const;
-        inline void set_options(const FetcherOptions& o);
+        inline bool verbose() const;
+        inline bool debug() const;
 
-        virtual bool fetch(const std::string& url,
-                           const std::string& path) const = 0;
+        inline void set_verbose(bool v);
+        inline void set_debug(bool v);
 
     private:
-        FetcherOptions _opts;
+        bool _verbose;
+        bool _debug;
 };
 
-inline const FetcherOptions& FetcherImp::options() const { return _opts; }
-inline void FetcherImp::set_options(const FetcherOptions& o) { _opts = o; }
+inline bool FetcherOptions::verbose() const { return _verbose; }
+inline bool FetcherOptions::debug() const { return _debug; }
+inline void FetcherOptions::set_verbose(bool v) { _verbose = v; }
+inline void FetcherOptions::set_debug(bool v) { _debug = v; }
 
-#endif /* _HAVE_FETCHERIMP_HH */
+#endif /* _HAVE_OPTIONS_HH */
 
 /* vim: set tw=80 sw=4 et : */

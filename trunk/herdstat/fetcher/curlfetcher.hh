@@ -35,7 +35,8 @@ class CurlFetcher : public FetcherImp
         CurlFetcher() { }
         virtual ~CurlFetcher() { }
 
-        virtual bool fetch(const std::string& url, const std::string& path);
+        virtual bool fetch(const std::string& url,
+                           const std::string& path) const;
 };
 
 #endif /* _HAVE_CURLFETCHER_HH */

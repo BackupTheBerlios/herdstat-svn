@@ -29,7 +29,7 @@
 #include <herdstat/fetcher/wgetfetcher.hh>
 
 bool
-WgetFetcher::fetch(const std::string& url, const std::string& path)
+WgetFetcher::fetch(const std::string& url, const std::string& path) const
 {
 #ifdef FETCH_METHOD_WGET
     std::string options("-r -t3 -T15");

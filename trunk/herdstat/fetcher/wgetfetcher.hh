@@ -35,7 +35,8 @@ class WgetFetcher : public FetcherImp
         WgetFetcher() { }
         virtual ~WgetFetcher() { }
 
-        virtual bool fetch(const std::string& url, const std::string& path);
+        virtual bool fetch(const std::string& url,
+                           const std::string& path) const;
 };
 
 #endif /* _HAVE_WGETFETCHER_HH */

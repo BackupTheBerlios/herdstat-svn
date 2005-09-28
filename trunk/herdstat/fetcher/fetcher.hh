@@ -38,17 +38,27 @@ class Fetcher : private noncopyable
         Fetcher(const std::string& url, const std::string& path);
         ~Fetcher();
 
+        inline const FetcherOptions& options() const;
         inline void set_options(const FetcherOptions& opts);
 
-        void operator()(const std::string& url, const std::string& path);
+        void operator()(const std::string& url, const std::string& path) const;
 
     private:
         void newFetcherImp();
         FetcherImp *_imp;
 };
 
-inline void Fetcher::set_options(const FetcherOptions& opts)
-{ _imp->set_options(opts); }
+inline const FetcherOptions&
+Fetcher::options() const
+{
+    return _imp->options();
+}
+
+inline void
+Fetcher::set_options(const FetcherOptions& opts)
+{
+    _imp->set_options(opts);
+}
 
 #endif /* _HAVE_FETCHER_HH */
 

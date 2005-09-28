@@ -79,8 +79,8 @@ do_fetch(const char * const url, const char * const file)
     try
     {
         FetcherOptions fetchopts;
-        fetchopts.verbose = options::verbose();
-        fetchopts.debug   = options::debug();
+        fetchopts.set_verbose(options::verbose());
+        fetchopts.set_debug(options::debug());
 
         Fetcher fetch(fetchopts);
             
