@@ -56,7 +56,7 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:Tb";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TbX:";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -105,6 +105,7 @@ static struct option long_opts[] =
     {"nometacache",  no_argument,	0,  '\f'},
     {"TEST",	    no_argument,	0,  'T'},
     {"birthday",    no_argument,	0,  'b'},
+    {"field",	    required_argument,	0,  'X'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -144,6 +145,8 @@ help()
 	<< " -a, --away              Look up away information for the specified developers." << std::endl
 	<< " -b, --birthday          Display developers whose birthday occurs during this" << std::endl
 	<< "                         month (requires userinfo.xml)." << std::endl
+	<< "     --field <field>     Search by field (for use with --dev).  Possible fields" << std::endl
+	<< "                         are birthday, joined, status, location." << std::endl
 	<< "     --versions          Look up versions of specified packages." << std::endl
 	<< "     --with-herd <regex> When used in conjunction with --package and --dev," << std::endl
 	<< "                         display all packages that belong to a herd that matches" << std::endl
@@ -342,6 +345,9 @@ handle_opts(int argc, char **argv, opts_type *args)
 		if (options::action() != action_unspecified)
 		    throw argsOneActionOnly();
 		options::set_action(action_bday);
+		break;
+	    case 'X':
+		options::set_field(optarg);
 		break;
 	    /* --no-overlay */
 	    case 'N':

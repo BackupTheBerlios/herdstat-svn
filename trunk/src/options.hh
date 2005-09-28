@@ -124,6 +124,8 @@ class options
         static void set_highlights(const std::string& v) { _highlights.assign(v); }
         static const std::string& locale() { return _locale; }
         static void set_locale(const std::string& v) { _locale.assign(v); }
+        static const std::string& field() { return _field; }
+        static void set_field(const std::string& v) { _field.assign(v); }
 
         static options_action_T action() { return _action; }
         static void set_action(options_action_T v) { _action = v; }
@@ -171,6 +173,7 @@ class options
         static std::string _metacache_expire;
         static std::string _highlights;
         static std::string _locale;
+        static std::string _field;
 
         static options_action_T _action;
 

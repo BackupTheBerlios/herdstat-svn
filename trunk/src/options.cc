@@ -68,6 +68,7 @@ std::string options::_hlcolor("yellow");
 std::string options::_metacache_expire("lastsync");
 std::string options::_highlights;
 std::string options::_locale(std::locale::classic().name());
+std::string options::_field;
 
 options_action_T options::_action = action_unspecified;
 

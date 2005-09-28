@@ -110,7 +110,8 @@ action_dev_handler_T::display(const std::string &d)
         else if (not options::count())
             output(util::sprintf("Herds(%d)", herds.size()), herds);
 
-        size += herds.size();
+        if (options::field().empty())
+            size += herds.size();
     }
 
     /* display userinfo.xml stuff */
@@ -202,7 +203,7 @@ action_dev_handler_T::operator() (opts_type &opts)
         flush();
         return EXIT_SUCCESS;
     }
-    else if (options::regex())
+    else if (options::field().empty() and options::regex())
     {
         const std::string re(opts.front());
         opts.clear();
@@ -232,6 +233,54 @@ action_dev_handler_T::operator() (opts_type &opts)
         /* remove any dupes */
         std::sort(opts.begin(), opts.end());
         opts.erase(std::unique(opts.begin(), opts.end()), opts.end());
+    }
+
+    /* --field=X */
+
+    const std::string& field(options::field());
+    const bool regex(options::regex());
+
+    if (not field.empty() and userinfo.empty())
+    {
+        std::cerr << "--field requires userinfo.xml." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    if (not field.empty())
+    {
+        const std::string query(opts.front());
+        const Regex queryre(query, options::eregex() ?
+                Regex::extended|Regex::icase : Regex::icase);
+        opts.clear();
+
+#define SAVE_USER_IF_FIELD_IS(x) \
+            if (field == #x) { \
+                if ((regex and queryre == d->x()) or \
+                    (not regex and query == d->x())) \
+                        opts.push_back(d->user()); \
+            }
+
+        const Developers& devs(userinfo.devs());
+        Developers::const_iterator d;
+        for (d = devs.begin() ; d != devs.end() ; ++d)
+        {
+            SAVE_USER_IF_FIELD_IS(name)
+            else SAVE_USER_IF_FIELD_IS(birthday)
+            else SAVE_USER_IF_FIELD_IS(joined)
+            else SAVE_USER_IF_FIELD_IS(status)
+            else SAVE_USER_IF_FIELD_IS(location)
+            else
+            {
+                std::cerr << "Unrecognized --field argument '" << field << "'."
+                    << std::endl;
+                return EXIT_FAILURE;
+            }
+        }
+
+#undef SAVE_USER_IF_FIELD_IS
+
+        size = opts.size();
+
     }
 
     /* for each specified dev... */
