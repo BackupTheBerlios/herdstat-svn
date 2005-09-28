@@ -51,11 +51,12 @@
 #include "action_versions_handler.hh"
 #include "action_away_handler.hh"
 #include "action_fetch_handler.hh"
+#include "action_bday_handler.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:T";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:Tb";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -103,6 +104,7 @@ static struct option long_opts[] =
     {"qa",	    no_argument,	0,  '\a'},
     {"nometacache",  no_argument,	0,  '\f'},
     {"TEST",	    no_argument,	0,  'T'},
+    {"birthday",    no_argument,	0,  'b'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -140,6 +142,8 @@ help()
 	<< " -w, --which             Look up full path to ebuild for specified packages." << std::endl
 	<< " -f, --find              Look up category/package for the specified packages." << std::endl
 	<< " -a, --away              Look up away information for the specified developers." << std::endl
+	<< " -b, --birthday          Display developers whose birthday occurs during this" << std::endl
+	<< "                         month (requires userinfo.xml)." << std::endl
 	<< "     --versions          Look up versions of specified packages." << std::endl
 	<< "     --with-herd <regex> When used in conjunction with --package and --dev," << std::endl
 	<< "                         display all packages that belong to a herd that matches" << std::endl
@@ -333,6 +337,12 @@ handle_opts(int argc, char **argv, opts_type *args)
 		    throw argsOneActionOnly();
 		options::set_action(action_fetch);
 		break;
+	    /* --birthday */
+	    case 'b':
+		if (options::action() != action_unspecified)
+		    throw argsOneActionOnly();
+		options::set_action(action_bday);
+		break;
 	    /* --no-overlay */
 	    case 'N':
 		options::set_overlay(false);
@@ -458,7 +468,8 @@ handle_opts(int argc, char **argv, opts_type *args)
 	if (action != action_unspecified and
 	    action != action_meta and
 	    action != action_versions and
-	    action != action_fetch)
+	    action != action_fetch and
+	    action != action_bday)
 	    throw argsUsage();
     }
 
@@ -604,6 +615,7 @@ main(int argc, char **argv)
 	handlers[action_find]     = new action_find_handler_T();
 	handlers[action_away]     = new action_away_handler_T();
 	handlers[action_fetch]    = new action_fetch_handler_T();
+	handlers[action_bday]     = new action_bday_handler_T();
 
 	action_handler_T *action_handler = handlers[options::action()];
 
