@@ -141,10 +141,9 @@ help()
 	<< " -w, --which             Look up full path to ebuild for specified packages." << std::endl
 	<< " -f, --find              Look up category/package for the specified packages." << std::endl
 	<< " -a, --away              Look up away information for the specified developers." << std::endl
-	<< " -b, --birthday          Display developers whose birthday occurs during this" << std::endl
-	<< "                         month (requires userinfo.xml)." << std::endl
-	<< "     --field <field>     Search by field (for use with --dev).  Possible fields" << std::endl
-	<< "                         are birthday, joined, status, location." << std::endl
+	<< "     --field field,criteria" << std::endl
+	<< "                         Search by field (for use with --dev).  Possible fields" << std::endl
+	<< "                         are user,name,birthday,joined,status,location." << std::endl
 	<< "     --versions          Look up versions of specified packages." << std::endl
 	<< "     --with-herd <regex> When used in conjunction with --package and --dev," << std::endl
 	<< "                         display all packages that belong to a herd that matches" << std::endl
