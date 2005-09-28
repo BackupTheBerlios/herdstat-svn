@@ -226,4 +226,29 @@ util::str2epoch(const char *str, const char *fmt)
     return std::mktime(&t);
 }
 /****************************************************************************/
+/* given string in form of "10 January 2000", get elapsed number of years.
+ * returns empty string on any failure. */
+const std::string
+util::get_elapsed_yrs(const std::string& date)
+{
+    std::time_t now, joined_date;
+
+    try
+    {
+        joined_date = util::str2epoch(date.c_str(), "%d %b %Y");
+        if (joined_date == static_cast<std::time_t>(-1))
+            return std::string();
+    }
+    catch (const BadDate& e)
+    {
+        return std::string();
+    }
+
+    if ((now = std::time(NULL)) == static_cast<std::time_t>(-1))
+        return std::string();
+
+    double seconds = std::difftime(now, joined_date);
+    return (util::sprintf("%.2f", seconds/31536000)+" yrs");
+}
+/****************************************************************************/
 /* vim: set tw=80 sw=4 et : */

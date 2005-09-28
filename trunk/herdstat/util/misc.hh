@@ -91,6 +91,8 @@ namespace util
      */
     std::time_t str2epoch(const char *str, const char *fmt);
 
+    const std::string get_elapsed_yrs(const std::string& date);
+
     /**
      * Color map.
      */
