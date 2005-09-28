@@ -248,22 +248,14 @@ action_dev_handler_T::operator() (opts_type &opts)
     /* --field=X */
     const std::vector<std::string>& fields(options::fields());
 
-//    const std::string& field(options::field());
-//    const bool regex(options::regex());
-
     if (not fields.empty() and userinfo.empty())
     {
-        std::cerr << "--field requires userinfo.xml." << std::endl;
+        std::cerr << "--field only makes sense when used with userinfo.xml." << std::endl;
         return EXIT_FAILURE;
     }
 
     if (not fields.empty())
     {
-#define MARK_MATCHES(x) \
-        if (parts[0] == #x) { \
-            matches = (queryre == d->x()); \
-        }
-
         const Developers& devs(userinfo.devs());
         Developers::const_iterator d;
         for (d = devs.begin() ; d != devs.end() ; ++d)
@@ -274,27 +266,31 @@ action_dev_handler_T::operator() (opts_type &opts)
             for (f = fields.begin() ; f != fields.end() ; ++f)
             {
                 std::vector<std::string> parts(util::split(*f, ','));
-                if (parts.size() != 2)
+                if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
                 {
                     std::cerr << "Format for --field is \"--field=field,criteria\"." << std::endl
-                        << "For example: --field=status,active" << std::endl;
+                              << "For example: --field=status,active" << std::endl;
                     return EXIT_FAILURE;
                 }
 
                 const Regex queryre(parts[1], options::eregex() ?
                         Regex::extended|Regex::icase : Regex::icase);
 
-                MARK_MATCHES(name)
-                else MARK_MATCHES(location)
-                else MARK_MATCHES(status)
-                else MARK_MATCHES(birthday)
-                else MARK_MATCHES(joined)
+#define IF_MATCHES(x) if (parts[0] == #x) { matches = (queryre == d->x()); }
+
+                IF_MATCHES(name)
+                else IF_MATCHES(user)
+                else IF_MATCHES(location)
+                else IF_MATCHES(status)
+                else IF_MATCHES(birthday)
+                else IF_MATCHES(joined)
                 else
                 {
-                    std::cerr << "Unrecognized --field argument '" << parts[0] << "'."
-                        << std::endl;
+                    std::cerr << "Unrecognized field '" << parts[0] << "'." << std::endl;
                     return EXIT_FAILURE;
                 }
+
+#undef IF_MATCHES
 
                 /* no point going to the next iteration
                  * if this one doesnt match */
@@ -307,8 +303,6 @@ action_dev_handler_T::operator() (opts_type &opts)
                     opts.push_back(d->user());
             }
         }
-
-#undef MARK_MATCHES
 
         size = opts.size();
     }
