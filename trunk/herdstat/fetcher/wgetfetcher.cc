@@ -32,11 +32,11 @@ bool
 WgetFetcher::fetch(const std::string& url, const std::string& path) const
 {
 #ifdef FETCH_METHOD_WGET
-    std::string options("-r -t3 -T15");
-    options += (options().verbose() ? " -v" : " -q");
+    std::string opts("-r -t3 -T15");
+    opts += (options().verbose() ? " -v" : " -q");
 
     return (std::system(util::sprintf("%s %s -O %s '%s'", WGET,
-                options.c_str(), path.c_str(),
+                opts.c_str(), path.c_str(),
                 url.c_str()).c_str()) == EXIT_SUCCESS);
 #else
     throw Exception("WgetFetcher::fetch() called, but wget support is not enabled.");
