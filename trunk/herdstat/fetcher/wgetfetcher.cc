@@ -33,7 +33,7 @@ WgetFetcher::fetch(const std::string& url, const std::string& path) const
 {
 #ifdef FETCH_METHOD_WGET
     std::string options("-r -t3 -T15");
-    options += (opts.verbose ? " -v" : " -q");
+    options += (options().verbose() ? " -v" : " -q");
 
     return (std::system(util::sprintf("%s %s -O %s '%s'", WGET,
                 options.c_str(), path.c_str(),
