@@ -36,7 +36,8 @@ action_fetch_handler_T::operator() (opts_type &null)
 {
     try
     {
-        options::set_verbose(true);
+        if (not options::quiet())
+            options::set_verbose(true);
 
         fetch_herdsxml();
         /* parse herds.xml so any xml files listed in <maintainingproject>
