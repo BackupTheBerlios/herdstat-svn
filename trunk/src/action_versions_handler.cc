@@ -54,6 +54,13 @@ action_versions_handler_T::operator() (opts_type &opts)
     output.set_quiet(options::quiet());
     output.set_attrs();
 
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with --away."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
     if (options::all())
     {
         std::cerr << "Versions action handler does not support the 'all' target."

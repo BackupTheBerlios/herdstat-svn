@@ -127,6 +127,13 @@ action_herd_handler_T::~action_herd_handler_T()
 int
 action_herd_handler_T::operator() (opts_type &opts)
 {
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with the herd action handler."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
     fetch_herdsxml();
     herdsxml.parse(options::herdsxml());
     const Herds& herds(herdsxml.herds());

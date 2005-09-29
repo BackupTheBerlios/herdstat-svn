@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <herdstat/util/string.hh>
@@ -46,6 +47,13 @@ action_stats_handler_T::~action_stats_handler_T()
 int
 action_stats_handler_T::operator() (opts_type &null)
 {
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with the stats action handler."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
     options::set_quiet(false);
     fetch_herdsxml();
     herdsxml.parse(options::herdsxml());

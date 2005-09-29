@@ -39,8 +39,12 @@ action_which_handler_T::~action_which_handler_T()
 int
 action_which_handler_T::operator() (opts_type &opts)
 {
-    pkgcache_T pkgcache;
-    std::multimap<std::string, std::string>::iterator m;
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with --away."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
 
     if (options::all())
     {
@@ -48,7 +52,11 @@ action_which_handler_T::operator() (opts_type &opts)
             << std::endl;
         return EXIT_FAILURE;
     }
-    else if (options::regex())
+
+    pkgcache_T pkgcache;
+    std::multimap<std::string, std::string>::iterator m;
+
+    if (options::regex())
     {
         const std::string re(opts.front());
         opts.clear();

@@ -66,6 +66,13 @@ action_away_handler_T::display(const Developer& dev)
 int
 action_away_handler_T::operator()(opts_type& opts)
 {
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with --away."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
     output.set_maxlabel(13);
     output.set_maxdata(options::maxcol() - output.maxlabel());
     output.set_quiet(options::quiet(), " ");

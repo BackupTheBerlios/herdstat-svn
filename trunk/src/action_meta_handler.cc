@@ -273,6 +273,13 @@ action_meta_handler_T::operator() (opts_type &opts)
     /* we dont care about these */
     options::set_count(false);
 
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with --away."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
     if (options::all())
     {
         std::cerr << "Metadata action handler does not support the 'all' target."

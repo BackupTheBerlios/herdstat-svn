@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <iostream>
+
 #include "common.hh"
 #include "action_fetch_handler.hh"
 
@@ -34,6 +36,13 @@ action_fetch_handler_T::~action_fetch_handler_T()
 int
 action_fetch_handler_T::operator() (opts_type &null)
 {
+    if (not options::fields().empty())
+    {
+        std::cerr << "--field doesn't really make much sense with --fetch."
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
     try
     {
         if (not options::quiet())
