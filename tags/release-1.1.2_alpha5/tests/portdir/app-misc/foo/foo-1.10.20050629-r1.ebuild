@@ -1,0 +1,5 @@
+HOMEPAGE="http://www.${PN}.org"
+FOO="lala"
+LALA="${FOO} ${LALA} ${LALA} ${NON_EXISTENT}"
+LALA="${LALA}"
+LALA="$(echo ${LALA} | sed -n -e 's/foo/bar/')-$(echo ${LALA} | sort -u)"
