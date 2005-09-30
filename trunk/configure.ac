@@ -178,7 +178,7 @@ if test "$WITH_CURL" != "yes" -o -z "$CURL_LIBS" ; then
     if test x$_WGET = "x"; then
 	AC_MSG_ERROR([wget is required])
     fi
-    AC_DEFINE(WGET, "$_WGET", [wget location])
+    AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
     AC_DEFINE(FETCH_METHOD_WGET, 1, [Use wget for fetching])
 fi
 
