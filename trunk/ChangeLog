@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-09-30 Aaron Walker <ka0ttic@gentoo.org>
+
+	* configure.ac: Updated version (1.1.2_alpha5).
+	* src/action_away_handler.cc, src/action_herd_handler.cc,
+	src/action_fetch_handler.cc, src/action_pkg_handler.cc,
+	src/action_stats_handler.cc, src/action_meta_handler.cc: Bail if
+	--field is specified on action handlers that dont support it.
+
 2005-09-28 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Add libcurl checks.
