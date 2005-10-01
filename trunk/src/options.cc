@@ -69,7 +69,7 @@ std::string options::_metacache_expire("lastsync");
 std::string options::_highlights;
 std::string options::_locale(std::locale::classic().name());
 
-std::vector<std::string> options::_fields;
+fields_type options::_fields;
 
 options_action_T options::_action = action_unspecified;
 

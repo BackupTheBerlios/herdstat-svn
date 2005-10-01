@@ -164,6 +164,49 @@ action_dev_handler_T::display(const std::string &d)
     }
 }
 
+template <typename InputIterator, typename OutputIterator>
+void
+transform_fields_into_matches(InputIterator first, InputIterator last,
+        OutputIterator result, const fields_type& fields)
+{
+    Regex queryre;
+    const int cflags(options::eregex() ?
+            Regex::extended|Regex::icase : Regex::icase);
+
+    for (; first != last ; ++first)
+    {
+        fields_type::const_iterator f;
+        for (f = fields.begin() ; f != fields.end() ; ++f)
+        {
+            queryre.assign(f->second, cflags);
+
+            /* FIXME: find a way to factor out the BREAK_IF_NO_MATCH stuff */
+
+#define BREAK_IF_NO_MATCH(x) \
+            if (f->first == #x) { \
+                if (queryre != first->x()) \
+                    break; \
+            }
+
+            BREAK_IF_NO_MATCH(name)
+            else BREAK_IF_NO_MATCH(user)
+            else BREAK_IF_NO_MATCH(location)
+            else BREAK_IF_NO_MATCH(status)
+            else BREAK_IF_NO_MATCH(birthday)
+            else BREAK_IF_NO_MATCH(joined)
+            else
+                throw InvalidField(f->first);
+
+#undef BREAK_IF_NO_MATCH
+
+            /* we're on the last field, meaning all previous ones matched
+             * as well, so save it finally */
+            if ((f+1) == fields.end())
+                *result++ = first->user();
+        }
+    }
+}
+
 /*
  * Given a list of developers, display all herds that
  * each developer belongs to.
@@ -244,64 +287,26 @@ action_dev_handler_T::operator() (opts_type &opts)
         std::sort(opts.begin(), opts.end());
         opts.erase(std::unique(opts.begin(), opts.end()), opts.end());
     }
-
-    /* --field=X */
-    const std::vector<std::string>& fields(options::fields());
-
-    if (not fields.empty() and userinfo.empty())
+    else if (not options::fields().empty())
     {
-        std::cerr << "--field only makes sense when used with userinfo.xml." << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    if (not fields.empty())
-    {
-        const Developers& devs(userinfo.devs());
-        Developers::const_iterator d;
-        for (d = devs.begin() ; d != devs.end() ; ++d)
+        if (userinfo.empty())
         {
-            bool matches = false;
+            std::cerr << "--field only makes sense when used with userinfo.xml."
+                << std::endl;
+            return EXIT_FAILURE;
+        }
 
-            std::vector<std::string>::const_iterator f;
-            for (f = fields.begin() ; f != fields.end() ; ++f)
-            {
-                std::vector<std::string> parts(util::split(*f, ','));
-                if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
-                {
-                    std::cerr << "Format for --field is \"--field=field,criteria\"." << std::endl
-                              << "For example: --field=status,active" << std::endl;
-                    return EXIT_FAILURE;
-                }
-
-                const Regex queryre(parts[1], options::eregex() ?
-                        Regex::extended|Regex::icase : Regex::icase);
-
-#define IF_MATCHES(x) if (parts[0] == #x) { matches = (queryre == d->x()); }
-
-                IF_MATCHES(name)
-                else IF_MATCHES(user)
-                else IF_MATCHES(location)
-                else IF_MATCHES(status)
-                else IF_MATCHES(birthday)
-                else IF_MATCHES(joined)
-                else
-                {
-                    std::cerr << "Unrecognized field '" << parts[0] << "'." << std::endl;
-                    return EXIT_FAILURE;
-                }
-
-#undef IF_MATCHES
-
-                /* no point going to the next iteration
-                 * if this one doesnt match */
-                if (not matches)
-                    break;
-
-                /* we're on the last field, meaning all previous ones matched
-                 * as well, so save it finally */
-                if ((f+1) == fields.end())
-                    opts.push_back(d->user());
-            }
+        try
+        {
+            transform_fields_into_matches(userinfo.devs().begin(),
+                userinfo.devs().end(), std::back_inserter(opts), options::fields());
+        }
+        catch (const InvalidField& e)
+        {
+            std::cerr << "Unrecognized field '" << e.what() << "'." << std::endl
+                << "Possibles are: name,user,location,status,birthday,joined."
+                << std::endl;
+            return EXIT_FAILURE;
         }
 
         size = opts.size();

@@ -46,6 +46,8 @@ enum options_action_T
     action_fetch
 };
 
+typedef std::vector<std::pair<std::string, std::string> > fields_type;
+
 class options
 {
     public:
@@ -124,8 +126,8 @@ class options
         static const std::string& locale() { return _locale; }
         static void set_locale(const std::string& v) { _locale.assign(v); }
 
-        static const std::vector<std::string>& fields() { return _fields; }
-        static void add_field(const std::string& v) { _fields.push_back(v); }
+        static const fields_type& fields() { return _fields; }
+        static void add_field(const fields_type::value_type v) { _fields.push_back(v); }
 
         static options_action_T action() { return _action; }
         static void set_action(options_action_T v) { _action = v; }
@@ -174,7 +176,7 @@ class options
         static std::string _highlights;
         static std::string _locale;
 
-        static std::vector<std::string> _fields;
+        static fields_type _fields;
 
         static options_action_T _action;
 

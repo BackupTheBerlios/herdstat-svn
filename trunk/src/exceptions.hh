@@ -36,6 +36,16 @@ class argsOneActionOnly : public argsUsage { };
 class argsHelp          : public argsException { };
 class argsVersion       : public argsException { };
 class argsUnimplemented : public argsException { };
+class argsInvalidField  : public argsException { };
+
+class InvalidField : public Exception
+{
+    public:
+        InvalidField() { }
+        InvalidField(const char *msg) : Exception(msg) { }
+        InvalidField(const std::string& msg) : Exception(msg) { }
+        virtual ~InvalidField() throw() { }
+};
 
 class BadOption : public Exception
 {

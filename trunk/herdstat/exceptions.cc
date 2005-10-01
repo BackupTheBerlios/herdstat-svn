@@ -79,8 +79,17 @@ Exception::operator= (const Exception& that)
         std::free(_buf);
         _buf = NULL;
     }
+
     if (that._buf)
         _buf = strdup(that._buf);
+
+#if defined(va_copy)
+    va_copy(_v, that._v);
+#elif defined(__va_copy)
+    __va_copy(_v, that._v);
+#else
+    std::memcpy(_v, that._v, sizeof(va_list));
+#endif
 
     return *this;
 }

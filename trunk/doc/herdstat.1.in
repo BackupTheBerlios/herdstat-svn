@@ -117,6 +117,12 @@ herds.xml and exit.
 Complain loudly if a QA-related problem occurs (rather than just ignoring it).
 For example, if --qa is specified and a category is listed in ${PORTDIR}/profiles/categories
 that does not exist, @PACKAGE@ will fail with an error message.
+.TP
+.B "\-X, \-\-field \fI<field,criteria>\fR"
+Search by the given field rather than the default.  For example, with --dev the default
+field is the developer's user name.  Using --field, it is possible to search by other means.
+\-\-field=status,retired shows retired developers.  The second arg, \fIcriteria\fR is interpreted
+as a regular expression (or an extended regular expression if \-E is specified).
 .SH "NON-OPTION ARGUMENTS"
 Unless you specify --version or --help, at least one non-option argument is
 required.  The non-option arguments depend on the action:

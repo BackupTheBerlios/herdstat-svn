@@ -111,8 +111,17 @@ static struct option long_opts[] =
 static void
 version()
 {
-    std::cout << PACKAGE << "-" << VERSION << std::endl;
-    std::cout << "Built: " << __DATE__ << " " << __TIME__ << std::endl;
+    std::cout << PACKAGE << "-" << VERSION
+	<< " (built: " << __DATE__ << " " << __TIME__ << ")" << std::endl;
+    std::cout << "Options:";
+#ifdef FETCH_METHOD_CURL
+    std::cout << " +curl";
+#endif
+#ifdef HAVE_NCURSES
+    std::cout << " +ncurses";
+#endif
+
+    std::cout << std::endl;
 }
 
 static void
@@ -141,7 +150,7 @@ help()
 	<< " -w, --which             Look up full path to ebuild for specified packages." << std::endl
 	<< " -f, --find              Look up category/package for the specified packages." << std::endl
 	<< " -a, --away              Look up away information for the specified developers." << std::endl
-	<< "     --field field,criteria" << std::endl
+	<< "     --field <field,criteria>" << std::endl
 	<< "                         Search by field (for use with --dev).  Possible fields" << std::endl
 	<< "                         are user,name,birthday,joined,status,location." << std::endl
 	<< "     --versions          Look up versions of specified packages." << std::endl
@@ -245,9 +254,25 @@ help()
 	<< "your herds.xml." << std::endl;
 }
 
+static void
+parse_fields(const std::vector<std::string>& fields)
+{
+    /* --field */
+    std::vector<std::string>::const_iterator i;
+    for (i = fields.begin() ; i != fields.end() ; ++i)
+    {
+	std::vector<std::string> parts(util::split(*i, ','));
+	if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
+	    throw argsInvalidField();
+
+	options::add_field(fields_type::value_type(parts[0], parts[1]));
+    }
+}
+
 static int
 handle_opts(int argc, char **argv, opts_type *args)
 {
+    std::vector<std::string> fields;
     int key, opt_index = 0;
 
     while (true)
@@ -339,7 +364,7 @@ handle_opts(int argc, char **argv, opts_type *args)
 		break;
 	    /* --field */
 	    case 'X':
-		options::add_field(optarg);
+		fields.push_back(optarg);
 		break;
 	    /* --no-overlay */
 	    case 'N':
@@ -454,6 +479,9 @@ handle_opts(int argc, char **argv, opts_type *args)
 	}
     }
 
+    /* --field */
+    parse_fields(fields);
+
     if (optind < argc)
     {
 	while (optind < argc)
@@ -463,11 +491,14 @@ handle_opts(int argc, char **argv, opts_type *args)
     {
 	/* actions that are allowed to have 0 non-option args */
 	options_action_T action = options::action();
+	if (action == action_dev and fields.empty())
+	    throw argsUsage();
+
 	if (action != action_unspecified and
 	    action != action_meta and
+	    action != action_dev and
 	    action != action_versions and
-	    action != action_fetch and
-	    action != action_dev)
+	    action != action_fetch)
 	    throw argsUsage();
     }
 
@@ -518,6 +549,13 @@ main(int argc, char **argv)
 	/* initialize XML stuff */
 	xml::Init init(options::qa());
 
+	if (not options::fields().empty() and not nonopt_args.empty())
+	{
+	    std::cerr << "--field doesn't make much sense when specified" << std::endl
+		      << "with an additional non-optional argument." << std::endl;
+	    return EXIT_FAILURE;
+	}
+
 	if (options::regex() and nonopt_args.size() > 1)
 	{
 	    std::cerr << "You may only specify one regular expression."
@@ -528,10 +566,8 @@ main(int argc, char **argv)
 	/* remove duplicates; also has the nice side advantage
 	 * of sorting the output */
 	std::sort(nonopt_args.begin(), nonopt_args.end());
-	opts_type::iterator pos =
-	    std::unique(nonopt_args.begin(), nonopt_args.end());
-	if (pos != nonopt_args.end())
-	    nonopt_args.erase(pos);
+	nonopt_args.erase(std::unique(nonopt_args.begin(),
+		nonopt_args.end()), nonopt_args.end());
 
 	/* did the user specify the all target? */
 	if (not options::regex() and
@@ -680,6 +716,12 @@ main(int argc, char **argv)
     {
 	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
+    }
+    catch (const argsInvalidField)
+    {
+        std::cerr << "Format for --field is \"--field=field,criteria\"." << std::endl
+            << "For example: --field=status,active" << std::endl;
+        return EXIT_FAILURE;
     }
     catch (const argsHelp)
     {

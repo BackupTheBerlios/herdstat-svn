@@ -37,6 +37,7 @@
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
 
+namespace util {
 /*****************************************************************************
  * Clean up the whitespace of the given string.                              *
  *****************************************************************************/
@@ -47,7 +48,7 @@ struct BothSpaces
 };
 
 std::string
-util::tidy_whitespace(const std::string &s)
+tidy_whitespace(const std::string &s)
 {
     if (s.empty())
 	return s;
@@ -74,7 +75,7 @@ util::tidy_whitespace(const std::string &s)
 }
 /*****************************************************************************/
 std::string
-util::sprintf(const char *fmt, ...)
+sprintf(const char *fmt, ...)
 {
     va_list v;
     va_start(v, fmt);
@@ -84,7 +85,7 @@ util::sprintf(const char *fmt, ...)
 }
 /*****************************************************************************/
 std::string
-util::sprintf(const char *fmt, va_list v)
+sprintf(const char *fmt, va_list v)
 {
     char *buf;
     vasprintf(&buf, fmt, v);
@@ -96,7 +97,7 @@ util::sprintf(const char *fmt, va_list v)
  * HTMLify the given std::string (replace any occurrences of &,>,<)               *
  *****************************************************************************/
 std::string
-util::htmlify(const std::string &str)
+htmlify(const std::string &str)
 {
     std::string result(str);
     std::map<std::string, std::string> sr;
@@ -129,7 +130,7 @@ util::htmlify(const std::string &str)
  * unHTMLify the given std::string (replace occurrences of &amp;,&gt;,&;lt;       *
  *****************************************************************************/
 std::string
-util::unhtmlify(const std::string &str)
+unhtmlify(const std::string &str)
 {
     std::string result(str);
     std::map<std::string, std::string> sr;
@@ -161,7 +162,7 @@ util::unhtmlify(const std::string &str)
  * Convert a vector of std::string to one std::string.                                 *
  *****************************************************************************/
 std::string
-util::join(const std::vector<std::string> &v,
+join(const std::vector<std::string> &v,
            const std::string::value_type delim)
 {
     std::string result;
@@ -178,8 +179,7 @@ util::join(const std::vector<std::string> &v,
 }
 /*****************************************************************************/
 std::vector<std::string>
-util::split(const std::string& str, const std::string::value_type delim,
-            bool append_empty)
+split(const std::string& str, const char delim, bool append_empty)
 {
     std::vector<std::string> v;
     std::string::size_type pos, lpos = 0;
@@ -203,4 +203,6 @@ util::split(const std::string& str, const std::string::value_type delim,
     return v;
 }
 /*****************************************************************************/
+} // namespace util
+
 /* vim: set tw=80 sw=4 et : */

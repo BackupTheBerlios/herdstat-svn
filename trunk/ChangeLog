@@ -1,5 +1,21 @@
 ChangeLog for herdstat
 
+2005-10-01 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/exceptions.cc: Copy Exceptions's va_list with memset if
+	va_copy or __va_copy is not defined.
+	* bashcomp, doc/herdstat.1.in: Added --field.
+	* src/exceptions.hh: Add argsInvalidField exception for use when an
+	invalid --field format is specified.
+	* src/action_dev_handler.cc, src/herdstat.cc, src/options.cc,
+	src/options.hh: Parse --fields args when we parse options, not in any
+	action handler that may use them.  This means the fields vector is now
+	a vector of pair<string,string>'s ready for use by handlers.
+	* src/action_dev_handler.cc: Factor out --fields logic into a separate
+	function, transform_fields_into_matches().  It still needs some work
+	as it's not possible to use this function outside of the dev handler
+	context yet.
+
 2005-09-30 Aaron Walker <ka0ttic@gentoo.org>
 
 	* configure.ac: Updated version (1.1.2_alpha5).
