@@ -30,6 +30,7 @@
 #include <herdstat/util/algorithm.hh>
 
 #include "exceptions.hh"
+#include "fields.hh"
 #include "action_herd_handler.hh"   /* for display_herd() */
 #include "action_dev_handler.hh"
 
@@ -164,49 +165,6 @@ action_dev_handler_T::display(const std::string &d)
     }
 }
 
-/* pointer to Developer const mem. function that returns a const std::string& */
-typedef const std::string& (Developer::*developer_mfp)(void) const;
-
-/* for mapping strings to Developer member functions */
-typedef std::map<std::string, developer_mfp> dfmap;
-
-template <typename OutputIterator>
-void
-transform_fields_into_matches(Developers::const_iterator first,
-        Developers::const_iterator last, OutputIterator result,
-        const fields_type& fields, const dfmap& fm)
-{
-    Regex queryre;
-    const int cflags(options::eregex() ?
-            Regex::extended|Regex::icase : Regex::icase);
-
-    for (; first != last ; ++first)
-    {
-        fields_type::const_iterator f;
-        for (f = fields.begin() ; f != fields.end() ; ++f)
-        {
-            /* check if field is valid */
-            dfmap::const_iterator i = fm.find(f->first);
-            if (i == fm.end())
-                throw InvalidField(f->first);
-
-            /* it's valid, so compile regex */
-            queryre.assign(f->second, cflags);
-
-            /* compare criteria against the return value of the
-             * Developer member function mapped to this field. */
-            const Developer& dev(*first);
-            if (queryre != (dev.*(i->second))())
-                break;
-
-            /* we're on the last field, meaning all fields that came before
-             * it also matched, so save it finally. */
-            if ((f+1) == fields.end())
-                *result++ = first->user();
-        }
-    }
-}
-
 /*
  * Given a list of developers, display all herds that
  * each developer belongs to.
@@ -298,7 +256,8 @@ action_dev_handler_T::operator() (opts_type &opts)
 
         try
         {
-            dfmap fm;
+            typedef const std::string& (Developer::*mfp)(void) const;
+            std::map<std::string, mfp> fm;
 
             /* insert valid --field values and their
              * corresponding comparison function */
@@ -314,7 +273,8 @@ action_dev_handler_T::operator() (opts_type &opts)
              * vector if the specified criteria for
              * each --field is met. */
             transform_fields_into_matches(userinfo.devs().begin(),
-                userinfo.devs().end(), std::back_inserter(opts), options::fields(), fm);
+                userinfo.devs().end(), std::back_inserter(opts),
+                options::fields(), fm, User());
         }
         catch (const InvalidField& e)
         {

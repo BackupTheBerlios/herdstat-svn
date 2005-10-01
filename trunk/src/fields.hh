@@ -32,22 +32,32 @@
 
 #include <herdstat/util/regex.hh>
 #include "options.hh"
+#include "exceptions.hh"
 
-template <typename Container,
+/**
+ * transform_fields_into_matches
+ * for each object in the range [first,last), iterate over fields vector
+ * comparing the criteria to the member function pointer mapped to the 
+ * respective field.  Objects in the aforementioned range that match all
+ * fields get written into OutputIterator.
+ */
+
+template <typename InputIterator,
           typename OutputIterator,
           typename UnaryOp>
 void
 transform_fields_into_matches(
-        typename Container::const_iterator first,
-        typename Container::const_iterator last,
+        InputIterator first,
+        InputIterator last,
         OutputIterator result,
         const fields_type& fields,
         const std::map<std::string,
-            const std::string& (Container::value_type::*)(void) const > & fm,
+            const std::string& (std::iterator_traits<InputIterator>::value_type::*)(void) const > & fm,
         UnaryOp op)
 {
-    typedef const std::string& (Container::value_type::*mfp)(void) const;
-
+    typedef std::map<std::string, const std::string&
+        (std::iterator_traits<InputIterator>::value_type::*)(void) const> fmap;
+    
     util::Regex criteria;
     const int cflags(options::eregex() ?
         util::Regex::extended|util::Regex::icase : util::Regex::icase);
@@ -58,7 +68,7 @@ transform_fields_into_matches(
         for (f = fields.begin() ; f != fields.end() ; ++f)
         {
             /* check if field is valid */
-            std::map<std::string, mfp>::const_iterator i = fm.find(f->first);
+            typename fmap::const_iterator i = fm.find(f->first);
             if (i == fm.end())
                 throw InvalidField(f->first);
 
@@ -66,9 +76,8 @@ transform_fields_into_matches(
             criteria.assign(f->second, cflags);
 
             /* compare criteria against the return value of the
-             * Container::value_type member function mapped to
-             * this field. */
-            const typename Container::value_type& v(*first);
+             * value_type member function mapped to this field. */
+            typename std::iterator_traits<InputIterator>::value_type v(*first);
             if (criteria != (v.*(i->second))())
                 break;
 
