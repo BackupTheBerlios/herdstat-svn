@@ -164,10 +164,17 @@ action_dev_handler_T::display(const std::string &d)
     }
 }
 
-template <typename InputIterator, typename OutputIterator>
+/* pointer to Developer const mem. function that returns a const std::string& */
+typedef const std::string& (Developer::*developer_mfp)(void) const;
+
+/* for mapping strings to Developer member functions */
+typedef std::map<std::string, developer_mfp> dfmap;
+
+template <typename OutputIterator>
 void
-transform_fields_into_matches(InputIterator first, InputIterator last,
-        OutputIterator result, const fields_type& fields)
+transform_fields_into_matches(Developers::const_iterator first,
+        Developers::const_iterator last, OutputIterator result,
+        const fields_type& fields, const dfmap& fm)
 {
     Regex queryre;
     const int cflags(options::eregex() ?
@@ -178,29 +185,22 @@ transform_fields_into_matches(InputIterator first, InputIterator last,
         fields_type::const_iterator f;
         for (f = fields.begin() ; f != fields.end() ; ++f)
         {
-            queryre.assign(f->second, cflags);
-
-            /* FIXME: find a way to factor out the BREAK_IF_NO_MATCH stuff */
-
-#define BREAK_IF_NO_MATCH(x) \
-            if (f->first == #x) { \
-                if (queryre != first->x()) \
-                    break; \
-            }
-
-            BREAK_IF_NO_MATCH(name)
-            else BREAK_IF_NO_MATCH(user)
-            else BREAK_IF_NO_MATCH(location)
-            else BREAK_IF_NO_MATCH(status)
-            else BREAK_IF_NO_MATCH(birthday)
-            else BREAK_IF_NO_MATCH(joined)
-            else
+            /* check if field is valid */
+            dfmap::const_iterator i = fm.find(f->first);
+            if (i == fm.end())
                 throw InvalidField(f->first);
 
-#undef BREAK_IF_NO_MATCH
+            /* it's valid, so compile regex */
+            queryre.assign(f->second, cflags);
 
-            /* we're on the last field, meaning all previous ones matched
-             * as well, so save it finally */
+            /* compare criteria against the return value of the
+             * Developer member function mapped to this field. */
+            const Developer& dev(*first);
+            if (queryre != (dev.*(i->second))())
+                break;
+
+            /* we're on the last field, meaning all fields that came before
+             * it also matched, so save it finally. */
             if ((f+1) == fields.end())
                 *result++ = first->user();
         }
@@ -298,8 +298,23 @@ action_dev_handler_T::operator() (opts_type &opts)
 
         try
         {
+            dfmap fm;
+
+            /* insert valid --field values and their
+             * corresponding comparison function */
+            fm.insert(std::make_pair("user",        &Developer::user));
+            fm.insert(std::make_pair("name",        &Developer::name));
+            fm.insert(std::make_pair("location",    &Developer::location));
+            fm.insert(std::make_pair("status",      &Developer::status));
+            fm.insert(std::make_pair("joined",      &Developer::joined));
+            fm.insert(std::make_pair("birthday",    &Developer::birthday));
+
+            /* for each user in userinfo.xml, insert
+             * the developer's username into the opts
+             * vector if the specified criteria for
+             * each --field is met. */
             transform_fields_into_matches(userinfo.devs().begin(),
-                userinfo.devs().end(), std::back_inserter(opts), options::fields());
+                userinfo.devs().end(), std::back_inserter(opts), options::fields(), fm);
         }
         catch (const InvalidField& e)
         {

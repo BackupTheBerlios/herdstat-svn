@@ -12,9 +12,10 @@ ChangeLog for herdstat
 	action handler that may use them.  This means the fields vector is now
 	a vector of pair<string,string>'s ready for use by handlers.
 	* src/action_dev_handler.cc: Factor out --fields logic into a separate
-	function, transform_fields_into_matches().  It still needs some work
-	as it's not possible to use this function outside of the dev handler
-	context yet.
+	function, transform_fields_into_matches().  Instead of the nasty
+	preprocessor stuff, we now use a map to map strings to Developer
+	member functions (via member function pointers).  Much cleaner
+	implementation.
 
 2005-09-30 Aaron Walker <ka0ttic@gentoo.org>
 
