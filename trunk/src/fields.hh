@@ -46,7 +46,7 @@ transform_fields_into_matches(
             const std::string& (Container::value_type::*)(void) const > & fm,
         UnaryOp op)
 {
-    typedef const std::string& (Container::*mfp)(void) const;
+    typedef const std::string& (Container::value_type::*mfp)(void) const;
 
     util::Regex criteria;
     const int cflags(options::eregex() ?
