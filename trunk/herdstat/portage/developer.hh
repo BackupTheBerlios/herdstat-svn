@@ -336,7 +336,7 @@ namespace portage {
     inline Developers::iterator Developers::find(const util::Regex& regex) const
     {
         return std::find_if(_devs.begin(), _devs.end(), std::bind1st(
-            UserRegexMatch<Developer>(), &regex));
+            UserRegexMatch<Developer>(), regex));
     }
 
     inline Developers::value_type&

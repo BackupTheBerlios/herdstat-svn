@@ -275,7 +275,7 @@ namespace portage {
     
     inline Herds::iterator Herds::find(const util::Regex& regex) const
     { return std::find_if(_herds.begin(), _herds.end(), std::bind1st(
-            NameRegexMatch<Herd>(), &regex)); }
+            NameRegexMatch<Herd>(), regex)); }
 
     inline Herds::value_type&
     Herds::front()

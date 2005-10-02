@@ -333,19 +333,16 @@ action_meta_handler_T::operator() (opts_type &opts)
     }
     else if (options::regex())
     {
-        const std::string re(opts.front());
+        regexp.assign(opts.front());
         opts.clear();
-
-        regexp.assign(re, options::eregex() ?
-            Regex::extended|Regex::icase : Regex::icase);
 
         matches = portage::find_package_regex(regexp, options::overlay(),
                     &search_timer);
 
         if (matches.empty())
         {
-            std::cerr << "Failed to find any packages matching '" << re << "'."
-                << std::endl;
+            std::cerr << "Failed to find any packages matching '"
+                << regexp() << "'." << std::endl;
             return EXIT_FAILURE;
         }
     }

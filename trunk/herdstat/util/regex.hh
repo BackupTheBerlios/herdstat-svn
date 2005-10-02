@@ -57,8 +57,17 @@ namespace util
             /// Default constructor.
             Regex();
 
+            /// Copy constructor.
+            Regex(const Regex& that);
+
             /** Constructor.
-             * @param r regular expression std::string.
+             * @param c CFLAGS.
+             * @param e EFLAGS.
+             */
+            Regex(int c, int e = 0);
+
+            /** Constructor.
+             * @param r regular expression string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
@@ -68,26 +77,34 @@ namespace util
             ~Regex();
 
             /** Assign a new regular expression.
-             * @param r regular expression std::string.
+             * @param r regular expression string.
+             */
+            void assign(const std::string& r);
+
+            /** Assign a new regular expression.
+             * @param r regular expression string.
              * @param c CFLAGS.
              * @param e EFLAGS.
              */
-            void assign(const std::string& r , int c = 0, int e = 0);
+            void assign(const std::string& r , int c, int e = 0);
 
             /** Assign a new regular expression (no CFLAGS/EFLAGS).
-             * @param s regular expression std::string.
+             * @param s regular expression string.
              * @returns a Regex object.
              */
-            inline Regex &operator= (const std::string& s);
+            inline Regex& operator= (const std::string& s);
+
+            /// Copy assignment operator.
+            Regex& operator= (const Regex& that);
 
             /** Determine if this regex matches the specified std::string.
-             * @param cmp Comparison std::string.
+             * @param cmp Comparison string.
              * @returns   A boolean value.
              */
             inline bool operator== (const std::string& cmp) const;
 
             /** Determine if this regex does not match the specified std::string.
-             * @param cmp Comparison std::string.
+             * @param cmp Comparison string.
              * @returns   A boolean value.
              */
             inline bool operator!= (const std::string& cmp) const;
@@ -101,6 +118,16 @@ namespace util
              * @returns A boolean value.
              */
             inline bool empty() const;
+
+            /// Get CFLAGS.
+            inline int get_cflags() const;
+            /// Set CFLAGS.
+            inline void set_cflags(int cflags);
+
+            /// Get EFLAGS.
+            inline int get_eflags() const;
+            /// Set EFLAGS.
+            inline void set_eflags(int eflags);
 
         private:
             /// Clean up compiled regex_t
@@ -146,14 +173,38 @@ namespace util
         return _str.empty();
     }
 
+    inline int
+    Regex::get_cflags() const
+    {
+        return _cflags;
+    }
+
+    inline void
+    Regex::set_cflags(int cflags)
+    {
+        _cflags = cflags;
+    }
+
+    inline int
+    Regex::get_eflags() const
+    {
+        return _eflags;
+    }
+
+    inline void
+    Regex::set_eflags(int eflags)
+    {
+        _eflags = eflags;
+    }
+
     /**
      * Functor for using Regex with standard algorithms.
      */
 
-    struct regexMatch : std::binary_function<const Regex *, std::string, bool>
+    struct regexMatch : std::binary_function<Regex, std::string, bool>
     {
-        bool operator() (const Regex *re, const std::string& s) const
-        { return (*re == s); }
+        bool operator() (const Regex &re, const std::string& s) const
+        { return (re == s); }
     };
 }
 

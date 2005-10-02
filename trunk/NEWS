@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.2_alpha6:
+    *Much* improved --field implementation.  All of the --dev specific code has
+    been factored out, meaning we should be able to use it for pretty much any
+    container in any action handler.
+
 1.1.2_alpha5:
     New features:
      - libcurl support - cleaner fetching implementation

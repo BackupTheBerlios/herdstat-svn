@@ -101,19 +101,17 @@ action_away_handler_T::operator()(opts_type& opts)
     
     if (options::regex())
     {
-        const std::string re(opts.front());
+        regexp.assign(opts.front());
         opts.clear();
-        regexp.assign(re, options::eregex() ?
-            Regex::extended|Regex::icase : Regex::icase);
 
         /* insert developer user names that match the regex into opts */
         transform_if(devs.begin(), devs.end(), std::back_inserter(opts),
-            std::bind1st(UserRegexMatch<Developer>(), &regexp), User());
+            std::bind1st(UserRegexMatch<Developer>(), regexp), User());
 
         if (opts.empty())
         {
             std::cerr << "Failed to find any developers matching '"
-                << re << "'." << std::endl;
+                << regexp() << "'." << std::endl;
             return EXIT_FAILURE;
         }
 

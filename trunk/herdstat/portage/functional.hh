@@ -37,32 +37,42 @@
 
 namespace portage {
 
+    /**
+     * Returns T::name().
+     */
     struct Name
     {
         template <typename T>
-        const std::string& operator()(const T& t) const { return t.name(); }
+        const std::string& operator()(const T& v) const { return v.name(); }
     };
 
+    /**
+     * Returns T::user().
+     */
     struct User
     {
         template <typename T>
-        const std::string& operator()(const T& t) const { return t.user(); }
+        const std::string& operator()(const T& v) const { return v.user(); }
     };
 
+    /**
+     * Compares regex against T::user().
+     */
     template <typename T>
-    struct UserRegexMatch
-        : std::binary_function<const util::Regex *, T, bool>
+    struct UserRegexMatch : std::binary_function<util::Regex, T, bool>
     {
-        bool operator()(const util::Regex *re, const T &t) const
-        { return (*re == t.user()); }
+        bool operator()(const util::Regex &re, const T& v) const
+        { return (re == v.user()); }
     };
 
+    /**
+     * Compares regex against T::name().
+     */
     template <typename T>
-    struct NameRegexMatch
-        : std::binary_function<const util::Regex *, T, bool>
+    struct NameRegexMatch : std::binary_function<util::Regex, T, bool>
     {
-        bool operator()(const util::Regex *re, const T& t) const
-        { return (*re == t.name()); }
+        bool operator()(const util::Regex &re, const T& v) const
+        { return (re == v.name()); }
     };
 
 } // namespace portage

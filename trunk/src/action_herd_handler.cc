@@ -161,12 +161,11 @@ action_herd_handler_T::operator() (opts_type &opts)
     }
     else if (options::regex())
     {
-        regexp.assign(opts.front(), options::eregex() ?
-                Regex::extended|Regex::icase : Regex::icase);
+        regexp.assign(opts.front());
         opts.clear();
 
         util::transform_if(herds.begin(), herds.end(), std::back_inserter(opts),
-            std::bind1st(NameRegexMatch<Herd>(), &regexp), Name());
+            std::bind1st(NameRegexMatch<Herd>(), regexp), Name());
     }
 
     /* for each specified herd... */

@@ -49,6 +49,17 @@ Regex::Regex()
 {
 }
 /*****************************************************************************/
+Regex::Regex(const Regex& that)
+    : _str(), _compiled(false), _cflags(0), _eflags(0), _regex()
+{
+    *this = that;
+}
+/*****************************************************************************/
+Regex::Regex(int c, int e)
+    : _str(), _compiled(false), _cflags(c), _eflags(e), _regex()
+{
+}
+/*****************************************************************************/
 Regex::Regex(const std::string &regex, int c, int e)
     : _str(regex), _compiled(false), _cflags(c), _eflags(e), _regex()
 {
@@ -61,13 +72,33 @@ Regex::~Regex()
         this->cleanup();
 }
 /*****************************************************************************/
+Regex&
+Regex::operator= (const Regex& that)
+{
+    /* compiler-generated copy constructor/assignment operator won't do
+     * since we need to free the old regex_t and compile the new one */
+
+    this->assign(that._str, that._cflags, that._eflags);
+    return *this;
+}
+/*****************************************************************************/
+void
+Regex::assign(const std::string& regex)
+{
+    if (this->_compiled)
+        this->cleanup();
+
+    this->_str.assign(regex);
+    this->compile();
+}
+/*****************************************************************************/
 void
 Regex::assign(const std::string &regex, int c, int e)
 {
     if (this->_compiled)
         this->cleanup();
 
-    this->_str    = regex;
+    this->_str.assign(regex);
     this->_cflags = c;
     this->_eflags = e;
 
@@ -92,7 +123,6 @@ Regex::cleanup()
 {
     regfree(&(this->_regex));
     this->_compiled = false;
-    this->_eflags = this->_cflags = 0;
     this->_str.clear();
 }
 /*****************************************************************************/

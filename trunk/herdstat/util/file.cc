@@ -288,24 +288,24 @@ dir_T::find(const std::string &base) const
 }
 /*****************************************************************************/
 dir_T::iterator
-dir_T::find(const Regex &regex)
+dir_T::find(const Regex& regex)
 {
     return std::find_if(this->begin(), this->end(),
-        std::bind1st(regexMatch(), &regex));
+        std::bind1st(regexMatch(), regex));
 }
 
 /*****************************************************************************/
 dir_T::const_iterator
-dir_T::find(const Regex &regex) const
+dir_T::find(const Regex& regex) const
 {
     return std::find_if(this->begin(), this->end(),
-        std::bind1st(regexMatch(), &regex));
+        std::bind1st(regexMatch(), regex));
 }
 /*****************************************************************************
  * general purpose file-related functions                                    *
  *****************************************************************************/
 std::string
-basename(const std::string &path)
+basename(const std::string& path)
 {
     std::string result(path);
     std::string::size_type pos;
@@ -321,7 +321,7 @@ basename(const std::string &path)
 }
 /*****************************************************************************/
 std::string
-dirname(const std::string &path)
+dirname(const std::string& path)
 {
     std::string result(path);
     std::string::size_type pos;
@@ -339,7 +339,7 @@ dirname(const std::string &path)
 }
 /*****************************************************************************/
 const char *
-chop_fileext(const std::string &path, unsigned short depth)
+chop_fileext(const std::string& path, unsigned short depth)
 {
     std::string result(path);
 
@@ -354,7 +354,7 @@ chop_fileext(const std::string &path, unsigned short depth)
 }
 /*****************************************************************************/
 void
-copy_file(const std::string &from, const std::string &to)
+copy_file(const std::string& from, const std::string& to)
 {
     /* remove to if it exists */
     if (is_file(to) and (unlink(to.c_str()) != 0))
@@ -375,7 +375,7 @@ copy_file(const std::string &from, const std::string &to)
 }
 /*****************************************************************************/
 void
-move_file(const std::string &from, const std::string &to)
+move_file(const std::string& from, const std::string& to)
 {
     copy_file(from, to);
     if (unlink(from.c_str()) != 0)

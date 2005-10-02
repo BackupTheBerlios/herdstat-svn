@@ -135,8 +135,7 @@ void
 action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
 {
     if (options::regex())
-        regexp.assign(q.query, options::eregex() ?
-            Regex::extended|Regex::icase : Regex::icase);
+        regexp.assign(q.query);
 
     /* for each package in the vector */
     for (opts_type::const_iterator i = pkgs.begin() ; i != pkgs.end() ; ++i)
@@ -175,9 +174,7 @@ action_pkg_handler_T::search(const opts_type &opts)
         for (opts_type::const_iterator i = opts.begin() ; i != opts.end() ; ++i)
         {
             if (options::regex())
-                regexp.assign(*i, options::eregex() ?
-                    Regex::extended|Regex::icase :
-                    Regex::icase);
+                regexp.assign(*i);
 
             /* does it match the criteria? */
             if (metadata_matches(*m, *i))

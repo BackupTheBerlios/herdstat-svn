@@ -45,19 +45,19 @@ action_find_handler_T::~action_find_handler_T()
 int
 action_find_handler_T::operator() (opts_type &opts)
 {
-    opts_type results;
-    pkgcache_T pkgcache(options::portdir());
-
     if (options::all())
     {
         std::cerr << "find handler does not support the 'all' target."
             << std::endl;
         return EXIT_FAILURE;
     }
-    else if (options::regex())
+
+    opts_type results;
+    pkgcache_T pkgcache(options::portdir());
+
+    if (options::regex())
     {
-        regexp.assign(opts.front(), options::eregex() ?
-                Regex::extended|Regex::icase : Regex::icase);
+        regexp.assign(opts.front());
 
         matches = portage::find_package_regex(regexp, options::overlay(),
                     &search_timer, pkgcache);
@@ -65,14 +65,13 @@ action_find_handler_T::operator() (opts_type &opts)
         if (matches.empty())
         {
             std::cerr << "Failed to find any packages matching '"
-                << opts.front() << "'." << std::endl;
+                << regexp() << "'." << std::endl;
             return EXIT_FAILURE;
         }
     }
     else
     {
-        opts_type::iterator i;
-        for (i = opts.begin() ; i != opts.end() ; ++i)
+        for (opts_type::iterator i = opts.begin() ; i != opts.end() ; ++i)
             matches.insert(std::make_pair("", *i));
     }
 

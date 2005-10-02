@@ -29,6 +29,8 @@
 action_handler_T::action_handler_T()
     : stream(options::outstream()), regexp(), color(), size(0)
 {
+    regexp.set_cflags(options::eregex() ?
+        util::Regex::extended|util::Regex::icase : util::Regex::icase);
 }
 
 void

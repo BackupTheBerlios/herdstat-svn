@@ -2,9 +2,6 @@
     <title>
         Todo list for herdstat
     </title>
-    <note priority="veryhigh" time="1128019723">
-        Add --field support for --find.
-    </note>
     <note priority="high" time="1126510481">
         Write a debug class for writing debugging messages instead of using debug_msg().
     </note>

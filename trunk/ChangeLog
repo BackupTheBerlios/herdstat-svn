@@ -1,5 +1,29 @@
 ChangeLog for herdstat
 
+2005-10-02 Aaron Walker <ka0ttic@gentoo.org>
+
+	* src/action_dev_handler.cc, src/fields.hh: Move
+	transform_fields_into_matches to it's own header, fields.hh.  It has
+	now been almost fully templatized.  Also added a helper class,
+	FieldsMap<T>, that can basically be treated as a map<string, const
+	string& (T::*)(void) const>; it is meant mainly for convenience
+	so that the member function pointer can be left out.  Also broke out
+	the usage of util::Regex and replaced it with another template
+	paramater, CmpType, so we can also use a string if we wanted.
+	* herdstat/util/regex.cc, herdstat/util/regex.hh: Provide copy
+	constructor and copy assignment operator, as the compiler-generated
+	ones will not suffice (the copied regex_t needs to be recompiled).
+	This means we can now make copies and actually use the copies without
+	a segmentation fault (which didnt occur before because we used
+	pointers).
+	* herdstat/portage/functional.hh, herdstat/portage/developer.hh,
+	herdstat/portage/herd.hh, src/action_dev_handler.cc,
+	src/action_away_handler.cc, src/action_herd_handler.cc: Updated uses
+	of portage functional stuff to pass a copy of the regex instead of
+	using a pointer.
+	* herdstat/util/file.cc: Updated use of regexMatch functor to pass
+	copy instead of pointer.
+
 2005-10-01 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/exceptions.cc: Copy Exceptions's va_list with memset if

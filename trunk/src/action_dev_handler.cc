@@ -201,11 +201,11 @@ action_dev_handler_T::operator() (opts_type &opts)
     {
         Herd all_devs;
 
-        /* for each herd... */
+        /* copy the developers in each herd to all_devs */
         for (h = herds.begin() ; h != herds.end() ; ++h)
             all_devs.insert(h->begin(), h->end());
 
-        /* insert those that exist in userinfo.xml but not herds.xml */
+        /* copy developers in userinfo.xml (some won't exist in herds.xml) */
         if (not userinfo.empty())
             all_devs.insert(userinfo.devs().begin(), userinfo.devs().end());
 
@@ -216,27 +216,24 @@ action_dev_handler_T::operator() (opts_type &opts)
     }
     else if (options::fields().empty() and options::regex())
     {
-        const std::string re(opts.front());
+        regexp.assign(opts.front());
         opts.clear();
-
-        regexp.assign(re, options::eregex() ?
-                Regex::extended|Regex::icase : Regex::icase);
 
         /* loop through herds searching for devs who's username
          * matches the regular expression, inserting those that do into opts */
         for (h = herds.begin() ; h != herds.end() ; ++h)
             util::transform_if(h->begin(), h->end(), std::back_inserter(opts),
-                std::bind1st(UserRegexMatch<Developer>(), &regexp), User());
+                std::bind1st(UserRegexMatch<Developer>(), regexp), User());
 
         /* also add those in userinfo.xml - dupes will be unique'd out below */
         if (not userinfo.empty())
-            util::transform_if(userinfo.devs().begin(), userinfo.devs().end(),
-                std::back_inserter(opts), std::bind1st(UserRegexMatch<Developer>(),
-                &regexp), User());
+            util::transform_if(userinfo.devs().begin(),
+                userinfo.devs().end(), std::back_inserter(opts),
+                std::bind1st(UserRegexMatch<Developer>(), regexp), User());
 
         if (opts.empty())
         {
-            std::cerr << "Failed to find any developers matching '" << re
+            std::cerr << "Failed to find any developers matching '" << regexp()
                 << "'." << std::endl;
             return EXIT_FAILURE;
         }
@@ -254,19 +251,21 @@ action_dev_handler_T::operator() (opts_type &opts)
             return EXIT_FAILURE;
         }
 
+        FieldsMap<Developer> fm;
+
+        /* insert valid --field values and their
+         * corresponding comparison function */
+        fm.insert("user",     &Developer::user);
+        fm.insert("name",     &Developer::name);
+        fm.insert("location", &Developer::location);
+        fm.insert("status",   &Developer::status);
+        fm.insert("joined",   &Developer::joined);
+        fm.insert("birthday", &Developer::birthday);
+
         try
         {
-            typedef const std::string& (Developer::*mfp)(void) const;
-            std::map<std::string, mfp> fm;
-
-            /* insert valid --field values and their
-             * corresponding comparison function */
-            fm.insert(std::make_pair("user",        &Developer::user));
-            fm.insert(std::make_pair("name",        &Developer::name));
-            fm.insert(std::make_pair("location",    &Developer::location));
-            fm.insert(std::make_pair("status",      &Developer::status));
-            fm.insert(std::make_pair("joined",      &Developer::joined));
-            fm.insert(std::make_pair("birthday",    &Developer::birthday));
+            regexp.set_cflags(options::eregex() ?
+                    Regex::extended|Regex::icase : Regex::icase);
 
             /* for each user in userinfo.xml, insert
              * the developer's username into the opts
@@ -274,13 +273,12 @@ action_dev_handler_T::operator() (opts_type &opts)
              * each --field is met. */
             transform_fields_into_matches(userinfo.devs().begin(),
                 userinfo.devs().end(), std::back_inserter(opts),
-                options::fields(), fm, User());
+                regexp, options::fields(), fm, User());
         }
         catch (const InvalidField& e)
         {
             std::cerr << "Unrecognized field '" << e.what() << "'." << std::endl
-                << "Possibles are: name,user,location,status,birthday,joined."
-                << std::endl;
+                << "Possibles are: " << fm.keys() << "." << std::endl;
             return EXIT_FAILURE;
         }
 

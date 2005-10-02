@@ -47,6 +47,7 @@ namespace portage {
 
             inline bool is_category() const;
             inline const std::string& pkg() const;
+            inline const std::string& name() const; /* synonym for pkg() */
             inline const std::string& longdesc() const;
 
             inline void set_category(bool cat);
@@ -70,6 +71,7 @@ namespace portage {
 
     inline bool metadata::is_category() const { return _cat; }
     inline const std::string& metadata::pkg() const { return _pkg; }
+    inline const std::string& metadata::name() const { return _pkg; }
     inline const std::string& metadata::longdesc() const { return _longdesc; }
     inline void metadata::set_category(bool cat) { _cat = cat; }
     inline void metadata::set_pkg(const std::string& pkg) { _pkg.assign(pkg); }
