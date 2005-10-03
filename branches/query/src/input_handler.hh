@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_handler.hh
+ * herdstat -- src/input_handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_ACTION_HANDLER_HH
-#define _HAVE_ACTION_HANDLER_HH 1
+#ifndef _HAVE_INPUT_HANDLER_HH
+#define _HAVE_INPUT_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -29,23 +29,21 @@
 
 #include "query.hh"
 
-enum ActionMethod
+enum InputMethod
 {
     Unspecified,
-    Herd,
-    Dev,
-    Find
-}
-
-class ActionHandler
-{
-    public:
-        ActionHandler() { }
-        virtual ~ActionHandler() { }
-
-        virtual int operator()(const Query& query) const = 0;
+    Readline
 };
 
-#endif /* _HAVE_ACTION_HANDLER_HH */
+class InputHandler
+{
+    public:
+        InputHandler() { }
+        virtual ~InputHandler() { }
+
+        virtual int operator()(Query *query) const = 0;
+};
+
+#endif /* _HAVE_INPUT_HANDLER_HH */
 
 /* vim: set tw=80 sw=4 et : */

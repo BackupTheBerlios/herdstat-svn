@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_handler.hh
+ * herdstat -- src/output/stream.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,32 +20,25 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_ACTION_HANDLER_HH
-#define _HAVE_ACTION_HANDLER_HH 1
+#ifndef _HAVE_STREAM_HH
+#define _HAVE_STREAM_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "query.hh"
+#include "output_handler.hh"
 
-enum ActionMethod
-{
-    Unspecified,
-    Herd,
-    Dev,
-    Find
-}
-
-class ActionHandler
+class StreamOutputHandler : public OutputHandler
 {
     public:
-        ActionHandler() { }
-        virtual ~ActionHandler() { }
+        StreamOutputHandler() { }
+        virtual ~StreamOutputHandler() { }
 
-        virtual int operator()(const Query& query) const = 0;
+        template <typename T>
+        virtual void operator()(const T& v) const;
 };
 
-#endif /* _HAVE_ACTION_HANDLER_HH */
+#endif /* _HAVE_STREAM_HH */
 
 /* vim: set tw=80 sw=4 et : */

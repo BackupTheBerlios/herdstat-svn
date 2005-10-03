@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_handler.hh
+ * herdstat -- src/query.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,32 +20,27 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_ACTION_HANDLER_HH
-#define _HAVE_ACTION_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include <algorithm>
 #include "query.hh"
 
-enum ActionMethod
+Query::iterator
+Query::find(const std::string& k)
 {
-    Unspecified,
-    Herd,
-    Dev,
-    Find
+    for (iterator i = _qm.begin() ; i != _qm.end() ; ++i)
+        if (i->first == k) return i;
+    return _qm.end();
 }
 
-class ActionHandler
+Query::const_iterator
+Query::find(const std::string& k) const
 {
-    public:
-        ActionHandler() { }
-        virtual ~ActionHandler() { }
-
-        virtual int operator()(const Query& query) const = 0;
-};
-
-#endif /* _HAVE_ACTION_HANDLER_HH */
+    for (const_iterator i = _qm.begin() ; i != _qm.end() ; ++i)
+        if (i->first == k) return i;
+    return _qm.end();
+}
 
 /* vim: set tw=80 sw=4 et : */

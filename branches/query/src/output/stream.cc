@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_handler.hh
+ * herdstat -- src/output/stream.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,32 +20,22 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_ACTION_HANDLER_HH
-#define _HAVE_ACTION_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "query.hh"
+#include <algorithm>
+#include <iterator>
 
-enum ActionMethod
+#include "stream.hh"
+
+template <typename T>
+void
+StreamOutputHandler::operator()(const T& buf) const
 {
-    Unspecified,
-    Herd,
-    Dev,
-    Find
+    std::transform(buf.begin(), buf.end(),
+        std::ostream_iterator<typename T::value_type>(*stream, "\n"),
+        Formatter());
 }
-
-class ActionHandler
-{
-    public:
-        ActionHandler() { }
-        virtual ~ActionHandler() { }
-
-        virtual int operator()(const Query& query) const = 0;
-};
-
-#endif /* _HAVE_ACTION_HANDLER_HH */
 
 /* vim: set tw=80 sw=4 et : */
