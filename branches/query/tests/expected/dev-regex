@@ -1,0 +1,125 @@
+Developer:   Michele Noberasco (s4t4n) 
+Email:       s4t4n@gentoo.org 
+Herds(1):    desktop-dock 
+
+Developer:   Christian Andreetta (satya) 
+Email:       satya@gentoo.org 
+Herds(1):    samba 
+
+Developer:   Andrea Luzzardi (scox) 
+Email:       scox@gentoo.org 
+Herds(1):    hardened 
+
+Developer:   Sebastian Bergmann (sebastian) 
+Email:       sebastian@gentoo.org 
+Herds(1):    php 
+
+Developer:   Stephen Diener (sediener) 
+Email:       sediener@gentoo.org 
+Herds(2):    mobile sci 
+
+Developer:   Seemant Kulleen (seemant) 
+Email:       seemant@gentoo.org* 
+Herds(5):    app-dicts base-system kerberos shell-tools x11 
+Devaway:     In Boston, without dev box. Dev Box arrives in the middle of 
+             September, that's when I will return. I don't check mailing lists 
+             or aliases -- I'm on IRC, but better to contact alternate people.  
+
+Developer:   Jochen Maes (sejo) 
+Email:       sejo@gentoo.org* 
+Herds(3):    java ppc ppc-kernel 
+Devaway:     no internet due to moving, normally 12/09 back internet :( 
+
+Developer:   Karol Wojtaszek (sekretarz) 
+Email:       sekretarz@gentoo.org 
+Herds(7):    amd64 gcc-porting graphics mobile net-im net-p2p x11 
+
+Developer:   Tom Martin (slarti) 
+Email:       slarti@gentoo.org* 
+Herds(4):    amd64 net-mail shell-tools vim 
+Devaway:     Gone till 1 Aug, then gone again on the 4 Aug till 22 Aug 
+             (roughly). No mail, irc or net at all. Recruiters -> 
+             #gentoo-devrel, net-mail -> #gentoo-netmail. spb has my phone if 
+             it's life threatening, but it won't be.  
+
+Developer:   Jonathan Smith (smithj) 
+Email:       smithj@gentoo.org* 
+Herds(2):    desktop-misc netmon 
+Devaway:     my laptop's motherboard fried... NEVER BUY A DELL!!! in any 
+             case, any dev can fix anything normally maintained by me. i hope 
+             to be back within a week or two, but who knows?  
+
+Developer:   Ned Ludd (solar) 
+Email:       solar@gentoo.org* 
+Herds(3):    embedded hardened toolchain 
+Devaway:     away moving.. as long as it takes to get done. 9-5 EST I will 
+             be reachable  
+
+Developer:   Stephen Bennett (spb) 
+Email:       spb@gentoo.org 
+Herds(2):    bsd mips 
+
+Developer:   D.M.D. Ljungmark (spider) 
+Email:       spider@gentoo.org* 
+Herds(1):    gnome 
+Devaway:     Moving // Germany from 12th to 17th ( Wave Gotik Treffen ) // 
+             3-5 weeks before I get an ISP in my new place.  
+
+Developer:   Michael Januszewski (spock) 
+Email:       spock@gentoo.org 
+Herds(3):    gcc-porting kernel x86-kernel 
+
+Developer:   Donnie Berkholz (spyderous) 
+Email:       spyderous@gentoo.org* 
+Herds(3):    cluster sci x11 
+Devaway:     Wedding+honeymoon, back Sept. 5. Bug joshuabaergen/battousai 
+             about X.  
+
+Developer:   Josh Grebe (squash) 
+Email:       squash@gentoo.org 
+Herds(1):    sparc 
+
+Developer:   Jon Hood (squinky86) 
+Email:       squinky86@gentoo.org 
+Herds(3):    accessibility forensics net-p2p 
+
+Developer:   Lim Swee Tat (st_lim) 
+Email:       st_lim@gentoo.org 
+Herds(5):    java net-dialup net-mail qmail web-apps 
+
+Developer:   Stefan Knoblich (stkn) 
+Email:       stkn@gentoo.org 
+Herds(1):    voip 
+
+Developer:   Benjamin Smee (strerror) 
+Email:       strerror@gentoo.org 
+Herds(2):    net-mail netmon 
+
+Developer:   Stuart Herbert (stuart) 
+Email:       stuart@gentoo.org* 
+Herds(6):    apache nx php vmware web-apps www-servers 
+Devaway:     On vacation - back 1st October. 
+
+Developer:   suka 
+Email:       suka@gentoo.org 
+Herds(1):    openoffice 
+
+Developer:   Aaron Kulbe (superlag) 
+Email:       superlag@gentoo.org 
+Herds(3):    amd64 commonbox net-mail 
+
+Developer:   Sergey Kuleshov (svyatogor) 
+Email:       svyatogor@gentoo.org 
+Herds(1):    wine 
+
+Developer:   Sven Wegener (swegener) 
+Email:       swegener@gentoo.org* 
+Herds(3):    net-irc net-news shell-tools 
+Devaway:     Looking for a new job, don't expect much Gentoo work during 
+             this time. Available via IRC and mail.  
+
+Developer:   yoswink 
+Email:       yoswink@gentoo.org 
+Herds(1):    alpha 
+
+*[00m Currently away
