@@ -33,12 +33,9 @@
 #endif
 
 #include "query.hh"
-#include "action_handler.hh"
 #include "action/dev.hh"
 #include "action/herd.hh"
-#include "input_handler.hh"
 #include "input/readline.hh"
-#include "output_handler.hh"
 #include "output/stream.hh"
 #include "options.hh"
 #include "exceptions.hh"

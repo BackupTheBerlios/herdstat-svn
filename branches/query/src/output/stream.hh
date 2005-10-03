@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "output_handler.hh"
+#include "handler.hh"
 
 class StreamOutputHandler : public OutputHandler
 {
