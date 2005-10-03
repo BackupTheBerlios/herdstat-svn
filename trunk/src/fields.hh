@@ -85,8 +85,8 @@ class FieldsMap
 /**
  * transform_fields_into_matches
  * for each object in the range [first,last), iterate over fields vector,
- * generating a regular expression for each field value, comparing it to
- * the return value of the correspoding member function (member function of
+ * assigning each field value to CmpType and then comparing it to the
+ * return value of the correspoding member function (member function of
  * the type that InIter points to).  If each field's criteria is met for
  * that iteration of [first,last), UnaryOp is called on the iterated object,
  * saving the result into OutIter.
