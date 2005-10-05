@@ -1,5 +1,16 @@
 ChangeLog for herdstat
 
+2005-10-04 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/portage/misc.hh, herdstat/portage/functional.hh: Moved
+	function objects declared in misc.hh to functional.hh.
+	* herdstat/util/functional.hh: Added Appender function object template
+	for calling T::append(const U&).
+	* herdstat/portage/version.cc, herdstat/portage/version.hh:
+	versions::value_type doesn't need to be a pointer.  Also, cleaned up
+	assign() and append() members (now uses util::copy_if).  versions
+	constructor that takes a vector<string> uses new Appender functor.
+
 2005-10-02 Aaron Walker <ka0ttic@gentoo.org>
 
 	* src/action_dev_handler.cc, src/fields.hh: Move

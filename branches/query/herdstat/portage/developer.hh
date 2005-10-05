@@ -218,11 +218,6 @@ namespace portage {
             /// Default constructor.
             Developers();
 
-            /** Copy constructor.
-             * @param that Reference to another Developers object.
-             */
-//            Developers(const Developers& that);
-
             /** Constructor. Assign a container_type.
              * @param v A reference to a container_type.
              */
@@ -230,8 +225,7 @@ namespace portage {
 
             /** Instantiate a Developer for each developer nick in the given
              * vector.
-             * @param v Reference to a std::vector<std::string> of developer
-             *          nicks (username).
+             * @param v vector of developer nicks.
              */
             Developers(const std::vector<std::string>& v);
 
@@ -240,12 +234,6 @@ namespace portage {
 
             /// Implicit conversion to std::vector<std::string>.
             operator std::vector<std::string>() const;
-
-            /** Copy assignment operator.
-             * @param that Reference to another Developers object.
-             * @returns Reference to this.
-             */
-//            Developers& operator= (const Developers& that);
 
             /** Assign a new container_type.
              * @param v Reference to container_type.
@@ -297,8 +285,6 @@ namespace portage {
             container_type _devs;
     };
 
-//    inline Developers& Developers::operator= (const Developers& that)
-//    { *this = that._devs; return *this; }
     inline Developers::iterator Developers::begin() { return _devs.begin(); }
     inline Developers::const_iterator Developers::begin() const { return _devs.begin(); }
     inline Developers::iterator Developers::end() { return _devs.end(); }

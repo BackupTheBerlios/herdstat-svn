@@ -34,6 +34,7 @@
 
 #include <functional>
 #include <herdstat/util/regex.hh>
+#include <herdstat/portage/misc.hh>
 
 namespace portage {
 
@@ -73,6 +74,30 @@ namespace portage {
     {
         bool operator()(const util::Regex &re, const T& v) const
         { return (re == v.name()); }
+    };
+
+    struct IsEbuild
+    {
+        bool operator()(const std::string& path) const
+        {
+            return is_ebuild(path);
+        }
+    };
+
+    struct IsPkgDir
+    {
+        bool operator()(const std::string& path) const
+        {
+            return is_pkg_dir(path);
+        }
+    };
+
+    struct GetPkgFromPath
+    {
+        std::string operator()(const std::string& path) const
+        {
+            return get_pkg_from_path(path);
+        }
     };
 
 } // namespace portage

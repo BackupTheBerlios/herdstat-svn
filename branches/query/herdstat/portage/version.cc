@@ -34,7 +34,9 @@
 
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/algorithm.hh>
 #include <herdstat/portage/misc.hh>
+#include <herdstat/portage/functional.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/version.hh>
 
@@ -388,9 +390,8 @@ versions::versions(const std::string& path)
 
 versions::versions(const std::vector<std::string>& paths)
 {
-    std::vector<std::string>::const_iterator i = paths.begin(),
-                                              e = paths.end();
-    for (; i != e ; ++i) this->append(*i);
+    std::for_each(paths.begin(), paths.end(),
+        std::bind2nd(util::Appender<versions, std::string>(), this));
 }
 /*****************************************************************************
  * Given a path to a package directory, insert a new version_string for    *
@@ -405,13 +406,8 @@ versions::assign(const std::string& path)
         return;
 
     const util::dir_T pkgdir(path);
-    util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
-    
-    for (; d != e ; ++d)
-    {
-        if (is_ebuild(*d))
-            assert(this->insert(*d));
-    }
+    util::copy_if(pkgdir.begin(), pkgdir.end(),
+        std::inserter(_vs, _vs.end()), IsEbuild());
 }
 /*****************************************************************************
  * Same as assign() but does not call clear().                               *
@@ -420,62 +416,8 @@ void
 versions::append(const std::string& path)
 {
     const util::dir_T pkgdir(path);
-    util::dir_T::const_iterator d = pkgdir.begin(), e = pkgdir.end();
-    
-    for (; d != e ; ++d)
-    {
-        if (is_ebuild(*d))
-            assert(this->insert(*d));
-    }
-}
-/*****************************************************************************
- * find wrapper                                                              *
- *****************************************************************************/
-versions::iterator
-versions::find(const std::string& path)
-{
-    version_string *v = new version_string(path);
-    iterator i = this->_vs.find(v);
-    delete v;
-    return i;
-}
-
-versions::const_iterator
-versions::find(const std::string& path) const
-{
-    version_string *v = new version_string(path);
-    const_iterator i = this->_vs.find(v);
-    delete v;
-    return i;
-}
-/*****************************************************************************
- * insert wrapper                                                            *
- *****************************************************************************/
-bool
-versions::insert(const std::string& path)
-{
-    version_string *v = new version_string(path);
-
-//    std::cout << "versions::insert ===> trying to insert "
-//        << (*v)() << std::endl;
-    
-    std::pair<iterator, bool> p = this->_vs.insert(v);
-    
-    if (not p.second)
-        delete v;
-
-//    std::cout << "versions::insert ===> successfully inserted "
-//        << (*v)() << std::endl;
-
-    return p.second;
-}
-/*****************************************************************************
- * clean up                                                                  *
- *****************************************************************************/
-versions::~versions()
-{
-    iterator i = this->_vs.begin(), e = this->_vs.end();
-    for (; i != e ; ++i) delete *i;
+    util::copy_if(pkgdir.begin(), pkgdir.end(),
+        std::inserter(_vs, _vs.end()), IsEbuild());
 }
 /*****************************************************************************/
 } // namespace portage

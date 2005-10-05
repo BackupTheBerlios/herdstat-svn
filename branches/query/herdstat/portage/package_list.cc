@@ -33,6 +33,7 @@
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/categories.hh>
+#include <herdstat/portage/functional.hh>
 #include <herdstat/portage/package_list.hh>
 
 namespace portage {

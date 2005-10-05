@@ -43,14 +43,6 @@ namespace portage
         return (fnmatch("*.ebuild", path.c_str(), 0) == 0);
     }
 
-    struct IsEbuild
-    {
-        bool operator()(const std::string& path) const
-        {
-            return (fnmatch("*.ebuild", path.c_str(), 0) == 0);
-        }
-    };
-
     /** Is the specified path a package directory?
      * @param p Path.
      * @returns A boolean value.
@@ -64,22 +56,8 @@ namespace portage
         /* consider it a package directory if an ebuild exists */
         const util::dir_T pkgdir(path);
         return (std::find_if(pkgdir.begin(),
-                    pkgdir.end(), IsEbuild()) != pkgdir.end());
+                    pkgdir.end(), is_ebuild) != pkgdir.end());
     }
-
-    struct IsPkgDir
-    {
-        bool operator()(const std::string& path) const
-        {
-            if (not util::is_dir(path))
-                return false;
-
-            /* consider it a package directory if an ebuild exists */
-            const util::dir_T pkgdir(path);
-            return (std::find_if(pkgdir.begin(),
-                        pkgdir.end(), IsEbuild()) != pkgdir.end());
-        }
-    };
 
     /** Are we inside a package directory?
      * @returns A boolean value.
@@ -97,16 +75,6 @@ namespace portage
         pos = path.rfind('/', --pos);
         return path.substr(++pos);
     }
-
-    struct GetPkgFromPath
-    {
-        std::string operator()(const std::string& path) const
-        {
-            std::string::size_type pos = path.rfind('/');
-            pos = path.rfind('/', --pos);
-            return path.substr(++pos);
-        }
-    };
 
 } // namespace portage
 
