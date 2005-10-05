@@ -31,8 +31,9 @@
 #include "exceptions.hh"
 #include "action_away_handler.hh"
 
-using namespace portage;
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::util;
 
 action_away_handler_T::~action_away_handler_T()
 {

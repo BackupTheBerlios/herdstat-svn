@@ -34,8 +34,9 @@
 #include "action_herd_handler.hh"   /* for display_herd() */
 #include "action_dev_handler.hh"
 
-using namespace portage;
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::util;
 
 action_dev_handler_T::action_dev_handler_T()
 {

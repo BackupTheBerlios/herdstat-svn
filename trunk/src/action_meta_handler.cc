@@ -41,8 +41,9 @@
 #include "overlaydisplay.hh"
 #include "action_meta_handler.hh"
 
-using namespace portage;
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::util;
 
 static std::string
 parse_license(const std::string& str)

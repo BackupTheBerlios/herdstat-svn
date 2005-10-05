@@ -40,7 +40,7 @@ class rc_T
 
     private:
         void set_options();
-        util::vars vars;
+        herdstat::util::vars vars;
 };
 
 #endif

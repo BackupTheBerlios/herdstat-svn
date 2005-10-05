@@ -48,8 +48,8 @@ class action_handler_T
         virtual void flush();
 
         std::ostream *stream;       /* output stream */
-        util::Regex regexp;         /* regular expression */
-        util::color_map_T color;    /* color map */
+        herdstat::util::Regex regexp;         /* regular expression */
+        herdstat::util::ColorMap color;    /* color map */
         std::size_t size;           /* number of results (for --count) */
 };
 
@@ -65,7 +65,7 @@ class action_fancy_handler_T : public action_handler_T
     protected:
         virtual void flush();
 
-        portage::devaway_xml devaway;
+        herdstat::portage::devaway_xml devaway;
         formatter_T output;                 /* output formatter */
 };
 
@@ -82,7 +82,7 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
     protected:
         virtual void flush();
 
-        portage::herds_xml herdsxml;
+        herdstat::portage::herds_xml herdsxml;
 };
 
 /*
@@ -98,7 +98,7 @@ class action_portage_find_handler_T : public action_fancy_handler_T
         virtual void flush();
 
         std::multimap<std::string, std::string> matches;
-        util::timer_T search_timer;
+        herdstat::util::Timer search_timer;
 };
 
 #endif

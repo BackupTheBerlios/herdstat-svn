@@ -34,7 +34,8 @@
 #include "metacache.hh"
 #include "action_stats_handler.hh"
 
-using namespace portage;
+using namespace herdstat;
+using namespace herdstat::portage;
 
 action_stats_handler_T::~action_stats_handler_T()
 {

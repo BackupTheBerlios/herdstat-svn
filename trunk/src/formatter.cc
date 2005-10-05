@@ -33,6 +33,8 @@
 #include <herdstat/util/regex.hh>
 #include "formatter.hh"
 
+using namespace herdstat;
+
 /** static members **********************************************************/
 formatter_T::attrs_type  formatter_T::attr;
 formatter_T::buffer_type formatter_T::buffer;

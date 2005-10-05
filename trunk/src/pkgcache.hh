@@ -30,7 +30,7 @@
 #include <herdstat/cachable.hh>
 #include <herdstat/portage/package_list.hh>
 
-class pkgcache_T : public cachable
+class pkgcache_T : public herdstat::cachable
 {
     public:
         typedef std::vector<std::string> container_type;
@@ -62,7 +62,7 @@ class pkgcache_T : public cachable
         int _reserve;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
-        portage::PackageList _pkgs;
+        herdstat::portage::PackageList _pkgs;
 };
 
 inline pkgcache_T::iterator

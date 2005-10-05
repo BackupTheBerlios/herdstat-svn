@@ -36,7 +36,8 @@
 #include "formatter.hh"
 #include "action_versions_handler.hh"
 
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::util;
 
 action_versions_handler_T::~action_versions_handler_T()
 {

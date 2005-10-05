@@ -33,14 +33,15 @@
 
 #include "action_herd_handler.hh"
 
-using namespace portage;
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::util;
 
 void
 display_herd(const Herd& herd)
 {
     formatter_T out;
-    util::color_map_T color;
+    util::ColorMap color;
 
     Herd devs(herd);
 
@@ -88,7 +89,7 @@ display_herd(const Herd& herd)
 static void
 display_herds(const Herds& herds)
 {
-    util::color_map_T color;
+    util::ColorMap color;
     formatter_T out;
 
     if (options::verbose() and not options::quiet())

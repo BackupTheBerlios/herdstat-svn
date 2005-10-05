@@ -39,6 +39,8 @@
 #define DEVAWAYXML_LOCAL  LOCALSTATEDIR"/devaway.xml"
 #define EXPIRE 86400 /* 24hrs */
 
+using namespace herdstat;
+
 void
 debug_msg(const char *fmt, ...)
 {
@@ -63,7 +65,7 @@ debug_msg(const char *fmt, ...)
 static void
 do_fetch(const char * const url, const char * const file)
 {
-    util::stat_T xml(file);
+    util::Stat xml(file);
     const std::time_t now(std::time(NULL));
     
     /* check if previously fetched copy is expired */

@@ -30,7 +30,8 @@
 #include "pkgcache.hh"
 #include "action_which_handler.hh"
 
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::util;
 
 action_which_handler_T::~action_which_handler_T()
 {

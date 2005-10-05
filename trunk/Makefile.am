@@ -1,8 +1,8 @@
-# $Id: Makefile.am 234 2005-04-19 12:34:46Z ka0ttic $
+# $Id$
 
 AUTOMAKE_OPTIONS = 1.8 dist-bzip2 no-dist-gzip
 
-SUBDIRS = herdstat src doc
+SUBDIRS = src doc
 
 CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
@@ -21,7 +21,7 @@ check:
 
 srchtml:
 	@test -d ${PWD}/html || mkdir ${PWD}/html ; \
-	for x in herdstat src ; do \
+	for x in src ; do \
 		if test -d ${PWD}/html/$${x} ; then \
 			rm -fr ${PWD}/html/$${x}/* ; \
 		else \

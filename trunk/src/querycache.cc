@@ -36,11 +36,14 @@
 #include "common.hh"
 #include "querycache.hh"
 
+using namespace herdstat;
+using namespace herdstat::xml;
+
 /*
  * Content Handler for our internal querycache.xml
  */
 
-class querycacheXMLHandler_T : public xml::saxhandler
+class querycacheXMLHandler_T : public saxhandler
 {
     public:
         querycacheXMLHandler_T();
@@ -198,7 +201,7 @@ querycache_T::load()
     if (not util::is_file(this->_path))
         return;
 
-    xml::Document<querycacheXMLHandler_T> querycache_xml;
+    Document<querycacheXMLHandler_T> querycache_xml;
     querycache_xml.parse(this->_path);
     querycacheXMLHandler_T *handler = querycache_xml.handler();
 

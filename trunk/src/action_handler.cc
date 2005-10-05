@@ -26,6 +26,8 @@
 
 #include "action_handler.hh"
 
+using namespace herdstat;
+
 action_handler_T::action_handler_T()
     : stream(options::outstream()), regexp(), color(), size(0)
 {

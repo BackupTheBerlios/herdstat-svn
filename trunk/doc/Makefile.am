@@ -6,26 +6,18 @@ CLEANFILES = $(man_MANS) \
 	     $(VERSION)/html/* \
 	     examples.html
 
-MAINTAINERCLEANFILES = Makefile.in Doxyfile *~
-EXTRA_DIST = Doxyfile.in \
-	     herdstat.1.in \
+MAINTAINERCLEANFILES = Makefile.in *~
+EXTRA_DIST = herdstat.1.in \
 	     default.css \
 	     herdstatrc.example \
 	     $(noinst_DATA)
 
 date  = date '+%b %Y'
 
-html: $(foreach f, $(doc_files), $(f).html) Doxyfile
-if GENERATE_API_DOCS
-	@DOXYGEN@
-endif
+html: $(foreach f, $(doc_files), $(f).html)
 
 %.html: %.txt
 	rst2html.py < $? > $@
-
-Doxyfile: Doxyfile.in
-	@SED@ -e "s,\@VERSION\@,$(VERSION),g" \
-	      -e "s,\@PACKAGE\@,$(PACKAGE),g" $? > $@
 
 herdstat.1: herdstat.1.in
 	@SED@ -e "s,\@VERSION\@,$(VERSION),g" \

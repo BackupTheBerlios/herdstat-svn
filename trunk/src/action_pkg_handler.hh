@@ -48,16 +48,17 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
         void display();
         void display(pkgQuery_T *);
         void cleanup();
-        bool metadata_matches(const portage::metadata &, const std::string &);
+        bool metadata_matches(const herdstat::portage::metadata &,
+                              const std::string &);
 
         std::map<std::string, pkgQuery_T * > matches;
         opts_type not_found, packages;
         metacache_T metacache;
         querycache_T querycache;
-        util::timer_T::size_type elapsed;
+        herdstat::util::Timer::size_type elapsed;
         const bool status;
         bool cache_is_valid, at_least_one_not_cached;
-        util::Regex with;
+        herdstat::util::Regex with;
 };
 
 #endif

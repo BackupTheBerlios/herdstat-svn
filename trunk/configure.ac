@@ -23,21 +23,6 @@ AC_SUBST(VERSION_SUFFIX)
 AC_SUBST(VERSION_SUFFIX_VERSION)
 AC_SUBST(VERSION_FULL)
 
-# shared lib versioning
-LIBRARY_VERSION=1:0:0
-#               | | |
-#        +------+ | +---+
-#        |        |     |
-#        current:revision:age
-#        |        |     |
-#        |        |     +- increment if interfaces have been added
-#        |        |        set to zero if interfaces have been removed
-#                          or changed
-#        |        +- increment if source code has changed
-#        |           set to zero if current is incremented
-#        +- increment if interfaces have been added, removed or changed
-AC_SUBST(LIBRARY_VERSION)
-
 VERSION=$VERSION_FULL
 
 AC_CONFIG_AUX_DIR(config)
@@ -47,21 +32,6 @@ test x$localstatedir = "xNONE" && localstatedir="$ac_default_localstatedir"
 test x$sysconfdir = "xNONE" && sysconfdir="$ac_default_sysconfdir"
 AC_DEFINE_UNQUOTED(LOCALSTATEDIR, "$localstatedir/herdstat", [Local state directory])
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir", [System configuration directory])
-
-dnl build API docs?
-AC_MSG_CHECKING([whether to build API docs for libherdstat])
-AC_ARG_ENABLE(doc,
-    AC_HELP_STRING([--enable-doc],[Enable API docs for libherdstat [off]]),
-    [enable_doc=$enableval],[enable_doc=no])
-AM_CONDITIONAL(GENERATE_API_DOCS, test x$enable_doc != "xno")
-AC_MSG_RESULT([$enable_doc])
-
-if test x$enable_doc != "xno" ; then
-    AC_PATH_PROGS(DOXYGEN, doxygen)
-    if test x$DOXYGEN = "x" ; then
-	AC_MSG_ERROR([doxygen is required to build API docs])
-    fi
-fi
 
 dnl --enable-debug
 AC_MSG_CHECKING([whether to enable debugging code/flags])
@@ -83,20 +53,16 @@ AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
-AC_DISABLE_SHARED
-dnl hack to disable damn f77 libtool checks (stolen from sandbox's configure.in)
-m4_undefine([AC_PROG_F77])
-m4_defun([AC_PROG_F77],[])
-AC_PROG_LIBTOOL
-
-LIBTOOL="${LIBTOOL} --silent"
-AC_SUBST(LIBTOOL)
-
-dnl SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
-AC_SUBST(SED)
+AC_PATH_PROGS(SED, gsed)
+if test -z "$SED" ; then
+    AC_PATH_PROGS(SED, sed)
+    if test -z "$SED" ; then
+	AC_MSG_ERROR([sed is required])
+    fi
+fi
 
 AC_MSG_CHECKING([gcc version])
-gccver=`${CC} -dumpversion | cut -f1 -d.`
+gccver=`gcc -dumpversion | cut -f1 -d.`
 AC_MSG_RESULT([$gccver])
 if test x$gccver = "x4" ; then
     AC_DEFINE_UNQUOTED(HAVE_GCC4, 1, [GCC Version 4])
@@ -104,100 +70,22 @@ fi
 
 dnl Required headers
 AC_HEADER_STDC
-AC_HEADER_TIME(,
-    [AC_MSG_ERROR([sys/time.h is required])])
-AC_HEADER_DIRENT(,
-    [AC_MSG_ERROR([dirent.h is required])])
-AC_CHECK_HEADERS(regex.h,,
-    [AC_MSG_ERROR([regex.h is required])])
-AC_CHECK_HEADERS(glob.h,,
-    [AC_MSG_ERROR([glob.h is required])])
-AC_CHECK_HEADERS(fnmatch.h,,
-    [AC_MSG_ERROR([fnmatch.h is required])])
 
 dnl Optional headers
 AC_CHECK_HEADERS(getopt.h)
 
 dnl Required functions
-AC_FUNC_CLOSEDIR_VOID
-AC_CHECK_FUNCS(gettimeofday,,
-    [AC_MSG_ERROR([gettimeofday is required])])
-AC_CHECK_FUNCS(regcomp,,
-    [AC_MSG_ERROR([regcomp is required])])
-AC_CHECK_FUNCS(regexec,,
-    [AC_MSG_ERROR([regexec is required])])
-AC_CHECK_FUNCS(regfree,,
-    [AC_MSG_ERROR([regfree is required])])
-AC_CHECK_FUNCS(regerror,,
-    [AC_MSG_ERROR([regerror is required])])
-AC_CHECK_FUNCS(glob,,
-    [AC_MSG_ERROR([glob is required])])
-AC_CHECK_FUNCS(fnmatch,,
-    [AC_MSG_ERROR([fnmatch is required])])
-AC_CHECK_FUNCS(vasprintf,,
-    [AC_MSG_ERROR(vasprintf is required)])
 
 dnl Optional functions
 AC_CHECK_FUNCS(getopt_long)
 
 dnl Required libs
 
-dnl Check for termcap lib
-AC_MSG_CHECKING([whether to use ncurses to get screen width for output formatting])
-AC_ARG_WITH(ncurses,
-    AC_HELP_STRING([--with-ncurses],[Use ncurses to determine terminal width used for output formatting [on]]),
-    [WITH_NCURSES=$withval],[WITH_NCURSES=yes])
-AC_MSG_RESULT([$WITH_NCURSES])
-
-if test "$WITH_NCURSES" = "yes" ; then
-    AC_CHECK_LIB(ncurses, tgetent, [TERMCAP_LIBS="-lncurses"])
-    AC_CHECK_HEADERS([curses.h term.h])
-    AC_DEFINE(HAVE_NCURSES, 1, [Use ncurses to determine terminal width])
-fi
-    
-AC_SUBST(TERMCAP_LIBS)
-
-AC_MSG_CHECKING([fetch method])
-AC_ARG_WITH(curl,
-    AC_HELP_STRING([--with-curl],[Use libcurl for fetching]),
-    [WITH_CURL=$withval],[WITH_CURL=yes])
-
-if test "$WITH_CURL" = "yes" ; then
-    AC_MSG_RESULT([libcurl])
-    AC_CHECK_LIB(curl, curl_easy_init, [CURL_LIBS="-lcurl"])
-    AC_CHECK_HEADERS([curl/curl.h])
-
-    if ! test -z "$CURL_LIBS" ; then
-	AC_DEFINE(FETCH_METHOD_CURL, 1, [Use libcurl for fetching])
-    fi
-fi
-    
-if test "$WITH_CURL" != "yes" -o -z "$CURL_LIBS" ; then
-    AC_MSG_RESULT([wget])
-    AC_PATH_PROGS(_WGET, wget)
-    if test x$_WGET = "x"; then
-	AC_MSG_ERROR([wget is required])
-    fi
-    AC_DEFINE_UNQUOTED(WGET, "$_WGET", [wget location])
-    AC_DEFINE(FETCH_METHOD_WGET, 1, [Use wget for fetching])
-fi
-
-AC_SUBST(CURL_LIBS)
-
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES(xmlwrapp, xmlwrapp >= 0.5.0,
-    [xmlwrapp_LIBS="-lxmlwrapp -lxslt -lxml2 -lz -lm"],
-    [AC_MSG_ERROR([xmlwrapp is required])])
-AC_SUBST(xmlwrapp_LIBS)
+PKG_CHECK_MODULES(libherdstat, libherdstat-0.1)
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
 	  doc/Makefile
-	  herdstat/Makefile
-	  herdstat/util/Makefile
-	  herdstat/fetcher/Makefile
-	  herdstat/xml/Makefile
-	  herdstat/portage/Makefile
 	  src/Makefile
-	  tests/Makefile
-	  tests/src/Makefile)
+	  tests/Makefile)

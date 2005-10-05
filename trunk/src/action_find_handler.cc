@@ -36,7 +36,9 @@
 #include "action_meta_handler.hh"
 #include "action_find_handler.hh"
 
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::util;
 
 action_find_handler_T::~action_find_handler_T()
 {

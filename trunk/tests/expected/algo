@@ -1,5 +1,0 @@
-original v1 = 1 10 20 199 -5 
-testing transform_if()
-  resulting v2 = 25 204 
-testing copy_if()
-  resulting v2 = 20 199 

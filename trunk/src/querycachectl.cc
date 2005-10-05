@@ -36,6 +36,8 @@
 # include <getopt.h>
 #endif
 
+using namespace herdstat;
+
 static const char *short_options = "dscV";
 
 #ifdef HAVE_GETOPT_LONG
@@ -159,7 +161,7 @@ doaction(querycache_T &querycache, const std::string &action)
 int
 main(int argc, char **argv)
 {
-    util::color_map_T color;
+    util::ColorMap color;
     formatter_T out;
     out.set_colors(true);
     out.set_labelcolor(color[green]);

@@ -36,7 +36,7 @@ class action_herd_handler_T : public action_herds_xml_handler_T
 	virtual int operator() (opts_type &);
 };
 
-void display_herd(const portage::Herd& herd);
+void display_herd(const herdstat::portage::Herd& herd);
 
 #endif
 

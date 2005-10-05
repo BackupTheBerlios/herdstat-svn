@@ -35,8 +35,9 @@
 #include "action_meta_handler.hh"
 #include "action_pkg_handler.hh"
 
-using namespace portage;
-using namespace util;
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::util;
 
 action_pkg_handler_T::action_pkg_handler_T()
     : action_herds_xml_handler_T(), metacache(options::portdir()),

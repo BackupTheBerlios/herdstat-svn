@@ -29,6 +29,8 @@
 #include "common.hh"
 #include "action_fetch_handler.hh"
 
+using namespace herdstat;
+
 action_fetch_handler_T::~action_fetch_handler_T()
 {
 }
