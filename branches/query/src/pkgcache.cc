@@ -40,7 +40,8 @@
 #define PKGCACHE                    /*LOCALSTATEDIR*/"/pkgcache"
 #define PKGCACHE_EXPIRE             259200 /* 3 days */ 
 
-using namespace portage;
+using namespace herdstat;
+using namespace herdstat::portage;
 
 pkgcache_T::pkgcache_T()
     : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
@@ -70,7 +71,7 @@ pkgcache_T::init()
 bool
 pkgcache_T::valid() const
 {
-    const util::stat_T pkgcache(this->path());
+    const util::Stat pkgcache(this->path());
     bool valid = false;
 
     const std::string expire(options::metacache_expire());
@@ -86,7 +87,7 @@ pkgcache_T::valid() const
 
             if (has_timestamp and has_lastsync)
             {
-                util::file_T t(path), l(lastsync);
+                util::File t(path), l(lastsync);
                 valid = (t == l);
                 if (not valid)
                 {
@@ -149,7 +150,7 @@ pkgcache_T::valid() const
 void
 pkgcache_T::fill()
 {
-    util::timer_T timer;
+    util::Timer timer;
 
     if (options::timer())
         timer.start();

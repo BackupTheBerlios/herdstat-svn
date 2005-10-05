@@ -32,6 +32,8 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/"PACKAGE"rc"
 #define HERDSTATRC_LOCAL    "/."PACKAGE"rc"
 
+using namespace herdstat;
+
 rc_T::rc_T()
 {
     if (util::is_file(HERDSTATRC_GLOBAL))

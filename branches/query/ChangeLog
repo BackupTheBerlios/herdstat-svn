@@ -1,5 +1,13 @@
 ChangeLog for herdstat
 
+2005-10-05 Aaron Walker <ka0ttic@gentoo.org>
+
+	* herdstat/: broke out libherdstat into it's own package.
+	* src/: libherdstat now lives in the herdstat namespace.  Update all
+	source/header files to use proper using declarasions/fully qualified
+	names, respectively.
+	* tests/: Remove libherdstat-specific tests.
+
 2005-10-04 Aaron Walker <ka0ttic@gentoo.org>
 
 	* herdstat/portage/misc.hh, herdstat/portage/functional.hh: Moved

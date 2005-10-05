@@ -1,15 +1,8 @@
 # $Id$
 
-SUBDIRS = src
+# SUBDIRS = src
 
-tests = string \
-	glob \
-	algo \
-	herds.xml \
-	devaway.xml \
-	userinfo.xml \
-	metadata.xml \
-	versions \
+tests = versions \
 	metadata \
 	dev \
 	herd \

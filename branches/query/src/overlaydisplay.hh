@@ -37,7 +37,7 @@ class OverlayDisplay_T
     typedef std::string string_type;
     typedef std::size_t size_type;
     typedef std::pair<string_type, size_type> OverlayCount;
-    typedef util::color_map_T color_type;
+    typedef herdstat::util::ColorMap color_type;
 
     class OverlaySort
     {

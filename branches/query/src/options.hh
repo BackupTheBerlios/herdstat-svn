@@ -180,7 +180,7 @@ class options
 
         static options_action_T _action;
 
-        static portage::config _config;
+        static herdstat::portage::config _config;
         static const std::string& _portdir;
         static const std::vector<std::string>& _overlays;
 };

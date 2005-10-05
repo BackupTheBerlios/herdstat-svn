@@ -29,6 +29,8 @@
 
 #include "options.hh"
 
+using namespace herdstat;
+
 std::ostream * options::_outstream = &std::cout;
 std::string options::_outfile("stdout");
 

@@ -30,6 +30,8 @@
 #include "pkgquery.hh"
 #include "options.hh"
 
+using namespace herdstat;
+
 pkgQuery_T::pkgQuery_T(const std::string &n, const std::string &w, bool dev)
     : _pkgs(), info(n), query(n), with(w), portdir(options::portdir()),
       overlays(options::overlays()), type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)

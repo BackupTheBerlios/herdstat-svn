@@ -76,7 +76,7 @@ class pkgQuery_T
         inline const_iterator find(const key_type& k) const;
 
         container_type _pkgs;
-        portage::Developer info;
+        herdstat::portage::Developer info;
         std::string query, with, portdir;
         std::vector<std::string> overlays;
         std::time_t date;

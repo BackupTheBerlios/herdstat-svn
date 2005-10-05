@@ -55,6 +55,10 @@
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
 
+using namespace herdstat;
+using namespace herdstat::portage;
+using namespace herdstat::xml;
+
 static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:";
 
 #ifdef HAVE_GETOPT_LONG
@@ -547,7 +551,7 @@ main(int argc, char **argv)
 	}
 
 	/* initialize XML stuff */
-	xml::Init init(options::qa());
+	Init init(options::qa());
 
 	if (not options::fields().empty() and not nonopt_args.empty())
 	{
@@ -613,7 +617,7 @@ main(int argc, char **argv)
 	options::outstream()->imbue(std::locale(options::locale().c_str()));
 
 	/* set common format attributes */
-	util::color_map_T color;
+	util::ColorMap color;
 	formatter_T output;
 	output.set_colors(options::color());
 	output.set_quiet(options::quiet());
@@ -674,12 +678,12 @@ main(int argc, char **argv)
 	for (m = handlers.begin() ; m != handlers.end() ; ++m)
 	    if (m->second) delete m->second;
     }
-    catch (const portage::QAException& e)
+    catch (const QAException& e)
     {
 	std::cerr << "QA Violation: " << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const xml::ParserException& e)
+    catch (const ParserException& e)
     {
 	std::cerr << "Error parsing " << e.file() << ": " << e.error()
 	    << std::endl;

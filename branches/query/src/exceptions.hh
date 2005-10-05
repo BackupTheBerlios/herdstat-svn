@@ -30,7 +30,7 @@
 #include <herdstat/exceptions.hh>
 
 /* command line handling exceptions */
-class argsException     : public BaseException { };
+class argsException     : public herdstat::BaseException { };
 class argsUsage         : public argsException { };
 class argsOneActionOnly : public argsUsage { };
 class argsHelp          : public argsException { };
@@ -38,21 +38,21 @@ class argsVersion       : public argsException { };
 class argsUnimplemented : public argsException { };
 class argsInvalidField  : public argsException { };
 
-class InvalidField : public Exception
+class InvalidField : public herdstat::Exception
 {
     public:
         InvalidField() { }
-        InvalidField(const char *msg) : Exception(msg) { }
-        InvalidField(const std::string& msg) : Exception(msg) { }
+        InvalidField(const char *msg) : herdstat::Exception(msg) { }
+        InvalidField(const std::string& msg) : herdstat::Exception(msg) { }
         virtual ~InvalidField() throw() { }
 };
 
-class BadOption : public Exception
+class BadOption : public herdstat::Exception
 {
     public:
         BadOption() { }
-        BadOption(const char *msg) : Exception(msg) { }
-        BadOption(const std::string &msg) : Exception(msg) { }
+        BadOption(const char *msg) : herdstat::Exception(msg) { }
+        BadOption(const std::string &msg) : herdstat::Exception(msg) { }
         virtual ~BadOption() throw() { }
         virtual const char *what() const throw()
         {
@@ -62,16 +62,16 @@ class BadOption : public Exception
         }
 };
 
-class FormatException : public Exception
+class FormatException : public herdstat::Exception
 {
     public:
         FormatException() { }
-        FormatException(const char *msg) : Exception(msg) { }
-        FormatException(const std::string &msg) : Exception(msg) { }
+        FormatException(const char *msg) : herdstat::Exception(msg) { }
+        FormatException(const std::string &msg) : herdstat::Exception(msg) { }
         virtual ~FormatException() throw() { }
 };
 
-class CleanupException : public Exception
+class CleanupException : public herdstat::Exception
 {
     public:
         CleanupException(int code) : _code(code) { }
@@ -83,7 +83,7 @@ class CleanupException : public Exception
 };
 
 /* action handler exceptions */
-class ActionException : public BaseException { };
+class ActionException : public herdstat::BaseException { };
 class HerdException   : public ActionException { };
 class DevException    : public ActionException { };
 

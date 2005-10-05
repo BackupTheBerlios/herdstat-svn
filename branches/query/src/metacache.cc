@@ -42,7 +42,8 @@
 #define METACACHE_EXPIRE        259200 /* 3 days */
 #define METACACHE_RESERVE       9100
 
-using namespace portage;
+using namespace herdstat;
+using namespace herdstat::portage;
 
 metacache_T::metacache_T(const std::string &portdir)
     : cachable(options::localstatedir()+METACACHE),
@@ -62,7 +63,7 @@ metacache_T::~metacache_T()
 bool
 metacache_T::valid() const
 {
-    const util::stat_T metacache(this->path());
+    const util::Stat metacache(this->path());
     bool valid = false;
 
     const std::string expire(options::metacache_expire());
@@ -78,7 +79,7 @@ metacache_T::valid() const
 
             if (has_timestamp and has_lastsync)
             {
-                util::file_T t(path), l(lastsync);
+                util::File t(path), l(lastsync);
 
                 if (options::debug())
                 {
@@ -163,7 +164,7 @@ metacache_T::fill()
 {
     const bool status = not options::quiet() and not options::debug();
     {
-        util::progress_T progress;
+        util::Progress progress;
         pkgcache_T pkgcache(this->_portdir);
         debug_msg("pkgcache.size() == %d", pkgcache.size());
 
