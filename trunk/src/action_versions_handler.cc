@@ -179,7 +179,7 @@ action_versions_handler_T::operator() (opts_type &opts)
                 portage::versions::iterator v;
                 for (v = versions.begin() ; v != versions.end() ; ++v)
                 {
-                    const portage::version_map &vmap = (*v)->components();
+                    const portage::version_map &vmap = v->components();
 
                     std::string s(vmap["PVR"]);
                     std::string::size_type pos = s.rfind("-r0");

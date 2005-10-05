@@ -290,8 +290,7 @@ namespace portage
     class versions
     {
         public:
-            typedef std::set<version_string *,
-                util::DereferenceLess<version_string> > container_type;
+            typedef std::set<version_string> container_type;
             typedef container_type::iterator iterator;
             typedef container_type::const_iterator const_iterator;
             typedef container_type::size_type size_type;
@@ -314,31 +313,31 @@ namespace portage
              */
             versions(const std::vector<std::string> &v);
 
-            /// Destructor.
-            ~versions();
-
             /* small set subset */
             iterator begin() { return _vs.begin(); }
             const_iterator begin() const { return _vs.begin(); }
             iterator end() { return _vs.end(); }
             const_iterator end() const { return _vs.end(); }
-            iterator find(const std::string&);
-            const_iterator find(const std::string&) const;
             size_type size() const { return _vs.size(); }
             bool empty() const { return _vs.empty(); }
             void clear() { _vs.clear(); }
 
-            inline version_string *front();
-            inline const version_string * const front() const;
-            inline version_string *back();
-            inline const version_string * const back() const;
+            inline const version_string& front() const;
+            inline const version_string& back() const;
+
+            inline iterator find(const std::string& path);
+            inline const_iterator find(const std::string& path) const;
+            inline iterator find(const version_string& v);
+            inline const_iterator find(const version_string& v) const;
 
             /** Instantiate and insert a version_string object with the
              * specified path.
              * @param p Path.
              * @returns A boolean value (whether insertion succeeded).
              */
-            bool insert(const std::string &p);
+            inline bool insert(const std::string &p);
+
+            inline bool insert(const version_string& v);
 
             /** Assign a new package directory clearing any previously
              * contained version_string instances.
@@ -356,36 +355,58 @@ namespace portage
             mutable container_type _vs;
     };
 
-    inline version_string *
-    versions::front()
+    inline versions::iterator
+    versions::find(const std::string& p)
     {
-        assert(not this->empty());
-        return *(this->begin());
+        return _vs.find(version_string(p));
     }
 
-    inline const version_string * const
+    inline versions::const_iterator
+    versions::find(const std::string& p) const
+    {
+        return _vs.find(version_string(p));
+    }
+
+    inline versions::iterator
+    versions::find(const version_string& v)
+    {
+        return _vs.find(v);
+    }
+
+    inline versions::const_iterator
+    versions::find(const version_string& v) const
+    {
+        return _vs.find(v);
+    }
+
+    inline bool
+    versions::insert(const std::string& path)
+    {
+        return _vs.insert(version_string(path)).second;
+    }
+
+    inline bool
+    versions::insert(const version_string& v)
+    {
+        return _vs.insert(v).second;
+    }
+
+    inline const version_string&
     versions::front() const
     {
         assert(not this->empty());
         return *(this->begin());
     }
 
-    inline version_string *
-    versions::back()
-    {
-        assert(not this->empty());
-        iterator i = this->end();
-        return *(--i);
-    }
-
-    inline const version_string * const
+    inline const version_string&
     versions::back() const
     {
         assert(not this->empty());
         const_iterator i = this->end();
         return *(--i);
     }
-}
+
+} // namespace portage
 
 #endif
 

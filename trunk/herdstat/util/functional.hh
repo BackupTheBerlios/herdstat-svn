@@ -135,6 +135,19 @@ namespace util {
         }
     };
 
+    /**
+     * Function object that calls T::append(const U&).
+     */
+
+    template <typename T, typename U = typename T::value_type>
+    struct Appender : std::binary_function<U, T* const, void>
+    {
+        void operator()(const U& u, T * const v) const
+        {
+            v->append(u);
+        }
+    };
+
 } // namespace util
 
 #endif /* _HAVE_UTIL_FUNCTIONAL_HH */

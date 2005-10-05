@@ -59,7 +59,7 @@ ebuild_which(const std::string &portdir, const std::string &pkg,
     if (versions.empty())
         throw NonExistentPkg(pkg);
 
-    return versions.back()->ebuild();
+    return versions.back().ebuild();
 }
 /*****************************************************************************
  * Overloaded ebuild_which() that takes a portage::config_T object and       *
