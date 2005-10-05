@@ -2,6 +2,8 @@
 
 include $(top_builddir)/Makefile.am.common
 
+SUBDIRS = io
+
 bin_PROGRAMS = herdstat
 
 herdstat_SOURCES = common.hh common.cc \

@@ -34,7 +34,8 @@ enum ActionMethod
     Unspecified,
     Herd,
     Dev,
-    Find
+    Find,
+    Which
 }
 
 class ActionHandler
@@ -43,7 +44,8 @@ class ActionHandler
         ActionHandler() { }
         virtual ~ActionHandler() { }
 
-        virtual int operator()(const Query& query) const = 0;
+        virtual void operator()(const Query& query,
+                                QueryResults * const results) const = 0;
 };
 
 #endif /* _HAVE_ACTION_HANDLER_HH */

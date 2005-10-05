@@ -132,7 +132,8 @@ help()
 }
 
 static bool
-handle_opts(int argc, char **argv, Query *q)
+handle_opts(int argc, char **argv,
+        Query *q, std::vector<std::string> *args)
 {
 
     return true;
@@ -151,64 +152,62 @@ main(int argc, char **argv)
 
     try
     {
-        Query query;
+        Query q;
         std::vector<std::string> nonopt_args;
 
         /* handle command line options */
-        if (not handle_opts(argc, argv, &query, &nonopt_args))
+        if (not handle_opts(argc, argv, &q, &nonopt_args))
             throw argsException();
 
-        if (options::prompt())
-            options::set_input(Readline);
+        if (options::iomethod() == Unspecified)
+            options::set_iomethod(Stream);
 
-        /* handle input */
-        if (options::input() != Unspecified)
+        /* setup I/O handlers */
+        std::map<IOMethod, IOHandler *> iohandlers;
+        iohandlers[Readline] = new ReadlineIOHandler();
+        iohandlers[Stream]   = new StreamIOHandler();
+        iohandlers[Gtk]      = new GtkIOHandler();
+
+        IOHandler *iohandler = iohandlers[options::iomethod()];
+        if (not iohandler)
+            throw IOMethodUnimplemented();
+
+        /* setup action handlers */
+        std::map<ActionMethod, ActionHandler *> ahandlers;
+        ahandlers[Herd] = new HerdActionHandler();
+        ahandlers[Dev]  = new DevActionHandler();
+
+        bool loop = (options::iomethod() != Stream);
+
+        /* main loop */
+        do
         {
-            std::map<InputMethod, InputHandler *> handlers;
-            handlers[Readline] = new ReadlineInputHandler();
+            Query query;
+            QueryResults results;
 
-            InputHandler *handler = handlers[options::input()];
-            if (handler)
+            /* handle input */
+            if (options::iomethod() == Stream)
             {
-                if ((*handler)(&query) != EXIT_SUCCESS)
-                    return EXIT_FAILURE;
+                /* we've already filled the query object when 
+                 * parsing the command line options, so use it. */
+                query = q;
             }
-            else
-                throw InputUnimplemented();
-        }
+            else if (not (*iohandler)(&query))
+                break;
 
-        /* handle query */
-        {
-            std::map<ActionMethod, ActionHandler *> handlers;
-            handlers[Herd] = new HerdActionHandler();
-            handlers[Dev]  = new DevActionHandler();
-
-            QueryHandler *handler = handlers[options::action()];
+            ActionHandler *handler = ahandlers[query.action()];
             if (handler)
             {
-                if ((*handler)(query) != EXIT_SUCCESS)
-                    return EXIT_FAILURE;
+                /* perform action */
+                (*handler)(query, &results);
             }
             else
                 throw ActionUnimplemented();
-        }
 
-        /* handle output */
-        {
-            if (options::output() == Unspecified)
-                options::set_output(Stream);
+            /* display results */
+            (*iohandler)(results);
 
-            std::map<OutputMethod, OutputHandler *> handlers;
-            handlers[Stream] = new StreamOutputHandler();
-
-            OutputHandler *handler = handlers[options::output()];
-            if (handler)
-            {
-                (*handler)();
-            }
-            else
-                throw OutputUnimplemented();
-        }
+        } while (loop);
     }
     catch (const argsHelp)
     {
