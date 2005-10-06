@@ -12,7 +12,7 @@ libtoolize --copy --force --automake
 rm -f config.cache
 dothis aclocal -I . ${ACLOCAL_FLAGS}
 dothis autoheader
-dothis automake -a
+dothis automake -a -c
 dothis autoconf
 
 echo "Success. Next, run ./configure --help for supported flags."
