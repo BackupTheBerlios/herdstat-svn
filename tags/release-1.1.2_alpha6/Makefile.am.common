@@ -1,0 +1,7 @@
+# $Id$
+
+INCLUDES = $(libherdstat_CFLAGS)
+MAINTAINERCLEANFILES = Makefile.in *~ *.loT
+AM_CXXFLAGS = -pedantic -ansi -Wall -Wold-style-cast -Woverloaded-virtual -Wredundant-decls
+
+# vim: set ft=automake :
