@@ -4,7 +4,6 @@ AUTOMAKE_OPTIONS = 1.8 dist-bzip2 no-dist-gzip
 
 SUBDIRS = src doc
 
-CLEANFILES = TODO
 MAINTAINERCLEANFILES = aclocal.m4 \
 		       configure \
 		       Makefile.in \
@@ -14,7 +13,9 @@ MAINTAINERCLEANFILES = aclocal.m4 \
 		       html/*/*.html \
 		       *~
 
-EXTRA_DIST = Makefile.am.common autogen.sh .todo bashcomp tests
+DISTCLEANFILES = ChangeLog TODO
+
+EXTRA_DIST = ChangeLog Makefile.am.common autogen.sh .todo bashcomp tests
 
 check:
 	cd tests && $(MAKE) $@
@@ -33,10 +34,24 @@ srchtml:
 TODO: .todo
 	@test -x $(prefix)/bin/devtodo && devtodo all --TODO
 
+clitimestamp:
+	@touch clitimestamp
+
+ChangeLog: clitimestamp
+	@if test -d $(top_srcdir)/.svn -a -x $(prefix)/bin/svn2cl ; then \
+		svn up $(top_srcdir) ; \
+		svn2cl --group-by-day --include-rev --stdout | \
+			@SED@ -e 's|\(ka0ttic\)|Aaron Walker <\1@gentoo.org>|' \
+			> $@; \
+	else \
+		touch ChangeLog; \
+	fi
+	@rm clitimestamp
+
 distcheck-hook:
 	@cp Makefile.am.common $(PACKAGE)-$(VERSION)/_build/
 
-dist-hook: TODO
+dist-hook: TODO ChangeLog
 
 dist-sign: dist
 	gpg --armour --detach-sign "$(PACKAGE)-$(VERSION).tar.bz2"
