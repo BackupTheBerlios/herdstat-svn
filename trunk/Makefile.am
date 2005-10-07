@@ -4,7 +4,9 @@ AUTOMAKE_OPTIONS = 1.8 dist-bzip2 no-dist-gzip
 
 SUBDIRS = src doc
 
-MAINTAINERCLEANFILES = aclocal.m4 \
+MAINTAINERCLEANFILES = COPYING \
+		       INSTALL \
+		       aclocal.m4 \
 		       configure \
 		       Makefile.in \
 		       config/* \
