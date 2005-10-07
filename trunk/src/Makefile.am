@@ -26,9 +26,10 @@ herdstat_SOURCES = common.hh common.cc \
 		   action_stats_handler.hh action_stats_handler.cc \
 		   action_which_handler.hh action_which_handler.cc \
 		   action_versions_handler.hh action_versions_handler.cc \
+		   getcols.cc \
 		   herdstat.cc
 
-herdstat_LDADD = $(libherdstat_LIBS)
+herdstat_LDADD = $(libherdstat_LIBS) @TERMCAP_LIBS@
 
 if DEBUG
 bin_PROGRAMS += querycachectl

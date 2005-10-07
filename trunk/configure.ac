@@ -79,8 +79,24 @@ dnl Required functions
 dnl Optional functions
 AC_CHECK_FUNCS(getopt_long)
 
-dnl Required libs
+dnl Optional libs
 
+dnl Check for termcap lib
+AC_MSG_CHECKING([whether to use ncurses to get screen width for output formatting])
+AC_ARG_WITH(ncurses,
+    AC_HELP_STRING([--with-ncurses],[Use ncurses to determine terminal width used for output formatting [on]]),
+    [WITH_NCURSES=$withval],[WITH_NCURSES=yes])
+AC_MSG_RESULT([$WITH_NCURSES])
+
+if test "$WITH_NCURSES" = "yes" ; then
+    AC_CHECK_LIB(ncurses, tgetent, [TERMCAP_LIBS="-lncurses"])
+    AC_CHECK_HEADERS([curses.h term.h])
+    AC_DEFINE(HAVE_NCURSES, 1, [Use ncurses to determine terminal width])
+fi
+    
+AC_SUBST(TERMCAP_LIBS)
+
+dnl Required libs
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(libherdstat, libherdstat-0.1)
 
