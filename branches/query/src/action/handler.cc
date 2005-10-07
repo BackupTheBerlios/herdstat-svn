@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/query.cc
+ * herdstat -- src/action/handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -24,27 +24,21 @@
 # include "config.h"
 #endif
 
-#include <algorithm>
-#include "query.hh"
+#include "common.hh"
+#include "options.hh"
+#include "action/handler.hh"
 
-Query::Query() : _qm()
+void
+XMLActionHandler::fetch_and_parse()
 {
-}
+    fetch_herdsxml();
+    herdsxml.parse(options::herdsxml());
 
-Query::iterator
-Query::find(const std::string& k)
-{
-    for (iterator i = _qm.begin() ; i != _qm.end() ; ++i)
-        if (i->first == k) return i;
-    return _qm.end();
-}
-
-Query::const_iterator
-Query::find(const std::string& k) const
-{
-    for (const_iterator i = _qm.begin() ; i != _qm.end() ; ++i)
-        if (i->first == k) return i;
-    return _qm.end();
+    if (options::devaway())
+    {
+        fetch_devawayxml();
+        devawayxml.parse(options::devawayxml());
+    }
 }
 
 /* vim: set tw=80 sw=4 et : */

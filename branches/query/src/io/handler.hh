@@ -35,6 +35,9 @@ enum IOMethod
     Stream
 };
 
+class Query;
+class QueryResults;
+
 class IOHandler
 {
     public:

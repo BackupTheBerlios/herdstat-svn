@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/query.cc
+ * herdstat -- src/action/herd.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,31 +20,25 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_HERD_HH
+#define _HAVE_HERD_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <algorithm>
-#include "query.hh"
+#include "action/handler.hh"
 
-Query::Query() : _qm()
+class HerdActionHandler : public XMLActionHandler
 {
-}
+    public:
+        HerdActionHandler() { }
+        virtual ~HerdActionHandler() { }
 
-Query::iterator
-Query::find(const std::string& k)
-{
-    for (iterator i = _qm.begin() ; i != _qm.end() ; ++i)
-        if (i->first == k) return i;
-    return _qm.end();
-}
+        virtual void operator()(const Query& query,
+                                QueryResults * const results) const;
+};
 
-Query::const_iterator
-Query::find(const std::string& k) const
-{
-    for (const_iterator i = _qm.begin() ; i != _qm.end() ; ++i)
-        if (i->first == k) return i;
-    return _qm.end();
-}
+#endif /* _HAVE_HERD_HH */
 
 /* vim: set tw=80 sw=4 et : */

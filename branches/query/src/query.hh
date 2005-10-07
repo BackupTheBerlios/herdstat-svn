@@ -31,6 +31,15 @@
 #include <utility>
 #include <string>
 
+enum ActionMethod;
+
+/**
+ * @class Query
+ * @brief Represents a list of conditions that whatever is being searched must
+ * meet in order to be considered a match.  Holds key/value pairs, the name of
+ * the field we're searching (name, fex), to the criteria (Aaron Walker, fex).
+ */
+
 class Query
 {
     public:
@@ -42,6 +51,22 @@ class Query
         typedef container_type::value_type value_type;
         typedef container_type::size_type size_type;
 
+        /// Default constructor.
+        Query();
+
+        /// Get action associated with this query.
+        inline ActionMethod action() const;
+
+        //@{
+        /// Special condition - match all.
+        inline bool all() const;
+        inline void set_all(bool v);
+        //@}
+
+        /**
+         * @name container_type subset
+         */
+        //@{
         iterator find(const std::string& k);
         const_iterator find(const std::string& k) const;
 
@@ -52,11 +77,17 @@ class Query
 
         inline size_type size() const;
         inline bool empty() const;
+        //@}
 
     private:
         container_type _qm;
+        ActionMethod _action;
+        bool _all;
 };
 
+inline ActionMethod Query::action() const { return _action; }
+inline bool Query::all() const { return _all; }
+inline void Query::set_all(bool v) { _all = v; }
 inline Query::iterator Query::begin() { return _qm.begin(); }
 inline Query::const_iterator Query::begin() const { return _qm.begin(); }
 inline Query::iterator Query::end() { return _qm.end(); }

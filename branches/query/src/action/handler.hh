@@ -27,8 +27,6 @@
 # include "config.h"
 #endif
 
-#include "query.hh"
-
 enum ActionMethod
 {
     Unspecified,
@@ -38,6 +36,9 @@ enum ActionMethod
     Which
 }
 
+class Query;
+class QueryResults;
+
 class ActionHandler
 {
     public:
@@ -46,6 +47,21 @@ class ActionHandler
 
         virtual void operator()(const Query& query,
                                 QueryResults * const results) const = 0;
+};
+
+class XMLActionHandler : public ActionHandler
+{
+    public:
+        virtual ~XMLActionHandler() { }
+
+        virtual void operator()(const Query& query,
+                                QueryResults * const results) const = 0;
+
+    protected:
+        void fetch_and_parse();
+
+        herdstat::portage::herds_xml herdsxml;
+        herdstat::portage::devaway_xml devawayxml;
 };
 
 #endif /* _HAVE_ACTION_HANDLER_HH */

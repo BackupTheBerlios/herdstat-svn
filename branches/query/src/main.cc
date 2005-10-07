@@ -28,6 +28,8 @@
 #include <map>
 #include <cstring>
 
+#include <herdstat/exceptions.hh>
+
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
 #endif
@@ -42,6 +44,8 @@
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
+
+using namespace herdstat;
 
 static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:";
 
@@ -139,6 +143,8 @@ handle_opts(int argc, char **argv,
     return true;
 }
 
+std::string::size_type getcols(); // defined in getcols.cc
+
 int
 main(int argc, char **argv)
 {
@@ -189,7 +195,8 @@ main(int argc, char **argv)
             if (options::iomethod() == Stream)
             {
                 /* we've already filled the query object when 
-                 * parsing the command line options, so use it. */
+                 * parsing the command line options, so use it
+                 * instead of calling the iohandler. */
                 query = q;
             }
             else if (not (*iohandler)(&query))
@@ -198,8 +205,15 @@ main(int argc, char **argv)
             ActionHandler *handler = ahandlers[query.action()];
             if (handler)
             {
-                /* perform action */
-                (*handler)(query, &results);
+                try
+                {
+                    /* perform action */
+                    (*handler)(query, &results);
+                }
+                catch (const ActionException)
+                {
+                    return EXIT_FAILURE;   
+                }
             }
             else
                 throw ActionUnimplemented();

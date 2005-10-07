@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/query.cc
+ * herdstat -- action/herd.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -24,27 +24,26 @@
 # include "config.h"
 #endif
 
-#include <algorithm>
-#include "query.hh"
+#include "options.hh"
+#include "action/herd.hh"
 
-Query::Query() : _qm()
-{
-}
+using namespace herdstat;
+using namespace herdstat::portage;
 
-Query::iterator
-Query::find(const std::string& k)
+void
+HerdActionHandler::operator()(const Query& query,
+                              QueryResults * const results) const
 {
-    for (iterator i = _qm.begin() ; i != _qm.end() ; ++i)
-        if (i->first == k) return i;
-    return _qm.end();
-}
+    const Herds& herds(herdsxml.herds());
 
-Query::const_iterator
-Query::find(const std::string& k) const
-{
-    for (const_iterator i = _qm.begin() ; i != _qm.end() ; ++i)
-        if (i->first == k) return i;
-    return _qm.end();
+    if (query.all())
+    {
+        /* transform all herds to QueryResults */
+    }
+    else if (options::regex())
+    {
+        /* transform all regex matches to QueryResults */
+    }
 }
 
 /* vim: set tw=80 sw=4 et : */
