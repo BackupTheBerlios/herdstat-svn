@@ -509,6 +509,8 @@ handle_opts(int argc, char **argv, opts_type *args)
     return 0;
 }
 
+std::string::size_type getcols(); // defined in getcols.cc
+
 int
 main(int argc, char **argv)
 {
@@ -523,7 +525,7 @@ main(int argc, char **argv)
 		       (std::strcmp(argv[1], "-T") == 0)));
 
     /* save column width */
-    options::set_maxcol((test ? 80 : util::getcols()));
+    options::set_maxcol((test ? 80 : getcols()));
 
     try
     { 
