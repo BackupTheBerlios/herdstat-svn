@@ -43,7 +43,8 @@ enum options_action_T
     action_versions,
     action_find,
     action_away,
-    action_fetch
+    action_fetch,
+    action_kw
 };
 
 typedef std::vector<std::pair<std::string, std::string> > fields_type;

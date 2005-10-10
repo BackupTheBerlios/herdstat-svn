@@ -21,6 +21,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   action_herd_handler.hh action_herd_handler.cc \
 		   action_fetch_handler.hh action_fetch_handler.cc \
 		   action_find_handler.hh action_find_handler.cc \
+		   action_keywords_handler.hh action_keywords_handler.cc \
 		   action_meta_handler.hh action_meta_handler.cc \
 		   action_pkg_handler.hh action_pkg_handler.cc \
 		   action_stats_handler.hh action_stats_handler.cc \
