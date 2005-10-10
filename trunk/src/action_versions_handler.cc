@@ -57,7 +57,7 @@ action_versions_handler_T::operator() (opts_type &opts)
 
     if (not options::fields().empty())
     {
-        std::cerr << "--field doesn't really make much sense with --away."
+        std::cerr << "--field doesn't really make much sense with --versions."
             << std::endl;
         return EXIT_FAILURE;
     }
@@ -162,6 +162,8 @@ action_versions_handler_T::operator() (opts_type &opts)
              * ebuilds are there - in this case, use real PORTDIR. */
             if (versions.empty())
                 versions.assign(options::portdir() + "/" + package);
+            if (versions.empty())
+                throw portage::NonExistentPkg(package);
 
             size += versions.size();
 
