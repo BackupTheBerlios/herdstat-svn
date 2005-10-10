@@ -181,25 +181,25 @@ action_meta_handler_T::display(const metadata_data& data)
         ebuild_vars.read(e);
         
             /* display LICENSE */
-//            if (options::quiet() and ebuild_vars["LICENSE"].empty())
-//                ebuild_vars["LICENSE"] = "none";
+            if (options::quiet() and ebuild_vars["LICENSE"].empty())
+                ebuild_vars["LICENSE"] = "none";
 
-//            if (not ebuild_vars["LICENSE"].empty())
-//            {
-//                try
-//                {
-//                    const std::string license(parse_license(ebuild_vars["LICENSE"]));
-//                    output("License", license);
-//                }
-//                catch (const QAException& e)
-//                {
-//                    std::string error("Invalid license '");
-//                    error += e.what();
-//                    error += "' for " + data.pkg;
+            if (not ebuild_vars["LICENSE"].empty())
+            {
+                try
+                {
+                    const std::string license(parse_license(ebuild_vars["LICENSE"]));
+                    output("License", license);
+                }
+                catch (const QAException& e)
+                {
+                    std::string error("Invalid license '");
+                    error += e.what();
+                    error += "' for " + data.pkg;
 
-//                    throw QAException(error);
-//                }
-//            }
+                    throw QAException(error);
+                }
+            }
 
         if (options::quiet() and ebuild_vars["HOMEPAGE"].empty())
             ebuild_vars["HOMEPAGE"] = "none";
