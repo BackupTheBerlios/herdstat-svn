@@ -35,14 +35,46 @@ HerdActionHandler::operator()(const Query& query,
                               QueryResults * const results) const
 {
     const Herds& herds(herdsxml.herds());
+    Herds::const_iterator h;
 
     if (query.all())
     {
         /* transform all herds to QueryResults */
+        std::string h;
+        std::map<std::string, std::string> hmap;
+
+        for (h = herds.begin() ; h != herds.end() ; ++h)
+            h += h->name() + " ";
+
+        hmap.insert(std::make_pair("herds", h));
+        results->push_back(hmap);
     }
     else if (options::regex())
     {
         /* transform all regex matches to QueryResults */
+        Query::const_iterator q;
+        /* for each query condition */
+        for (q = query.begin() ; q != query.end() ; ++q)
+        {
+            std::map<std::string, std::string> hmap;
+            const util::Regex regex(q->second);
+
+            /* for each herd */
+            for (h = herds.begin() ; h != herds.end() ; ++h)
+            {
+                if (regex == (h->q->first())())
+                {
+                    if (not h->name().empty())
+                        hmap.insert(std::make_pair("name", h->name()));
+                    if (not h->email().empty())
+                        hmap.insert(std::make_pair("email", h->email()));
+                }
+            }
+        }
+    }
+    else
+    {
+
     }
 }
 

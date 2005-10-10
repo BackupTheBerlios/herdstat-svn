@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/handler.hh
+ * herdstat -- io/stream.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,34 +20,26 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_IO_HANDLER_HH
-#define _HAVE_IO_HANDLER_HH 1
+#ifndef _HAVE_STREAM_HH
+#define _HAVE_STREAM_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-enum IOMethod
-{
-    Unspecified,
-    Readline,
-    Gtk,
-    Stream
-};
+#include "io/handler.hh"
 
-class Query;
-class QueryResults;
-
-class IOHandler
+class StreamIOHandler : public IOHandler
 {
     public:
-        virtual ~IOHandler() { }
+        virtual ~StreamIOHandler() { }
+
         /* input */
-        virtual bool operator()(Query * const query) = 0;
+        virtual bool operator()(Query * const query);
         /* output */
-        virtual bool operator()(const QueryResults& results) = 0;
+        virtual bool operator()(const QueryResults& results);
 };
 
-#endif /* _HAVE_IO_HANDLER_HH */
+#endif /* _HAVE_STREAM_HH */
 
 /* vim: set tw=80 sw=4 et : */

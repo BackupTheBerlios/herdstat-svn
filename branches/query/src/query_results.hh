@@ -29,10 +29,11 @@
 
 #include <map>
 #include <vector>
+#include <utility>
 
 /**
  * @class QueryResults
- * @brief Represents a vector of maps. Each element in the vector describes one
+ * @brief Represents a vector of pairs. Each element in the vector describes one
  * match with the map being a list of key/value pairs (fex, "name" => "Aaron
  * Walker").
  */
@@ -40,7 +41,8 @@
 class QueryResults
 {
     public:
-        typedef std::vector<std::map<std::string, std::string> > container_type;
+        typedef std::vector<std::pair<std::string, std::string> > Result;
+        typedef std::vector<Result> container_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
         typedef container_type::reference reference;

@@ -83,7 +83,7 @@ class FieldsMap
 };
 
 /**
- * transform_fields_into_matches
+ * transform_query_into_results
  * for each object in the range [first,last), iterate over fields vector,
  * assigning each field value to CmpType and then comparing it to the
  * return value of the correspoding member function (member function of
@@ -118,7 +118,7 @@ class FieldsMap
 
 template <typename InIter, typename OutIter, typename CmpType, typename UnaryOp>
 void
-transform_fields_into_matches(InIter first, InIter last, OutIter result,
+transform_query_into_results(InIter first, InIter last, OutIter result,
         CmpType& cmp, const fields_type& fields,
         const FieldsMap<typename std::iterator_traits<InIter>::value_type>& fm,
         UnaryOp op)
