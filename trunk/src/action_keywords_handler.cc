@@ -59,7 +59,7 @@ action_keywords_handler_T::operator() (opts_type &opts)
     typedef std::vector<std::pair<std::string, std::string> > spv;
 
     spv outvec;
-    OverlayDisplay_T od;
+    OverlayDisplay od;
     std::string dir;
     bool pwd = false;
 
@@ -240,7 +240,7 @@ action_keywords_handler_T::operator() (opts_type &opts)
     spv::iterator i = std::max_element(outvec.begin(),
                         outvec.end(), FirstLengthLess());
 
-    output.set_maxlabel(i->first.length()+maxlen+2);
+    output.set_maxlabel(i->first.length()+2);
     output.set_maxdata(options::maxcol() - output.maxlabel());
     output.set_quiet(options::quiet());
     output.set_attrs();

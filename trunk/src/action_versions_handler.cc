@@ -46,7 +46,7 @@ action_versions_handler_T::~action_versions_handler_T()
 int
 action_versions_handler_T::operator() (opts_type &opts)
 {
-    OverlayDisplay_T od;
+    OverlayDisplay od;
     std::string dir;
     bool pwd = false;
 

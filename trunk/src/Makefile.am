@@ -13,7 +13,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
 		   formatter.hh formatter.cc \
-		   overlaydisplay.hh \
+		   overlaydisplay.hh overlaydisplay.cc \
 		   fields.hh \
 		   action_handler.hh action_handler.cc \
 		   action_away_handler.hh action_away_handler.cc \

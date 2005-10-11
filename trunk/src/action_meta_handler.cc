@@ -253,7 +253,7 @@ action_meta_handler_T::display(const metadata_data& data)
 int
 action_meta_handler_T::operator() (opts_type &opts)
 {
-    OverlayDisplay_T od;
+    OverlayDisplay od;
 
     bool pwd = false;
     std::string dir;
