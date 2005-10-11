@@ -211,7 +211,7 @@ metacache_T::load()
 
     try
     {
-        const util::vars cache(this->path());
+        util::vars cache(this->path());
 
         /* reserve to prevent tons of reallocations */
         if (cache["size"].empty() or cache["size"] == "0")
