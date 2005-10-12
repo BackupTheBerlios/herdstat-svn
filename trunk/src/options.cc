@@ -75,9 +75,8 @@ fields_type options::_fields;
 
 options_action_T options::_action = action_unspecified;
 
-portage::config options::_config;
-const std::string& options::_portdir = portage::config::portdir();
-const std::vector<std::string>& options::_overlays = portage::config::overlays();
+const std::string& options::_portdir = portage::GlobalConfig().portdir();
+const std::vector<std::string>& options::_overlays = portage::GlobalConfig().overlays();
 
 options::options()
 {
