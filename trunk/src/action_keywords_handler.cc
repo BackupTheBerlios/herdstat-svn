@@ -30,7 +30,7 @@
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/version.hh>
-#include <herdstat/portage/ebuild.hh>
+#include <herdstat/portage/keywords.hh>
 
 #include "pkgcache.hh"
 #include "overlaydisplay.hh"
@@ -197,17 +197,20 @@ action_keywords_handler_T::operator() (opts_type &opts)
                         s.erase(pos);
 
                     /* get keywords for this version */
-                    portage::ebuild ebuild(v->ebuild());
-                    spv::value_type p(s,
-                            (ebuild["KEYWORDS"].empty() ?
-                                    "Non-existent KEYWORDS variable." :
-                                    ebuild["KEYWORDS"]));
-                    outvec.push_back(p);
+//                    portage::ebuild ebuild(v->ebuild());
+//                    spv::value_type p(s,
+//                            (ebuild["KEYWORDS"].empty() ?
+//                                    "Non-existent KEYWORDS variable." :
+//                                    ebuild["KEYWORDS"]));
+//                    outvec.push_back(p);
+
+                    portage::Keywords kw(v->ebuild(), options::color());
+                    outvec.push_back(spv::value_type(s, kw.str()));
                 }
             }
 
             if (not options::count() and (n != matches.size()))
-                output.endl();
+                outvec.push_back(spv::value_type("", ""));
         }
         catch (const portage::AmbiguousPkg &e)
         {
