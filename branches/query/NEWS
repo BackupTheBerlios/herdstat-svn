@@ -5,6 +5,13 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
     Moved getcols() function from libherdstat as it really doesn't belong in
     the lib and just bloats it with another lib.
 
+    New features:
+     - The --metadata option now displays package's LICENSE.
+     - Added --keywords option for displaying package keywords.
+
+    Bug fixes:
+     - Fixed bug where --versions <category> didn't bail like it should.
+
 1.1.2_alpha6:
     Broke out the convenience library residing in herdstat/ into its own
     package, libherdstat.

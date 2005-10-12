@@ -15,7 +15,7 @@ herdstat_SOURCES = common.hh common.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
 		   formatter.hh formatter.cc \
-		   overlaydisplay.hh \
+		   overlaydisplay.hh overlaydisplay.cc \
 		   query.hh query.cc \
 		   query_results.hh \
 		   fields.hh \

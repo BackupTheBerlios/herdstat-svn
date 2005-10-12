@@ -51,6 +51,7 @@
 #include "action_versions_handler.hh"
 #include "action_away_handler.hh"
 #include "action_fetch_handler.hh"
+#include "action_keywords_handler.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
@@ -59,7 +60,7 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::xml;
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:k";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -108,6 +109,7 @@ static struct option long_opts[] =
     {"nometacache",  no_argument,	0,  '\f'},
     {"TEST",	    no_argument,	0,  'T'},
     {"field",	    required_argument,	0,  'X'},
+    {"keywords",    no_argument,	0,  'k'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -155,6 +157,7 @@ help()
 	<< " -f, --find              Look up category/package for the specified packages." << std::endl
 	<< " -a, --away              Look up away information for the specified developers." << std::endl
 	<< "     --versions          Look up versions of specified packages." << std::endl
+	<< " -k, --keywords          Display keywords for the specified packages." << std::endl
 	<< "     --field <field,criteria>" << std::endl
 	<< "                         Search by field (for use with --dev).  Possible fields" << std::endl
 	<< "                         are user,name,birthday,joined,status,location." << std::endl
@@ -354,6 +357,11 @@ handle_opts(int argc, char **argv, opts_type *args)
 		    throw argsOneActionOnly();
 		options::set_action(action_versions);
 		break;
+	    case 'k':
+		if (options::action() != action_unspecified)
+		    throw argsOneActionOnly();
+		options::set_action(action_kw);
+		break;
 	    /* --away */
 	    case 'a':
 		if (options::action() != action_unspecified)
@@ -502,7 +510,8 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    action != action_meta and
 	    action != action_dev and
 	    action != action_versions and
-	    action != action_fetch)
+	    action != action_fetch and
+	    action != action_kw)
 	    throw argsUsage();
     }
 
@@ -655,6 +664,7 @@ main(int argc, char **argv)
 	handlers[action_find]     = new action_find_handler_T();
 	handlers[action_away]     = new action_away_handler_T();
 	handlers[action_fetch]    = new action_fetch_handler_T();
+	handlers[action_kw]       = new action_keywords_handler_T();
 
 	action_handler_T *action_handler = handlers[options::action()];
 

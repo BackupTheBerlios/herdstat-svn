@@ -27,97 +27,33 @@
 # include "config.h"
 #endif
 
-#include <set>
+#include <string>
 #include <utility>
-#include <sstream>
-#include "common.hh"
+#include <herdstat/util/functional.hh>
+#include <herdstat/util/container_base.hh>
 
-class OverlayDisplay_T
+/*
+ * Keeps track of overlays and assigns them numbers.
+ * Displays the overlay list (in order) upon destruction.
+ */
+
+class OverlayDisplay
+    // implemented-in-terms-of 'set<pair<string, size_t>, SecondLess>'
+    : private herdstat::util::SetBase<
+        std::pair<std::string, std::size_t>, herdstat::util::SecondLess>
 {
-    typedef std::string string_type;
-    typedef std::size_t size_type;
-    typedef std::pair<string_type, size_type> OverlayCount;
-    typedef herdstat::util::ColorMap color_type;
+    typedef herdstat::util::SetBase<std::pair<std::string, std::size_t>,
+                                    herdstat::util::SecondLess> base_type;
 
-    class OverlaySort
-    {
-        public:
-            bool operator() (OverlayCount c1, OverlayCount c2)
-            { return c1.second < c2.second; }
-    };
-    
     public:
-        typedef std::set<OverlayCount, OverlaySort>::iterator iterator;
+        virtual ~OverlayDisplay();
 
-        const string_type operator[] (const std::string &s) const
-        {
-            if (options::quiet())
-                return "";
-
-            iterator i;
-            size_type n = 0;
-            for (i = this->_oset.begin() ; i != this->_oset.end()  ; ++i)
-            {
-                if (i->first == s)
-                {
-                    n = i->second;
-                    break;
-                }
-            }
-
-            assert(n != 0);
-
-            std::ostringstream os;
-            color_type color;
-            if (options::color())
-                os << color[cyan] << "[" << n << "]" << color[none];
-            else
-                os << "[" << n << "]";
-            return os.str();
-        }
-
-        void insert(const std::string &s)
-        {
-            bool found = false;
-
-            /* can't use oset.find() since we only know the second value
-             * of the pair before insertion */
-            iterator i;
-            for (i = this->_oset.begin() ; i != this->_oset.end() ; ++i)
-            {
-                if (i->first == s)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found)
-                return;
-
-            OverlayCount o;
-            o.first = s;
-            o.second = this->_oset.size() + 1;
-            this->_oset.insert(o);
-        }
-
-        ~OverlayDisplay_T()
-        {
-            if (options::quiet() or this->_oset.empty())
-                return;
-
-            *(options::outstream()) << std::endl << "Portage overlays:" << std::endl;
-
-            iterator i;
-            for (i = this->_oset.begin() ; i != this->_oset.end() ; ++i)
-                *(options::outstream()) << " " << this->operator[](i->first)
-                    << " " << i->first << std::endl;
-        }
-
-    private:
-        std::set<OverlayCount, OverlaySort> _oset;
+        // Get "[N]" string where N is the number of the given overlay.
+        std::string operator[](const std::string& k);
+        // Insert new overlay
+        void insert(const std::string& overlay);
 };
 
-#endif
+#endif /* HAVE_OVERLAYDISPLAY_HH */
 
 /* vim: set tw=80 sw=4 et : */
