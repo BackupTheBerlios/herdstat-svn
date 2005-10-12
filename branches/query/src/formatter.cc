@@ -200,7 +200,8 @@ formatter_T::append(const string_type &label,
         buffer.push_back(util::join(data));
 
     else if (attr.quiet)
-        std::copy(data.begin(), data.end(), std::back_inserter(buffer));
+        buffer.insert(buffer.end(), data.begin(), data.end());
+//        std::copy(data.begin(), data.end(), std::back_inserter(buffer));
 
     /* otherwise, produce a data string and call the real append() */
     else
