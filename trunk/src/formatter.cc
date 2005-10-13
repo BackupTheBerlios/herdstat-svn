@@ -80,10 +80,10 @@ Formatter::Formatter(const FormatAttrs& attrs)
 }
 
 void
-Formatter::highlight(std::vector<std::string> *data)
+Formatter::highlight(std::vector<std::string>& data)
 {
     std::vector<std::string>::iterator i;
-    for (i = data->begin() ; i != data->end() ; ++i)
+    for (i = data.begin() ; i != data.end() ; ++i)
     {
         const std::string colorfree(util::strip_colors(*i));
         bool is_away = (not _attrs.quiet() and
@@ -100,26 +100,12 @@ Formatter::highlight(std::vector<std::string> *data)
         for (h = _attrs.highlights().begin() ;
              h != _attrs.highlights().end() ; ++h)
         {
-            /* if it's a regex and the regex matches, highlight it */
+            /* if it's a regex and the regex matches, or
+             * if its not a regex and the literal matches, highlight it */
             std::string::size_type pos = h->first.find("re:");
-            if (pos != std::string::npos)
-            {
-                if (util::Regex(h->first.substr(pos+3)) == *i)
-                {
-                    if (result.find((*i)+_attrs.no_color()) == std::string::npos)
-                        result += h->second + (*i);
-                    else
-                        result += (*i);
-
-                    if (is_away)
-                        result += _attrs.devaway_color() + "*";
-
-                    result += _attrs.no_color();
-                    
-                }
-            }
-            /* or it's not a regex but the strings are equal */
-            else if (h->first == *i)
+            if ((pos != std::string::npos and
+                 util::Regex(h->first.substr(pos+3)) == colorfree) or
+                (pos == std::string::npos and h->first == colorfree))
             {
                 if (result.find((*i)+_attrs.no_color()) == std::string::npos)
                     result += h->second + (*i);
@@ -129,7 +115,8 @@ Formatter::highlight(std::vector<std::string> *data)
                 if (is_away)
                     result += _attrs.devaway_color() + "*";
 
-                result += _attrs.no_color();
+                if (_attrs.colors())
+                    result += _attrs.no_color();
             }
         }
 
@@ -139,7 +126,11 @@ Formatter::highlight(std::vector<std::string> *data)
         {
             result += (*i);
             if (is_away)
-                result += _attrs.devaway_color() + "*" + _attrs.no_color();
+            {
+                result += _attrs.devaway_color() + "*";
+                if (_attrs.colors())
+                    result += _attrs.no_color();
+            }
         }
 
         i->assign(result);
@@ -202,7 +193,7 @@ Formatter::flush(std::ostream& stream)
         {
             /* perform highlights and get back a vector of the data */
             std::vector<std::string> parts(util::split(i->second));
-            highlight(&parts);
+            highlight(parts);
 
             std::string::size_type outlen = util::strip_colors(label).length();
             while (not parts.empty())
@@ -217,6 +208,9 @@ Formatter::flush(std::ostream& stream)
                 }
                 else
                 {
+                    if (out[out.length() - 1] == ' ')
+                        out.erase(out.length() - 1);
+
                     out += "\n";
                     label.assign(maxlabel+1, ' ');
                     out += label + word + " ";
@@ -226,6 +220,9 @@ Formatter::flush(std::ostream& stream)
                 parts.erase(parts.begin());
             }
         }
+
+        if (out[out.length() - 1] == ' ')
+            out.erase(out.length() - 1);
 
         outbuf.push_back(out);
     }

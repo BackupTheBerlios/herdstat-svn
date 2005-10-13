@@ -22,8 +22,8 @@ Developer:   Seemant Kulleen (seemant)
 Email:       seemant@gentoo.org*
 Herds(5):    app-dicts base-system kerberos shell-tools x11
 Devaway:     In Boston, without dev box. Dev Box arrives in the middle of
-             September, that's when I will return. I don't check mailing lists 
-             or aliases -- I'm on IRC, but better to contact alternate people. 
+             September, that's when I will return. I don't check mailing lists
+             or aliases -- I'm on IRC, but better to contact alternate people.
 
 Developer:   Jochen Maes (sejo)
 Email:       sejo@gentoo.org*
@@ -38,22 +38,22 @@ Developer:   Tom Martin (slarti)
 Email:       slarti@gentoo.org*
 Herds(4):    amd64 net-mail shell-tools vim
 Devaway:     Gone till 1 Aug, then gone again on the 4 Aug till 22 Aug
-             (roughly). No mail, irc or net at all. Recruiters -> 
-             #gentoo-devrel, net-mail -> #gentoo-netmail. spb has my phone if 
-             it's life threatening, but it won't be. 
+             (roughly). No mail, irc or net at all. Recruiters ->
+             #gentoo-devrel, net-mail -> #gentoo-netmail. spb has my phone if
+             it's life threatening, but it won't be.
 
 Developer:   Jonathan Smith (smithj)
 Email:       smithj@gentoo.org*
 Herds(2):    desktop-misc netmon
 Devaway:     my laptop's motherboard fried... NEVER BUY A DELL!!! in any case,
-             any dev can fix anything normally maintained by me. i hope to be 
-             back within a week or two, but who knows? 
+             any dev can fix anything normally maintained by me. i hope to be
+             back within a week or two, but who knows?
 
 Developer:   Ned Ludd (solar)
 Email:       solar@gentoo.org*
 Herds(3):    embedded hardened toolchain
 Devaway:     away moving.. as long as it takes to get done. 9-5 EST I will be
-             reachable 
+             reachable
 
 Developer:   Stephen Bennett (spb)
 Email:       spb@gentoo.org
@@ -63,7 +63,7 @@ Developer:   D.M.D. Ljungmark (spider)
 Email:       spider@gentoo.org*
 Herds(1):    gnome
 Devaway:     Moving // Germany from 12th to 17th ( Wave Gotik Treffen ) // 3-5
-             weeks before I get an ISP in my new place. 
+             weeks before I get an ISP in my new place.
 
 Developer:   Michael Januszewski (spock)
 Email:       spock@gentoo.org
@@ -73,7 +73,7 @@ Developer:   Donnie Berkholz (spyderous)
 Email:       spyderous@gentoo.org*
 Herds(3):    cluster sci x11
 Devaway:     Wedding+honeymoon, back Sept. 5. Bug joshuabaergen/battousai about
-             X. 
+             X.
 
 Developer:   Josh Grebe (squash)
 Email:       squash@gentoo.org
@@ -116,7 +116,7 @@ Developer:   Sven Wegener (swegener)
 Email:       swegener@gentoo.org*
 Herds(3):    net-irc net-news shell-tools
 Devaway:     Looking for a new job, don't expect much Gentoo work during this
-             time. Available via IRC and mail. 
+             time. Available via IRC and mail.
 
 Developer:   yoswink
 Email:       yoswink@gentoo.org

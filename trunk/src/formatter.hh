@@ -156,7 +156,7 @@ class Formatter
         void append(const std::string& label, const std::string& data)
         { _buffer.push_back(buffer_type::value_type(label, data)); }
         //// Perform highlighting
-        void highlight(std::vector<std::string> *v);
+        void highlight(std::vector<std::string>& v);
 
         FormatAttrs _attrs;
         buffer_type _buffer;
