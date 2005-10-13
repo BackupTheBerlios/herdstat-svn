@@ -124,10 +124,7 @@ doaction(querycache_T &querycache, const std::string &action)
     }
     else if (action == "summary")
     {
-        formatter_T out;
-        out.set_maxlabel(15);
-        out.set_maxdata(options::maxcol() - out.maxlabel());
-        out.set_attrs();
+        Formatter& out(GlobalFormatter());
 
         out("Size", util::sprintf("%d", querycache.size()));
 
@@ -161,12 +158,9 @@ doaction(querycache_T &querycache, const std::string &action)
 int
 main(int argc, char **argv)
 {
-    util::ColorMap color;
-    formatter_T out;
-    out.set_colors(true);
-    out.set_labelcolor(color[green]);
-    out.set_highlightcolor(color[yellow]);
-    out.add_highlight(util::current_user());
+    Formatter& out(GlobalFormatter());
+    out.attrs().set_colors(true);
+    out.attrs().add_highlight(util::current_user());
 
     try
     {
