@@ -28,6 +28,7 @@
 #include <herdstat/portage/config.hh>
 #include "formatter.hh"
 #include "pkgquery.hh"
+#include "common.hh"
 #include "options.hh"
 
 using namespace herdstat;
@@ -41,11 +42,7 @@ pkgQuery_T::pkgQuery_T(const std::string &n, const std::string &w, bool dev)
 void
 pkgQuery_T::dump(std::ostream &stream) const
 {
-    formatter_T out;
-    out.set_maxlabel(16);
-    out.set_maxdata(options::maxcol() - out.maxlabel());
-    out.set_attrs();
-    
+    Formatter& out(GlobalFormatter());
     out("Query string", this->query);
     out("Query with", this->with);
     out("Query type", (this->type == QUERYTYPE_DEV ? "dev":"herd"));

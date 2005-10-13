@@ -287,7 +287,8 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         if ((options::verbose() and not options::quiet()) and
                 not longdesc.empty())
         {
-            if (output.size() > 1 and output.peek() != "")
+            if (output.size() > 1 and
+                output.peek() != Formatter::buffer_type::value_type("", ""))
                 output.endl();
 
             if (options::color())
@@ -325,11 +326,11 @@ action_pkg_handler_T::display()
     /* set format attributes */
     if (not options::meta())
     {
-        output.set_maxlabel(16);
-        output.set_maxdata(options::maxcol() - output.maxlabel());
+//        output.set_maxlabel(16);
+//        output.set_maxdata(options::maxcol() - output.maxlabel());
         if (options::devaway())
-            output.set_devaway(devaway.keys());
-        output.set_attrs();
+            output.attrs().set_devaway(devaway.keys());
+//        output.set_attrs();
     }
 
     opts_type::size_type n = 1;

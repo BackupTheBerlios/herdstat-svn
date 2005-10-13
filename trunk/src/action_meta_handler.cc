@@ -98,7 +98,7 @@ display_metadata(const metadata_data& data, std::string& longdesc)
     const Herds& herds(meta.herds());
     const Developers& devs(meta.devs());
 
-    formatter_T output;
+    Formatter& output(GlobalFormatter());
 
     /* display herds */
     if (not meta.is_category() and
@@ -262,14 +262,13 @@ action_meta_handler_T::operator() (opts_type &opts)
     {
         fetch_devawayxml();
         devaway.parse(options::devawayxml());
+        output.attrs().set_devaway(devaway.keys());
     }
 
-    output.set_maxlabel(16);
-    output.set_maxdata(options::maxcol() - output.maxlabel());
-    output.set_quiet(options::quiet(), " ");
-    if (options::devaway())
-        output.set_devaway(devaway.keys());
-    output.set_attrs();
+//    output.set_maxlabel(16);
+//    output.set_maxdata(options::maxcol() - output.maxlabel());
+    output.attrs().set_quiet(options::quiet(), " ");
+//    output.set_attrs();
 
     /* we dont care about these */
     options::set_count(false);

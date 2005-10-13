@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/formatter.hh
+ * herdstat -- src/format.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,122 +20,155 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_FORMATTER_HH
-#define HAVE_FORMATTER_HH 1
+#ifndef _HAVE_FORMAT_HH
+#define _HAVE_FORMAT_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <ostream>
-#include <map>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <utility>
 #include <herdstat/util/misc.hh>
-#include "common.hh"
 
-class formatter_T
+struct FirstLengthLess
 {
-    public:
-        typedef std::size_t size_type;
-        typedef std::string string_type;
-        typedef std::vector<string_type> buffer_type;
-        typedef herdstat::util::ColorMap color_type;
-
-        formatter_T() { }
-
-        void operator() (const string_type &l, const string_type &d)
-        { append(l, d); }
-
-        void operator() (const string_type &l, const std::vector<string_type> &d)
-        { append(l, d); }
-
-        void endl() { buffer.push_back(""); }
-        void flush(std::ostream &);
-        const string_type &peek() const { return buffer.back(); }
-        buffer_type::size_type size() const { return buffer.size(); }
-
-        void set_attrs();
-
-        /* attribute member functions */
-        void set_marked_away(const bool &value) { attr.marked_away = value; }
-        const bool &marked_away() const { return attr.marked_away; }
-
-        void set_maxtotal(const size_type &s) { attr.maxtotal = s; }
-        const size_type &maxtotal() const { return attr.maxtotal; }
-            
-        void set_maxlabel(const size_type &s) { attr.maxlabel = s; }
-        const size_type &maxlabel() const { return attr.maxlabel; }
-
-        void set_maxdata(const size_type &s) { attr.maxdata = s; }
-        const size_type &maxdata() const { return attr.maxdata; }
-
-        void set_colors(const bool &value) { attr.colors = value; }
-        const bool &colors() const { return attr.colors; }
-
-        void set_quiet(const bool &value, const string_type &delim = "\n")
-        {
-            attr.quiet = value;
-            attr.quiet_delim = delim;
-        }
-        const bool &quiet() const { return attr.quiet; }
-
-        void set_labelcolor(const string_type &s) { attr.label_color = s; }
-        const string_type &labelcolor() const { return attr.label_color; }
-
-        void set_datacolor(const string_type &s) { attr.data_color = s; }
-        const string_type &datacolor() const { return attr.data_color; }
-
-        void set_highlightcolor(const string_type &s) { attr.highlight_color = s; }
-        const string_type &highlightcolor() const { return attr.highlight_color; }
-
-        void set_devaway_color(const string_type &s) { attr.devaway_color = s; }
-        const string_type &devaway_color() const { return attr.devaway_color; }
-
-        void add_highlight(const string_type &s,
-                           const string_type &c = attr.highlight_color)
-        { attr.highlights[s] = attr.colors? c : ""; }
-        void add_highlights(const std::vector<string_type> &);
-
-        void set_devaway(const std::vector<string_type> &v)
-        { attr.devaway = v; }
-
-    private:
-        /* format attributes */
-        struct attrs_type
-        {
-            attrs_type();
-
-            bool colors;
-            bool quiet;
-            bool marked_away;
-
-            string_type quiet_delim;
-            string_type label_color;
-            string_type data_color;
-            string_type highlight_color;
-            string_type devaway_color;
-            string_type no_color;
-
-            string_type::size_type maxtotal;
-            string_type::size_type maxlabel;
-            string_type::size_type maxdata;
-            
-            string_type::size_type maxctotal;
-            string_type::size_type maxclabel;
-            string_type::size_type maxcdata;
-
-            std::map<string_type, string_type> highlights;
-            std::vector<string_type> devaway;
-        };
-
-        string_type highlight(const std::vector<string_type> &);
-        void append(const string_type &, const string_type &);
-        void append(const string_type &, const std::vector<string_type> &);
-
-        static buffer_type buffer;
-        static attrs_type attr;
-        static color_type color;
+    bool operator()(const std::pair<std::string, std::string>& p1,
+                    const std::pair<std::string, std::string>& p2) const
+    {
+        return (p1.first.length() < p2.first.length());
+    }
 };
 
-#endif
+class FormatAttrs
+{
+    public:
+        FormatAttrs();
+
+        std::size_t maxlen() const { return _maxlen; }
+        void set_maxlen(std::size_t n) { _maxlen = n; }
+
+        const std::vector<std::string>& devaway() const { return _devaway; }
+        void set_devaway(const std::vector<std::string>& v) { _devaway = v; }
+
+        const std::map<std::string, std::string>& highlights() const
+        { return _highlights; }
+        void add_highlights(const std::vector<std::string>& v);
+        void add_highlight(const std::string &s,
+                           const std::string &c = "")
+        { _highlights[s] = (_colors? (c.empty() ? _hcolor : c) : ""); }
+
+        const std::string& no_color() const { return _no_color; }
+
+        const std::string& label_color() const { return _lcolor; }
+        void set_label_color(const std::string& c) { _lcolor = c; }
+
+        const std::string& highlight_color() const { return _hcolor; }
+        void set_highlight_color(const std::string& c) { _hcolor = c; }
+
+        const std::string& devaway_color() const { return _dcolor; }
+        void set_devaway_color(const std::string& c) { _dcolor = c; }
+
+        bool colors() const { return _colors; }
+        void set_colors(bool c)
+        {
+            _colors = c;
+            if (not _colors)
+            {
+                _hcolor.clear(); _dcolor.clear();
+                _lcolor.clear();
+            }
+        }
+
+        bool quiet() const { return _quiet; }
+        const std::string& quiet_delim() const { return _quiet_delim; }
+        void set_quiet(bool quiet, std::string delim = "\n")
+        { _quiet = quiet; _quiet_delim = delim; set_colors(not quiet); }
+
+        bool marked_away() const { return _away; }
+        void set_marked_away(bool a) { _away = a; }
+
+    private:
+        herdstat::util::ColorMap _cmap;
+        bool _quiet;
+        bool _colors;
+        bool _away;
+        std::string _quiet_delim;
+        std::size_t _maxlen;
+        std::string _lcolor; /* label color */
+        std::string _hcolor; /* highlight color */
+        std::string _dcolor; /* devaway color */
+        std::string _no_color;
+        std::vector<std::string> _devaway;
+        std::map<std::string, std::string> _highlights;
+};
+
+class Formatter
+{
+    public:
+        typedef std::vector<std::pair<std::string, std::string> > buffer_type;
+
+        /// Get attributes.
+        FormatAttrs& attrs() { return _attrs; }
+        /// Set attributes.
+        void set_attrs(const FormatAttrs& attrs) { _attrs = attrs; }
+
+        /** Append label/data.
+         * @param label Label describing data
+         * @param data data string
+         */
+        void operator()(const std::string& label, const std::string& data)
+        {
+            this->append((not _attrs.quiet() and not label.empty()) ?
+                        label : "", data);
+        }
+
+        /** Append label/data.
+         * @param label Label describing data
+         * @param data data vector
+         */
+        void operator()(const std::string& label,
+                        const std::vector<std::string>& data);
+
+        /// Append new line.
+        void endl() { this->append("", ""); }
+
+        /// Flush buffer to stream.
+        void flush(std::ostream& stream);
+
+        /// Clear buffer.
+        void clear() { _buffer.clear(); }
+
+        /// Get buffer size.
+        buffer_type::size_type size() { return _buffer.size(); }
+        /// Get reference to last element of buffer.
+        buffer_type::reference peek() { return _buffer.back(); }
+
+    private:
+        friend Formatter& GlobalFormatter();
+
+        Formatter();
+        Formatter(const FormatAttrs& attrs);
+
+        /// Raw access to the buffer.
+        void append(const std::string& label, const std::string& data)
+        { _buffer.push_back(buffer_type::value_type(label, data)); }
+        //// Perform highlighting
+        std::string highlight(const std::vector<std::string>& v);
+
+        FormatAttrs _attrs;
+        buffer_type _buffer;
+};
+
+inline Formatter&
+GlobalFormatter()
+{
+    static Formatter f;
+    return f;
+}
+
+#endif /* _HAVE_FORMAT_HH */
 
 /* vim: set tw=80 sw=4 et : */

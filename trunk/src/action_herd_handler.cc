@@ -40,7 +40,7 @@ using namespace herdstat::util;
 void
 display_herd(const Herd& herd)
 {
-    formatter_T out;
+    Formatter& out(GlobalFormatter());
     util::ColorMap color;
 
     Herd devs(herd);
@@ -90,7 +90,7 @@ static void
 display_herds(const Herds& herds)
 {
     util::ColorMap color;
-    formatter_T out;
+    Formatter& out(GlobalFormatter());
 
     if (options::verbose() and not options::quiet())
     {
@@ -143,14 +143,8 @@ action_herd_handler_T::operator() (opts_type &opts)
     {
         fetch_devawayxml();
         devaway.parse(options::devawayxml());
+        output.attrs().set_devaway(devaway.keys());
     }
-
-    /* set format attributes */
-    output.set_maxlabel(options::all() ? 11 : 15);
-    output.set_maxdata(options::maxcol() - output.maxlabel());
-    if (options::devaway())
-        output.set_devaway(devaway.keys());
-    output.set_attrs();
 
     /* was the all target specified? */
     if (options::all())

@@ -60,13 +60,14 @@ class action_handler_T
 class action_fancy_handler_T : public action_handler_T
 {
     public:
+        action_fancy_handler_T();
         virtual ~action_fancy_handler_T() { }
 
     protected:
         virtual void flush();
 
         herdstat::portage::devaway_xml devaway;
-        formatter_T output;                 /* output formatter */
+        Formatter& output;                 /* output formatter */
 };
 
 /*

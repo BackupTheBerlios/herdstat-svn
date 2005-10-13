@@ -74,7 +74,7 @@ action_dev_handler_T::display(const std::string &d)
     if (not options::fields().empty())
     {
         options::set_quiet(false);
-        output.set_quiet(false);
+        output.attrs().set_quiet(false);
     }
 
     if (not options::quiet())
@@ -184,18 +184,17 @@ action_dev_handler_T::operator() (opts_type &opts)
     {
         fetch_devawayxml();
         devaway.parse(options::devawayxml());
+        output.attrs().set_devaway(devaway.keys());
     }
 
     if (not options::userinfoxml().empty())
         userinfo.parse(options::userinfoxml());
 
     /* set format attributes */
-    output.set_maxlabel(options::all() ? 16 : 12);
-    output.set_maxdata(options::maxcol() - output.maxlabel());
+//    output.set_maxlabel(options::all() ? 16 : 12);
+//    output.set_maxdata(options::maxcol() - output.maxlabel());
     /* set away devs (for use in marking them when they occur in output) */
-    if (options::devaway())
-        output.set_devaway(devaway.keys());
-    output.set_attrs();
+//    output.set_attrs();
 
     /* all target? */
     if (options::all())

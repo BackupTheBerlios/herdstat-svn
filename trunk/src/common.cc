@@ -54,9 +54,9 @@ debug_msg(const char *fmt, ...)
 
     /* make ASCII colors visible - TODO: anyway to escape them?
      * simply inserting a '\' before it doesnt work... */
-    std::string::size_type pos = s.find("\033");
-    if (pos != std::string::npos)
-	s.erase(pos, 1);
+//    std::string::size_type pos = s.find("\033");
+//    if (pos != std::string::npos)
+//        s.erase(pos, 1);
 
     *(options::outstream()) << "!!! " << s << std::endl;
     va_end(v);

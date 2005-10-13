@@ -1,64 +1,64 @@
-Herd:           net-dialup 
-Email:          net-dialup@gentoo.org 
-Description:    Dialup connection tools 
-Developers(5):  genstef merlin mrness st_lim tove 
+Herd:             net-dialup
+Email:            net-dialup@gentoo.org
+Description:      Dialup connection tools
+Developers(5):    genstef merlin mrness st_lim tove
 
-Herd:           net-fs 
-Email:          net-fs@gentoo.org 
-Description:    network based filesystems and support 
-Developers(3):  latexer rphillips vapier 
+Herd:             net-fs
+Email:            net-fs@gentoo.org
+Description:      network based filesystems and support
+Developers(3):    latexer rphillips vapier
 
-Herd:           net-ftp 
-Email:          net-ftp@gentoo.org 
-Description:    FTP (File Transfer Protocol) related applications 
-Developers(2):  humpback uberlord 
+Herd:             net-ftp
+Email:            net-ftp@gentoo.org
+Description:      FTP (File Transfer Protocol) related applications
+Developers(2):    humpback uberlord
 
-Herd:           net-im 
-Email:          net-im@gentoo.org 
-Description:    Instant messaging clients and servers 
-Developers(4):  humpback rizzo sekretarz tester 
+Herd:             net-im
+Email:            net-im@gentoo.org
+Description:      Instant messaging clients and servers
+Developers(4):    humpback rizzo sekretarz tester
 
-Herd:           net-irc 
-Email:          net-irc@gentoo.org 
-Description:    IRC and related ebuilds 
-Developers(2):  gregf swegener* 
+Herd:             net-irc
+Email:            net-irc@gentoo.org
+Description:      IRC and related ebuilds
+Developers(2):    gregf swegener*
 
-Herd:           net-mail 
-Email:          net-mail@gentoo.org 
-Description:    Email servers, clients, and related packages 
-Developers(20): anarchy beu* ferdy g2boojum gregf hansmi hattya hhg langthang 
-                lcars max nakano robbat2 slarti* st_lim strerror superlag ticho 
-                tomk tove  
+Herd:             net-mail
+Email:            net-mail@gentoo.org
+Description:      Email servers, clients, and related packages
+Developers(20):   anarchy beu* ferdy g2boojum gregf hansmi hattya hhg langthang
+                  lcars max nakano robbat2 slarti* st_lim strerror superlag 
+                  ticho tomk tove 
 
-Herd:           net-news 
-Email:          net-news@gentoo.org 
-Description:    Herd for NNTP related packages in net-news 
-Developers(1):  swegener* 
+Herd:             net-news
+Email:            net-news@gentoo.org
+Description:      Herd for NNTP related packages in net-news
+Developers(1):    swegener*
 
-Herd:           net-p2p 
-Email:          net-p2p@gentoo.org 
-Description:    Peer to Peer network related packages 
-Developers(4):  kang malverian sekretarz squinky86 
+Herd:             net-p2p
+Email:            net-p2p@gentoo.org
+Description:      Peer to Peer network related packages
+Developers(4):    kang malverian sekretarz squinky86
 
-Herd:           net-proxy 
-Email:          net-proxy@gentoo.org 
-Description:    Network proxies 
-Developers(2):  cryos mrness 
+Herd:             net-proxy
+Email:            net-proxy@gentoo.org
+Description:      Network proxies
+Developers(2):    cryos mrness
 
-Herd:           net-zope 
-Email:          net-zope@gentoo.org 
-Description:    Zope and ZProduct packages 
-Developers(3):  batlogg kutsuya radek 
+Herd:             net-zope
+Email:            net-zope@gentoo.org
+Description:      Zope and ZProduct packages
+Developers(3):    batlogg kutsuya radek
 
-Herd:           netmon 
-Email:          netmon@gentoo.org 
-Description:    Network monitoring software and tools 
-Developers(9):  angusyoung* dragonheart eldad ka0ttic ramereth smithj* 
-                strerror vanquirius vapier  
+Herd:             netmon
+Email:            netmon@gentoo.org
+Description:      Network monitoring software and tools
+Developers(9):    angusyoung* dragonheart eldad ka0ttic ramereth smithj*
+                  strerror vanquirius vapier 
 
-Herd:           nx 
-Email:          nx@gentoo.org 
-Description:    NoMachine's NX Server and GPL'd clones 
-Developers(1):  stuart* 
+Herd:             nx
+Email:            nx@gentoo.org
+Description:      NoMachine's NX Server and GPL'd clones
+Developers(1):    stuart*
 
 *[00m Currently away

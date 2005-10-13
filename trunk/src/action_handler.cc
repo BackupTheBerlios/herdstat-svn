@@ -42,20 +42,25 @@ action_handler_T::flush()
         *stream << size << std::endl;
 }
 
+action_fancy_handler_T::action_fancy_handler_T()
+    : output(GlobalFormatter())
+{
+}
+
 void
 action_fancy_handler_T::flush()
 {
     output.flush(*stream);
     action_handler_T::flush();
 
-    if (output.marked_away() and not options::count())
+    if (output.attrs().marked_away() and not options::count())
     {
-        *stream << std::endl << output.devaway_color()
+        *stream << std::endl << output.attrs().devaway_color()
             << "*" << color[none] << " Currently away" << std::endl;
 
         /* set false so the above isn't displayed more than once
          * in cases where more than one action handler is run. */
-        output.set_marked_away(false);
+        output.attrs().set_marked_away(false);
 
         if (options::timer() and not options::count())
             *stream << std::endl << "Took " << devaway.elapsed()

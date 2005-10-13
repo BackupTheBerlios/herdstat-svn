@@ -629,21 +629,19 @@ main(int argc, char **argv)
 
 	/* set common format attributes */
 	util::ColorMap color;
-	formatter_T output;
-	output.set_colors(options::color());
-	output.set_quiet(options::quiet());
-	output.set_labelcolor(color[options::labelcolor()]);
-	output.set_highlightcolor(color[options::hlcolor()]);
-	output.set_devaway_color(color[red]);
+	FormatAttrs& attrs(GlobalFormatter().attrs());
+	attrs.set_maxlen(options::maxcol());
+	attrs.set_quiet(options::quiet());
+	attrs.set_colors(options::color());
 
 	/* add highlights */
-	output.add_highlight(util::current_user());
-	output.add_highlight(util::get_user_from_email(util::current_user()));
+	attrs.add_highlight(util::current_user());
+	attrs.add_highlight(util::get_user_from_email(util::current_user()));
 	
 	/* user-defined highlights */
 	{
 	    const std::vector<std::string> hv(util::split(options::highlights()));
-	    output.add_highlights(hv);
+	    attrs.add_highlights(hv);
 	}
 
 	/* set default action */

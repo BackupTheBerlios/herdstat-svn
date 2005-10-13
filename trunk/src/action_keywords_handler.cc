@@ -34,7 +34,6 @@
 
 #include "pkgcache.hh"
 #include "overlaydisplay.hh"
-#include "formatter.hh"
 #include "action_keywords_handler.hh"
 
 using namespace herdstat;
@@ -43,15 +42,6 @@ using namespace herdstat::util;
 action_keywords_handler_T::~action_keywords_handler_T()
 {
 }
-
-struct FirstLengthLess
-{
-    bool operator()(const std::pair<std::string, std::string>& p1,
-                    const std::pair<std::string, std::string>& p2) const
-    {
-        return (p1.first.length() < p2.first.length());
-    }
-};
 
 int
 action_keywords_handler_T::operator() (opts_type &opts)
@@ -197,13 +187,6 @@ action_keywords_handler_T::operator() (opts_type &opts)
                         s.erase(pos);
 
                     /* get keywords for this version */
-//                    portage::ebuild ebuild(v->ebuild());
-//                    spv::value_type p(s,
-//                            (ebuild["KEYWORDS"].empty() ?
-//                                    "Non-existent KEYWORDS variable." :
-//                                    ebuild["KEYWORDS"]));
-//                    outvec.push_back(p);
-
                     portage::Keywords kw(v->ebuild(), options::color());
                     outvec.push_back(spv::value_type(s, kw.str()));
                 }
@@ -240,15 +223,15 @@ action_keywords_handler_T::operator() (opts_type &opts)
     }
 
     /* get max label length */
-    spv::iterator i = std::max_element(outvec.begin(),
-                        outvec.end(), FirstLengthLess());
+//    spv::iterator i = std::max_element(outvec.begin(),
+//                        outvec.end(), FirstLengthLess());
 
-    output.set_maxlabel(i->first.length()+2);
-    output.set_maxdata(options::maxcol() - output.maxlabel());
-    output.set_quiet(options::quiet());
-    output.set_attrs();
+//    output.set_maxlabel(i->first.length()+2);
+//    output.set_maxdata(options::maxcol() - output.maxlabel());
+    output.attrs().set_quiet(options::quiet());
+//    output.set_attrs();
 
-    for (i = outvec.begin() ; i != outvec.end() ; ++i)
+    for (spv::iterator i = outvec.begin() ; i != outvec.end() ; ++i)
         output(i->first, i->second);
 
     flush();

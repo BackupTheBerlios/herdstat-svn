@@ -33,7 +33,6 @@
 
 #include "pkgcache.hh"
 #include "overlaydisplay.hh"
-#include "formatter.hh"
 #include "action_versions_handler.hh"
 
 using namespace herdstat;
@@ -50,10 +49,7 @@ action_versions_handler_T::operator() (opts_type &opts)
     std::string dir;
     bool pwd = false;
 
-    output.set_maxlabel(8);
-    output.set_maxdata(options::maxcol() - output.maxlabel());
-    output.set_quiet(options::quiet());
-    output.set_attrs();
+    output.attrs().set_quiet(options::quiet());
 
     if (not options::fields().empty())
     {

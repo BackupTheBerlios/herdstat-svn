@@ -74,10 +74,10 @@ action_away_handler_T::operator()(opts_type& opts)
         return EXIT_FAILURE;
     }
 
-    output.set_maxlabel(13);
-    output.set_maxdata(options::maxcol() - output.maxlabel());
-    output.set_quiet(options::quiet(), " ");
-    output.set_attrs();
+//    output.set_maxlabel(13);
+//    output.set_maxdata(options::maxcol() - output.maxlabel());
+    output.attrs().set_quiet(options::quiet(), " ");
+//    output.set_attrs();
 
     fetch_devawayxml();
     devaway.parse(options::devawayxml());
