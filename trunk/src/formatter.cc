@@ -79,83 +79,71 @@ Formatter::Formatter(const FormatAttrs& attrs)
     set_attrs(attrs);
 }
 
-std::string
-Formatter::highlight(const std::vector<std::string>& data)
+void
+Formatter::highlight(std::vector<std::string> *data)
 {
-    std::string result;
-    std::vector<std::string>::const_iterator i, end;
-    for (i = data.begin(), end = data.end() ; i != end ; ++i)
+    std::vector<std::string>::iterator i;
+    for (i = data->begin() ; i != data->end() ; ++i)
     {
-        bool highlight = false;
+        const std::string colorfree(util::strip_colors(*i));
+        bool is_away = (not _attrs.quiet() and
+                std::find(_attrs.devaway().begin(), _attrs.devaway().end(),
+                colorfree) != _attrs.devaway().end());
 
-        /* perform any highlight substitutions */
-        std::map<std::string, std::string>::const_iterator h, hend;
-        for (h = _attrs.highlights().begin(), hend = _attrs.highlights().end();
-                h != hend ; ++h)
+        if (is_away)
+            _attrs.set_marked_away(true);
+
+        std::string result;
+
+        /* search highlights */
+        std::map<std::string, std::string>::const_iterator h;
+        for (h = _attrs.highlights().begin() ;
+             h != _attrs.highlights().end() ; ++h)
         {
-
-#define MARK_IF_AWAY(x) \
-            if (not _attrs.quiet() and\
-                std::find(_attrs.devaway().begin(), _attrs.devaway().end(), \
-                    util::strip_colors(x)) != _attrs.devaway().end()) { \
-                result += _attrs.devaway_color() + "*"; \
-                _attrs.set_marked_away(true); \
-            }
-
+            /* if it's a regex and the regex matches, highlight it */
             std::string::size_type pos = h->first.find("re:");
-            if (pos == std::string::npos and h->first == *i)
+            if (pos != std::string::npos)
             {
-                highlight = true;
-                if (result.find((*i) + _attrs.no_color()) == std::string::npos)
+                if (util::Regex(h->first.substr(pos+3)) == *i)
                 {
-                    result += h->second + (*i);
-                    MARK_IF_AWAY(*i);
-                    result += _attrs.no_color() + " ";
-                }
-                else
-                {
-                    result += (*i);
-                    MARK_IF_AWAY(*i);
-                    result += _attrs.no_color() + " ";
+                    if (result.find((*i)+_attrs.no_color()) == std::string::npos)
+                        result += h->second + (*i);
+                    else
+                        result += (*i);
+
+                    if (is_away)
+                        result += _attrs.devaway_color() + "*";
+
+                    result += _attrs.no_color();
+                    
                 }
             }
-            else if (pos != std::string::npos)
+            /* or it's not a regex but the strings are equal */
+            else if (h->first == *i)
             {
-                util::Regex regex(h->first.substr(pos+3));
-                if (regex == *i)
-                {
-                    highlight = true;
-                    if (result.find((*i) + _attrs.no_color()) == std::string::npos)
-                    {
-                        result += h->second + (*i);
-                        MARK_IF_AWAY(*i);
-                        result += _attrs.no_color() + " ";
-                    }
-                    else
-                    {
-                        result += (*i);
-                        MARK_IF_AWAY(*i);
-                        result += _attrs.no_color() + " ";
-                    }
-                }
+                if (result.find((*i)+_attrs.no_color()) == std::string::npos)
+                    result += h->second + (*i);
+                else
+                    result += (*i);
+
+                if (is_away)
+                    result += _attrs.devaway_color() + "*";
+
+                result += _attrs.no_color();
             }
         }
 
-        if (not highlight)
+        /* no highlights were found, so fill result with *i and mark
+         * it if the word matches one in devaway */
+        if (result.empty())
         {
             result += (*i);
-            MARK_IF_AWAY(*i);
-            result += _attrs.no_color() + " ";
+            if (is_away)
+                result += _attrs.devaway_color() + "*" + _attrs.no_color();
         }
 
-#undef MARK_IF_AWAY
-
+        i->assign(result);
     }
-
-    if (result[result.length() - 1] == ' ')
-        result.erase(result.length() - 1);
-
-    return result;
 }
 
 void
@@ -166,9 +154,6 @@ Formatter::operator()(const std::string& label,
         this->append("", util::join(data));
     else if (_attrs.quiet())
     {
-//        std::transform(data.begin(), data.end(),
-//                std::back_inserter(_buffer), EmptyFirst());
-    
         std::vector<std::string>::const_iterator i;
         for (i = data.begin() ; i != data.end() ; ++i)
             this->append("", *i);
@@ -191,32 +176,23 @@ Formatter::flush(std::ostream& stream)
 
     std::size_t maxlabel = i->first.length();
     if (not _attrs.quiet()) maxlabel += 3; /* indent */
-    std::size_t maxdata  = _attrs.maxlen() - maxlabel;
-    std::size_t maxlen = maxlabel + maxdata;
+    std::size_t maxlen = _attrs.maxlen();
 
     for (i = _buffer.begin() ; i != _buffer.end() ; ++i)
     {
         std::string out, label, data;
-        std::size_t clen = 0; /* color length */
 
         /* label */
         if (i->first.empty() and not i->second.empty() and not _attrs.quiet())
-        {
-            label.assign(maxlabel, ' ');
-        }
+            label.assign(maxlabel+1, ' ');
         else if (not i->first.empty() and not _attrs.quiet())
         {
             if (_attrs.colors())
-            {
                 label.assign(_attrs.label_color() + i->first + _attrs.no_color() + ":");
-                clen += _attrs.label_color().length() + _attrs.no_color().length();
-                label.append(maxlabel - i->first.length(), ' ');
-            }
             else
-            {
                 label.assign(i->first + ":");
-                label.append(maxlabel - i->first.length(), ' ');
-            }
+
+            label.append(maxlabel - i->first.length(), ' ');
         }
 
         out += label;
@@ -224,51 +200,30 @@ Formatter::flush(std::ostream& stream)
         /* data */
         if (not i->second.empty())
         {
+            /* perform highlights and get back a vector of the data */
             std::vector<std::string> parts(util::split(i->second));
-            data.assign(highlight(parts));
+            highlight(&parts);
 
-            std::string colorfree(util::strip_colors(data));
-            if (_attrs.quiet() or not _attrs.colors())
-                data.assign(colorfree);
-            clen += (data.length() - colorfree.length());
-
-            /* if it'll all fit on one line or we cant break it up, do it */
-            std::string::size_type breakpos;
-            if (((label.length() + data.length() - clen) < maxlen) or
-                ((breakpos = data.rfind(" ", maxdata-2)) == std::string::npos))
-                out += data;
-            /* otherwise, truncate it and loop through the rest
-             * of the words, wrapping when necessary */
-            else if (breakpos != std::string::npos)
+            std::string::size_type outlen = util::strip_colors(label).length();
+            while (not parts.empty())
             {
-                out += data.substr(0, breakpos) + "\n";
-                data.erase(0, breakpos+1);
-                parts = util::split(data);
+                std::string& word(parts.front());
+                std::string wcfree(util::strip_colors(word));
 
-                label.assign(maxlabel+1, ' '); /* indent */
-                out += label;
-
-                std::size_t outlen = label.length(); /* current output length */
-                while (not parts.empty())
+                if ((outlen + wcfree.length()) < maxlen)
                 {
-                    colorfree.assign(util::strip_colors(parts.front()));
-                    clen = (parts.front().length() - colorfree.length());
-
-                    if (((outlen + parts.front().length() + 1) - clen) < maxlen)
-                    {
-                        out += parts.front() + " ";
-                        outlen += colorfree.length() + 1;
-                    }
-                    else
-                    {
-                        out += "\n";
-                        label.assign(maxlabel+1, ' ');
-                        out += label + parts.front() + " ";
-                        outlen = label.length() + colorfree.length() + 1;
-                    }
-
-                    parts.erase(parts.begin());
+                    out += word + " ";
+                    outlen += wcfree.length() + 1;
                 }
+                else
+                {
+                    out += "\n";
+                    label.assign(maxlabel+1, ' ');
+                    out += label + word + " ";
+                    outlen = label.length() + wcfree.length() + 1;
+                }
+
+                parts.erase(parts.begin());
             }
         }
 
