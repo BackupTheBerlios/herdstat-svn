@@ -628,7 +628,6 @@ main(int argc, char **argv)
 	options::outstream()->imbue(std::locale(options::locale().c_str()));
 
 	/* set common format attributes */
-	util::ColorMap color;
 	FormatAttrs& attrs(GlobalFormatter().attrs());
 	attrs.set_maxlen(options::maxcol());
 	attrs.set_quiet(options::quiet());
