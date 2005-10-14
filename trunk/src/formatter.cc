@@ -87,8 +87,8 @@ Formatter::highlight(std::vector<std::string>& data)
     {
         const std::string colorfree(util::strip_colors(*i));
         bool is_away = (not _attrs.quiet() and
-                std::find(_attrs.devaway().begin(), _attrs.devaway().end(),
-                colorfree) != _attrs.devaway().end());
+                std::binary_search(_attrs.devaway().begin(),
+                    _attrs.devaway().end(), colorfree));
 
         if (is_away)
             _attrs.set_marked_away(true);
@@ -191,21 +191,25 @@ Formatter::flush(std::ostream& stream)
         /* data */
         if (not i->second.empty())
         {
-            /* perform highlights and get back a vector of the data */
+            /* split into a vector and perform any highlights */
             std::vector<std::string> parts(util::split(i->second));
             highlight(parts);
 
             std::string::size_type outlen = util::strip_colors(label).length();
+            /* while there's still data to process... */
             while (not parts.empty())
             {
-                std::string& word(parts.front());
-                std::string wcfree(util::strip_colors(word));
+                const std::string& word(parts.front());
+                const std::string::size_type wclen =
+                    util::strip_colors(word).length();
 
-                if ((outlen + wcfree.length()) < maxlen)
+                /* if it fits, put it on the current line */
+                if ((outlen + wclen) < maxlen)
                 {
                     out += word + " ";
-                    outlen += wcfree.length() + 1;
+                    outlen += wclen + 1;
                 }
+                /* otherwise, end that line and start a new one */
                 else
                 {
                     if (out[out.length() - 1] == ' ')
@@ -214,7 +218,7 @@ Formatter::flush(std::ostream& stream)
                     out += "\n";
                     label.assign(maxlabel+1, ' ');
                     out += label + word + " ";
-                    outlen = label.length() + wcfree.length() + 1;
+                    outlen = label.length() + wclen + 1;
                 }
 
                 parts.erase(parts.begin());
