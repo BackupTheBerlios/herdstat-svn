@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/format.hh
+ * herdstat -- src/formatter.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -162,6 +162,10 @@ class Formatter
         buffer_type _buffer;
 };
 
+/**
+ * Single point of access for the Formatter class.
+ * @returns Reference to a static local Formatter instance.
+ */
 inline Formatter&
 GlobalFormatter()
 {

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/format.cc
+ * herdstat -- src/formatter.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -24,7 +24,6 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <iterator>
