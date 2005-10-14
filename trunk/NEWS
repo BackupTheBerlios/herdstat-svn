@@ -2,8 +2,8 @@ This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
 1.1.2_alpha7:
-    Moved getcols() function from libherdstat as it really doesn't belong in
-    the lib and just bloats it with another lib.
+    - Moved getcols() function from libherdstat as it really doesn't belong in
+      the lib and just bloats it with another lib (ncurses).
 
     New features:
      - The --metadata option now displays package's LICENSE.
@@ -11,6 +11,13 @@ ChangeLog file for a more detailed listing of changes/bug fixes.
 
     Bug fixes:
      - Fixed bug where --versions <category> didn't bail like it should.
+     - Rewrote output formatter.  In the process, a few long time bugs were
+       fixed.  Before a lot of the lines would have an extra ' ' causing weird
+       formatting problems if the line was long enough. Fixed another bug: when
+       highlighting was performed, the more colors used, the shorter the
+       resulting line would be.  This was because the formatter wasn't taking
+       into consideration the length of the invisble color escapes when
+       calculating whether it'd fit on the current line.
 
 1.1.2_alpha6:
     Broke out the convenience library residing in herdstat/ into its own
