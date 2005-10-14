@@ -171,7 +171,6 @@ action_keywords_handler_T::operator() (opts_type &opts)
                 outvec.push_back(spv::value_type("Package",
                                  (dir == options::portdir() or pwd) ?
                                     package : package + od[dir]));
-                outvec.push_back(spv::value_type("", ""));
             }
 
             if (not options::count())
@@ -187,8 +186,16 @@ action_keywords_handler_T::operator() (opts_type &opts)
                         s.erase(pos);
 
                     /* get keywords for this version */
-                    portage::Keywords kw(v->ebuild(), options::color());
-                    outvec.push_back(spv::value_type(s, kw.str()));
+                    try
+                    {
+                        portage::Keywords kw(v->ebuild(), options::color());
+                        outvec.push_back(spv::value_type(s, kw.str()));
+                    }
+                    catch (const Exception& e)
+                    {
+                        outvec.push_back(spv::value_type(s,
+                                "no KEYWORDS variable defined"));
+                    }
                 }
             }
 
