@@ -34,6 +34,7 @@
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/ebuild.hh>
+#include <herdstat/portage/license.hh>
 #include <herdstat/portage/metadata.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
@@ -44,50 +45,6 @@
 using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::util;
-
-static std::string
-parse_license(const std::string& str)
-{
-    std::string result(str);
-
-    result.erase(std::remove(result.begin(), result.end(), '|'), result.end());
-    result.erase(std::remove(result.begin(), result.end(), '('), result.end());
-    result.erase(std::remove(result.begin(), result.end(), ')'), result.end());
-
-    /* extract FOO from lines like "foo? ( FOO )" */
-    std::string::size_type pos;
-    while ((pos = result.find('?')) != std::string::npos)
-    {
-	std::string::size_type lpos = pos;
-
-	while ((result.at(lpos) != ' '))
-	{
-	    result.erase(lpos, 1);
-
-            /* there may not be a ' ' as 'foo?' is at the beginning */
-	    if (lpos == 0)
-		break;
-
-	    --lpos;
-	}
-    }
-
-    result = tidy_whitespace(result);
-
-    /* if in QA-mode, make sure the license is valid (ie it exists) */
-    if (options::qa())
-    {
-        std::vector<std::string> parts = util::split(result);
-        std::vector<std::string>::iterator i;
-        for (i = parts.begin() ; i != parts.end() ; ++i)
-        {
-            if (not util::is_file(options::portdir()+"/licenses/"+(*i)))
-                throw QAException(*i);
-        }
-    }
-
-    return result;
-}
 
 static void
 display_metadata(const metadata_data& data, std::string& longdesc)
@@ -188,8 +145,9 @@ action_meta_handler_T::display(const metadata_data& data)
         {
             try
             {
-                const std::string license(parse_license(ebuild_vars["LICENSE"]));
-                    output("License", license);
+                portage::License
+                    license(ebuild_vars["LICENSE"], options::qa());
+                output("License", license);
             }
             catch (const QAException& e)
             {
