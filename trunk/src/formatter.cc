@@ -30,7 +30,6 @@
 
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
-#include <herdstat/util/regex.hh>
 
 #include "common.hh"
 #include "formatter.hh"
@@ -60,9 +59,11 @@ FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
     {
         std::vector<std::string> parts(util::split(*i, ','));
         if (parts.size() == 1)
-            _highlights.insert(std::make_pair(parts.front(), _hcolor));
+            _highlights.insert(std::make_pair(
+                    util::Regex(parts.front()), _hcolor));
         else if (parts.size() == 2)
-            _highlights.insert(std::make_pair(parts.front(),
+            _highlights.insert(std::make_pair(
+                    util::Regex(parts.front()),
                     _colors ? _cmap[parts.back()] : ""));
         else
             throw Exception("Invalid highlight specification '%s'", i->c_str());
@@ -78,63 +79,39 @@ Formatter::Formatter(const FormatAttrs& attrs)
     set_attrs(attrs);
 }
 
-void
-Formatter::highlight(std::vector<std::string>& data)
+struct Highlight : std::binary_function<std::string, FormatAttrs *, std::string>
 {
-    std::vector<std::string>::iterator i;
-    for (i = data.begin() ; i != data.end() ; ++i)
+    std::string operator()(const std::string& str, FormatAttrs* attrs) const
     {
-        const std::string colorfree(util::strip_colors(*i));
-        bool is_away = (not _attrs.quiet() and
-                std::binary_search(_attrs.devaway().begin(),
-                    _attrs.devaway().end(), colorfree));
+        std::string result;
+        const std::string colorfree(util::strip_colors(str));
+        const bool is_away(not attrs->quiet() and
+            std::binary_search(attrs->devaway().begin(),
+                attrs->devaway().end(), colorfree));
 
         if (is_away)
-            _attrs.set_marked_away(true);
+            attrs->set_marked_away(true);
 
-        std::string result;
-
-        /* search highlights */
-        std::map<std::string, std::string>::const_iterator h;
-        for (h = _attrs.highlights().begin() ;
-             h != _attrs.highlights().end() ; ++h)
+        /* Does str (stripped of any colors) match any regular expressions in
+         * the highlights map? */
+        util::RegexMap<std::string>::const_iterator h =
+            attrs->highlights().find(colorfree);
+        if (h != attrs->highlights().end())
         {
-            /* if it's a regex and the regex matches, or
-             * if its not a regex and the literal matches, highlight it */
-            std::string::size_type pos = h->first.find("re:");
-            if ((pos != std::string::npos and
-                 util::Regex(h->first.substr(pos+3)) == colorfree) or
-                (pos == std::string::npos and h->first == colorfree))
-            {
-                if (result.find((*i)+_attrs.no_color()) == std::string::npos)
-                    result += h->second + (*i);
-                else
-                    result += (*i);
-
-                if (is_away)
-                    result += _attrs.devaway_color() + "*";
-
-                if (_attrs.colors())
-                    result += _attrs.no_color();
-            }
+            result.assign(h->second+str);
+            if (is_away) result.append(attrs->devaway_color()+"*");
+            return (result+attrs->no_color());
         }
 
-        /* no highlights were found, so fill result with *i and mark
-         * it if the word matches one in devaway */
-        if (result.empty())
-        {
-            result += (*i);
-            if (is_away)
-            {
-                result += _attrs.devaway_color() + "*";
-                if (_attrs.colors())
-                    result += _attrs.no_color();
-            }
-        }
+        /* wasnt found in highlights, so mark it if away, or return
+         * the original string. */
+        result.assign(str);
+        if (is_away)
+            result.append(attrs->devaway_color()+"*"+attrs->no_color());
 
-        i->assign(result);
+        return result;
     }
-}
+};
 
 void
 Formatter::operator()(const std::string& label,
@@ -177,11 +154,7 @@ Formatter::flush(std::ostream& stream)
             label.assign(maxlabel+1, ' ');
         else if (not i->first.empty() and not _attrs.quiet())
         {
-            if (_attrs.colors())
-                label.assign(_attrs.label_color() + i->first + _attrs.no_color() + ":");
-            else
-                label.assign(i->first + ":");
-
+            label.assign(_attrs.label_color() + i->first + _attrs.no_color() + ":");
             label.append(maxlabel - i->first.length(), ' ');
         }
 
@@ -190,9 +163,11 @@ Formatter::flush(std::ostream& stream)
         /* data */
         if (not i->second.empty())
         {
-            /* split into a vector and perform any highlights */
+            /* split into a vector of words */
             std::vector<std::string> parts(util::split(i->second));
-            highlight(parts);
+            /* perform any highlights */
+            std::transform(parts.begin(), parts.end(),
+                parts.begin(), std::bind2nd(Highlight(), &_attrs));
 
             std::string::size_type outlen = util::strip_colors(label).length();
             /* while there's still data to process... */

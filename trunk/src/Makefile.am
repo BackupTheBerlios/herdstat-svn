@@ -8,11 +8,11 @@ herdstat_SOURCES = common.hh common.cc \
 		   exceptions.hh \
 		   options.hh options.cc \
 		   rc.hh rc.cc \
+		   formatter.hh formatter.cc \
 		   pkgquery.hh pkgquery.cc \
 		   pkgcache.hh pkgcache.cc \
 		   metacache.hh metacache.cc \
 		   querycache.hh querycache.cc \
-		   formatter.hh formatter.cc \
 		   overlaydisplay.hh overlaydisplay.cc \
 		   fields.hh \
 		   action_handler.hh action_handler.cc \
