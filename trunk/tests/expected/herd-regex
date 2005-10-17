@@ -26,9 +26,9 @@ Developers(2):    gregf swegener*
 Herd:             net-mail
 Email:            net-mail@gentoo.org
 Description:      Email servers, clients, and related packages
-Developers(20):   anarchy beu* ferdy g2boojum gregf hansmi hattya hhg langthang
-                  lcars max nakano robbat2 slarti* st_lim strerror superlag
-                  ticho tomk tove
+Developers(20):   anarchy beu* ferdy g2boojum gregf hansmi hattya hhg
+                  langthang lcars max nakano robbat2 slarti* st_lim strerror
+                  superlag ticho tomk tove
 
 Herd:             net-news
 Email:            net-news@gentoo.org

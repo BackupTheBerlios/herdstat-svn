@@ -534,7 +534,7 @@ main(int argc, char **argv)
 		       (std::strcmp(argv[1], "-T") == 0)));
 
     /* save column width */
-    options::set_maxcol((test ? 80 : getcols()));
+    options::set_maxcol((test ? 79 : getcols()-1));
 
     try
     { 
