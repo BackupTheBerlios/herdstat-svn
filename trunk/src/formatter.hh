@@ -49,8 +49,10 @@ class FormatAttrs
     public:
         FormatAttrs();
 
-        std::size_t maxlen() const { return _maxlen; }
-        void set_maxlen(std::size_t n) { _maxlen = n; }
+        std::string::size_type maxlen() const { return _maxlen; }
+        void set_maxlen(std::string::size_type n) { _maxlen = n; }
+        std::string::size_type maxlabel() const { return _maxlabel; }
+        void set_maxlabel(std::string::size_type n) { _maxlabel = n; }
 
         const std::vector<std::string>& devaway() const { return _devaway; }
         void set_devaway(const std::vector<std::string>& v) { _devaway = v; }
@@ -101,7 +103,8 @@ class FormatAttrs
         bool _colors;
         bool _away;
         std::string _quiet_delim;
-        std::size_t _maxlen;
+        std::string::size_type _maxlen;
+        std::string::size_type _maxlabel;
         std::string _lcolor; /* label color */
         std::string _hcolor; /* highlight color */
         std::string _dcolor; /* devaway color */
@@ -153,13 +156,11 @@ class Formatter
 
     private:
         friend Formatter& GlobalFormatter();
-
-        Formatter();
-        Formatter(const FormatAttrs& attrs);
+        Formatter() { }
 
         /// Raw access to the buffer.
         void append(const std::string& label, const std::string& data)
-        { _buffer.push_back(buffer_type::value_type(label, data)); }
+        { _buffer.push_back(std::make_pair(label, data)); }
 
         FormatAttrs _attrs;
         buffer_type _buffer;

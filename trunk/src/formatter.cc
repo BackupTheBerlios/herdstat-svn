@@ -35,14 +35,9 @@
 #include "formatter.hh"
 
 using namespace herdstat;
-
-struct EmptyFirst
-{
-    std::pair<std::string, std::string>
-    operator()(const std::string& str) const
-    { return std::pair<std::string, std::string>("", str); }
-};
-
+/****************************************************************************
+ * FormatAttrs - Format attributes
+ ****************************************************************************/
 FormatAttrs::FormatAttrs()
     : _cmap(), _quiet(false), _colors(true), _away(false), _quiet_delim("\n"),
       _maxlen(78),
@@ -50,7 +45,7 @@ FormatAttrs::FormatAttrs()
       _no_color(_cmap[none]), _devaway(), _highlights()
 {
 }
-
+/****************************************************************************/
 void
 FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
 {
@@ -69,65 +64,176 @@ FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
             throw Exception("Invalid highlight specification '%s'", i->c_str());
     }
 }
-
-Formatter::Formatter()
+/****************************************************************************
+ * Small struct for encapsulating some data to pass to Wrap().
+ ****************************************************************************/
+struct OutData
 {
-}
+    OutData(std::string::size_type maxln,
+            std::string::size_type maxlb)
+        : str(), len(0), maxlen(maxln), maxlabel(maxlb) { }
 
-Formatter::Formatter(const FormatAttrs& attrs)
-{
-    set_attrs(attrs);
-}
-
-struct Highlight : std::binary_function<std::string, FormatAttrs *, std::string>
-{
-    std::string operator()(const std::string& str, FormatAttrs* attrs) const
-    {
-        std::string result;
-        const std::string colorfree(util::strip_colors(str));
-        const bool is_away(not attrs->quiet() and
-            std::binary_search(attrs->devaway().begin(),
-                attrs->devaway().end(), colorfree));
-
-        if (is_away)
-            attrs->set_marked_away(true);
-
-        /* Does str (stripped of any colors) match any regular expressions in
-         * the highlights map? */
-        util::RegexMap<std::string>::const_iterator h =
-            attrs->highlights().find(colorfree);
-        if (h != attrs->highlights().end())
-        {
-            result.assign(h->second+str);
-            if (is_away) result.append(attrs->devaway_color()+"*");
-            return (result+attrs->no_color());
-        }
-
-        /* wasnt found in highlights, so mark it if away, or return
-         * the original string. */
-        result.assign(str);
-        if (is_away)
-            result.append(attrs->devaway_color()+"*"+attrs->no_color());
-
-        return result;
-    }
+    std::string str;
+    std::string::size_type len;
+    const std::string::size_type maxlen;
+    const std::string::size_type maxlabel;
 };
+/****************************************************************************
+ * Function object for highlighting words based on user-defined regular
+ * expressions.
+ ****************************************************************************/
+struct Highlight
+    : std::binary_function<std::string, FormatAttrs * const, std::string>
+{
+    std::string
+    operator()(const std::string& str, FormatAttrs * const attrs) const;
+};
+/****************************************************************************
+ * Function object for performing line wrapping.
+ ****************************************************************************/
+struct Wrap
+    : std::binary_function<std::string, OutData * const, void>
+{
+    void operator()(const std::string& str, OutData * const out) const;
+};
+/****************************************************************************
+ * Function object for formatting pairs of strings (label/data).
+ ****************************************************************************/
+struct Format : std::binary_function<std::pair<std::string, std::string>,
+                                     FormatAttrs * const, std::string>
+{
+    std::string
+    operator()(const std::pair<std::string, std::string>& data,
+               FormatAttrs * const attrs) const;
+};
+/****************************************************************************/
+std::string
+Highlight::operator()(const std::string& str, FormatAttrs * const attrs) const
+{
+    std::string result;
+    const std::string colorfree(util::strip_colors(str));
+    const bool is_away(not attrs->quiet() and
+        std::binary_search(attrs->devaway().begin(),
+            attrs->devaway().end(), colorfree));
+
+    if (is_away)
+        attrs->set_marked_away(true);
+
+    /* Does str (stripped of any colors) match any regular expressions in
+     * the highlights map? */
+    util::RegexMap<std::string>::const_iterator h =
+        attrs->highlights().find(colorfree);
+    if (h != attrs->highlights().end())
+    {
+        result.assign(h->second+str);
+        if (is_away) result.append(attrs->devaway_color()+"*");
+        return (result+attrs->no_color());
+    }
+
+    /* wasnt found in highlights, so mark it if away, or return
+     * the original string. */
+    result.assign(str);
+    if (is_away)
+        result.append(attrs->devaway_color()+"*"+attrs->no_color());
+
+    return result;
+}
+
+void
+Wrap::operator()(const std::string& str, OutData * const out) const
+{
+    /* length of str after colors are stripped */
+    const std::string::size_type wclen =
+        util::strip_colors(str).length();
+
+    /* if it fits, put it on the current line */
+    if ((out->len + wclen) < out->maxlen)
+    {
+        out->str.append(str + " ");
+        out->len += wclen + 1;
+    }
+    /* otherwise, end that line and start a new one */
+    else
+    {
+        if (out->str[out->str.length() - 1] == ' ')
+            out->str.erase(out->str.length() - 1);
+
+        out->str.append("\n");
+        out->str.append(out->maxlabel+1, ' ');
+        out->str.append(str + " ");
+        out->len = out->maxlabel+1 + wclen+1;
+    }
+}
+
+std::string
+Format::operator()(const std::pair<std::string, std::string>& pair,
+                   FormatAttrs * const attrs) const
+{
+    OutData out(attrs->maxlen(), attrs->maxlabel());
+    const std::string& label(pair.first);
+    const std::string& data(pair.second);
+
+    /* handle label */
+    if (label.empty() and not data.empty() and not attrs->quiet())
+        out.str.assign(attrs->maxlabel()+1, ' ');
+    else if (not label.empty() and not attrs->quiet())
+    {
+        out.str.assign(attrs->label_color() + label + attrs->no_color() + ":");
+        out.str.append(attrs->maxlabel() - label.length(), ' ');
+    }
+
+    /* handle data */
+    if (not data.empty())
+    {
+        /* split into a vector of words */
+        std::vector<std::string> parts(util::split(data));
+        /* perform any highlights */
+        std::transform(parts.begin(), parts.end(),
+            parts.begin(), std::bind2nd(Highlight(), attrs));
+        /* perform any line wrapping */
+        out.len = util::strip_colors(out.str).length();
+        std::for_each(parts.begin(), parts.end(),
+            std::bind2nd(Wrap(), &out));
+    }
+
+    if (out.str[out.str.length() - 1] == ' ')
+        out.str.erase(out.str.length() - 1);
+
+    return out.str;
+}
+
+/*
+ * Function object that returns a pair of strings with an empty first element.
+ */
+
+struct EmptyFirst
+{
+    std::pair<std::string, std::string>
+    operator()(const std::string& str) const
+    { return std::pair<std::string, std::string>("", str); }
+};
+
+/*
+ * Append a label/vector of data.
+ */
 
 void
 Formatter::operator()(const std::string& label,
                       const std::vector<std::string>& data)
 {
-    if (_attrs.quiet() and _attrs.quiet_delim() == " ")
-        this->append("", util::join(data));
-    else if (_attrs.quiet())
-    {
-        std::vector<std::string>::const_iterator i;
-        for (i = data.begin() ; i != data.end() ; ++i)
-            this->append("", *i);
-    }
+    if (_attrs.quiet() and _attrs.quiet_delim() != " ")
+        /* append a new element (with an empty label) for
+         * each element in data to our buffer */
+        std::transform(data.begin(), data.end(),
+                std::back_inserter(_buffer), EmptyFirst());
     else
-        this->operator()(label, util::join(data));
+        this->append(label, util::join(data));
 }
+
+/*
+ * Flush our buffer.
+ * This is the user interface to what does the actual formatting.
+ */
 
 void
 Formatter::flush(std::ostream& stream)
@@ -135,75 +241,21 @@ Formatter::flush(std::ostream& stream)
     if (_buffer.empty())
         return;
 
-    std::vector<std::string> outbuf;
-
-    /* get max label length */
+    /* dynamically set maximum label length
+     * to at least the size of the longest label */
     buffer_type::iterator i =
         std::max_element(_buffer.begin(), _buffer.end(), FirstLengthLess());
 
-    std::size_t maxlabel = i->first.length();
-    if (not _attrs.quiet()) maxlabel += 3; /* indent */
-    std::size_t maxlen = _attrs.maxlen();
+    _attrs.set_maxlabel(_attrs.quiet() ?
+                            i->first.length() :
+                            i->first.length() + 3 /* padding */);
 
-    for (i = _buffer.begin() ; i != _buffer.end() ; ++i)
-    {
-        std::string out, label, data;
-
-        /* label */
-        if (i->first.empty() and not i->second.empty() and not _attrs.quiet())
-            label.assign(maxlabel+1, ' ');
-        else if (not i->first.empty() and not _attrs.quiet())
-        {
-            label.assign(_attrs.label_color() + i->first + _attrs.no_color() + ":");
-            label.append(maxlabel - i->first.length(), ' ');
-        }
-
-        out += label;
-
-        /* data */
-        if (not i->second.empty())
-        {
-            /* split into a vector of words */
-            std::vector<std::string> parts(util::split(i->second));
-            /* perform any highlights */
-            std::transform(parts.begin(), parts.end(),
-                parts.begin(), std::bind2nd(Highlight(), &_attrs));
-
-            std::string::size_type outlen = util::strip_colors(label).length();
-            /* while there's still data to process... */
-            while (not parts.empty())
-            {
-                const std::string& word(parts.front());
-                const std::string::size_type wclen =
-                    util::strip_colors(word).length();
-
-                /* if it fits, put it on the current line */
-                if ((outlen + wclen) < maxlen)
-                {
-                    out += word + " ";
-                    outlen += wclen + 1;
-                }
-                /* otherwise, end that line and start a new one */
-                else
-                {
-                    if (out[out.length() - 1] == ' ')
-                        out.erase(out.length() - 1);
-
-                    out += "\n";
-                    label.assign(maxlabel+1, ' ');
-                    out += label + word + " ";
-                    outlen = label.length() + wclen + 1;
-                }
-
-                parts.erase(parts.begin());
-            }
-        }
-
-        if (out[out.length() - 1] == ' ')
-            out.erase(out.length() - 1);
-
-        outbuf.push_back(out);
-    }
+    /* for each element in our buffer, format it and insert
+     * the result into the real output buffer. */
+    std::vector<std::string> outbuf;
+    std::transform(_buffer.begin(), _buffer.end(),
+        std::back_inserter(outbuf),
+        std::bind2nd(Format(), &_attrs));
 
     _buffer.clear();
 
