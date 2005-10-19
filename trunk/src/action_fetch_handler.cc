@@ -31,12 +31,12 @@
 
 using namespace herdstat;
 
-action_fetch_handler_T::~action_fetch_handler_T()
+action_fetch_handler::~action_fetch_handler()
 {
 }
 
 int
-action_fetch_handler_T::operator() (opts_type &null)
+action_fetch_handler::operator() (opts_type &null)
 {
     if (not options::fields().empty())
     {

@@ -37,11 +37,11 @@
  * Base action handler classes.
  */
 
-class action_handler_T
+class action_handler
 {
     public:
-        action_handler_T();
-        virtual ~action_handler_T() { }
+        action_handler();
+        virtual ~action_handler() { }
         virtual int operator() (opts_type &) = 0;
 
     protected:
@@ -57,11 +57,11 @@ class action_handler_T
  * fancy (uses an output formatter)
  */
 
-class action_fancy_handler_T : public action_handler_T
+class action_fancy_handler : public action_handler
 {
     public:
-        action_fancy_handler_T();
-        virtual ~action_fancy_handler_T() { }
+        action_fancy_handler();
+        virtual ~action_fancy_handler() { }
 
     protected:
         virtual void flush();
@@ -74,11 +74,11 @@ class action_fancy_handler_T : public action_handler_T
  * fancy and parses herds.xml
  */
 
-class action_herds_xml_handler_T : public action_fancy_handler_T
+class action_herds_xml_handler : public action_fancy_handler
 {
     public:
-        action_herds_xml_handler_T();
-        virtual ~action_herds_xml_handler_T() { }
+        action_herds_xml_handler();
+        virtual ~action_herds_xml_handler() { }
 
     protected:
         virtual void flush();
@@ -90,10 +90,10 @@ class action_herds_xml_handler_T : public action_fancy_handler_T
  * fancy and searches portage
  */
 
-class action_portage_find_handler_T : public action_fancy_handler_T
+class action_portage_find_handler : public action_fancy_handler
 {
     public:
-        virtual ~action_portage_find_handler_T() { }
+        virtual ~action_portage_find_handler() { }
 
     protected:
         virtual void flush();

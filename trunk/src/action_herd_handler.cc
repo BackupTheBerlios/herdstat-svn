@@ -116,7 +116,7 @@ display_herds(const Herds& herds)
         out(util::sprintf("Herds(%d)", herds.size()), herds);
 }
 
-action_herd_handler_T::~action_herd_handler_T()
+action_herd_handler::~action_herd_handler()
 {
 }
 
@@ -126,7 +126,7 @@ action_herd_handler_T::~action_herd_handler_T()
  */
 
 int
-action_herd_handler_T::operator() (opts_type &opts)
+action_herd_handler::operator() (opts_type &opts)
 {
     if (not options::fields().empty())
     {

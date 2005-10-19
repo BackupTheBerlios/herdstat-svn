@@ -39,15 +39,15 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::util;
 
-action_pkg_handler_T::action_pkg_handler_T()
-    : action_herds_xml_handler_T(), mcache(options::portdir()),
+action_pkg_handler::action_pkg_handler()
+    : action_herds_xml_handler(), mcache(options::portdir()),
       elapsed(0),
       status(not options::quiet() and not options::debug()),
       cache_is_valid(false), at_least_one_not_cached(false)
 {
 }
 
-action_pkg_handler_T::~action_pkg_handler_T()
+action_pkg_handler::~action_pkg_handler()
 {
 }
 
@@ -83,7 +83,7 @@ struct Error : std::binary_function<std::string, const util::Regex *, void>
  */
 
 bool
-action_pkg_handler_T::metadata_matches(const metadata &meta,
+action_pkg_handler::metadata_matches(const metadata &meta,
                                        const std::string &criteria)
 {
     const Herds& herds(meta.herds());
@@ -133,7 +133,7 @@ action_pkg_handler_T::metadata_matches(const metadata &meta,
  */
 
 void
-action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
+action_pkg_handler::search(const opts_type &pkgs, pkgQuery &q)
 {
     if (options::regex())
         regexp.assign(q.query);
@@ -155,9 +155,9 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
     }
 
     /* cache it */
-    querycache(q);
+    qcache(q);
     /* save it in results map */
-    matches.insert(std::make_pair(q.query, new pkgQuery_T(q)));
+    matches.insert(std::make_pair(q.query, new pkgQuery(q)));
 }
 
 /*
@@ -165,7 +165,7 @@ action_pkg_handler_T::search(const opts_type &pkgs, pkgQuery_T &q)
  */
 
 void
-action_pkg_handler_T::search(const opts_type &opts)
+action_pkg_handler::search(const opts_type &opts)
 {
     /* for each metadata.xml */
     for (metacache::const_iterator m = mcache.begin() ; m != mcache.end() ; ++m)
@@ -180,7 +180,7 @@ action_pkg_handler_T::search(const opts_type &opts)
             if (metadata_matches(*m, *i))
             {
                 /* we've already inserted at least one package */
-                std::map<std::string, pkgQuery_T * >::iterator mpos;
+                std::map<std::string, pkgQuery * >::iterator mpos;
                 if ((mpos = matches.find(*i)) != matches.end())
                     mpos->second->insert(std::make_pair(m->pkg(),
                                                         m->longdesc()));
@@ -188,7 +188,7 @@ action_pkg_handler_T::search(const opts_type &opts)
                 else
                 {
                     matches.insert(std::make_pair(*i,
-                                   new pkgQuery_T(*i, with(), options::dev())));
+                                   new pkgQuery(*i, with(), options::dev())));
                     matches[*i]->date = std::time(NULL);
                     matches[*i]->insert(std::make_pair(m->pkg(),
                                                        m->longdesc()));
@@ -204,7 +204,7 @@ action_pkg_handler_T::search(const opts_type &opts)
             else if (matches.find(*i) == matches.end())
             {
                 matches.insert(std::make_pair(*i,
-                               new pkgQuery_T(*i, with(), options::dev())));
+                               new pkgQuery(*i, with(), options::dev())));
                 matches[*i]->date = std::time(NULL);
 
                 if (options::dev())
@@ -217,9 +217,9 @@ action_pkg_handler_T::search(const opts_type &opts)
     }
 
     /* cache everything */
-    std::map<std::string, pkgQuery_T * >::iterator p;
+    std::map<std::string, pkgQuery * >::iterator p;
     for (p = matches.begin() ; p != matches.end() ; ++p)
-        querycache(*(p->second));
+        qcache(*(p->second));
 }
 
 /*
@@ -227,7 +227,7 @@ action_pkg_handler_T::search(const opts_type &opts)
  */
 
 void
-action_pkg_handler_T::display(pkgQuery_T *q)
+action_pkg_handler::display(pkgQuery *q)
 {
     assert(q);
 
@@ -274,8 +274,8 @@ action_pkg_handler_T::display(pkgQuery_T *q)
         output("", q->begin()->first);
 
     /* display the category/package */
-    pkgQuery_T::const_iterator p;
-    pkgQuery_T::size_type pn = 1;
+    pkgQuery::const_iterator p;
+    pkgQuery::size_type pn = 1;
     for (p = ++(q->begin()) ; p != q->end() ; ++p, ++pn)
     {
         std::string longdesc;
@@ -320,20 +320,14 @@ action_pkg_handler_T::display(pkgQuery_T *q)
  */
 
 void
-action_pkg_handler_T::display()
+action_pkg_handler::display()
 {
     /* set format attributes */
-    if (not options::meta())
-    {
-//        output.set_maxlabel(16);
-//        output.set_maxdata(options::maxcol() - output.maxlabel());
-        if (options::devaway())
-            output.attrs().set_devaway(devaway.keys());
-//        output.set_attrs();
-    }
+    if (not options::meta() and options::devaway())
+        output.attrs().set_devaway(devaway.keys());
 
     opts_type::size_type n = 1;
-    std::map<std::string, pkgQuery_T * >::iterator m;
+    std::map<std::string, pkgQuery * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
     {
         if (m->second->empty())
@@ -355,11 +349,11 @@ action_pkg_handler_T::display()
 
         /* was --metadata also specified? if so, construct the package
          * list.  When we're all done, the list will be passed to
-         * action_meta_handler_T::operator(). */
+         * action_meta_handler::operator(). */
         if (options::meta() and not options::count())
         {
             /* we're only interested in the package names */
-            pkgQuery_T::iterator p;
+            pkgQuery::iterator p;
             for (p = m->second->begin() ; p != m->second->end() ; ++p)
                 packages.push_back(p->first);
         }
@@ -382,7 +376,7 @@ action_pkg_handler_T::display()
  */
 
 int
-action_pkg_handler_T::operator() (opts_type &opts)
+action_pkg_handler::operator() (opts_type &opts)
 {
     /* action_pkg_handler doesn't support the all target */
     if (options::all())
@@ -414,23 +408,23 @@ action_pkg_handler_T::operator() (opts_type &opts)
 
     /* load previously cached results */
     if (options::querycache())
-        querycache.load();
+        qcache.load();
 
     /* search previously cached results for current queries
      * and insert into our matches map if found */
-    if (not querycache.empty())
+    if (not qcache.empty())
     {
         for (opts_type::iterator i = opts.begin() ; i != opts.end() ; )
         {
             /* does a previously cached query that
              * matches our criteria exist? */
-            querycache_T::iterator qi =
-                querycache.find(pkgQuery_T(*i, with(), options::dev()));
-            if (qi != querycache.end() and not querycache.is_expired(*qi))
+            querycache::iterator qi =
+                qcache.find(pkgQuery(*i, with(), options::dev()));
+            if (qi != qcache.end() and not qcache.is_expired(*qi))
             {
                 debug_msg("found '%s' in query cache", i->c_str());
 
-                matches.insert(std::make_pair(*i, new pkgQuery_T(*qi)));
+                matches.insert(std::make_pair(*i, new pkgQuery(*qi)));
                 matches[*i]->query = *i;
                 matches[*i]->with  = with();
 
@@ -443,12 +437,12 @@ action_pkg_handler_T::operator() (opts_type &opts)
                 i = opts.erase(i);
             }
             /* is a wider-scoped query cached? */
-            else if (qi == querycache.end() and not with.empty())
+            else if (qi == qcache.end() and not with.empty())
             {
                 /* If so, use the results to narrow down what we need and
                  * partially load the metadata cache */
-                qi = querycache.find(pkgQuery_T(*i, "", options::dev()));
-                if (qi != querycache.end() and not querycache.is_expired(*qi))
+                qi = qcache.find(pkgQuery(*i, "", options::dev()));
+                if (qi != qcache.end() and not qcache.is_expired(*qi))
                 {
                     /* 
                      * but only if there's less than a certain amount (since
@@ -460,7 +454,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
                     const opts_type pkgs(qi->pkgs());
                     if (pkgs.size() < 100)
                     {
-                        pkgQuery_T q(*i, with(), options::dev());
+                        pkgQuery q(*i, with(), options::dev());
                         q.date = std::time(NULL);
                         q.with = with();
 
@@ -532,7 +526,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
             packages.end());
 
         /* ...and pass it to the metadata handler */
-        action_meta_handler_T mhandler;
+        action_meta_handler mhandler;
         mhandler(packages);
     }
 
@@ -561,7 +555,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     if (options::querycache())
-        querycache.dump();
+        qcache.dump();
 
     /* we handler timer here */
     options::set_timer(false);
@@ -572,9 +566,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
 }
 
 void
-action_pkg_handler_T::cleanup()
+action_pkg_handler::cleanup()
 {
-    std::map<std::string, pkgQuery_T * >::iterator m;
+    std::map<std::string, pkgQuery * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
         delete m->second;
 }

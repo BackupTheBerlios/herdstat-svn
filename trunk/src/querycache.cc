@@ -43,13 +43,13 @@ using namespace herdstat::xml;
  * Content Handler for our internal querycache.xml
  */
 
-class querycacheXMLHandler_T : public saxhandler
+class querycacheXMLHandler : public saxhandler
 {
     public:
-        querycacheXMLHandler_T();
-        virtual ~querycacheXMLHandler_T();
+        querycacheXMLHandler();
+        virtual ~querycacheXMLHandler();
 
-        std::vector<pkgQuery_T> queries;
+        std::vector<pkgQuery> queries;
 
     protected:
         /* callbacks */
@@ -62,22 +62,22 @@ class querycacheXMLHandler_T : public saxhandler
         bool in_query, in_string, in_with, in_type, in_results, in_pkg,
              in_portdir, in_overlays;
         std::string cur_pkg, cur_date;
-        pkgQuery_T::iterator cur_query;
+        pkgQuery::iterator cur_query;
 };
 
-querycacheXMLHandler_T::querycacheXMLHandler_T()
+querycacheXMLHandler::querycacheXMLHandler()
     : in_query(false), in_string(false), in_with(false), in_type(false),
       in_results(false), in_pkg(false), in_portdir(false), in_overlays(false),
       cur_pkg(), cur_date(), cur_query()
 {
 }
 
-querycacheXMLHandler_T::~querycacheXMLHandler_T()
+querycacheXMLHandler::~querycacheXMLHandler()
 {
 }
 
 bool
-querycacheXMLHandler_T::start_element(const std::string &name,
+querycacheXMLHandler::start_element(const std::string &name,
                                     const attrs_type &attrs)
 {
     if (name == "query")
@@ -114,7 +114,7 @@ querycacheXMLHandler_T::start_element(const std::string &name,
 }
 
 bool
-querycacheXMLHandler_T::end_element(const std::string &name)
+querycacheXMLHandler::end_element(const std::string &name)
 {
     if (name == "query")
         in_query = false;
@@ -137,11 +137,11 @@ querycacheXMLHandler_T::end_element(const std::string &name)
 }
 
 bool
-querycacheXMLHandler_T::text(const std::string &text)
+querycacheXMLHandler::text(const std::string &text)
 {
     if (in_string)
     {
-        queries.push_back(pkgQuery_T(text));
+        queries.push_back(pkgQuery(text));
         queries.back().date = util::destringify<long>(cur_date);
     }
     else if (in_with)
@@ -161,7 +161,7 @@ querycacheXMLHandler_T::text(const std::string &text)
 
 /****************************************************************************/
 
-querycache_T::querycache_T()
+querycache::querycache()
     : _max(options::querycache_max()),
       _expire(options::querycache_expire()),
       _path(options::localstatedir()+"/querycache.xml")
@@ -169,12 +169,12 @@ querycache_T::querycache_T()
 }
 
 /*
- * Add a pkgQuery_T object to the cache, removing
- * an expired pkgQuery_T object if it exists.
+ * Add a pkgQuery object to the cache, removing
+ * an expired pkgQuery object if it exists.
  */
 
 void
-querycache_T::operator() (const pkgQuery_T &q)
+querycache::operator() (const pkgQuery &q)
 {
     /* remove old cached query if it exists */
     iterator i = this->find(q);
@@ -196,14 +196,14 @@ querycache_T::operator() (const pkgQuery_T &q)
  */
 
 void
-querycache_T::load()
+querycache::load()
 {
     if (not util::is_file(this->_path))
         return;
 
-    Document<querycacheXMLHandler_T> querycache_xml;
+    Document<querycacheXMLHandler> querycache_xml;
     querycache_xml.parse(this->_path);
-    querycacheXMLHandler_T *handler = querycache_xml.handler();
+    querycacheXMLHandler *handler = querycache_xml.handler();
 
     _queries.insert(_queries.end(),
             handler->queries.begin(),
@@ -216,12 +216,12 @@ querycache_T::load()
 
 struct LessDate
 {
-    bool operator()(const pkgQuery_T &q1, const pkgQuery_T &q2) const
+    bool operator()(const pkgQuery &q1, const pkgQuery &q2) const
     { return (q1.date < q2.date); }
 };
 
 void
-querycache_T::sort()
+querycache::sort()
 {
     /* sort by date */
     std::stable_sort(_queries.begin(), _queries.end(), LessDate());
@@ -232,9 +232,9 @@ querycache_T::sort()
  */
 
 void
-querycache_T::purge_old()
+querycache::purge_old()
 {
-    debug_msg("this->size() > querycache_T::_max(%d), so trimming oldest queries.",
+    debug_msg("this->size() > querycache::_max(%d), so trimming oldest queries.",
         this->_max);
 
     /* while > querycache_MAX, erase the first (oldest) query */
@@ -243,7 +243,7 @@ querycache_T::purge_old()
 }
 
 void
-querycache_T::dump(std::ostream &stream)
+querycache::dump(std::ostream &stream)
 {
     stream << "Query cache (size: " << _queries.size()
         << "/" << this->_max << ")" << std::endl << std::endl;
@@ -260,7 +260,7 @@ querycache_T::dump(std::ostream &stream)
  */
 
 void
-querycache_T::dump()
+querycache::dump()
 {
     this->sort();
 
@@ -303,7 +303,7 @@ querycache_T::dump()
                 util::sprintf("%d", i->size()).c_str());
 
             /* for each package in query results */
-            pkgQuery_T::const_iterator pi, pe;
+            pkgQuery::const_iterator pi, pe;
             for (pi = i->begin(), pe = i->end() ; pi != pe ; ++pi)
             {
                 const std::string longdesc(util::tidy_whitespace(pi->second));
@@ -328,7 +328,7 @@ querycache_T::dump()
  */
 
 std::vector<std::string>
-querycache_T::queries() const
+querycache::queries() const
 {
     std::vector<std::string> v;
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)

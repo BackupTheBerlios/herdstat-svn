@@ -28,7 +28,7 @@
 
 using namespace herdstat;
 
-action_handler_T::action_handler_T()
+action_handler::action_handler()
     : stream(options::outstream()), regexp(), color(), size(0)
 {
     regexp.set_cflags(options::eregex() ?
@@ -36,22 +36,22 @@ action_handler_T::action_handler_T()
 }
 
 void
-action_handler_T::flush()
+action_handler::flush()
 {
     if (options::count())
         *stream << size << std::endl;
 }
 
-action_fancy_handler_T::action_fancy_handler_T()
+action_fancy_handler::action_fancy_handler()
     : output(GlobalFormatter())
 {
 }
 
 void
-action_fancy_handler_T::flush()
+action_fancy_handler::flush()
 {
     output.flush(*stream);
-    action_handler_T::flush();
+    action_handler::flush();
 
     if (output.attrs().marked_away() and not options::count())
     {
@@ -68,7 +68,7 @@ action_fancy_handler_T::flush()
     }
 }
 
-action_herds_xml_handler_T::action_herds_xml_handler_T()
+action_herds_xml_handler::action_herds_xml_handler()
     : herdsxml()
 {
     herdsxml.set_cvsdir(options::cvsdir());
@@ -76,9 +76,9 @@ action_herds_xml_handler_T::action_herds_xml_handler_T()
 }
 
 void
-action_herds_xml_handler_T::flush()
+action_herds_xml_handler::flush()
 {
-    action_fancy_handler_T::flush();
+    action_fancy_handler::flush();
 
     if (options::timer() and not options::count())
         *stream << "Took " << herdsxml.elapsed()
@@ -86,9 +86,9 @@ action_herds_xml_handler_T::flush()
 }
 
 void
-action_portage_find_handler_T::flush()
+action_portage_find_handler::flush()
 {
-    action_fancy_handler_T::flush();
+    action_fancy_handler::flush();
 
     if (options::timer() and not options::count())
         *stream << std::endl << "Took " << search_timer.elapsed()

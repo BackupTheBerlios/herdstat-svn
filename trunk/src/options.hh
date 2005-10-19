@@ -31,7 +31,7 @@
 #include <vector>
 #include <herdstat/portage/config.hh>
 
-enum options_action_T
+enum options_action
 {
     action_unspecified,
     action_herd,
@@ -130,8 +130,8 @@ class options
         static const fields_type& fields() { return _fields; }
         static void add_field(const fields_type::value_type v) { _fields.push_back(v); }
 
-        static options_action_T action() { return _action; }
-        static void set_action(options_action_T v) { _action = v; }
+        static options_action action() { return _action; }
+        static void set_action(options_action v) { _action = v; }
 
         /* read-only */
         static const std::string& portdir() { return _portdir; }
@@ -179,7 +179,7 @@ class options
 
         static fields_type _fields;
 
-        static options_action_T _action;
+        static options_action _action;
 
         static herdstat::portage::config _config;
         static const std::string& _portdir;

@@ -36,7 +36,7 @@
 
 enum query_type { QUERYTYPE_DEV, QUERYTYPE_HERD };
 
-class pkgQuery_T
+class pkgQuery
 {
     public:
         typedef std::map<std::string, std::string> container_type;
@@ -47,12 +47,12 @@ class pkgQuery_T
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        pkgQuery_T(const std::string &n,
+        pkgQuery(const std::string &n,
                    const std::string &w = "",
                    bool dev = false);
 
         void dump(std::ostream &) const;
-        bool operator== (const pkgQuery_T &) const;
+        bool operator== (const pkgQuery &) const;
         std::vector<std::string> pkgs() const;
 
         inline iterator begin();
@@ -83,26 +83,26 @@ class pkgQuery_T
         query_type type;
 };
 
-inline pkgQuery_T::iterator pkgQuery_T::begin() { return _pkgs.begin(); }
-inline pkgQuery_T::const_iterator pkgQuery_T::begin() const { return _pkgs.begin(); }
-inline pkgQuery_T::iterator pkgQuery_T::end() { return _pkgs.end(); }
-inline pkgQuery_T::const_iterator pkgQuery_T::end() const { return _pkgs.end(); }
-inline pkgQuery_T::size_type pkgQuery_T::size() const { return _pkgs.size(); }
-inline bool pkgQuery_T::empty() const { return _pkgs.empty(); }
-inline pkgQuery_T::mapped_type& pkgQuery_T::operator[] (const key_type& k)
+inline pkgQuery::iterator pkgQuery::begin() { return _pkgs.begin(); }
+inline pkgQuery::const_iterator pkgQuery::begin() const { return _pkgs.begin(); }
+inline pkgQuery::iterator pkgQuery::end() { return _pkgs.end(); }
+inline pkgQuery::const_iterator pkgQuery::end() const { return _pkgs.end(); }
+inline pkgQuery::size_type pkgQuery::size() const { return _pkgs.size(); }
+inline bool pkgQuery::empty() const { return _pkgs.empty(); }
+inline pkgQuery::mapped_type& pkgQuery::operator[] (const key_type& k)
 { return _pkgs[k]; }
-inline void pkgQuery_T::erase(iterator pos) { _pkgs.erase(pos); }
-inline void pkgQuery_T::erase(iterator begin, iterator end) { _pkgs.erase(begin, end); }
-inline pkgQuery_T::size_type pkgQuery_T::erase(const key_type& k)
+inline void pkgQuery::erase(iterator pos) { _pkgs.erase(pos); }
+inline void pkgQuery::erase(iterator begin, iterator end) { _pkgs.erase(begin, end); }
+inline pkgQuery::size_type pkgQuery::erase(const key_type& k)
 { return _pkgs.erase(k); }
-inline pkgQuery_T::iterator pkgQuery_T::find(const key_type& k)
+inline pkgQuery::iterator pkgQuery::find(const key_type& k)
 { return _pkgs.find(k); }
-inline pkgQuery_T::const_iterator pkgQuery_T::find(const key_type& k) const
+inline pkgQuery::const_iterator pkgQuery::find(const key_type& k) const
 { return _pkgs.find(k); }
-inline std::pair<pkgQuery_T::iterator, bool>
-pkgQuery_T::insert(const value_type& v) { return _pkgs.insert(v); }
+inline std::pair<pkgQuery::iterator, bool>
+pkgQuery::insert(const value_type& v) { return _pkgs.insert(v); }
 template <class In>
-inline void pkgQuery_T::insert(In begin, In end) { _pkgs.insert(begin, end); }
+inline void pkgQuery::insert(In begin, In end) { _pkgs.insert(begin, end); }
 
 #endif
 

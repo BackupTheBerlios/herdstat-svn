@@ -39,16 +39,13 @@
 using namespace herdstat;
 using namespace herdstat::util;
 
-action_keywords_handler_T::~action_keywords_handler_T()
+action_keywords_handler::~action_keywords_handler()
 {
 }
 
 int
-action_keywords_handler_T::operator() (opts_type &opts)
+action_keywords_handler::operator() (opts_type &opts)
 {
-    typedef std::vector<std::pair<std::string, std::string> > spv;
-
-    spv outvec;
     OverlayDisplay od;
     std::string dir;
     bool pwd = false;
@@ -110,7 +107,7 @@ action_keywords_handler_T::operator() (opts_type &opts)
         regexp.assign(opts.front());
         opts.clear();
         
-        pkgcache_T pkgcache(options::portdir());
+        pkgcache pkgcache(options::portdir());
         matches = portage::find_package_regex(regexp, options::overlay(),
                     &search_timer, pkgcache);
         
@@ -167,11 +164,8 @@ action_keywords_handler_T::operator() (opts_type &opts)
             size += versions.size();
 
             if (not options::quiet())
-            {
-                outvec.push_back(spv::value_type("Package",
-                                 (dir == options::portdir() or pwd) ?
-                                    package : package + od[dir]));
-            }
+                output("Package", (dir == options::portdir() or pwd) ?
+                        package : package+od[dir]);
 
             if (not options::count())
             {
@@ -189,18 +183,17 @@ action_keywords_handler_T::operator() (opts_type &opts)
                     try
                     {
                         portage::Keywords kw(v->ebuild(), options::color());
-                        outvec.push_back(spv::value_type(s, kw.str()));
+                        output(s, kw.str());
                     }
                     catch (const Exception& e)
                     {
-                        outvec.push_back(spv::value_type(s,
-                                "no KEYWORDS variable defined"));
+                        output(s, "no KEYWORDS variable defined");
                     }
                 }
             }
 
             if (not options::count() and (n != matches.size()))
-                outvec.push_back(spv::value_type("", ""));
+                output.endl();
         }
         catch (const portage::AmbiguousPkg &e)
         {
@@ -228,18 +221,6 @@ action_keywords_handler_T::operator() (opts_type &opts)
                 return EXIT_FAILURE;
         }
     }
-
-    /* get max label length */
-//    spv::iterator i = std::max_element(outvec.begin(),
-//                        outvec.end(), FirstLengthLess());
-
-//    output.set_maxlabel(i->first.length()+2);
-//    output.set_maxdata(options::maxcol() - output.maxlabel());
-    output.attrs().set_quiet(options::quiet());
-//    output.set_attrs();
-
-    for (spv::iterator i = outvec.begin() ; i != outvec.end() ; ++i)
-        output(i->first, i->second);
 
     flush();
     return EXIT_SUCCESS;

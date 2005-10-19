@@ -35,12 +35,12 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::util;
 
-action_away_handler_T::~action_away_handler_T()
+action_away_handler::~action_away_handler()
 {
 }
 
 void
-action_away_handler_T::display(const Developer& dev)
+action_away_handler::display(const Developer& dev)
 {
     ++size;
 
@@ -65,7 +65,7 @@ action_away_handler_T::display(const Developer& dev)
 }
 
 int
-action_away_handler_T::operator()(opts_type& opts)
+action_away_handler::operator()(opts_type& opts)
 {
     if (not options::fields().empty())
     {
@@ -74,10 +74,7 @@ action_away_handler_T::operator()(opts_type& opts)
         return EXIT_FAILURE;
     }
 
-//    output.set_maxlabel(13);
-//    output.set_maxdata(options::maxcol() - output.maxlabel());
     output.attrs().set_quiet(options::quiet(), " ");
-//    output.set_attrs();
 
     fetch_devawayxml();
     devaway.parse(options::devawayxml());

@@ -30,11 +30,11 @@
 #include <herdstat/portage/userinfo_xml.hh>
 #include "action_handler.hh"
 
-class action_dev_handler_T : public action_herds_xml_handler_T
+class action_dev_handler : public action_herds_xml_handler
 {
     public:
-        action_dev_handler_T();
-        virtual ~action_dev_handler_T();
+        action_dev_handler();
+        virtual ~action_dev_handler();
         virtual int operator() (opts_type &);
 
     private:

@@ -33,14 +33,14 @@
 
 using namespace herdstat;
 
-pkgQuery_T::pkgQuery_T(const std::string &n, const std::string &w, bool dev)
+pkgQuery::pkgQuery(const std::string &n, const std::string &w, bool dev)
     : _pkgs(), info(n), query(n), with(w), portdir(options::portdir()),
       overlays(options::overlays()), type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
 {
 }
 
 void
-pkgQuery_T::dump(std::ostream &stream) const
+pkgQuery::dump(std::ostream &stream) const
 {
     Formatter& out(GlobalFormatter());
     out("Query string", this->query);
@@ -66,9 +66,9 @@ pkgQuery_T::dump(std::ostream &stream) const
 }
 
 bool
-pkgQuery_T::operator== (const pkgQuery_T &that) const
+pkgQuery::operator== (const pkgQuery &that) const
 {
-    debug_msg(" pkgQuery_T::operator==");
+    debug_msg(" pkgQuery::operator==");
     debug_msg("   this->query(%s) == that.query(%s) ? %d",
         this->query.c_str(), that.query.c_str(), (this->query == that.query));
     debug_msg("   this->with(%s) == that.with(%s) ? %d",
@@ -100,7 +100,7 @@ pkgQuery_T::operator== (const pkgQuery_T &that) const
  */
 
 std::vector<std::string>
-pkgQuery_T::pkgs() const
+pkgQuery::pkgs() const
 {
     std::vector<std::string> v;
     for (const_iterator i = this->begin() ; i != this->end() ; ++i)

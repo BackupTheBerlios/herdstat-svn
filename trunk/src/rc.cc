@@ -34,7 +34,7 @@
 
 using namespace herdstat;
 
-rc_T::rc_T()
+rc::rc()
 {
     if (util::is_file(HERDSTATRC_GLOBAL))
     {
@@ -61,7 +61,7 @@ rc_T::rc_T()
 }
 
 void
-rc_T::set_options()
+rc::set_options()
 {
     if (not vars["colors"].empty())
         options::set_color(util::destringify<bool>(vars["colors"]));

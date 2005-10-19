@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/pkgcache_T.hh
+ * herdstat -- src/pkgcache.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -30,7 +30,7 @@
 #include <herdstat/cachable.hh>
 #include <herdstat/portage/package_list.hh>
 
-class pkgcache_T : public herdstat::cachable
+class pkgcache : public herdstat::cachable
 {
     public:
         typedef std::vector<std::string> container_type;
@@ -39,8 +39,8 @@ class pkgcache_T : public herdstat::cachable
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        pkgcache_T();
-        pkgcache_T(const std::string &portdir);
+        pkgcache();
+        pkgcache(const std::string &portdir);
         void init();
 
         virtual bool valid() const;
@@ -65,44 +65,44 @@ class pkgcache_T : public herdstat::cachable
         herdstat::portage::PackageList _pkgs;
 };
 
-inline pkgcache_T::iterator
-pkgcache_T::begin()
+inline pkgcache::iterator
+pkgcache::begin()
 {
     return _pkgs.begin();
 }
 
-inline pkgcache_T::const_iterator
-pkgcache_T::begin() const
+inline pkgcache::const_iterator
+pkgcache::begin() const
 {
     return _pkgs.begin();
 }
 
-inline pkgcache_T::iterator
-pkgcache_T::end()
+inline pkgcache::iterator
+pkgcache::end()
 {
     return _pkgs.end();
 }
 
-inline pkgcache_T::const_iterator
-pkgcache_T::end() const
+inline pkgcache::const_iterator
+pkgcache::end() const
 {
     return _pkgs.end();
 }
 
-inline pkgcache_T::size_type
-pkgcache_T::size() const
+inline pkgcache::size_type
+pkgcache::size() const
 {
     return _pkgs.size();
 }
 
 inline bool
-pkgcache_T::empty() const
+pkgcache::empty() const
 {
     return _pkgs.empty();
 }
 
-inline pkgcache_T::operator
-const pkgcache_T::container_type&() const
+inline pkgcache::operator
+const pkgcache::container_type&() const
 {
     return _pkgs;
 }

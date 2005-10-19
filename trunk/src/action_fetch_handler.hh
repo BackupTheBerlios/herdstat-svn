@@ -29,10 +29,10 @@
 
 #include "action_handler.hh"
 
-class action_fetch_handler_T : public action_herds_xml_handler_T
+class action_fetch_handler : public action_herds_xml_handler
 {
     public:
-        virtual ~action_fetch_handler_T();
+        virtual ~action_fetch_handler();
         virtual int operator() (opts_type &);
 
     protected:

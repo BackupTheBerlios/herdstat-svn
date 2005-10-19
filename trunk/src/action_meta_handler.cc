@@ -98,12 +98,12 @@ display_metadata(const metadata_data& data, std::string& longdesc)
         longdesc.assign(meta.longdesc());
 }
 
-action_meta_handler_T::~action_meta_handler_T()
+action_meta_handler::~action_meta_handler()
 {
 }
 
 void
-action_meta_handler_T::display(const metadata_data& data)
+action_meta_handler::display(const metadata_data& data)
 {
     std::string longdesc;
     ebuild ebuild_vars;
@@ -209,7 +209,7 @@ action_meta_handler_T::display(const metadata_data& data)
  */
 
 int
-action_meta_handler_T::operator() (opts_type &opts)
+action_meta_handler::operator() (opts_type &opts)
 {
     OverlayDisplay od;
 
@@ -223,10 +223,7 @@ action_meta_handler_T::operator() (opts_type &opts)
         output.attrs().set_devaway(devaway.keys());
     }
 
-//    output.set_maxlabel(16);
-//    output.set_maxdata(options::maxcol() - output.maxlabel());
     output.attrs().set_quiet(options::quiet(), " ");
-//    output.set_attrs();
 
     /* we dont care about these */
     options::set_count(false);

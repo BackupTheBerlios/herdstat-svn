@@ -502,7 +502,7 @@ handle_opts(int argc, char **argv, opts_type *args)
     else
     {
 	/* actions that are allowed to have 0 non-option args */
-	options_action_T action = options::action();
+	options_action action = options::action();
 	if (action == action_dev and fields.empty())
 	    throw argsUsage();
 
@@ -524,7 +524,7 @@ int
 main(int argc, char **argv)
 {
     options opts;
-    std::map<options_action_T, action_handler_T * > handlers;
+    std::map<options_action, action_handler * > handlers;
     std::ostream *outstream = NULL;
 
     /* we need to know if -T or --TEST was specified before 
@@ -541,7 +541,7 @@ main(int argc, char **argv)
 	opts_type nonopt_args;
 	
 	/* handle rc file(s) */
-	if (not test) { rc_T rc; }
+	if (not test) { rc rc; }
 
 	/* handle command line options */
 	if (handle_opts(argc, argv, &nonopt_args) != 0)
@@ -567,7 +567,7 @@ main(int argc, char **argv)
 	if (not options::fields().empty() and not nonopt_args.empty())
 	{
 	    std::cerr << "--field doesn't make much sense when specified" << std::endl
-		      << "with an additional non-optional argument." << std::endl;
+		      << "with additional non-optional arguments." << std::endl;
 	    return EXIT_FAILURE;
 	}
 
@@ -636,40 +636,34 @@ main(int argc, char **argv)
 	/* add highlights */
 	attrs.add_highlight(util::current_user());
 	attrs.add_highlight(util::get_user_from_email(util::current_user()));
-	
 	/* user-defined highlights */
-	{
-	    const std::vector<std::string> hv(util::split(options::highlights()));
-	    attrs.add_highlights(hv);
-	}
+	attrs.add_highlights(util::split(options::highlights()));
 
 	/* set default action */
-	if (options::action() == action_unspecified and nonopt_args.empty())
-	    options::set_action(action_stats);
-	else if (options::action() == action_unspecified and
-		not nonopt_args.empty())
-	    options::set_action(action_herd);
+	if (options::action() == action_unspecified)
+	    options::set_action(nonopt_args.empty() ?
+				    action_stats : action_herd);
 
 	/* setup action handlers */
-	handlers[action_herd]     = new action_herd_handler_T();
-	handlers[action_dev]      = new action_dev_handler_T();
-	handlers[action_pkg]      = new action_pkg_handler_T();
-	handlers[action_meta]     = new action_meta_handler_T();
-	handlers[action_stats]    = new action_stats_handler_T();
-	handlers[action_which]    = new action_which_handler_T();
-	handlers[action_versions] = new action_versions_handler_T();
-	handlers[action_find]     = new action_find_handler_T();
-	handlers[action_away]     = new action_away_handler_T();
-	handlers[action_fetch]    = new action_fetch_handler_T();
-	handlers[action_kw]       = new action_keywords_handler_T();
+	handlers[action_herd]     = new action_herd_handler();
+	handlers[action_dev]      = new action_dev_handler();
+	handlers[action_pkg]      = new action_pkg_handler();
+	handlers[action_meta]     = new action_meta_handler();
+	handlers[action_stats]    = new action_stats_handler();
+	handlers[action_which]    = new action_which_handler();
+	handlers[action_versions] = new action_versions_handler();
+	handlers[action_find]     = new action_find_handler();
+	handlers[action_away]     = new action_away_handler();
+	handlers[action_fetch]    = new action_fetch_handler();
+	handlers[action_kw]       = new action_keywords_handler();
 
-	action_handler_T *action_handler = handlers[options::action()];
+	action_handler *handler = handlers[options::action()];
 
-	if (action_handler)
+	if (handler)
 	{
 	    try
 	    {
-		if ((*action_handler)(nonopt_args) != EXIT_SUCCESS)
+		if ((*handler)(nonopt_args) != EXIT_SUCCESS)
 		    return EXIT_FAILURE;
 	    }
 	    catch (const ActionException)
@@ -683,7 +677,7 @@ main(int argc, char **argv)
 	if (outstream)
 	    delete outstream;
 
-	std::map<options_action_T, action_handler_T * >::iterator m;
+	std::map<options_action, action_handler * >::iterator m;
 	for (m = handlers.begin() ; m != handlers.end() ; ++m)
 	    if (m->second) delete m->second;
     }
@@ -714,7 +708,9 @@ main(int argc, char **argv)
 	return EXIT_FAILURE;
     }
     catch (const FetchException)
-    { return EXIT_FAILURE; }
+    {
+	return EXIT_FAILURE;
+    }
     catch (const BadRegex)
     {
 	std::cerr << "Bad regular expression." << std::endl;

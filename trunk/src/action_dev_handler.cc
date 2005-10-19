@@ -38,11 +38,11 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::util;
 
-action_dev_handler_T::action_dev_handler_T()
+action_dev_handler::action_dev_handler()
 {
 }
 
-action_dev_handler_T::~action_dev_handler_T()
+action_dev_handler::~action_dev_handler()
 {
 }
 
@@ -51,7 +51,7 @@ action_dev_handler_T::~action_dev_handler_T()
  */
 
 void
-action_dev_handler_T::display(const std::string &d)
+action_dev_handler::display(const std::string &d)
 {
     if (not options::fields().empty() and options::count())
         return;
@@ -172,7 +172,7 @@ action_dev_handler_T::display(const std::string &d)
  */
 
 int
-action_dev_handler_T::operator() (opts_type &opts)
+action_dev_handler::operator() (opts_type &opts)
 {
     fetch_herdsxml();
     herdsxml.parse(options::herdsxml());
@@ -189,12 +189,6 @@ action_dev_handler_T::operator() (opts_type &opts)
 
     if (not options::userinfoxml().empty())
         userinfo.parse(options::userinfoxml());
-
-    /* set format attributes */
-//    output.set_maxlabel(options::all() ? 16 : 12);
-//    output.set_maxdata(options::maxcol() - output.maxlabel());
-    /* set away devs (for use in marking them when they occur in output) */
-//    output.set_attrs();
 
     /* all target? */
     if (options::all())

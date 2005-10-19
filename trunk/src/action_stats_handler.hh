@@ -30,10 +30,10 @@
 #include "metacache.hh"
 #include "action_handler.hh"
 
-class action_stats_handler_T : public action_herds_xml_handler_T
+class action_stats_handler : public action_herds_xml_handler
 {
     public:
-        virtual ~action_stats_handler_T();
+        virtual ~action_stats_handler();
         virtual int operator() (opts_type &);
 };
 

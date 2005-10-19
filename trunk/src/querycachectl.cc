@@ -108,7 +108,7 @@ handle_opts(int argc, char **argv, std::string *action)
 }
 
 static void
-doaction(querycache_T &querycache, const std::string &action)
+doaction(querycache &querycache, const std::string &action)
 {
     if (action == "dump")
     {
@@ -166,12 +166,12 @@ main(int argc, char **argv)
     {
         std::string action;
 
-        { rc_T rc; }
+        { rc rc; }
 
         if (handle_opts(argc, argv, &action) != 0)
             throw argsException();
 
-        querycache_T querycache;
+        querycache querycache;
         querycache.load();
 
         doaction(querycache, action);

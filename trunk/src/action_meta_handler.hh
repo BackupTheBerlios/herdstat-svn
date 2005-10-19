@@ -37,10 +37,10 @@ struct metadata_data
     bool is_category;
 };
 
-class action_meta_handler_T : public action_portage_find_handler_T
+class action_meta_handler : public action_portage_find_handler
 {
     public:
-        virtual ~action_meta_handler_T();
+        virtual ~action_meta_handler();
         virtual int operator() (opts_type &);
 
     private:

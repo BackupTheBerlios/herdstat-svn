@@ -165,7 +165,7 @@ metacache::fill()
     const bool status = not options::quiet() and not options::debug();
     {
         util::Progress progress;
-        pkgcache_T pkgcache(this->_portdir);
+        pkgcache pkgcache(this->_portdir);
         debug_msg("pkgcache.size() == %d", pkgcache.size());
 
         if (status)
@@ -179,7 +179,7 @@ metacache::fill()
         _metadatas.reserve(pkgcache.size());
 
         /* for each pkg */
-        pkgcache_T::iterator i, end = pkgcache.end();
+        pkgcache::iterator i, end = pkgcache.end();
         for (i = pkgcache.begin() ; i != end ; ++i)
         {
             if (status)

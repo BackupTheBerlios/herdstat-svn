@@ -34,27 +34,27 @@
 #include "querycache.hh"
 #include "action_handler.hh"
 
-class action_pkg_handler_T : public action_herds_xml_handler_T
+class action_pkg_handler : public action_herds_xml_handler
 {
     public:
-        action_pkg_handler_T();
-        virtual ~action_pkg_handler_T();
+        action_pkg_handler();
+        virtual ~action_pkg_handler();
 
 	virtual int operator() (opts_type &);
 
     private:
-        void search(const opts_type &, pkgQuery_T &);
+        void search(const opts_type &, pkgQuery &);
         void search(const opts_type &);
         void display();
-        void display(pkgQuery_T *);
+        void display(pkgQuery *);
         void cleanup();
         bool metadata_matches(const herdstat::portage::metadata &,
                               const std::string &);
 
-        std::map<std::string, pkgQuery_T * > matches;
+        std::map<std::string, pkgQuery * > matches;
         opts_type not_found, packages;
         metacache mcache;
-        querycache_T querycache;
+        querycache qcache;
         herdstat::util::Timer::size_type elapsed;
         const bool status;
         bool cache_is_valid, at_least_one_not_cached;

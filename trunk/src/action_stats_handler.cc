@@ -37,7 +37,7 @@
 using namespace herdstat;
 using namespace herdstat::portage;
 
-action_stats_handler_T::~action_stats_handler_T()
+action_stats_handler::~action_stats_handler()
 {
 }
 
@@ -46,7 +46,7 @@ action_stats_handler_T::~action_stats_handler_T()
  */
 
 int
-action_stats_handler_T::operator() (opts_type &null)
+action_stats_handler::operator() (opts_type &null)
 {
     if (not options::fields().empty())
     {
@@ -67,11 +67,8 @@ action_stats_handler_T::operator() (opts_type &null)
     }
 
     /* set format attributes */
-//    output.set_maxlabel(35);
-//    output.set_maxdata(options::maxcol() - output.maxlabel());
     if (options::devaway())
         output.attrs().set_devaway(devaway.keys());
-//    output.set_attrs();
 
     float nherds = 0, ndevs = 0;
     std::vector<std::string> most_herds, least_herds, most_devs, least_devs;

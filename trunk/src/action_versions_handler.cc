@@ -38,12 +38,12 @@
 using namespace herdstat;
 using namespace herdstat::util;
 
-action_versions_handler_T::~action_versions_handler_T()
+action_versions_handler::~action_versions_handler()
 {
 }
 
 int
-action_versions_handler_T::operator() (opts_type &opts)
+action_versions_handler::operator() (opts_type &opts)
 {
     OverlayDisplay od;
     std::string dir;
@@ -108,7 +108,7 @@ action_versions_handler_T::operator() (opts_type &opts)
         regexp.assign(opts.front());
         opts.clear();
         
-        pkgcache_T pkgcache(options::portdir());
+        pkgcache pkgcache(options::portdir());
         matches = portage::find_package_regex(regexp, options::overlay(),
                     &search_timer, pkgcache);
         

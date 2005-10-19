@@ -33,12 +33,12 @@
 using namespace herdstat;
 using namespace herdstat::util;
 
-action_which_handler_T::~action_which_handler_T()
+action_which_handler::~action_which_handler()
 {
 }
 
 int
-action_which_handler_T::operator() (opts_type &opts)
+action_which_handler::operator() (opts_type &opts)
 {
     if (not options::fields().empty())
     {
@@ -54,7 +54,7 @@ action_which_handler_T::operator() (opts_type &opts)
         return EXIT_FAILURE;
     }
 
-    pkgcache_T pkgcache;
+    pkgcache pkgcache;
     std::multimap<std::string, std::string>::iterator m;
 
     if (options::regex())

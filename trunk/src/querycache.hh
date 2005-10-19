@@ -33,13 +33,13 @@
 
 /*
  * Represents a package query results
- * (produced by action_pkg_handler_T::search()).
+ * (produced by action_pkg_handler::search()).
  */
 
-class querycache_T
+class querycache
 {
     public:
-        typedef std::vector<pkgQuery_T> container_type;
+        typedef std::vector<pkgQuery> container_type;
         typedef container_type::value_type value_type;
         typedef container_type::reference reference;
         typedef container_type::const_reference const_reference;
@@ -47,14 +47,14 @@ class querycache_T
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        querycache_T();
+        querycache();
 
-        void operator() (const pkgQuery_T &);
+        void operator() (const pkgQuery &);
         void load();
         void dump();
         void dump(std::ostream &);
 
-        bool is_expired(const pkgQuery_T &) const;
+        bool is_expired(const pkgQuery &) const;
         void sort();
         std::vector<std::string> queries() const;
 
@@ -81,27 +81,27 @@ class querycache_T
         const std::string _path;
 };
 
-inline querycache_T::iterator querycache_T::begin() { return _queries.begin(); }
-inline querycache_T::const_iterator querycache_T::begin() const
+inline querycache::iterator querycache::begin() { return _queries.begin(); }
+inline querycache::const_iterator querycache::begin() const
 { return _queries.begin(); }
-inline querycache_T::iterator querycache_T::end() { return _queries.end(); }
-inline querycache_T::const_iterator querycache_T::end() const
+inline querycache::iterator querycache::end() { return _queries.end(); }
+inline querycache::const_iterator querycache::end() const
 { return _queries.end(); }
-inline querycache_T::reference querycache_T::front() { return _queries.front(); }
-inline querycache_T::const_reference querycache_T::front() const
+inline querycache::reference querycache::front() { return _queries.front(); }
+inline querycache::const_reference querycache::front() const
 { return _queries.front(); }
-inline querycache_T::reference querycache_T::back() { return _queries.back(); }
-inline querycache_T::const_reference querycache_T::back() const
+inline querycache::reference querycache::back() { return _queries.back(); }
+inline querycache::const_reference querycache::back() const
 { return _queries.back(); }
-inline querycache_T::iterator querycache_T::find(const_reference q)
+inline querycache::iterator querycache::find(const_reference q)
 { return std::find(_queries.begin(), _queries.end(), q); }
-inline querycache_T::const_iterator querycache_T::find(const_reference q) const
+inline querycache::const_iterator querycache::find(const_reference q) const
 { return std::find(_queries.begin(), _queries.end(), q); }
-inline querycache_T::size_type  querycache_T::size() const { return _queries.size(); }
-inline bool querycache_T::empty() const { return _queries.empty(); }
-inline void querycache_T::clear() { _queries.clear(); }
+inline querycache::size_type  querycache::size() const { return _queries.size(); }
+inline bool querycache::empty() const { return _queries.empty(); }
+inline void querycache::clear() { _queries.clear(); }
 
-inline bool querycache_T::is_expired(const_reference q) const
+inline bool querycache::is_expired(const_reference q) const
 { return ((std::time(NULL) - q.date) > this->_expire); } 
 
 #endif

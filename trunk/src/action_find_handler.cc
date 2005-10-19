@@ -40,12 +40,12 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::util;
 
-action_find_handler_T::~action_find_handler_T()
+action_find_handler::~action_find_handler()
 {
 }
 
 int
-action_find_handler_T::operator() (opts_type &opts)
+action_find_handler::operator() (opts_type &opts)
 {
     if (options::all())
     {
@@ -55,7 +55,7 @@ action_find_handler_T::operator() (opts_type &opts)
     }
 
     opts_type results;
-    pkgcache_T pkgcache(options::portdir());
+    pkgcache pkgcache(options::portdir());
 
     if (options::regex())
     {
@@ -122,7 +122,7 @@ action_find_handler_T::operator() (opts_type &opts)
         options::set_regex(false);
         options::set_eregex(false);
         
-        action_meta_handler_T mhandler;
+        action_meta_handler mhandler;
         mhandler(results);
     }
     else if (not options::count())
