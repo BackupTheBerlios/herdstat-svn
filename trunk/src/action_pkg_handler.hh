@@ -53,7 +53,7 @@ class action_pkg_handler_T : public action_herds_xml_handler_T
 
         std::map<std::string, pkgQuery_T * > matches;
         opts_type not_found, packages;
-        metacache_T metacache;
+        metacache mcache;
         querycache_T querycache;
         herdstat::util::Timer::size_type elapsed;
         const bool status;

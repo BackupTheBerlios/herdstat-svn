@@ -40,7 +40,7 @@ using namespace herdstat::portage;
 using namespace herdstat::util;
 
 action_pkg_handler_T::action_pkg_handler_T()
-    : action_herds_xml_handler_T(), metacache(options::portdir()),
+    : action_herds_xml_handler_T(), mcache(options::portdir()),
       elapsed(0),
       status(not options::quiet() and not options::debug()),
       cache_is_valid(false), at_least_one_not_cached(false)
@@ -168,8 +168,7 @@ void
 action_pkg_handler_T::search(const opts_type &opts)
 {
     /* for each metadata.xml */
-    for (metacache_T::const_iterator m = metacache.begin() ;
-         m != metacache.end() ; ++m)
+    for (metacache::const_iterator m = mcache.begin() ; m != mcache.end() ; ++m)
     {
         /* for each specified herd/dev */
         for (opts_type::const_iterator i = opts.begin() ; i != opts.end() ; ++i)
@@ -488,13 +487,13 @@ action_pkg_handler_T::operator() (opts_type &opts)
     }
 
     at_least_one_not_cached = (not opts.empty());
-    cache_is_valid = (options::metacache() and metacache.valid());
+    cache_is_valid = (options::metacache() and mcache.valid());
 
     if (cache_is_valid and at_least_one_not_cached)
     {
         try
         {
-            metacache.load();
+            mcache.load();
         }
         catch (const Exception)
         {
@@ -504,11 +503,11 @@ action_pkg_handler_T::operator() (opts_type &opts)
     else if (at_least_one_not_cached)
     {
         /* fill cache and dump to disk */
-        metacache.fill();
-        metacache.dump();
+        mcache.fill();
+        mcache.dump();
     }
 
-    debug_msg("metacache.size() == %d", metacache.size());
+    debug_msg("mcache.size() == %d", mcache.size());
 
     if (at_least_one_not_cached)
         search(opts);
@@ -548,9 +547,9 @@ action_pkg_handler_T::operator() (opts_type &opts)
     if (options::timer())
     {
         *stream << std::endl << "Took " << elapsed << "ms to parse "
-            << metacache.size() << " metadata.xml's ("
+            << mcache.size() << " metadata.xml's ("
             << std::setprecision(4)
-            << (static_cast<float>(elapsed) / metacache.size())
+            << (static_cast<float>(elapsed) / mcache.size())
             << " ms/metadata.xml)." << std::endl
             << "Took " << herdsxml.elapsed() << "ms to parse herds.xml."
             << std::endl;
@@ -558,7 +557,7 @@ action_pkg_handler_T::operator() (opts_type &opts)
     else if (options::verbose() and not options::quiet())
     {
         *stream << std::endl
-            << "Parsed " << metacache.size() << " metadata.xml's." << std::endl;
+            << "Parsed " << mcache.size() << " metadata.xml's." << std::endl;
     }
 
     if (options::querycache())

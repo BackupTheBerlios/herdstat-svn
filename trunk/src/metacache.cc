@@ -45,14 +45,14 @@
 using namespace herdstat;
 using namespace herdstat::portage;
 
-metacache_T::metacache_T(const std::string &portdir)
+metacache::metacache(const std::string &portdir)
     : cachable(options::localstatedir()+METACACHE),
       _portdir(portdir),
       _overlays(options::overlays())
 {
 }
 
-metacache_T::~metacache_T()
+metacache::~metacache()
 {
 }
 
@@ -61,15 +61,15 @@ metacache_T::~metacache_T()
  */
 
 bool
-metacache_T::valid() const
+metacache::valid() const
 {
-    const util::Stat metacache(this->path());
+    const util::Stat mcache(this->path());
     bool valid = false;
 
     const std::string expire(options::metacache_expire());
     const std::string lastsync(options::localstatedir()+LASTSYNC);
 
-    if (metacache.exists())
+    if (mcache.exists())
     {
         if (expire == "lastsync")
         {
@@ -100,22 +100,22 @@ metacache_T::valid() const
             else if (has_lastsync)
             {
                 unlink(LASTSYNC);
-                valid = ((std::time(NULL) - metacache.mtime())
+                valid = ((std::time(NULL) - mcache.mtime())
                         < METACACHE_EXPIRE);
             }
             else if (has_timestamp)
                 util::copy_file(path, lastsync);
             else
-                valid = ((std::time(NULL) - metacache.mtime())
+                valid = ((std::time(NULL) - mcache.mtime())
                         < METACACHE_EXPIRE);
         }
         else
-            valid = ((std::time(NULL) - metacache.mtime()) <
+            valid = ((std::time(NULL) - mcache.mtime()) <
                     std::strtol(expire.c_str(), NULL, 10));
 
         /* only valid if size > 0 */
         if (valid)
-            valid = (metacache.size() > 0);
+            valid = (mcache.size() > 0);
     }
 
     /* 
@@ -160,7 +160,7 @@ metacache_T::valid() const
  */
 
 void
-metacache_T::fill()
+metacache::fill()
 {
     const bool status = not options::quiet() and not options::debug();
     {
@@ -174,6 +174,9 @@ metacache_T::fill()
                 << "Generating metadata.xml cache: ";
             progress.start(pkgcache.size());
         }
+
+        /* we will contain at most pkgcache.size() elements */
+        _metadatas.reserve(pkgcache.size());
 
         /* for each pkg */
         pkgcache_T::iterator i, end = pkgcache.end();
@@ -193,6 +196,9 @@ metacache_T::fill()
                 _metadatas.push_back(meta.data());
             }
         }
+
+        /* trim unused space */
+        std::vector<portage::metadata>(_metadatas).swap(_metadatas);
     }
 
     if (status)
@@ -204,7 +210,7 @@ metacache_T::fill()
  */
 
 void
-metacache_T::load()
+metacache::load()
 {
     if (not util::is_file(this->path()))
         return;
@@ -280,7 +286,7 @@ metacache_T::load()
  */
 
 void
-metacache_T::dump()
+metacache::dump()
 {
     std::ofstream f(this->path().c_str());
     if (not f)

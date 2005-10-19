@@ -35,7 +35,7 @@
  * A cache of all metadata.xml's.
  */
 
-class metacache_T : public herdstat::cachable
+class metacache : public herdstat::cachable
 {
     public:
         typedef std::vector<herdstat::portage::metadata> container_type;
@@ -44,17 +44,15 @@ class metacache_T : public herdstat::cachable
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        metacache_T(const std::string &portdir);
-        ~metacache_T();
+        metacache(const std::string& portdir);
+        ~metacache();
 
         virtual bool valid() const;
         virtual void fill();
         virtual void load();
         virtual void dump();
 
-        inline iterator begin();
         inline const_iterator begin() const;
-        inline iterator end();
         inline const_iterator end() const;
         inline size_type size() const;
         inline bool empty() const;
@@ -65,38 +63,26 @@ class metacache_T : public herdstat::cachable
         container_type _metadatas;
 };
 
-inline metacache_T::iterator
-metacache_T::begin()
+inline metacache::const_iterator
+metacache::begin() const
 {
     return _metadatas.begin();
 }
 
-inline metacache_T::const_iterator
-metacache_T::begin() const
-{
-    return _metadatas.begin();
-}
-
-inline metacache_T::iterator
-metacache_T::end()
+inline metacache::const_iterator
+metacache::end() const
 {
     return _metadatas.end();
 }
 
-inline metacache_T::const_iterator
-metacache_T::end() const
-{
-    return _metadatas.end();
-}
-
-inline metacache_T::size_type
-metacache_T::size() const
+inline metacache::size_type
+metacache::size() const
 {
     return _metadatas.size();
 }
 
 inline bool
-metacache_T::empty() const
+metacache::empty() const
 {
     return _metadatas.empty();
 }
