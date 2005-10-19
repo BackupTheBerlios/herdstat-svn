@@ -87,6 +87,12 @@ struct Highlight
 {
     std::string
     operator()(const std::string& str, FormatAttrs * const attrs) const;
+
+    /* handle special cases where we don't
+     * want to highlight certain characters in a word */
+    std::string handle_special_cases(const std::string& str,
+                                     const std::string& color,
+                                     const std::string& nocolor) const;
 };
 /****************************************************************************
  * Function object for performing line wrapping.
@@ -108,9 +114,29 @@ struct Format : std::binary_function<std::pair<std::string, std::string>,
 };
 /****************************************************************************/
 std::string
+Highlight::handle_special_cases(const std::string& str,
+                                const std::string& color,
+                                const std::string& nocolor) const
+{
+    if (str.empty())
+        return str;
+
+    /* wrapped in parenthesis */
+    if (str[0] == '(' and str[str.length() - 1] == ')')
+        return std::string("(" + color + str.substr(1, str.length() - 2) +
+                nocolor + ")");
+    /* ends in a comma */
+    else if (str[str.length() - 1] == ',')
+        return std::string(color + str.substr(0, str.length() - 1) +
+                nocolor + ",");
+
+    /* non-special case - highlight whole word */
+    return (color+str);
+}
+/****************************************************************************/
+std::string
 Highlight::operator()(const std::string& str, FormatAttrs * const attrs) const
 {
-    std::string result;
     const std::string colorfree(util::strip_colors(str));
     const bool is_away(not attrs->quiet() and
         std::binary_search(attrs->devaway().begin(),
@@ -125,14 +151,15 @@ Highlight::operator()(const std::string& str, FormatAttrs * const attrs) const
         attrs->highlights().find(colorfree);
     if (h != attrs->highlights().end())
     {
-        result.assign(h->second+str);
+        std::string result(
+                handle_special_cases(str, h->second, attrs->no_color()));
         if (is_away) result.append(attrs->devaway_color()+"*");
         return (result+attrs->no_color());
     }
 
     /* wasnt found in highlights, so mark it if away, or return
      * the original string. */
-    result.assign(str);
+    std::string result(str);
     if (is_away)
         result.append(attrs->devaway_color()+"*"+attrs->no_color());
 
@@ -146,8 +173,10 @@ Wrap::operator()(const std::string& str, OutData * const out) const
     const std::string::size_type wclen =
         util::strip_colors(str).length();
 
-    /* if it fits, put it on the current line */
-    if ((out->len + wclen) < out->maxlen)
+    /* if it fits or it doesnt fit but it's the only word (a long
+     * URL for example), put it on the current line */
+    if (((out->len + wclen) < out->maxlen) or
+        (out->len == (out->maxlabel+1)))
     {
         out->str.append(str + " ");
         out->len += wclen + 1;
