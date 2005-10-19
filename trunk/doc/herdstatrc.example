@@ -15,11 +15,12 @@ colors=true
 
 # highlight definitions
 #   value is a space-delimited list of words in the form of:
-#     word1,color1 word2,color2 re:some_regex,color3
-#   A "re:" prefixed word is interpreted as a regular expression.  A color
-#   may be omitted, in which case the default highlight color (which can
-#   be defined with the "highlight.color" option in this file) is used.
-#highlights=word1 word2,color1 re:regex,color2 word3,color3
+#	regex1,color1 regex2,color2 regex3,color3
+#
+#   A color may be omitted, in which case the default highlight color
+#   (which can be changed with the "highlight.color" option) is used.
+#
+#highlights=
 
 # QA mode? validates XML and other QA-related things (fex, a category
 # exists in $PORTDIR/profiles/categories that doesn't actually exist,
@@ -77,11 +78,5 @@ querycache.max=100
 # is considered expired?
 #   value can be a number (seconds)
 querycache.expire=84600
-
-# Specify any extra options to pass to wget
-#   NOTE: you need to specify two %s's.  The first one is the name of the
-#   path to save the local file as.  The second one is the URL and needs
-#   to be quoted.
-wget.options=-rq -t3 -T10
 
 # vim: set ft=conf :
