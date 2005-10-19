@@ -256,7 +256,7 @@ Formatter::operator()(const std::string& label,
         std::transform(data.begin(), data.end(),
                 std::back_inserter(_buffer), EmptyFirst());
     else
-        this->append(label, util::join(data));
+        this->operator()(label, util::join(data));
 }
 
 /*

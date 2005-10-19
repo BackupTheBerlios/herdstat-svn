@@ -128,10 +128,7 @@ class Formatter
          * @param data data string
          */
         void operator()(const std::string& label, const std::string& data)
-        {
-            this->append((not _attrs.quiet() and not label.empty()) ?
-                        label : "", data);
-        }
+        { this->append(_attrs.quiet() ? "" : label, data); }
 
         /** Append label/data.
          * @param label Label describing data
