@@ -30,20 +30,14 @@
 
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
-#include <herdstat/util/regex.hh>
 
 #include "common.hh"
 #include "formatter.hh"
 
 using namespace herdstat;
-
-struct EmptyFirst
-{
-    std::pair<std::string, std::string>
-    operator()(const std::string& str) const
-    { return std::pair<std::string, std::string>("", str); }
-};
-
+/****************************************************************************
+ * FormatAttrs - Format attributes
+ ****************************************************************************/
 FormatAttrs::FormatAttrs()
     : _cmap(), _quiet(false), _colors(true), _away(false), _quiet_delim("\n"),
       _maxlen(78),
@@ -51,7 +45,7 @@ FormatAttrs::FormatAttrs()
       _no_color(_cmap[none]), _devaway(), _highlights()
 {
 }
-
+/****************************************************************************/
 void
 FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
 {
@@ -60,97 +54,215 @@ FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
     {
         std::vector<std::string> parts(util::split(*i, ','));
         if (parts.size() == 1)
-            _highlights.insert(std::make_pair(parts.front(), _hcolor));
+            _highlights.insert(std::make_pair(
+                    util::Regex(parts.front()), _hcolor));
         else if (parts.size() == 2)
-            _highlights.insert(std::make_pair(parts.front(),
+            _highlights.insert(std::make_pair(
+                    util::Regex(parts.front()),
                     _colors ? _cmap[parts.back()] : ""));
         else
             throw Exception("Invalid highlight specification '%s'", i->c_str());
     }
 }
-
-Formatter::Formatter()
+/****************************************************************************
+ * Small struct for encapsulating some data to pass to Wrap().
+ ****************************************************************************/
+struct OutData
 {
+    OutData(std::string::size_type maxln,
+            std::string::size_type maxlb)
+        : str(), len(0), maxlen(maxln), maxlabel(maxlb) { }
+
+    std::string str;
+    std::string::size_type len;
+    const std::string::size_type maxlen;
+    const std::string::size_type maxlabel;
+};
+/****************************************************************************
+ * Function object for highlighting words based on user-defined regular
+ * expressions.
+ ****************************************************************************/
+struct Highlight
+    : std::binary_function<std::string, FormatAttrs * const, std::string>
+{
+    std::string
+    operator()(const std::string& str, FormatAttrs * const attrs) const;
+
+    /* handle special cases where we don't
+     * want to highlight certain characters in a word */
+    std::string handle_special_cases(const std::string& str,
+                                     const std::string& color,
+                                     const std::string& nocolor) const;
+};
+/****************************************************************************
+ * Function object for performing line wrapping.
+ ****************************************************************************/
+struct Wrap
+    : std::binary_function<std::string, OutData * const, void>
+{
+    void operator()(const std::string& str, OutData * const out) const;
+};
+/****************************************************************************
+ * Function object for formatting pairs of strings (label/data).
+ ****************************************************************************/
+struct Format : std::binary_function<std::pair<std::string, std::string>,
+                                     FormatAttrs * const, std::string>
+{
+    std::string
+    operator()(const std::pair<std::string, std::string>& data,
+               FormatAttrs * const attrs) const;
+};
+/****************************************************************************/
+std::string
+Highlight::handle_special_cases(const std::string& str,
+                                const std::string& color,
+                                const std::string& nocolor) const
+{
+    if (str.empty())
+        return str;
+
+    /* wrapped in parenthesis */
+    if (str[0] == '(' and str[str.length() - 1] == ')')
+        return std::string("(" + color + str.substr(1, str.length() - 2) +
+                nocolor + ")");
+    /* ends in a comma */
+    else if (str[str.length() - 1] == ',')
+        return std::string(color + str.substr(0, str.length() - 1) +
+                nocolor + ",");
+
+    /* non-special case - highlight whole word */
+    return (color+str);
 }
-
-Formatter::Formatter(const FormatAttrs& attrs)
+/****************************************************************************/
+std::string
+Highlight::operator()(const std::string& str, FormatAttrs * const attrs) const
 {
-    set_attrs(attrs);
+    const std::string colorfree(util::strip_colors(str));
+    const bool is_away(not attrs->quiet() and
+        std::binary_search(attrs->devaway().begin(),
+            attrs->devaway().end(), colorfree));
+
+    if (is_away)
+        attrs->set_marked_away(true);
+
+    /* Does str (stripped of any colors) match any regular expressions in
+     * the highlights map? */
+    util::RegexMap<std::string>::const_iterator h =
+        attrs->highlights().find(colorfree);
+    if (h != attrs->highlights().end())
+    {
+        std::string result(
+                handle_special_cases(str, h->second, attrs->no_color()));
+        if (is_away) result.append(attrs->devaway_color()+"*");
+        return (result+attrs->no_color());
+    }
+
+    /* wasnt found in highlights, so mark it if away, or return
+     * the original string. */
+    std::string result(str);
+    if (is_away)
+        result.append(attrs->devaway_color()+"*"+attrs->no_color());
+
+    return result;
 }
 
 void
-Formatter::highlight(std::vector<std::string>& data)
+Wrap::operator()(const std::string& str, OutData * const out) const
 {
-    std::vector<std::string>::iterator i;
-    for (i = data.begin() ; i != data.end() ; ++i)
+    /* length of str after colors are stripped */
+    const std::string::size_type wclen =
+        util::strip_colors(str).length();
+
+    /* if it fits or it doesnt fit but it's the only word (a long
+     * URL for example), put it on the current line */
+    if (((out->len + wclen) < out->maxlen) or
+        (out->len == (out->maxlabel+1)))
     {
-        const std::string colorfree(util::strip_colors(*i));
-        bool is_away = (not _attrs.quiet() and
-                std::binary_search(_attrs.devaway().begin(),
-                    _attrs.devaway().end(), colorfree));
+        out->str.append(str + " ");
+        out->len += wclen + 1;
+    }
+    /* otherwise, end that line and start a new one */
+    else
+    {
+        if (out->str[out->str.length() - 1] == ' ')
+            out->str.erase(out->str.length() - 1);
 
-        if (is_away)
-            _attrs.set_marked_away(true);
-
-        std::string result;
-
-        /* search highlights */
-        std::map<std::string, std::string>::const_iterator h;
-        for (h = _attrs.highlights().begin() ;
-             h != _attrs.highlights().end() ; ++h)
-        {
-            /* if it's a regex and the regex matches, or
-             * if its not a regex and the literal matches, highlight it */
-            std::string::size_type pos = h->first.find("re:");
-            if ((pos != std::string::npos and
-                 util::Regex(h->first.substr(pos+3)) == colorfree) or
-                (pos == std::string::npos and h->first == colorfree))
-            {
-                if (result.find((*i)+_attrs.no_color()) == std::string::npos)
-                    result += h->second + (*i);
-                else
-                    result += (*i);
-
-                if (is_away)
-                    result += _attrs.devaway_color() + "*";
-
-                if (_attrs.colors())
-                    result += _attrs.no_color();
-            }
-        }
-
-        /* no highlights were found, so fill result with *i and mark
-         * it if the word matches one in devaway */
-        if (result.empty())
-        {
-            result += (*i);
-            if (is_away)
-            {
-                result += _attrs.devaway_color() + "*";
-                if (_attrs.colors())
-                    result += _attrs.no_color();
-            }
-        }
-
-        i->assign(result);
+        out->str.append("\n");
+        out->str.append(out->maxlabel+1, ' ');
+        out->str.append(str + " ");
+        out->len = out->maxlabel+1 + wclen+1;
     }
 }
+
+std::string
+Format::operator()(const std::pair<std::string, std::string>& pair,
+                   FormatAttrs * const attrs) const
+{
+    OutData out(attrs->maxlen(), attrs->maxlabel());
+    const std::string& label(pair.first);
+    const std::string& data(pair.second);
+
+    /* handle label */
+    if (label.empty() and not data.empty() and not attrs->quiet())
+        out.str.assign(attrs->maxlabel()+1, ' ');
+    else if (not label.empty() and not attrs->quiet())
+    {
+        out.str.assign(attrs->label_color() + label + attrs->no_color() + ":");
+        out.str.append(attrs->maxlabel() - label.length(), ' ');
+    }
+
+    /* handle data */
+    if (not data.empty())
+    {
+        /* split into a vector of words */
+        std::vector<std::string> parts(util::split(data));
+        /* perform any highlights */
+        std::transform(parts.begin(), parts.end(),
+            parts.begin(), std::bind2nd(Highlight(), attrs));
+        /* perform any line wrapping */
+        out.len = util::strip_colors(out.str).length();
+        std::for_each(parts.begin(), parts.end(),
+            std::bind2nd(Wrap(), &out));
+    }
+
+    if (out.str[out.str.length() - 1] == ' ')
+        out.str.erase(out.str.length() - 1);
+
+    return out.str;
+}
+
+/*
+ * Function object that returns a pair of strings with an empty first element.
+ */
+
+struct EmptyFirst
+{
+    std::pair<std::string, std::string>
+    operator()(const std::string& str) const
+    { return std::pair<std::string, std::string>("", str); }
+};
+
+/*
+ * Append a label/vector of data.
+ */
 
 void
 Formatter::operator()(const std::string& label,
                       const std::vector<std::string>& data)
 {
-    if (_attrs.quiet() and _attrs.quiet_delim() == " ")
-        this->append("", util::join(data));
-    else if (_attrs.quiet())
-    {
-        std::vector<std::string>::const_iterator i;
-        for (i = data.begin() ; i != data.end() ; ++i)
-            this->append("", *i);
-    }
+    if (_attrs.quiet() and _attrs.quiet_delim() != " ")
+        /* append a new element (with an empty label) for
+         * each element in data to our buffer */
+        std::transform(data.begin(), data.end(),
+                std::back_inserter(_buffer), EmptyFirst());
     else
         this->operator()(label, util::join(data));
 }
+
+/*
+ * Flush our buffer.
+ * This is the user interface to what does the actual formatting.
+ */
 
 void
 Formatter::flush(std::ostream& stream)
@@ -158,77 +270,21 @@ Formatter::flush(std::ostream& stream)
     if (_buffer.empty())
         return;
 
-    std::vector<std::string> outbuf;
-
-    /* get max label length */
+    /* dynamically set maximum label length
+     * to at least the size of the longest label */
     buffer_type::iterator i =
         std::max_element(_buffer.begin(), _buffer.end(), FirstLengthLess());
 
-    std::size_t maxlabel = i->first.length();
-    if (not _attrs.quiet()) maxlabel += 3; /* indent */
-    std::size_t maxlen = _attrs.maxlen();
+    _attrs.set_maxlabel(_attrs.quiet() ?
+                            i->first.length() :
+                            i->first.length() + 3 /* padding */);
 
-    for (i = _buffer.begin() ; i != _buffer.end() ; ++i)
-    {
-        std::string out, label, data;
-
-        /* label */
-        if (i->first.empty() and not i->second.empty() and not _attrs.quiet())
-            label.assign(maxlabel+1, ' ');
-        else if (not i->first.empty() and not _attrs.quiet())
-        {
-            if (_attrs.colors())
-                label.assign(_attrs.label_color() + i->first + _attrs.no_color() + ":");
-            else
-                label.assign(i->first + ":");
-
-            label.append(maxlabel - i->first.length(), ' ');
-        }
-
-        out += label;
-
-        /* data */
-        if (not i->second.empty())
-        {
-            /* split into a vector and perform any highlights */
-            std::vector<std::string> parts(util::split(i->second));
-            highlight(parts);
-
-            std::string::size_type outlen = util::strip_colors(label).length();
-            /* while there's still data to process... */
-            while (not parts.empty())
-            {
-                const std::string& word(parts.front());
-                const std::string::size_type wclen =
-                    util::strip_colors(word).length();
-
-                /* if it fits, put it on the current line */
-                if ((outlen + wclen) < maxlen)
-                {
-                    out += word + " ";
-                    outlen += wclen + 1;
-                }
-                /* otherwise, end that line and start a new one */
-                else
-                {
-                    if (out[out.length() - 1] == ' ')
-                        out.erase(out.length() - 1);
-
-                    out += "\n";
-                    label.assign(maxlabel+1, ' ');
-                    out += label + word + " ";
-                    outlen = label.length() + wclen + 1;
-                }
-
-                parts.erase(parts.begin());
-            }
-        }
-
-        if (out[out.length() - 1] == ' ')
-            out.erase(out.length() - 1);
-
-        outbuf.push_back(out);
-    }
+    /* for each element in our buffer, format it and insert
+     * the result into the real output buffer. */
+    std::vector<std::string> outbuf;
+    std::transform(_buffer.begin(), _buffer.end(),
+        std::back_inserter(outbuf),
+        std::bind2nd(Format(), &_attrs));
 
     _buffer.clear();
 

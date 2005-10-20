@@ -33,10 +33,10 @@
  * configuration file class
  */
 
-class rc_T
+class rc
 {
     public:
-        rc_T();
+        rc();
 
     private:
         void set_options();

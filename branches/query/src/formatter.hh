@@ -31,7 +31,9 @@
 #include <string>
 #include <vector>
 #include <utility>
+
 #include <herdstat/util/misc.hh>
+#include <herdstat/util/regex.hh>
 
 struct FirstLengthLess
 {
@@ -47,18 +49,23 @@ class FormatAttrs
     public:
         FormatAttrs();
 
-        std::size_t maxlen() const { return _maxlen; }
-        void set_maxlen(std::size_t n) { _maxlen = n; }
+        std::string::size_type maxlen() const { return _maxlen; }
+        void set_maxlen(std::string::size_type n) { _maxlen = n; }
+        std::string::size_type maxlabel() const { return _maxlabel; }
+        void set_maxlabel(std::string::size_type n) { _maxlabel = n; }
 
         const std::vector<std::string>& devaway() const { return _devaway; }
         void set_devaway(const std::vector<std::string>& v) { _devaway = v; }
 
-        const std::map<std::string, std::string>& highlights() const
+        const herdstat::util::RegexMap<std::string>& highlights() const
         { return _highlights; }
         void add_highlights(const std::vector<std::string>& v);
         void add_highlight(const std::string &s,
                            const std::string &c = "")
-        { _highlights[s] = (_colors? (c.empty() ? _hcolor : c) : ""); }
+        {
+            _highlights.insert(std::make_pair(herdstat::util::Regex(s),
+                (_colors? (c.empty() ? _hcolor : c) : "")));
+        }
 
         const std::string& no_color() const { return _no_color; }
 
@@ -78,7 +85,7 @@ class FormatAttrs
             if (not _colors)
             {
                 _hcolor.clear(); _dcolor.clear();
-                _lcolor.clear();
+                _lcolor.clear(); _no_color.clear();
             }
         }
 
@@ -96,13 +103,14 @@ class FormatAttrs
         bool _colors;
         bool _away;
         std::string _quiet_delim;
-        std::size_t _maxlen;
+        std::string::size_type _maxlen;
+        std::string::size_type _maxlabel;
         std::string _lcolor; /* label color */
         std::string _hcolor; /* highlight color */
         std::string _dcolor; /* devaway color */
         std::string _no_color;
         std::vector<std::string> _devaway;
-        std::map<std::string, std::string> _highlights;
+        herdstat::util::RegexMap<std::string> _highlights;
 };
 
 class Formatter
@@ -120,10 +128,7 @@ class Formatter
          * @param data data string
          */
         void operator()(const std::string& label, const std::string& data)
-        {
-            this->append((not _attrs.quiet() and not label.empty()) ?
-                        label : "", data);
-        }
+        { this->append(_attrs.quiet() ? "" : label, data); }
 
         /** Append label/data.
          * @param label Label describing data
@@ -148,15 +153,11 @@ class Formatter
 
     private:
         friend Formatter& GlobalFormatter();
-
-        Formatter();
-        Formatter(const FormatAttrs& attrs);
+        Formatter() { }
 
         /// Raw access to the buffer.
         void append(const std::string& label, const std::string& data)
-        { _buffer.push_back(buffer_type::value_type(label, data)); }
-        //// Perform highlighting
-        void highlight(std::vector<std::string>& v);
+        { _buffer.push_back(std::make_pair(label, data)); }
 
         FormatAttrs _attrs;
         buffer_type _buffer;

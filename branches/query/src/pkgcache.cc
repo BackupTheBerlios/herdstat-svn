@@ -43,14 +43,14 @@
 using namespace herdstat;
 using namespace herdstat::portage;
 
-pkgcache_T::pkgcache_T()
+pkgcache::pkgcache()
     : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
       _portdir(options::portdir()), _overlays(options::overlays()),
       _pkgs(_portdir, _overlays)
 {
 }
 
-pkgcache_T::pkgcache_T(const std::string &portdir)
+pkgcache::pkgcache(const std::string &portdir)
     : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
       _portdir(portdir), _overlays(options::overlays()),
       _pkgs(_portdir, _overlays)
@@ -59,7 +59,7 @@ pkgcache_T::pkgcache_T(const std::string &portdir)
 }
 
 void
-pkgcache_T::init()
+pkgcache::init()
 {
     this->logic();
 }
@@ -69,7 +69,7 @@ pkgcache_T::init()
  */
 
 bool
-pkgcache_T::valid() const
+pkgcache::valid() const
 {
     const util::Stat pkgcache(this->path());
     bool valid = false;
@@ -148,7 +148,7 @@ pkgcache_T::valid() const
 }
 
 void
-pkgcache_T::fill()
+pkgcache::fill()
 {
     util::Timer timer;
 
@@ -169,7 +169,7 @@ pkgcache_T::fill()
  */
 
 void
-pkgcache_T::load()
+pkgcache::load()
 {
     std::ifstream stream(this->path().c_str());
     if (not stream)
@@ -197,7 +197,7 @@ pkgcache_T::load()
  */
 
 void
-pkgcache_T::dump()
+pkgcache::dump()
 {
     std::ofstream stream(this->path().c_str());
     if (not stream)
