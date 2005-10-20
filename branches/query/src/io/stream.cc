@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include "query.hh"
+#include "query_results.hh"
 #include "io/stream.hh"
 
 bool
@@ -43,7 +45,7 @@ StreamIOHandler::operator()(const QueryResults& results)
 
     }
 
-    size = results.size();
+//    size = results.size();
 
     return true;
 }

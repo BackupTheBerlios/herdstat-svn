@@ -24,7 +24,12 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
+#include <iterator>
+
 #include "options.hh"
+#include "query.hh"
+#include "query_results.hh"
 #include "action/herd.hh"
 
 using namespace herdstat;
@@ -39,15 +44,13 @@ HerdActionHandler::operator()(const Query& query,
 
     if (query.all())
     {
+        QueryResults::value_type v("", std::vector<std::string>());
+
         /* transform all herds to QueryResults */
-        std::string h;
-        std::map<std::string, std::string> hmap;
+        std::transform(herds.begin(), herds.end(),
+            std::back_inserter(v.second), Name());
 
-        for (h = herds.begin() ; h != herds.end() ; ++h)
-            h += h->name() + " ";
-
-        hmap.insert(std::make_pair("herds", h));
-        results->push_back(hmap);
+        results->push_back(v);
     }
     else if (options::regex())
     {

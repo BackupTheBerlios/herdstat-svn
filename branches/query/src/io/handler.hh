@@ -29,10 +29,10 @@
 
 enum IOMethod
 {
-    Unspecified,
-    Readline,
-    Gtk,
-    Stream
+    IOMethodUnspecified,
+    IOMethodReadline,
+    IOMethodGtk,
+    IOMethodStream
 };
 
 class Query;

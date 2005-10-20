@@ -37,6 +37,7 @@ querycachectl_SOURCES = common.hh common.cc \
 querycachectl_LDADD = $(libherdstat_LIBS)
 endif
 
+INCLUDES = -I.. $(libherdstat_CFLAGS)
 MAINTAINERCLEANFILES = Makefile.in *~
 
 srchtml: $(foreach f, $(herdstat_SOURCES), $(f).html)

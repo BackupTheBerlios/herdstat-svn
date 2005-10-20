@@ -38,10 +38,11 @@
  * Walker").
  */
 
+typedef std::pair<std::string, std::vector<std::string> > Result;
+
 class QueryResults
 {
     public:
-        typedef std::vector<std::pair<std::string, std::string> > Result;
         typedef std::vector<Result> container_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
@@ -61,6 +62,8 @@ class QueryResults
         size_type size() const { return _results.size(); }
         bool empty() const { return _results.empty(); }
         void push_back(const value_type& v) { _results.push_back(v); }
+        iterator insert(iterator pos, const value_type& v)
+        { return _results.insert(pos, v); }
         //@}
         
     private:

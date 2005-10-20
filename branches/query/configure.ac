@@ -53,13 +53,16 @@ AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
-AC_PATH_PROGS(SED, gsed)
-if test -z "$SED" ; then
-    AC_PATH_PROGS(SED, sed)
-    if test -z "$SED" ; then
-	AC_MSG_ERROR([sed is required])
-    fi
-fi
+dnl hack to disable damn f77 libtool checks (stolen from sandbox's configure.in)
+m4_undefine([AC_PROG_F77])
+m4_defun([AC_PROG_F77],[])
+AC_PROG_LIBTOOL
+
+LIBTOOL="${LIBTOOL} --silent"
+AC_SUBST(LIBTOOL)
+
+dnl SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
+AC_SUBST(SED)
 
 AC_MSG_CHECKING([gcc version])
 gccver=`gcc -dumpversion | cut -f1 -d.`
@@ -104,4 +107,6 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
 	  doc/Makefile
 	  src/Makefile
+	  src/io/Makefile
+	  src/action/Makefile
 	  tests/Makefile)

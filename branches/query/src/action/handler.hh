@@ -27,14 +27,17 @@
 # include "config.h"
 #endif
 
+#include <herdstat/portage/herds_xml.hh>
+#include <herdstat/portage/devaway_xml.hh>
+
 enum ActionMethod
 {
-    Unspecified,
-    Herd,
-    Dev,
-    Find,
-    Which
-}
+    ActionUnspecified,
+    ActionHerd,
+    ActionDev,
+    ActionFind,
+    ActionWhich
+};
 
 class Query;
 class QueryResults;

@@ -20,8 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_HERD_HH
-#define _HAVE_HERD_HH 1
+#ifndef _HAVE_ACTION_HERD_HH
+#define _HAVE_ACTION_HERD_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -39,6 +39,6 @@ class HerdActionHandler : public XMLActionHandler
                                 QueryResults * const results) const;
 };
 
-#endif /* _HAVE_HERD_HH */
+#endif /* _HAVE_ACTION_HERD_HH */
 
 /* vim: set tw=80 sw=4 et : */

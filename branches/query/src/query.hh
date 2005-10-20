@@ -31,7 +31,7 @@
 #include <utility>
 #include <string>
 
-enum ActionMethod;
+#include "action/handler.hh"
 
 /**
  * @class Query

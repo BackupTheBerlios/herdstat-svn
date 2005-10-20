@@ -165,14 +165,14 @@ main(int argc, char **argv)
         if (not handle_opts(argc, argv, &q, &nonopt_args))
             throw argsException();
 
-        if (options::iomethod() == Unspecified)
-            options::set_iomethod(Stream);
+        if (options::iomethod() == IOMethodUnspecified)
+            options::set_iomethod(IOMethodStream);
 
         /* setup I/O handlers */
         std::map<IOMethod, IOHandler *> iohandlers;
-        iohandlers[Readline] = new ReadlineIOHandler();
-        iohandlers[Stream]   = new StreamIOHandler();
-        iohandlers[Gtk]      = new GtkIOHandler();
+        iohandlers[IOMethodReadline] = new ReadlineIOHandler();
+        iohandlers[IOMethodStream]   = new StreamIOHandler();
+        iohandlers[IOMethodGtk]      = new GtkIOHandler();
 
         IOHandler *iohandler = iohandlers[options::iomethod()];
         if (not iohandler)
@@ -180,10 +180,10 @@ main(int argc, char **argv)
 
         /* setup action handlers */
         std::map<ActionMethod, ActionHandler *> ahandlers;
-        ahandlers[Herd] = new HerdActionHandler();
-        ahandlers[Dev]  = new DevActionHandler();
+        ahandlers[ActionHerd] = new HerdActionHandler();
+        ahandlers[ActionDev]  = new DevActionHandler();
 
-        bool loop = (options::iomethod() != Stream);
+        bool loop = (options::iomethod() != IOMethodStream);
 
         /* main loop */
         do
@@ -192,7 +192,7 @@ main(int argc, char **argv)
             QueryResults results;
 
             /* handle input */
-            if (options::iomethod() == Stream)
+            if (options::iomethod() == IOMethodStream)
             {
                 /* we've already filled the query object when 
                  * parsing the command line options, so use it
