@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = 1.8 dist-bzip2 no-dist-gzip
 
-SUBDIRS = src doc
+SUBDIRS = doc src tests
 
 MAINTAINERCLEANFILES = COPYING \
 		       INSTALL \
@@ -17,10 +17,7 @@ MAINTAINERCLEANFILES = COPYING \
 
 DISTCLEANFILES = ChangeLog TODO
 
-EXTRA_DIST = ChangeLog Makefile.am.common autogen.sh .todo bashcomp tests
-
-check:
-	cd tests && $(MAKE) $@
+EXTRA_DIST = ChangeLog Makefile.am.common autogen.sh .todo bashcomp
 
 srchtml:
 	@test -d ${PWD}/html || mkdir ${PWD}/html ; \
@@ -34,7 +31,7 @@ srchtml:
 	done
 
 TODO: .todo
-	@test -x $(prefix)/bin/devtodo && devtodo all --TODO
+	@test -x /usr/bin/devtodo && devtodo all --TODO
 
 clitimestamp:
 	@touch clitimestamp
