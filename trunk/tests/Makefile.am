@@ -11,7 +11,7 @@ tests = versions \
 	which
 
 TESTS = $(foreach f, $(tests), $(f)-test.sh)
-TESTS_ENVIRONMENT = PORTDIR=portdir PORTDIR_OVERLAY=''
+TESTS_ENVIRONMENT = TEST_DATA=$(TEST_DATA) PORTDIR=$(TEST_DATA)/portdir PORTDIR_OVERLAY=''
 
 CLEANFILES = actual/* localstatedir/*cache*
 MAINTAINERCLEANFILES = Makefile.in *~

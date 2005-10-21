@@ -9,7 +9,7 @@ VERSION_MAJOR=1
 VERSION_MINOR=1
 VERSION_MICRO=2
 VERSION_SUFFIX=rc
-VERSION_SUFFIX_VERSION=1
+VERSION_SUFFIX_VERSION=2
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_MICRO"
 
 if ! test -z "$VERSION_SUFFIX" ; then
@@ -39,6 +39,15 @@ AC_ARG_ENABLE(debug,
     AC_HELP_STRING([--enable-debug],[Enable debugging code/flags]),
     [enable_debug=$enableval],[enable_debug=no])
 AM_CONDITIONAL(DEBUG, test x$enable_debug != "xno")
+
+dnl --with-test-data
+AC_ARG_WITH(test-data,
+    AC_HELP_STRING([--with-test-data],[Test data directory]),
+    [TEST_DATA=$withval], [TEST_DATA=foo])
+if test x"$TEST_DATA" = "xfoo" ; then
+    TEST_DATA="${PWD}/../../libherdstat/test-data"
+fi
+AC_SUBST(TEST_DATA)
 
 if test x$enable_debug != "xno" ; then
     CXXFLAGS="-ggdb3 -Winline"
