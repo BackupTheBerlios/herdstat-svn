@@ -76,13 +76,13 @@ getcols()
 #else /* HAVE_NCURSES */
 
     std::string output;
-    FILE *p = std::popen("stty size 2>/dev/null", "r");
+    FILE *p = popen("stty size 2>/dev/null", "r");
     if (p)
     {
 	char line[10];
 	if (std::fgets(line, sizeof(line) - 1, p) != NULL)
 	    output = line;
-	std::pclose(p);
+	pclose(p);
     }
 
     if (not output.empty())
