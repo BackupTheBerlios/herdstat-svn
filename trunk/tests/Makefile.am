@@ -1,7 +1,5 @@
 # $Id$
 
-# SUBDIRS = src
-
 tests = versions \
 	metadata \
 	dev \
@@ -17,8 +15,4 @@ TESTS_ENVIRONMENT = PORTDIR=portdir PORTDIR_OVERLAY=''
 
 CLEANFILES = actual/* localstatedir/*cache*
 MAINTAINERCLEANFILES = Makefile.in *~
-EXTRA_DIST = $(TESTS) \
-	     common.sh \
-	     portdir \
-	     expected \
-	     localstatedir
+EXTRA_DIST = $(TESTS) common.sh expected
