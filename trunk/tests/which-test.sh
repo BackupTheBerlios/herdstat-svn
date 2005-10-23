@@ -11,8 +11,8 @@ for x in portdir/app-lala/foomatic/foomatic-1000.ebuild \
     echo "${TEST_DATA}/${x}" >> ${srcdir}/expected/which-regex
 done
 
-run_herdstat "${0}" "ebuild which" "-wq foo" || exit 1
-run_herdstat "which-regex-test" "ebuild which (regex)" "-wqr foo" || exit 1
+run_herdstat "${0}" "which handler" "-wq foo" || exit 1
+run_herdstat "which-regex-test" "which handler (regex)" "-wqr foo" || exit 1
 
 rm -f ${srcdir}/expected/which*
 

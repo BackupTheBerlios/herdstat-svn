@@ -36,5 +36,5 @@ sys-libs/libfoo
 fu
 none
 GPL-2 BSD
-none
-none
+http://www.gentoo.org/proj/en/libfoo
+libfoo for writing foomatic apps
