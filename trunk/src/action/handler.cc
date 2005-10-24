@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_away_handler.hh
+ * herdstat -- action/handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,25 +20,22 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_AWAY_HANDLER_HH
-#define HAVE_ACTION_AWAY_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include "action/handler.hh"
+#include "common.hh"
 
-class action_away_handler : public action_herds_xml_handler
+void
+XMLActionHandler::fetch_and_parse()
 {
-    public:
-        virtual ~action_away_handler();
-        virtual int operator() (opts_type &);
+    fetch_herdsxml();
+    if (options::devaway())
+        fetch_devawayxml();
 
-    private:
-        void display(const herdstat::portage::Developer&);
-};
-
-#endif
+    herds_xml.parse();
+    devaway_xml.parse();
+}
 
 /* vim: set tw=80 sw=4 et : */

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_fetch_handler.cc
+ * herdstat -- src/io/readline.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,50 +20,24 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_READLINE_HH
+#define _HAVE_READLINE_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <iostream>
+#include "io/handler.hh"
 
-#include "common.hh"
-#include "action_fetch_handler.hh"
-
-using namespace herdstat;
-
-action_fetch_handler::~action_fetch_handler()
+class ReadLineIOHandler : public PrettyIOHandler
 {
-}
+    public:
+        ReadLineIOHandler();
+        virtual ~ReadLineIOHandler() { }
 
-int
-action_fetch_handler::operator() (opts_type &null)
-{
-    if (not options::fields().empty())
-    {
-        std::cerr << "--field doesn't really make much sense with --fetch."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
+        virtual bool input(Query * const query);
+};
 
-    try
-    {
-        if (not options::quiet())
-            options::set_verbose(true);
-
-        fetch_herdsxml();
-        /* parse herds.xml so any xml files listed in <maintainingproject>
-         * tags will be fetched. */
-        herdsxml.parse(options::herdsxml());
-
-        if (options::devaway())
-            fetch_devawayxml();
-    }
-    catch (const FetchException)
-    {
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
+#endif /* _HAVE_READLINE_HH */
 
 /* vim: set tw=80 sw=4 et : */

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_meta_handler.hh
+ * herdstat -- action/handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,33 +20,45 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_META_HANDLER_HH
-#define HAVE_ACTION_META_HANDLER_HH 1
+#ifndef _HAVE_ACTION_HANDLER_HH
+#define _HAVE_ACTION_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include <herdstat/portage/herds_xml.hh>
+#include <herdstat/portage/devaway_xml.hh>
+#include <herdstat/portage/userinfo_xml.hh>
 
-struct metadata_data
-{
-    std::string path;
-    std::string portdir;
-    std::string pkg;
-    bool is_category;
-};
+#include "query.hh"
+#include "query_results.hh"
 
-class action_meta_handler : public action_portage_find_handler
+class ActionHandler
 {
     public:
-        virtual ~action_meta_handler();
-        virtual int operator() (opts_type &);
+        virtual ~ActionHandler() { }
 
-    private:
-        void display(const metadata_data&);
+        virtual void operator()(const Query& query,
+                                QueryResults * const results) = 0;
 };
 
-#endif
+class XMLActionHandler : public ActionHandler
+{
+    public:
+        virtual ~XMLActionHandler() { }
+
+        virtual void operator()(const Query& query,
+                                QueryResults * const results) = 0;
+
+    protected:
+        void fetch_and_parse();
+
+        herdstat::portage::herds_xml herds_xml;
+        herdstat::portage::devaway_xml devaway_xml;
+        herdstat::portage::userinfo_xml userinfo_xml;
+};
+
+#endif /* _HAVE_ACTION_HANDLER_HH */
 
 /* vim: set tw=80 sw=4 et : */

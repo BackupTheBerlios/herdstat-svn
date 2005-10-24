@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_stats_handler.hh
+ * herdstat -- io/handler.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,23 +20,39 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_STATS_HANDLER_HH
-#define HAVE_ACTION_STATS_HANDLER_HH 1
+#ifndef _HAVE_IO_HANDLER_HH
+#define _HAVE_IO_HANDLER_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "metacache.hh"
-#include "action_handler.hh"
+#include "query.hh"
+#include "query_results.hh"
+#include "formatter.hh"
 
-class action_stats_handler : public action_herds_xml_handler
+class IOHandler
 {
     public:
-        virtual ~action_stats_handler();
-        virtual int operator() (opts_type &);
+        virtual ~IOHandler() { }
+        virtual bool input(Query * const query) = 0;
+        virtual bool output(const QueryResults& results) = 0;
 };
 
-#endif
+class PrettyIOHandler : public IOHandler
+{
+    public:
+        PrettyIOHandler();
+        virtual ~PrettyIOHandler() { }
+
+        virtual bool input(Query * const query) = 0;
+        virtual bool output(const QueryResults& results);
+
+    protected:
+        Formatter& out;
+        FormatAttrs& attrs;
+};
+
+#endif /* _HAVE_IO_HANDLER_HH */
 
 /* vim: set tw=80 sw=4 et : */

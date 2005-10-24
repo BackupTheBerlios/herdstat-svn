@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_which_handler.hh
+ * herdstat -- action/herd.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,22 +20,37 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_WHICH_HANDLER_HH
-#define HAVE_ACTION_WHICH_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include "action/herd.hh"
 
-class action_which_handler : public action_portage_find_handler
+using namespace herdstat;
+using namespace herdstat::portage;
+
+void
+HerdActionHandler::operator()(const Query& query,
+                              QueryResults * const results)
 {
-    public:
-        virtual ~action_which_handler();
-        virtual int operator() (opts_type &);
-};
+    /* search for items in query and insert results */
+    fetch_and_parse();
 
-#endif
+    const Herds& herds(herds_xml.herds());
+    Herds::const_iterator h;
+
+    Query::const_iterator q;
+    for (q = query.begin() ; q != query.end() ; ++q)
+    {
+        if ((h = herds.find(q->second)) != herds.end())
+        {
+            results->add("name", h->name());
+            results->add("email", h->email());
+            
+            std::vector<std::string> devs(h->begin(), h->end());
+            results->add("developers", devs);
+        }
+    }
+}
 
 /* vim: set tw=80 sw=4 et : */

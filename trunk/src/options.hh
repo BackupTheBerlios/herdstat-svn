@@ -31,7 +31,7 @@
 #include <vector>
 #include <herdstat/portage/config.hh>
 
-enum options_action
+enum ActionMethod
 {
     action_unspecified,
     action_herd,
@@ -45,6 +45,14 @@ enum options_action
     action_away,
     action_fetch,
     action_kw
+};
+
+enum IOMethod
+{
+    IOMethodUnspecified,
+    IOMethodStream,
+    IOMethodReadLine,
+    IOMethodBatch
 };
 
 typedef std::vector<std::pair<std::string, std::string> > fields_type;
@@ -130,8 +138,10 @@ class options
         static const fields_type& fields() { return _fields; }
         static void add_field(const fields_type::value_type v) { _fields.push_back(v); }
 
-        static options_action action() { return _action; }
-        static void set_action(options_action v) { _action = v; }
+        static ActionMethod action() { return _action; }
+        static void set_action(ActionMethod v) { _action = v; }
+        static IOMethod iomethod() { return _iomethod; }
+        static void set_iomethod(IOMethod v) { _iomethod = v; }
 
         /* read-only */
         static const std::string& portdir() { return _portdir; }
@@ -179,7 +189,8 @@ class options
 
         static fields_type _fields;
 
-        static options_action _action;
+        static ActionMethod _action;
+        static IOMethod _iomethod;
 
         static herdstat::portage::config _config;
         static const std::string& _portdir;

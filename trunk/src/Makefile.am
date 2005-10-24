@@ -2,6 +2,8 @@
 
 include $(top_builddir)/Makefile.am.common
 
+SUBDIRS = action io
+
 bin_PROGRAMS = herdstat
 
 herdstat_SOURCES = common.hh common.cc \
@@ -15,36 +17,31 @@ herdstat_SOURCES = common.hh common.cc \
 		   querycache.hh querycache.cc \
 		   overlaydisplay.hh overlaydisplay.cc \
 		   fields.hh \
-		   action_handler.hh action_handler.cc \
-		   action_away_handler.hh action_away_handler.cc \
-		   action_dev_handler.hh action_dev_handler.cc \
-		   action_herd_handler.hh action_herd_handler.cc \
-		   action_fetch_handler.hh action_fetch_handler.cc \
-		   action_find_handler.hh action_find_handler.cc \
-		   action_keywords_handler.hh action_keywords_handler.cc \
-		   action_meta_handler.hh action_meta_handler.cc \
-		   action_pkg_handler.hh action_pkg_handler.cc \
-		   action_stats_handler.hh action_stats_handler.cc \
-		   action_which_handler.hh action_which_handler.cc \
-		   action_versions_handler.hh action_versions_handler.cc \
+		   query.hh query.cc \
+		   query_results.hh \
 		   getcols.cc \
 		   herdstat.cc
 
-herdstat_LDADD = $(libherdstat_LIBS) @TERMCAP_LIBS@
+herdstat_LDADD = \
+		action/libaction.la \
+		io/libio.la \
+		$(libherdstat_LIBS) \
+		@TERMCAP_LIBS@
 
-if DEBUG
-bin_PROGRAMS += querycachectl
-querycachectl_SOURCES = common.hh common.cc \
-			exceptions.hh \
-			options.hh options.cc \
-			rc.hh rc.cc \
-			formatter.hh formatter.cc \
-			pkgquery.hh pkgquery.cc \
-			querycache.hh querycache.cc \
-			querycachectl.cc
-querycachectl_LDADD = $(libherdstat_LIBS)
-endif
+# if DEBUG
+# bin_PROGRAMS += querycachectl
+# querycachectl_SOURCES = common.hh common.cc \
+#                         exceptions.hh \
+#                         options.hh options.cc \
+#                         rc.hh rc.cc \
+#                         formatter.hh formatter.cc \
+#                         pkgquery.hh pkgquery.cc \
+#                         querycache.hh querycache.cc \
+#                         querycachectl.cc
+# querycachectl_LDADD = $(libherdstat_LIBS)
+# endif
 
+INCLUDES = $(libherdstat_CFLAGS)
 MAINTAINERCLEANFILES = Makefile.in *~
 
 srchtml: $(foreach f, $(herdstat_SOURCES), $(f).html)

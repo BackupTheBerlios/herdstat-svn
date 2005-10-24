@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_dev_handler.hh
+ * herdstat -- src/query.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,29 +20,33 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_DEV_HANDLER_HH
-#define HAVE_ACTION_DEV_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/portage/userinfo_xml.hh>
-#include "action_handler.hh"
+#include "query.hh"
 
-class action_dev_handler : public action_herds_xml_handler
+/****************************************************************************/
+Query::Query()
+    : _action(action_unspecified), _all(false)
 {
-    public:
-        action_dev_handler();
-        virtual ~action_dev_handler();
-        virtual int operator() (opts_type &);
 
-    private:
-        void display(const std::string &);
-
-        herdstat::portage::userinfo_xml userinfo;
-};
-
-#endif
-
+}
+/****************************************************************************/
+Query::iterator
+Query::find(const std::string& k)
+{
+    for (iterator i = this->begin() ; i != this->end() ; ++i)
+        if (i->first == k) return i;
+    return this->end();
+}
+/****************************************************************************/
+Query::const_iterator
+Query::find(const std::string& k) const
+{
+    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
+        if (i->first == k) return i;
+    return this->end();
+}
+/****************************************************************************/
 /* vim: set tw=80 sw=4 et : */

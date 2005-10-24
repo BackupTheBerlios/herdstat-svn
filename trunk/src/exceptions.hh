@@ -82,6 +82,8 @@ class CleanupException : public herdstat::Exception
         int _code;
 };
 
+class IOHandlerUnimplemented : public herdstat::Exception { };
+
 /* action handler exceptions */
 class ActionException : public herdstat::BaseException { };
 class HerdException   : public ActionException { };

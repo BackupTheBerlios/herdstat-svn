@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_fetch_handler.hh
+ * herdstat -- io/stream.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,25 +20,22 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_FETCH_HANDLER_HH
-#define HAVE_ACTION_FETCH_HANDLER_HH 1
+#ifndef _HAVE_STREAM_HH
+#define _HAVE_STREAM_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include "io/handler.hh"
 
-class action_fetch_handler : public action_herds_xml_handler
+class StreamIOHandler : public PrettyIOHandler
 {
     public:
-        virtual ~action_fetch_handler();
-        virtual int operator() (opts_type &);
-
-    protected:
-        virtual void flush() { }
+        virtual ~StreamIOHandler() { }
+        virtual bool input(Query * const query);
 };
 
-#endif
+#endif /* _HAVE_STREAM_HH */
 
 /* vim: set tw=80 sw=4 et : */

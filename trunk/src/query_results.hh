@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_versions_handler.hh
+ * herdstat -- src/query_results.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,22 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_VERSIONS_HANDLER_HH
-#define HAVE_ACTION_VERSIONS_HANDLER_HH 1
+#ifndef _HAVE_QUERY_RESULTS_HH
+#define _HAVE_QUERY_RESULTS_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include <string>
+#include <vector>
+#include <utility>
 
-class action_versions_handler : public action_portage_find_handler
+#include <herdstat/util/container_base.hh>
+
+typedef std::pair<std::string, std::vector<std::string> > Result;
+
+class QueryResults : public herdstat::util::VectorBase<Result>
 {
     public:
-        virtual ~action_versions_handler();
-        virtual int operator() (opts_type &);
+        void add(const std::string& field, const std::string& val)
+        {
+            std::vector<std::string> v;
+            v.push_back(val);
+            this->push_back(std::make_pair(field, v));
+        }
+
+        void add(const std::string& field, const std::vector<std::string>& val)
+        { this->push_back(std::make_pair(field, val)); }
 };
 
-#endif
+#endif /* _HAVE_QUERY_RESULTS_HH */
 
 /* vim: set tw=80 sw=4 et : */

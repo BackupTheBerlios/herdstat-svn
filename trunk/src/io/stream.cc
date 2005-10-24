@@ -1,6 +1,6 @@
 /*
- * herdstat -- src/action_keywords_handler.hh
- * $Id: action_versions_handler.hh 558 2005-09-12 11:54:23Z ka0ttic $
+ * herdstat -- io/stream.cc
+ * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
@@ -20,22 +20,22 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_KEYWORDS_HANDLER_HH
-#define HAVE_ACTION_KEYWORDS_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include <iostream>
+#include <herdstat/util/string.hh>
+#include "io/stream.hh"
+#include "formatter.hh"
 
-class action_keywords_handler : public action_portage_find_handler
+using namespace herdstat;
+
+bool
+StreamIOHandler::input(Query * const query)
 {
-    public:
-        virtual ~action_keywords_handler();
-        virtual int operator() (opts_type &);
-};
-
-#endif
+    /* stream input is handled when parsing command line options */
+    return true;
+}
 
 /* vim: set tw=80 sw=4 et : */

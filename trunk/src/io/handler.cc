@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action_find_handler.hh
+ * herdstat -- io/handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,22 +20,40 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_FIND_HANDLER_HH
-#define HAVE_ACTION_FIND_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include <herdstat/util/string.hh>
+#include "io/handler.hh"
 
-class action_find_handler : public action_portage_find_handler
+using namespace herdstat;
+
+PrettyIOHandler::PrettyIOHandler()
+    : out(GlobalFormatter()), attrs(out.attrs())
 {
-    public:
-        virtual ~action_find_handler();
-        virtual int operator() (opts_type &);
-};
+    /* set common format attributes */
+    attrs.set_maxlen(options::maxcol());
+    attrs.set_quiet(options::quiet());
+    attrs.set_colors(options::color());
 
-#endif
+    /* add highlights */
+    attrs.add_highlight(util::current_user());
+    attrs.add_highlight(util::get_user_from_email(util::current_user()));
+    /* user-defined highlights */
+    attrs.add_highlights(util::split(options::highlights()));
+}
+
+bool
+PrettyIOHandler::output(const QueryResults& results)
+{
+    QueryResults::const_iterator i;
+    for (i = results.begin() ; i != results.end() ; ++i)
+        out(i->first, i->second);
+
+    out.flush(*options::outstream());
+
+    return true;
+}
 
 /* vim: set tw=80 sw=4 et : */

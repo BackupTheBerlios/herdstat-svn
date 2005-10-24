@@ -1,7 +1,7 @@
 /*
- * herdstat -- src/action_herd_handler.hh
+ * herdstat -- src/io/batch.cc
  * $Id$
- * Copyright (c) 2005 Aaron Walker <ka0ttic at gentoo.org>
+ * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
  * This file is part of herdstat.
  *
@@ -20,24 +20,29 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_ACTION_HERD_HANDLER_HH
-#define HAVE_ACTION_HERD_HANDLER_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action_handler.hh"
+#include <iostream>
+#include <string>
+#include "io/batch.hh"
 
-class action_herd_handler : public action_herds_xml_handler
+bool
+BatchIOHandler::input(Query * const query)
 {
-    public:
-        virtual ~action_herd_handler();
-	virtual int operator() (opts_type &);
-};
+    std::string in;
+    if (not std::getline(std::cin, in))
+        return false;
 
-void display_herd(const herdstat::portage::Herd& herd);
+    return true;
+}
 
-#endif
+bool
+BatchIOHandler::output(const QueryResults& results)
+{
+
+    return true;
+}
 
 /* vim: set tw=80 sw=4 et : */

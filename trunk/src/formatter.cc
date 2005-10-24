@@ -30,6 +30,7 @@
 
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/functional.hh>
 
 #include "common.hh"
 #include "formatter.hh"
@@ -232,17 +233,6 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
 }
 
 /*
- * Function object that returns a pair of strings with an empty first element.
- */
-
-struct EmptyFirst
-{
-    std::pair<std::string, std::string>
-    operator()(const std::string& str) const
-    { return std::pair<std::string, std::string>("", str); }
-};
-
-/*
  * Append a label/vector of data.
  */
 
@@ -254,7 +244,7 @@ Formatter::operator()(const std::string& label,
         /* append a new element (with an empty label) for
          * each element in data to our buffer */
         std::transform(data.begin(), data.end(),
-                std::back_inserter(_buffer), EmptyFirst());
+                std::back_inserter(_buffer), util::EmptyFirst());
     else
         this->operator()(label, util::join(data));
 }

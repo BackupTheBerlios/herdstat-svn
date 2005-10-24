@@ -6,10 +6,10 @@ AC_INIT(src/herdstat.cc)
 
 # release versioning
 VERSION_MAJOR=1
-VERSION_MINOR=1
-VERSION_MICRO=2
-VERSION_SUFFIX=rc
-VERSION_SUFFIX_VERSION=2
+VERSION_MINOR=2
+VERSION_MICRO=0
+VERSION_SUFFIX=alpha
+VERSION_SUFFIX_VERSION=1
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_MICRO"
 
 if ! test -z "$VERSION_SUFFIX" ; then
@@ -62,13 +62,16 @@ AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
-AC_PATH_PROGS(SED, gsed)
-if test -z "$SED" ; then
-    AC_PATH_PROGS(SED, sed)
-    if test -z "$SED" ; then
-	AC_MSG_ERROR([sed is required])
-    fi
-fi
+dnl hack to disable damn f77 libtool checks (stolen from sandbox's configure.in)
+m4_undefine([AC_PROG_F77])
+m4_defun([AC_PROG_F77],[])
+AC_PROG_LIBTOOL
+
+LIBTOOL="${LIBTOOL} --silent"
+AC_SUBST(LIBTOOL)
+
+dnl SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
+AC_SUBST(SED)
 
 AC_MSG_CHECKING([gcc version])
 gccver=`gcc -dumpversion | cut -f1 -d.`
@@ -97,13 +100,25 @@ AC_ARG_WITH(ncurses,
     [WITH_NCURSES=$withval],[WITH_NCURSES=yes])
 AC_MSG_RESULT([$WITH_NCURSES])
 
-if test "$WITH_NCURSES" = "yes" ; then
+if test x"$WITH_NCURSES" = "xyes" ; then
     AC_CHECK_LIB(ncurses, tgetent, [TERMCAP_LIBS="-lncurses"])
     AC_CHECK_HEADERS([curses.h term.h])
     AC_DEFINE(HAVE_NCURSES, 1, [Use ncurses to determine terminal width])
 fi
     
 AC_SUBST(TERMCAP_LIBS)
+
+AC_MSG_CHECKING([whether to enable the readline front-end])
+AC_ARG_WITH(readline,
+    AC_HELP_STRING([--with-readline],[Enable the readline front-end]),
+    [WITH_READLINE=$withval],[WITH_READLINE=yes])
+AC_MSG_RESULT([$WITH_READLINE])
+
+if test x"$WITH_READLINE" = "xyes" ; then
+    AC_CHECK_HEADERS(readline/readline.h,,
+	[AC_MSG_ERROR([readline support was enabled but no readline/readline.h was found])])
+    AC_CHECK_LIB(readline, readline)
+fi
 
 dnl Required libs
 PKG_PROG_PKG_CONFIG
@@ -113,4 +128,6 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
 	  doc/Makefile
 	  src/Makefile
+	  src/action/Makefile
+	  src/io/Makefile
 	  tests/Makefile)

@@ -73,7 +73,8 @@ std::string options::_locale(std::locale::classic().name());
 
 fields_type options::_fields;
 
-options_action options::_action = action_unspecified;
+ActionMethod options::_action = action_unspecified;
+IOMethod options::_iomethod = IOMethodUnspecified;
 
 const std::string& options::_portdir = portage::GlobalConfig().portdir();
 const std::vector<std::string>& options::_overlays = portage::GlobalConfig().overlays();

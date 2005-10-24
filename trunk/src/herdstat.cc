@@ -35,23 +35,19 @@
 
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/functional.hh>
 #include <herdstat/xml/init.hh>
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
 #include "rc.hh"
 #include "formatter.hh"
-#include "action_herd_handler.hh"
-#include "action_pkg_handler.hh"
-#include "action_dev_handler.hh"
-#include "action_find_handler.hh"
-#include "action_meta_handler.hh"
-#include "action_stats_handler.hh"
-#include "action_which_handler.hh"
-#include "action_versions_handler.hh"
-#include "action_away_handler.hh"
-#include "action_fetch_handler.hh"
-#include "action_keywords_handler.hh"
+#include "io/handler.hh"
+#include "io/stream.hh"
+#include "io/readline.hh"
+#include "io/batch.hh"
+#include "action/handler.hh"
+#include "action/herd.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
@@ -60,7 +56,7 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::xml;
 
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:k";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:ki:";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -110,6 +106,7 @@ static struct option long_opts[] =
     {"TEST",	    no_argument,	0,  'T'},
     {"field",	    required_argument,	0,  'X'},
     {"keywords",    no_argument,	0,  'k'},
+    {"iomethod",    required_argument,  0,  'i'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
@@ -120,11 +117,15 @@ version()
     std::cout << PACKAGE << "-" << VERSION
 	<< " (built: " << __DATE__ << " " << __TIME__ << ")" << std::endl;
     std::cout << "Options:";
-#ifdef FETCH_METHOD_CURL
-    std::cout << " +curl";
-#endif
 #ifdef HAVE_NCURSES
     std::cout << " +ncurses";
+#else
+    std::cout << " -ncurses";
+#endif
+#ifdef HAVE_LIBREADLINE
+    std::cout << " +readline";
+#else
+    std::cout << " -readline";
 #endif
 
     std::cout << std::endl;
@@ -158,6 +159,7 @@ help()
 	<< " -a, --away              Look up away information for the specified developers." << std::endl
 	<< "     --versions          Look up versions of specified packages." << std::endl
 	<< " -k, --keywords          Display keywords for the specified packages." << std::endl
+	<< " -i, --iomethod          Front-end to use (readline, batch)." << std::endl
 	<< "     --field <field,criteria>" << std::endl
 	<< "                         Search by field (for use with --dev).  Possible fields" << std::endl
 	<< "                         are user,name,birthday,joined,status,location." << std::endl
@@ -276,11 +278,15 @@ parse_fields(const std::vector<std::string>& fields)
     }
 }
 
-static int
-handle_opts(int argc, char **argv, opts_type *args)
+static bool
+handle_opts(int argc, char **argv, Query *q)
 {
     std::vector<std::string> fields;
     int key, opt_index = 0;
+
+    std::map<std::string, IOMethod> methodmap;
+    methodmap["batch"] = IOMethodBatch;
+    methodmap["readline"] = IOMethodReadLine;
 
     while (true)
     {
@@ -474,6 +480,10 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    case '\a':
 		options::set_qa(true);
 		break;
+	    /* --iomethod */
+	    case 'i':
+		options::set_iomethod(methodmap[optarg]);
+		break;
 	    /* --version */
 	    case 'V':
 		throw argsVersion();
@@ -495,14 +505,12 @@ handle_opts(int argc, char **argv, opts_type *args)
     parse_fields(fields);
 
     if (optind < argc)
-    {
-	while (optind < argc)
-	    args->push_back(argv[optind++]);
-    }
+	std::transform(argv+optind, argv+argc,
+	    std::back_inserter(*q), util::EmptyFirst());
     else
     {
 	/* actions that are allowed to have 0 non-option args */
-	options_action action = options::action();
+	ActionMethod action = options::action();
 	if (action == action_dev and fields.empty())
 	    throw argsUsage();
 
@@ -511,11 +519,12 @@ handle_opts(int argc, char **argv, opts_type *args)
 	    action != action_dev and
 	    action != action_versions and
 	    action != action_fetch and
-	    action != action_kw)
+	    action != action_kw and
+	    (options::iomethod() == IOMethodStream))
 	    throw argsUsage();
     }
 
-    return 0;
+    return true;
 }
 
 std::string::size_type getcols(); // defined in getcols.cc
@@ -524,7 +533,6 @@ int
 main(int argc, char **argv)
 {
     options opts;
-    std::map<options_action, action_handler * > handlers;
     std::ostream *outstream = NULL;
 
     /* we need to know if -T or --TEST was specified before 
@@ -538,14 +546,18 @@ main(int argc, char **argv)
 
     try
     { 
+	Query q;
 	opts_type nonopt_args;
 	
 	/* handle rc file(s) */
 	if (not test) { rc rc; }
 
 	/* handle command line options */
-	if (handle_opts(argc, argv, &nonopt_args) != 0)
+	if (not handle_opts(argc, argv, &q))
 	    throw argsException();
+
+	if (options::iomethod() == IOMethodUnspecified)
+	    options::set_iomethod(IOMethodStream);
 
 	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
 	if (not options::cvsdir().empty())
@@ -627,59 +639,83 @@ main(int argc, char **argv)
 	/* set locale */
 	options::outstream()->imbue(std::locale(options::locale().c_str()));
 
-	/* set common format attributes */
-	FormatAttrs& attrs(GlobalFormatter().attrs());
-	attrs.set_maxlen(options::maxcol());
-	attrs.set_quiet(options::quiet());
-	attrs.set_colors(options::color());
-
-	/* add highlights */
-	attrs.add_highlight(util::current_user());
-	attrs.add_highlight(util::get_user_from_email(util::current_user()));
-	/* user-defined highlights */
-	attrs.add_highlights(util::split(options::highlights()));
+//        if (options::batch_mode())
+//        {
+//            options::set_quiet(true);
+//            options::set_color(false);
+//        }
 
 	/* set default action */
 	if (options::action() == action_unspecified)
-	    options::set_action(nonopt_args.empty() ?
+	    options::set_action(q.empty() ?
 				    action_stats : action_herd);
 
 	/* setup action handlers */
-	handlers[action_herd]     = new action_herd_handler();
-	handlers[action_dev]      = new action_dev_handler();
-	handlers[action_pkg]      = new action_pkg_handler();
-	handlers[action_meta]     = new action_meta_handler();
-	handlers[action_stats]    = new action_stats_handler();
-	handlers[action_which]    = new action_which_handler();
-	handlers[action_versions] = new action_versions_handler();
-	handlers[action_find]     = new action_find_handler();
-	handlers[action_away]     = new action_away_handler();
-	handlers[action_fetch]    = new action_fetch_handler();
-	handlers[action_kw]       = new action_keywords_handler();
+	std::map<ActionMethod, ActionHandler * > handlers;
+	handlers[action_herd] = new HerdActionHandler();
 
-	action_handler *handler = handlers[options::action()];
+	/* setup I/O handlers */
+	std::map<IOMethod, IOHandler *> iohandlers;
+	iohandlers[IOMethodStream]   = new StreamIOHandler();
+	iohandlers[IOMethodReadLine] = new ReadLineIOHandler();
+	iohandlers[IOMethodBatch]    = new BatchIOHandler();
 
-	if (handler)
+	bool loop = (options::iomethod() != IOMethodStream);
+
+	do
 	{
-	    try
+	    Query query;
+	    QueryResults results;
+
+	    IOHandler *iohandler = iohandlers[options::iomethod()];
+	    if (not iohandler)
+		throw IOHandlerUnimplemented();
+
+	    /* handle input */
+	    if (options::iomethod() == IOMethodStream)
 	    {
-		if ((*handler)(nonopt_args) != EXIT_SUCCESS)
+		/* we've already filled the query object when
+		 * parsing the command line options, so use it
+		 * instead of calling the handler. */
+		query = q;
+	    }
+	    else if (not iohandler->input(&query))
+		break;
+
+	    /* perform action */
+	    ActionHandler *handler = handlers[options::action()];
+	    if (handler)
+	    {
+		try
+		{
+		    (*handler)(query, &results);
+		}
+		catch (const ActionException)
+		{
+		    if (loop)
+			continue;
+
 		    return EXIT_FAILURE;
+		}
 	    }
-	    catch (const ActionException)
-	    {
-		return EXIT_FAILURE;
-	    }
-	}
-	else
-	    throw argsUnimplemented();
+	    else
+		throw argsUnimplemented();
+
+	    /* handle output */
+	    iohandler->output(results);
+
+	} while (loop);
 
 	if (outstream)
 	    delete outstream;
 
-	std::map<options_action, action_handler * >::iterator m;
+	std::map<ActionMethod, ActionHandler *>::iterator m;
 	for (m = handlers.begin() ; m != handlers.end() ; ++m)
 	    if (m->second) delete m->second;
+
+	std::map<IOMethod, IOHandler *>::iterator i;
+	for (i = iohandlers.begin() ; i != iohandlers.end() ; ++i)
+	    if (i->second) delete i->second;
     }
     catch (const QAException& e)
     {
