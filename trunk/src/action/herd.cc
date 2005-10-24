@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/string.hh>
 #include "action/herd.hh"
 
 using namespace herdstat;
@@ -39,16 +40,15 @@ HerdActionHandler::operator()(const Query& query,
     const Herds& herds(herds_xml.herds());
     Herds::const_iterator h;
 
-    Query::const_iterator q;
-    for (q = query.begin() ; q != query.end() ; ++q)
+    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
     {
         if ((h = herds.find(q->second)) != herds.end())
         {
-            results->add("name", h->name());
-            results->add("email", h->email());
+            results->add("Name", h->name());
+            results->add("Email", h->email());
             
             std::vector<std::string> devs(h->begin(), h->end());
-            results->add("developers", devs);
+            results->add(util::sprintf("Developers(%d)", h->size()), devs);
         }
     }
 }

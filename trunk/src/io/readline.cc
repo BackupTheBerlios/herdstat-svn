@@ -51,13 +51,13 @@ readline_init()
 }
 
 /* readline() wrapper */
-static std::string getinput(const std::string&, const std::string& = "");
+static void get_input(const std::string&, std::string *,
+                      const std::string& = "");
 
-std::string
-getinput(const std::string& prompt, const std::string& text)
+void
+get_input(const std::string& prompt, std::string *result,
+          const std::string& text)
 {
-    std::string result;
-    
     /* for readline_init startup hook */
     rl_buffer = &text;
     
@@ -68,18 +68,16 @@ getinput(const std::string& prompt, const std::string& text)
     if (*input)
     {
         add_history(input);
-        result.assign(input);
+        result->assign(input);
     }
     
     std::free(input);
-    return result;
 }
 
 ReadLineIOHandler::ReadLineIOHandler()
 {
     rl_startup_hook = readline_init;
-
-    /* no completions */
+    /* no completions (for now) */
     rl_bind_key('\t', NULL);
 }
 
@@ -91,7 +89,7 @@ ReadLineIOHandler::input(Query * const query)
     /* try to read input */
     try
     {
-        in.assign(getinput(PACKAGE"> "));
+        get_input(PACKAGE"> ", &in);
     }
     catch (const ReadlineEOF)
     {
