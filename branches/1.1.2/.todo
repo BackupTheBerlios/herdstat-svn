@@ -1,0 +1,17 @@
+<todo version="0.1.19">
+    <title>
+        Todo list for herdstat
+    </title>
+    <note priority="veryhigh" time="1130062506">
+        Allow keywords action handler to only show keywords for a specific version.
+    </note>
+    <note priority="high" time="1126510481">
+        Write a debug class for writing debugging messages instead of using debug_msg().
+    </note>
+    <note priority="high" time="1129831232">
+        Add some kind of --extract option for only displaying a certain piece of info about something. Fex, 'herdstat -d ka0ttic --extract birthday'
+    </note>
+    <note priority="verylow" time="1126623676">
+        Look into adding LDAP support for Gentoo's LDAP.
+    </note>
+</todo>
