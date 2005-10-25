@@ -24,32 +24,46 @@
 # include "config.h"
 #endif
 
+#include <gtkmm.h>
 #include "io/gtk.hh"
 
 class GtkFrontEnd
 {
+    public:
+        void run() { _app.run(_main); }
+
     private:
         friend GtkFrontEnd& GlobalGtkFrontEnd(int argc = 0, char **argv = NULL);
-        GtkFrontEnd() { }
+        GtkFrontEnd(int argc, char **argv);
         ~GtkFrontEnd() { }
+
+        Gtk::Main _app;
+        Gtk::Window _main;
+        Gtk::Notebook _notebook;
+        Gtk::MenuBar _menu;
 };
+
+GtkFrontEnd::GtkFrontEnd(int argc, char **argv)
+    : _app(argc, argv)
+{
+}
 
 GtkFrontEnd& GlobalGtkFrontEnd(int argc, char **argv)
 {
-    static GtkFrontEnd g;
+    static GtkFrontEnd g(argc, argv);
     return g;
 }
 
 GtkIOHandler::GtkIOHandler(int argc, char **argv)
     : GuiIOHandler(argc, argv)
 {
-
 }
 
 bool
 GtkIOHandler::operator()(Query * const query)
 {
-
+    GtkFrontEnd& fe(GlobalGtkFrontEnd(argc, argv));
+    fe.run();
     return true;
 }
 
