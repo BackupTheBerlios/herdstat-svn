@@ -39,8 +39,7 @@ class GtkIOHandler : public GuiIOHandler
         GtkIOHandler(int argc, char **argv);
         virtual ~GtkIOHandler() { }
 
-        virtual bool input(Query * const query);
-        virtual bool output(const QueryResults& results);
+        virtual bool operator()(Query * const query);
 };
 
 #endif /* _HAVE_GTK_HH */

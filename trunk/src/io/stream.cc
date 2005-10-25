@@ -24,17 +24,24 @@
 # include "config.h"
 #endif
 
-#include <iostream>
-#include <herdstat/util/string.hh>
+#include "exceptions.hh"
+#include "handler_map.hh"
+#include "action/handler.hh"
 #include "io/stream.hh"
-#include "formatter.hh"
 
 using namespace herdstat;
 
 bool
-StreamIOHandler::input(Query * const query)
+StreamIOHandler::operator()(Query * const query)
 {
-    /* stream input is handled when parsing command line options */
+    ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[query->action()];
+    if (not h)
+        throw ActionUnimplemented(query->action());
+
+    QueryResults results;
+    (*h)(*query, &results);
+    display(results);
+
     return true;
 }
 

@@ -35,8 +35,7 @@ class IOHandler
 {
     public:
         virtual ~IOHandler() { }
-        virtual bool input(Query * const query) = 0;
-        virtual bool output(const QueryResults& results) = 0;
+        virtual bool operator()(Query * const query) = 0;
 };
 
 class PrettyIOHandler : public IOHandler
@@ -45,8 +44,7 @@ class PrettyIOHandler : public IOHandler
         PrettyIOHandler();
         virtual ~PrettyIOHandler() { }
 
-        virtual bool input(Query * const query) = 0;
-        virtual bool output(const QueryResults& results);
+        void display(const QueryResults& results);
 
     protected:
         Formatter& out;

@@ -38,9 +38,7 @@ class QtIOHandler : public GuiIOHandler
     public:
         QtIOHandler(int c, char **v);
         virtual ~QtIOHandler() { }
-
-        virtual bool input(Query * const query);
-        virtual bool output(const QueryResults& results);
+        virtual bool operator()(Query * const query);
 };
 
 #endif /* _HAVE_QT_HH */

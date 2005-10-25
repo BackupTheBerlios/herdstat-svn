@@ -35,6 +35,7 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
 
+#include "exceptions.hh"
 #include "handler_map.hh"
 #include "action/handler.hh"
 #include "io/readline.hh"
@@ -84,45 +85,51 @@ ReadLineIOHandler::ReadLineIOHandler()
 }
 
 bool
-ReadLineIOHandler::input(Query * const query)
+ReadLineIOHandler::operator()(Query * const query)
 {
     Options& options(GlobalOptions());
-    std::string in;
-    
-    /* try to read input */
+
     try
     {
+        std::string in;
+
+        /* TODO: allow action binding and show current action in the prompt. */
         get_input(PACKAGE"> ", &in);
+
+        /* empty, so just call ourselves again and display another prompt */
+        if (in.empty())
+            return this->operator()(query);
+        if (in == "quit" or in == "exit")
+            return true;
+
+        std::vector<std::string> parts(util::split(in));
+        if (parts.empty())
+	    return false;
+
+        ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[parts[0]];
+        if (not h)
+            throw ActionUnimplemented(parts[0]);
+
+        /* assign arguments */
+        if (parts.size() > 1)
+            std::transform(parts.begin() + 1, parts.end(),
+                std::back_inserter(*query), util::EmptyFirst());
+
+        QueryResults results;
+        (*h)(*query, &results);
+        display(results);
     }
     catch (const ReadlineEOF)
     {
         options.outstream() << std::endl;
-        return false;
+        return true;
     }
-
-    /* empty, so just call ourselves again and display another prompt */
-    if (in.empty())
-        return input(query);
-    if (in == "quit" or in == "exit")
-        return false;
-
-    std::vector<std::string> parts(util::split(in));
-    if (parts.empty())
-	return false;
-
-    HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
-    if (handlers.find(parts[0]) == handlers.end())
+    catch (const ActionUnimplemented& e)
     {
-        options.outstream() << "Unknown action.  Try 'help'." << std::endl;
-        return input(query);
+        options.outstream() << "Unknown action '"
+            << e.what() << "'.  Try 'help'." << std::endl;
+        return this->operator()(query);
     }
-
-    query->set_action(parts[0]);
-
-    /* assign arguments */
-    if (parts.size() > 1)
-        std::transform(parts.begin() + 1, parts.end(),
-            std::back_inserter(*query), util::EmptyFirst());
 
     return true;
 }

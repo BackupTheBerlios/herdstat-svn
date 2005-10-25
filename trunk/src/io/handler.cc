@@ -47,16 +47,14 @@ PrettyIOHandler::PrettyIOHandler()
     attrs.add_highlights(util::split(opts.highlights()));
 }
 
-bool
-PrettyIOHandler::output(const QueryResults& results)
+void
+PrettyIOHandler::display(const QueryResults& results)
 {
     QueryResults::const_iterator i;
     for (i = results.begin() ; i != results.end() ; ++i)
         out(i->first, i->second);
 
     out.flush(GlobalOptions().outstream());
-
-    return true;
 }
 
 /* vim: set tw=80 sw=4 et : */

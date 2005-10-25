@@ -33,7 +33,7 @@ class StreamIOHandler : public PrettyIOHandler
 {
     public:
         virtual ~StreamIOHandler() { }
-        virtual bool input(Query * const query);
+        virtual bool operator()(Query * const query);
 };
 
 #endif /* _HAVE_STREAM_HH */

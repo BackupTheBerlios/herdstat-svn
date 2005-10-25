@@ -47,14 +47,7 @@ GtkIOHandler::GtkIOHandler(int argc, char **argv)
 }
 
 bool
-GtkIOHandler::input(Query * const query)
-{
-
-    return true;
-}
-
-bool
-GtkIOHandler::output(const QueryResults& results)
+GtkIOHandler::operator()(Query * const query)
 {
 
     return true;

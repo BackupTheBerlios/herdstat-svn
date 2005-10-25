@@ -80,17 +80,10 @@ QtIOHandler::QtIOHandler(int argc, char **argv)
 }
 
 bool
-QtIOHandler::input(Query * const query)
+QtIOHandler::operator()(Query * const query)
 {
     QtFrontEnd& fe(GlobalQtFrontEnd(argc, argv));
     return (fe.app().exec());
-}
-
-bool
-QtIOHandler::output(const QueryResults& results)
-{
-//    QtFrontEnd& fe(GlobalQtFrontEnd());
-    return true;
 }
 
 /* vim: set tw=80 sw=4 et : */

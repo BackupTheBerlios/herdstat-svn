@@ -34,13 +34,16 @@
  * Represents a list of conditions that whatever is being searched must meet in
  * order to be considered a match.  Holds key/value pairs, the name of the field
  * we're searching (name, for example), to the criteria (Aaron Walker, for
- * example).
+ * example).  The 'first' member may be empty.
  */
 
 class Query
     : public herdstat::util::VectorBase<std::pair<std::string, std::string> >
 {
     public:
+        typedef herdstat::util::VectorBase<std::pair<std::string, std::string> > \
+            base_type;
+
         Query();
 
         /* get action associated with this query */
@@ -51,8 +54,8 @@ class Query
         bool all() const { return _all; }
         void set_all(bool v) { _all = v; }
 
-        iterator find(const std::string& k);
-        const_iterator find(const std::string& k) const;
+//        iterator find(const std::string& k);
+//        const_iterator find(const std::string& k) const;
 
     private:
         std::string _action;

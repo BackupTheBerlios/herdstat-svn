@@ -569,9 +569,6 @@ main(int argc, char **argv)
 	if (not handle_opts(argc, argv, &q))
 	    throw argsException();
 
-	if (options.iomethod() == "unspecified")
-	    options.set_iomethod("stream");
-
 	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
 	if (not options.cvsdir().empty())
 	{
@@ -588,36 +585,6 @@ main(int argc, char **argv)
 
 	/* initialize XML stuff */
 	Init init(options.qa());
-
-	if (not options.fields().empty() and not nonopt_args.empty())
-	{
-	    std::cerr << "--field doesn't make much sense when specified" << std::endl
-		      << "with additional non-optional arguments." << std::endl;
-	    return EXIT_FAILURE;
-	}
-
-	if (options.regex() and nonopt_args.size() > 1)
-	{
-	    std::cerr << "You may only specify one regular expression."
-		<< std::endl;
-	    return EXIT_FAILURE;
-	}
-
-	/* remove duplicates; also has the nice side advantage
-	 * of sorting the output */
-	std::sort(nonopt_args.begin(), nonopt_args.end());
-	nonopt_args.erase(std::unique(nonopt_args.begin(),
-		nonopt_args.end()), nonopt_args.end());
-
-	/* did the user specify the all target? */
-	if (not options.regex() and
-	    (std::find(nonopt_args.begin(),
-		       nonopt_args.end(), "all") != nonopt_args.end()))
-	{
-	    options.set_all(true);
-	    nonopt_args.clear();
-	    nonopt_args.push_back("all");
-	}
 
 	/* setup output stream */
 	if (options.outfile() != "stdout" and options.outfile() != "stderr")
@@ -644,10 +611,6 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	    }
 	}
-
-	/* dump options */
-//        if (options.debug())
-//            options.dump(*options.outstream());	
 
 	/* set locale */
 	options.outstream().imbue(std::locale(options.locale().c_str()));
@@ -683,51 +646,32 @@ main(int argc, char **argv)
 	iohandlers.insert(std::make_pair("gtk", new GtkIOHandler(argc, argv)));
 #endif
 
-	bool loop = (options.iomethod() != "stream");
+	if (options.iomethod() == "unspecified")
+	    options.set_iomethod("stream");
 
-	do
+	while (true)
 	{
-	    Query query;
-	    QueryResults results;
+	    std::auto_ptr<Query> query(new Query());
+	    const std::string& iomethod(options.iomethod());
 
-	    IOHandler *iohandler = iohandlers[options.iomethod()];
-	    if (not iohandler)
-		throw IOHandlerUnimplemented();
+	    IOHandler *handler = iohandlers[iomethod];
+	    if (not handler)
+		throw IOHandlerUnimplemented(iomethod);
 
-	    /* handle input */
-	    if (options.iomethod() == "stream")
-	    {
-		/* we've already filled the query object when
-		 * parsing the command line options, so use it
-		 * instead of calling the handler. */
-		query = q;
-	    }
-	    else if (not iohandler->input(&query))
+	    /* we've already filled a query object when parsing the
+	     * command line options so use it instead. */
+	    if (iomethod == "stream")
+		std::swap(*query, q);
+
+	    /* do or die! */
+	    if ((*handler)(query.get()))
 		break;
-
-	    /* perform action */
-	    ActionHandler *handler = handlers[query.action()];
-	    if (handler)
-	    {
-		try
-		{
-		    (*handler)(query, &results);
-		}
-		catch (const ActionException)
-		{
-		    if (loop)
-			continue;
-
-		    return EXIT_FAILURE;
-		}
-	    }
 	    else
-		throw argsUnimplemented();
+		throw Exception("eek!");
 
-	    /* handle output */
-	    iohandler->output(results);
-
-	} while (loop);
+	    if (iomethod == "stream")
+		break;
+	}
 
 	if (outstream)
 	    delete outstream;
@@ -739,6 +683,12 @@ main(int argc, char **argv)
 	HandlerMap<IOHandler>::iterator i;
 	for (i = iohandlers.begin() ; i != iohandlers.end() ; ++i)
 	    if (i->second) delete i->second;
+    }
+    catch (const ActionUnimplemented& e)
+    {
+	std::cerr << "Invalid action '" << e.what() << "'.  Try --help."
+	    << std::endl;
+	return EXIT_FAILURE;
     }
     catch (const QAException& e)
     {

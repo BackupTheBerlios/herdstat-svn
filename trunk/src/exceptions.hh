@@ -101,6 +101,15 @@ class IOHandlerUnimplemented : public herdstat::Exception
         }
 };
 
+class ActionUnimplemented : public herdstat::Exception
+{
+    public:
+        ActionUnimplemented() { }
+        ActionUnimplemented(const char *msg) : herdstat::Exception(msg) { }
+        ActionUnimplemented(const std::string& msg) : herdstat::Exception(msg) { }
+        virtual ~ActionUnimplemented() throw() { }
+};
+
 /* action handler exceptions */
 class ActionException : public herdstat::BaseException { };
 class HerdException   : public ActionException { };

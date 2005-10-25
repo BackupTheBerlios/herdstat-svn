@@ -33,9 +33,7 @@ class BatchIOHandler : public IOHandler
 {
     public:
         virtual ~BatchIOHandler() { }
-
-        virtual bool input(Query * const query);
-        virtual bool output(const QueryResults& results);
+        virtual bool operator()(Query * const query);
 };
 
 #endif /* _HAVE_BATCH_HH */

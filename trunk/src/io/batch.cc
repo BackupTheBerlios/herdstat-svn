@@ -29,18 +29,11 @@
 #include "io/batch.hh"
 
 bool
-BatchIOHandler::input(Query * const query)
+BatchIOHandler::operator()(Query * const query)
 {
     std::string in;
     if (not std::getline(std::cin, in))
         return false;
-
-    return true;
-}
-
-bool
-BatchIOHandler::output(const QueryResults& results)
-{
 
     return true;
 }

@@ -35,7 +35,7 @@ class ReadLineIOHandler : public PrettyIOHandler
         ReadLineIOHandler();
         virtual ~ReadLineIOHandler() { }
 
-        virtual bool input(Query * const query);
+        virtual bool operator()(Query * const query);
 };
 
 #endif /* _HAVE_READLINE_HH */
