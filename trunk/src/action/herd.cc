@@ -34,6 +34,8 @@ void
 HerdActionHandler::operator()(const Query& query,
                               QueryResults * const results)
 {
+    Options& options(GlobalOptions());
+
     /* search for items in query and insert results */
     fetch_and_parse();
 
@@ -44,8 +46,11 @@ HerdActionHandler::operator()(const Query& query,
     {
         if ((h = herds.find(q->second)) != herds.end())
         {
-            results->add("Name", h->name());
-            results->add("Email", h->email());
+            if (not options.quiet())
+            {
+                results->add("Name", h->name());
+                results->add("Email", h->email());
+            }
             
             std::vector<std::string> devs(h->begin(), h->end());
             results->add(util::sprintf("Developers(%d)", h->size()), devs);

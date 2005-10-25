@@ -100,17 +100,17 @@ ReadLineIOHandler::operator()(Query * const query)
         if (in.empty())
             return this->operator()(query);
         if (in == "quit" or in == "exit")
-            return true;
+            return false;
 
         std::vector<std::string> parts(util::split(in));
         if (parts.empty())
-	    return false;
+	    throw Exception("Failed to parse input!");
 
         ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[parts[0]];
         if (not h)
             throw ActionUnimplemented(parts[0]);
 
-        /* assign arguments */
+        /* transform arguments into the query object */
         if (parts.size() > 1)
             std::transform(parts.begin() + 1, parts.end(),
                 std::back_inserter(*query), util::EmptyFirst());
@@ -122,7 +122,7 @@ ReadLineIOHandler::operator()(Query * const query)
     catch (const ReadlineEOF)
     {
         options.outstream() << std::endl;
-        return true;
+        return false;
     }
     catch (const ActionUnimplemented& e)
     {

@@ -663,13 +663,8 @@ main(int argc, char **argv)
 	    if (iomethod == "stream")
 		std::swap(*query, q);
 
-	    /* do or die! */
-	    if ((*handler)(query.get()))
-		break;
-	    else
-		throw Exception("eek!");
-
-	    if (iomethod == "stream")
+	    /* start I/O handler */
+	    if (not (*handler)(query.get()) or iomethod == "stream")
 		break;
 	}
 

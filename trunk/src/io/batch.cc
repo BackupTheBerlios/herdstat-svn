@@ -24,16 +24,55 @@
 # include "config.h"
 #endif
 
-#include <iostream>
 #include <string>
+#include <vector>
+
+#include <herdstat/util/string.hh>
+#include <herdstat/util/functional.hh>
+
+#include "exceptions.hh"
+#include "handler_map.hh"
+#include "action/handler.hh"
 #include "io/batch.hh"
+
+using namespace herdstat;
 
 bool
 BatchIOHandler::operator()(Query * const query)
 {
+    Options& options(GlobalOptions());
+
+    options.set_color(false);
+    options.set_quiet(true);
+
     std::string in;
     if (not std::getline(std::cin, in))
         return false;
+
+    if (in.empty())
+        return this->operator()(query);
+    if (in == "exit" or in == "quit")
+        return false;
+
+    std::vector<std::string> parts(util::split(in));
+    if (parts.empty())
+        throw Exception("Failed to parse input!");
+
+    ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[parts[0]];
+    if (not h)
+        throw ActionUnimplemented(parts[0]);
+
+    /* transform arguments into the query object */
+    if (parts.size() > 1)
+        std::transform(parts.begin() + 1, parts.end(),
+            std::back_inserter(*query), util::EmptyFirst());
+
+    QueryResults results;
+    (*h)(*query, &results);
+    
+    QueryResults::iterator i;
+    for (i = results.begin() ; i != results.end() ; ++i)
+        options.outstream() << util::join(i->second) << std::endl;
 
     return true;
 }
