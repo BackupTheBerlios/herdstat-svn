@@ -24,4 +24,40 @@
 # include "config.h"
 #endif
 
+#include "io/gtk.hh"
+
+class GtkFrontEnd
+{
+    private:
+        friend GtkFrontEnd& GlobalGtkFrontEnd(int argc = 0, char **argv = NULL);
+        GtkFrontEnd() { }
+        ~GtkFrontEnd() { }
+};
+
+GtkFrontEnd& GlobalGtkFrontEnd(int argc, char **argv)
+{
+    static GtkFrontEnd g;
+    return g;
+}
+
+GtkIOHandler::GtkIOHandler(int argc, char **argv)
+    : GuiIOHandler(argc, argv)
+{
+
+}
+
+bool
+GtkIOHandler::input(Query * const query)
+{
+
+    return true;
+}
+
+bool
+GtkIOHandler::output(const QueryResults& results)
+{
+
+    return true;
+}
+
 /* vim: set tw=80 sw=4 et : */

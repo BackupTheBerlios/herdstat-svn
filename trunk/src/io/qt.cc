@@ -52,9 +52,9 @@ class QtFrontEnd : private noncopyable
 QtFrontEnd::QtFrontEnd(int argc, char **argv)
     : _app(argc, argv), _tabs()
 {
-    _tabs.resize(200, 200);
+    _tabs.resize(400, 400);
 
-    /* insert a new tab for each action we support */
+    /* insert a new tab for each action handler */
     HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
     HandlerMap<ActionHandler>::iterator i;
     for (i = handlers.begin() ; i != handlers.end() ; ++i)

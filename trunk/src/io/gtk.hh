@@ -36,7 +36,7 @@
 class GtkIOHandler : public GuiIOHandler
 {
     public:
-        GtkIOHandler(int c, char **v);
+        GtkIOHandler(int argc, char **argv);
         virtual ~GtkIOHandler() { }
 
         virtual bool input(Query * const query);

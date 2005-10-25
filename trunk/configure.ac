@@ -167,7 +167,7 @@ AC_ARG_WITH(gtk,
 AC_MSG_RESULT([$WITH_GTK])
 
 if test x"$WITH_GTK" = "xyes" ; then
-    PKG_CHECK_MODULES(glibmm, glibmm-2.4)
+    PKG_CHECK_MODULES(gtkmm, gtkmm-2.4)
     AC_DEFINE(GTK_FRONTEND, 1, [Enable GTK+ front-end])
 fi
 
