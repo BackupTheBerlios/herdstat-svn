@@ -29,173 +29,154 @@
 
 #include <string>
 #include <vector>
-#include <herdstat/portage/config.hh>
-
-enum ActionMethod
-{
-    action_unspecified,
-    action_herd,
-    action_dev,
-    action_pkg,
-    action_meta,
-    action_stats,
-    action_which,
-    action_versions,
-    action_find,
-    action_away,
-    action_fetch,
-    action_kw
-};
-
-enum IOMethod
-{
-    IOMethodUnspecified,
-    IOMethodStream,
-    IOMethodReadLine,
-    IOMethodBatch
-};
+#include <utility>
+#include <herdstat/noncopyable.hh>
 
 typedef std::vector<std::pair<std::string, std::string> > fields_type;
 
-class options
+class Options : private herdstat::noncopyable
 {
     public:
-        options();
-
-        static bool verbose() { return _verbose; }
-        static void set_verbose(bool v) { _verbose = v; }
-        static bool quiet() { return _quiet; }
-        static void set_quiet(bool v) { _quiet = v; }
-        static bool debug() { return _debug; }
-        static void set_debug(bool v) { _debug = v; }
-        static bool timer() { return _timer; }
-        static void set_timer(bool v) { _timer = v; }
-        static bool all() { return _all; }
-        static void set_all(bool v) { _all = v; }
-        static bool dev() { return _dev; }
-        static void set_dev(bool v) { _dev = v; }
-        static bool count() { return _count; }
-        static void set_count(bool v) { _count = v; }
-        static bool color() { return _color; }
-        static void set_color(bool v) { _color = v; }
-        static bool overlay() { return _overlay; }
-        static void set_overlay(bool v) { _overlay = v; }
-        static bool eregex() { return _eregex; }
-        static void set_eregex(bool v) { _eregex = v; }
-        static bool regex() { return _regex; }
-        static void set_regex(bool v) { _regex = v; }
-        static bool qa() { return _qa; }
-        static void set_qa(bool v) { _qa = v; }
-        static bool meta() { return _meta; }
-        static void set_meta(bool v) { _meta = v; }
-        static bool metacache() { return _metacache; }
-        static void set_metacache(bool v) { _metacache = v; }
-        static bool querycache() { return _querycache; }
-        static void set_querycache(bool v) { _querycache = v; }
-        static bool devaway() { return _devaway; }
-        static void set_devaway(bool v)  { _devaway = v; }
+        bool verbose() const { return _verbose; }
+        void set_verbose(bool v) { _verbose = v; }
+        bool quiet() const { return _quiet; }
+        void set_quiet(bool v) { _quiet = v; }
+        bool debug() const { return _debug; }
+        void set_debug(bool v) { _debug = v; }
+        bool timer() const { return _timer; }
+        void set_timer(bool v) { _timer = v; }
+        bool all() const { return _all; }
+        void set_all(bool v) { _all = v; }
+        bool dev() const { return _dev; }
+        void set_dev(bool v) { _dev = v; }
+        bool count() const { return _count; }
+        void set_count(bool v) { _count = v; }
+        bool color() const { return _color; }
+        void set_color(bool v) { _color = v; }
+        bool overlay() const { return _overlay; }
+        void set_overlay(bool v) { _overlay = v; }
+        bool eregex() const { return _eregex; }
+        void set_eregex(bool v) { _eregex = v; }
+        bool regex() const { return _regex; }
+        void set_regex(bool v) { _regex = v; }
+        bool qa() const { return _qa; }
+        void set_qa(bool v) { _qa = v; }
+        bool meta() const { return _meta; }
+        void set_meta(bool v) { _meta = v; }
+        bool metacache() const { return _metacache; }
+        void set_metacache(bool v) { _metacache = v; }
+        bool querycache() const { return _querycache; }
+        void set_querycache(bool v) { _querycache = v; }
+        bool devaway() const { return _devaway; }
+        void set_devaway(bool v)  { _devaway = v; }
+        bool fetch() const { return _fetch; }
+        void set_fetch(bool v) { _fetch = v; }
         
-        static int& querycache_max() { return _querycache_max; }
-        static void set_querycache_max(int v) { _querycache_max = v; }
-        static long& querycache_expire() { return _querycache_expire; }
-        static void set_querycache_expire(long v) { _querycache_expire = v; }
-        static long& devaway_expire() { return _devaway_expire; }
-        static void set_devaway_expire(long v) { _devaway_expire = v; }
-        static size_t& maxcol() { return _maxcol; }
-        static void set_maxcol(size_t v) { _maxcol = v; }
+        const int& querycache_max() const { return _querycache_max; }
+        void set_querycache_max(int v) { _querycache_max = v; }
+        const long& querycache_expire() const { return _querycache_expire; }
+        void set_querycache_expire(long v) { _querycache_expire = v; }
+        const long& devaway_expire() const { return _devaway_expire; }
+        void set_devaway_expire(long v) { _devaway_expire = v; }
+        const size_t& maxcol() const { return _maxcol; }
+        void set_maxcol(size_t v) { _maxcol = v; }
 
-        static std::ostream * const outstream() { return _outstream; }
-        static void set_outstream(std::ostream *s) { _outstream = s; }
-        static const std::string& outfile() { return _outfile; }
-        static void set_outfile(const std::string& v) { _outfile.assign(v); }
-        static const std::string& cvsdir() { return _cvsdir; }
-        static void set_cvsdir(const std::string& v) { _cvsdir.assign(v); }
-        static const std::string& herdsxml() { return _herdsxml; }
-        static void set_herdsxml(const std::string& v) { _herdsxml.assign(v); }
-        static const std::string& devawayxml() { return _devawayxml; }
-        static void set_devawayxml(const std::string& v) { _devawayxml.assign(v); }
-        static const std::string& userinfoxml() { return _userinfoxml; }
-        static void set_userinfoxml(const std::string& v) { _userinfoxml.assign(v); }
-        static const std::string& with_herd() { return _with_herd; }
-        static void set_with_herd(const std::string& v) { _with_herd.assign(v); }
-        static const std::string& with_dev() { return _with_dev; }
-        static void set_with_dev(const std::string& v) { _with_dev.assign(v); }
-        static const std::string& localstatedir() { return _localstatedir; }
-        static void set_localstatedir(const std::string& v) { _localstatedir.assign(v); }
-        static const std::string& wget_options() { return _wgetopts; }
-        static void set_wget_options(const std::string& v) { _wgetopts.assign(v); }
-        static const std::string& labelcolor() { return _labelcolor; }
-        static void set_labelcolor(const std::string& v) { _labelcolor.assign(v); }
-        static const std::string& hlcolor() { return _hlcolor; }
-        static void set_hlcolor(const std::string& v) { _hlcolor.assign(v); }
-        static const std::string& metacache_expire() { return _metacache_expire; }
-        static void set_metacache_expire(const std::string& v) { _metacache_expire.assign(v); }
-        static const std::string& highlights() { return _highlights; }
-        static void set_highlights(const std::string& v) { _highlights.assign(v); }
-        static const std::string& locale() { return _locale; }
-        static void set_locale(const std::string& v) { _locale.assign(v); }
+        std::ostream& outstream() const { return *_outstream; }
+        void set_outstream(std::ostream *s) { _outstream = s; }
+        const std::string& outfile() const { return _outfile; }
+        void set_outfile(const std::string& v) { _outfile.assign(v); }
+        const std::string& cvsdir() const { return _cvsdir; }
+        void set_cvsdir(const std::string& v) { _cvsdir.assign(v); }
+        const std::string& herdsxml() const { return _herdsxml; }
+        void set_herdsxml(const std::string& v) { _herdsxml.assign(v); }
+        const std::string& devawayxml() const { return _devawayxml; }
+        void set_devawayxml(const std::string& v) { _devawayxml.assign(v); }
+        const std::string& userinfoxml() const { return _userinfoxml; }
+        void set_userinfoxml(const std::string& v) { _userinfoxml.assign(v); }
+        const std::string& with_herd() const { return _with_herd; }
+        void set_with_herd(const std::string& v) { _with_herd.assign(v); }
+        const std::string& with_dev() const { return _with_dev; }
+        void set_with_dev(const std::string& v) { _with_dev.assign(v); }
+        const std::string& localstatedir() const { return _localstatedir; }
+        void set_localstatedir(const std::string& v) { _localstatedir.assign(v); }
+        const std::string& labelcolor() const { return _labelcolor; }
+        void set_labelcolor(const std::string& v) { _labelcolor.assign(v); }
+        const std::string& hlcolor() const { return _hlcolor; }
+        void set_hlcolor(const std::string& v) { _hlcolor.assign(v); }
+        const std::string& metacache_expire() const { return _metacache_expire; }
+        void set_metacache_expire(const std::string& v) { _metacache_expire.assign(v); }
+        const std::string& highlights() const { return _highlights; }
+        void set_highlights(const std::string& v) { _highlights.assign(v); }
+        const std::string& locale() const { return _locale; }
+        void set_locale(const std::string& v) { _locale.assign(v); }
 
-        static const fields_type& fields() { return _fields; }
-        static void add_field(const fields_type::value_type v) { _fields.push_back(v); }
+        const fields_type& fields() const { return _fields; }
+        void add_field(const fields_type::value_type v) { _fields.push_back(v); }
 
-        static ActionMethod action() { return _action; }
-        static void set_action(ActionMethod v) { _action = v; }
-        static IOMethod iomethod() { return _iomethod; }
-        static void set_iomethod(IOMethod v) { _iomethod = v; }
+        const std::string& iomethod() const { return _iomethod; }
+        void set_iomethod(const std::string& v) { _iomethod.assign(v); }
 
         /* read-only */
-        static const std::string& portdir() { return _portdir; }
-        static const std::vector<std::string>& overlays() { return _overlays; }
+        const std::string& portdir() { return _portdir; }
+        const std::vector<std::string>& overlays() { return _overlays; }
 
     private:
-        static bool _init;
-        static bool _verbose;
-        static bool _quiet;
-        static bool _debug;
-        static bool _timer;
-        static bool _all;
-        static bool _dev;
-        static bool _count;
-        static bool _color;
-        static bool _overlay;
-        static bool _eregex;
-        static bool _regex;
-        static bool _qa;
-        static bool _meta;
-        static bool _metacache;
-        static bool _querycache;
-        static bool _devaway;
+        friend Options& GlobalOptions();
+        Options();
 
-        static int _querycache_max;
-        static long _querycache_expire;
-        static long _devaway_expire;
-        static size_t _maxcol;
+        bool _verbose;
+        bool _quiet;
+        bool _debug;
+        bool _timer;
+        bool _all;
+        bool _dev;
+        bool _count;
+        bool _color;
+        bool _overlay;
+        bool _eregex;
+        bool _regex;
+        bool _qa;
+        bool _meta;
+        bool _metacache;
+        bool _querycache;
+        bool _devaway;
+        bool _fetch;
 
-        static std::ostream *_outstream;
-        static std::string _outfile;
-        static std::string _cvsdir;
-        static std::string _herdsxml;
-        static std::string _devawayxml;
-        static std::string _userinfoxml;
-        static std::string _with_herd;
-        static std::string _with_dev;
-        static std::string _localstatedir;
-        static std::string _wgetopts;
-        static std::string _labelcolor;
-        static std::string _hlcolor;
-        static std::string _metacache_expire;
-        static std::string _highlights;
-        static std::string _locale;
+        int _querycache_max;
+        long _querycache_expire;
+        long _devaway_expire;
+        size_t _maxcol;
 
-        static fields_type _fields;
+        std::ostream *_outstream;
+        std::string _outfile;
+        std::string _cvsdir;
+        std::string _herdsxml;
+        std::string _devawayxml;
+        std::string _userinfoxml;
+        std::string _with_herd;
+        std::string _with_dev;
+        std::string _localstatedir;
+        std::string _wgetopts;
+        std::string _labelcolor;
+        std::string _hlcolor;
+        std::string _metacache_expire;
+        std::string _highlights;
+        std::string _locale;
 
-        static ActionMethod _action;
-        static IOMethod _iomethod;
+        fields_type _fields;
 
-        static herdstat::portage::config _config;
-        static const std::string& _portdir;
-        static const std::vector<std::string>& _overlays;
+        std::string _iomethod;
+
+        const std::string& _portdir;
+        const std::vector<std::string>& _overlays;
 };
+
+inline Options&
+GlobalOptions()
+{
+    static Options o;
+    return o;
+}
 
 #endif
 
