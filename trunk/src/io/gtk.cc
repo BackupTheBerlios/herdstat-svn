@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/common.hh
+ * herdstat -- src/io/gtk.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,25 +20,8 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_COMMON_HH
-#define HAVE_COMMON_HH 1
-
-#include <string>
-#include <vector>
-#include "options.hh"
-#include "exceptions.hh"
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
-#endif
-
-#define USE_XMLWRAPP
-#define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
-
-typedef std::vector<std::string> opts_type;
-
-void debug_msg(const char *, ...);
-
 #endif
 
 /* vim: set tw=80 sw=4 et : */

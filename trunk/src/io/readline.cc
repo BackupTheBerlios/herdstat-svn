@@ -35,6 +35,8 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
 
+#include "handler_map.hh"
+#include "action/handler.hh"
 #include "io/readline.hh"
 
 using namespace herdstat;
@@ -84,6 +86,7 @@ ReadLineIOHandler::ReadLineIOHandler()
 bool
 ReadLineIOHandler::input(Query * const query)
 {
+    Options& options(GlobalOptions());
     std::string in;
     
     /* try to read input */
@@ -93,7 +96,7 @@ ReadLineIOHandler::input(Query * const query)
     }
     catch (const ReadlineEOF)
     {
-        *options::outstream() << std::endl;
+        options.outstream() << std::endl;
         return false;
     }
 
@@ -107,34 +110,14 @@ ReadLineIOHandler::input(Query * const query)
     if (parts.empty())
 	return false;
 
-    /* set action accordingly */
-    if (parts[0] == "away")
-	options::set_action(action_away);
-    else if (parts[0] == "dev")
-	options::set_action(action_dev);
-    else if (parts[0] == "fetch")
-	options::set_action(action_fetch);
-    else if (parts[0] == "find")
-	options::set_action(action_find);
-    else if (parts[0] == "herd")
-	options::set_action(action_herd);
-    else if (parts[0] == "keywords")
-	options::set_action(action_kw);
-    else if (parts[0] == "meta")
-	options::set_action(action_meta);
-    else if (parts[0] == "pkg")
-	options::set_action(action_pkg);
-    else if (parts[0] == "stats")
-	options::set_action(action_stats);
-    else if (parts[0] == "versions")
-	options::set_action(action_versions);
-    else if (parts[0] == "which")
-	options::set_action(action_which);
-    else
+    HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
+    if (handlers.find(parts[0]) == handlers.end())
     {
-	std::cerr << "Unknown action.  Try 'help'." << std::endl;
-	return input(query);
+        options.outstream() << "Unknown action.  Try 'help'." << std::endl;
+        return input(query);
     }
+
+    query->set_action(parts[0]);
 
     /* assign arguments */
     if (parts.size() > 1)

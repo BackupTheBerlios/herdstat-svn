@@ -46,9 +46,10 @@ using namespace herdstat;
 using namespace herdstat::portage;
 
 metacache::metacache(const std::string &portdir)
-    : cachable(options::localstatedir()+METACACHE),
+    : cachable(GlobalOptions().localstatedir()+METACACHE),
+      _options(GlobalOptions()),
       _portdir(portdir),
-      _overlays(options::overlays())
+      _overlays(_options.overlays())
 {
 }
 
@@ -66,8 +67,8 @@ metacache::valid() const
     const util::Stat mcache(this->path());
     bool valid = false;
 
-    const std::string expire(options::metacache_expire());
-    const std::string lastsync(options::localstatedir()+LASTSYNC);
+    const std::string expire(_options.metacache_expire());
+    const std::string lastsync(_options.localstatedir()+LASTSYNC);
 
     if (mcache.exists())
     {
@@ -81,7 +82,7 @@ metacache::valid() const
             {
                 util::File t(path), l(lastsync);
 
-                if (options::debug())
+                if (_options.debug())
                 {
                     debug_msg("Checking timestamps...");
                     t.dump(std::cout);
@@ -162,7 +163,7 @@ metacache::valid() const
 void
 metacache::fill()
 {
-    const bool status = not options::quiet() and not options::debug();
+    const bool status = not _options.quiet() and not _options.debug();
     {
         util::Progress progress;
         pkgcache pkgcache(this->_portdir);
@@ -170,7 +171,7 @@ metacache::fill()
 
         if (status)
         {
-            *(options::outstream())
+            _options.outstream()
                 << "Generating metadata.xml cache: ";
             progress.start(pkgcache.size());
         }
@@ -202,7 +203,7 @@ metacache::fill()
     }
 
     if (status)
-        *(options::outstream()) << std::endl;
+        _options.outstream() << std::endl;
 }
 
 /*

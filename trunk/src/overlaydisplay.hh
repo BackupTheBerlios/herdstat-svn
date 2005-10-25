@@ -32,6 +32,8 @@
 #include <herdstat/util/functional.hh>
 #include <herdstat/util/container_base.hh>
 
+#include "options.hh"
+
 /*
  * Keeps track of overlays and assigns them numbers.
  * Displays the overlay list (in order) upon destruction.
@@ -46,12 +48,16 @@ class OverlayDisplay
                                     herdstat::util::SecondLess> base_type;
 
     public:
+        OverlayDisplay();
         virtual ~OverlayDisplay();
 
         // Get "[N]" string where N is the number of the given overlay.
         std::string operator[](const std::string& k);
         // Insert new overlay
         void insert(const std::string& overlay);
+
+    private:
+        Options& _options;
 };
 
 #endif /* HAVE_OVERLAYDISPLAY_HH */

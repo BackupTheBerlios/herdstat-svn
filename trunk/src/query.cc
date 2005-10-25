@@ -28,7 +28,7 @@
 
 /****************************************************************************/
 Query::Query()
-    : _action(action_unspecified), _all(false)
+    : _action("unspecified"), _all(false)
 {
 
 }

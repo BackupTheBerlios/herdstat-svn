@@ -46,8 +46,13 @@
 #include "io/stream.hh"
 #include "io/readline.hh"
 #include "io/batch.hh"
+#include "io/gtk.hh"
+#include "io/qt.hh"
 #include "action/handler.hh"
 #include "action/herd.hh"
+#include "action/dev.hh"
+#include "action/away.hh"
+#include "handler_map.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
@@ -122,10 +127,20 @@ version()
 #else
     std::cout << " -ncurses";
 #endif
-#ifdef HAVE_LIBREADLINE
+#ifdef READLINE_FRONTEND
     std::cout << " +readline";
 #else
     std::cout << " -readline";
+#endif
+#ifdef QT_FRONTEND
+    std::cout << " +qt";
+#else
+    std::cout << " -qt";
+#endif
+#ifdef GTK_FRONTEND
+    std::cout << " +gtk";
+#else
+    std::cout << " -gtk";
 #endif
 
     std::cout << std::endl;
@@ -274,19 +289,16 @@ parse_fields(const std::vector<std::string>& fields)
 	if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
 	    throw argsInvalidField();
 
-	options::add_field(fields_type::value_type(parts[0], parts[1]));
+	GlobalOptions().add_field(std::make_pair(parts[0], parts[1]));
     }
 }
 
 static bool
 handle_opts(int argc, char **argv, Query *q)
 {
+    Options& options(GlobalOptions());
     std::vector<std::string> fields;
     int key, opt_index = 0;
-
-    std::map<std::string, IOMethod> methodmap;
-    methodmap["batch"] = IOMethodBatch;
-    methodmap["readline"] = IOMethodReadLine;
 
     while (true)
     {
@@ -305,80 +317,81 @@ handle_opts(int argc, char **argv, Query *q)
 		break;
 	    /* --dev */
 	    case 'd':
-		if (options::action() != action_unspecified and
-		    options::action() != action_pkg and
-		    options::action() != action_meta)
+		if (q->action() != "unspecified" and
+		    q->action() != "pkg" and
+		    q->action() != "meta")
 		    throw argsOneActionOnly();
-		if (options::action() == action_pkg or
-		    options::action() == action_meta)
-		    options::set_dev(true);
+		if (q->action() == "pkg" or
+		    q->action() == "meta")
+		    options.set_dev(true);
 		else
-		    options::set_action(action_dev);
+		    q->set_action("dev");
 		break;
 	    /* --package */
 	    case 'p':
-		if (options::action() != action_unspecified and
-		    options::action() != action_dev and
-		    options::action() != action_meta)
+		if (q->action() != "unspecified" and
+		    q->action() != "dev" and
+		    q->action() != "meta")
 		    throw argsOneActionOnly();
-		if (options::action() == action_dev)
-		    options::set_dev(true);
-		if (options::action() == action_meta)
-		    options::set_meta(true);
-		options::set_action(action_pkg);
+		if (q->action() == "dev")
+		    options.set_dev(true);
+		if (q->action() == "meta")
+		    options.set_meta(true);
+		q->set_action("pkg");
 		break;
 	    /* --metadata */
 	    case 'm':
-		if (options::action() != action_unspecified and
-		    options::action() != action_pkg and
-		    options::action() != action_dev and
-		    options::action() != action_find)
+		if (q->action() != "unspecified" and
+		    q->action() != "pkg" and
+		    q->action() != "dev" and
+		    q->action() != "find")
 		    throw argsOneActionOnly();
 
-		if (options::action() == action_pkg or
-		    options::action() == action_dev or
-		    options::action() == action_find)
-		    options::set_meta(true);
+		if (q->action() == "pkg" or
+		    q->action() == "dev" or
+		    q->action() == "find")
+		    options.set_meta(true);
 		else
-		    options::set_action(action_meta);
+		    q->set_action("meta");
 		break;
 	    /* --which */
 	    case 'w':
-		if (options::action() != action_unspecified)
+		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
-		options::set_action(action_which);
+		q->set_action("which");
 		break;
 	    /* --find */
 	    case 'f':
-		if (options::action() != action_unspecified and
-		    options::action() != action_meta)
+		if (q->action() != "unspecified" and
+		    q->action() != "meta")
 		    throw argsOneActionOnly();
-		if (options::action() == action_meta)
-		    options::set_meta(true);
-		options::set_action(action_find);
+		if (q->action() == "meta")
+		    options.set_meta(true);
+		q->set_action("find");
 		break;
 	    /* --versions */
 	    case '\b':
-		if (options::action() != action_unspecified)
+		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
-		options::set_action(action_versions);
+		q->set_action("versions");
 		break;
 	    case 'k':
-		if (options::action() != action_unspecified)
+		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
-		options::set_action(action_kw);
+		q->set_action("kw");
 		break;
 	    /* --away */
 	    case 'a':
-		if (options::action() != action_unspecified)
+		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
-		options::set_action(action_away);
+		q->set_action("away");
 		break;
 	    /* --fetch */
 	    case 'F':
-		if (options::action() != action_unspecified)
+		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
-		options::set_action(action_fetch);
+		q->set_action("fetch");
+		options.set_fetch(true);
 		break;
 	    /* --field */
 	    case 'X':
@@ -386,103 +399,103 @@ handle_opts(int argc, char **argv, Query *q)
 		break;
 	    /* --no-overlay */
 	    case 'N':
-		options::set_overlay(false);
+		options.set_overlay(false);
 		break;
 	    /* --outfile */
 	    case 'o':
 		if (strcmp(optarg, "stdout") != 0)
 		{
 		    if (strcmp(optarg, "stderr") == 0)
-			options::set_outstream(&std::cerr);
-		    options::set_outfile(optarg);
-		    options::set_quiet(true);
-		    options::set_timer(false);
+			options.set_outstream(&std::cerr);
+		    options.set_outfile(optarg);
+		    options.set_quiet(true);
+		    options.set_timer(false);
 		}
 		break;
 	    /* --regex */
 	    case 'r':
-		options::set_regex(true);
+		options.set_regex(true);
 		break;
 	    /* --extended */
 	    case 'E':
-		options::set_regex(true);
-		options::set_eregex(true);
+		options.set_regex(true);
+		options.set_eregex(true);
 		break;
 	    /* --no-herd */
 	    case '\n':
-		options::set_with_herd("no-herd");
+		options.set_with_herd("no-herd");
 		break;
 	    /* --with-herd */
 	    case '\v':
-		options::set_with_herd(optarg);
+		options.set_with_herd(optarg);
 		break;
 	    /* --no-maintainer */
 	    case '\r':
-		options::set_with_dev("none");
+		options.set_with_dev("none");
 		break;
 	    /* --with-maintainer */
 	    case '\t':
-		options::set_with_dev(optarg);
+		options.set_with_dev(optarg);
 		break;
 	    /* --nometacache */
 	    case '\f':
-		options::set_metacache(false);
+		options.set_metacache(false);
 		break;
 	    /* --verbose */
 	    case 'v':
-		options::set_verbose(true);
+		options.set_verbose(true);
 		break;
 	    /* --quiet */
 	    case 'q':
-		options::set_quiet(true);
-		options::set_color(false);
+		options.set_quiet(true);
+		options.set_color(false);
 		break;
 	    /* --count */
 	    case 'c':
-		options::set_count(true);
-		options::set_quiet(true);
+		options.set_count(true);
+		options.set_quiet(true);
 		break;
 	    /* --nocolor */
 	    case 'n':
-		options::set_color(false);
+		options.set_color(false);
 		break;
 	    /* --gentoo-cvs */
 	    case 'C':
-		options::set_cvsdir(optarg);
+		options.set_cvsdir(optarg);
 		break;
 	    /* --userinfo */
 	    case 'U':
-		options::set_userinfoxml(optarg);
+		options.set_userinfoxml(optarg);
 		break;
 	    /* --herdsxml */
 	    case 'H':
-		options::set_herdsxml(optarg);
+		options.set_herdsxml(optarg);
 		break;
 	    /* --devaway */
 	    case 'A':
-		options::set_devawayxml(optarg);
+		options.set_devawayxml(optarg);
 		break;
 	    /* --localstatedir */
 	    case 'L':
-		options::set_localstatedir(optarg);
+		options.set_localstatedir(optarg);
 		break;
 	    /* --debug */
 	    case 'D':
-		options::set_timer(true);
-		options::set_debug(true);
+		options.set_timer(true);
+		options.set_debug(true);
 		break;
 	    /* --timer */
 	    case 't':
-		if (options::outfile() == "stdout")
-		    options::set_timer(true);
+		if (options.outfile() == "stdout")
+		    options.set_timer(true);
 		break;
 	    /* --qa */
 	    case '\a':
-		options::set_qa(true);
+		options.set_qa(true);
 		break;
 	    /* --iomethod */
 	    case 'i':
-		options::set_iomethod(methodmap[optarg]);
+		options.set_iomethod(optarg);
 		break;
 	    /* --version */
 	    case 'V':
@@ -510,17 +523,17 @@ handle_opts(int argc, char **argv, Query *q)
     else
     {
 	/* actions that are allowed to have 0 non-option args */
-	ActionMethod action = options::action();
-	if (action == action_dev and fields.empty())
+	const std::string& action = q->action();
+	if (action == "dev" and fields.empty())
 	    throw argsUsage();
 
-	if (action != action_unspecified and
-	    action != action_meta and
-	    action != action_dev and
-	    action != action_versions and
-	    action != action_fetch and
-	    action != action_kw and
-	    (options::iomethod() == IOMethodStream))
+	if (action != "unspecified" and
+	    action != "meta" and
+	    action != "dev" and
+	    action != "versions" and
+	    action != "fetch" and
+	    action != "kw" and
+	    (options.iomethod() == "stream"))
 	    throw argsUsage();
     }
 
@@ -532,7 +545,7 @@ std::string::size_type getcols(); // defined in getcols.cc
 int
 main(int argc, char **argv)
 {
-    options opts;
+    Options& options(GlobalOptions());
     std::ostream *outstream = NULL;
 
     /* we need to know if -T or --TEST was specified before 
@@ -542,7 +555,7 @@ main(int argc, char **argv)
 		       (std::strcmp(argv[1], "-T") == 0)));
 
     /* save column width */
-    options::set_maxcol((test ? 79 : getcols()-1));
+    options.set_maxcol((test ? 79 : getcols()-1));
 
     try
     { 
@@ -556,34 +569,34 @@ main(int argc, char **argv)
 	if (not handle_opts(argc, argv, &q))
 	    throw argsException();
 
-	if (options::iomethod() == IOMethodUnspecified)
-	    options::set_iomethod(IOMethodStream);
+	if (options.iomethod() == "unspecified")
+	    options.set_iomethod("stream");
 
 	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
-	if (not options::cvsdir().empty())
+	if (not options.cvsdir().empty())
 	{
-	    const std::string gentoocvs(options::cvsdir());
+	    const std::string gentoocvs(options.cvsdir());
 	    if (not util::is_dir(gentoocvs))
 		throw FileException(gentoocvs);
 
 	    /* only set if it wasnt specified on the command line */
-	    if (options::herdsxml().empty())
-		options::set_herdsxml(gentoocvs+"/gentoo/misc/herds.xml");
-	    if (options::userinfoxml().empty())
-		options::set_userinfoxml(gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
+	    if (options.herdsxml().empty())
+		options.set_herdsxml(gentoocvs+"/gentoo/misc/herds.xml");
+	    if (options.userinfoxml().empty())
+		options.set_userinfoxml(gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
 	}
 
 	/* initialize XML stuff */
-	Init init(options::qa());
+	Init init(options.qa());
 
-	if (not options::fields().empty() and not nonopt_args.empty())
+	if (not options.fields().empty() and not nonopt_args.empty())
 	{
 	    std::cerr << "--field doesn't make much sense when specified" << std::endl
 		      << "with additional non-optional arguments." << std::endl;
 	    return EXIT_FAILURE;
 	}
 
-	if (options::regex() and nonopt_args.size() > 1)
+	if (options.regex() and nonopt_args.size() > 1)
 	{
 	    std::cerr << "You may only specify one regular expression."
 		<< std::endl;
@@ -597,29 +610,29 @@ main(int argc, char **argv)
 		nonopt_args.end()), nonopt_args.end());
 
 	/* did the user specify the all target? */
-	if (not options::regex() and
+	if (not options.regex() and
 	    (std::find(nonopt_args.begin(),
 		       nonopt_args.end(), "all") != nonopt_args.end()))
 	{
-	    options::set_all(true);
+	    options.set_all(true);
 	    nonopt_args.clear();
 	    nonopt_args.push_back("all");
 	}
 
 	/* setup output stream */
-	if (options::outfile() != "stdout" and options::outfile() != "stderr")
+	if (options.outfile() != "stdout" and options.outfile() != "stderr")
 	{
-	    outstream = new std::ofstream(options::outfile().c_str());
+	    outstream = new std::ofstream(options.outfile().c_str());
 	    if (not *outstream)
-		throw FileException(options::outfile());
-	    options::set_outstream(outstream);
+		throw FileException(options.outfile());
+	    options.set_outstream(outstream);
 	}
 	else
 	{
 	    /* save locale name */
 	    try
 	    {
-		options::set_locale(std::locale("").name());
+		options.set_locale(std::locale("").name());
 	    }
 	    catch (const std::runtime_error)
 	    {
@@ -633,46 +646,56 @@ main(int argc, char **argv)
 	}
 
 	/* dump options */
-//        if (options::debug())
-//            options.dump(*options::outstream());	
+//        if (options.debug())
+//            options.dump(*options.outstream());	
 
 	/* set locale */
-	options::outstream()->imbue(std::locale(options::locale().c_str()));
+	options.outstream().imbue(std::locale(options.locale().c_str()));
 
-//        if (options::batch_mode())
+//        if (options.batch_mode())
 //        {
-//            options::set_quiet(true);
-//            options::set_color(false);
+//            options.set_quiet(true);
+//            options.set_color(false);
 //        }
 
 	/* set default action */
-	if (options::action() == action_unspecified)
-	    options::set_action(q.empty() ?
-				    action_stats : action_herd);
+	if (q.action() == "unspecified")
+	    q.set_action(q.empty() ? "stats" : "herd");
 
 	/* setup action handlers */
-	std::map<ActionMethod, ActionHandler * > handlers;
-	handlers[action_herd] = new HerdActionHandler();
+	HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
+	handlers.insert(std::make_pair("herd", new HerdActionHandler()));
+	handlers.insert(std::make_pair("away", new AwayActionHandler()));
+	handlers.insert(std::make_pair("dev",  new DevActionHandler()));
 
 	/* setup I/O handlers */
-	std::map<IOMethod, IOHandler *> iohandlers;
-	iohandlers[IOMethodStream]   = new StreamIOHandler();
-	iohandlers[IOMethodReadLine] = new ReadLineIOHandler();
-	iohandlers[IOMethodBatch]    = new BatchIOHandler();
+	HandlerMap<IOHandler>& iohandlers(GlobalHandlerMap<IOHandler>());
+	iohandlers.insert(std::make_pair("stream", new StreamIOHandler()));
+	iohandlers.insert(std::make_pair("batch", new BatchIOHandler()));
 
-	bool loop = (options::iomethod() != IOMethodStream);
+#ifdef READLINE_FRONTEND
+	iohandlers.insert(std::make_pair("readline", new ReadLineIOHandler()));
+#endif
+#ifdef QT_FRONTEND
+	iohandlers.insert(std::make_pair("qt", new QtIOHandler(argc, argv)));
+#endif
+#ifdef GTK_FRONTEND
+	iohandlers.insert(std::make_pair("gtk", new GtkIOHandler(argc, argv)));
+#endif
+
+	bool loop = (options.iomethod() != "stream");
 
 	do
 	{
 	    Query query;
 	    QueryResults results;
 
-	    IOHandler *iohandler = iohandlers[options::iomethod()];
+	    IOHandler *iohandler = iohandlers[options.iomethod()];
 	    if (not iohandler)
 		throw IOHandlerUnimplemented();
 
 	    /* handle input */
-	    if (options::iomethod() == IOMethodStream)
+	    if (options.iomethod() == "stream")
 	    {
 		/* we've already filled the query object when
 		 * parsing the command line options, so use it
@@ -683,7 +706,7 @@ main(int argc, char **argv)
 		break;
 
 	    /* perform action */
-	    ActionHandler *handler = handlers[options::action()];
+	    ActionHandler *handler = handlers[query.action()];
 	    if (handler)
 	    {
 		try
@@ -709,11 +732,11 @@ main(int argc, char **argv)
 	if (outstream)
 	    delete outstream;
 
-	std::map<ActionMethod, ActionHandler *>::iterator m;
+	HandlerMap<ActionHandler>::iterator m;
 	for (m = handlers.begin() ; m != handlers.end() ; ++m)
 	    if (m->second) delete m->second;
 
-	std::map<IOMethod, IOHandler *>::iterator i;
+	HandlerMap<IOHandler>::iterator i;
 	for (i = iohandlers.begin() ; i != iohandlers.end() ; ++i)
 	    if (i->second) delete i->second;
     }
@@ -786,6 +809,11 @@ main(int argc, char **argv)
     catch (const argsException)
     {
 	usage();
+	return EXIT_FAILURE;
+    }
+    catch (const Exception& e)
+    {
+	std::cerr << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const BaseException& e)

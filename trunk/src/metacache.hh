@@ -58,6 +58,7 @@ class metacache : public herdstat::cachable
         inline bool empty() const;
 
     private:
+        Options& _options;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
         container_type _metadatas;

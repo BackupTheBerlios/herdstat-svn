@@ -32,17 +32,22 @@
 
 using namespace herdstat;
 
+OverlayDisplay::OverlayDisplay()
+    : _options(GlobalOptions())
+{
+}
+
 OverlayDisplay::~OverlayDisplay()
 {
-    if (options::quiet() or this->empty())
+    if (_options.quiet() or this->empty())
         return;
 
-    std::ostream *stream = options::outstream();
-    *stream << std::endl << "Portage overlays:" << std::endl;
+    _options.outstream() << std::endl << "Portage overlays:"
+        << std::endl;
 
     for (iterator i = this->begin() ; i != this->end() ; ++i)
     {
-        *stream << " " << this->operator[](i->first) << " "
+        _options.outstream() << " " << this->operator[](i->first) << " "
             << i->first << std::endl;
     }
 }
@@ -50,7 +55,7 @@ OverlayDisplay::~OverlayDisplay()
 std::string
 OverlayDisplay::operator[] (const std::string& overlay)
 {
-    if (options::quiet())
+    if (_options.quiet())
         return std::string();
 
     /* cant use find() as we dont now the second value of the pair */
@@ -62,7 +67,7 @@ OverlayDisplay::operator[] (const std::string& overlay)
     }
     assert(i != this->end());
 
-    if (options::color())
+    if (_options.color())
     {
         util::ColorMap color;
         return util::sprintf("%s[%d]%s", color[cyan].c_str(),

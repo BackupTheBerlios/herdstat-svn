@@ -34,8 +34,10 @@
 using namespace herdstat;
 
 pkgQuery::pkgQuery(const std::string &n, const std::string &w, bool dev)
-    : _pkgs(), info(n), query(n), with(w), portdir(options::portdir()),
-      overlays(options::overlays()), type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
+    : _pkgs(), info(n), query(n), with(w),
+      portdir(GlobalOptions().portdir()),
+      overlays(GlobalOptions().overlays()),
+      type(dev? QUERYTYPE_DEV : QUERYTYPE_HERD)
 {
 }
 

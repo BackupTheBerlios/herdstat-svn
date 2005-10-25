@@ -162,9 +162,9 @@ querycacheXMLHandler::text(const std::string &text)
 /****************************************************************************/
 
 querycache::querycache()
-    : _max(options::querycache_max()),
-      _expire(options::querycache_expire()),
-      _path(options::localstatedir()+"/querycache.xml")
+    : _max(GlobalOptions().querycache_max()),
+      _expire(GlobalOptions().querycache_expire()),
+      _path(GlobalOptions().localstatedir()+"/querycache.xml")
 {
 }
 

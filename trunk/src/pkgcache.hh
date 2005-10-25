@@ -59,6 +59,7 @@ class pkgcache : public herdstat::cachable
         inline bool empty() const;
 
     private:
+        Options& _options;
         int _reserve;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;

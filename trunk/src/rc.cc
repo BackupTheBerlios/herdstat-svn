@@ -63,40 +63,40 @@ rc::rc()
 void
 rc::set_options()
 {
+    Options& options(GlobalOptions());
+
     if (not vars["colors"].empty())
-        options::set_color(util::destringify<bool>(vars["colors"]));
+        options.set_color(util::destringify<bool>(vars["colors"]));
     if (not vars["label.color"].empty())
-	options::set_labelcolor(vars["label.color"]);
+	options.set_labelcolor(vars["label.color"]);
     if (not vars["highlight.color"].empty())
-	options::set_hlcolor(vars["highlight.color"]);
+	options.set_hlcolor(vars["highlight.color"]);
     if (not vars["qa"].empty())
-        options::set_qa(util::destringify<bool>(vars["qa"]));
+        options.set_qa(util::destringify<bool>(vars["qa"]));
     if (not vars["herdsxml"].empty())
-	options::set_herdsxml(vars["herdsxml"]);
+	options.set_herdsxml(vars["herdsxml"]);
     if (not vars["gentoo.cvs"].empty())
-        options::set_cvsdir(vars["gentoo.cvs"]);
+        options.set_cvsdir(vars["gentoo.cvs"]);
     if (not vars["userinfo"].empty())
-        options::set_userinfoxml(vars["userinfo"]);
+        options.set_userinfoxml(vars["userinfo"]);
     if (not vars["use.devaway"].empty())
-        options::set_devaway(util::destringify<bool>(vars["use.devaway"]));
+        options.set_devaway(util::destringify<bool>(vars["use.devaway"]));
     if (not vars["devaway.expire"].empty())
-        options::set_devaway_expire(util::destringify<long>(vars["devaway.expire"]));
+        options.set_devaway_expire(util::destringify<long>(vars["devaway.expire"]));
     if (not vars["devaway.location"].empty())
-        options::set_devawayxml(vars["devaway.location"]);
+        options.set_devawayxml(vars["devaway.location"]);
     if (not vars["use.metacache"].empty())
-        options::set_metacache(util::destringify<bool>(vars["use.metacache"]));
+        options.set_metacache(util::destringify<bool>(vars["use.metacache"]));
     if (not vars["metacache.expire"].empty())
-	options::set_metacache_expire(vars["metacache.expire"]);
+	options.set_metacache_expire(vars["metacache.expire"]);
     if (not vars["use.querycache"].empty())
-        options::set_querycache(util::destringify<bool>(vars["use.querycache"]));
+        options.set_querycache(util::destringify<bool>(vars["use.querycache"]));
     if (not vars["querycache.max"].empty())
-        options::set_querycache_max(util::destringify<int>(vars["querycache.max"]));
+        options.set_querycache_max(util::destringify<int>(vars["querycache.max"]));
     if (not vars["querycache.expire"].empty())
-        options::set_querycache_expire(util::destringify<long>(vars["querycache.expire"]));
-    if (not vars["wget.options"].empty())
-	options::set_wget_options(vars["wget.options"]);
+        options.set_querycache_expire(util::destringify<long>(vars["querycache.expire"]));
     if (not vars["highlights"].empty())
-        options::set_highlights(vars["highlights"]);
+        options.set_highlights(vars["highlights"]);
 }
 
 /* vim: set tw=80 sw=4 et : */

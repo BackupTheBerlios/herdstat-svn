@@ -53,6 +53,16 @@ class PrettyIOHandler : public IOHandler
         FormatAttrs& attrs;
 };
 
+class GuiIOHandler : public IOHandler
+{
+    public:
+        GuiIOHandler(int c, char **v) : argc(c), argv(v) { }
+
+    protected:
+        int argc;
+        char **argv;
+};
+
 #endif /* _HAVE_IO_HANDLER_HH */
 
 /* vim: set tw=80 sw=4 et : */

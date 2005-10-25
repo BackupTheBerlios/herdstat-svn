@@ -1,5 +1,5 @@
 /*
- * herdstat -- io/handler.cc
+ * herdstat -- src/io/gtk.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,43 +20,29 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_GTK_HH
+#define _HAVE_GTK_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/util/string.hh>
 #include "io/handler.hh"
 
-using namespace herdstat;
+/*
+ * IOHandler for the GTK+ toolkit.
+ */
 
-PrettyIOHandler::PrettyIOHandler()
-    : out(GlobalFormatter()), attrs(out.attrs())
+class GtkIOHandler : public GuiIOHandler
 {
-    const Options& opts(GlobalOptions());
+    public:
+        GtkIOHandler(int c, char **v);
+        virtual ~GtkIOHandler() { }
 
-    /* set common format attributes */
-    attrs.set_maxlen(opts.maxcol());
-    attrs.set_quiet(opts.quiet());
-    attrs.set_colors(opts.color());
+        virtual bool input(Query * const query);
+        virtual bool output(const QueryResults& results);
+};
 
-    /* add highlights */
-    const std::string user(util::current_user());
-    attrs.add_highlight(user);
-    attrs.add_highlight(util::get_user_from_email(user));
-    /* user-defined highlights */
-    attrs.add_highlights(util::split(opts.highlights()));
-}
-
-bool
-PrettyIOHandler::output(const QueryResults& results)
-{
-    QueryResults::const_iterator i;
-    for (i = results.begin() ; i != results.end() ; ++i)
-        out(i->first, i->second);
-
-    out.flush(GlobalOptions().outstream());
-
-    return true;
-}
+#endif /* _HAVE_GTK_HH */
 
 /* vim: set tw=80 sw=4 et : */

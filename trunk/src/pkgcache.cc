@@ -44,15 +44,19 @@ using namespace herdstat;
 using namespace herdstat::portage;
 
 pkgcache::pkgcache()
-    : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
-      _portdir(options::portdir()), _overlays(options::overlays()),
+    : cachable(GlobalOptions().localstatedir()+PKGCACHE),
+      _options(GlobalOptions()),
+      _reserve(PKGLIST_RESERVE),
+      _portdir(_options.portdir()), _overlays(_options.overlays()),
       _pkgs(_portdir, _overlays)
 {
 }
 
 pkgcache::pkgcache(const std::string &portdir)
-    : cachable(options::localstatedir()+PKGCACHE), _reserve(PKGLIST_RESERVE),
-      _portdir(portdir), _overlays(options::overlays()),
+    : cachable(GlobalOptions().localstatedir()+PKGCACHE),
+      _options(GlobalOptions()),
+      _reserve(PKGLIST_RESERVE),
+      _portdir(portdir), _overlays(_options.overlays()),
       _pkgs(_portdir, _overlays)
 {
     this->logic();
@@ -74,8 +78,8 @@ pkgcache::valid() const
     const util::Stat pkgcache(this->path());
     bool valid = false;
 
-    const std::string expire(options::metacache_expire());
-    const std::string lastsync(options::localstatedir()+LASTSYNC);
+    const std::string expire(_options.metacache_expire());
+    const std::string lastsync(_options.localstatedir()+LASTSYNC);
 
     if (pkgcache.exists())
     {
@@ -152,12 +156,12 @@ pkgcache::fill()
 {
     util::Timer timer;
 
-    if (options::timer())
+    if (_options.timer())
         timer.start();
 
     _pkgs.fill();
 
-    if (options::timer())
+    if (_options.timer())
     {
         timer.stop();
         debug_msg("Took %ldms to fill package cache.", timer.elapsed());

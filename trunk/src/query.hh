@@ -44,7 +44,8 @@ class Query
         Query();
 
         /* get action associated with this query */
-        ActionMethod action() const { return _action; }
+        const std::string& action() const { return _action; }
+        void set_action(const std::string& v) { _action.assign(v); }
 
         /* special condition - match all. */
         bool all() const { return _all; }
@@ -54,7 +55,7 @@ class Query
         const_iterator find(const std::string& k) const;
 
     private:
-        ActionMethod _action;
+        std::string _action;
         bool _all;
 };
 

@@ -1,5 +1,5 @@
 /*
- * herdstat -- io/handler.cc
+ * herdstat -- src/handler_map.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,43 +20,32 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_HANDLER_MAP_HH
+#define _HAVE_HANDLER_MAP_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/util/string.hh>
-#include "io/handler.hh"
+#include <herdstat/util/container_base.hh>
 
-using namespace herdstat;
-
-PrettyIOHandler::PrettyIOHandler()
-    : out(GlobalFormatter()), attrs(out.attrs())
+template <typename T>
+class HandlerMap
+    : public herdstat::util::MapBase<std::string, T*>
 {
-    const Options& opts(GlobalOptions());
+    private:
+        template <typename U> friend HandlerMap<U>& GlobalHandlerMap();
+        HandlerMap() { }
+};
 
-    /* set common format attributes */
-    attrs.set_maxlen(opts.maxcol());
-    attrs.set_quiet(opts.quiet());
-    attrs.set_colors(opts.color());
-
-    /* add highlights */
-    const std::string user(util::current_user());
-    attrs.add_highlight(user);
-    attrs.add_highlight(util::get_user_from_email(user));
-    /* user-defined highlights */
-    attrs.add_highlights(util::split(opts.highlights()));
+template <typename T>
+inline HandlerMap<T>&
+GlobalHandlerMap()
+{
+    static HandlerMap<T> m;
+    return m;
 }
 
-bool
-PrettyIOHandler::output(const QueryResults& results)
-{
-    QueryResults::const_iterator i;
-    for (i = results.begin() ; i != results.end() ; ++i)
-        out(i->first, i->second);
-
-    out.flush(GlobalOptions().outstream());
-
-    return true;
-}
+#endif /* _HAVE_HANDLER_MAP_HH */
 
 /* vim: set tw=80 sw=4 et : */

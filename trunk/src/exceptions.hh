@@ -82,7 +82,24 @@ class CleanupException : public herdstat::Exception
         int _code;
 };
 
-class IOHandlerUnimplemented : public herdstat::Exception { };
+class IOHandlerUnimplemented : public herdstat::Exception
+{
+    public:
+        IOHandlerUnimplemented() { }
+        IOHandlerUnimplemented(const char *msg) : herdstat::Exception(msg) { }
+        IOHandlerUnimplemented(const std::string& msg) : herdstat::Exception(msg) { }
+        virtual ~IOHandlerUnimplemented() throw() { }
+        virtual const char *what() const throw()
+        {
+            if (this->message())
+            {
+                std::string s("Invalid I/O method: ");
+                s+=this->message();
+                return s.c_str();
+            }
+            return "";
+        }
+};
 
 /* action handler exceptions */
 class ActionException : public herdstat::BaseException { };

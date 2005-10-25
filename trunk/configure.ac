@@ -101,14 +101,13 @@ AC_ARG_WITH(ncurses,
 AC_MSG_RESULT([$WITH_NCURSES])
 
 if test x"$WITH_NCURSES" = "xyes" ; then
-    AC_CHECK_LIB(ncurses, tgetent, [TERMCAP_LIBS="-lncurses"])
+    AC_CHECK_LIB(ncurses, tgetent)
     AC_CHECK_HEADERS([curses.h term.h])
     AC_DEFINE(HAVE_NCURSES, 1, [Use ncurses to determine terminal width])
 fi
-    
-AC_SUBST(TERMCAP_LIBS)
 
-AC_MSG_CHECKING([whether to enable the readline front-end])
+dnl --with-readline
+AC_MSG_CHECKING([whether to build the readline front-end])
 AC_ARG_WITH(readline,
     AC_HELP_STRING([--with-readline],[Enable the readline front-end]),
     [WITH_READLINE=$withval],[WITH_READLINE=yes])
@@ -118,10 +117,65 @@ if test x"$WITH_READLINE" = "xyes" ; then
     AC_CHECK_HEADERS(readline/readline.h,,
 	[AC_MSG_ERROR([readline support was enabled but no readline/readline.h was found])])
     AC_CHECK_LIB(readline, readline)
+    AC_DEFINE(READLINE_FRONTEND, 1, [Enable Readline front-end])
 fi
 
-dnl Required libs
 PKG_PROG_PKG_CONFIG
+
+dnl --with-qt
+AC_MSG_CHECKING([whether to build the Qt front-end])
+AC_ARG_WITH(qt,
+    AC_HELP_STRING([--with-qt],[Enable the Qt front-end]),
+    [WITH_QT=$withval],[WITH_QT=yes])
+AC_MSG_RESULT([$WITH_QT])
+
+if test x"$WITH_QT" = "xyes" ; then
+#    QT_CHECK_COMPILERS
+    QT_PATH
+
+    if test x"$have_qt" = "xno" ; then
+	AC_MSG_ERROR([[
+***
+*** Qt ($qt_minversion) $ac_qt_notfound not found.  Please check your
+*** installation!  For more details about this problem, look at the
+*** end of config.log.$missing_qt_mt
+***]])
+
+    fi
+
+    if test x"$have_moc" = "xno" ; then
+	AC_MSG_ERROR([[
+***
+*** No Qt meta object compiler (moc) found!
+*** Please check whether you installed Qt correctly.
+*** You need to have a running moc binary.
+*** configure tried to run $ac_cv_path_moc and the test didn't
+*** succeed. If configure shouldn't have tried this one, set
+*** the environment variable MOC to the right one before running
+*** configure.
+***]])
+
+    fi
+
+    AC_DEFINE(QT_FRONTEND, 1, [Enable Qt front-end])
+fi
+
+AC_MSG_CHECKING([whether to build the GTK+ front-end])
+AC_ARG_WITH(gtk,
+    AC_HELP_STRING([--with-gtk],[Enable the GTK+ front-end]),
+    [WITH_GTK=$withval],[WITH_GTK=yes])
+AC_MSG_RESULT([$WITH_GTK])
+
+if test x"$WITH_GTK" = "xyes" ; then
+    PKG_CHECK_MODULES(glibmm, glibmm-2.4)
+    AC_DEFINE(GTK_FRONTEND, 1, [Enable GTK+ front-end])
+fi
+
+AM_CONDITIONAL(BUILD_RL_FRONTEND, test x"$WITH_READLINE" = "xyes")
+AM_CONDITIONAL(BUILD_QT_FRONTEND, test x"$WITH_QT" = "xyes")
+AM_CONDITIONAL(BUILD_GTK_FRONTEND, test x"$WITH_GTK" = "xyes")
+
+dnl Required libs
 PKG_CHECK_MODULES(libherdstat, libherdstat-0.1)
 
 AM_CONFIG_HEADER(config.h)
