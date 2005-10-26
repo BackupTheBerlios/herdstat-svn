@@ -19,3 +19,11 @@ libaction_la_SOURCES = \
 
 INCLUDES = -I$(top_builddir)/src $(libherdstat_CFLAGS)
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
+
+srchtml: $(foreach f, $(libaction_la_SOURCES), $(f).html)
+%.cc.html: %.cc
+	@echo Generating $@
+	@source-highlight -c ../../src.css -s cpp -f html -t4 -n -i $? -o ../../html/src/action/$@
+%.hh.html: %.hh
+	@echo Generating $@
+	@source-highlight -c ../../src.css -s cpp -f html -t4 -n -i $? -o ../../html/src/action/$@

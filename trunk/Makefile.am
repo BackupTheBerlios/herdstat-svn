@@ -21,11 +21,11 @@ EXTRA_DIST = ChangeLog Makefile.am.common autogen.sh .todo bashcomp
 
 srchtml:
 	@test -d ${PWD}/html || mkdir ${PWD}/html ; \
-	for x in src ; do \
+	for x in src src/action src/io src/io/gui ; do \
 		if test -d ${PWD}/html/$${x} ; then \
 			rm -fr ${PWD}/html/$${x}/* ; \
 		else \
-			mkdir ${PWD}/html/$${x} ; \
+			mkdir -p ${PWD}/html/$${x} ; \
 		fi ; \
 		cd ${PWD}/$${x} && $(MAKE) $@ ; \
 	done

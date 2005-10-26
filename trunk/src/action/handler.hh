@@ -33,14 +33,14 @@
 
 #include "query.hh"
 #include "query_results.hh"
-
-class herdstat::gui::Tab;
-class herdstat::gui::GuiFactory;
+#include "io/gui/gui_factory.hh"
 
 class ActionHandler
 {
     public:
         virtual ~ActionHandler() { }
+
+        virtual const char * const id() const = 0;
 
         virtual void operator()(const Query& query,
                                 QueryResults * const results) = 0;
@@ -48,6 +48,8 @@ class ActionHandler
     protected:
         friend class GuiIOHandler;
 
+        /* Called by GuiIOHandler::operator() when
+         * filling the TabBar. */
         virtual herdstat::gui::Tab *
             createTab(herdstat::gui::GuiFactory *factory) = 0;
 };

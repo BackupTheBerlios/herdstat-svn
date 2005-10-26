@@ -50,14 +50,18 @@ class QtWindow : public Window
     public:
         virtual ~QtWindow() { }
         virtual void resize(std::size_t x, std::size_t y) { }
-        virtual void setTitle(const std::string& title) { }
+};
+
+class QtLabel : public Label
+{
+    public:
+        virtual ~QtLabel() { }
 };
 
 class QtMenuItem : public MenuItem
 {
     public:
         virtual ~QtMenuItem() { }
-        virtual void setTitle(const std::string& title) { }
 };
 
 class QtMenu : public Menu
@@ -124,6 +128,7 @@ QtFactory::createApplication(int argc, char **argv) const
 }
 
 Window * QtFactory::createWindow() const { return new QtWindow(); }
+Label * QtFactory::createLabel() const { return new QtLabel(); }
 MenuItem * QtFactory::createMenuItem() const { return new QtMenuItem(); }
 Menu * QtFactory::createMenu() const { return new QtMenu(); }
 MenuBar * QtFactory::createMenuBar() const { return new QtMenuBar(); }

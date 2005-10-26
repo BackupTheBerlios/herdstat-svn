@@ -26,6 +26,24 @@
 
 #include "action/dev.hh"
 
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+DevActionHandler::id() const
+{
+    return "dev";
+}
+
+Tab *
+DevActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
 void
 DevActionHandler::operator()(const Query& query,
                               QueryResults * const results)

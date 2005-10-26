@@ -33,8 +33,13 @@ class AwayActionHandler : public XMLActionHandler
 {
     public:
         virtual ~AwayActionHandler() { }
+        virtual const char * const id() const;
         virtual void operator()(const Query& query,
                                 QueryResults * const results);
+
+    protected:
+        virtual herdstat::gui::Tab *
+            createTab(herdstat::gui::GuiFactory *factory);
 };
 
 #endif /* _HAVE_ACTION_AWAY_HH */

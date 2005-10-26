@@ -1,5 +1,5 @@
 /*
- * herdstat -- io/handler.hh
+ * herdstat -- src/io/gui.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,42 +20,34 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_IO_HANDLER_HH
-#define _HAVE_IO_HANDLER_HH 1
+#ifndef _HAVE_IO_GUI_HH
+#define _HAVE_IO_GUI_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "query.hh"
-#include "query_results.hh"
-#include "formatter.hh"
 #include "options.hh"
+#include "io/handler.hh"
 
-#if defined(QT_FRONTEND) || defined(GTK_FRONTEND)
-# include "io/gui/gui_factory.hh"
-#endif
+class herdstat::gui::GuiFactory;
 
-class IOHandler
+class GuiIOHandler : public IOHandler
 {
     public:
-        virtual ~IOHandler() { }
-        virtual bool operator()(Query * const query) = 0;
-};
+        GuiIOHandler(int argc, char **argv);
+        virtual ~GuiIOHandler() { }
 
-class PrettyIOHandler : public IOHandler
-{
-    public:
-        PrettyIOHandler();
-        virtual ~PrettyIOHandler() { }
-
-        void display(const QueryResults& results);
+        virtual bool operator()(Query * const query);
 
     protected:
-        Formatter& out;
-        FormatAttrs& attrs;
+        int _argc;
+        char **_argv;
+
+        herdstat::gui::GuiFactory *_guiFactory;
+        Options& _options;
 };
 
-#endif /* _HAVE_IO_HANDLER_HH */
+#endif /* _HAVE_IO_GUI_HH */
 
 /* vim: set tw=80 sw=4 et : */

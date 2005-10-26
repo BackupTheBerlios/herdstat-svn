@@ -37,6 +37,9 @@
     private: \
         std::string _title;
 
+namespace herdstat {
+namespace gui {
+
 class Application
 {
     public:
@@ -135,6 +138,9 @@ class VBox
         VBox() { }
         virtual ~VBox() { }
 };
+
+} // namespace gui
+} // namespace herdstat
 
 #undef HAS_TITLE
 

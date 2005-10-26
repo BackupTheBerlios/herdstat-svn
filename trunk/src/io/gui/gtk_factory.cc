@@ -55,14 +55,18 @@ class GtkWindow : public Window
     public:
         virtual ~GtkWindow() { }
         virtual void resize(std::size_t x, std::size_t y) { }
-        virtual void setTitle(const std::string& title) { }
+};
+
+class GtkLabel : public Label
+{
+    public:
+        virtual ~GtkLabel() { }
 };
 
 class GtkMenuItem : public MenuItem
 {
     public:
         virtual ~GtkMenuItem() { }
-        virtual void setTitle(const std::string& title) { }
 };
 
 class GtkMenu : public Menu
@@ -83,7 +87,6 @@ class GtkTab : public Tab
 {
     public:
         virtual ~GtkTab() { }
-        virtual void setTitle(const std::string& title) { }
 };
 
 class GtkTabBar : public TabBar
@@ -112,6 +115,7 @@ GtkFactory::createApplication(int argc, char **argv) const
 }
 
 Window * GtkFactory::createWindow() const { return new GtkWindow(); }
+Label * GtkFactory::createLabel() const { return new GtkLabel(); }
 MenuItem * GtkFactory::createMenuItem() const { return new GtkMenuItem(); }
 Menu * GtkFactory::createMenu() const { return new GtkMenu(); }
 MenuBar * GtkFactory::createMenuBar() const { return new GtkMenuBar(); }

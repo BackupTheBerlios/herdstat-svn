@@ -29,6 +29,24 @@
 
 using namespace herdstat;
 using namespace herdstat::portage;
+using namespace herdstat::gui;
+
+const char * const
+HerdActionHandler::id() const
+{
+    return "herd";
+}
+
+Tab *
+HerdActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    /* ... */
+
+    return tab;
+}
 
 void
 HerdActionHandler::operator()(const Query& query,

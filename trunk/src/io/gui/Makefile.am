@@ -25,3 +25,11 @@ endif
 if BUILD_GTK_FRONTEND
 libgui_la_SOURCES += gtk_factory.hh gtk_factory.cc
 endif
+
+srchtml: $(foreach f, $(libgui_la_SOURCES), $(f).html)
+%.cc.html: %.cc
+	@echo Generating $@
+	@source-highlight -c ../../../src.css -s cpp -f html -t4 -n -i $? -o ../../../html/src/io/gui/$@
+%.hh.html: %.hh
+	@echo Generating $@
+	@source-highlight -c ../../../src.css -s cpp -f html -t4 -n -i $? -o ../../../html/src/io/gui/$@

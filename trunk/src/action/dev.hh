@@ -33,8 +33,13 @@ class DevActionHandler : public XMLActionHandler
 {
     public:
         virtual ~DevActionHandler() { }
+        virtual const char * const id() const;
         virtual void operator()(const Query& query,
                                 QueryResults * const results);
+
+    protected:
+        virtual herdstat::gui::Tab *
+            createTab(herdstat::gui::GuiFactory *factory);
 };
 
 #endif /* _HAVE_ACTION_DEV_HH */
