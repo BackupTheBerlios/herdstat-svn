@@ -40,6 +40,7 @@ class GuiFactory
 
         virtual Application *createApplication(int argc, char **argv) const = 0;
         virtual Window *createWindow() const = 0;
+        virtual Button *createButton() const = 0;
         virtual Label *createLabel() const = 0;
         virtual MenuItem *createMenuItem() const = 0;
         virtual Menu *createMenu() const = 0;

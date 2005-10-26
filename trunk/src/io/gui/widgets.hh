@@ -27,6 +27,11 @@
 # include "config.h"
 #endif
 
+/**
+ * @file src/io/gui/widgets.hh
+ * @brief Defines abstract widget product classes.
+ */
+
 #include <string>
 #include <cstdlib>
 
@@ -74,6 +79,12 @@ class Label
     public:
         Label() { }
         virtual ~Label() { }
+};
+
+class Button
+{
+    public:
+        virtual ~Button() { }
 };
 
 class TextBox

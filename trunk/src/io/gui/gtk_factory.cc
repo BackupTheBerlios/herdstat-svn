@@ -57,6 +57,12 @@ class GtkWindow : public Window
         virtual void resize(std::size_t x, std::size_t y) { }
 };
 
+class GtkButton : public Button
+{
+    public:
+        virtual ~GtkButton() { }
+};
+
 class GtkLabel : public Label
 {
     public:
@@ -115,6 +121,7 @@ GtkFactory::createApplication(int argc, char **argv) const
 }
 
 Window * GtkFactory::createWindow() const { return new GtkWindow(); }
+Button * GtkFactory::createButton() const { return new GtkButton(); }
 Label * GtkFactory::createLabel() const { return new GtkLabel(); }
 MenuItem * GtkFactory::createMenuItem() const { return new GtkMenuItem(); }
 Menu * GtkFactory::createMenu() const { return new GtkMenu(); }

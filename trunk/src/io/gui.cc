@@ -38,7 +38,7 @@
 #include "io/gui/gui_factory.hh"
 #include "io/gui.hh"
 
-using namespace herdstat;
+using namespace herdstat::gui;
 
 GuiIOHandler::GuiIOHandler(int argc, char **argv)
     : _argc(argc), _argv(argv),
@@ -46,13 +46,13 @@ GuiIOHandler::GuiIOHandler(int argc, char **argv)
 {
 #if defined(QT_FRONTEND) && defined(GTK_FRONTEND)
     if (_options.iomethod() == "qt")
-        _guiFactory = new gui::QtFactory();
+        _guiFactory = new QtFactory();
     else
-        _guiFactory = new gui::GtkFactory();
+        _guiFactory = new GtkFactory();
 #elif defined(QT_FRONTEND)
-    _guiFactory = new gui::QtFactory();
+    _guiFactory = new QtFactory();
 #elif defined(GTK_FRONTEND)
-    _guiFactory = new gui::GtkFactory();
+    _guiFactory = new GtkFactory();
 #endif /* QT_FRONTEND && GTK_FRONTEND */
 
 #if defined(QT_FRONTEND) || defined(GTK_FRONTEND)
@@ -63,30 +63,29 @@ GuiIOHandler::GuiIOHandler(int argc, char **argv)
 bool
 GuiIOHandler::operator()(Query * const query)
 {
-    using namespace herdstat::gui;
+    /* instantiate widgets */
+    std::auto_ptr<Application> app(_guiFactory->createApplication(_argc, _argv));
+    std::auto_ptr<VBox> hbox(_guiFactory->createVBox());
+    std::auto_ptr<TabBar> tabs(_guiFactory->createTabBar());
+    std::auto_ptr<MenuBar> menu(_guiFactory->createMenuBar());
+    std::auto_ptr<Button> action_button(_guiFactory->createButton());
+    std::auto_ptr<Button> quit_button(_guiFactory->createButton());
 
     /* setup user interface */
-    std::auto_ptr<Application> app(_guiFactory->createApplication(_argc, _argv));
-    std::auto_ptr<HBox> hbox(_guiFactory->createHBox());
-    std::auto_ptr<TabBar> tabs(_guiFactory->createTabBar());
+    
 
-    /* create a new tab for each action */
+    /* have each action handler create their tab */
     HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
     HandlerMap<ActionHandler>::iterator i;
     for (i = handlers.begin() ; i != handlers.end() ; ++i)
         tabs->addTab(i->second->createTab(_guiFactory));
 
-    /* construct query object with user input */
 
-    /* perform action */
-    ActionHandler *handler = handlers[query->action()];
-    if (not handler)
-        throw ActionUnimplemented(query->action());
+    /* setup callbacks */
 
-    QueryResults results;
-    (*handler)(*query, &results);
+    /* when tab changes, call Query::set_action() with new tab name. */
+    /* when action_button is pressed, execute action and display results */
 
-    /* show query results */
 
     /* main event loop */
     app->exec();

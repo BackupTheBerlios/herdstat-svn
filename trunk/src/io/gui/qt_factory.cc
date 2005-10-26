@@ -52,6 +52,12 @@ class QtWindow : public Window
         virtual void resize(std::size_t x, std::size_t y) { }
 };
 
+class QtButton : public Button
+{
+    public:
+        virtual ~QtButton() { }
+};
+
 class QtLabel : public Label
 {
     public:
@@ -128,6 +134,7 @@ QtFactory::createApplication(int argc, char **argv) const
 }
 
 Window * QtFactory::createWindow() const { return new QtWindow(); }
+Button * QtFactory::createButton() const { return new QtButton(); }
 Label * QtFactory::createLabel() const { return new QtLabel(); }
 MenuItem * QtFactory::createMenuItem() const { return new QtMenuItem(); }
 Menu * QtFactory::createMenu() const { return new QtMenu(); }

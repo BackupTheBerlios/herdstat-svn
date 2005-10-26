@@ -40,6 +40,7 @@ class GtkFactory : public GuiFactory
 
         virtual Application *createApplication(int argc, char **argv) const;
         virtual Window *createWindow() const;
+        virtual Button *createButton() const;
         virtual Label *createLabel() const;
         virtual MenuItem *createMenuItem() const;
         virtual Menu *createMenu() const;
