@@ -97,6 +97,8 @@ rc::set_options()
         options.set_querycache_expire(util::destringify<long>(vars["querycache.expire"]));
     if (not vars["highlights"].empty())
         options.set_highlights(vars["highlights"]);
+    if (not vars["frontend"].empty())
+        options.set_iomethod(vars["frontend"]);
 }
 
 /* vim: set tw=80 sw=4 et : */

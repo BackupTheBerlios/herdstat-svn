@@ -34,6 +34,9 @@
 #include "query.hh"
 #include "query_results.hh"
 
+class herdstat::gui::Tab;
+class herdstat::gui::GuiFactory;
+
 class ActionHandler
 {
     public:
@@ -41,15 +44,18 @@ class ActionHandler
 
         virtual void operator()(const Query& query,
                                 QueryResults * const results) = 0;
+
+    protected:
+        friend class GuiIOHandler;
+
+        virtual herdstat::gui::Tab *
+            createTab(herdstat::gui::GuiFactory *factory) = 0;
 };
 
 class XMLActionHandler : public ActionHandler
 {
     public:
         virtual ~XMLActionHandler() { }
-
-        virtual void operator()(const Query& query,
-                                QueryResults * const results) = 0;
 
     protected:
         void fetch_and_parse();

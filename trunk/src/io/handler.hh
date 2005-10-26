@@ -30,6 +30,11 @@
 #include "query.hh"
 #include "query_results.hh"
 #include "formatter.hh"
+#include "options.hh"
+
+#if defined(QT_FRONTEND) || defined(GTK_FRONTEND)
+# include "io/gui/gui_factory.hh"
+#endif
 
 class IOHandler
 {
@@ -51,15 +56,24 @@ class PrettyIOHandler : public IOHandler
         FormatAttrs& attrs;
 };
 
+
+#if defined(QT_FRONTEND) || defined(GTK_FRONTEND)
 class GuiIOHandler : public IOHandler
 {
     public:
-        GuiIOHandler(int c, char **v) : argc(c), argv(v) { }
+        GuiIOHandler(int argc, char **argv);
+        virtual ~GuiIOHandler() { }
+
+        virtual bool operator()(Query * const query);
 
     protected:
-        int argc;
-        char **argv;
+        int _argc;
+        char **_argv;
+
+        herdstat::gui::GuiFactory *_guiFactory;
+        Options& _options;
 };
+#endif /* QT_FRONTEND||GTK_FRONTEND */
 
 #endif /* _HAVE_IO_HANDLER_HH */
 

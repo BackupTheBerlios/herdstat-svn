@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gtk.hh
+ * herdstat -- src/io/gui/qt_factory.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,28 +20,39 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_GTK_HH
-#define _HAVE_GTK_HH 1
+#ifndef _HAVE_GUI_QT_FACTORY_HH
+#define _HAVE_GUI_QT_FACTORY_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/handler.hh"
+#include "io/gui/gui_factory.hh"
 
-/*
- * IOHandler for the GTK+ toolkit.
- */
+namespace herdstat {
+namespace gui {
 
-class GtkIOHandler : public GuiIOHandler
+class QtFactory : public GuiFactory
 {
     public:
-        GtkIOHandler(int argc, char **argv);
-        virtual ~GtkIOHandler() { }
+        QtFactory() { }
+        virtual ~QtFactory() { }
 
-        virtual bool operator()(Query * const query);
+        virtual Application *createApplication(int argc, char **argv) const;
+        virtual Window *createWindow() const;
+        virtual Label *createLabel() const;
+        virtual MenuItem *createMenuItem() const;
+        virtual Menu *createMenu() const;
+        virtual MenuBar *createMenuBar() const;
+        virtual Tab *createTab() const;
+        virtual TabBar *createTabBar() const;
+        virtual HBox *createHBox() const;
+        virtual VBox *createVBox() const;
 };
 
-#endif /* _HAVE_GTK_HH */
+} // namespace gui
+} // namespace herdstat
+
+#endif /* _HAVE_GUI_QT_FACTORY_HH */
 
 /* vim: set tw=80 sw=4 et : */

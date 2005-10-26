@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gtk.cc
+ * herdstat -- src/io/gui/gui_factory.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,51 +20,39 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_GUI_GUI_FACTORY_HH
+#define _HAVE_GUI_GUI_FACTORY_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <gtkmm.h>
-#include "io/gtk.hh"
+#include "io/gui/widgets.hh"
 
-class GtkFrontEnd
+namespace herdstat {
+namespace gui {
+
+class GuiFactory
 {
     public:
-        void run() { _app.run(_main); }
+        GuiFactory() { }
+        virtual ~GuiFactory() { }
 
-    private:
-        friend GtkFrontEnd& GlobalGtkFrontEnd(int argc = 0, char **argv = NULL);
-        GtkFrontEnd(int argc, char **argv);
-        ~GtkFrontEnd() { }
-
-        Gtk::Main _app;
-        Gtk::Window _main;
-        Gtk::Notebook _notebook;
-        Gtk::MenuBar _menu;
+        virtual Application *createApplication(int argc, char **argv) const = 0;
+        virtual Window *createWindow() const = 0;
+        virtual Label *createLabel() const = 0;
+        virtual MenuItem *createMenuItem() const = 0;
+        virtual Menu *createMenu() const = 0;
+        virtual MenuBar *createMenuBar() const = 0;
+        virtual Tab *createTab() const = 0;
+        virtual TabBar *createTabBar() const = 0;
+        virtual HBox *createHBox() const = 0;
+        virtual VBox *createVBox() const = 0;
 };
 
-GtkFrontEnd::GtkFrontEnd(int argc, char **argv)
-    : _app(argc, argv)
-{
-}
+} // namespace gui
+} // namespace herdstat
 
-GtkFrontEnd& GlobalGtkFrontEnd(int argc, char **argv)
-{
-    static GtkFrontEnd g(argc, argv);
-    return g;
-}
-
-GtkIOHandler::GtkIOHandler(int argc, char **argv)
-    : GuiIOHandler(argc, argv)
-{
-}
-
-bool
-GtkIOHandler::operator()(Query * const query)
-{
-    GtkFrontEnd& fe(GlobalGtkFrontEnd(argc, argv));
-    fe.run();
-    return true;
-}
+#endif /* _HAVE_GUI_GUI_FACTORY_HH */
 
 /* vim: set tw=80 sw=4 et : */

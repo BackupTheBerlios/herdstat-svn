@@ -184,4 +184,5 @@ AC_OUTPUT(Makefile
 	  src/Makefile
 	  src/action/Makefile
 	  src/io/Makefile
+	  src/io/gui/Makefile
 	  tests/Makefile)

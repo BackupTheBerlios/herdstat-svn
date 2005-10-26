@@ -25,8 +25,8 @@
 #endif
 
 #include <locale>
-#include <map>
 #include <vector>
+#include <memory>
 #include <algorithm>
 
 #ifdef HAVE_GETOPT_H
@@ -560,7 +560,10 @@ main(int argc, char **argv)
     try
     { 
 	Query q;
-	opts_type nonopt_args;
+	char *getenv_result = NULL;
+	
+	if ((getenv_result = std::getenv("HERDSTAT_FRONTEND")))
+	    options.set_iomethod(getenv_result);
 	
 	/* handle rc file(s) */
 	if (not test) { rc rc; }
@@ -640,10 +643,10 @@ main(int argc, char **argv)
 	iohandlers.insert(std::make_pair("readline", new ReadLineIOHandler()));
 #endif
 #ifdef QT_FRONTEND
-	iohandlers.insert(std::make_pair("qt", new QtIOHandler(argc, argv)));
+	iohandlers.insert(std::make_pair("qt", new GuiIOHandler(argc, argv)));
 #endif
 #ifdef GTK_FRONTEND
-	iohandlers.insert(std::make_pair("gtk", new GtkIOHandler(argc, argv)));
+	iohandlers.insert(std::make_pair("gtk", new GuiIOHandler(argc, argv)));
 #endif
 
 	if (options.iomethod() == "unspecified")
