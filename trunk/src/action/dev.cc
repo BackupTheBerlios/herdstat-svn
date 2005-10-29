@@ -35,6 +35,12 @@ DevActionHandler::id() const
     return "dev";
 }
 
+const char * const
+DevActionHandler::desc() const
+{
+    return "Get information about the given developer.";
+}
+
 Tab *
 DevActionHandler::createTab(GuiFactory *guiFactory)
 {

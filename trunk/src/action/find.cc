@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/find.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+FindActionHandler::id() const
+{
+    return "find";
+}
+
+const char * const
+FindActionHandler::desc() const
+{
+    return "Find packages matching the given criteria.";
+}
+
+Tab *
+FindActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
+void
+FindActionHandler::operator()(const Query& query,
+                              QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

@@ -35,6 +35,12 @@ AwayActionHandler::id() const
     return "away";
 }
 
+const char * const
+AwayActionHandler::desc() const
+{
+    return "Display away developers and their away messages.";
+}
+
 Tab *
 AwayActionHandler::createTab(GuiFactory *guiFactory)
 {

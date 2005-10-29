@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/meta.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+MetaActionHandler::id() const
+{
+    return "meta";
+}
+
+const char * const
+MetaActionHandler::desc() const
+{
+    return "Get metadata information for the given category/package.";
+}
+
+Tab *
+MetaActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
+void
+MetaActionHandler::operator()(const Query& query,
+                              QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

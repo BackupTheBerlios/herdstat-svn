@@ -27,6 +27,24 @@
 # include "config.h"
 #endif
 
+#include "action/handler.hh"
+
+class FindActionHandler : public ActionHandler
+{
+    public:
+        virtual ~FindActionHandler() { }
+
+        virtual const char * const id() const;
+        virtual const char * const desc() const;
+
+        virtual void operator()(const Query& query,
+                                QueryResults * const results);
+
+    protected:
+        virtual herdstat::gui::Tab*
+            createTab(herdstat::gui::GuiFactory *factory);
+};
+
 #endif /* _HAVE_FIND_HH */
 
 /* vim: set tw=80 sw=4 et : */

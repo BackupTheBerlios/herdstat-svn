@@ -48,9 +48,17 @@
 #include "io/batch.hh"
 #include "io/gui.hh"
 #include "action/handler.hh"
-#include "action/herd.hh"
-#include "action/dev.hh"
 #include "action/away.hh"
+#include "action/dev.hh"
+#include "action/fetch.hh"
+#include "action/find.hh"
+#include "action/herd.hh"
+#include "action/keywords.hh"
+#include "action/meta.hh"
+#include "action/pkg.hh"
+#include "action/stats.hh"
+#include "action/versions.hh"
+#include "action/which.hh"
 #include "handler_map.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
@@ -629,9 +637,17 @@ main(int argc, char **argv)
 
 	/* setup action handlers */
 	HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
-	handlers.insert(std::make_pair("herd", new HerdActionHandler()));
 	handlers.insert(std::make_pair("away", new AwayActionHandler()));
 	handlers.insert(std::make_pair("dev",  new DevActionHandler()));
+	handlers.insert(std::make_pair("fetch", new FetchActionHandler()));
+	handlers.insert(std::make_pair("find", new FindActionHandler()));
+	handlers.insert(std::make_pair("herd", new HerdActionHandler()));
+	handlers.insert(std::make_pair("keywords", new KeywordsActionHandler()));
+	handlers.insert(std::make_pair("meta", new MetaActionHandler()));
+	handlers.insert(std::make_pair("pkg", new PkgActionHandler()));
+	handlers.insert(std::make_pair("stats", new StatsActionHandler()));
+	handlers.insert(std::make_pair("versions", new VersionsActionHandler()));
+	handlers.insert(std::make_pair("which", new WhichActionHandler()));
 
 	/* setup I/O handlers */
 	HandlerMap<IOHandler>& iohandlers(GlobalHandlerMap<IOHandler>());

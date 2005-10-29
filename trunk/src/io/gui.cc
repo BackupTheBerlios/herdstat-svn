@@ -65,11 +65,7 @@ GuiIOHandler::operator()(Query * const query)
 {
     /* instantiate widgets */
     std::auto_ptr<Application> app(_guiFactory->createApplication(_argc, _argv));
-    std::auto_ptr<VBox> hbox(_guiFactory->createVBox());
     std::auto_ptr<TabBar> tabs(_guiFactory->createTabBar());
-    std::auto_ptr<MenuBar> menu(_guiFactory->createMenuBar());
-    std::auto_ptr<Button> action_button(_guiFactory->createButton());
-    std::auto_ptr<Button> quit_button(_guiFactory->createButton());
 
     /* setup user interface */
     
@@ -78,7 +74,11 @@ GuiIOHandler::operator()(Query * const query)
     HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
     HandlerMap<ActionHandler>::iterator i;
     for (i = handlers.begin() ; i != handlers.end() ; ++i)
-        tabs->addTab(i->second->createTab(_guiFactory));
+    {
+        Tab *tab = NULL;
+        if ((tab = i->second->createTab(_guiFactory)))
+            tabs->addTab(tab);
+    }
 
 
     /* setup callbacks */
@@ -88,6 +88,10 @@ GuiIOHandler::operator()(Query * const query)
 
 
     /* main event loop */
+
+//    app->setMainWidget(tabs.get());
+    tabs->resize(500, 400);
+    tabs->show();
     app->exec();
 
     return false;

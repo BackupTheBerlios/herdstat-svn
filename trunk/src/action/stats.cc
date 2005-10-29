@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/stats.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+StatsActionHandler::id() const
+{
+    return "stats";
+}
+
+const char * const
+StatsActionHandler::desc() const
+{
+    return "Show herds.xml statistics.";
+}
+
+Tab *
+StatsActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
+void
+StatsActionHandler::operator()(const Query& query,
+                               QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

@@ -44,11 +44,16 @@ class GtkApplication : public Application
         Gtk::Window _window;
 };
 
-void
-GtkApplication::exec()
+class GtkWidget : public Widget
 {
-    _app.run(_window);
-}
+    public:
+        virtual ~GtkWidget() { }
+        virtual void show();
+        virtual void resize(std::size_t x, std::size_t y);
+
+    private:
+        Gtk::Widget _widget;
+};
 
 class GtkWindow : public Window
 {
@@ -61,12 +66,19 @@ class GtkButton : public Button
 {
     public:
         virtual ~GtkButton() { }
+
+    private:
+        Gtk::Button _button;
 };
 
 class GtkLabel : public Label
 {
     public:
         virtual ~GtkLabel() { }
+        virtual void setTitle(const std::string& title);
+
+    private:
+        Gtk::Label _label;
 };
 
 class GtkMenuItem : public MenuItem
@@ -99,7 +111,10 @@ class GtkTabBar : public TabBar
 {
     public:
         virtual ~GtkTabBar() { }
-        virtual void addTab(Tab *tab) { }
+        virtual void addTab(Tab *tab);
+
+    private:
+        Gtk::Notebook _bar;
 };
 
 class GtkHBox : public HBox
@@ -113,6 +128,37 @@ class GtkVBox : public VBox
     public:
         virtual ~GtkVBox() { }
 };
+
+void
+GtkWidget::show()
+{
+    _widget.show_all();
+}
+
+void
+GtkWidget::resize(std::size_t x, std::size_t y)
+{
+    _widget.set_size_request(x, y);
+}
+
+void
+GtkLabel::setTitle(const std::string& title)
+{
+    Label::setTitle(title);
+    _label.set_label(title);
+}
+
+void
+GtkTabBar::addTab(Tab *tab)
+{
+//    _bar.append_page(tab->child(), tab->title());
+}
+
+void
+GtkApplication::exec()
+{
+    _app.run(_window);
+}
 
 Application *
 GtkFactory::createApplication(int argc, char **argv) const

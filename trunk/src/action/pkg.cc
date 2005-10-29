@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/pkg.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+PkgActionHandler::id() const
+{
+    return "pkg";
+}
+
+const char * const
+PkgActionHandler::desc() const
+{
+    return "Find packages maintained by the given herd/developer.";
+}
+
+Tab *
+PkgActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
+void
+PkgActionHandler::operator()(const Query& query,
+                             QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

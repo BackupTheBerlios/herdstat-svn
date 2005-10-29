@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/which.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+WhichActionHandler::id() const
+{
+    return "which";
+}
+
+const char * const
+WhichActionHandler::desc() const
+{
+    return "Like which(1) but for ebuilds.  Gets the path to the latest ebuild for the given package.";
+}
+
+Tab *
+WhichActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
+void
+WhichActionHandler::operator()(const Query& query,
+                               QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

@@ -37,13 +37,23 @@
 
 #define HAS_TITLE \
     public: \
-        void setTitle(const std::string& title) { _title.assign(title); } \
-        const std::string& title() const { return _title; } \
+        virtual void setTitle(const std::string& title) { _title.assign(title); } \
+        virtual const std::string& title() const { return _title; } \
     private: \
         std::string _title;
 
 namespace herdstat {
 namespace gui {
+
+class Widget
+{
+    public:
+        Widget() { }
+        virtual ~Widget() { }
+        
+        virtual void show() { }
+        virtual void resize(std::size_t x, std::size_t y) { }
+};
 
 class Application
 {
@@ -54,25 +64,16 @@ class Application
         virtual void exec() = 0;
 };
 
-class Widget
-{
-    public:
-        Widget() { }
-        virtual ~Widget() { }
-};
-
-class Window
+class Window : public Widget
 {
     HAS_TITLE
 
     public:
         Window() { }
         virtual ~Window() { }
-
-        virtual void resize(std::size_t x, std::size_t y) = 0;
 };
 
-class Label
+class Label : public Widget
 {
     HAS_TITLE
 
@@ -81,20 +82,20 @@ class Label
         virtual ~Label() { }
 };
 
-class Button
+class Button : public Widget
 {
     public:
         virtual ~Button() { }
 };
 
-class TextBox
+class TextBox : public Widget
 {
     public:
         TextBox() { }
         virtual ~TextBox() { }
 };
 
-class MenuItem
+class MenuItem : public Widget
 {
     HAS_TITLE
 
@@ -103,7 +104,7 @@ class MenuItem
         virtual ~MenuItem() { }
 };
 
-class Menu
+class Menu : public Widget
 {
     public:
         Menu() { }
@@ -111,7 +112,7 @@ class Menu
         virtual void addMenuItem(MenuItem *item) = 0;
 };
 
-class MenuBar
+class MenuBar : public Widget
 {
     public:
         MenuBar() { }
@@ -119,7 +120,7 @@ class MenuBar
         virtual void addMenu(Menu *menu) = 0;
 };
 
-class Tab
+class Tab : public Widget
 {
     HAS_TITLE
 
@@ -128,22 +129,23 @@ class Tab
         virtual ~Tab() { }
 };
 
-class TabBar
+class TabBar : public Widget
 {
     public:
         TabBar() { }
         virtual ~TabBar() { }
+
         virtual void addTab(Tab *tab) = 0;
 };
 
-class HBox
+class HBox : public Widget
 {
     public:
         HBox() { }
         virtual ~HBox() { }
 };
 
-class VBox
+class VBox : public Widget
 {
     public:
         VBox() { }

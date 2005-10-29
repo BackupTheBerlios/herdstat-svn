@@ -27,6 +27,24 @@
 # include "config.h"
 #endif
 
+#include "action/handler.hh"
+
+class StatsActionHandler : public ActionHandler
+{
+    public:
+        virtual ~StatsActionHandler() { }
+
+        virtual const char * const id() const;
+        virtual const char * const desc() const;
+
+        virtual void operator()(const Query& query,
+                                QueryResults * const results);
+
+    protected:
+        virtual herdstat::gui::Tab *
+            createTab(herdstat::gui::GuiFactory *factory);
+};
+
 #endif /* _HAVE_ACTION_STATS_HH */
 
 /* vim: set tw=80 sw=4 et : */

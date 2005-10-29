@@ -45,6 +45,18 @@ class QtApplication : public Application
         QApplication _app;
 };
 
+class QtWidget : public Widget
+{
+    public:
+        virtual ~QtWidget() { }
+
+        void setWidget(QWidget *widget) { _widget = widget; }
+        QWidget *widget() { return _widget; }
+
+    private:
+        QWidget *_widget;
+};
+
 class QtWindow : public Window
 {
     public:
@@ -98,6 +110,8 @@ class QtTabBar : public TabBar
     public:
         virtual ~QtTabBar() { }
         virtual void addTab(Tab *tab);
+        virtual void show();
+        virtual void resize(std::size_t x, std::size_t y);
 
     private:
         QTabBar _bar;
@@ -125,6 +139,18 @@ void
 QtTabBar::addTab(Tab *tab)
 {
     _bar.addTab(new QTab(tab->title()));
+}
+
+void
+QtTabBar::show()
+{
+    _bar.show();
+}
+
+void
+QtTabBar::resize(std::size_t x, std::size_t y)
+{
+    _bar.resize(x, y);
 }
 
 Application *

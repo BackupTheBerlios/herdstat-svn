@@ -37,6 +37,12 @@ HerdActionHandler::id() const
     return "herd";
 }
 
+const char * const
+HerdActionHandler::desc() const
+{
+    return "Get information for the given herds.";
+}
+
 Tab *
 HerdActionHandler::createTab(GuiFactory *guiFactory)
 {

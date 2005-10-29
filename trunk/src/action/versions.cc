@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/versions.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+VersionsActionHandler::id() const
+{
+    return "versions";
+}
+
+const char * const
+VersionsActionHandler::desc() const
+{
+    return "Show version information for the given package(s).";
+}
+
+Tab *
+VersionsActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
+void
+VersionsActionHandler::operator()(const Query& query,
+                                  QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

@@ -24,4 +24,35 @@
 # include "config.h"
 #endif
 
+#include "action/fetch.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+FetchActionHandler::id() const
+{
+    return "fetch";
+}
+
+const char * const
+FetchActionHandler::desc() const
+{
+    return "Fetch files required for herdstat to do its thing.";
+}
+
+Tab *
+FetchActionHandler::createTab(GuiFactory *guiFactory)
+{
+    /* this action gets no tab */
+    return NULL;
+}
+
+void
+FetchActionHandler::operator()(const Query& query,
+                               QueryResults * const results)
+{
+
+}
+
 /* vim: set tw=80 sw=4 et : */

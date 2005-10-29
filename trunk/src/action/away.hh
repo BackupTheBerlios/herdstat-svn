@@ -34,6 +34,7 @@ class AwayActionHandler : public XMLActionHandler
     public:
         virtual ~AwayActionHandler() { }
         virtual const char * const id() const;
+        virtual const char * const desc() const;
         virtual void operator()(const Query& query,
                                 QueryResults * const results);
 

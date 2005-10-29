@@ -40,8 +40,12 @@ class ActionHandler
     public:
         virtual ~ActionHandler() { }
 
+        /// action identifier string
         virtual const char * const id() const = 0;
+        /// action description string
+        virtual const char * const desc() const = 0;
 
+        /// perform action
         virtual void operator()(const Query& query,
                                 QueryResults * const results) = 0;
 

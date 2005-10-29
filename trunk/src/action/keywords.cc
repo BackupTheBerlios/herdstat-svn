@@ -24,4 +24,37 @@
 # include "config.h"
 #endif
 
+#include "action/keywords.hh"
+
+using namespace herdstat;
+using namespace herdstat::gui;
+
+const char * const
+KeywordsActionHandler::id() const
+{
+    return "keywords";
+}
+
+const char * const
+KeywordsActionHandler::desc() const
+{
+    return "Get keywords for the given packages.";
+}
+
+void
+KeywordsActionHandler::operator()(const Query& query,
+                                  QueryResults * const results)
+{
+
+}
+
+Tab *
+KeywordsActionHandler::createTab(GuiFactory *guiFactory)
+{
+    Tab *tab = guiFactory->createTab();
+    tab->setTitle(this->id());
+
+    return tab;
+}
+
 /* vim: set tw=80 sw=4 et : */

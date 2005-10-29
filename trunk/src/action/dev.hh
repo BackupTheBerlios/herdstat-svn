@@ -34,6 +34,7 @@ class DevActionHandler : public XMLActionHandler
     public:
         virtual ~DevActionHandler() { }
         virtual const char * const id() const;
+        virtual const char * const desc() const;
         virtual void operator()(const Query& query,
                                 QueryResults * const results);
 
