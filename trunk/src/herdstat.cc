@@ -68,6 +68,7 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::xml;
 
+// {{{ getopt stuff
 static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:ki:";
 
 #ifdef HAVE_GETOPT_LONG
@@ -122,6 +123,7 @@ static struct option long_opts[] =
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
+// }}}
 
 static void
 version()
@@ -161,6 +163,7 @@ usage()
 	<< "Use --help to see more detailed usage information." << std::endl;
 }
 
+// {{{ help()
 static void
 help()
 {
@@ -284,6 +287,7 @@ help()
 	<< "Set it in your shell rcfile to permanently set the location of "
 	<< "your herds.xml." << std::endl;
 }
+// }}}
 
 static void
 parse_fields(const std::vector<std::string>& fields)
@@ -318,6 +322,7 @@ handle_opts(int argc, char **argv, Query *q)
 	if (key == -1)
 	    break;
 
+	// {{{
 	switch (key)
 	{
 	    case 'T':
@@ -520,6 +525,7 @@ handle_opts(int argc, char **argv, Query *q)
 		break;
 	}
     }
+    // }}}
 
     /* --field */
     parse_fields(fields);
@@ -697,6 +703,7 @@ main(int argc, char **argv)
 	for (i = iohandlers.begin() ; i != iohandlers.end() ; ++i)
 	    if (i->second) delete i->second;
     }
+    // {{{ catches
     catch (const ActionUnimplemented& e)
     {
 	std::cerr << "Invalid action '" << e.what() << "'.  Try --help."
@@ -784,6 +791,9 @@ main(int argc, char **argv)
 	std::cerr << "Unhandled exception: " << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
+    // }}}
 
     return EXIT_SUCCESS;
 }
+
+/* vim: set tw=80 sw=4 fdm=marker et : */
