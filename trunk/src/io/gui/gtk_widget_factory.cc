@@ -36,6 +36,7 @@ namespace gui {
 class GtkWidget : public Widget
 {
     public:
+        GtkWidget(Gtk::Widget *widget = NULL);
         virtual ~GtkWidget();
 
     protected:
@@ -69,21 +70,30 @@ class GtkTab : public Tab, public GtkWidget
 class GtkTabBar : public TabBar, public GtkWidget
 {
     public:
+        GtkTabBar();
         virtual ~GtkTabBar() { }
         virtual void add_tab(Tab *tab);
-
-    private:
-        Gtk::Notebook _bar;
 };
 
 /*
  * }}}
  */
 
+GtkWidget::GtkWidget(Gtk::Widget *widget)
+    : _widget(widget)
+{
+}
+
 GtkWidget::~GtkWidget()
 {
     if (_widget)
         delete _widget;
+}
+
+GtkTabBar::GtkTabBar()
+    : GtkWidget(new Gtk::Notebook())
+{
+
 }
 
 void
