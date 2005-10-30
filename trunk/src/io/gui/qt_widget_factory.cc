@@ -38,7 +38,14 @@ namespace gui {
 class QtWidget : public Widget
 {
     public:
-        virtual ~QtWidget() { }
+        virtual ~QtWidget();
+
+    protected:
+        QWidget *widget() { return _widget; }
+        void set_widget(QWidget *widget) { _widget = widget; }
+
+    private:
+        QWidget *_widget;
 };
 
 class QtApplication : public Application
@@ -54,7 +61,7 @@ class QtApplication : public Application
         QApplication _app;
 };
 
-class QtTab : public Tab
+class QtTab : public Tab, public QtWidget
 {
     public:
         virtual ~QtTab() { }
@@ -64,7 +71,7 @@ class QtTab : public Tab
         QTab _tab;
 };
 
-class QtTabBar : public TabBar
+class QtTabBar : public TabBar, public QtWidget
 {
     public:
         virtual ~QtTabBar() { }
@@ -79,6 +86,12 @@ class QtTabBar : public TabBar
 /*
  * }}}
  */
+
+QtWidget::~QtWidget()
+{
+    if (_widget)
+        delete _widget;
+}
 
 void
 QtApplication::exec()

@@ -36,7 +36,14 @@ namespace gui {
 class GtkWidget : public Widget
 {
     public:
-        virtual ~GtkWidget() { }
+        virtual ~GtkWidget();
+
+    protected:
+        Gtk::Widget *widget() { return _widget; }
+        void set_widget(Gtk::Widget *widget) { _widget = widget; }
+
+    private:
+        Gtk::Widget *_widget;
 };
 
 class GtkApplication : public Application
@@ -53,13 +60,13 @@ class GtkApplication : public Application
         Gtk::Window _window;
 };
 
-class GtkTab : public Tab
+class GtkTab : public Tab, public GtkWidget
 {
     public:
         virtual ~GtkTab() { }
 };
 
-class GtkTabBar : public TabBar
+class GtkTabBar : public TabBar, public GtkWidget
 {
     public:
         virtual ~GtkTabBar() { }
@@ -72,6 +79,12 @@ class GtkTabBar : public TabBar
 /*
  * }}}
  */
+
+GtkWidget::~GtkWidget()
+{
+    if (_widget)
+        delete _widget;
+}
 
 void
 GtkTabBar::add_tab(Tab *tab)
