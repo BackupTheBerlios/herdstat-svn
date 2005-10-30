@@ -27,7 +27,6 @@
 #include <gtkmm.h>
 #include "io/gui/gtk_factory.hh"
 
-namespace herdstat {
 namespace gui {
 
 class GtkApplication : public Application
@@ -44,67 +43,69 @@ class GtkApplication : public Application
         Gtk::Window _window;
 };
 
-class GtkWidget : public Widget
-{
-    public:
-        virtual ~GtkWidget() { }
-        virtual void show();
-        virtual void resize(std::size_t x, std::size_t y);
+//class GtkWidget : public Widget
+//{
+//    public:
+//        virtual ~GtkWidget() { }
+//        virtual void show();
+//        virtual void resize(std::size_t x, std::size_t y);
 
-    private:
-        Gtk::Widget _widget;
-};
+//    private:
+//        Gtk::Widget _widget;
+//};
 
-class GtkWindow : public Window
-{
-    public:
-        virtual ~GtkWindow() { }
-        virtual void resize(std::size_t x, std::size_t y) { }
-};
+//class GtkWindow : public Window
+//{
+//    public:
+//        virtual ~GtkWindow() { }
+//        virtual void resize(std::size_t x, std::size_t y) { }
+//};
 
-class GtkButton : public Button
-{
-    public:
-        virtual ~GtkButton() { }
+//class GtkButton : public Button
+//{
+//    public:
+//        virtual ~GtkButton() { }
 
-    private:
-        Gtk::Button _button;
-};
+//    private:
+//        Gtk::Button _button;
+//};
 
-class GtkLabel : public Label
-{
-    public:
-        virtual ~GtkLabel() { }
-        virtual void setTitle(const std::string& title);
+//class GtkLabel : public Label
+//{
+//    public:
+//        virtual ~GtkLabel() { }
+//        virtual void setTitle(const std::string& title);
 
-    private:
-        Gtk::Label _label;
-};
+//    private:
+//        Gtk::Label _label;
+//};
 
-class GtkMenuItem : public MenuItem
-{
-    public:
-        virtual ~GtkMenuItem() { }
-};
+//class GtkMenuItem : public MenuItem
+//{
+//    public:
+//        virtual ~GtkMenuItem() { }
+//};
 
-class GtkMenu : public Menu
-{
-    public:
-        virtual ~GtkMenu() { }
-        virtual void addMenuItem(MenuItem *item) { }
-};
+//class GtkMenu : public Menu
+//{
+//    public:
+//        virtual ~GtkMenu() { }
+//        virtual void addMenuItem(MenuItem *item) { }
+//};
 
-class GtkMenuBar : public MenuBar
-{
-    public:
-        virtual ~GtkMenuBar() { }
-        virtual void addMenu(Menu *menu) { }
-};
+//class GtkMenuBar : public MenuBar
+//{
+//    public:
+//        virtual ~GtkMenuBar() { }
+//        virtual void addMenu(Menu *menu) { }
+//};
 
 class GtkTab : public Tab
 {
     public:
         virtual ~GtkTab() { }
+        virtual void setTitle(const std::string& title) { }
+        virtual const std::string& title() const { }
 };
 
 class GtkTabBar : public TabBar
@@ -117,36 +118,17 @@ class GtkTabBar : public TabBar
         Gtk::Notebook _bar;
 };
 
-class GtkHBox : public HBox
-{
-    public:
-        virtual ~GtkHBox() { }
-};
+//class GtkHBox : public HBox
+//{
+//    public:
+//        virtual ~GtkHBox() { }
+//};
 
-class GtkVBox : public VBox
-{
-    public:
-        virtual ~GtkVBox() { }
-};
-
-void
-GtkWidget::show()
-{
-    _widget.show_all();
-}
-
-void
-GtkWidget::resize(std::size_t x, std::size_t y)
-{
-    _widget.set_size_request(x, y);
-}
-
-void
-GtkLabel::setTitle(const std::string& title)
-{
-    Label::setTitle(title);
-    _label.set_label(title);
-}
+//class GtkVBox : public VBox
+//{
+//    public:
+//        virtual ~GtkVBox() { }
+//};
 
 void
 GtkTabBar::addTab(Tab *tab)
@@ -166,18 +148,17 @@ GtkFactory::createApplication(int argc, char **argv) const
     return new GtkApplication(argc, argv);
 }
 
-Window * GtkFactory::createWindow() const { return new GtkWindow(); }
-Button * GtkFactory::createButton() const { return new GtkButton(); }
-Label * GtkFactory::createLabel() const { return new GtkLabel(); }
-MenuItem * GtkFactory::createMenuItem() const { return new GtkMenuItem(); }
-Menu * GtkFactory::createMenu() const { return new GtkMenu(); }
-MenuBar * GtkFactory::createMenuBar() const { return new GtkMenuBar(); }
+//Window * GtkFactory::createWindow() const { return new GtkWindow(); }
+//Button * GtkFactory::createButton() const { return new GtkButton(); }
+//Label * GtkFactory::createLabel() const { return new GtkLabel(); }
+//MenuItem * GtkFactory::createMenuItem() const { return new GtkMenuItem(); }
+//Menu * GtkFactory::createMenu() const { return new GtkMenu(); }
+//MenuBar * GtkFactory::createMenuBar() const { return new GtkMenuBar(); }
 Tab * GtkFactory::createTab() const { return new GtkTab(); }
 TabBar * GtkFactory::createTabBar() const { return new GtkTabBar(); }
-HBox * GtkFactory::createHBox() const { return new GtkHBox(); }
-VBox * GtkFactory::createVBox() const { return new GtkVBox(); }
+//HBox * GtkFactory::createHBox() const { return new GtkHBox(); }
+//VBox * GtkFactory::createVBox() const { return new GtkVBox(); }
 
 } // namespace gui
-} // namespace herdstat
 
 /* vim: set tw=80 sw=4 et : */

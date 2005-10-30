@@ -9,7 +9,8 @@ MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 
 noinst_LTLIBRARIES = libgui.la
 libgui_la_SOURCES = \
-	widgets.hh \
+	widget.hh widget.cc \
+	products.hh \
 	gui_factory.hh
 
 libgui_la_LIBADD = $(QT_LIBS) $(gtkmm_LIBS)

@@ -29,7 +29,6 @@
 
 #include "io/gui/qt_factory.hh"
 
-namespace herdstat {
 namespace gui {
 
 class QtApplication : public Application
@@ -45,61 +44,50 @@ class QtApplication : public Application
         QApplication _app;
 };
 
-class QtWidget : public Widget
-{
-    public:
-        virtual ~QtWidget() { }
+//class QtWindow : public Window
+//{
+//    public:
+//        virtual ~QtWindow() { }
+//        virtual void resize(std::size_t x, std::size_t y) { }
+//};
 
-        void setWidget(QWidget *widget) { _widget = widget; }
-        QWidget *widget() { return _widget; }
+//class QtButton : public Button
+//{
+//    public:
+//        virtual ~QtButton() { }
+//};
 
-    private:
-        QWidget *_widget;
-};
+//class QtLabel : public Label
+//{
+//    public:
+//        virtual ~QtLabel() { }
+//};
 
-class QtWindow : public Window
-{
-    public:
-        virtual ~QtWindow() { }
-        virtual void resize(std::size_t x, std::size_t y) { }
-};
+//class QtMenuItem : public MenuItem
+//{
+//    public:
+//        virtual ~QtMenuItem() { }
+//};
 
-class QtButton : public Button
-{
-    public:
-        virtual ~QtButton() { }
-};
+//class QtMenu : public Menu
+//{
+//    public:
+//        virtual ~QtMenu() { }
+//        virtual void addMenuItem(MenuItem *item) { }
+//};
 
-class QtLabel : public Label
-{
-    public:
-        virtual ~QtLabel() { }
-};
-
-class QtMenuItem : public MenuItem
-{
-    public:
-        virtual ~QtMenuItem() { }
-};
-
-class QtMenu : public Menu
-{
-    public:
-        virtual ~QtMenu() { }
-        virtual void addMenuItem(MenuItem *item) { }
-};
-
-class QtMenuBar : public MenuBar
-{
-    public:
-        virtual ~QtMenuBar() { }
-        virtual void addMenu(Menu *menu) { }
-};
+//class QtMenuBar : public MenuBar
+//{
+//    public:
+//        virtual ~QtMenuBar() { }
+//        virtual void addMenu(Menu *menu) { }
+//};
 
 class QtTab : public Tab
 {
     public:
         virtual ~QtTab() { }
+        virtual void set_title(const std::string& title);
 
     private:
         QTab _tab;
@@ -117,22 +105,29 @@ class QtTabBar : public TabBar
         QTabBar _bar;
 };
 
-class QtHBox : public HBox
-{
-    public:
-        virtual ~QtHBox() { }
-};
+//class QtHBox : public HBox
+//{
+//    public:
+//        virtual ~QtHBox() { }
+//};
 
-class QtVBox : public VBox
-{
-    public:
-        virtual ~QtVBox() { }
-};
+//class QtVBox : public VBox
+//{
+//    public:
+//        virtual ~QtVBox() { }
+//};
 
 void
 QtApplication::exec()
 {
     _app.exec();
+}
+
+void
+QtTab::set_title(const std::string& title)
+{
+    Tab::set_title(title);
+    _tab.setText(title);
 }
 
 void
@@ -159,18 +154,17 @@ QtFactory::createApplication(int argc, char **argv) const
     return new QtApplication(argc, argv);
 }
 
-Window * QtFactory::createWindow() const { return new QtWindow(); }
-Button * QtFactory::createButton() const { return new QtButton(); }
-Label * QtFactory::createLabel() const { return new QtLabel(); }
-MenuItem * QtFactory::createMenuItem() const { return new QtMenuItem(); }
-Menu * QtFactory::createMenu() const { return new QtMenu(); }
-MenuBar * QtFactory::createMenuBar() const { return new QtMenuBar(); }
+//Window * QtFactory::createWindow() const { return new QtWindow(); }
+//Button * QtFactory::createButton() const { return new QtButton(); }
+//Label * QtFactory::createLabel() const { return new QtLabel(); }
+//MenuItem * QtFactory::createMenuItem() const { return new QtMenuItem(); }
+//Menu * QtFactory::createMenu() const { return new QtMenu(); }
+//MenuBar * QtFactory::createMenuBar() const { return new QtMenuBar(); }
 Tab * QtFactory::createTab() const { return new QtTab(); }
 TabBar * QtFactory::createTabBar() const { return new QtTabBar(); }
-HBox * QtFactory::createHBox() const { return new QtHBox(); }
-VBox * QtFactory::createVBox() const { return new QtVBox(); }
+//HBox * QtFactory::createHBox() const { return new QtHBox(); }
+//VBox * QtFactory::createVBox() const { return new QtVBox(); }
 
 } // namespace gui
-} // namespace herdstat
 
 /* vim: set tw=80 sw=4 et : */

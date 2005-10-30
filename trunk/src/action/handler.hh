@@ -54,8 +54,8 @@ class ActionHandler
 
         /* Called by GuiIOHandler::operator() when
          * filling the TabBar. */
-        virtual herdstat::gui::Tab *
-            createTab(herdstat::gui::GuiFactory *factory) = 0;
+        virtual gui::Tab *
+            createTab(gui::GuiFactory *factory) = 0;
 };
 
 class XMLActionHandler : public ActionHandler

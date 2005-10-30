@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action/pkg.cc
+ * herdstat -- src/io/gui/widget.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,41 +20,37 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_GUI_WIDGET_HH
+#define _HAVE_GUI_WIDGET_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action/pkg.hh"
+#include <string>
 
-using namespace herdstat;
-using namespace gui;
+namespace gui {
 
-const char * const
-PkgActionHandler::id() const
+class Widget
 {
-    return "pkg";
-}
+    public:
+        virtual ~Widget() { }
+};
 
-const char * const
-PkgActionHandler::desc() const
+class WidgetWithTitle : public Widget
 {
-    return "Find packages maintained by the given herd/developer.";
-}
+    public:
+        virtual ~WidgetWithTitle() { }
 
-Tab *
-PkgActionHandler::createTab(GuiFactory *guiFactory)
-{
-    Tab *tab = guiFactory->createTab();
-    tab->set_title(this->id());
+        virtual void set_title(const std::string& title);
+        virtual const std::string& title() const;
 
-    return tab;
-}
+    private:
+        std::string _title;
+};
 
-void
-PkgActionHandler::operator()(const Query& query,
-                             QueryResults * const results)
-{
+} // namespace gui
 
-}
+#endif /* _HAVE_GUI_WIDGET_HH */
 
 /* vim: set tw=80 sw=4 et : */

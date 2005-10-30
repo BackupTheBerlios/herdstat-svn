@@ -41,8 +41,8 @@ class HerdActionHandler : public XMLActionHandler
                                 QueryResults * const results);
 
     protected:
-        virtual herdstat::gui::Tab *
-            createTab(herdstat::gui::GuiFactory *factory);
+        virtual gui::Tab *
+            createTab(gui::GuiFactory *factory);
 };
 
 #endif /* _HAVE_ACTION_HERD_HH */

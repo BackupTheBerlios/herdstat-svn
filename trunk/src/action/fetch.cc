@@ -27,7 +27,7 @@
 #include "action/fetch.hh"
 
 using namespace herdstat;
-using namespace herdstat::gui;
+using namespace gui;
 
 const char * const
 FetchActionHandler::id() const

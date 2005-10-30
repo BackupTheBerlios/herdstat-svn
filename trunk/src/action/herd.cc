@@ -29,7 +29,7 @@
 
 using namespace herdstat;
 using namespace herdstat::portage;
-using namespace herdstat::gui;
+using namespace gui;
 
 const char * const
 HerdActionHandler::id() const
@@ -47,7 +47,7 @@ Tab *
 HerdActionHandler::createTab(GuiFactory *guiFactory)
 {
     Tab *tab = guiFactory->createTab();
-    tab->setTitle(this->id());
+    tab->set_title(this->id());
 
     /* ... */
 

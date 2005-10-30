@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/action/pkg.cc
+ * herdstat -- src/io/gui/products.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,41 +20,41 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE_GUI_PRODUCTS_HH
+#define _HAVE_GUI_PRODUCTS_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "action/pkg.hh"
+#include "io/gui/widget.hh"
 
-using namespace herdstat;
-using namespace gui;
+namespace gui {
 
-const char * const
-PkgActionHandler::id() const
-{
-    return "pkg";
-}
+    class Application
+    {
+        public:
+            virtual ~Application() { }
+            virtual void exec() = 0;
+    };
 
-const char * const
-PkgActionHandler::desc() const
-{
-    return "Find packages maintained by the given herd/developer.";
-}
+    class Tab : public WidgetWithTitle
+    {
+        public:
+            virtual ~Tab() { }
+    };
 
-Tab *
-PkgActionHandler::createTab(GuiFactory *guiFactory)
-{
-    Tab *tab = guiFactory->createTab();
-    tab->set_title(this->id());
+    class TabBar : public Widget
+    {
+        public:
+            virtual ~TabBar() { }
+            virtual void addTab(Tab *tab) = 0;
+            virtual void show() { }
+            virtual void resize(std::size_t x, std::size_t y) { }
+    };
 
-    return tab;
-}
+} // namespace gui
 
-void
-PkgActionHandler::operator()(const Query& query,
-                             QueryResults * const results)
-{
-
-}
+#endif /* _HAVE_GUI_PRODUCTS_HH */
 
 /* vim: set tw=80 sw=4 et : */

@@ -30,7 +30,7 @@
 #include "options.hh"
 #include "io/handler.hh"
 
-class herdstat::gui::GuiFactory;
+class gui::GuiFactory;
 
 class GuiIOHandler : public IOHandler
 {
@@ -44,7 +44,7 @@ class GuiIOHandler : public IOHandler
         int _argc;
         char **_argv;
 
-        herdstat::gui::GuiFactory *_guiFactory;
+        gui::GuiFactory *_guiFactory;
         Options& _options;
 };
 

@@ -29,7 +29,6 @@
 
 #include "io/gui/gui_factory.hh"
 
-namespace herdstat {
 namespace gui {
 
 class QtFactory : public GuiFactory
@@ -39,20 +38,19 @@ class QtFactory : public GuiFactory
         virtual ~QtFactory() { }
 
         virtual Application *createApplication(int argc, char **argv) const;
-        virtual Window *createWindow() const;
-        virtual Button *createButton() const;
-        virtual Label *createLabel() const;
-        virtual MenuItem *createMenuItem() const;
-        virtual Menu *createMenu() const;
-        virtual MenuBar *createMenuBar() const;
+//        virtual Window *createWindow() const;
+//        virtual Button *createButton() const;
+//        virtual Label *createLabel() const;
+//        virtual MenuItem *createMenuItem() const;
+//        virtual Menu *createMenu() const;
+//        virtual MenuBar *createMenuBar() const;
         virtual Tab *createTab() const;
         virtual TabBar *createTabBar() const;
-        virtual HBox *createHBox() const;
-        virtual VBox *createVBox() const;
+//        virtual HBox *createHBox() const;
+//        virtual VBox *createVBox() const;
 };
 
 } // namespace gui
-} // namespace herdstat
 
 #endif /* _HAVE_GUI_QT_FACTORY_HH */
 

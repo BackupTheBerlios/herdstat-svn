@@ -38,7 +38,7 @@
 #include "io/gui/gui_factory.hh"
 #include "io/gui.hh"
 
-using namespace herdstat::gui;
+using namespace gui;
 
 GuiIOHandler::GuiIOHandler(int argc, char **argv)
     : _argc(argc), _argv(argv),

@@ -27,7 +27,7 @@
 #include "action/away.hh"
 
 using namespace herdstat;
-using namespace herdstat::gui;
+using namespace gui;
 
 const char * const
 AwayActionHandler::id() const
@@ -45,7 +45,7 @@ Tab *
 AwayActionHandler::createTab(GuiFactory *guiFactory)
 {
     Tab *tab = guiFactory->createTab();
-    tab->setTitle(this->id());
+    tab->set_title(this->id());
 
     return tab;
 }

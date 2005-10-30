@@ -27,9 +27,8 @@
 # include "config.h"
 #endif
 
-#include "io/gui/widgets.hh"
+#include "io/gui/products.hh"
 
-namespace herdstat {
 namespace gui {
 
 class GuiFactory
@@ -39,20 +38,19 @@ class GuiFactory
         virtual ~GuiFactory() { }
 
         virtual Application *createApplication(int argc, char **argv) const = 0;
-        virtual Window *createWindow() const = 0;
-        virtual Button *createButton() const = 0;
-        virtual Label *createLabel() const = 0;
-        virtual MenuItem *createMenuItem() const = 0;
-        virtual Menu *createMenu() const = 0;
-        virtual MenuBar *createMenuBar() const = 0;
+//        virtual Window *createWindow() const = 0;
+//        virtual Button *createButton() const = 0;
+//        virtual Label *createLabel() const = 0;
+//        virtual MenuItem *createMenuItem() const = 0;
+//        virtual Menu *createMenu() const = 0;
+//        virtual MenuBar *createMenuBar() const = 0;
         virtual Tab *createTab() const = 0;
         virtual TabBar *createTabBar() const = 0;
-        virtual HBox *createHBox() const = 0;
-        virtual VBox *createVBox() const = 0;
+//        virtual HBox *createHBox() const = 0;
+//        virtual VBox *createVBox() const = 0;
 };
 
 } // namespace gui
-} // namespace herdstat
 
 #endif /* _HAVE_GUI_GUI_FACTORY_HH */
 
