@@ -51,4 +51,4 @@ class QueryResults : public herdstat::util::VectorBase<Result>
 
 #endif /* _HAVE_QUERY_RESULTS_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

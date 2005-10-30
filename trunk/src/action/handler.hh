@@ -33,7 +33,7 @@
 
 #include "query.hh"
 #include "query_results.hh"
-#include "io/gui/gui_factory.hh"
+#include "io/gui/widget_factory.hh"
 
 class ActionHandler
 {
@@ -54,8 +54,7 @@ class ActionHandler
 
         /* Called by GuiIOHandler::operator() when
          * filling the TabBar. */
-        virtual gui::Tab *
-            createTab(gui::GuiFactory *factory) = 0;
+        virtual gui::Tab *createTab(gui::WidgetFactory *factory) = 0;
 };
 
 class XMLActionHandler : public ActionHandler
@@ -73,4 +72,4 @@ class XMLActionHandler : public ActionHandler
 
 #endif /* _HAVE_ACTION_HANDLER_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

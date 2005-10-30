@@ -106,4 +106,4 @@ inline bool querycache::is_expired(const_reference q) const
 
 #endif
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

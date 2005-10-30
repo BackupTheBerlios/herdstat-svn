@@ -42,7 +42,7 @@ FetchActionHandler::desc() const
 }
 
 Tab *
-FetchActionHandler::createTab(GuiFactory *guiFactory)
+FetchActionHandler::createTab(WidgetFactory *widgetFactory)
 {
     /* this action gets no tab */
     return NULL;
@@ -55,4 +55,4 @@ FetchActionHandler::operator()(const Query& query,
 
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

@@ -283,4 +283,4 @@ Formatter::flush(std::ostream& stream)
         std::ostream_iterator<std::string>(stream, "\n"));
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

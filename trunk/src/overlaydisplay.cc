@@ -90,4 +90,4 @@ OverlayDisplay::insert(const std::string& overlay)
     base_type::insert(value_type(overlay, this->size() + 1));
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

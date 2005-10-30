@@ -111,4 +111,4 @@ XMLActionHandler::fetch_and_parse()
         devaway_xml.parse();
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

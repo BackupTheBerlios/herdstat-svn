@@ -41,4 +41,4 @@ void debug_msg(const char *, ...);
 
 #endif
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

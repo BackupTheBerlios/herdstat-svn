@@ -49,12 +49,12 @@ KeywordsActionHandler::operator()(const Query& query,
 }
 
 Tab *
-KeywordsActionHandler::createTab(GuiFactory *guiFactory)
+KeywordsActionHandler::createTab(WidgetFactory *widgetFactory)
 {
-    Tab *tab = guiFactory->createTab();
+    Tab *tab = widgetFactory->createTab();
     tab->set_title(this->id());
 
     return tab;
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

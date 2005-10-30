@@ -155,4 +155,4 @@ transform_fields_into_matches(InIter first, InIter last, OutIter result,
 
 #endif /* _HAVE_FIELDS_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

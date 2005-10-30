@@ -101,4 +101,4 @@ rc::set_options()
         options.set_iomethod(vars["frontend"]);
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

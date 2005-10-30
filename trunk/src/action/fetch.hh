@@ -40,9 +40,9 @@ class FetchActionHandler : public ActionHandler
 
     protected:
         virtual gui::Tab *
-            createTab(gui::GuiFactory *factory);
+            createTab(gui::WidgetFactory *factory);
 };
 
 #endif /* _HAVE_FETCH_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

@@ -64,4 +64,4 @@ class Query
 
 #endif /* _HAVE_QUERY_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

@@ -44,9 +44,9 @@ HerdActionHandler::desc() const
 }
 
 Tab *
-HerdActionHandler::createTab(GuiFactory *guiFactory)
+HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 {
-    Tab *tab = guiFactory->createTab();
+    Tab *tab = widgetFactory->createTab();
     tab->set_title(this->id());
 
     /* ... */
@@ -82,4 +82,4 @@ HerdActionHandler::operator()(const Query& query,
     }
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

@@ -42,9 +42,9 @@ DevActionHandler::desc() const
 }
 
 Tab *
-DevActionHandler::createTab(GuiFactory *guiFactory)
+DevActionHandler::createTab(WidgetFactory *widgetFactory)
 {
-    Tab *tab = guiFactory->createTab();
+    Tab *tab = widgetFactory->createTab();
     tab->set_title(this->id());
 
     return tab;
@@ -57,4 +57,4 @@ DevActionHandler::operator()(const Query& query,
 
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */
