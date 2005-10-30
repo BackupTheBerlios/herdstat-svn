@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gui/gui_factory.hh
+ * herdstat -- src/io/gui/widget_factory.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,38 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_GUI_GUI_FACTORY_HH
-#define _HAVE_GUI_GUI_FACTORY_HH 1
+#ifndef _HAVE__WIDGET_FACTORY_HH
+#define _HAVE__WIDGET_FACTORY_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/gui/products.hh"
+/**
+ * @file io/gui/widget_factory.hh
+ * @brief Defines a AbstractFactory for creating gui widgets.
+ */
+
+#include "io/gui/widgets.hh"
 
 namespace gui {
 
-class GuiFactory
-{
-    public:
-        GuiFactory() { }
-        virtual ~GuiFactory() { }
+    class WidgetFactory
+    {
+        public:
+            virtual ~WidgetFactory() { }
 
-        virtual Application *createApplication(int argc, char **argv) const = 0;
-//        virtual Window *createWindow() const = 0;
-//        virtual Button *createButton() const = 0;
-//        virtual Label *createLabel() const = 0;
-//        virtual MenuItem *createMenuItem() const = 0;
-//        virtual Menu *createMenu() const = 0;
-//        virtual MenuBar *createMenuBar() const = 0;
-        virtual Tab *createTab() const = 0;
-        virtual TabBar *createTabBar() const = 0;
-//        virtual HBox *createHBox() const = 0;
-//        virtual VBox *createVBox() const = 0;
-};
+            virtual Widget *createWidget() const = 0;
+            virtual Application *createApplication(int argc, char **argv) const = 0;
+            virtual Tab *createTab() const = 0;
+            virtual TabBar *createTabBar() const = 0;
+    };
 
 } // namespace gui
 
-#endif /* _HAVE_GUI_GUI_FACTORY_HH */
+#endif /* _HAVE__WIDGET_FACTORY_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

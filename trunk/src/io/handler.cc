@@ -27,13 +27,6 @@
 #include <memory>
 #include <herdstat/util/string.hh>
 
-#ifdef QT_FRONTEND
-# include "io/gui/qt_factory.hh"
-#endif
-#ifdef GTK_FRONTEND
-# include "io/gui/gtk_factory.hh"
-#endif
-
 #include "exceptions.hh"
 #include "handler_map.hh"
 #include "action/handler.hh"
@@ -69,4 +62,4 @@ PrettyIOHandler::display(const QueryResults& results)
     out.flush(GlobalOptions().outstream());
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

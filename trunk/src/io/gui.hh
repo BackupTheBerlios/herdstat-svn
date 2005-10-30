@@ -29,8 +29,7 @@
 
 #include "options.hh"
 #include "io/handler.hh"
-
-class gui::GuiFactory;
+#include "io/gui/widget_factory.hh"
 
 class GuiIOHandler : public IOHandler
 {
@@ -44,10 +43,10 @@ class GuiIOHandler : public IOHandler
         int _argc;
         char **_argv;
 
-        gui::GuiFactory *_guiFactory;
+        gui::WidgetFactory *_widgetFactory;
         Options& _options;
 };
 
 #endif /* _HAVE_IO_GUI_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

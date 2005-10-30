@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gui/qt_factory.hh
+ * herdstat -- src/io/gui/widgets.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,38 +20,26 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_GUI_QT_FACTORY_HH
-#define _HAVE_GUI_QT_FACTORY_HH 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/gui/gui_factory.hh"
+#include "io/gui/widgets.hh"
 
 namespace gui {
-
-class QtFactory : public GuiFactory
+/****************************************************************************/
+void
+WidgetWithTitle::set_title(const std::string& title)
 {
-    public:
-        QtFactory() { }
-        virtual ~QtFactory() { }
-
-        virtual Application *createApplication(int argc, char **argv) const;
-//        virtual Window *createWindow() const;
-//        virtual Button *createButton() const;
-//        virtual Label *createLabel() const;
-//        virtual MenuItem *createMenuItem() const;
-//        virtual Menu *createMenu() const;
-//        virtual MenuBar *createMenuBar() const;
-        virtual Tab *createTab() const;
-        virtual TabBar *createTabBar() const;
-//        virtual HBox *createHBox() const;
-//        virtual VBox *createVBox() const;
-};
-
+    _title.assign(title);
+}
+/****************************************************************************/
+const std::string&
+WidgetWithTitle::title() const
+{
+    return _title;
+}
+/****************************************************************************/
 } // namespace gui
 
-#endif /* _HAVE_GUI_QT_FACTORY_HH */
-
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

@@ -32,10 +32,6 @@
 #include "formatter.hh"
 #include "options.hh"
 
-#if defined(QT_FRONTEND) || defined(GTK_FRONTEND)
-# include "io/gui/gui_factory.hh"
-#endif
-
 class IOHandler
 {
     public:
@@ -58,4 +54,4 @@ class PrettyIOHandler : public IOHandler
 
 #endif /* _HAVE_IO_HANDLER_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

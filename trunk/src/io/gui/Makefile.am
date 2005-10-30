@@ -9,22 +9,21 @@ MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 
 noinst_LTLIBRARIES = libgui.la
 libgui_la_SOURCES = \
-	widget.hh widget.cc \
-	products.hh \
-	gui_factory.hh
+	widgets.hh widgets.cc \
+	widget_factory.hh
 
 libgui_la_LIBADD = $(QT_LIBS) $(gtkmm_LIBS)
 libgui_la_LDFLAGS = $(QT_LDFLAGS) $(QT_RPATH)
 
 if BUILD_QT_FRONTEND
-libgui_la_SOURCES += qt_factory.hh qt_factory.cc
+libgui_la_SOURCES += qt_widget_factory.hh qt_widget_factory.cc
 AM_CXXFLAGS += -Wno-long-long
 else
 AM_CXXFLAGS += -Wold-style-cast
 endif
 
 if BUILD_GTK_FRONTEND
-libgui_la_SOURCES += gtk_factory.hh gtk_factory.cc
+libgui_la_SOURCES += gtk_widget_factory.hh gtk_widget_factory.cc
 endif
 
 srchtml: $(foreach f, $(libgui_la_SOURCES), $(f).html)

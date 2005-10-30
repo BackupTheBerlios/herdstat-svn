@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gui/gtk_factory.hh
+ * herdstat -- src/io/gui/gtk_widget_factory.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,38 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_GUI_GTK_FACTORY_HH
-#define _HAVE_GUI_GTK_FACTORY_HH 1
+#ifndef _HAVE__GTK_WIDGET_FACTORY_HH
+#define _HAVE__GTK_WIDGET_FACTORY_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/gui/gui_factory.hh"
+/**
+ * @file io/gui/gtk_widget_factory.hh
+ * @brief Defines a ConcreteFactory for creating GTK+ widgets
+ */
+
+#include "io/gui/widget_factory.hh"
 
 namespace gui {
 
-class GtkFactory : public GuiFactory
-{
-    public:
-        GtkFactory() { }
-        virtual ~GtkFactory() { }
+    class GtkWidgetFactory : public WidgetFactory
+    {
+        public:
+            virtual ~GtkWidgetFactory() { }
 
-        virtual Application *createApplication(int argc, char **argv) const;
-//        virtual Window *createWindow() const;
-//        virtual Button *createButton() const;
-//        virtual Label *createLabel() const;
-//        virtual MenuItem *createMenuItem() const;
-//        virtual Menu *createMenu() const;
-//        virtual MenuBar *createMenuBar() const;
-        virtual Tab *createTab() const;
-        virtual TabBar *createTabBar() const;
-//        virtual HBox *createHBox() const;
-//        virtual VBox *createVBox() const;
-};
+            virtual Widget *createWidget() const;
+            virtual Application *createApplication(int argc, char **argv) const;
+            virtual Tab *createTab() const;
+            virtual TabBar *createTabBar() const;
+    };
 
 } // namespace gui
 
-#endif /* _HAVE_GUI_GTK_FACTORY_HH */
+#endif /* _HAVE__GTK_WIDGET_FACTORY_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

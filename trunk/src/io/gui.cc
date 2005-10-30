@@ -30,33 +30,33 @@
 #include "handler_map.hh"
 #include "action/handler.hh"
 #ifdef QT_FRONTEND
-# include <io/gui/qt_factory.hh>
+# include <io/gui/qt_widget_factory.hh>
 #endif
 #ifdef GTK_FRONTEND
-# include <io/gui/gtk_factory.hh>
+# include <io/gui/gtk_widget_factory.hh>
 #endif
-#include "io/gui/gui_factory.hh"
+#include "io/gui/widget_factory.hh"
 #include "io/gui.hh"
 
 using namespace gui;
 
 GuiIOHandler::GuiIOHandler(int argc, char **argv)
     : _argc(argc), _argv(argv),
-      _guiFactory(NULL), _options(GlobalOptions())
+      _widgetFactory(NULL), _options(GlobalOptions())
 {
 #if defined(QT_FRONTEND) && defined(GTK_FRONTEND)
     if (_options.iomethod() == "qt")
-        _guiFactory = new QtFactory();
+        _widgetFactory = new QtWidgetFactory();
     else
-        _guiFactory = new GtkFactory();
+        _widgetFactory = new GtkWidgetFactory();
 #elif defined(QT_FRONTEND)
-    _guiFactory = new QtFactory();
+    _widgetFactory = new QtWidgetFactory();
 #elif defined(GTK_FRONTEND)
-    _guiFactory = new GtkFactory();
+    _widgetFactory = new GtkWidgetFactory();
 #endif /* QT_FRONTEND && GTK_FRONTEND */
 
 #if defined(QT_FRONTEND) || defined(GTK_FRONTEND)
-    assert(_guiFactory);
+    assert(_widgetFactory);
 #endif
 }
 
@@ -64,8 +64,8 @@ bool
 GuiIOHandler::operator()(Query * const query)
 {
     /* instantiate widgets */
-    std::auto_ptr<Application> app(_guiFactory->createApplication(_argc, _argv));
-    std::auto_ptr<TabBar> tabs(_guiFactory->createTabBar());
+    std::auto_ptr<Application> app(_widgetFactory->createApplication(_argc, _argv));
+    std::auto_ptr<TabBar> tabs(_widgetFactory->createTabBar());
 
     /* setup user interface */
     
@@ -76,8 +76,8 @@ GuiIOHandler::operator()(Query * const query)
     for (i = handlers.begin() ; i != handlers.end() ; ++i)
     {
         Tab *tab = NULL;
-        if ((tab = i->second->createTab(_guiFactory)))
-            tabs->addTab(tab);
+        if ((tab = i->second->createTab(_widgetFactory)))
+            tabs->add_tab(tab);
     }
 
 
@@ -97,4 +97,4 @@ GuiIOHandler::operator()(Query * const query)
     return false;
 }
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

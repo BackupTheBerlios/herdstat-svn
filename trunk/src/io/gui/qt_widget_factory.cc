@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gui/qt_factory.cc
+ * herdstat -- src/io/gui/qt_widget_factory.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -27,9 +27,19 @@
 #include <qapplication.h>
 #include <qtabbar.h>
 
-#include "io/gui/qt_factory.hh"
+#include "io/gui/qt_widget_factory.hh"
 
 namespace gui {
+
+/*
+ * {{{ ConcreteProduct classes for Qt widgets
+ */
+
+class QtWidget : public Widget
+{
+    public:
+        virtual ~QtWidget() { }
+};
 
 class QtApplication : public Application
 {
@@ -43,45 +53,6 @@ class QtApplication : public Application
     private:
         QApplication _app;
 };
-
-//class QtWindow : public Window
-//{
-//    public:
-//        virtual ~QtWindow() { }
-//        virtual void resize(std::size_t x, std::size_t y) { }
-//};
-
-//class QtButton : public Button
-//{
-//    public:
-//        virtual ~QtButton() { }
-//};
-
-//class QtLabel : public Label
-//{
-//    public:
-//        virtual ~QtLabel() { }
-//};
-
-//class QtMenuItem : public MenuItem
-//{
-//    public:
-//        virtual ~QtMenuItem() { }
-//};
-
-//class QtMenu : public Menu
-//{
-//    public:
-//        virtual ~QtMenu() { }
-//        virtual void addMenuItem(MenuItem *item) { }
-//};
-
-//class QtMenuBar : public MenuBar
-//{
-//    public:
-//        virtual ~QtMenuBar() { }
-//        virtual void addMenu(Menu *menu) { }
-//};
 
 class QtTab : public Tab
 {
@@ -97,7 +68,7 @@ class QtTabBar : public TabBar
 {
     public:
         virtual ~QtTabBar() { }
-        virtual void addTab(Tab *tab);
+        virtual void add_tab(Tab *tab);
         virtual void show();
         virtual void resize(std::size_t x, std::size_t y);
 
@@ -105,17 +76,9 @@ class QtTabBar : public TabBar
         QTabBar _bar;
 };
 
-//class QtHBox : public HBox
-//{
-//    public:
-//        virtual ~QtHBox() { }
-//};
-
-//class QtVBox : public VBox
-//{
-//    public:
-//        virtual ~QtVBox() { }
-//};
+/*
+ * }}}
+ */
 
 void
 QtApplication::exec()
@@ -131,7 +94,7 @@ QtTab::set_title(const std::string& title)
 }
 
 void
-QtTabBar::addTab(Tab *tab)
+QtTabBar::add_tab(Tab *tab)
 {
     _bar.addTab(new QTab(tab->title()));
 }
@@ -149,22 +112,15 @@ QtTabBar::resize(std::size_t x, std::size_t y)
 }
 
 Application *
-QtFactory::createApplication(int argc, char **argv) const
+QtWidgetFactory::createApplication(int argc, char **argv) const
 {
     return new QtApplication(argc, argv);
 }
 
-//Window * QtFactory::createWindow() const { return new QtWindow(); }
-//Button * QtFactory::createButton() const { return new QtButton(); }
-//Label * QtFactory::createLabel() const { return new QtLabel(); }
-//MenuItem * QtFactory::createMenuItem() const { return new QtMenuItem(); }
-//Menu * QtFactory::createMenu() const { return new QtMenu(); }
-//MenuBar * QtFactory::createMenuBar() const { return new QtMenuBar(); }
-Tab * QtFactory::createTab() const { return new QtTab(); }
-TabBar * QtFactory::createTabBar() const { return new QtTabBar(); }
-//HBox * QtFactory::createHBox() const { return new QtHBox(); }
-//VBox * QtFactory::createVBox() const { return new QtVBox(); }
+Widget * QtWidgetFactory::createWidget() const { return new QtWidget(); }
+Tab * QtWidgetFactory::createTab() const { return new QtTab(); }
+TabBar * QtWidgetFactory::createTabBar() const { return new QtTabBar(); }
 
 } // namespace gui
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

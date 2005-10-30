@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gui/products.hh
+ * herdstat -- src/io/gui/widgets.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,16 +20,38 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_GUI_PRODUCTS_HH
-#define _HAVE_GUI_PRODUCTS_HH 1
+#ifndef _HAVE__WIDGETS_HH
+#define _HAVE__WIDGETS_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/gui/widget.hh"
+/**
+ * @file io/gui/widgets.hh
+ * @brief Abstract widget products for WidgetFactory.
+ */
+
+#include <string>
 
 namespace gui {
+
+    class Widget
+    {
+        public:
+            virtual ~Widget() { }
+    };
+
+    class WidgetWithTitle : public Widget
+    {
+        public:
+            virtual ~WidgetWithTitle() { }
+            virtual void set_title(const std::string& title);
+            virtual const std::string& title() const;
+
+        private:
+            std::string _title;
+    };
 
     class Application
     {
@@ -48,13 +70,13 @@ namespace gui {
     {
         public:
             virtual ~TabBar() { }
-            virtual void addTab(Tab *tab) = 0;
+            virtual void add_tab(Tab *tab) = 0;
             virtual void show() { }
             virtual void resize(std::size_t x, std::size_t y) { }
     };
 
 } // namespace gui
 
-#endif /* _HAVE_GUI_PRODUCTS_HH */
+#endif /* _HAVE__WIDGETS_HH */
 
-/* vim: set tw=80 sw=4 et : */
+/* vim: set tw=80 sw=4 fdm=marker et : */

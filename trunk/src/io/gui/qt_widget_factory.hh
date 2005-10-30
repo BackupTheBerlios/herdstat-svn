@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/gui/widget.cc
+ * herdstat -- src/io/gui/qt_widget_factory.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,26 +20,35 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
+#ifndef _HAVE__QT_WIDGET_FACTORY_HH
+#define _HAVE__QT_WIDGET_FACTORY_HH 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/gui/widget.hh"
+/**
+ * @file io/gui/qt_widget_factory.hh
+ * @brief Defines a ConcreteFactory for creating Qt widgets
+ */
+
+#include "io/gui/widget_factory.hh"
 
 namespace gui {
 
-void
-WidgetWithTitle::set_title(const std::string& title)
-{
-    _title.assign(title);
-}
+    class QtWidgetFactory : public WidgetFactory
+    {
+        public:
+            virtual ~QtWidgetFactory() { }
 
-const std::string&
-WidgetWithTitle::title() const
-{
-    return _title;
-}
+            virtual Widget *createWidget() const;
+            virtual Application *createApplication(int argc, char **argv) const;
+            virtual Tab *createTab() const;
+            virtual TabBar *createTabBar() const;
+    };
 
 } // namespace gui
 
-/* vim: set tw=80 sw=4 et : */
+#endif /* _HAVE__QT_WIDGET_FACTORY_HH */
+
+/* vim: set tw=80 sw=4 fdm=marker et : */
