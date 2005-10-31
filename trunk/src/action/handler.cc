@@ -24,7 +24,15 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/string.hh>
 #include "action/handler.hh"
+
+using namespace herdstat;
+
+ActionHandler::ActionHandler()
+    : options(GlobalOptions()), _err(false), _size(0)
+{
+}
 
 bool
 ActionHandler::allow_empty_query() const
@@ -38,6 +46,13 @@ ActionHandler::usage() const
 {
     /* by default, just show the action name */
     return this->id();
+}
+
+void
+ActionHandler::operator()(const Query &null, QueryResults * const results)
+{
+    results->add(util::stringify<std::size_t>(this->_size));
+    this->_size = this->_err = 0;
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

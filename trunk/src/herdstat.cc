@@ -694,6 +694,10 @@ main(int argc, char **argv)
 	    if (i->second) delete i->second;
     }
     // {{{ catches
+    catch (const ActionException)
+    {
+        return EXIT_FAILURE;
+    }
     catch (const ActionUnimplemented& e)
     {
 	std::cerr << "Invalid action '" << e.what() << "'.  Try --help."

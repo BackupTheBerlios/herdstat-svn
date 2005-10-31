@@ -43,6 +43,8 @@ class QueryResults : public herdstat::util::VectorBase<Result>
         { this->push_back(std::make_pair(field, val)); }
         void add(const std::string& field, const std::vector<std::string>& val)
         { this->push_back(std::make_pair(field, herdstat::util::join(val))); }
+        template <typename T> void add(const T& v) { this->add("", v); }
+        void add_linebreak() { this->add(""); }
 };
 
 #endif /* _HAVE_QUERY_RESULTS_HH */

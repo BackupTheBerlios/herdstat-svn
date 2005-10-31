@@ -42,7 +42,7 @@ void
 BindActionHandler::operator()(const Query& query,
                               QueryResults * const results)
 {
-    results->add("", "Unimplemented");
+    results->add("Unimplemented");
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

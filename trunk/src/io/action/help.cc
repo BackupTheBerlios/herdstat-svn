@@ -64,9 +64,9 @@ HelpActionHandler::operator()(const Query& query,
         for (i = handlers.begin() ; i != handlers.end() ; ++i)
             actions.append(i->first + " ");
 
-        results->add("", "Valid actions: " + actions);
-        results->add("", "");
+        results->add("Valid actions: " + actions);
         results->add("", "Use 'help <action>' to get usage information for the specified action.");
+        results->add_linebreak();
     }
     /* show action handler help */
     else
@@ -74,16 +74,15 @@ HelpActionHandler::operator()(const Query& query,
         ActionHandler *h = handlers[query.front().second];
         if (h)
         {
-            results->add("",
-                    util::sprintf("Help for '%s' action handler.", h->id()));
-            results->add("", "");
-            results->add("", util::sprintf("Description: %s", h->desc()));
-            results->add("", util::sprintf("Usage: %s", h->usage()));
+            results->add(util::sprintf("Help for '%s' action handler.", h->id()));
+            results->add_linebreak();
+            results->add(util::sprintf("Description: %s", h->desc()));
+            results->add(util::sprintf("Usage: %s", h->usage()));
         }
         else
         {
-            results->add("",
-                util::sprintf("Unknown action '%s'.  Run 'help' with no arguments to get a list of valid actions.",
+            results->add(util::sprintf(
+                "Unknown action '%s'.  Run 'help' with no arguments to get a list of valid actions.",
                 query.front().second.c_str()));
         }
     }

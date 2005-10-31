@@ -38,11 +38,17 @@ SetActionHandler::desc() const
     return "Set an option.";
 }
 
+const char * const
+SetActionHandler::usage() const
+{
+    return "set <option=value>";
+}
+
 void
 SetActionHandler::operator()(const Query& query,
                              QueryResults * const results)
 {
-    results->add("", "Unimplemented");
+    results->add("Unimplemented");
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

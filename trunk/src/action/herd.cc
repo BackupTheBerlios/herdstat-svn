@@ -42,7 +42,7 @@ HerdActionHandler::id() const
 const char * const
 HerdActionHandler::desc() const
 {
-    return "Get information for the given herds.";
+    return "Get information for the given herd(s).";
 }
 
 const char * const
@@ -66,33 +66,43 @@ void
 HerdActionHandler::operator()(const Query& query,
                               QueryResults * const results)
 {
-    Options& options(GlobalOptions());
-
     /* search for items in query and insert results */
-    const Herds& herds(GlobalHerdsXML().herds());
-    Herds::const_iterator h;
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+    portage::Herds::const_iterator h;
 
     for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
     {
-        if ((h = herds.find(q->second)) != herds.end())
+        try
         {
+            if ((h = herds.find(q->second)) == herds.end())
+                throw ActionException();
+
             if (not options.quiet())
             {
                 results->add("Name", h->name());
                 results->add("Email", h->email());
             }
             
-            std::vector<std::string> devs(h->begin(), h->end());
-            results->add(util::sprintf("Developers(%d)", h->size()), devs);
-        }
-        else
-            results->add("",
-                util::sprintf("Herd '%s' doesn't seem to exist.",
-                q->second.c_str()));
+            if (not options.count())
+            {
+                std::vector<std::string> devs(h->begin(), h->end());
+                results->add(util::sprintf("Developers(%d)", h->size()), devs);
+            }
 
-        if ((q+1) != query.end())
-            results->add("", "");
+            if ((q+1) != query.end())
+                results->add_linebreak();
+
+            this->size() += h->size();
+        }
+        catch (const ActionException)
+        {
+            this->error() = true;
+            results->add(util::sprintf("Herd '%s' doesn't seem to exist.",
+                q->second.c_str()));
+        }
     }
+
+    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

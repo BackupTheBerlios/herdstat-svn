@@ -36,11 +36,11 @@
 class ActionHandler
 {
     public:
+        ActionHandler();
         virtual ~ActionHandler() { }
 
         /// this handler allows empty query objects to be passed?
         virtual bool allow_empty_query() const;
-
         /// action identifier string
         virtual const char * const id() const = 0;
         /// action description string
@@ -53,14 +53,23 @@ class ActionHandler
                                 QueryResults * const results) = 0;
 
     protected:
-        friend class GuiIOHandler;
-
         /* Called by GuiIOHandler::operator() when
          * filling the TabBar. */
+        friend class GuiIOHandler;
         virtual gui::Tab *createTab(gui::WidgetFactory *factory) = 0;
 
-        std::size_t size; /* for count option */
+        /* result size (not necessarily same size as results
+         * object passed to operator()). */
+        std::size_t& size() { return _size; }
+        /* did the handler err at least once? */
+        bool& error() { return _err; }
+
+        Options& options;
         herdstat::util::ColorMap color;
+
+    private:
+        bool _err;
+        std::size_t _size;
 };
 
 #endif /* _HAVE_ACTION_HANDLER_HH */

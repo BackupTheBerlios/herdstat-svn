@@ -129,7 +129,7 @@ ReadLineIOHandler::operator()(Query * const query)
         else if (not h->allow_empty_query())
         {
             query->clear();
-            query->push_back(std::make_pair("", query->action()));
+            query->push_back(std::make_pair("", h->id()));
             h = handlers["help"];
         }
         

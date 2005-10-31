@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include "common.hh"
 #include "action/away.hh"
 
 using namespace herdstat;
@@ -60,7 +61,57 @@ void
 AwayActionHandler::operator()(const Query& query,
                               QueryResults * const results)
 {
+    portage::devaway_xml& devaway_xml(GlobalDevawayXML());
 
+//    GlobalFormatter().attrs().set_quiet(options.quiet(), " ");
+
+    const portage::Developers& devs(devaway_xml.devs());
+    portage::Developers::const_iterator d;
+
+    if (query.all())
+    {
+
+    }
+    else if (options.regex())
+    {
+
+    }
+
+    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    {
+        try
+        {
+            if ((d = devs.find(q->second)) == devs.end())
+                throw ActionException();
+
+            this->size()++;
+
+            if (not options.count())
+            {
+                portage::Developer dev(*d);
+                GlobalHerdsXML().fill_developer(dev);
+
+                if (dev.name().empty())
+                    results->add("Developer", dev.user());
+                else
+                    results->add("Developer",
+                                 dev.name() + " (" + dev.user() + ")");
+
+                results->add("Email", dev.email());
+                results->add("Away message",
+                             util::tidy_whitespace(dev.awaymsg()));
+            }
+        }
+        catch (const ActionException)
+        {
+            this->error() = true;
+            results->add(util::sprintf(
+                "Developer '%s' either doesn't exist or is not currently away.",
+                q->second.c_str()));
+        }
+    }
+
+    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
