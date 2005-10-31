@@ -36,7 +36,6 @@
 #include <herdstat/exceptions.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
-#include <herdstat/xml/init.hh>
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
@@ -599,9 +598,6 @@ main(int argc, char **argv)
 		options.set_userinfoxml(gentoocvs+"/gentoo/xml/htdocs/proj/en/devrel/roll-call/userinfo.xml");
 	}
 
-	/* initialize XML stuff */
-	Init init(options.qa());
-
 	/* setup output stream */
 	if (options.outfile() != "stdout" and options.outfile() != "stderr")
 	{
@@ -630,12 +626,6 @@ main(int argc, char **argv)
 
 	/* set locale */
 	options.outstream().imbue(std::locale(options.locale().c_str()));
-
-//        if (options.batch_mode())
-//        {
-//            options.set_quiet(true);
-//            options.set_color(false);
-//        }
 
 	/* set default action */
 	if (q.action() == "unspecified")
