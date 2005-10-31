@@ -104,17 +104,35 @@ ReadLineIOHandler::operator()(Query * const query)
 
         std::vector<std::string> parts(util::split(in));
         if (parts.empty())
+            /* should never happen since in isn't empty */
 	    throw Exception("Failed to parse input!");
 
-        ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[parts[0]];
+        /* copy the global action handler map and
+         * add our own readline-specific actions to it */
+        HandlerMap<ActionHandler> handlers(GlobalHandlerMap<ActionHandler>());
+        insert_extra_actions(handlers);        
+
+        ActionHandler *h = handlers[parts[0]];
         if (not h)
             throw ActionUnimplemented(parts[0]);
+
+        query->set_action(parts[0]);
+        init_xml_if_necessary(query->action());
 
         /* transform arguments into the query object */
         if (parts.size() > 1)
             std::transform(parts.begin() + 1, parts.end(),
                 std::back_inserter(*query), util::EmptyFirst());
-
+        /* no arguments - if the action handler doesn't allow
+         * empty query objects then set the action to the 'help'
+         * handler and display the help for that action */
+        else if (not h->allow_empty_query())
+        {
+            query->clear();
+            query->push_back(std::make_pair("", query->action()));
+            h = handlers["help"];
+        }
+        
         QueryResults results;
         (*h)(*query, &results);
         display(results);

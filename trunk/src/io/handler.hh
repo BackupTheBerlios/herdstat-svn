@@ -31,12 +31,19 @@
 #include "query_results.hh"
 #include "formatter.hh"
 #include "options.hh"
+#include "handler_map.hh"
+#include "action/handler.hh"
 
 class IOHandler
 {
     public:
         virtual ~IOHandler() { }
+
         virtual bool operator()(Query * const query) = 0;
+        virtual void insert_extra_actions(HandlerMap<ActionHandler>& h) { }
+
+    protected:
+        void init_xml_if_necessary(const std::string& action);
 };
 
 class PrettyIOHandler : public IOHandler
@@ -45,11 +52,13 @@ class PrettyIOHandler : public IOHandler
         PrettyIOHandler();
         virtual ~PrettyIOHandler() { }
 
+        virtual void insert_extra_actions(HandlerMap<ActionHandler>& h);
         void display(const QueryResults& results);
 
     protected:
         Formatter& out;
         FormatAttrs& attrs;
+        Options& opts;
 };
 
 #endif /* _HAVE_IO_HANDLER_HH */

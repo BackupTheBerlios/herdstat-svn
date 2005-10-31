@@ -38,6 +38,8 @@ StreamIOHandler::operator()(Query * const query)
     if (not h)
         throw ActionUnimplemented(query->action());
 
+    init_xml_if_necessary(query->action());
+
     QueryResults results;
     (*h)(*query, &results);
     display(results);

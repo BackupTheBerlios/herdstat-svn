@@ -70,9 +70,11 @@ class GtkTab : public Tab, public GtkWidget
 class GtkTabBar : public TabBar, public GtkWidget
 {
     public:
-        GtkTabBar();
         virtual ~GtkTabBar() { }
         virtual void add_tab(Tab *tab);
+
+    private:
+        Gtk::Notebook _bar;
 };
 
 /*
@@ -90,16 +92,11 @@ GtkWidget::~GtkWidget()
         delete _widget;
 }
 
-GtkTabBar::GtkTabBar()
-    : GtkWidget(new Gtk::Notebook())
-{
-
-}
-
 void
 GtkTabBar::add_tab(Tab *tab)
 {
-//    _bar.append_page(tab->child(), tab->title());
+    Gtk::VBox foo;
+    _bar.append_page(foo, tab->title());
 }
 
 void

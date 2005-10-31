@@ -24,21 +24,30 @@
 # include "config.h"
 #endif
 
-#include <memory>
+#include <algorithm>
 #include <herdstat/util/string.hh>
 
-#include "exceptions.hh"
-#include "handler_map.hh"
-#include "action/handler.hh"
+#include "common.hh"
+#include "xmlinit.hh"
+#include "io/action/help.hh"
+#include "io/action/set.hh"
+#include "io/action/bind.hh"
 #include "io/handler.hh"
 
 using namespace herdstat;
 
-PrettyIOHandler::PrettyIOHandler()
-    : out(GlobalFormatter()), attrs(out.attrs())
+void
+IOHandler::init_xml_if_necessary(const std::string& action)
 {
-    const Options& opts(GlobalOptions());
+    static char *actions[] = { "away", "dev", "herd", "stats" };
+    if (std::binary_search(actions, actions+NELEMS(actions), action))
+        GlobalXMLInit();
+}
 
+PrettyIOHandler::PrettyIOHandler()
+    : out(GlobalFormatter()), attrs(out.attrs()),
+      opts(GlobalOptions())
+{
     /* set common format attributes */
     attrs.set_maxlen(opts.maxcol());
     attrs.set_quiet(opts.quiet());
@@ -50,6 +59,21 @@ PrettyIOHandler::PrettyIOHandler()
     attrs.add_highlight(util::get_user_from_email(user));
     /* user-defined highlights */
     attrs.add_highlights(util::split(opts.highlights()));
+
+    /* devaway */
+    if (opts.devaway())
+    {
+        init_xml_if_necessary("away");
+        attrs.set_devaway(GlobalDevawayXML().keys());
+    }
+}
+
+void
+PrettyIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap)
+{
+    hmap.insert(std::make_pair("help", new HelpActionHandler()));
+    hmap.insert(std::make_pair("set", new SetActionHandler()));
+    hmap.insert(std::make_pair("bind", new BindActionHandler()));
 }
 
 void
@@ -59,7 +83,16 @@ PrettyIOHandler::display(const QueryResults& results)
     for (i = results.begin() ; i != results.end() ; ++i)
         out(i->first, i->second);
 
-    out.flush(GlobalOptions().outstream());
+    out.flush(opts.outstream());
+
+    if (attrs.marked_away() and not opts.count())
+    {
+        util::ColorMap color;
+        opts.outstream() << std::endl << attrs.devaway_color()
+            << "*" << color[none] << " Currently away" << std::endl;
+        
+        attrs.set_marked_away(false);
+    }
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

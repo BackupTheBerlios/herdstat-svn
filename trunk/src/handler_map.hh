@@ -33,8 +33,13 @@ template <typename T>
 class HandlerMap
     : public herdstat::util::MapBase<std::string, T*>
 {
+    public:
+        virtual ~HandlerMap() { }
+
     private:
-        template <typename U> friend HandlerMap<U>& GlobalHandlerMap();
+        template <typename U>
+        friend HandlerMap<U>& GlobalHandlerMap();
+
         HandlerMap() { }
 };
 

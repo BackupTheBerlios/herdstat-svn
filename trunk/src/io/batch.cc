@@ -62,6 +62,9 @@ BatchIOHandler::operator()(Query * const query)
     if (not h)
         throw ActionUnimplemented(parts[0]);
 
+    query->set_action(parts[0]);
+    init_xml_if_necessary(query->action());
+
     /* transform arguments into the query object */
     if (parts.size() > 1)
         std::transform(parts.begin() + 1, parts.end(),
@@ -72,7 +75,7 @@ BatchIOHandler::operator()(Query * const query)
     
     QueryResults::iterator i;
     for (i = results.begin() ; i != results.end() ; ++i)
-        options.outstream() << util::join(i->second) << std::endl;
+        options.outstream() << i->second << std::endl;
 
     return true;
 }
