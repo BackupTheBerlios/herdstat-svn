@@ -6,10 +6,10 @@ AC_INIT(src/herdstat.cc)
 
 # release versioning
 VERSION_MAJOR=1
-VERSION_MINOR=2
-VERSION_MICRO=0
-VERSION_SUFFIX=alpha
-VERSION_SUFFIX_VERSION=1
+VERSION_MINOR=1
+VERSION_MICRO=90
+VERSION_SUFFIX=
+VERSION_SUFFIX_VERSION=
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_MICRO"
 
 if ! test -z "$VERSION_SUFFIX" ; then
@@ -184,5 +184,6 @@ AC_OUTPUT(Makefile
 	  src/Makefile
 	  src/action/Makefile
 	  src/io/Makefile
+	  src/io/action/Makefile
 	  src/io/gui/Makefile
 	  tests/Makefile)
