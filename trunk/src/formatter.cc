@@ -267,7 +267,7 @@ Formatter::flush(std::ostream& stream)
 
     _attrs.set_maxlabel(_attrs.quiet() ?
                             i->first.length() :
-                            i->first.length() + 3 /* padding */);
+                            i->first.empty() ? 0 : i->first.length()+3);
 
     /* for each element in our buffer, format it and insert
      * the result into the real output buffer. */
