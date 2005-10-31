@@ -265,9 +265,13 @@ Formatter::flush(std::ostream& stream)
     buffer_type::iterator i =
         std::max_element(_buffer.begin(), _buffer.end(), FirstLengthLess());
 
-    _attrs.set_maxlabel(_attrs.quiet() ?
-                            i->first.length() :
-                            i->first.empty() ? 0 : i->first.length()+3);
+    _attrs.set_maxlabel(
+        _attrs.quiet() ?
+                i->first.length() :
+                i->first.length() == 0 ? 
+                        0 :
+                        i->first.length() + 3
+    );
 
     /* for each element in our buffer, format it and insert
      * the result into the real output buffer. */
