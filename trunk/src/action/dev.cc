@@ -179,7 +179,7 @@ DevActionHandler::operator()(const Query& query,
         }
         catch (const ActionException)
         {
-            results->add("", util::sprintf("Developer '%d' doesn't seem to exist.",
+            results->add("", util::sprintf("Developer '%s' doesn't seem to exist.",
                     q->second.c_str()));
         }
     }
