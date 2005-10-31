@@ -69,7 +69,7 @@ do_fetch(const char * const url, const char * const file)
     const std::time_t now(std::time(NULL));
 
     /* check if previously fetched copy is expired */
-    if (options.fetch() and
+    if (not options.fetch() and
         (now != static_cast<std::time_t>(-1)) and xml.exists() and
         ((now - xml.mtime()) < EXPIRE) and (xml.size() > 0))
         return;
