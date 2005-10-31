@@ -1,0 +1,19 @@
+# $Id$
+
+INCLUDES = -I$(top_builddir)/src $(libherdstat_CFLAGS)
+MAINTAINERCLEANFILES = Makefile.in *~ *.loT
+
+noinst_LTLIBRARIES = libio_action.la
+libio_action_la_SOURCES = \
+	handler.hh handler.cc \
+	help.hh help.cc \
+	set.hh set.cc \
+	bind.hh bind.cc
+
+srchtml: $(foreach f, $(libio_action_la_SOURCES), $(f).html)
+%.cc.html: %.cc
+	@echo Generating $@
+	@source-highlight -c ../../../src.css -s cpp -f html -t4 -n -i $? -o ../../../html/src/io/$@
+%.hh.html: %.hh
+	@echo Generating $@
+	@source-highlight -c ../../../src.css -s cpp -f html -t4 -n -i $? -o ../../../html/src/io/$@

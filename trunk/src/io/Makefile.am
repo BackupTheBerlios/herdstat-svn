@@ -1,6 +1,6 @@
 # $Id$
 
-SUBDIRS = gui
+SUBDIRS = action gui
 
 INCLUDES = -I$(top_builddir)/src $(libherdstat_CFLAGS)
 MAINTAINERCLEANFILES = Makefile.in *~ *.loT
@@ -12,7 +12,9 @@ libio_la_SOURCES = \
 	batch.hh batch.cc \
 	gui.hh gui.cc
 
-libio_la_LIBADD = gui/libgui.la
+libio_la_LIBADD = \
+	action/libio_action.la \
+	gui/libio_gui.la
 
 if BUILD_RL_FRONTEND
 libio_la_SOURCES += readline.hh readline.cc
