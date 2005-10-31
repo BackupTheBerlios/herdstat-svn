@@ -31,22 +31,18 @@
 #include <vector>
 #include <utility>
 
+#include <herdstat/util/string.hh>
 #include <herdstat/util/container_base.hh>
 
-typedef std::pair<std::string, std::vector<std::string> > Result;
+typedef std::pair<std::string, std::string> Result;
 
 class QueryResults : public herdstat::util::VectorBase<Result>
 {
     public:
         void add(const std::string& field, const std::string& val)
-        {
-            std::vector<std::string> v;
-            v.push_back(val);
-            this->push_back(std::make_pair(field, v));
-        }
-
-        void add(const std::string& field, const std::vector<std::string>& val)
         { this->push_back(std::make_pair(field, val)); }
+        void add(const std::string& field, const std::vector<std::string>& val)
+        { this->push_back(std::make_pair(field, herdstat::util::join(val))); }
 };
 
 #endif /* _HAVE_QUERY_RESULTS_HH */
