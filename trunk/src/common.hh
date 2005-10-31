@@ -25,6 +25,11 @@
 
 #include <string>
 #include <vector>
+
+#include <herdstat/portage/herds_xml.hh>
+#include <herdstat/portage/devaway_xml.hh>
+#include <herdstat/portage/userinfo_xml.hh>
+
 #include "options.hh"
 #include "exceptions.hh"
 
@@ -35,9 +40,17 @@
 #define USE_XMLWRAPP
 #define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
 
+#define NELEMS(x) (sizeof(x) / sizeof(x[0]))
+
 typedef std::vector<std::string> opts_type;
 
 void debug_msg(const char *, ...);
+void fetch_devawayxml();
+void fetch_herdsxml();
+
+herdstat::portage::herds_xml& GlobalHerdsXML();
+herdstat::portage::devaway_xml& GlobalDevawayXML();
+herdstat::portage::userinfo_xml& GlobalUserinfoXML();
 
 #endif
 
