@@ -41,6 +41,12 @@ FindActionHandler::desc() const
     return "Find packages matching the given criteria.";
 }
 
+const char * const
+FindActionHandler::usage() const
+{
+    return "find <package(s)>";
+}
+
 Tab *
 FindActionHandler::createTab(WidgetFactory *widgetFactory)
 {

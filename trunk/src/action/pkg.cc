@@ -41,6 +41,12 @@ PkgActionHandler::desc() const
     return "Find packages maintained by the given herd/developer.";
 }
 
+const char * const
+PkgActionHandler::usage() const
+{
+    return "pkg <herd(s)|developer(s)>";
+}
+
 Tab *
 PkgActionHandler::createTab(WidgetFactory *widgetFactory)
 {

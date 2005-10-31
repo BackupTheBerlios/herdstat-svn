@@ -27,9 +27,7 @@
 # include "config.h"
 #endif
 
-#include <herdstat/portage/herds_xml.hh>
-#include <herdstat/portage/devaway_xml.hh>
-#include <herdstat/portage/userinfo_xml.hh>
+#include <herdstat/util/misc.hh>
 
 #include "query.hh"
 #include "query_results.hh"
@@ -40,10 +38,15 @@ class ActionHandler
     public:
         virtual ~ActionHandler() { }
 
+        /// this handler allows empty query objects to be passed?
+        virtual bool allow_empty_query() const;
+
         /// action identifier string
         virtual const char * const id() const = 0;
         /// action description string
         virtual const char * const desc() const = 0;
+        /// action usage string
+        virtual const char * const usage() const;
 
         /// perform action
         virtual void operator()(const Query& query,
@@ -55,19 +58,9 @@ class ActionHandler
         /* Called by GuiIOHandler::operator() when
          * filling the TabBar. */
         virtual gui::Tab *createTab(gui::WidgetFactory *factory) = 0;
-};
 
-class XMLActionHandler : public ActionHandler
-{
-    public:
-        virtual ~XMLActionHandler() { }
-
-    protected:
-        void fetch_and_parse();
-
-        herdstat::portage::herds_xml herds_xml;
-        herdstat::portage::devaway_xml devaway_xml;
-        herdstat::portage::userinfo_xml userinfo_xml;
+        std::size_t size; /* for count option */
+        herdstat::util::ColorMap color;
 };
 
 #endif /* _HAVE_ACTION_HANDLER_HH */

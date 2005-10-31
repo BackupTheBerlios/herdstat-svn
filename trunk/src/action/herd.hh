@@ -29,14 +29,14 @@
 
 #include "action/handler.hh"
 
-class HerdActionHandler : public XMLActionHandler
+class HerdActionHandler : public ActionHandler
 {
     public:
         virtual ~HerdActionHandler() { }
 
         virtual const char * const id() const;
         virtual const char * const desc() const;
-
+        virtual const char * const usage() const;
         virtual void operator()(const Query& query,
                                 QueryResults * const results);
 

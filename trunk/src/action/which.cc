@@ -41,6 +41,12 @@ WhichActionHandler::desc() const
     return "Like which(1) but for ebuilds.  Gets the path to the latest ebuild for the given package.";
 }
 
+const char * const
+WhichActionHandler::usage() const
+{
+    return "which <package(s)>";
+}
+
 Tab *
 WhichActionHandler::createTab(WidgetFactory *widgetFactory)
 {

@@ -41,6 +41,12 @@ VersionsActionHandler::desc() const
     return "Show version information for the given package(s).";
 }
 
+const char * const
+VersionsActionHandler::usage() const
+{
+    return "versions <package(s)>";
+}
+
 Tab *
 VersionsActionHandler::createTab(WidgetFactory *widgetFactory)
 {

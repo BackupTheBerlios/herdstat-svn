@@ -41,6 +41,12 @@ KeywordsActionHandler::desc() const
     return "Get keywords for the given packages.";
 }
 
+const char * const
+KeywordsActionHandler::usage() const
+{
+    return "keywords <package(s)>";
+}
+
 void
 KeywordsActionHandler::operator()(const Query& query,
                                   QueryResults * const results)

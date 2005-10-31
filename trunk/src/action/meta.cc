@@ -41,6 +41,12 @@ MetaActionHandler::desc() const
     return "Get metadata information for the given category/package.";
 }
 
+const char * const
+MetaActionHandler::usage() const
+{
+    return "meta <package(s)|categor(y|ies)>";
+}
+
 Tab *
 MetaActionHandler::createTab(WidgetFactory *widgetFactory)
 {

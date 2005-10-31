@@ -24,91 +24,20 @@
 # include "config.h"
 #endif
 
-#include <iostream>
-#include <herdstat/exceptions.hh>
-#include <herdstat/fetcher/fetcher.hh>
-#include <herdstat/util/string.hh>
-#include <herdstat/util/file.hh>
-
 #include "action/handler.hh"
-#include "common.hh"
 
-#define HERDSXML_REMOTE "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"
-#define HERDSXML_LOCAL  LOCALSTATEDIR"/herds.xml"
-#define DEVAWAYXML_REMOTE "http://dev.gentoo.org/devaway/xml/index.php"
-#define DEVAWAYXML_LOCAL  LOCALSTATEDIR"/devaway.xml"
-#define EXPIRE 86400 /* 24hrs */
-
-using namespace herdstat;
-
-static void
-do_fetch(const char * const url, const char * const file)
+bool
+ActionHandler::allow_empty_query() const
 {
-    Options& options(GlobalOptions());
-    util::Stat xml(file);
-    const std::time_t now(std::time(NULL));
-    
-    /* check if previously fetched copy is expired */
-    if ((options.fetch()) and
-        (now != static_cast<std::time_t>(-1)) and xml.exists() and
-        ((now - xml.mtime()) < EXPIRE) and (xml.size() > 0))
-        return;
-    /* exists but expired */
-    else if (xml.exists() and (xml.size() > 0))
-        /* back it up in case fetching fais */
-        util::copy_file(xml.path(), xml.path()+".bak");
-
-    try
-    {
-        FetcherOptions fetchopts;
-        fetchopts.set_verbose(options.verbose());
-        fetchopts.set_debug(options.debug());
-
-        Fetcher fetch(fetchopts);
-            
-        fetch(url, xml.path());
-
-        if (not xml() or (xml.size() == 0))
-            throw FetchException();
-
-        /* remove backup */
-        unlink((xml.path()+".bak").c_str());
-    }
-    catch (const FetchException& e)
-    {
-        std::cerr << "Error fetching " << url << std::endl;
-
-        if (util::is_file(xml.path()+".bak"))
-        {
-            std::cerr << "Using cached copy..." << std::endl;
-            util::move_file(xml.path()+".bak", xml.path());
-        }
-
-        if (not xml())
-            throw;
-        else if (xml.size() == 0)
-        {
-            unlink(xml.path().c_str());
-            throw;
-        }
-    }
+    /* by default, action handlers require a non-empty query object */
+    return false;
 }
 
-void
-XMLActionHandler::fetch_and_parse()
+const char * const
+ActionHandler::usage() const
 {
-    Options& options(GlobalOptions());
-
-    if (options.herdsxml().empty())
-        do_fetch(HERDSXML_REMOTE, HERDSXML_LOCAL);
-
-    if (options.devaway() and options.devawayxml().empty())
-        do_fetch(DEVAWAYXML_REMOTE, DEVAWAYXML_LOCAL);
-
-    herds_xml.parse();
-
-    if (options.devaway())
-        devaway_xml.parse();
+    /* by default, just show the action name */
+    return this->id();
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

@@ -25,6 +25,8 @@
 #endif
 
 #include <herdstat/util/string.hh>
+
+#include "common.hh"
 #include "action/herd.hh"
 
 using namespace herdstat;
@@ -41,6 +43,12 @@ const char * const
 HerdActionHandler::desc() const
 {
     return "Get information for the given herds.";
+}
+
+const char * const
+HerdActionHandler::usage() const
+{
+    return "herd <herd(s)>";
 }
 
 Tab *
@@ -61,9 +69,7 @@ HerdActionHandler::operator()(const Query& query,
     Options& options(GlobalOptions());
 
     /* search for items in query and insert results */
-    fetch_and_parse();
-
-    const Herds& herds(herds_xml.herds());
+    const Herds& herds(GlobalHerdsXML().herds());
     Herds::const_iterator h;
 
     for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
@@ -79,6 +85,13 @@ HerdActionHandler::operator()(const Query& query,
             std::vector<std::string> devs(h->begin(), h->end());
             results->add(util::sprintf("Developers(%d)", h->size()), devs);
         }
+        else
+            results->add("",
+                util::sprintf("Herd '%s' doesn't seem to exist.",
+                q->second.c_str()));
+
+        if ((q+1) != query.end())
+            results->add("", "");
     }
 }
 
