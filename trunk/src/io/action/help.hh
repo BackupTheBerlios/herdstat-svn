@@ -33,7 +33,7 @@ class HelpActionHandler : public IOActionHandler
 {
     public:
         virtual ~HelpActionHandler() { }
-
+        virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;
 

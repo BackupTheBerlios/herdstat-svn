@@ -31,6 +31,12 @@
 
 using namespace herdstat;
 
+bool
+HelpActionHandler::allow_empty_query() const
+{
+    return true;
+}
+
 const char * const
 HelpActionHandler::id() const
 {
