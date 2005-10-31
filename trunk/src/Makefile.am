@@ -12,6 +12,7 @@ herdstat_SOURCES = \
 	options.hh options.cc \
 	common.hh common.cc \
 	rc.hh rc.cc \
+	xmlinit.hh xmlinit.cc \
 	formatter.hh formatter.cc \
 	pkgquery.hh pkgquery.cc \
 	pkgcache.hh pkgcache.cc \
