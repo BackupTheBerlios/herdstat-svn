@@ -110,7 +110,7 @@ class Options : private herdstat::noncopyable
         const std::string& locale() const { return _locale; }
         void set_locale(const std::string& v) { _locale.assign(v); }
         const std::string& prompt() const { return _prompt; }
-        void set_prompt(const std::string& v) { _prompt.assign(v); }
+        void set_prompt(const std::string& v) { _prompt.assign(v+" "); }
 
         const fields_type& fields() const { return _fields; }
         void add_field(const fields_type::value_type v) { _fields.push_back(v); }

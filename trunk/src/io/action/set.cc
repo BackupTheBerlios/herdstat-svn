@@ -65,12 +65,10 @@ SetActionHandler::operator()(const Query& query,
 
             /* remove any begin/end quotes */
             char begin(val[0]), end(val[val.length() - 1]);
-            if ((begin == '\'' and end == '\'') or
-                (begin == '"'  and end == '"'))
-            {
+            if (begin == '\'' or begin == '"')
                 val.erase(0, 1);
+            if (end == '\'' or end == '"')
                 val.erase(val.length() - 1);
-            }
 
             FormatAttrs& attrs(GlobalFormatter().attrs());
 
