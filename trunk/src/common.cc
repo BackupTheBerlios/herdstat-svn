@@ -150,4 +150,11 @@ GlobalUserinfoXML()
     return u;
 }
 
+util::ColorMap&
+GlobalColorMap()
+{
+    static util::ColorMap c;
+    return c;
+}
+
 /* vim: set tw=80 sw=4 fdm=marker et : */

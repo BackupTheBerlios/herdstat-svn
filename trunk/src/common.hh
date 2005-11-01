@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include <herdstat/util/misc.hh>
 #include <herdstat/portage/herds_xml.hh>
 #include <herdstat/portage/devaway_xml.hh>
 #include <herdstat/portage/userinfo_xml.hh>
@@ -51,6 +52,7 @@ void fetch_herdsxml();
 herdstat::portage::herds_xml& GlobalHerdsXML();
 herdstat::portage::devaway_xml& GlobalDevawayXML();
 herdstat::portage::userinfo_xml& GlobalUserinfoXML();
+herdstat::util::ColorMap& GlobalColorMap();
 
 #endif
 
