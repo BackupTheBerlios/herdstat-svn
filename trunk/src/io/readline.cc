@@ -94,7 +94,7 @@ ReadLineIOHandler::operator()(Query * const query)
         std::string in;
 
         /* TODO: allow action binding and show current action in the prompt. */
-        get_input(PACKAGE"> ", &in);
+        get_input(options.prompt(), &in);
 
         /* empty, so just call ourselves again and display another prompt */
         if (in.empty())
@@ -121,8 +121,15 @@ ReadLineIOHandler::operator()(Query * const query)
 
         /* transform arguments into the query object */
         if (parts.size() > 1)
-            std::transform(parts.begin() + 1, parts.end(),
+        {
+            parts.erase(parts.begin());
+
+            if (parts.front() == "all")
+                query->set_all(true);
+            
+            std::transform(parts.begin(), parts.end(),
                 std::back_inserter(*query), util::EmptyFirst());
+        }
         /* no arguments - if the action handler doesn't allow
          * empty query objects then set the action to the 'help'
          * handler and display the help for that action */
