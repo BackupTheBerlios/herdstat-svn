@@ -29,11 +29,11 @@
 
 #include "action/handler.hh"
 
-class MetaActionHandler : public ActionHandler
+class MetaActionHandler : public PortageSearchActionHandler
 {
     public:
         virtual ~MetaActionHandler() { }
-
+        virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
