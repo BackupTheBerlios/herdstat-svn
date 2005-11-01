@@ -34,15 +34,24 @@ using namespace herdstat;
 bool
 StreamIOHandler::operator()(Query * const query)
 {
-    ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[query->action()];
-    if (not h)
-        throw ActionUnimplemented(query->action());
-
-    init_xml_if_necessary(query->action());
-
     QueryResults results;
-    (*h)(*query, &results);
-    display(results);
+
+    try
+    {
+        ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[query->action()];
+        if (not h)
+            throw ActionUnimplemented(query->action());
+
+        init_xml_if_necessary(query->action());
+
+        (*h)(*query, &results);
+        display(results);
+    }
+    catch (const ActionException)
+    {
+        display(results);
+        throw;
+    }
 
     return true;
 }
