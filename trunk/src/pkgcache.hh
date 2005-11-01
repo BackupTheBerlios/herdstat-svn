@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include "options.hh"
 #include <herdstat/cachable.hh>
 #include <herdstat/portage/package_list.hh>
 
