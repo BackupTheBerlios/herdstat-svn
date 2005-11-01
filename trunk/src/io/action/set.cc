@@ -24,7 +24,11 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/string.hh>
+#include "formatter.hh"
 #include "io/action/set.hh"
+
+using namespace herdstat;
 
 const char * const
 SetActionHandler::id() const
@@ -48,7 +52,72 @@ void
 SetActionHandler::operator()(const Query& query,
                              QueryResults * const results)
 {
-    results->add("Unimplemented");
+    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    {
+        try
+        {
+            std::vector<std::string> parts(util::split(q->second, '='));
+            if (parts.size() != 2)
+                throw Exception("Failed to parse option. Use option=value.");
+        
+            const std::string& key(parts.front());
+            const std::string& val(parts.back());
+
+            FormatAttrs& attrs(GlobalFormatter().attrs());
+
+#define SET_INT_IF_EQUAL(type, x) \
+            if (key == #x) options.set_##x(util::destringify<type>(val));
+#define SET_STR_IF_EQUAL(x) \
+            if (key == #x) options.set_##x(val);
+
+            if (key == "quiet")
+            {
+                const bool v(util::destringify<bool>(val));
+                options.set_quiet(v);
+                options.set_color(not v);
+                attrs.set_quiet(v);
+            }
+            else if (key == "colors")
+            {
+                const bool v(util::destringify<bool>(val));
+                options.set_color(v);
+                attrs.set_colors(v);
+            }
+            else SET_INT_IF_EQUAL(bool, verbose)
+            else SET_INT_IF_EQUAL(bool, overlay)
+            else SET_INT_IF_EQUAL(bool, regex)
+            else if (key == "eregex")
+            {
+                options.set_regex(true);
+                options.set_eregex(true);
+            }
+            else SET_INT_IF_EQUAL(bool, qa)
+            else SET_INT_IF_EQUAL(bool, metacache)
+            else SET_INT_IF_EQUAL(bool, querycache)
+            else SET_INT_IF_EQUAL(bool, devaway)
+            else SET_INT_IF_EQUAL(int, querycache_max)
+            else SET_INT_IF_EQUAL(long, querycache_expire)
+            else SET_INT_IF_EQUAL(size_t, maxcol)
+            else SET_STR_IF_EQUAL(cvsdir)
+            else SET_STR_IF_EQUAL(herdsxml)
+            else SET_STR_IF_EQUAL(devawayxml)
+            else SET_STR_IF_EQUAL(userinfoxml)
+            else SET_STR_IF_EQUAL(localstatedir)
+            else SET_STR_IF_EQUAL(locale)
+            else SET_STR_IF_EQUAL(labelcolor)
+            else SET_STR_IF_EQUAL(hlcolor)
+            else SET_STR_IF_EQUAL(metacache_expire)
+            else SET_STR_IF_EQUAL(prompt)
+            else throw Exception("Unknown option '%s'.", key.c_str());
+
+#undef SET_INT_IF_EQUAL
+#undef SET_STR_IF_EQUAL
+        }
+        catch (const Exception& e)
+        {
+            results->add(e.what());
+        }
+    }
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
