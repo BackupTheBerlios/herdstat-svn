@@ -25,13 +25,92 @@
 #endif
 
 #include <herdstat/util/string.hh>
+#include <herdstat/util/algorithm.hh>
+#include <herdstat/util/functional.hh>
 
 #include "common.hh"
 #include "action/herd.hh"
 
 using namespace herdstat;
-using namespace herdstat::portage;
 using namespace gui;
+
+void
+add_herd(const portage::Herd& herd, QueryResults * const results)
+{
+    const Options& options(GlobalOptions());
+
+    if (not options.quiet())
+    {
+        if (not herd.name().empty())
+            results->add("Herd", herd.name());
+        if (not herd.email().empty())
+            results->add("Email", herd.email());
+        if (not herd.desc().empty())
+            results->add("Description", util::tidy_whitespace(herd.desc()));
+
+        if (options.verbose())
+            results->add(util::sprintf("Developers(%d)", herd.size()), "");
+    }
+
+    if (options.verbose() and not options.quiet())
+    {
+        util::ColorMap& color(GlobalColorMap());
+        const std::string user(util::current_user());
+
+        portage::Herd::const_iterator i;
+        for (i = herd.begin() ; i != herd.end() ; ++i)
+        {
+            if ((i->user() == user) or not options.color())
+                results->add(i->email());
+            else
+                results->add(color[blue] + i->email() + color[none]);
+
+            if (not i->name().empty())
+                results->add(i->name());
+            if (not i->role().empty())
+                results->add(i->role());
+            if (not i->name().empty() or not i->role().empty())
+                results->add_linebreak();
+        }
+    }
+
+    if ((not options.verbose() and not options.quiet()) or
+        (not options.verbose() and options.quiet() and not options.count()))
+    {
+        std::vector<std::string> devs(herd);
+        results->add(util::sprintf("Developers(%d)", devs.size()), devs);
+    }
+}
+
+static void
+add_herds(const portage::Herds& herds, QueryResults * const results)
+{
+    const Options& options(GlobalOptions());
+    util::ColorMap& color(GlobalColorMap());
+
+    if (options.verbose() and not options.quiet())
+    {
+        results->add(util::sprintf("Herds(%d)", herds.size()), "");
+
+        portage::Herds::size_type n = 1;
+        portage::Herds::const_iterator h;
+        for (h = herds.begin() ; h != herds.end() ; ++h)
+        {
+            if (options.color())
+                results->add(color[blue] + h->name() + color[none]);
+            else
+                results->add(h->name());
+
+            if (not h->desc().empty())
+                results->add(util::tidy_whitespace(h->desc()));
+
+            if (not options.count() and n != herds.size())
+                results->add_linebreak();
+        }
+    }
+    else if (not options.count())
+        results->add(util::sprintf("Herds(%d)", herds.size()), herds);
+}
 
 const char * const
 HerdActionHandler::id() const
@@ -63,12 +142,34 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-HerdActionHandler::operator()(const Query& query,
+HerdActionHandler::operator()(const Query& qq,
                               QueryResults * const results)
 {
+    Query query(qq);
+
     /* search for items in query and insert results */
     const portage::Herds& herds(GlobalHerdsXML().herds());
     portage::Herds::const_iterator h;
+
+    if (query.all())
+    {
+        add_herds(herds, results);
+        this->size() = herds.size();
+        ActionHandler::operator()(query, results);
+        return;
+    }
+    else if (options.regex())
+    {
+        regexp.assign(query.front().second);
+        query.clear();
+
+        std::vector<std::string> rvec;
+        util::transform_if(herds.begin(), herds.end(), std::back_inserter(rvec),
+            std::bind1st(portage::NameRegexMatch<portage::Herd>(), regexp),
+            portage::Name());
+        std::transform(rvec.begin(), rvec.end(),
+            std::back_inserter(query), util::EmptyFirst());
+    }
 
     for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
     {
@@ -99,6 +200,9 @@ HerdActionHandler::operator()(const Query& query,
             this->error() = true;
             results->add(util::sprintf("Herd '%s' doesn't seem to exist.",
                 q->second.c_str()));
+
+            if (options.iomethod() == "stream")
+                throw;
         }
     }
 

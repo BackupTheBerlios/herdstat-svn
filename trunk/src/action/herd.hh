@@ -45,6 +45,10 @@ class HerdActionHandler : public ActionHandler
             createTab(gui::WidgetFactory *factory);
 };
 
+/* add info from given herd to query results */
+void add_herd(const herdstat::portage::Herd& herd,
+              QueryResults * const results);
+
 #endif /* _HAVE_ACTION_HERD_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
