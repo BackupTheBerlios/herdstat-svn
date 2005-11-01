@@ -28,44 +28,39 @@
 #include <herdstat/util/string.hh>
 
 #include "common.hh"
+#include "query_results.hh"
 #include "overlaydisplay.hh"
 
 using namespace herdstat;
 
-OverlayDisplay::OverlayDisplay()
-    : _options(GlobalOptions())
+OverlayDisplay::OverlayDisplay(QueryResults * const results)
+    : _options(GlobalOptions()), _results(results)
 {
 }
 
 OverlayDisplay::~OverlayDisplay()
 {
-    if (_options.quiet() or this->empty())
+    if (_options.quiet() or _oset.empty())
         return;
 
-    _options.outstream() << std::endl << "Portage overlays:"
-        << std::endl;
+    _results->add_linebreak();
+    _results->add("Portage overlays:");
 
-    for (iterator i = this->begin() ; i != this->end() ; ++i)
-    {
-        _options.outstream() << " " << this->operator[](i->first) << " "
-            << i->first << std::endl;
-    }
+    for (iterator i = _oset.begin() ; i != _oset.end() ; ++i)
+        _results->add(" " + this->operator[](i->first) + " " + i->first);
 }
 
 std::string
-OverlayDisplay::operator[] (const std::string& overlay)
+OverlayDisplay::operator[] (const std::string& overlay) const
 {
     if (_options.quiet())
         return std::string();
 
     /* cant use find() as we dont now the second value of the pair */
     iterator i;
-    for (i = this->begin() ; i != this->end() ; ++i)
-    {
-        if (i->first == overlay)
-            break;
-    }
-    assert(i != this->end());
+    for (i = _oset.begin() ; i != _oset.end() ; ++i)
+        if (i->first == overlay) break;
+    assert(i != _oset.end());
 
     if (_options.color())
     {
@@ -81,13 +76,10 @@ void
 OverlayDisplay::insert(const std::string& overlay)
 {
     /* cant use find() as we dont now the second value of the pair */
-    for (iterator i = this->begin() ; i != this->end() ; ++i)
-    {
-        if (i->first == overlay)
-            return;
-    }
+    for (iterator i = _oset.begin() ; i != _oset.end() ; ++i)
+        if (i->first == overlay) return;
 
-    base_type::insert(value_type(overlay, this->size() + 1));
+    _oset.insert(value_type(overlay, _oset.size() + 1));
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

@@ -30,7 +30,6 @@
 #include <string>
 #include <utility>
 #include <herdstat/util/functional.hh>
-#include <herdstat/util/container_base.hh>
 
 #include "options.hh"
 
@@ -39,25 +38,33 @@
  * Displays the overlay list (in order) upon destruction.
  */
 
+class QueryResults;
+
 class OverlayDisplay
-    // implemented-in-terms-of 'set<pair<string, size_t>, SecondLess>'
-    : private herdstat::util::SetBase<
-        std::pair<std::string, std::size_t>, herdstat::util::SecondLess>
 {
-    typedef herdstat::util::SetBase<std::pair<std::string, std::size_t>,
-                                    herdstat::util::SecondLess> base_type;
-
     public:
-        OverlayDisplay();
-        virtual ~OverlayDisplay();
+        typedef std::set<std::pair<std::string, std::size_t>,
+                         herdstat::util::SecondLess> container_type;
+        typedef container_type::size_type size_type;
+        typedef container_type::value_type value_type;
+        typedef container_type::iterator iterator;
+        typedef container_type::const_iterator const_iterator;
 
-        // Get "[N]" string where N is the number of the given overlay.
-        std::string operator[](const std::string& k);
-        // Insert new overlay
+        OverlayDisplay(QueryResults * const results);
+        ~OverlayDisplay();
+
+        // Get a "[N]" string where N is the number of the given overlay.
+        std::string operator[](const std::string& k) const;
+        // insert new overlay
         void insert(const std::string& overlay);
+
+        bool empty() const { return _oset.empty(); }
+        size_type size() const { return _oset.size(); }
 
     private:
         Options& _options;
+        QueryResults * const _results;
+        container_type _oset;
 };
 
 #endif /* HAVE_OVERLAYDISPLAY_HH */

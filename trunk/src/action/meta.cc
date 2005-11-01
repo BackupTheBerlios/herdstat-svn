@@ -231,7 +231,7 @@ MetaActionHandler::operator()(const Query& qq,
                               QueryResults * const results)
 {
     Query query(qq);
-    OverlayDisplay od;
+    OverlayDisplay od(results);
     bool pwd = false;
     std::string dir;
 
