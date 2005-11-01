@@ -57,8 +57,8 @@ PrettyIOHandler::PrettyIOHandler()
 
     /* add highlights */
     const std::string user(util::current_user());
-    attrs.add_highlight(user);
-    attrs.add_highlight(util::get_user_from_email(user));
+    attrs.add_highlight("^"+user+"$");
+    attrs.add_highlight("^"+util::get_user_from_email(user)+"$");
     /* user-defined highlights */
     attrs.add_highlights(util::split(opts.highlights()));
 
