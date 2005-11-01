@@ -289,7 +289,7 @@ help()
 // }}}
 
 static void
-parse_fields(const std::vector<std::string>& fields)
+parse_fields(const std::vector<std::string>& fields, Options *options)
 {
     /* --field */
     std::vector<std::string>::const_iterator i;
@@ -299,7 +299,7 @@ parse_fields(const std::vector<std::string>& fields)
 	if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
 	    throw argsInvalidField();
 
-	GlobalOptions().add_field(std::make_pair(parts[0], parts[1]));
+        options->add_field(std::make_pair(parts[0], parts[1]));
     }
 }
 
@@ -527,7 +527,7 @@ handle_opts(int argc, char **argv, Query *q)
     // }}}
 
     /* --field */
-    parse_fields(fields);
+    parse_fields(fields, &options);
 
     if (optind < argc)
 	std::transform(argv+optind, argv+argc,
@@ -560,6 +560,14 @@ main(int argc, char **argv)
     Options& options(GlobalOptions());
     std::ostream *outstream = NULL;
 
+    /* set iomethod based on argv[0] */
+    if (util::basename(argv[0]) == PACKAGE"-rl")
+        options.set_iomethod("readline");
+    else if (util::basename(argv[0]) == PACKAGE"-gtk")
+        options.set_iomethod("gtk");
+    else if (util::basename(argv[0]) == PACKAGE"-qt")
+        options.set_iomethod("qt");
+
     /* we need to know if -T or --TEST was specified before 
      * we parse the command line options. */
     const bool test = ((argc > 1) and
@@ -583,6 +591,9 @@ main(int argc, char **argv)
 	/* handle command line options */
 	if (not handle_opts(argc, argv, &q))
 	    throw argsException();
+
+        if (not q.empty() and q.front().second == "all")
+            q.set_all(true);
 
 	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
 	if (not options.cvsdir().empty())
