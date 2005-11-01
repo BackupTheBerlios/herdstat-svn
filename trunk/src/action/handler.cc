@@ -25,12 +25,15 @@
 #endif
 
 #include <herdstat/util/string.hh>
+
+#include "common.hh"
 #include "action/handler.hh"
 
 using namespace herdstat;
 
 ActionHandler::ActionHandler()
-    : options(GlobalOptions()), _err(false), _size(0)
+    : options(GlobalOptions()),
+      color(GlobalColorMap()), _err(false), _size(0)
 {
 }
 
@@ -56,6 +59,15 @@ ActionHandler::operator()(const Query &null, QueryResults * const results)
         results->add(util::stringify<std::size_t>(this->_size));
 
     this->_size = this->_err = 0;
+}
+
+void
+PortageSearchActionHandler::operator()(const Query& null,
+                                       QueryResults * const results)
+{
+    ActionHandler::operator()(null, results);
+    matches.clear();
+    search_timer.reset();
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

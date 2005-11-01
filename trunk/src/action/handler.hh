@@ -27,7 +27,10 @@
 # include "config.h"
 #endif
 
+#include <map>
 #include <herdstat/util/misc.hh>
+#include <herdstat/util/timer.hh>
+#include <herdstat/util/regex.hh>
 
 #include "query.hh"
 #include "query_results.hh"
@@ -65,11 +68,25 @@ class ActionHandler
         bool& error() { return _err; }
 
         Options& options;
-        herdstat::util::ColorMap color;
+        herdstat::util::ColorMap& color;
+        herdstat::util::Regex regexp;
 
     private:
         bool _err;
         std::size_t _size;
+};
+
+class PortageSearchActionHandler : public ActionHandler
+{
+    public:
+        virtual ~PortageSearchActionHandler() { }
+
+        virtual void operator()(const Query& query,
+                                QueryResults * const results) = 0;
+
+    protected:
+        std::multimap<std::string, std::string> matches;
+        herdstat::util::Timer search_timer;
 };
 
 #endif /* _HAVE_ACTION_HANDLER_HH */
