@@ -29,7 +29,7 @@
 
 #include "action/handler.hh"
 
-class FindActionHandler : public ActionHandler
+class FindActionHandler : public PortageSearchActionHandler
 {
     public:
         virtual ~FindActionHandler() { }
@@ -41,8 +41,7 @@ class FindActionHandler : public ActionHandler
                                 QueryResults * const results);
 
     protected:
-        virtual gui::Tab*
-            createTab(gui::WidgetFactory *factory);
+        virtual gui::Tab *createTab(gui::WidgetFactory *factory);
 };
 
 #endif /* _HAVE_FIND_HH */

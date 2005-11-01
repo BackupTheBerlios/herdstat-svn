@@ -24,6 +24,15 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
+#include <iterator>
+#include <herdstat/util/functional.hh>
+#include <herdstat/portage/find.hh>
+#include <herdstat/portage/exceptions.hh>
+
+#include "exceptions.hh"
+#include "pkgcache.hh"
+#include "action/meta.hh"
 #include "action/find.hh"
 
 using namespace herdstat;
@@ -60,7 +69,101 @@ void
 FindActionHandler::operator()(const Query& query,
                               QueryResults * const results)
 {
+    if (query.all())
+    {
+        results->add("'find' handler does not support the all target.");
+        return;
+    }
 
+    static pkgcache pkgcache(options.portdir());
+
+    if (options.regex())
+    {
+        regexp.assign(query.front().second);
+
+        matches = portage::find_package_regex(regexp, options.overlay(),
+                        &search_timer, pkgcache);
+
+        if (matches.empty())
+        {
+            results->add(util::sprintf("Failed to find any packages matching '%s'.",
+                         regexp().c_str()));
+            return;
+        }
+    }
+    else
+        std::transform(query.begin(), query.end(),
+            std::inserter(matches, matches.end()), util::EmptyFirst());
+
+    std::vector<std::string> res;
+    std::multimap<std::string, std::string>::iterator m;
+    for (m = matches.begin() ; m != matches.end() ; ++m)
+    {
+        std::pair<std::string, std::string> p;
+
+        try
+        {
+            if (options.regex())
+                p = *m;
+            else
+                p = portage::find_package(m->second, options.overlay(),
+                                &search_timer, pkgcache);
+        }
+        catch (const portage::AmbiguousPkg& e)
+        {
+            /* ambiguous still matches */
+            res.insert(res.end(), e.packages.begin(), e.packages.end());
+            continue;
+        }
+        catch (const portage::NonExistentPkg& e)
+        {
+            results->add(m->second + " doesn't seem to exist.");
+
+            if (matches.size() == 1 and options.iomethod() == "stream")
+                throw ActionException();
+
+            continue;
+        }
+
+        res.push_back(p.second);
+    }
+
+    if (res.size() > 1)
+    {
+        std::sort(res.begin(), res.end());
+        res.erase(std::unique(res.begin(), res.end()), res.end());
+    }
+
+    if (options.meta())
+    {
+        const bool re = options.regex();
+        const bool ere = options.eregex();
+
+        /* disable stuff we've already handled */
+        options.set_regex(false);
+        options.set_eregex(false);
+
+        Query q;
+        std::transform(res.begin(), res.end(),
+            std::back_inserter(q), util::EmptyFirst());
+
+        MetaActionHandler mhandler;
+        mhandler(q, results);
+
+        options.set_regex(re);
+        options.set_eregex(ere);
+    }
+    else if (not options.count())
+    {
+        if (res.size() == 1)
+            results->add(res.front());
+        else
+            std::transform(res.begin(), res.end(),
+                std::back_inserter(*results), util::EmptyFirst());
+    }
+
+    this->size() = res.size();
+    PortageSearchActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
