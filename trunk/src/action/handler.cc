@@ -51,7 +51,10 @@ ActionHandler::usage() const
 void
 ActionHandler::operator()(const Query &null, QueryResults * const results)
 {
-    results->add(util::stringify<std::size_t>(this->_size));
+    /* show count, if requested */
+    if (options.count() and not this->error())
+        results->add(util::stringify<std::size_t>(this->_size));
+
     this->_size = this->_err = 0;
 }
 
