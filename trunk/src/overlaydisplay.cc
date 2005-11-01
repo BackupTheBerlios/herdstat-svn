@@ -27,7 +27,7 @@
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/string.hh>
 
-#include "options.hh"
+#include "common.hh"
 #include "overlaydisplay.hh"
 
 using namespace herdstat;
@@ -69,7 +69,7 @@ OverlayDisplay::operator[] (const std::string& overlay)
 
     if (_options.color())
     {
-        util::ColorMap color;
+        util::ColorMap& color(GlobalColorMap());
         return util::sprintf("%s[%d]%s", color[cyan].c_str(),
                 i->second, color[none].c_str());
     }
