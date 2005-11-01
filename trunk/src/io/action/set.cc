@@ -61,7 +61,16 @@ SetActionHandler::operator()(const Query& query,
                 throw Exception("Failed to parse option. Use option=value.");
         
             const std::string& key(parts.front());
-            const std::string& val(parts.back());
+            std::string& val(parts.back());
+
+            /* remove any begin/end quotes */
+            char begin(val[0]), end(val[val.length() - 1]);
+            if ((begin == '\'' and end == '\'') or
+                (begin == '"'  and end == '"'))
+            {
+                val.erase(0, 1);
+                val.erase(val.length() - 1);
+            }
 
             FormatAttrs& attrs(GlobalFormatter().attrs());
 
