@@ -28,6 +28,12 @@
 
 using namespace gui;
 
+bool
+IOActionHandler::allow_empty_query() const
+{
+    return true;
+}
+
 Tab *
 IOActionHandler::createTab(WidgetFactory* widgetFactory)
 {

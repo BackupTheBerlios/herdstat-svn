@@ -38,6 +38,7 @@ class IOActionHandler : public ActionHandler
 {
     public:
         virtual ~IOActionHandler() { }
+        virtual bool allow_empty_query() const;
 
     protected:
         virtual gui::Tab *createTab(gui::WidgetFactory *factory);
