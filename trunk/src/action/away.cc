@@ -108,6 +108,9 @@ AwayActionHandler::operator()(const Query& query,
             results->add(util::sprintf(
                 "Developer '%s' either doesn't exist or is not currently away.",
                 q->second.c_str()));
+
+            if (options.iomethod() == "stream")
+                throw;
         }
     }
 
