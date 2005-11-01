@@ -59,6 +59,7 @@ class PrettyIOHandler : public IOHandler
         Formatter& out;
         FormatAttrs& attrs;
         Options& opts;
+        herdstat::util::ColorMap& color;
 };
 
 #endif /* _HAVE_IO_HANDLER_HH */

@@ -31,7 +31,7 @@
 #include "xmlinit.hh"
 #include "io/action/help.hh"
 #include "io/action/set.hh"
-#include "io/action/bind.hh"
+#include "io/action/print.hh"
 #include "io/handler.hh"
 
 using namespace herdstat;
@@ -46,11 +46,13 @@ IOHandler::init_xml_if_necessary(const std::string& action)
 
 PrettyIOHandler::PrettyIOHandler()
     : out(GlobalFormatter()), attrs(out.attrs()),
-      opts(GlobalOptions())
+      opts(GlobalOptions()), color(GlobalColorMap())
 {
     /* set common format attributes */
     attrs.set_maxlen(opts.maxcol());
     attrs.set_quiet(opts.quiet());
+    attrs.set_label_color(color[opts.labelcolor()]);
+    attrs.set_highlight_color(color[opts.hlcolor()]);
     attrs.set_colors(opts.color());
 
     /* add highlights */
@@ -72,8 +74,8 @@ void
 PrettyIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap)
 {
     hmap.insert(std::make_pair("help", new HelpActionHandler()));
+    hmap.insert(std::make_pair("print", new PrintActionHandler()));
     hmap.insert(std::make_pair("set", new SetActionHandler()));
-    hmap.insert(std::make_pair("bind", new BindActionHandler()));
 }
 
 void
@@ -87,7 +89,6 @@ PrettyIOHandler::display(const QueryResults& results)
 
     if (attrs.marked_away() and not opts.count())
     {
-        util::ColorMap color;
         opts.outstream() << std::endl << attrs.devaway_color()
             << "*" << color[none] << " Currently away" << std::endl;
         
