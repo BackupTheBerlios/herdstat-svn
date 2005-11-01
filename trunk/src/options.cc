@@ -42,6 +42,7 @@ Options::Options()
       _localstatedir(LOCALSTATEDIR), _labelcolor("green"),
       _hlcolor("yellow"), _metacache_expire("lastsync"),
       _locale(std::locale::classic().name()),
+      _prompt(PACKAGE"> "),
       _iomethod("unspecified"),
       _portdir(portage::GlobalConfig().portdir()),
       _overlays(portage::GlobalConfig().overlays())
