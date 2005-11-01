@@ -47,8 +47,6 @@ struct FirstLengthLess
 class FormatAttrs
 {
     public:
-        FormatAttrs();
-
         std::string::size_type maxlen() const { return _maxlen; }
         void set_maxlen(std::string::size_type n) { _maxlen = n; }
         std::string::size_type maxlabel() const { return _maxlabel; }
@@ -79,15 +77,7 @@ class FormatAttrs
         void set_devaway_color(const std::string& c) { _dcolor = c; }
 
         bool colors() const { return _colors; }
-        void set_colors(bool c)
-        {
-            _colors = c;
-            if (not _colors)
-            {
-                _hcolor.clear(); _dcolor.clear();
-                _lcolor.clear(); _no_color.clear();
-            }
-        }
+        void set_colors(bool c);
 
         bool quiet() const { return _quiet; }
         const std::string& quiet_delim() const { return _quiet_delim; }
@@ -98,17 +88,22 @@ class FormatAttrs
         void set_marked_away(bool a) { _away = a; }
 
     private:
-        herdstat::util::ColorMap _cmap;
+        friend class Formatter;
+        FormatAttrs();
+        FormatAttrs(const FormatAttrs&);
+        FormatAttrs& operator= (const FormatAttrs&);
+
+        herdstat::util::ColorMap& _cmap;
         bool _quiet;
         bool _colors;
         bool _away;
         std::string _quiet_delim;
         std::string::size_type _maxlen;
         std::string::size_type _maxlabel;
-        std::string _lcolor; /* label color */
-        std::string _hcolor; /* highlight color */
-        std::string _dcolor; /* devaway color */
-        std::string _no_color;
+        std::string _lcolor, _lcolor_save; /* label color */
+        std::string _hcolor, _hcolor_save; /* highlight color */
+        std::string _dcolor, _dcolor_save; /* devaway color */
+        std::string _no_color, _no_color_save;
         std::vector<std::string> _devaway;
         herdstat::util::RegexMap<std::string> _highlights;
 };

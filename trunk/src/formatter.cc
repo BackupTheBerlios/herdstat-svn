@@ -40,8 +40,8 @@ using namespace herdstat;
  * FormatAttrs - Format attributes
  ****************************************************************************/
 FormatAttrs::FormatAttrs()
-    : _cmap(), _quiet(false), _colors(true), _away(false), _quiet_delim("\n"),
-      _maxlen(78),
+    : _cmap(GlobalColorMap()), _quiet(false), _colors(true), _away(false),
+      _quiet_delim("\n"), _maxlen(78),
       _lcolor(_cmap[green]), _hcolor(_cmap[yellow]), _dcolor(_cmap[red]),
       _no_color(_cmap[none]), _devaway(), _highlights()
 {
@@ -63,6 +63,37 @@ FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
                     _colors ? _cmap[parts.back()] : ""));
         else
             throw Exception("Invalid highlight specification '%s'", i->c_str());
+    }
+}
+/****************************************************************************/
+void
+FormatAttrs::set_colors(bool c)
+{
+    _colors = c;
+    if (not _colors)
+    {
+        _hcolor_save.assign(_hcolor);
+        _hcolor.clear();
+
+        _dcolor_save.assign(_dcolor);
+        _dcolor.clear();
+
+        _lcolor_save.assign(_lcolor);
+        _lcolor.clear();
+
+        _no_color_save.assign(_no_color);
+        _no_color.clear();
+    }
+    else
+    {
+        if (not _hcolor_save.empty())
+            _hcolor.assign(_hcolor_save);
+        if (not _dcolor_save.empty())
+            _dcolor.assign(_dcolor_save);
+        if (not _lcolor_save.empty())
+            _lcolor.assign(_lcolor_save);
+        if (not _no_color_save.empty())
+            _no_color.assign(_no_color_save);
     }
 }
 /****************************************************************************
@@ -177,7 +208,7 @@ Wrap::operator()(const std::string& str, OutData * const out) const
     /* if it fits or it doesnt fit but it's the only word (a long
      * URL for example), put it on the current line */
     if (((out->len + wclen) < out->maxlen) or
-        (out->len == (out->maxlabel+1)))
+        (out->len == (out->maxlabel)))
     {
         out->str.append(str + " ");
         out->len += wclen + 1;
@@ -189,9 +220,9 @@ Wrap::operator()(const std::string& str, OutData * const out) const
             out->str.erase(out->str.length() - 1);
 
         out->str.append("\n");
-        out->str.append(out->maxlabel+1, ' ');
+        out->str.append(out->maxlabel, ' ');
         out->str.append(str + " ");
-        out->len = out->maxlabel+1 + wclen+1;
+        out->len = out->maxlabel + wclen+1;
     }
 }
 
@@ -199,12 +230,13 @@ std::string
 Format::operator()(const std::pair<std::string, std::string>& pair,
                    FormatAttrs * const attrs) const
 {
-    OutData out(attrs->maxlen(), attrs->maxlabel());
+    OutData out(attrs->maxlen(), attrs->maxlabel()+1);
     const std::string& label(pair.first);
     const std::string& data(pair.second);
 
     /* handle label */
-    if (label.empty() and not data.empty() and not attrs->quiet())
+    if (label.empty() and not data.empty() and not attrs->quiet()
+            and attrs->maxlabel() != 0)
         out.str.assign(attrs->maxlabel()+1, ' ');
     else if (not label.empty() and not attrs->quiet())
     {
@@ -218,8 +250,9 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
         /* split into a vector of words */
         std::vector<std::string> parts(util::split(data));
         /* perform any highlights */
-        std::transform(parts.begin(), parts.end(),
-            parts.begin(), std::bind2nd(Highlight(), attrs));
+        if (attrs->colors())
+            std::transform(parts.begin(), parts.end(),
+                parts.begin(), std::bind2nd(Highlight(), attrs));
         /* perform any line wrapping */
         out.len = util::strip_colors(out.str).length();
         std::for_each(parts.begin(), parts.end(),
