@@ -8,7 +8,7 @@ libio_action_la_SOURCES = \
 	handler.hh handler.cc \
 	help.hh help.cc \
 	set.hh set.cc \
-	bind.hh bind.cc
+	print.hh print.cc
 
 srchtml: $(foreach f, $(libio_action_la_SOURCES), $(f).html)
 %.cc.html: %.cc
