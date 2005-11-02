@@ -48,6 +48,19 @@ PrettyIOHandler::PrettyIOHandler()
     : out(GlobalFormatter()), attrs(out.attrs()),
       opts(GlobalOptions()), color(GlobalColorMap())
 {
+}
+
+void
+PrettyIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap)
+{
+    hmap.insert(std::make_pair("help", new HelpActionHandler()));
+    hmap.insert(std::make_pair("print", new PrintActionHandler()));
+    hmap.insert(std::make_pair("set", new SetActionHandler()));
+}
+
+void
+PrettyIOHandler::display(const QueryResults& results)
+{
     /* set common format attributes */
     attrs.set_maxlen(opts.maxcol());
     attrs.set_quiet(opts.quiet());
@@ -68,19 +81,7 @@ PrettyIOHandler::PrettyIOHandler()
         init_xml_if_necessary("away");
         attrs.set_devaway(GlobalDevawayXML().keys());
     }
-}
 
-void
-PrettyIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap)
-{
-    hmap.insert(std::make_pair("help", new HelpActionHandler()));
-    hmap.insert(std::make_pair("print", new PrintActionHandler()));
-    hmap.insert(std::make_pair("set", new SetActionHandler()));
-}
-
-void
-PrettyIOHandler::display(const QueryResults& results)
-{
     QueryResults::const_iterator i;
     for (i = results.begin() ; i != results.end() ; ++i)
         out(i->first, i->second);
