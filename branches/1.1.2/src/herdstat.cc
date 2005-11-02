@@ -562,7 +562,7 @@ main(int argc, char **argv)
 	}
 
 	/* initialize XML stuff */
-	Init init(options::qa());
+	herdstat::xml::GlobalInit(options::qa());
 
 	if (not options::fields().empty() and not nonopt_args.empty())
 	{
