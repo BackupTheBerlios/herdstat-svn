@@ -389,7 +389,7 @@ handle_opts(int argc, char **argv, Query *q)
 	    case 'k':
 		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
-		q->set_action("kw");
+		q->set_action("keywords");
 		break;
 	    /* --away */
 	    case 'a':
@@ -561,12 +561,15 @@ main(int argc, char **argv)
     std::ostream *outstream = NULL;
 
     /* set iomethod based on argv[0] */
-    if (util::basename(argv[0]) == PACKAGE"-rl")
-        options.set_iomethod("readline");
-    else if (util::basename(argv[0]) == PACKAGE"-gtk")
-        options.set_iomethod("gtk");
-    else if (util::basename(argv[0]) == PACKAGE"-qt")
-        options.set_iomethod("qt");
+    if (std::strcmp(argv[0], PACKAGE) != 0)
+    {
+        if (util::basename(argv[0]) == PACKAGE"-rl")
+            options.set_iomethod("readline");
+        else if (util::basename(argv[0]) == PACKAGE"-gtk")
+            options.set_iomethod("gtk");
+        else if (util::basename(argv[0]) == PACKAGE"-qt")
+            options.set_iomethod("qt");
+    }
 
     /* we need to know if -T or --TEST was specified before 
      * we parse the command line options. */
