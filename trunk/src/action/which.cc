@@ -24,6 +24,11 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/functional.hh>
+#include <herdstat/portage/exceptions.hh>
+#include <herdstat/portage/find.hh>
+
+#include "common.hh"
 #include "action/which.hh"
 
 using namespace herdstat;
@@ -57,10 +62,101 @@ WhichActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-WhichActionHandler::operator()(const Query& query,
+WhichActionHandler::operator()(const Query& qq,
                                QueryResults * const results)
 {
+    Query query(qq);
 
+    if (query.all())
+    {
+        results->add("This handler does not support the 'all' target.");
+        throw ActionException();
+    }
+
+    pkgcache& pkgcache(GlobalPkgCache());
+    std::multimap<std::string, std::string>::iterator m;
+
+    if (options.regex())
+    {
+        regexp.assign(query.front().second);
+        query.clear();
+
+        matches = portage::find_package_regex(regexp, options.overlay(),
+                        &search_timer, pkgcache);
+
+        if (matches.empty())
+        {
+            results->add("Failed to find any packages matching '" + regexp() + "'.");
+            throw ActionException();
+        }
+
+        std::vector<std::string> v;
+        for (m = matches.begin() ; m != matches.end() ; ++m)
+        {
+            if (std::find(v.begin(), v.end(), m->second) == v.end())
+                v.push_back(m->second);
+            else
+                matches.erase(m--);
+        }
+    }
+    else
+        std::transform(query.begin(), query.end(),
+            std::inserter(matches, matches.end()), util::EmptyFirst());
+
+    for (m = matches.begin() ; m != matches.end() ; ++m)
+    {
+        std::string ebuild;
+        std::pair<std::string, std::string> p;
+        
+        try
+        {
+            if (options.regex())
+                p = *m;
+            else
+                p = portage::find_package(m->second, options.overlay(),
+                        &search_timer);
+        }
+        catch (const portage::AmbiguousPkg &e)
+        {
+            results->add(e.name() + " is ambiguous. Possible matches are:");
+            results->add_linebreak();
+
+            std::vector<std::string>::const_iterator i;
+            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
+            {
+                if (options.quiet() or not options.color())
+                    results->add(*i);
+                else
+                    results->add(color[green] + (*i) + color[none]);
+            }
+            
+            if (matches.size() == 1 and options.iomethod() == "stream")
+                throw ActionException();
+
+            continue;
+        }
+        catch (const portage::NonExistentPkg &e)
+        {
+            results->add(m->second + " doesn't seem to exist.");
+
+            if (matches.size() == 1 and options.iomethod() == "stream")
+                throw ActionException();
+
+            continue;
+        }
+        
+        if (options.regex())
+            ebuild = portage::ebuild_which(p.second, options.overlay(), NULL,
+                pkgcache);
+        else
+            ebuild = portage::ebuild_which(p.second, options.overlay(), NULL);
+
+        if (not options.count())
+            results->add(ebuild);
+    }
+    
+    this->size() = matches.size();
+    PortageSearchActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

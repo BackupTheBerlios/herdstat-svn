@@ -24,10 +24,17 @@
 # include "config.h"
 #endif
 
+#include "common.hh"
 #include "action/stats.hh"
 
 using namespace herdstat;
 using namespace gui;
+
+bool
+StatsActionHandler::allow_empty_query() const
+{
+    return true;
+}
 
 const char * const
 StatsActionHandler::id() const
@@ -54,7 +61,71 @@ void
 StatsActionHandler::operator()(const Query& query,
                                QueryResults * const results)
 {
+    const bool quiet_save(options.quiet());
+    options.set_quiet(false);
 
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+    portage::Herds::const_iterator h;
+    portage::Herd::const_iterator d;
+
+    float nherds = 0, ndevs = 0;
+    std::vector<std::string> most_herds, least_herds, most_devs, least_devs;
+    portage::Herd::size_type biggest_herd = 0, smallest_herd = 1;
+    unsigned short biggest_dev = 0, smallest_dev = 1;
+    std::map<std::string, unsigned short> herds_per_dev;
+
+    for (h = herds.begin() ; h != herds.end() ; ++h)
+    {
+        ndevs += h->size();
+        for (d = h->begin() ; d != h->end() ; ++d)
+            ++herds_per_dev[d->user()];
+        
+        if (h->size() > biggest_herd) biggest_herd = h->size();
+        if (h->size() <= smallest_herd) smallest_herd = h->size();
+    }
+
+    std::map<std::string, unsigned short>::iterator i;
+    for (i = herds_per_dev.begin() ; i != herds_per_dev.end() ; ++i)
+    {
+        nherds += i->second;
+        if (i->second > biggest_dev) biggest_dev = i->second;
+        if (i->second <= smallest_dev) smallest_dev = i->second;
+    }
+
+        /* we now have least/most devs, so find all devs with matching numbers */
+    for (h = herds.begin() ; h != herds.end() ; ++h)
+    {
+        if (h->size() == biggest_herd)          most_devs.push_back(h->name());
+        else if (h->size() == smallest_herd)    least_devs.push_back(h->name());
+    }
+    
+    /* we now have least/most herds, so find all herds with matching numbers */
+    for (i = herds_per_dev.begin() ; i != herds_per_dev.end() ; ++i)
+    {
+        if (i->second == biggest_dev)
+            most_herds.push_back(util::get_user_from_email(i->first));
+        else if (i->second == smallest_dev)
+            least_herds.push_back(util::get_user_from_email(i->first));
+    }
+    
+    /* display it all */
+    results->add("Total herds", util::sprintf("%d", herds.size()));
+    results->add("Total devs", util::sprintf("%d", herds_per_dev.size()));
+    results->add("Avg devs/herd", util::sprintf("%.2f",
+        ndevs / herds.size()));
+    results->add("Avg herds/dev", util::sprintf("%.2f",
+        nherds / herds_per_dev.size()));
+    results->add(util::sprintf("Herd(s) with most devs(%d)", biggest_herd),
+        most_devs);
+    results->add(util::sprintf("Herd(s) with least devs(%d)", smallest_herd),
+        least_devs);
+    results->add(util::sprintf("Dev(s) belonging to most herds(%d)", biggest_dev),
+        most_herds);
+    results->add(util::sprintf("Dev(s) belonging to least herds(%d)", smallest_dev),
+        least_herds);
+
+    options.set_quiet(quiet_save);
+    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

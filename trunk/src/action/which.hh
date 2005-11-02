@@ -29,7 +29,7 @@
 
 #include "action/handler.hh"
 
-class WhichActionHandler : public ActionHandler
+class WhichActionHandler : public PortageSearchActionHandler
 {
     public:
         virtual ~WhichActionHandler() { }

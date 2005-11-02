@@ -27,11 +27,18 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/regex.hh>
+#include <herdstat/portage/metadata.hh>
+
+#include "metacache.hh"
+#include "querycache.hh"
+#include "pkgquery.hh"
 #include "action/handler.hh"
 
 class PkgActionHandler : public ActionHandler
 {
     public:
+        PkgActionHandler();
         virtual ~PkgActionHandler() { }
 
         virtual const char * const id() const;
@@ -43,6 +50,24 @@ class PkgActionHandler : public ActionHandler
     protected:
         virtual gui::Tab *
             createTab(gui::WidgetFactory *factory);
+
+    private:
+        void search(const Query& q, pkgQuery &pq);
+        void search(const Query& q);
+        void add_matches(QueryResults * const results);
+        void add_matches(pkgQuery *pq, QueryResults * const results);
+        void cleanup();
+        bool metadata_matches(const herdstat::portage::metadata &meta,
+                              const std::string& pkg);
+
+        std::map<std::string, pkgQuery *> matches;
+        std::vector<std::string> not_found, packages;
+        metacache mcache;
+        querycache qcache;
+        const bool status;
+        bool cache_is_valid, at_least_one_not_cached;
+        herdstat::util::Regex with;
+        herdstat::portage::herds_xml& herds_xml;
 };
 
 #endif /* _HAVE_ACTION_PKG_HH */
