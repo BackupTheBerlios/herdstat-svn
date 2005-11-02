@@ -83,6 +83,12 @@ BatchIOHandler::operator()(Query * const query)
         if (parts.size() > 1)
             std::transform(parts.begin() + 1, parts.end(),
                 std::back_inserter(*query), util::EmptyFirst());
+        else if (not h->allow_empty_query())
+        {
+            query->clear();
+            query->push_back(std::make_pair("", h->id()));
+            h = handlers["help"];
+        }
 
         QueryResults results;
         (*h)(*query, &results);
