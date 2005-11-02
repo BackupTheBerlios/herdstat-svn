@@ -24,6 +24,10 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/algorithm.hh>
+#include <herdstat/util/functional.hh>
+#include <herdstat/portage/functional.hh>
+
 #include "common.hh"
 #include "action/away.hh"
 
@@ -57,10 +61,38 @@ AwayActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
+static void
+add_away(const portage::Developer& d, QueryResults * const results)
+{
+    Options& options(GlobalOptions());
+
+    if (options.count())
+        return;
+
+    if (options.quiet())
+        results->add(d.user() + " - " + util::tidy_whitespace(d.awaymsg()));
+    else
+    {
+        portage::Developer dev(d);
+        GlobalHerdsXML().fill_developer(dev);
+
+        if (dev.name().empty())
+            results->add("Developer", dev.user());
+        else
+            results->add("Developer",
+                         dev.name() + " (" + dev.user() + ")");
+
+        results->add("Email", dev.email());
+        results->add("Away Message",
+                     util::tidy_whitespace(dev.awaymsg()));
+    }
+}
+
 void
-AwayActionHandler::operator()(const Query& query,
+AwayActionHandler::operator()(const Query& qq,
                               QueryResults * const results)
 {
+    Query query(qq);
     portage::devaway_xml& devaway_xml(GlobalDevawayXML());
 
 //    GlobalFormatter().attrs().set_quiet(options.quiet(), " ");
@@ -70,11 +102,34 @@ AwayActionHandler::operator()(const Query& query,
 
     if (query.all())
     {
-
+        for (d = devs.begin() ; d != devs.end() ; )
+        {
+            add_away(*d++, results);
+            if (not options.quiet() and (d != devs.end()))
+                results->add_linebreak();
+        }
+        this->size() = devs.size();
+        return ActionHandler::operator()(query, results);
     }
     else if (options.regex())
     {
+        regexp.assign(query.front().second);
+        query.clear();
 
+        std::vector<std::string> rvec;
+        util::transform_if(devs.begin(), devs.end(), std::back_inserter(rvec),
+            std::bind1st(portage::UserRegexMatch<portage::Developer>(),
+            regexp), portage::User());
+
+        if (rvec.empty())
+        {
+            results->add("Failed to find any developers matching '" + regexp() + "'.");
+            throw ActionException();
+        }
+
+        std::sort(rvec.begin(), rvec.end());
+        std::transform(rvec.begin(), rvec.end(),
+            std::back_inserter(query), util::EmptyFirst());
     }
 
     for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
@@ -85,22 +140,7 @@ AwayActionHandler::operator()(const Query& query,
                 throw ActionException();
 
             this->size()++;
-
-            if (not options.count())
-            {
-                portage::Developer dev(*d);
-                GlobalHerdsXML().fill_developer(dev);
-
-                if (dev.name().empty())
-                    results->add("Developer", dev.user());
-                else
-                    results->add("Developer",
-                                 dev.name() + " (" + dev.user() + ")");
-
-                results->add("Email", dev.email());
-                results->add("Away message",
-                             util::tidy_whitespace(dev.awaymsg()));
-            }
+            add_away(*d, results);
         }
         catch (const ActionException)
         {
@@ -112,6 +152,9 @@ AwayActionHandler::operator()(const Query& query,
             if (options.iomethod() == "stream")
                 throw;
         }
+
+        if (not options.quiet() and ((q+1) != query.end()))
+            results->add_linebreak();
     }
 
     ActionHandler::operator()(query, results);
