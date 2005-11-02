@@ -1,6 +1,11 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.2:
+    - Removed test whose output changed over time (displaying elapsed time
+      since a constant date) which caused it to fail after a certain period
+      of time.
+
 1.1.2_rc2:
     - Added a few more tests.
 
