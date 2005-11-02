@@ -19,6 +19,18 @@ DISTCLEANFILES = ChangeLog TODO
 
 EXTRA_DIST = ChangeLog Makefile.am.common autogen.sh .todo bashcomp
 
+if BUILD_RL_FRONTEND
+rlsym = rl
+endif
+if BUILD_QT_FRONTEND
+qtsym = qt
+endif
+if BUILD_GTK_FRONTEND
+gtksym = gtk
+endif
+
+export symlinks = $(rlsym) $(qtsym) $(gtksym)
+
 srchtml:
 	@test -d ${PWD}/html || mkdir ${PWD}/html ; \
 	for x in src src/action src/io src/io/gui ; do \

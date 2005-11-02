@@ -46,6 +46,12 @@ herdstat_LDADD = \
 INCLUDES = $(libherdstat_CFLAGS)
 MAINTAINERCLEANFILES = Makefile.in *~
 
+install-data-local: $(foreach f, $(symlinks), install-symlink-$(f))
+
+install-symlink-%:
+	ln -snf $(DESTDIR)$(bindir)/herdstat \
+		$(DESTDIR)$(bindir)/herdstat-$*
+
 srchtml: $(foreach f, $(herdstat_SOURCES), $(f).html)
 %.cc.html: %.cc
 	@echo Generating $@
