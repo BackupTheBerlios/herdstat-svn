@@ -571,11 +571,15 @@ main(int argc, char **argv)
             options.set_iomethod("qt");
     }
 
-    /* we need to know if -T or --TEST was specified before 
-     * we parse the command line options. */
-    const bool test = ((argc > 1) and
-		      ((std::strcmp(argv[1], "--TEST") == 0) or
-		       (std::strcmp(argv[1], "-T") == 0)));
+    bool test = false;
+    if (argc > 1)
+    {
+        if (std::strcmp(argv[1], "-") == 0)
+            options.set_iomethod("batch");
+        else if ((std::strcmp(argv[1], "--TEST") == 0) or
+                 (std::strcmp(argv[1], "-T")))
+            test = true;
+    }
 
     /* save column width */
     options.set_maxcol((test ? 79 : getcols()-1));
