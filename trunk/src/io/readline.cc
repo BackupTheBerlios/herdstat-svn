@@ -93,12 +93,23 @@ ReadLineIOHandler::operator()(Query * const query)
     {
         std::string in;
 
-        /* TODO: allow action binding and show current action in the prompt. */
+        /* if action is already set, adjust prompt to reflect it */
+        if (options.action() == "unspecified")
+        {
+            options.set_prompt(PACKAGE">");
+            query->set_action("unspecified");
+        }
+        else
+        {
+            options.set_prompt(std::string(PACKAGE)+":"+options.action()+">");
+            query->set_action(options.action());
+        }
+
         get_input(options.prompt(), &in);
 
         /* empty, so just call ourselves again and display another prompt */
         if (in.empty())
-            return this->operator()(query);
+            return true;
         if (in == "quit" or in == "exit")
             return false;
 
@@ -109,23 +120,38 @@ ReadLineIOHandler::operator()(Query * const query)
 
         /* copy the global action handler map and
          * add our own readline-specific actions to it */
-        HandlerMap<ActionHandler> handlers(GlobalHandlerMap<ActionHandler>());
+        static HandlerMap<ActionHandler>
+            handlers(GlobalHandlerMap<ActionHandler>());
         insert_extra_actions(handlers);        
 
-        ActionHandler *h = handlers[parts[0]];
-        if (not h)
-            throw ActionUnimplemented(parts[0]);
+        if (query->action() == "unspecified")
+        {
+            query->set_action(parts.front());
+            parts.erase(parts.begin());
+        }
 
-        query->set_action(parts[0]);
+        ActionHandler *h = handlers[query->action()];
+        if (not h)
+            throw ActionUnimplemented(query->action());
+
         init_xml_if_necessary(query->action());
 
         /* transform arguments into the query object */
-        if (parts.size() > 1)
+        if (not parts.empty())
         {
-            parts.erase(parts.begin());
+            const std::string& front(parts.front());
 
-            if (parts.front() == "all")
+            if (front == "all")
                 query->set_all(true);
+            /* action is bound, but we still want to provide access to our
+             * handler-specific actions */
+            else if (front == "set" or
+                     front == "print" or
+                     front == "help")
+            {
+                h = handlers[front];
+                parts.erase(parts.begin());
+            }
             
             std::transform(parts.begin(), parts.end(),
                 std::back_inserter(*query), util::EmptyFirst());
@@ -153,7 +179,6 @@ ReadLineIOHandler::operator()(Query * const query)
     {
         options.outstream() << "Unknown action '"
             << e.what() << "'.  Try 'help'." << std::endl;
-        return this->operator()(query);
     }
 
     return true;

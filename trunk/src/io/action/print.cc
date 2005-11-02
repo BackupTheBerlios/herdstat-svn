@@ -71,10 +71,13 @@ PrintActionHandler::operator()(const Query& query,
             else ADD_INT_IF_EQUAL(bool, qa)
             else ADD_INT_IF_EQUAL(bool, metacache)
             else ADD_INT_IF_EQUAL(bool, devaway)
+            else ADD_INT_IF_EQUAL(bool, meta)
+            else ADD_INT_IF_EQUAL(bool, dev)
             else ADD_INT_IF_EQUAL(int, querycache_max)
             else ADD_INT_IF_EQUAL(long, querycache_expire)
             else ADD_INT_IF_EQUAL(long, devaway_expire)
             else ADD_INT_IF_EQUAL(size_t, maxcol)
+            else ADD_STR_IF_EQUAL(action)
             else ADD_STR_IF_EQUAL(cvsdir)
             else ADD_STR_IF_EQUAL(herdsxml)
             else ADD_STR_IF_EQUAL(devawayxml)
@@ -84,6 +87,8 @@ PrintActionHandler::operator()(const Query& query,
             else ADD_STR_IF_EQUAL(locale)
             else ADD_STR_IF_EQUAL(iomethod)
             else ADD_STR_IF_EQUAL(portdir)
+            else ADD_STR_IF_EQUAL(with_dev)
+            else ADD_STR_IF_EQUAL(with_herd)
             else if (q->second == "version")
                 results->add(PACKAGE"-"VERSION);
             else throw Exception("Unknown option '%s'.", q->second.c_str());
