@@ -50,7 +50,7 @@ BatchIOHandler::operator()(Query * const query)
         return false;
 
     if (in.empty())
-        return this->operator()(query);
+        return true;
     if (in == "exit" or in == "quit")
         return false;
 
