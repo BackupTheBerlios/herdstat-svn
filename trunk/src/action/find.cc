@@ -30,8 +30,7 @@
 #include <herdstat/portage/find.hh>
 #include <herdstat/portage/exceptions.hh>
 
-#include "exceptions.hh"
-#include "pkgcache.hh"
+#include "common.hh"
 #include "action/meta.hh"
 #include "action/find.hh"
 
@@ -75,7 +74,7 @@ FindActionHandler::operator()(const Query& query,
         return;
     }
 
-    static pkgcache pkgcache(options.portdir());
+    pkgcache& pkgcache(GlobalPkgCache());
 
     if (options.regex())
     {

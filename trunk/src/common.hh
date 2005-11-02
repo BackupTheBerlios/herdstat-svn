@@ -33,6 +33,7 @@
 
 #include "options.hh"
 #include "exceptions.hh"
+#include "pkgcache.hh"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -53,6 +54,7 @@ herdstat::portage::herds_xml& GlobalHerdsXML();
 herdstat::portage::devaway_xml& GlobalDevawayXML();
 herdstat::portage::userinfo_xml& GlobalUserinfoXML();
 herdstat::util::ColorMap& GlobalColorMap();
+pkgcache& GlobalPkgCache();
 
 #endif
 

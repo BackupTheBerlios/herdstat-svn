@@ -35,7 +35,6 @@
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "metacache.hh"
 
 #define METACACHE               /*LOCALSTATEDIR*/"/metacache"
@@ -166,7 +165,7 @@ metacache::fill()
     const bool status = not _options.quiet() and not _options.debug();
     {
         util::Progress progress;
-        pkgcache pkgcache(this->_portdir);
+        pkgcache& pkgcache(GlobalPkgCache());
         debug_msg("pkgcache.size() == %d", pkgcache.size());
 
         if (status)
