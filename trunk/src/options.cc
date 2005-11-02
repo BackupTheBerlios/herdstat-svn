@@ -43,6 +43,7 @@ Options::Options()
       _hlcolor("yellow"), _metacache_expire("lastsync"),
       _locale(std::locale::classic().name()),
       _prompt(PACKAGE"> "),
+      _action("unspecified"),
       _iomethod("unspecified"),
       _portdir(portage::GlobalConfig().portdir()),
       _overlays(portage::GlobalConfig().overlays())

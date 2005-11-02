@@ -111,6 +111,8 @@ class Options : private herdstat::noncopyable
         void set_locale(const std::string& v) { _locale.assign(v); }
         const std::string& prompt() const { return _prompt; }
         void set_prompt(const std::string& v) { _prompt.assign(v+" "); }
+        const std::string& action() const { return _action; }
+        void set_action(const std::string& v) { _action.assign(v); }
 
         const fields_type& fields() const { return _fields; }
         void add_field(const fields_type::value_type v) { _fields.push_back(v); }
@@ -165,10 +167,10 @@ class Options : private herdstat::noncopyable
         std::string _highlights;
         std::string _locale;
         std::string _prompt;
+        std::string _action;
+        std::string _iomethod;
 
         fields_type _fields;
-
-        std::string _iomethod;
 
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
