@@ -219,14 +219,14 @@ DevActionHandler::operator()(const Query& qq,
                     results->add("Roles", dev.role());
                 if (DEFINED(location))
                     results->add("Location", dev.location());
-            }
 
 #undef DEFINED
 
-            if (dev.is_away() and not dev.awaymsg().empty())
-                results->add("Devaway",
-                             util::tidy_whitespace(dev.awaymsg()));
+                if (dev.is_away() and not dev.awaymsg().empty())
+                    results->add("Devaway",
+                                 util::tidy_whitespace(dev.awaymsg()));
 
+            }
             if ((q+1) != query.end())
                 results->add_linebreak();
         }
