@@ -319,10 +319,9 @@ MetaActionHandler::operator()(const Query& qq,
                 data.pkg = p.second;
             }
         }
-        catch (const portage::AmbiguousPkg &e)
+        catch (const portage::AmbiguousPkg& e)
         {
-            results->add(e.name() + " is ambiguous.  Possible matches are: ");
-            results->add_linebreak();
+            results->add(e.name() + " is ambiguous.  Possible matches are:");
             results->add_linebreak();
 
             std::vector<std::string>::const_iterator i;
