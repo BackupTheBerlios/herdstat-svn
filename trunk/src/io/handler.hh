@@ -40,7 +40,7 @@ class IOHandler
         virtual ~IOHandler() { }
 
         virtual bool operator()(Query * const query) = 0;
-        virtual void insert_extra_actions(HandlerMap<ActionHandler>& h) { }
+        virtual void insert_extra_actions(HandlerMap<ActionHandler>&) const { }
 
     protected:
         void init_xml_if_necessary(const std::string& action);
@@ -52,7 +52,6 @@ class PrettyIOHandler : public IOHandler
         PrettyIOHandler();
         virtual ~PrettyIOHandler() { }
 
-        virtual void insert_extra_actions(HandlerMap<ActionHandler>& h);
         void display(const QueryResults& results);
 
     protected:

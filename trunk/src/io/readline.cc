@@ -38,6 +38,9 @@
 #include "exceptions.hh"
 #include "handler_map.hh"
 #include "action/handler.hh"
+#include "io/action/set.hh"
+#include "io/action/print.hh"
+#include "io/action/help.hh"
 #include "io/readline.hh"
 
 using namespace herdstat;
@@ -82,6 +85,14 @@ ReadLineIOHandler::ReadLineIOHandler()
     rl_startup_hook = readline_init;
     /* no completions (for now) */
     rl_bind_key('\t', NULL);
+}
+
+void
+ReadLineIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap) const
+{
+    hmap.insert(std::make_pair("help", new HelpActionHandler()));
+    hmap.insert(std::make_pair("set", new SetActionHandler()));
+    hmap.insert(std::make_pair("print", new PrintActionHandler()));
 }
 
 bool

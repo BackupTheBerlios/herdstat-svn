@@ -51,14 +51,6 @@ PrettyIOHandler::PrettyIOHandler()
 }
 
 void
-PrettyIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap)
-{
-    hmap.insert(std::make_pair("help", new HelpActionHandler()));
-    hmap.insert(std::make_pair("print", new PrintActionHandler()));
-    hmap.insert(std::make_pair("set", new SetActionHandler()));
-}
-
-void
 PrettyIOHandler::display(const QueryResults& results)
 {
     /* set common format attributes */

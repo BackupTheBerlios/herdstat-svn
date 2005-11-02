@@ -35,6 +35,7 @@ class ReadLineIOHandler : public PrettyIOHandler
         ReadLineIOHandler();
         virtual ~ReadLineIOHandler() { }
 
+        virtual void insert_extra_actions(HandlerMap<ActionHandler>&) const;
         virtual bool operator()(Query * const query);
 };
 

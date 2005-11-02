@@ -33,9 +33,16 @@
 #include "exceptions.hh"
 #include "handler_map.hh"
 #include "action/handler.hh"
+#include "io/action/help.hh"
 #include "io/batch.hh"
 
 using namespace herdstat;
+
+void
+BatchIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap) const
+{
+    hmap.insert(std::make_pair("help", new HelpActionHandler()));
+}
 
 bool
 BatchIOHandler::operator()(Query * const query)
@@ -45,37 +52,50 @@ BatchIOHandler::operator()(Query * const query)
     options.set_color(false);
     options.set_quiet(true);
 
-    std::string in;
-    if (not std::getline(std::cin, in))
-        return false;
+    try
+    {
+        std::string in;
+        if (not std::getline(std::cin, in))
+            return false;
 
-    if (in.empty())
-        return true;
-    if (in == "exit" or in == "quit")
-        return false;
+        if (in.empty())
+            return true;
+        if (in == "exit" or in == "quit")
+            return false;
 
-    std::vector<std::string> parts(util::split(in));
-    if (parts.empty())
-        throw Exception("Failed to parse input!");
+        std::vector<std::string> parts(util::split(in));
+        if (parts.empty())
+            throw Exception("Failed to parse input!");
 
-    ActionHandler *h = (GlobalHandlerMap<ActionHandler>())[parts[0]];
-    if (not h)
-        throw ActionUnimplemented(parts[0]);
+        /* copy the global handler map and insert our additional actions */
+        static HandlerMap<ActionHandler>
+            handlers(GlobalHandlerMap<ActionHandler>());
+        insert_extra_actions(handlers);
 
-    query->set_action(parts[0]);
-    init_xml_if_necessary(query->action());
+        ActionHandler *h = handlers[parts[0]];
+        if (not h)
+            throw ActionUnimplemented(parts[0]);
 
-    /* transform arguments into the query object */
-    if (parts.size() > 1)
-        std::transform(parts.begin() + 1, parts.end(),
-            std::back_inserter(*query), util::EmptyFirst());
+        query->set_action(parts[0]);
+        init_xml_if_necessary(query->action());
 
-    QueryResults results;
-    (*h)(*query, &results);
+        /* transform arguments into the query object */
+        if (parts.size() > 1)
+            std::transform(parts.begin() + 1, parts.end(),
+                std::back_inserter(*query), util::EmptyFirst());
+
+        QueryResults results;
+        (*h)(*query, &results);
     
-    QueryResults::iterator i;
-    for (i = results.begin() ; i != results.end() ; ++i)
-        options.outstream() << i->second << std::endl;
+        QueryResults::iterator i;
+        for (i = results.begin() ; i != results.end() ; ++i)
+            options.outstream() << i->second << std::endl;
+    }
+    catch (const ActionUnimplemented& e)
+    {
+        options.outstream() << "Unknown action '"
+            << e.what() << "'.  Try 'help'." << std::endl;
+    }
 
     return true;
 }

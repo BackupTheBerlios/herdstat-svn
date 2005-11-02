@@ -33,6 +33,7 @@ class BatchIOHandler : public IOHandler
 {
     public:
         virtual ~BatchIOHandler() { }
+        virtual void insert_extra_actions(HandlerMap<ActionHandler>&) const;
         virtual bool operator()(Query * const query);
 };
 
