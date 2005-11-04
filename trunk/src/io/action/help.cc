@@ -65,7 +65,7 @@ HelpActionHandler::operator()(const Query& query,
             actions.append(i->first + " ");
 
         results->add("Valid actions: " + actions);
-        results->add("", "Use 'help <action>' to get usage information for the specified action.");
+        results->add("Use 'help <action>' to get usage information for the specified action.");
         results->add_linebreak();
     }
     /* show action handler help */
