@@ -38,9 +38,9 @@ class PrettyIOHandler : public IOHandler
         PrettyIOHandler();
         virtual ~PrettyIOHandler() { }
 
+    protected:
         void display(const QueryResults& results);
 
-    protected:
         Formatter& out;
         FormatAttrs& attrs;
         Options& opts;
