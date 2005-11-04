@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/io/readline.hh
+ * herdstat -- src/io/pretty.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,25 +20,33 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_READLINE_HH
-#define _HAVE_READLINE_HH 1
+#ifndef _HAVE_IO_PRETTY_HH
+#define _HAVE_IO_PRETTY_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "io/pretty.hh"
+#include <herdstat/util/misc.hh>
+#include "io/handler.hh"
+#include "formatter.hh"
+#include "options.hh"
 
-class ReadLineIOHandler : public PrettyIOHandler
+class PrettyIOHandler : public IOHandler
 {
     public:
-        ReadLineIOHandler();
-        virtual ~ReadLineIOHandler() { }
+        PrettyIOHandler();
+        virtual ~PrettyIOHandler() { }
 
-        virtual void insert_extra_actions(HandlerMap<ActionHandler>&) const;
-        virtual bool operator()(Query * const query);
+        void display(const QueryResults& results);
+
+    protected:
+        Formatter& out;
+        FormatAttrs& attrs;
+        Options& opts;
+        herdstat::util::ColorMap& color;
 };
 
-#endif /* _HAVE_READLINE_HH */
+#endif /* _HAVE_IO_PRETTY_HH */
 
-/* vim: set tw=80 sw=4 fdm=marker et : */
+/* vim: set tw=80 sw=4 et : */

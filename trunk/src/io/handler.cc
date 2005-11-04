@@ -44,49 +44,4 @@ IOHandler::init_xml_if_necessary(const std::string& action)
         GlobalXMLInit();
 }
 
-PrettyIOHandler::PrettyIOHandler()
-    : out(GlobalFormatter()), attrs(out.attrs()),
-      opts(GlobalOptions()), color(GlobalColorMap())
-{
-}
-
-void
-PrettyIOHandler::display(const QueryResults& results)
-{
-    /* set common format attributes */
-    attrs.set_maxlen(opts.maxcol());
-    attrs.set_quiet(opts.quiet());
-    attrs.set_label_color(color[opts.labelcolor()]);
-    attrs.set_highlight_color(color[opts.hlcolor()]);
-    attrs.set_colors(opts.color());
-
-    /* add highlights */
-    const std::string user(util::current_user());
-    attrs.add_highlight("^"+user+"$");
-    attrs.add_highlight("^"+util::get_user_from_email(user)+"$");
-    /* user-defined highlights */
-    attrs.add_highlights(util::split(opts.highlights()));
-
-    /* devaway */
-    if (opts.devaway())
-    {
-        init_xml_if_necessary("away");
-        attrs.set_devaway(GlobalDevawayXML().keys());
-    }
-
-    QueryResults::const_iterator i;
-    for (i = results.begin() ; i != results.end() ; ++i)
-        out(i->first, i->second);
-
-    out.flush(opts.outstream());
-
-    if (attrs.marked_away() and not opts.count())
-    {
-        opts.outstream() << std::endl << attrs.devaway_color()
-            << "*" << color[none] << " Currently away" << std::endl;
-        
-        attrs.set_marked_away(false);
-    }
-}
-
 /* vim: set tw=80 sw=4 fdm=marker et : */

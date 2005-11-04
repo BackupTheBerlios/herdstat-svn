@@ -27,7 +27,7 @@
 # include "config.h"
 #endif
 
-#include "io/handler.hh"
+#include "io/pretty.hh"
 
 class StreamIOHandler : public PrettyIOHandler
 {

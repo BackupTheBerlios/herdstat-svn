@@ -8,6 +8,7 @@ MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 noinst_LTLIBRARIES = libio.la
 libio_la_SOURCES = \
 	handler.hh handler.cc \
+	pretty.hh pretty.cc \
 	stream.hh stream.cc \
 	batch.hh batch.cc \
 	gui.hh gui.cc

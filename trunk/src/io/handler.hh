@@ -46,21 +46,6 @@ class IOHandler
         void init_xml_if_necessary(const std::string& action);
 };
 
-class PrettyIOHandler : public IOHandler
-{
-    public:
-        PrettyIOHandler();
-        virtual ~PrettyIOHandler() { }
-
-        void display(const QueryResults& results);
-
-    protected:
-        Formatter& out;
-        FormatAttrs& attrs;
-        Options& opts;
-        herdstat::util::ColorMap& color;
-};
-
 #endif /* _HAVE_IO_HANDLER_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
