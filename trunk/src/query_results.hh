@@ -39,13 +39,136 @@ typedef std::pair<std::string, std::string> Result;
 class QueryResults : public herdstat::util::VectorBase<Result>
 {
     public:
+        /// Add a string.
+        void add(const std::string& val) { this->add(std::string(), val); }
+        /// Add a field and a string.
         void add(const std::string& field, const std::string& val)
         { this->push_back(std::make_pair(field, val)); }
-        void add(const std::string& field, const std::vector<std::string>& val)
-        { this->push_back(std::make_pair(field, herdstat::util::join(val))); }
-        template <typename T> void add(const T& v) { this->add("", v); }
-        void add_linebreak() { this->add(""); }
+        void add(const char * const val)
+        { this->add(std::string(), std::string(val)); }
+        void add(const char * const field, const char * const val)
+        { this->add(std::string(field), std::string(val)); }
+        void add(const char * const field, const std::string& val)
+        { this->add(std::string(field), val); }
+        void add(const std::string& field, const char * const val)
+        { this->add(field, std::string(val)); }
+
+        /// Add a field and a type.
+        template <typename T> void add(const std::string& field, const T& val)
+        { this->add(field, herdstat::util::stringify<T>(val)); }
+        /// Add a type with an empty field.
+        template <typename T> void add(const T& val)
+        { this->add(std::string(), val); }
+
+        ///@{
+        /// Add a range.
+        template <typename InIter>
+        void add(InIter begin, InIter end)
+        { this->add(std::string(), begin, end); }
+        template <typename InIter>
+        void add(const std::string& field, InIter begin, InIter end);
+        ///@}
+
+        ///@{
+        /// Add the result of UnaryOp() run on each in the range.
+        template <typename InIter, typename UnaryOp>
+        void add(InIter begin, InIter end, UnaryOp op)
+        { this->add(std::string(), begin, end, op); }
+        template <typename InIter, typename UnaryOp>
+        void add(const std::string& field, InIter begin, InIter end, UnaryOp op);
+        ///@}
+        
+        ///@{
+        /// Add each in the range [begin,end) for which UnaryPred returns true
+        template <typename InIter, typename UnaryPred>
+        void add_if(InIter begin, InIter end, UnaryPred pred)
+        { this->add_if(std::string(), begin, end, pred); }
+        template <typename InIter, typename UnaryPred>
+        void add_if(const std::string& field,
+                    InIter begin, InIter end, UnaryPred pred);
+        ///@}
+        
+        ///@{
+        /** Add the result of UnaryOp() for each in the range [begin,end) for
+         *  which UnaryPred returns true.
+         */
+        template <typename InIter, typename UnaryPred, typename UnaryOp>
+        void add_if(InIter begin, InIter end, UnaryPred pred, UnaryOp op)
+        { this->add_if(std::string(), begin, end, pred, op); }
+        template <typename InIter, typename UnaryPred, typename UnaryOp>
+        void add_if(const std::string& field, InIter begin, InIter end,
+                    UnaryPred pred, UnaryOp op);
+        ///@}
+
+        /// Add an empty line.
+        void add_linebreak() { this->add(std::string()); }
 };
+
+template <typename InIter>
+void
+QueryResults::add(const std::string& field, InIter begin, InIter end)
+{
+    std::string val;
+    while (begin != end)
+    {
+        val += *begin;
+        if (++begin != end)
+            val += " ";
+    }
+
+    this->add(field, val);
+}
+
+template <typename InIter, typename UnaryOp>
+void
+QueryResults::add(const std::string& field, InIter begin, InIter end, UnaryOp op)
+{
+    std::string val;
+    while (begin != end)
+    {
+        val += op(*begin);
+        if (++begin != end)
+            val += " ";
+    }
+
+    this->add(field, val);
+}
+
+template <typename InIter, typename UnaryPred>
+void
+QueryResults::add_if(const std::string& field,
+                     InIter begin, InIter end, UnaryPred pred)
+{
+    std::string val;
+    while (begin != end)
+    {
+        if (pred(*begin))
+        {
+            val += *begin;
+            if (++begin != end)
+                val += " ";
+        }
+        else ++begin;
+    }
+}
+
+template <typename InIter, typename UnaryPred, typename UnaryOp>
+void
+QueryResults::add_if(const std::string& field, InIter begin, InIter end,
+                     UnaryPred pred, UnaryOp op)
+{
+    std::string val;
+    while (begin != end)
+    {
+        if (pred(*begin))
+        {
+            val += op(*begin);
+            if (++begin != end)
+                val += " ";
+        }
+        else ++begin;
+    }
+}
 
 #endif /* _HAVE_QUERY_RESULTS_HH */
 

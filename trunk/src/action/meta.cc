@@ -94,7 +94,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
         (herds.empty() or (herds.front() == "no-herd")))
         results->add("Herds(0)", "none");
     else if (not herds.empty())
-        results->add(util::sprintf("Herds(%d)", herds.size()), herds);
+        results->add(util::sprintf("Herds(%d)", herds.size()),
+                herds.begin(), herds.end());
 
     if (options.quiet())
     {
@@ -170,7 +171,7 @@ add_data(const metadata_data& data, QueryResults * const results)
             {
                 portage::License
                     license(ebuild_vars["LICENSE"], options.qa());
-                results->add("License", license);
+                results->add("License", license.str());
             }
             catch (const portage::QAException& e)
             {

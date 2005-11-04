@@ -109,7 +109,8 @@ add_herds(const portage::Herds& herds, QueryResults * const results)
         }
     }
     else if (not options.count())
-        results->add(util::sprintf("Herds(%d)", herds.size()), herds);
+        results->add(util::sprintf("Herds(%d)", herds.size()),
+                herds.begin(), herds.end());
 }
 
 const char * const
