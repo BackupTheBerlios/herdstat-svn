@@ -69,6 +69,15 @@ VersionsActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
+struct OnlyPVR
+{
+    std::string operator()(const portage::version_string& v) const
+    {
+        const std::string& pvr((v.components())["PVR"]);
+        return (pvr.substr(0, pvr.rfind("-r0")));
+    }
+};
+
 void
 VersionsActionHandler::operator()(const Query& qq,
                                   QueryResults * const results)
@@ -177,22 +186,10 @@ VersionsActionHandler::operator()(const Query& qq,
             if (not options.quiet())
                 results->add("Package", (dir == options.portdir() or pwd) ?
                         package : package+od[dir]);
-
+            
             if (not options.count())
-            {
-                portage::versions::iterator v;
-                for (v = versions.begin() ; v != versions.end() ; ++v)
-                {
-                    const portage::version_map& vmap(v->components());
-
-                    std::string s(vmap["PVR"]);
-                    std::string::size_type pos = s.rfind("-r0");
-                    if (pos != std::string::npos)
-                        s.erase(pos);
-
-                    results->add(s);
-                }
-            }
+                results->add(versions.begin(), versions.end(), OnlyPVR());
+            
             if (not options.count() and (n != matches.size()))
                 results->add_linebreak();
         }
