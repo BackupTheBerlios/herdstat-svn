@@ -27,8 +27,8 @@
 # include "config.h"
 #endif
 
+#include <string>
 #include <herdstat/util/container_base.hh>
-#include "options.hh"
 
 /*
  * Represents a list of conditions that whatever is being searched must meet in
@@ -41,9 +41,6 @@ class Query
     : public herdstat::util::VectorBase<std::pair<std::string, std::string> >
 {
     public:
-        typedef herdstat::util::VectorBase<std::pair<std::string, std::string> > \
-            base_type;
-
         Query();
 
         /* get action associated with this query */
@@ -53,9 +50,6 @@ class Query
         /* special condition - match all. */
         bool all() const { return _all; }
         void set_all(bool v) { _all = v; }
-
-//        iterator find(const std::string& k);
-//        const_iterator find(const std::string& k) const;
 
     private:
         std::string _action;

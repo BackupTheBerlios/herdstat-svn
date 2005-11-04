@@ -28,15 +28,13 @@
 #endif
 
 #include <string>
-#include <vector>
 #include <utility>
 
 #include <herdstat/util/string.hh>
 #include <herdstat/util/container_base.hh>
 
-typedef std::pair<std::string, std::string> Result;
-
-class QueryResults : public herdstat::util::VectorBase<Result>
+class QueryResults
+    : public herdstat::util::VectorBase<std::pair<std::string, std::string> >
 {
     public:
         ///@{

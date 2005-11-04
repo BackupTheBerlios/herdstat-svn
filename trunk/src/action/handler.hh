@@ -32,6 +32,7 @@
 #include <herdstat/util/timer.hh>
 #include <herdstat/util/regex.hh>
 
+#include "options.hh"
 #include "query.hh"
 #include "query_results.hh"
 #include "io/gui/widget_factory.hh"

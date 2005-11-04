@@ -33,20 +33,4 @@ Query::Query()
 
 }
 /****************************************************************************/
-//Query::iterator
-//Query::find(const std::string& k)
-//{
-//    for (iterator i = this->begin() ; i != this->end() ; ++i)
-//        if (i->first == k) return i;
-//    return this->end();
-//}
-/****************************************************************************/
-//Query::const_iterator
-//Query::find(const std::string& k) const
-//{
-//    for (const_iterator i = this->begin() ; i != this->end() ; ++i)
-//        if (i->first == k) return i;
-//    return this->end();
-//}
-/****************************************************************************/
 /* vim: set tw=80 sw=4 fdm=marker et : */
