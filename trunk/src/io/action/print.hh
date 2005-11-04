@@ -29,10 +29,10 @@
 
 #include "io/action/handler.hh"
 
-class PrintActionHandler : public IOActionHandler
+class PrintIOActionHandler : public IOActionHandler
 {
     public:
-        virtual ~PrintActionHandler() { }
+        virtual ~PrintIOActionHandler() { }
 
         virtual const char * const id() const;
         virtual const char * const desc() const;

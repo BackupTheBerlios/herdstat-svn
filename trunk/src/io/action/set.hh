@@ -29,10 +29,10 @@
 
 #include "io/action/handler.hh"
 
-class SetActionHandler : public IOActionHandler
+class SetIOActionHandler : public IOActionHandler
 {
     public:
-        virtual ~SetActionHandler() { }
+        virtual ~SetIOActionHandler() { }
 
         virtual const char * const id() const;
         virtual const char * const desc() const;

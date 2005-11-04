@@ -41,7 +41,7 @@ using namespace herdstat;
 void
 BatchIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap) const
 {
-    hmap.insert(std::make_pair("help", new HelpActionHandler()));
+    hmap.insert(std::make_pair("help", new HelpIOActionHandler()));
 }
 
 bool

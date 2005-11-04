@@ -29,10 +29,10 @@
 
 #include "io/action/handler.hh"
 
-class HelpActionHandler : public IOActionHandler
+class HelpIOActionHandler : public IOActionHandler
 {
     public:
-        virtual ~HelpActionHandler() { }
+        virtual ~HelpIOActionHandler() { }
         virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;

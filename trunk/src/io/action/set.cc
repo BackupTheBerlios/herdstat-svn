@@ -32,25 +32,25 @@
 using namespace herdstat;
 
 const char * const
-SetActionHandler::id() const
+SetIOActionHandler::id() const
 {
     return "set";
 }
 
 const char * const
-SetActionHandler::desc() const
+SetIOActionHandler::desc() const
 {
     return "Set an option.";
 }
 
 const char * const
-SetActionHandler::usage() const
+SetIOActionHandler::usage() const
 {
     return "set <option=value>";
 }
 
 void
-SetActionHandler::operator()(const Query& query,
+SetIOActionHandler::operator()(const Query& query,
                              QueryResults * const results)
 {
     for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)

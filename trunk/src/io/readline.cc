@@ -90,9 +90,9 @@ ReadLineIOHandler::ReadLineIOHandler()
 void
 ReadLineIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap) const
 {
-    hmap.insert(std::make_pair("help", new HelpActionHandler()));
-    hmap.insert(std::make_pair("set", new SetActionHandler()));
-    hmap.insert(std::make_pair("print", new PrintActionHandler()));
+    hmap.insert(std::make_pair("help", new HelpIOActionHandler()));
+    hmap.insert(std::make_pair("set", new SetIOActionHandler()));
+    hmap.insert(std::make_pair("print", new PrintIOActionHandler()));
 }
 
 bool

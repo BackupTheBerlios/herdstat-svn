@@ -32,25 +32,25 @@
 using namespace herdstat;
 
 bool
-HelpActionHandler::allow_empty_query() const
+HelpIOActionHandler::allow_empty_query() const
 {
     return true;
 }
 
 const char * const
-HelpActionHandler::id() const
+HelpIOActionHandler::id() const
 {
     return "help";
 }
 
 const char * const
-HelpActionHandler::desc() const
+HelpIOActionHandler::desc() const
 {
     return "Display help.";
 }
 
 void
-HelpActionHandler::operator()(const Query& query,
+HelpIOActionHandler::operator()(const Query& query,
                               QueryResults * const results)
 {
     HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());

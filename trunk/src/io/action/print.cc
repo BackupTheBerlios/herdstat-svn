@@ -30,25 +30,25 @@
 using namespace herdstat;
 
 const char * const
-PrintActionHandler::id() const
+PrintIOActionHandler::id() const
 {
     return "print";
 }
 
 const char * const
-PrintActionHandler::desc() const
+PrintIOActionHandler::desc() const
 {
     return "Display the specified option's value.";
 }
 
 const char * const
-PrintActionHandler::usage() const
+PrintIOActionHandler::usage() const
 {
     return "print <option>";
 }
 
 void
-PrintActionHandler::operator()(const Query& query,
+PrintIOActionHandler::operator()(const Query& query,
                                QueryResults * const results)
 {
     for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
