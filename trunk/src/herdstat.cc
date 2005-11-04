@@ -696,7 +696,7 @@ main(int argc, char **argv)
 		std::swap(*query, q);
 
 	    /* start I/O handler */
-	    if (not (*handler)(query.get()) or iomethod == "stream")
+	    if (not (*handler)(query.get()))
 		break;
 	}
 
