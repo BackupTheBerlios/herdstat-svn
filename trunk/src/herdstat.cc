@@ -577,7 +577,7 @@ main(int argc, char **argv)
         if (std::strcmp(argv[1], "-") == 0)
             options.set_iomethod("batch");
         else if ((std::strcmp(argv[1], "--TEST") == 0) or
-                 (std::strcmp(argv[1], "-T")))
+                 (std::strcmp(argv[1], "-T") == 0))
             test = true;
     }
 
