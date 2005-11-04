@@ -1,5 +1,7 @@
 # $Id$
 
+include $(top_builddir)/Makefile.am.common
+
 SUBDIRS = action gui
 
 INCLUDES = -I$(top_builddir)/src $(libherdstat_CFLAGS)
