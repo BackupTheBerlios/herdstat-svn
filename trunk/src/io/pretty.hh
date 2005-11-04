@@ -27,24 +27,15 @@
 # include "config.h"
 #endif
 
-#include <herdstat/util/misc.hh>
 #include "io/handler.hh"
-#include "formatter.hh"
-#include "options.hh"
 
 class PrettyIOHandler : public IOHandler
 {
     public:
-        PrettyIOHandler();
         virtual ~PrettyIOHandler() { }
 
     protected:
         void display(const QueryResults& results);
-
-        Formatter& out;
-        FormatAttrs& attrs;
-        Options& opts;
-        herdstat::util::ColorMap& color;
 };
 
 #endif /* _HAVE_IO_PRETTY_HH */

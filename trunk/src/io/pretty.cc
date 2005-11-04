@@ -30,15 +30,14 @@
 
 using namespace herdstat;
 
-PrettyIOHandler::PrettyIOHandler()
-    : out(GlobalFormatter()), attrs(out.attrs()),
-      opts(GlobalOptions()), color(GlobalColorMap())
-{
-}
-
 void
 PrettyIOHandler::display(const QueryResults& results)
 {
+    Formatter& out(GlobalFormatter());
+    FormatAttrs& attrs(out.attrs());
+    Options& opts(GlobalOptions());
+    herdstat::util::ColorMap& color(GlobalColorMap());
+
     /* set common format attributes */
     attrs.set_maxlen(opts.maxcol());
     attrs.set_quiet(opts.quiet());
