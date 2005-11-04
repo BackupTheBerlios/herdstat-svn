@@ -266,54 +266,33 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
 }
 
 /*
- * Append a label/vector of data.
- */
-
-void
-Formatter::operator()(const std::string& label,
-                      const std::vector<std::string>& data)
-{
-    if (_attrs.quiet() and _attrs.quiet_delim() != " ")
-        /* append a new element (with an empty label) for
-         * each element in data to our buffer */
-        std::transform(data.begin(), data.end(),
-                std::back_inserter(_buffer), util::EmptyFirst());
-    else
-        this->operator()(label, util::join(data));
-}
-
-/*
  * Flush our buffer.
  * This is the user interface to what does the actual formatting.
  */
 
 void
-Formatter::flush(std::ostream& stream)
+Formatter::operator()(const QueryResults& results, std::ostream& stream)
 {
-    if (_buffer.empty())
+    if (results.empty())
         return;
 
     /* dynamically set maximum label length
      * to at least the size of the longest label */
-    buffer_type::iterator i =
-        std::max_element(_buffer.begin(), _buffer.end(), FirstLengthLess());
+    QueryResults::const_iterator i =
+        std::max_element(results.begin(), results.end(), FirstLengthLess());
 
     _attrs.set_maxlabel(
-        _attrs.quiet() ?
-                i->first.length() :
-                i->first.length() == 0 ? 
-                        0 :
-                        i->first.length() + 3
+            _attrs.quiet() ?
+                0 : i->first.length() == 0 ?
+                    0 : i->first.length() + 3
     );
 
     /* for each element in our buffer, format it and insert
      * the result into the real output buffer. */
     std::vector<std::string> outbuf;
-    std::transform(_buffer.begin(), _buffer.end(),
+    std::transform(results.begin(), results.end(),
         std::back_inserter(outbuf),
         std::bind2nd(Format(), &_attrs));
-
-    _buffer.clear();
 
     /* display it finally */
     std::copy(outbuf.begin(), outbuf.end(),

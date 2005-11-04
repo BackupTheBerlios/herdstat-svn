@@ -33,8 +33,8 @@ using namespace herdstat;
 void
 PrettyIOHandler::display(const QueryResults& results)
 {
-    Formatter& out(GlobalFormatter());
-    FormatAttrs& attrs(out.attrs());
+    Formatter& output(GlobalFormatter());
+    FormatAttrs& attrs(output.attrs());
     Options& opts(GlobalOptions());
     herdstat::util::ColorMap& color(GlobalColorMap());
 
@@ -59,11 +59,7 @@ PrettyIOHandler::display(const QueryResults& results)
         attrs.set_devaway(GlobalDevawayXML().keys());
     }
 
-    QueryResults::const_iterator i;
-    for (i = results.begin() ; i != results.end() ; ++i)
-        out(i->first, i->second);
-
-    out.flush(opts.outstream());
+    output(results, opts.outstream());
 
     if (attrs.marked_away() and not opts.count())
     {

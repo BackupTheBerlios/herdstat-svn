@@ -35,6 +35,8 @@
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/regex.hh>
 
+#include "query_results.hh"
+
 struct FirstLengthLess
 {
     bool operator()(const std::pair<std::string, std::string>& p1,
@@ -111,51 +113,17 @@ class FormatAttrs
 class Formatter
 {
     public:
-        typedef std::vector<std::pair<std::string, std::string> > buffer_type;
+        /// Flush results buffer to stream.
+        void operator()(const QueryResults& results, std::ostream& stream);
 
         /// Get attributes.
         FormatAttrs& attrs() { return _attrs; }
-        /// Set attributes.
-        void set_attrs(const FormatAttrs& attrs) { _attrs = attrs; }
-
-        /** Append label/data.
-         * @param label Label describing data
-         * @param data data string
-         */
-        void operator()(const std::string& label, const std::string& data)
-        { this->append(_attrs.quiet() ? "" : label, data); }
-
-        /** Append label/data.
-         * @param label Label describing data
-         * @param data data vector
-         */
-        void operator()(const std::string& label,
-                        const std::vector<std::string>& data);
-
-        /// Append new line.
-        void endl() { this->append("", ""); }
-
-        /// Flush buffer to stream.
-        void flush(std::ostream& stream);
-
-        /// Clear buffer.
-        void clear() { _buffer.clear(); }
-
-        /// Get buffer size.
-        buffer_type::size_type size() { return _buffer.size(); }
-        /// Get reference to last element of buffer.
-        buffer_type::reference peek() { return _buffer.back(); }
 
     private:
         friend Formatter& GlobalFormatter();
         Formatter() { }
 
-        /// Raw access to the buffer.
-        void append(const std::string& label, const std::string& data)
-        { _buffer.push_back(std::make_pair(label, data)); }
-
         FormatAttrs _attrs;
-        buffer_type _buffer;
 };
 
 /**

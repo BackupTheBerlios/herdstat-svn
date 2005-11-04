@@ -25,6 +25,7 @@
 #endif
 
 #include <herdstat/util/string.hh>
+#include <herdstat/util/functional.hh>
 #include <herdstat/portage/config.hh>
 #include "formatter.hh"
 #include "pkgquery.hh"
@@ -44,27 +45,31 @@ pkgQuery::pkgQuery(const std::string &n, const std::string &w, bool dev)
 void
 pkgQuery::dump(std::ostream &stream) const
 {
-    Formatter& out(GlobalFormatter());
-    out("Query string", this->query);
-    out("Query with", this->with);
-    out("Query type", (this->type == QUERYTYPE_DEV ? "dev":"herd"));
-    out("Query Portdir", this->portdir);
-    out("Query date", util::sprintf("%lu", static_cast<unsigned long>(this->date))
+    QueryResults results;
+    Formatter& output(GlobalFormatter());
+    results.add("Query string", this->query);
+    results.add("Query with", this->with);
+    results.add("Query type", (this->type == QUERYTYPE_DEV ? "dev":"herd"));
+    results.add("Query Portdir", this->portdir);
+    results.add("Query date", util::sprintf("%lu", static_cast<unsigned long>(this->date))
         + " (" + util::format_date(this->date) + ")");
 
     if (not this->empty())
-        out(util::sprintf("Results(%d)", this->size()),
+        results.add(util::sprintf("Results(%d)", this->size()),
             this->begin()->first);
 
-    if (this->size() > 1)
-    {
-        const_iterator p = this->begin();
-        ++p;
-        for ( ; p != this->end() ; ++p)
-            out("", p->first);
-    }
+//    if (this->size() > 1)
+//    {
+//        const_iterator p = this->begin();
+//        ++p;
+//        for ( ; p != this->end() ; ++p)
+//            results.add("", p->first);
+//    }
 
-    out.flush(stream);
+    if (this->size() > 1)
+        results.add(++(this->begin()), this->end(), util::First());
+
+    output(results, stream);
 }
 
 bool
