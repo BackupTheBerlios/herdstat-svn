@@ -49,6 +49,7 @@ class QueryResults
         inline void add(const char * const field, const char * const val);
         inline void add(const char * const field, const std::string& val);
         inline void add(const std::string& field, const char * const val);
+        inline void add(const std::pair<std::string, std::string>& p);
         ///@}
 
         /// Add a field and a type.
@@ -94,6 +95,15 @@ class QueryResults
                     UnaryPred pred, UnaryOp op);
         ///@}
 
+        template <typename InIter>
+        void add_each(InIter begin, InIter end);
+        template <typename InIter, typename UnaryOp>
+        void add_each(InIter begin, InIter end, UnaryOp op);
+        template <typename InIter, typename UnaryPred>
+        void add_each_if(InIter begin, InIter end, UnaryPred pred);
+        template <typename InIter, typename UnaryOp, typename UnaryPred>
+        void add_each_if(InIter begin, InIter end, UnaryOp op, UnaryPred pred);
+
         /// Add an empty line.
         inline void add_linebreak();
 };
@@ -138,6 +148,12 @@ inline void
 QueryResults::add(const std::string& field, const char * const val)
 {
     this->add(field, std::string(val));
+}
+
+inline void
+QueryResults::add(const std::pair<std::string, std::string>& p)
+{
+    this->add(p.first, p.second);
 }
 
 template <typename T>
@@ -245,6 +261,46 @@ QueryResults::add_if(const std::string& field, InIter begin, InIter end,
                 val += " ";
         }
         else ++begin;
+    }
+}
+
+template <typename InIter>
+void
+QueryResults::add_each(InIter begin, InIter end)
+{
+    while (begin != end)
+        this->add(*begin++);
+}
+
+template <typename InIter, typename UnaryOp>
+void
+QueryResults::add_each(InIter begin, InIter end, UnaryOp op)
+{
+    while (begin != end)
+        this->add(op(*begin++));
+}
+
+template <typename InIter, typename UnaryPred>
+void
+QueryResults::add_each_if(InIter begin, InIter end, UnaryPred pred)
+{
+    while (begin != end)
+    {
+        if (pred(*begin))
+            this->add(*begin);
+        ++begin;
+    }
+}
+
+template <typename InIter, typename UnaryOp, typename UnaryPred>
+void
+QueryResults::add_each_if(InIter begin, InIter end, UnaryOp op, UnaryPred pred)
+{
+    while (begin != end)
+    {
+        if (pred(*begin))
+            this->add(op(*begin));
+        ++begin;
     }
 }
 
