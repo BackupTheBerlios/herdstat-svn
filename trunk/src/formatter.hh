@@ -70,13 +70,16 @@ class FormatAttrs
         const std::string& no_color() const { return _no_color; }
 
         const std::string& label_color() const { return _lcolor; }
-        void set_label_color(const std::string& c) { _lcolor = c; }
+        void set_label_color(const std::string& c)
+        { _lcolor_save = _lcolor ; _lcolor = c; }
 
         const std::string& highlight_color() const { return _hcolor; }
-        void set_highlight_color(const std::string& c) { _hcolor = c; }
+        void set_highlight_color(const std::string& c)
+        { _hcolor_save = _hcolor ; _hcolor  = c; }
 
         const std::string& devaway_color() const { return _dcolor; }
-        void set_devaway_color(const std::string& c) { _dcolor = c; }
+        void set_devaway_color(const std::string& c)
+        { _dcolor_save = _dcolor ; _dcolor = c; }
 
         bool colors() const { return _colors; }
         void set_colors(bool c);
