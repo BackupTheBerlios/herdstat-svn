@@ -71,7 +71,7 @@ FindActionHandler::operator()(const Query& query,
     if (query.all())
     {
         results->add("'find' handler does not support the all target.");
-        return;
+        throw ActionException();
     }
 
     pkgcache& pkgcache(GlobalPkgCache());
@@ -87,7 +87,7 @@ FindActionHandler::operator()(const Query& query,
         {
             results->add(util::sprintf("Failed to find any packages matching '%s'.",
                          regexp().c_str()));
-            return;
+            throw ActionException();
         }
     }
     else
