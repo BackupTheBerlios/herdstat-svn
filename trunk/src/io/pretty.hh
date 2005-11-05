@@ -32,10 +32,17 @@
 class PrettyIOHandler : public IOHandler
 {
     public:
+        PrettyIOHandler();
         virtual ~PrettyIOHandler() { }
 
     protected:
         void display(const QueryResults& results);
+
+    private:
+        Formatter& output;
+        FormatAttrs& attrs;
+        Options& opts;
+        herdstat::util::ColorMap& color;
 };
 
 #endif /* _HAVE_IO_PRETTY_HH */

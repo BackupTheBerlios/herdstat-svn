@@ -30,14 +30,10 @@
 
 using namespace herdstat;
 
-void
-PrettyIOHandler::display(const QueryResults& results)
+PrettyIOHandler::PrettyIOHandler()
+    : output(GlobalFormatter()), attrs(output.attrs()),
+      opts(GlobalOptions()), color(GlobalColorMap())
 {
-    Formatter& output(GlobalFormatter());
-    FormatAttrs& attrs(output.attrs());
-    Options& opts(GlobalOptions());
-    herdstat::util::ColorMap& color(GlobalColorMap());
-
     /* set common format attributes */
     attrs.set_maxlen(opts.maxcol());
     attrs.set_quiet(opts.quiet());
@@ -51,7 +47,11 @@ PrettyIOHandler::display(const QueryResults& results)
     attrs.add_highlight("^"+util::get_user_from_email(user)+"$");
     /* user-defined highlights */
     attrs.add_highlights(util::split(opts.highlights()));
+}
 
+void
+PrettyIOHandler::display(const QueryResults& results)
+{
     /* devaway */
     if (opts.devaway())
     {
