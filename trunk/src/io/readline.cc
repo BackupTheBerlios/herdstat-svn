@@ -99,6 +99,7 @@ bool
 ReadLineIOHandler::operator()(Query * const query)
 {
     Options& options(GlobalOptions());
+    QueryResults results;
 
     try
     {
@@ -177,7 +178,6 @@ ReadLineIOHandler::operator()(Query * const query)
             h = handlers["help"];
         }
         
-        QueryResults results;
         (*h)(*query, &results);
         display(results);
     }
@@ -190,6 +190,10 @@ ReadLineIOHandler::operator()(Query * const query)
     {
         options.outstream() << "Unknown action '"
             << e.what() << "'.  Try 'help'." << std::endl;
+    }
+    catch (const ActionException)
+    {
+        display(results);
     }
 
     return true;

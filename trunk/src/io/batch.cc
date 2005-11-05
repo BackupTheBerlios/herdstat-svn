@@ -26,6 +26,8 @@
 
 #include <string>
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
@@ -48,6 +50,7 @@ bool
 BatchIOHandler::operator()(Query * const query)
 {
     Options& options(GlobalOptions());
+    QueryResults results;
 
     options.set_color(false);
     options.set_quiet(true);
@@ -90,17 +93,21 @@ BatchIOHandler::operator()(Query * const query)
             h = handlers["help"];
         }
 
-        QueryResults results;
         (*h)(*query, &results);
-    
-        QueryResults::iterator i;
-        for (i = results.begin() ; i != results.end() ; ++i)
-            options.outstream() << i->second << std::endl;
+        std::transform(results.begin(), results.end(),
+            std::ostream_iterator<std::string>(options.outstream(), "\n"),
+            util::Second());
     }
     catch (const ActionUnimplemented& e)
     {
         options.outstream() << "Unknown action '"
             << e.what() << "'.  Try 'help'." << std::endl;
+    }
+    catch (const ActionException)
+    {
+        std::transform(results.begin(), results.end(),
+            std::ostream_iterator<std::string>(options.outstream(), "\n"),
+            util::Second());
     }
 
     return true;
