@@ -121,14 +121,8 @@ WhichActionHandler::operator()(const Query& qq,
             results->add(e.name() + " is ambiguous. Possible matches are:");
             results->add_linebreak();
 
-            std::vector<std::string>::const_iterator i;
-            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
-            {
-                if (options.quiet() or not options.color())
-                    results->add(*i);
-                else
-                    results->add(color[green] + (*i) + color[none]);
-            }
+            std::for_each(e.packages.begin(), e.packages.end(),
+                std::bind2nd(ColorIfNecessary(), results));
             
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

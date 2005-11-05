@@ -78,6 +78,18 @@ struct OnlyPVR
     }
 };
 
+struct OnlyPVREmptyFirst
+{
+    std::pair<std::string, std::string>
+    operator()(const portage::version_string& v)
+    {
+        std::pair<std::string, std::string> p;
+        const std::string& pvr((v.components())["PVR"]);
+        p.second.assign(pvr.substr(0, pvr.rfind("-r0")));
+        return p;
+    }
+};
+
 void
 VersionsActionHandler::operator()(const Query& qq,
                                   QueryResults * const results)
@@ -184,10 +196,13 @@ VersionsActionHandler::operator()(const Query& qq,
             this->size() += versions.size();
 
             if (not options.quiet())
+            {
                 results->add("Package", (dir == options.portdir() or pwd) ?
                         package : package+od[dir]);
-            
-            if (not options.count())
+                results->add_each(versions.begin(), versions.end(),
+                    OnlyPVREmptyFirst());
+            }
+            else if (not options.count())
                 results->add(versions.begin(), versions.end(), OnlyPVR());
             
             if (not options.count() and (n != matches.size()))
@@ -198,14 +213,8 @@ VersionsActionHandler::operator()(const Query& qq,
             results->add(e.name() + " is ambiguous.  Possible matches are:");
             results->add_linebreak();
 
-            opts_type::const_iterator i;
-            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
-            {
-                if (options.quiet() or not options.color())
-                    results->add(*i);
-                else
-                    results->add(color[green] + (*i) + color[none]);
-            }
+            std::for_each(e.packages.begin(), e.packages.end(),
+                std::bind2nd(ColorIfNecessary(), results));
             
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

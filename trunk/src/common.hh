@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include <herdstat/util/misc.hh>
 #include <herdstat/portage/herds_xml.hh>
@@ -33,6 +34,7 @@
 
 #include "options.hh"
 #include "exceptions.hh"
+#include "query_results.hh"
 #include "pkgcache.hh"
 
 #ifdef HAVE_CONFIG_H
@@ -55,6 +57,22 @@ herdstat::portage::devaway_xml& GlobalDevawayXML();
 herdstat::portage::userinfo_xml& GlobalUserinfoXML();
 herdstat::util::ColorMap& GlobalColorMap();
 pkgcache& GlobalPkgCache();
+
+struct ColorIfNecessary
+    : std::binary_function<std::string, QueryResults * const, void>
+{
+    void operator()(const std::string& str, QueryResults * const results) const
+    {
+        Options& options(GlobalOptions());
+        if (options.quiet() or not options.color())
+            results->add(str);
+        else
+        {
+            herdstat::util::ColorMap& color(GlobalColorMap());
+            results->add(color[green] + str + color[none]);
+        }
+    }
+};
 
 #endif
 

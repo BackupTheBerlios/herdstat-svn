@@ -76,10 +76,8 @@ add_herd(const portage::Herd& herd, QueryResults * const results)
 
     if ((not options.verbose() and not options.quiet()) or
         (not options.verbose() and options.quiet() and not options.count()))
-    {
-        std::vector<std::string> devs(herd);
-        results->add(util::sprintf("Developers(%d)", devs.size()), devs);
-    }
+        results->add(util::sprintf("Developers(%d)", herd.size()),
+                        herd.begin(), herd.end());
 }
 
 static void
@@ -186,10 +184,8 @@ HerdActionHandler::operator()(const Query& qq,
             }
             
             if (not options.count())
-            {
-                std::vector<std::string> devs(h->begin(), h->end());
-                results->add(util::sprintf("Developers(%d)", h->size()), devs);
-            }
+                results->add(util::sprintf("Developers(%d)", h->size()),
+                            h->begin(), h->end());
 
             if ((q+1) != query.end())
                 results->add_linebreak();

@@ -70,6 +70,31 @@ KeywordsActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
+struct GetKeywords
+{
+    std::pair<std::string, std::string>
+    operator()(const portage::version_string& v) const
+    {
+        std::pair<std::string, std::string> result;
+        
+        const std::string& pvr((v.components())["PVR"]);
+        result.first.assign(pvr.substr(0, pvr.rfind("-r0")));
+
+        /* get keywords for this version */
+        try
+        {
+            portage::Keywords kw(v.ebuild(), GlobalOptions().color());
+            result.second.assign(kw.str());
+        }
+        catch (const Exception& e)
+        {
+            result.second.assign("no KEYWORDS variable defined");
+        }
+
+        return result;
+    }
+};
+
 void
 KeywordsActionHandler::operator()(const Query& qq,
                                   QueryResults * const results)
@@ -176,33 +201,15 @@ KeywordsActionHandler::operator()(const Query& qq,
             this->size() += versions.size();
 
             if (not options.quiet())
-                results->add("Package", (dir == options.portdir() or pwd) ?
-                        package : package+od[dir]);
+                results->add("Package",
+                        (dir == options.portdir() or pwd) ?
+                            package : package+od[dir]);
 
+            /* insert version/keywords pair for each version into results */
             if (not options.count())
-            {
-                portage::versions::iterator v;
-                for (v = versions.begin() ; v != versions.end() ; ++v)
-                {
-                    const portage::version_map& vmap(v->components());
+                std::transform(versions.begin(), versions.end(),
+                    std::back_inserter(*results), GetKeywords());
 
-                    std::string s(vmap["PVR"]);
-                    std::string::size_type pos = s.rfind("-r0");
-                    if (pos != std::string::npos)
-                        s.erase(pos);
-
-                    /* get keywords for this version */
-                    try
-                    {
-                        portage::Keywords kw(v->ebuild(), options.color());
-                        results->add(s, kw.str());
-                    }
-                    catch (const Exception& e)
-                    {
-                        results->add(s, "no KEYWORDS variable defined");
-                    }
-                }
-            }
             if (not options.count() and (n != matches.size()))
                 results->add_linebreak();
         }
@@ -211,14 +218,8 @@ KeywordsActionHandler::operator()(const Query& qq,
             results->add(e.name() + " is ambiguous.  Possible matches are:");
             results->add_linebreak();
 
-            opts_type::const_iterator i;
-            for (i = e.packages.begin() ; i != e.packages.end() ; ++i)
-            {
-                if (options.quiet() or not options.color())
-                    results->add(*i);
-                else
-                    results->add(color[green] + (*i) + color[none]);
-            }
+            std::for_each(e.packages.begin(), e.packages.end(),
+                std::bind2nd(ColorIfNecessary(), results));
             
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

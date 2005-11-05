@@ -94,9 +94,6 @@ AwayActionHandler::operator()(const Query& qq,
 {
     Query query(qq);
     portage::devaway_xml& devaway_xml(GlobalDevawayXML());
-
-//    GlobalFormatter().attrs().set_quiet(options.quiet(), " ");
-
     const portage::Developers& devs(devaway_xml.devs());
     portage::Developers::const_iterator d;
 
