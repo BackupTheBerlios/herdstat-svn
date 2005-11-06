@@ -60,49 +60,45 @@ class QueryResults
         inline void add(const T& val);
 
         ///@{
-        /// Add a range [begin,end).
-        template <typename InIter>
-        inline void add(InIter begin, InIter end);
-        template <typename InIter>
-        void add(const std::string& field, InIter begin, InIter end);
+        /// Add a range [first,last).
+        template <typename InputIterator>
+        inline void add(InputIterator first, InputIterator last);
+        template <typename InputIterator>
+        void add(const std::string& field, InputIterator first,
+                 InputIterator last);
         ///@}
 
         ///@{
-        /// Add the result of UnaryOp() run on each in the range [begin,end).
-        template <typename InIter, typename UnaryOp>
-        inline void add(InIter begin, InIter end, UnaryOp op);
-        template <typename InIter, typename UnaryOp>
-        void add(const std::string& field, InIter begin, InIter end, UnaryOp op);
+        /// Add the result of UnaryOp() run on each in the range [first,last).
+        template <typename InputIterator, typename UnaryOp>
+        inline void transform(InputIterator first, InputIterator last,
+                              UnaryOp op);
+        template <typename InputIterator, typename UnaryOp>
+        void transform(const std::string& field, InputIterator first,
+                 InputIterator last, UnaryOp op);
         ///@}
         
         ///@{
-        /// Add each in the range [begin,end) for which UnaryPred returns true.
-        template <typename InIter, typename UnaryPred>
-        inline void add_if(InIter begin, InIter end, UnaryPred pred);
-        template <typename InIter, typename UnaryPred>
+        /// Add each in the range [first,last) for which UnaryPred returns true.
+        template <typename InputIterator, typename UnaryPred>
+        inline void add_if(InputIterator first, InputIterator last,
+                           UnaryPred pred);
+        template <typename InputIterator, typename UnaryPred>
         void add_if(const std::string& field,
-                    InIter begin, InIter end, UnaryPred pred);
+                    InputIterator first, InputIterator last, UnaryPred pred);
         ///@}
         
         ///@{
-        /** Add the result of UnaryOp() for each in the range [begin,end) for
+        /** Add the result of UnaryOp() for each in the range [first,last) for
          *  which UnaryPred returns true.
          */
-        template <typename InIter, typename UnaryPred, typename UnaryOp>
-        inline void add_if(InIter begin, InIter end, UnaryPred pred, UnaryOp op);
-        template <typename InIter, typename UnaryPred, typename UnaryOp>
-        void add_if(const std::string& field, InIter begin, InIter end,
-                    UnaryPred pred, UnaryOp op);
+        template <typename InputIterator, typename UnaryPred, typename UnaryOp>
+        inline void transform_if(InputIterator first, InputIterator last,
+                                 UnaryPred pred, UnaryOp op);
+        template <typename InputIterator, typename UnaryPred, typename UnaryOp>
+        void transform_if(const std::string& field, InputIterator first,
+                          InputIterator last, UnaryPred pred, UnaryOp op);
         ///@}
-
-        template <typename InIter>
-        void add_each(InIter begin, InIter end);
-        template <typename InIter, typename UnaryOp>
-        void add_each(InIter begin, InIter end, UnaryOp op);
-        template <typename InIter, typename UnaryPred>
-        void add_each_if(InIter begin, InIter end, UnaryPred pred);
-        template <typename InIter, typename UnaryOp, typename UnaryPred>
-        void add_each_if(InIter begin, InIter end, UnaryOp op, UnaryPred pred);
 
         /// Add an empty line.
         inline void add_linebreak();
@@ -170,138 +166,165 @@ QueryResults::add(const T& val)
     this->add(std::string(), val);
 }
 
-template <typename InIter>
+template <typename InputIterator>
 inline void
-QueryResults::add(InIter begin, InIter end)
+QueryResults::add(InputIterator first, InputIterator last)
 {
-    this->add(std::string(), begin, end);
+    this->add(std::string(), first, last);
 }
 
-template <typename InIter>
+template <typename InputIterator>
 void
-QueryResults::add(const std::string& field, InIter begin, InIter end)
+QueryResults::add(const std::string& field,
+                  InputIterator first,
+                  InputIterator last)
 {
     std::string val;
-    while (begin != end)
+    while (first != last)
     {
-        val += *begin;
-        if (++begin != end)
+        val += *first;
+        if (++first != last)
             val += " ";
     }
 
     this->add(field, val);
 }
 
-template <typename InIter, typename UnaryOp>
+template <typename InputIterator, typename UnaryOp>
 inline void
-QueryResults::add(InIter begin, InIter end, UnaryOp op)
+QueryResults::transform(InputIterator first,
+                        InputIterator last,
+                        UnaryOp op)
 {
-    this->add(std::string(), begin, end, op);
+    this->transform(std::string(), first, last, op);
 }
 
-template <typename InIter, typename UnaryOp>
+template <typename InputIterator, typename UnaryOp>
 void
-QueryResults::add(const std::string& field, InIter begin, InIter end, UnaryOp op)
+QueryResults::transform(const std::string& field,
+                        InputIterator first,
+                        InputIterator last,
+                        UnaryOp op)
 {
     std::string val;
-    while (begin != end)
+    while (first != last)
     {
-        val += op(*begin);
-        if (++begin != end)
+        val += op(*first);
+        if (++first != last)
             val += " ";
     }
 
     this->add(field, val);
 }
 
-template <typename InIter, typename UnaryPred>
+template <typename InputIterator, typename UnaryPred>
 inline void
-QueryResults::add_if(InIter begin, InIter end, UnaryPred pred)
+QueryResults::add_if(InputIterator first,
+                     InputIterator last,
+                     UnaryPred pred)
 {
-    this->add(std::string(), begin, end, pred);
+    this->add_if(std::string(), first, last, pred);
 }
 
-template <typename InIter, typename UnaryPred>
+template <typename InputIterator, typename UnaryPred>
 void
 QueryResults::add_if(const std::string& field,
-                     InIter begin, InIter end, UnaryPred pred)
+                     InputIterator first,
+                     InputIterator last,
+                     UnaryPred pred)
 {
     std::string val;
-    while (begin != end)
+    while (first != last)
     {
-        if (pred(*begin))
+        if (pred(*first))
         {
-            val += *begin;
-            if (++begin != end)
+            val += *first;
+            if (++first != last)
                 val += " ";
         }
-        else ++begin;
+        else ++first;
     }
+
+    this->add(field, val);
 }
 
-template <typename InIter, typename UnaryPred, typename UnaryOp>
+template <typename InputIterator, typename UnaryPred, typename UnaryOp>
 inline void
-QueryResults::add_if(InIter begin, InIter end, UnaryPred pred, UnaryOp op)
+QueryResults::transform_if(InputIterator first,
+                     InputIterator last,
+                     UnaryPred pred,
+                     UnaryOp op)
 {
-    this->add(std::string(), begin, end, pred, op);
+    this->transform_if(std::string(), first, last, pred, op);
 }
 
-template <typename InIter, typename UnaryPred, typename UnaryOp>
+template <typename InputIterator, typename UnaryPred, typename UnaryOp>
 void
-QueryResults::add_if(const std::string& field, InIter begin, InIter end,
-                     UnaryPred pred, UnaryOp op)
+QueryResults::transform_if(const std::string& field,
+                     InputIterator first,
+                     InputIterator last,
+                     UnaryPred pred,
+                     UnaryOp op)
 {
     std::string val;
-    while (begin != end)
+    while (first != last)
     {
-        if (pred(*begin))
+        if (pred(*first))
         {
-            val += op(*begin);
-            if (++begin != end)
+            val += op(*first);
+            if (++first != last)
                 val += " ";
         }
-        else ++begin;
+        else ++first;
     }
+
+    this->add(field, val);
 }
 
-template <typename InIter>
+template <typename InputIterator>
 void
-QueryResults::add_each(InIter begin, InIter end)
+copy_to_results(InputIterator first,
+                InputIterator last,
+                QueryResults& results)
 {
-    while (begin != end)
-        this->add(*begin++);
+    while (first != last)
+        results.add(*first++);
 }
 
-template <typename InIter, typename UnaryOp>
+template <typename InputIterator, typename UnaryOp>
 void
-QueryResults::add_each(InIter begin, InIter end, UnaryOp op)
+transform_to_results(InputIterator first,
+                     InputIterator last,
+                     QueryResults& results,
+                     UnaryOp op)
 {
-    while (begin != end)
-        this->add(op(*begin++));
+    while (first != last)
+        results.add(op(*first++));
 }
 
-template <typename InIter, typename UnaryPred>
+template <typename InputIterator, typename UnaryPred>
 void
-QueryResults::add_each_if(InIter begin, InIter end, UnaryPred pred)
+copy_to_results_if(InputIterator first,
+                   InputIterator last,
+                   QueryResults &results,
+                   UnaryPred pred)
 {
-    while (begin != end)
-    {
-        if (pred(*begin))
-            this->add(*begin);
-        ++begin;
-    }
+    for ( ; first != last ; ++first)
+        if (pred(*first))
+            results.add(*first);
 }
 
-template <typename InIter, typename UnaryOp, typename UnaryPred>
+template <typename InputIterator, typename UnaryPred, typename UnaryOp>
 void
-QueryResults::add_each_if(InIter begin, InIter end, UnaryOp op, UnaryPred pred)
+transform_to_results_if(InputIterator first,
+                        InputIterator last,
+                        QueryResults& results,
+                        UnaryPred pred,
+                        UnaryOp op)
 {
-    while (begin != end)
-    {
-        if (pred(*begin))
-            this->add(op(*begin));
-        ++begin;
-    }
+    for ( ; first != last ; ++first)
+        if (pred(*first))
+            results.add(op(*first));
 }
 
 #endif /* _HAVE_QUERY_RESULTS_HH */
