@@ -92,7 +92,7 @@ BatchIOHandler::operator()(Query * const query)
                 parts.erase(parts.begin());
             }
 
-            transform_to_query(parts.begin(), parts.end(), *query);
+            copy_to_query(parts.begin(), parts.end(), *query);
         }
         else if (not h->allow_empty_query())
         {

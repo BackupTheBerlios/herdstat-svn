@@ -20,6 +20,7 @@ herdstat_SOURCES = \
 	querycache.hh querycache.cc \
 	overlaydisplay.hh overlaydisplay.cc \
 	fields.hh \
+	query_base.hh \
 	query.hh query.cc \
 	query_results.hh \
 	getcols.cc \

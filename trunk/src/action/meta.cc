@@ -111,7 +111,7 @@ add_metadata(const metadata_data& data, std::string& longdesc,
                     devs.front().email());
 
         if (devs.size() > 1)
-            transform_to_results(++devs.begin(), devs.end(),
+            transform_to_query(++devs.begin(), devs.end(),
                 *results, portage::Email());
         else if (not meta.is_category() and devs.empty())
             results->add("Maintainers(0)", "none");
@@ -189,7 +189,7 @@ add_data(const metadata_data& data, QueryResults * const results)
                     results->add("Homepage", parts.front());
 
                 if (parts.size() > 1)
-                    copy_to_results(parts.begin() + 1, parts.end(), *results);
+                    copy_to_query(parts.begin() + 1, parts.end(), *results);
             }
             else
                 results->add("Homepage", ebuild_vars["HOMEPAGE"]);

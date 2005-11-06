@@ -199,7 +199,7 @@ VersionsActionHandler::operator()(Query& query,
             {
                 results->add("Package", (dir == options.portdir() or pwd) ?
                         package : package+od[dir]);
-                transform_to_results(versions.begin(), versions.end(),
+                transform_to_query(versions.begin(), versions.end(),
                     *results, OnlyPVREmptyFirst());
             }
             else if (not options.count())

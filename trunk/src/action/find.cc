@@ -143,7 +143,7 @@ FindActionHandler::operator()(Query& query,
         options.set_eregex(false);
 
         Query q;
-        transform_to_query(res.begin(), res.end(), q);
+        copy_to_query(res.begin(), res.end(), q);
 
         MetaActionHandler mhandler;
         mhandler(q, results);
@@ -152,7 +152,7 @@ FindActionHandler::operator()(Query& query,
         options.set_eregex(ere);
     }
     else if (not options.count())
-        copy_to_results(res.begin(), res.end(), *results);
+        copy_to_query(res.begin(), res.end(), *results);
 
     this->size() = res.size();
     PortageSearchActionHandler::operator()(query, results);

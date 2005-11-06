@@ -27,8 +27,7 @@
 # include "config.h"
 #endif
 
-#include <string>
-#include <herdstat/util/container_base.hh>
+#include "query_base.hh"
 
 /*
  * Represents a list of conditions that whatever is being searched must meet in
@@ -37,11 +36,11 @@
  * example).  The 'first' member may be empty.
  */
 
-class Query
-    : public herdstat::util::VectorBase<std::pair<std::string, std::string> >
+class Query : public QueryBase
 {
     public:
         Query();
+        virtual ~Query() { }
 
         /* get action associated with this query */
         const std::string& action() const { return _action; }
@@ -55,38 +54,6 @@ class Query
         std::string _action;
         bool _all;
 };
-
-template <typename InputIterator>
-void
-transform_to_query(InputIterator first, InputIterator last, Query& query)
-{
-    while (first != last)
-        query.push_back(std::make_pair(std::string(), *first++));
-}
-
-template <typename InputIterator, typename UnaryOp>
-void
-transform_to_query(InputIterator first,
-                   InputIterator last,
-                   Query& query,
-                   UnaryOp op)
-{
-    while (first != last)
-        query.push_back(std::make_pair(std::string(), op(*first++)));
-}
-
-template <typename InputIterator, typename UnaryPred, typename UnaryOp>
-void
-transform_to_query_if(InputIterator first,
-                      InputIterator last,
-                      Query& query,
-                      UnaryPred pred,
-                      UnaryOp op)
-{
-    for ( ; first != last ; ++first)
-        if (pred(*first))
-            query.push_back(std::make_pair(std::string() , op(*first)));
-}
 
 #endif /* _HAVE_QUERY_HH */
 
