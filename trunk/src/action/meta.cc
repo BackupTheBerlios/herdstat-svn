@@ -99,13 +99,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
 
     if (options.quiet())
     {
-        std::vector<std::string> qdevs;
-        portage::Developers::const_iterator d;
-        for (d = devs.begin() ; d != devs.end() ; ++d)
-            qdevs.push_back(d->email());
-
         if (devs.size() >= 1)
-            results->add(qdevs);
+            results->transform(devs.begin(), devs.end(), portage::Email());
         else if (not meta.is_category())
             results->add("none");
     }
@@ -116,11 +111,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
                     devs.front().email());
 
         if (devs.size() > 1)
-        {
-            portage::Developers::const_iterator d;
-            for (d = ++devs.begin() ; d != devs.end() ; ++d)
-                results->add(d->email());
-        }
+            transform_to_results(++devs.begin(), devs.end(),
+                *results, portage::Email());
         else if (not meta.is_category() and devs.empty())
             results->add("Maintainers(0)", "none");
     }
@@ -197,11 +189,7 @@ add_data(const metadata_data& data, QueryResults * const results)
                     results->add("Homepage", parts.front());
 
                 if (parts.size() > 1)
-                {
-                    std::vector<std::string>::iterator h;
-                    for (h = ( parts.begin() + 1) ; h != parts.end() ; ++h)
-                        results->add(*h);
-                }
+                    copy_to_results(parts.begin() + 1, parts.end(), *results);
             }
             else
                 results->add("Homepage", ebuild_vars["HOMEPAGE"]);
@@ -228,10 +216,9 @@ add_data(const metadata_data& data, QueryResults * const results)
 }
 
 void
-MetaActionHandler::operator()(const Query& qq,
+MetaActionHandler::operator()(Query& query,
                               QueryResults * const results)
 {
-    Query query(qq);
     OverlayDisplay od(results);
     bool pwd = false;
     std::string dir;
@@ -326,7 +313,7 @@ MetaActionHandler::operator()(const Query& qq,
             results->add_linebreak();
 
             std::for_each(e.packages.begin(), e.packages.end(),
-                std::bind2nd(ColorIfNecessary(), results));
+                std::bind2nd(ColorAmbiguousPkg(), results));
 
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

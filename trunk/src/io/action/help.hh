@@ -36,9 +36,7 @@ class HelpIOActionHandler : public IOActionHandler
         virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;
-
-        virtual void operator()(const Query& query,
-                                QueryResults * const results);
+        virtual void operator()(Query& query, QueryResults * const results);
 };
 
 #endif /* _HAVE_ACTION_HELP_HH */

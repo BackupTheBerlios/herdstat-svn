@@ -48,54 +48,46 @@ PrintIOActionHandler::usage() const
 }
 
 void
-PrintIOActionHandler::operator()(const Query& query,
-                               QueryResults * const results)
+PrintIOActionHandler::operator()(Query& query,
+                                 QueryResults * const results)
 {
-    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
-        try
-        {
 #define ADD_IF_EQUAL(x) \
-            if (q->second == #x) \
-                results->add(options.x());
+        if (q->second == #x) \
+            results->add(options.x());
 
-            ADD_IF_EQUAL(quiet)
-            else ADD_IF_EQUAL(verbose)
-            else ADD_IF_EQUAL(count)
-            else ADD_IF_EQUAL(regex)
-            else ADD_IF_EQUAL(eregex)
-            else ADD_IF_EQUAL(overlay)
-            else ADD_IF_EQUAL(qa)
-            else ADD_IF_EQUAL(metacache)
-            else ADD_IF_EQUAL(devaway)
-            else ADD_IF_EQUAL(meta)
-            else ADD_IF_EQUAL(dev)
-            else ADD_IF_EQUAL(querycache_max)
-            else ADD_IF_EQUAL(querycache_expire)
-            else ADD_IF_EQUAL(devaway_expire)
-            else ADD_IF_EQUAL(maxcol)
-            else ADD_IF_EQUAL(action)
-            else ADD_IF_EQUAL(cvsdir)
-            else ADD_IF_EQUAL(herdsxml)
-            else ADD_IF_EQUAL(devawayxml)
-            else ADD_IF_EQUAL(userinfoxml)
-            else ADD_IF_EQUAL(localstatedir)
-            else ADD_IF_EQUAL(metacache_expire)
-            else ADD_IF_EQUAL(locale)
-            else ADD_IF_EQUAL(iomethod)
-            else ADD_IF_EQUAL(portdir)
-            else ADD_IF_EQUAL(with_dev)
-            else ADD_IF_EQUAL(with_herd)
-            else if (q->second == "version")
-                results->add(PACKAGE"-"VERSION);
-            else throw Exception("Unknown option '%s'.", q->second.c_str());
-
+        ADD_IF_EQUAL(quiet)
+        else ADD_IF_EQUAL(verbose)
+        else ADD_IF_EQUAL(count)
+        else ADD_IF_EQUAL(regex)
+        else ADD_IF_EQUAL(eregex)
+        else ADD_IF_EQUAL(overlay)
+        else ADD_IF_EQUAL(qa)
+        else ADD_IF_EQUAL(metacache)
+        else ADD_IF_EQUAL(devaway)
+        else ADD_IF_EQUAL(meta)
+        else ADD_IF_EQUAL(dev)
+        else ADD_IF_EQUAL(querycache_max)
+        else ADD_IF_EQUAL(querycache_expire)
+        else ADD_IF_EQUAL(devaway_expire)
+        else ADD_IF_EQUAL(maxcol)
+        else ADD_IF_EQUAL(action)
+        else ADD_IF_EQUAL(cvsdir)
+        else ADD_IF_EQUAL(herdsxml)
+        else ADD_IF_EQUAL(devawayxml)
+        else ADD_IF_EQUAL(userinfoxml)
+        else ADD_IF_EQUAL(localstatedir)
+        else ADD_IF_EQUAL(metacache_expire)
+        else ADD_IF_EQUAL(locale)
+        else ADD_IF_EQUAL(iomethod)
+        else ADD_IF_EQUAL(portdir)
+        else ADD_IF_EQUAL(with_dev)
+        else ADD_IF_EQUAL(with_herd)
+        else if (q->second == "version")
+            results->add(PACKAGE"-"VERSION);
+        else results->add("Unknown option '" + q->second + "'.");
 #undef ADD_IF_EQUAL
-        }
-        catch (const Exception& e)
-        {
-            results->add(e.what());
-        }
     }
 }
 

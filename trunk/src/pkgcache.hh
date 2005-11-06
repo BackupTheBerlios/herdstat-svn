@@ -40,9 +40,7 @@ class pkgcache : public herdstat::cachable
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        pkgcache();
-        pkgcache(const std::string &portdir);
-        void init();
+        virtual ~pkgcache();
 
         virtual bool valid() const;
         virtual void fill();
@@ -50,16 +48,22 @@ class pkgcache : public herdstat::cachable
         virtual void dump();
 
         /// Implicit conversion to container_type
-        inline operator const container_type&() const;
+        operator const container_type&() const { return _pkgs; }
 
-        inline iterator begin();
-        inline const_iterator begin() const;
-        inline iterator end();
-        inline const_iterator end() const;
-        inline size_type size() const;
-        inline bool empty() const;
+        iterator begin() { return _pkgs.begin(); }
+        const_iterator begin() const { return _pkgs.begin(); }
+        iterator end() { return _pkgs.end(); }
+        const_iterator end() const { return _pkgs.end(); }
+        size_type size() const { return _pkgs.size(); }
+        bool empty() const { return _pkgs.empty(); }
 
     private:
+        friend pkgcache& GlobalPkgCache();
+        pkgcache();
+        pkgcache(const std::string &portdir);
+        pkgcache(const pkgcache&);
+        pkgcache& operator= (const pkgcache&);
+
         Options& _options;
         int _reserve;
         const std::string& _portdir;
@@ -67,47 +71,7 @@ class pkgcache : public herdstat::cachable
         herdstat::portage::PackageList _pkgs;
 };
 
-inline pkgcache::iterator
-pkgcache::begin()
-{
-    return _pkgs.begin();
-}
-
-inline pkgcache::const_iterator
-pkgcache::begin() const
-{
-    return _pkgs.begin();
-}
-
-inline pkgcache::iterator
-pkgcache::end()
-{
-    return _pkgs.end();
-}
-
-inline pkgcache::const_iterator
-pkgcache::end() const
-{
-    return _pkgs.end();
-}
-
-inline pkgcache::size_type
-pkgcache::size() const
-{
-    return _pkgs.size();
-}
-
-inline bool
-pkgcache::empty() const
-{
-    return _pkgs.empty();
-}
-
-inline pkgcache::operator
-const pkgcache::container_type&() const
-{
-    return _pkgs;
-}
+pkgcache& GlobalPkgCache();
 
 #endif
 

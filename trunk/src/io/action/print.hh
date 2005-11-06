@@ -33,13 +33,10 @@ class PrintIOActionHandler : public IOActionHandler
 {
     public:
         virtual ~PrintIOActionHandler() { }
-
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
-
-        virtual void operator()(const Query& query,
-                                QueryResults * const results);
+        virtual void operator()(Query& query, QueryResults * const results);
 };
 
 #endif /* _HAVE_ACTION_PRINT_HH */

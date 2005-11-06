@@ -43,13 +43,11 @@
 using namespace herdstat;
 using namespace herdstat::portage;
 
-pkgcache::pkgcache()
-    : cachable(GlobalOptions().localstatedir()+PKGCACHE),
-      _options(GlobalOptions()),
-      _reserve(PKGLIST_RESERVE),
-      _portdir(_options.portdir()), _overlays(_options.overlays()),
-      _pkgs(_portdir, _overlays)
+pkgcache&
+GlobalPkgCache()
 {
+    static pkgcache p(GlobalOptions().portdir());
+    return p;
 }
 
 pkgcache::pkgcache(const std::string &portdir)
@@ -62,10 +60,8 @@ pkgcache::pkgcache(const std::string &portdir)
     this->logic();
 }
 
-void
-pkgcache::init()
+pkgcache::~pkgcache()
 {
-    this->logic();
 }
 
 /*
@@ -164,7 +160,8 @@ pkgcache::fill()
     if (_options.timer())
     {
         timer.stop();
-        debug_msg("Took %ldms to fill package cache.", timer.elapsed());
+        _options.outstream() << "Took " << timer.elapsed()
+            << "ms to fill the package cache." << std::endl;
     }
 }
 

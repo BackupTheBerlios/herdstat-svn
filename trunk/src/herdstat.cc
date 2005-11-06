@@ -600,7 +600,10 @@ main(int argc, char **argv)
 	    throw argsException();
 
         if (not q.empty() and q.front().second == "all")
+        {
+            q.erase(q.begin());
             q.set_all(true);
+        }
 
 	/* set path to herds.xml and userinfo.xml if --gentoo-cvs was specified */
 	if (not options.cvsdir().empty())

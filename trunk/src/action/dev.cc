@@ -62,14 +62,12 @@ DevActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-DevActionHandler::operator()(const Query& qq,
-                              QueryResults * const results)
+DevActionHandler::operator()(Query& query, QueryResults * const results)
 {
-    Query query(qq);
-
     portage::herds_xml& herds_xml(GlobalHerdsXML());
     portage::devaway_xml& devaway_xml(GlobalDevawayXML());
     portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
+    const portage::Developers& devs(userinfo_xml.devs());
 
     const portage::Herds& herds(herds_xml.herds());
     portage::Herds::const_iterator h;
@@ -84,8 +82,7 @@ DevActionHandler::operator()(const Query& qq,
             all_devs.insert(h->begin(), h->end());
 
         if (not userinfo_xml.empty())
-            all_devs.insert(userinfo_xml.devs().begin(),
-                            userinfo_xml.devs().end());
+            all_devs.insert(devs.begin(), devs.end());
 
         add_herd(all_devs, results);
         this->size() = all_devs.size();
@@ -97,20 +94,21 @@ DevActionHandler::operator()(const Query& qq,
         regexp.assign(query.front().second);
         query.clear();
 
-        std::vector<std::string> rvec;
-
+        /* insert the user name of each developer
+         * that matches the regex into our query object */
         for (h = herds.begin() ; h != herds.end() ; ++h)
-            util::transform_if(h->begin(), h->end(), std::back_inserter(rvec),
-                std::bind1st(portage::UserRegexMatch<portage::Developer>(), regexp),
-                portage::User());
+            transform_to_query_if(h->begin(), h->end(), query,
+                std::bind1st(portage::UserRegexMatch<portage::Developer>(),
+                regexp), portage::User());
 
+        /* likewise for userinfo.xml, if used.  There may be
+         * developers that match that aren't listed in herds.xml */
         if (not userinfo_xml.empty())
-            util::transform_if(userinfo_xml.devs().begin(), userinfo_xml.devs().end(),
-                std::back_inserter(rvec),
-                std::bind1st(portage::UserRegexMatch<portage::Developer>(), regexp),
-                portage::User());
+            transform_to_query_if(devs.begin(), devs.end(), query,
+                std::bind1st(portage::UserRegexMatch<portage::Developer>(),
+                regexp), portage::User());
 
-        if (rvec.empty())
+        if (query.empty())
         {
             results->add(util::sprintf(
                 "Failed to find any developers matching '%s'.", regexp().c_str()));
@@ -118,13 +116,12 @@ DevActionHandler::operator()(const Query& qq,
         }
 
         /* remove any dupes */
-        std::sort(rvec.begin(), rvec.end());
-        rvec.erase(std::unique(rvec.begin(), rvec.end()), rvec.end());
-        std::transform(rvec.begin(), rvec.end(),
-            std::back_inserter(query), util::EmptyFirst());
+        std::sort(query.begin(), query.end(), util::SecondLess());
+        query.erase(std::unique(query.begin(), query.end(), util::SecondEqual()),
+            query.end());
     }
 
-    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
         try
         {
@@ -134,7 +131,7 @@ DevActionHandler::operator()(const Query& qq,
             userinfo_xml.fill_developer(dev);
 
             if (dev.herds().empty() and (userinfo_xml.empty() or
-                (userinfo_xml.devs().find(q->second) == userinfo_xml.devs().end())))
+                (devs.find(q->second) == devs.end())))
                 throw ActionException();
 
             const std::vector<std::string>& hvec(dev.herds());
@@ -233,7 +230,7 @@ DevActionHandler::operator()(const Query& qq,
         catch (const ActionException)
         {
             this->error() = true;
-            results->add(util::sprintf("Developer '%s' doesn't seem to exist.",
+            results->add(util::sprintf("Developer '%s' doesn't seem to belong to any herds.",
                     q->second.c_str()));
 
             if (options.iomethod() == "stream")

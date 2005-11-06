@@ -52,7 +52,7 @@ ActionHandler::usage() const
 }
 
 void
-ActionHandler::operator()(const Query &null, QueryResults * const results)
+ActionHandler::operator()(Query &null, QueryResults * const results)
 {
     /* show count, if requested */
     if (options.count() and not this->error())
@@ -62,7 +62,7 @@ ActionHandler::operator()(const Query &null, QueryResults * const results)
 }
 
 void
-PortageSearchActionHandler::operator()(const Query& null,
+PortageSearchActionHandler::operator()(Query& null,
                                        QueryResults * const results)
 {
     ActionHandler::operator()(null, results);

@@ -49,7 +49,7 @@ FetchActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-FetchActionHandler::operator()(const Query& query,
+FetchActionHandler::operator()(Query& query,
                                QueryResults * const results)
 {
 

@@ -53,7 +53,7 @@ class ActionHandler
         virtual const char * const usage() const;
 
         /// perform action
-        virtual void operator()(const Query& query,
+        virtual void operator()(Query& query,
                                 QueryResults * const results) = 0;
 
     protected:
@@ -82,7 +82,7 @@ class PortageSearchActionHandler : public ActionHandler
     public:
         virtual ~PortageSearchActionHandler() { }
 
-        virtual void operator()(const Query& query,
+        virtual void operator()(Query& query,
                                 QueryResults * const results) = 0;
 
     protected:

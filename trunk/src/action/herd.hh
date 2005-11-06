@@ -37,7 +37,7 @@ class HerdActionHandler : public ActionHandler
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
-        virtual void operator()(const Query& query,
+        virtual void operator()(Query& query,
                                 QueryResults * const results);
 
     protected:

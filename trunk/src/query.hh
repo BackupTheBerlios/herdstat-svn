@@ -56,6 +56,38 @@ class Query
         bool _all;
 };
 
+template <typename InputIterator>
+void
+transform_to_query(InputIterator first, InputIterator last, Query& query)
+{
+    while (first != last)
+        query.push_back(std::make_pair(std::string(), *first++));
+}
+
+template <typename InputIterator, typename UnaryOp>
+void
+transform_to_query(InputIterator first,
+                   InputIterator last,
+                   Query& query,
+                   UnaryOp op)
+{
+    while (first != last)
+        query.push_back(std::make_pair(std::string(), op(*first++)));
+}
+
+template <typename InputIterator, typename UnaryPred, typename UnaryOp>
+void
+transform_to_query_if(InputIterator first,
+                      InputIterator last,
+                      Query& query,
+                      UnaryPred pred,
+                      UnaryOp op)
+{
+    for ( ; first != last ; ++first)
+        if (pred(*first))
+            query.push_back(std::make_pair(std::string() , op(*first)));
+}
+
 #endif /* _HAVE_QUERY_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

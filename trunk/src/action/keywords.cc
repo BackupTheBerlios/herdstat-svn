@@ -31,6 +31,7 @@
 #include <herdstat/portage/keywords.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "action/keywords.hh"
 
@@ -96,10 +97,9 @@ struct GetKeywords
 };
 
 void
-KeywordsActionHandler::operator()(const Query& qq,
+KeywordsActionHandler::operator()(Query& query,
                                   QueryResults * const results)
 {
-    Query query(qq);
     OverlayDisplay od(results);
     std::string dir;
     bool pwd = false;
@@ -219,7 +219,7 @@ KeywordsActionHandler::operator()(const Query& qq,
             results->add_linebreak();
 
             std::for_each(e.packages.begin(), e.packages.end(),
-                std::bind2nd(ColorIfNecessary(), results));
+                std::bind2nd(ColorAmbiguousPkg(), results));
             
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

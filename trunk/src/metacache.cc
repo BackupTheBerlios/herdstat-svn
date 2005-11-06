@@ -35,11 +35,12 @@
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "metacache.hh"
 
 #define METACACHE               /*LOCALSTATEDIR*/"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
-#define METACACHE_RESERVE       9100
+#define METACACHE_RESERVE       9600
 
 using namespace herdstat;
 using namespace herdstat::portage;

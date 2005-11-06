@@ -31,6 +31,7 @@
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "action/meta.hh"
 #include "action/find.hh"
 
@@ -65,7 +66,7 @@ FindActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-FindActionHandler::operator()(const Query& query,
+FindActionHandler::operator()(Query& query,
                               QueryResults * const results)
 {
     if (query.all())
@@ -85,8 +86,7 @@ FindActionHandler::operator()(const Query& query,
 
         if (matches.empty())
         {
-            results->add(util::sprintf("Failed to find any packages matching '%s'.",
-                         regexp().c_str()));
+            results->add("Failed to find any packages matching '" + regexp() + "'.");
             throw ActionException();
         }
     }
@@ -143,8 +143,7 @@ FindActionHandler::operator()(const Query& query,
         options.set_eregex(false);
 
         Query q;
-        std::transform(res.begin(), res.end(),
-            std::back_inserter(q), util::EmptyFirst());
+        transform_to_query(res.begin(), res.end(), q);
 
         MetaActionHandler mhandler;
         mhandler(q, results);
@@ -153,13 +152,7 @@ FindActionHandler::operator()(const Query& query,
         options.set_eregex(ere);
     }
     else if (not options.count())
-    {
-        if (res.size() == 1)
-            results->add(res.front());
-        else
-            std::transform(res.begin(), res.end(),
-                std::back_inserter(*results), util::EmptyFirst());
-    }
+        copy_to_results(res.begin(), res.end(), *results);
 
     this->size() = res.size();
     PortageSearchActionHandler::operator()(query, results);

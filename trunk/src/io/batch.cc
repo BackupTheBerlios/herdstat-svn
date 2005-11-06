@@ -75,17 +75,25 @@ BatchIOHandler::operator()(Query * const query)
             handlers(GlobalHandlerMap<ActionHandler>());
         insert_extra_actions(handlers);
 
-        ActionHandler *h = handlers[parts[0]];
+        ActionHandler *h = handlers[parts.front()];
         if (not h)
-            throw ActionUnimplemented(parts[0]);
+            throw ActionUnimplemented(parts.front());
 
-        query->set_action(parts[0]);
+        query->set_action(parts.front());
+        parts.erase(parts.begin());
         init_xml_if_necessary(query->action());
 
         /* transform arguments into the query object */
         if (parts.size() > 1)
-            std::transform(parts.begin() + 1, parts.end(),
-                std::back_inserter(*query), util::EmptyFirst());
+        {
+            if (parts.front() == "all")
+            {
+                query->set_all(true);
+                parts.erase(parts.begin());
+            }
+
+            transform_to_query(parts.begin(), parts.end(), *query);
+        }
         else if (not h->allow_empty_query())
         {
             query->clear();

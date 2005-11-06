@@ -58,7 +58,7 @@ StatsActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-StatsActionHandler::operator()(const Query& query,
+StatsActionHandler::operator()(Query& query,
                                QueryResults * const results)
 {
     const bool quiet_save(options.quiet());

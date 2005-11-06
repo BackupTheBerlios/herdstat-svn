@@ -29,6 +29,7 @@
 #include <herdstat/portage/find.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "action/which.hh"
 
 using namespace herdstat;
@@ -62,11 +63,9 @@ WhichActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-WhichActionHandler::operator()(const Query& qq,
+WhichActionHandler::operator()(Query& query,
                                QueryResults * const results)
 {
-    Query query(qq);
-
     if (query.all())
     {
         results->add("This handler does not support the 'all' target.");
@@ -122,7 +121,7 @@ WhichActionHandler::operator()(const Query& qq,
             results->add_linebreak();
 
             std::for_each(e.packages.begin(), e.packages.end(),
-                std::bind2nd(ColorIfNecessary(), results));
+                std::bind2nd(ColorAmbiguousPkg(), results));
             
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

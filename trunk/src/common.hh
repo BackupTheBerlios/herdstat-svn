@@ -35,7 +35,6 @@
 #include "options.hh"
 #include "exceptions.hh"
 #include "query_results.hh"
-#include "pkgcache.hh"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -56,9 +55,8 @@ herdstat::portage::herds_xml& GlobalHerdsXML();
 herdstat::portage::devaway_xml& GlobalDevawayXML();
 herdstat::portage::userinfo_xml& GlobalUserinfoXML();
 herdstat::util::ColorMap& GlobalColorMap();
-pkgcache& GlobalPkgCache();
 
-struct ColorIfNecessary
+struct ColorAmbiguousPkg
     : std::binary_function<std::string, QueryResults * const, void>
 {
     void operator()(const std::string& str, QueryResults * const results) const

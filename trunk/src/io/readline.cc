@@ -154,7 +154,10 @@ ReadLineIOHandler::operator()(Query * const query)
             const std::string& front(parts.front());
 
             if (front == "all")
+            {
                 query->set_all(true);
+                parts.erase(parts.begin());
+            }
             /* action is bound, but we still want to provide access to our
              * handler-specific actions */
             else if (front == "set" or

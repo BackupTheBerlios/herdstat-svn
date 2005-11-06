@@ -50,22 +50,23 @@ SetIOActionHandler::usage() const
 }
 
 void
-SetIOActionHandler::operator()(const Query& query,
-                             QueryResults * const results)
+SetIOActionHandler::operator()(Query& query,
+                               QueryResults * const results)
 {
-    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
         try
         {
             std::vector<std::string> parts(util::split(q->second, '='));
             if (parts.size() != 2)
-                throw Exception("Failed to parse option. Use option=value.");
+                throw Exception("Failed to parse '%s'. Use option=value.",
+                                q->second.c_str());
         
             const std::string& key(parts.front());
             std::string& val(parts.back());
 
             /* remove any begin/end quotes */
-            char begin(val[0]), end(val[val.length() - 1]);
+            const char begin(val[0]), end(val[val.length() - 1]);
             if (begin == '\'' or begin == '"')
                 val.erase(0, 1);
             if (end == '\'' or end == '"')
@@ -128,7 +129,7 @@ SetIOActionHandler::operator()(const Query& query,
             else SET_STR_IF_EQUAL(with_dev)
             else SET_STR_IF_EQUAL(with_herd)
             else SET_STR_IF_EQUAL(metacache_expire)
-            else throw Exception("Unknown option '%s'.", key.c_str());
+            else results->add("Unknown option '" + key + "'.");
 
 #undef SET_INT_IF_EQUAL
 #undef SET_STR_IF_EQUAL

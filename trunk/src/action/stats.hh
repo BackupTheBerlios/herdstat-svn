@@ -36,7 +36,7 @@ class StatsActionHandler : public ActionHandler
         virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;
-        virtual void operator()(const Query& query,
+        virtual void operator()(Query& query,
                                 QueryResults * const results);
 
     protected:

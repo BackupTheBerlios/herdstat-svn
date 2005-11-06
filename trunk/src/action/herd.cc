@@ -141,11 +141,9 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-HerdActionHandler::operator()(const Query& qq,
+HerdActionHandler::operator()(Query& query,
                               QueryResults * const results)
 {
-    Query query(qq);
-
     /* search for items in query and insert results */
     const portage::Herds& herds(GlobalHerdsXML().herds());
     portage::Herds::const_iterator h;
@@ -162,15 +160,12 @@ HerdActionHandler::operator()(const Query& qq,
         regexp.assign(query.front().second);
         query.clear();
 
-        std::vector<std::string> rvec;
-        util::transform_if(herds.begin(), herds.end(), std::back_inserter(rvec),
+        transform_to_query_if(herds.begin(), herds.end(), query,
             std::bind1st(portage::NameRegexMatch<portage::Herd>(), regexp),
             portage::Name());
-        std::transform(rvec.begin(), rvec.end(),
-            std::back_inserter(query), util::EmptyFirst());
     }
 
-    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
         try
         {

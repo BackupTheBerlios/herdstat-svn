@@ -67,7 +67,7 @@ pkgQuery::dump(std::ostream &stream) const
 //    }
 
     if (this->size() > 1)
-        results.add(++(this->begin()), this->end(), util::First());
+        results.transform(++(this->begin()), this->end(), util::First());
 
     output(results, stream);
 }

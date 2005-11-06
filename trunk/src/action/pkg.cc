@@ -395,11 +395,11 @@ PkgActionHandler::add_matches(QueryResults * const results)
  */
 
 void
-PkgActionHandler::operator()(const Query& qq,
+PkgActionHandler::operator()(Query& query,
                              QueryResults * const results)
 {
     /* PkgActionHandler doesn't support the all target */
-    if (qq.all())
+    if (query.all())
     {
         results->add("Package action handler does not support the 'all' target.");
         throw ActionException();
@@ -409,7 +409,6 @@ PkgActionHandler::operator()(const Query& qq,
     if (not util::is_dir(options.portdir()))
 	throw FileException(options.portdir());
 
-    Query query(qq);
     /* setup with regex */
     with.assign(options.dev() ? options.with_herd() :
                                  options.with_dev(),

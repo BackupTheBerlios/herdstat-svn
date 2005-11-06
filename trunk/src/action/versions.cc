@@ -30,6 +30,7 @@
 #include <herdstat/portage/version.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "action/versions.hh"
 
@@ -91,10 +92,9 @@ struct OnlyPVREmptyFirst
 };
 
 void
-VersionsActionHandler::operator()(const Query& qq,
+VersionsActionHandler::operator()(Query& query,
                                   QueryResults * const results)
 {
-    Query query(qq);
     OverlayDisplay od(results);
     std::string dir;
     bool pwd = false;
@@ -199,11 +199,11 @@ VersionsActionHandler::operator()(const Query& qq,
             {
                 results->add("Package", (dir == options.portdir() or pwd) ?
                         package : package+od[dir]);
-                results->add_each(versions.begin(), versions.end(),
-                    OnlyPVREmptyFirst());
+                transform_to_results(versions.begin(), versions.end(),
+                    *results, OnlyPVREmptyFirst());
             }
             else if (not options.count())
-                results->add(versions.begin(), versions.end(), OnlyPVR());
+                results->transform(versions.begin(), versions.end(), OnlyPVR());
             
             if (not options.count() and (n != matches.size()))
                 results->add_linebreak();
@@ -214,7 +214,7 @@ VersionsActionHandler::operator()(const Query& qq,
             results->add_linebreak();
 
             std::for_each(e.packages.begin(), e.packages.end(),
-                std::bind2nd(ColorIfNecessary(), results));
+                std::bind2nd(ColorAmbiguousPkg(), results));
             
             if (matches.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();

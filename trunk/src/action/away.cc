@@ -61,75 +61,34 @@ AwayActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
-static void
-add_away(const portage::Developer& d, QueryResults * const results)
-{
-    Options& options(GlobalOptions());
-
-    if (options.count())
-        return;
-
-    if (options.quiet())
-        results->add(d.user() + " - " + util::tidy_whitespace(d.awaymsg()));
-    else
-    {
-        portage::Developer dev(d);
-        GlobalHerdsXML().fill_developer(dev);
-
-        if (dev.name().empty())
-            results->add("Developer", dev.user());
-        else
-            results->add("Developer",
-                         dev.name() + " (" + dev.user() + ")");
-
-        results->add("Email", dev.email());
-        results->add("Away Message",
-                     util::tidy_whitespace(dev.awaymsg()));
-    }
-}
-
 void
-AwayActionHandler::operator()(const Query& qq,
+AwayActionHandler::operator()(Query& query,
                               QueryResults * const results)
 {
-    Query query(qq);
-    portage::devaway_xml& devaway_xml(GlobalDevawayXML());
-    const portage::Developers& devs(devaway_xml.devs());
+    const portage::Developers& devs(GlobalDevawayXML().devs());
     portage::Developers::const_iterator d;
 
     if (query.all())
-    {
-        for (d = devs.begin() ; d != devs.end() ; )
-        {
-            add_away(*d++, results);
-            if (not options.quiet() and (d != devs.end()))
-                results->add_linebreak();
-        }
-        this->size() = devs.size();
-        return ActionHandler::operator()(query, results);
-    }
+        transform_to_query(devs.begin(), devs.end(),
+            query, portage::User());
     else if (options.regex())
     {
         regexp.assign(query.front().second);
         query.clear();
 
-        std::vector<std::string> rvec;
-        util::transform_if(devs.begin(), devs.end(), std::back_inserter(rvec),
+        transform_to_query_if(devs.begin(), devs.end(), query,
             std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-            regexp), portage::User());
+                regexp), portage::User());
 
-        if (rvec.empty())
+        if (query.empty())
         {
-            results->add("Failed to find any developers matching '" + regexp() + "'.");
+            results->add("Failed to find any developers matching '" +
+                         regexp() + "'.");
             throw ActionException();
         }
-
-        std::sort(rvec.begin(), rvec.end());
-        std::transform(rvec.begin(), rvec.end(),
-            std::back_inserter(query), util::EmptyFirst());
     }
 
-    for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
         try
         {
@@ -137,7 +96,29 @@ AwayActionHandler::operator()(const Query& qq,
                 throw ActionException();
 
             this->size()++;
-            add_away(*d, results);
+
+            if (options.count())
+                continue;
+
+            if (options.quiet())
+                results->add(
+                    d->user() + " - " + util::tidy_whitespace(d->awaymsg()));
+            else
+            {
+                /* copy what we have and fill it with info in herds.xml */
+                portage::Developer dev(*d);
+                GlobalHerdsXML().fill_developer(dev);
+
+                if (dev.name().empty())
+                    results->add("Developer", dev.user());
+                else
+                    results->add("Developer",
+                         dev.name() + " (" + dev.user() + ")");
+
+                results->add("Email", dev.email());
+                results->add("Away Message",
+                     util::tidy_whitespace(dev.awaymsg()));
+            }
         }
         catch (const ActionException)
         {
@@ -146,7 +127,7 @@ AwayActionHandler::operator()(const Query& qq,
                 "Developer '%s' either doesn't exist or is not currently away.",
                 q->second.c_str()));
 
-            if (options.iomethod() == "stream")
+            if (query.size() == 1 and options.iomethod() == "stream")
                 throw;
         }
 

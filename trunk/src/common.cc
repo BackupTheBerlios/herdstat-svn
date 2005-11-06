@@ -157,11 +157,4 @@ GlobalColorMap()
     return c;
 }
 
-pkgcache&
-GlobalPkgCache()
-{
-    static pkgcache p(GlobalOptions().portdir());
-    return p;
-}
-
 /* vim: set tw=80 sw=4 fdm=marker et : */
