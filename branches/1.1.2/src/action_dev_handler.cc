@@ -1,4 +1,4 @@
-/*
+
  * herdstat -- src/action_dev_handler.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
@@ -289,7 +289,7 @@ action_dev_handler::operator() (opts_type &opts)
         catch (const DevException)
         {
             std::cerr << "Developer '" << *i << "' doesn't seem to "
-                << "exist." << std::endl;
+                << "belong to any herds." << std::endl;
 
             if (opts.size() == 1)
                 return EXIT_FAILURE;
