@@ -27,21 +27,22 @@
 # include "config.h"
 #endif
 
+#include <herdstat/noncopyable.hh>
 #include <herdstat/xml/init.hh>
 
-class XMLInit
+class XMLInit : private herdstat::noncopyable
 {
     private:
         friend void GlobalXMLInit();
         XMLInit();
 
-        herdstat::xml::Init& _init;
+        const herdstat::xml::Init& _init;
 };
 
 inline void
 GlobalXMLInit()
 {
-    static XMLInit x;
+    static const XMLInit x;
 }
 
 #endif /* _HAVE_SRC_XMLINIT_HH */
