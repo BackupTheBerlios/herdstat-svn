@@ -54,9 +54,28 @@ ActionHandler::usage() const
 void
 ActionHandler::operator()(Query &null, QueryResults * const results)
 {
+
+#if 0
+
+    psuedo code:
+
+    if (query->all())
+        this->do_all(query, results);
+    else if(options.regex())
+        this->do_regex(query, results);
+
+    filter out unmatching queries
+    for each filter, format results
+
+    this->transform_query_into_results(query, results);
+    this->_size = query.size();
+
+#endif
+
+
     /* show count, if requested */
     if (options.count() and not this->error())
-        results->add(util::stringify<std::size_t>(this->_size));
+        results->add(this->_size);
 
     this->_size = this->_err = 0;
 }
