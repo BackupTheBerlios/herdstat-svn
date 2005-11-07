@@ -530,8 +530,7 @@ handle_opts(int argc, char **argv, Query *q)
     parse_fields(fields, &options);
 
     if (optind < argc)
-	std::transform(argv+optind, argv+argc,
-	    std::back_inserter(*q), util::EmptyFirst());
+        q->add(argv+optind, argv+argc);
     else
     {
 	/* actions that are allowed to have 0 non-option args */
@@ -650,13 +649,13 @@ main(int argc, char **argv)
 
 	/* set default action */
 	if (q.action() == "unspecified")
-	    q.set_action(q.empty() ? "stats" : "herd");
+	    q.set_action(q.all() ? "herd" : q.empty() ? "stats" : "herd");
 
 	/* setup action handlers */
 	HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
 	handlers.insert(std::make_pair("away", new AwayActionHandler()));
 	handlers.insert(std::make_pair("dev",  new DevActionHandler()));
-	handlers.insert(std::make_pair("fetch", new FetchActionHandler()));
+//        handlers.insert(std::make_pair("fetch", new FetchActionHandler()));
 	handlers.insert(std::make_pair("find", new FindActionHandler()));
 	handlers.insert(std::make_pair("herd", new HerdActionHandler()));
 	handlers.insert(std::make_pair("keywords", new KeywordsActionHandler()));

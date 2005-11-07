@@ -33,8 +33,11 @@ using namespace herdstat;
 
 ActionHandler::ActionHandler()
     : options(GlobalOptions()),
-      color(GlobalColorMap()), _err(false), _size(0)
+      color(GlobalColorMap()), _err(false), _size(-1)
 {
+    regexp.set_cflags(options.eregex() ?
+                util::Regex::icase|util::Regex::extended :
+                util::Regex::icase);
 }
 
 bool
@@ -52,27 +55,29 @@ ActionHandler::usage() const
 }
 
 void
-ActionHandler::operator()(Query &null, QueryResults * const results)
+ActionHandler::operator()(Query &query, QueryResults * const results)
 {
+    this->do_init(query, results);
 
-#if 0
-
-    psuedo code:
-
-    if (query->all())
+    /* handle all target */
+    if (query.all())
         this->do_all(query, results);
+    /* handle regex */
     else if(options.regex())
         this->do_regex(query, results);
 
-    filter out unmatching queries
-    for each filter, format results
+    /* fill results */
+    this->do_results(query, results);
 
-    this->transform_query_into_results(query, results);
-    this->_size = query.size();
+    if (this->_size == -1)
+        this->_size = query.size();
 
-#endif
+    this->do_cleanup(results);
+}
 
-
+void
+ActionHandler::do_cleanup(QueryResults * const results)
+{
     /* show count, if requested */
     if (options.count() and not this->error())
         results->add(this->_size);
@@ -81,10 +86,9 @@ ActionHandler::operator()(Query &null, QueryResults * const results)
 }
 
 void
-PortageSearchActionHandler::operator()(Query& null,
-                                       QueryResults * const results)
+PortageSearchActionHandler::do_cleanup(QueryResults * const results)
 {
-    ActionHandler::operator()(null, results);
+    ActionHandler::do_cleanup(results);
     matches.clear();
     search_timer.reset();
 }

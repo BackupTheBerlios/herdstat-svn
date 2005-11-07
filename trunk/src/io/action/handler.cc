@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include "exceptions.hh"
 #include "io/action/handler.hh"
 
 using namespace gui;
@@ -32,6 +33,20 @@ bool
 IOActionHandler::allow_empty_query() const
 {
     return true;
+}
+
+void
+IOActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+IOActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support regular expressions.");
+    throw ActionException();
 }
 
 Tab *

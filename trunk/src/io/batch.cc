@@ -84,7 +84,7 @@ BatchIOHandler::operator()(Query * const query)
         init_xml_if_necessary(query->action());
 
         /* transform arguments into the query object */
-        if (parts.size() > 1)
+        if (not parts.empty())
         {
             if (parts.front() == "all")
             {
@@ -92,12 +92,12 @@ BatchIOHandler::operator()(Query * const query)
                 parts.erase(parts.begin());
             }
 
-            copy_to_query(parts.begin(), parts.end(), *query);
+            std::copy(parts.begin(), parts.end(), std::back_inserter(*query));
         }
         else if (not h->allow_empty_query())
         {
             query->clear();
-            query->push_back(std::make_pair("", h->id()));
+            query->add(h->id());
             h = handlers["help"];
         }
 

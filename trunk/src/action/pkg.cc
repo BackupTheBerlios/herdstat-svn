@@ -356,7 +356,7 @@ PkgActionHandler::add_matches(QueryResults * const results)
             {
                 Error error;
                 error(m->first, &with);
-                cleanup();
+                this->do_cleanup(results);
                 throw ActionException();
             }
 
@@ -388,22 +388,10 @@ PkgActionHandler::add_matches(QueryResults * const results)
     }
 }
 
-/*
- * Given a list of herds/devs, determine all packages belonging
- * to each herd/dev. For reliability reasons, every metadata.xml
- * in the tree is parsed.
- */
-
 void
-PkgActionHandler::operator()(Query& query,
-                             QueryResults * const results)
+PkgActionHandler::do_init(Query& query, QueryResults * const results)
 {
-    /* PkgActionHandler doesn't support the all target */
-    if (query.all())
-    {
-        results->add("Package action handler does not support the 'all' target.");
-        throw ActionException();
-    }
+    this->size() = 0;
 
     /* check PORTDIR */
     if (not util::is_dir(options.portdir()))
@@ -506,7 +494,23 @@ PkgActionHandler::operator()(Query& query,
     }
 
     debug_msg("mcache.size() == %d", mcache.size());
+}
 
+void
+PkgActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+PkgActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+}
+
+void
+PkgActionHandler::do_results(Query& query, QueryResults * const results)
+{
     if (at_least_one_not_cached)
         search(query);
 
@@ -552,35 +556,15 @@ PkgActionHandler::operator()(Query& query,
             std::bind2nd(Error(), &with));
     }
 
-//    if (options.timer())
-//    {
-//        *stream << std::endl << "Took " << elapsed << "ms to parse "
-//            << mcache.size() << " metadata.xml's ("
-//            << std::setprecision(4)
-//            << (static_cast<float>(elapsed) / mcache.size())
-//            << " ms/metadata.xml)." << std::endl
-//            << "Took " << herds_xml.elapsed() << "ms to parse herds.xml."
-//            << std::endl;
-//    }
-//    else if (options.verbose() and not options.quiet())
-//    {
-//        *stream << std::endl
-//            << "Parsed " << mcache.size() << " metadata.xml's." << std::endl;
-//    }
-
     if (options.querycache())
         qcache.dump();
-
-    /* we handler timer here */
-    options.set_timer(false);
-
-    cleanup();
-    ActionHandler::operator()(query, results);
 }
 
 void
-PkgActionHandler::cleanup()
+PkgActionHandler::do_cleanup(QueryResults * const results)
 {
+    ActionHandler::do_cleanup(results);
+
     std::map<std::string, pkgQuery * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
         delete m->second;

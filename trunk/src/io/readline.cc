@@ -168,8 +168,7 @@ ReadLineIOHandler::operator()(Query * const query)
                 parts.erase(parts.begin());
             }
             
-            std::transform(parts.begin(), parts.end(),
-                std::back_inserter(*query), util::EmptyFirst());
+            std::copy(parts.begin(), parts.end(), std::back_inserter(*query));
         }
         /* no arguments - if the action handler doesn't allow
          * empty query objects then set the action to the 'help'
@@ -177,7 +176,7 @@ ReadLineIOHandler::operator()(Query * const query)
         else if (not h->allow_empty_query())
         {
             query->clear();
-            query->push_back(std::make_pair("", h->id()));
+            query->add(h->id());
             h = handlers["help"];
         }
         

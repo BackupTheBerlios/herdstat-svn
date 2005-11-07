@@ -58,7 +58,21 @@ StatsActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-StatsActionHandler::operator()(Query& query,
+StatsActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+StatsActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support regular expressions.");
+    throw ActionException();
+}
+
+void
+StatsActionHandler::do_results(Query& query,
                                QueryResults * const results)
 {
     const bool quiet_save(options.quiet());
@@ -125,7 +139,6 @@ StatsActionHandler::operator()(Query& query,
         least_herds);
 
     options.set_quiet(quiet_save);
-    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

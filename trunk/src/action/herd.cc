@@ -141,64 +141,67 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-HerdActionHandler::operator()(Query& query,
-                              QueryResults * const results)
+HerdActionHandler::do_all(Query& query, QueryResults * const results)
 {
-    /* search for items in query and insert results */
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+    std::transform(herds.begin(), herds.end(),
+        std::back_inserter(query), portage::Name());
+}
+
+void
+HerdActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+
+    regexp.assign(query.front().second);
+    query.clear();
+
+    util::transform_if(herds.begin(), herds.end(), std::back_inserter(query),
+        std::bind1st(portage::NameRegexMatch<portage::Herd>(), regexp),
+        portage::Name());
+}
+
+void
+HerdActionHandler::do_results(Query& query, QueryResults * const results)
+{
     const portage::Herds& herds(GlobalHerdsXML().herds());
     portage::Herds::const_iterator h;
 
-    if (query.all())
+    if (query.all() and options.quiet())
     {
-        add_herds(herds, results);
-        this->size() = herds.size();
-        ActionHandler::operator()(query, results);
+        results->transform(query.begin(), query.end(), util::Second());
         return;
-    }
-    else if (options.regex())
-    {
-        regexp.assign(query.front().second);
-        query.clear();
-
-        transform_to_query_if(herds.begin(), herds.end(), query,
-            std::bind1st(portage::NameRegexMatch<portage::Herd>(), regexp),
-            portage::Name());
     }
 
     for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
-        try
+        if ((h = herds.find(q->second)) == herds.end())
         {
-            if ((h = herds.find(q->second)) == herds.end())
+            this->error() = true;
+            results->add("Herd '" + q->second + "' doesn't seem to exist.");
+
+            if (options.iomethod() == "stream")
                 throw ActionException();
 
+            q = query.erase(q);
+        }
+        else if (options.count())
+            continue;
+        else
+        {
             if (not options.quiet())
             {
                 results->add("Name", h->name());
                 results->add("Email", h->email());
             }
-            
-            if (not options.count())
-                results->add(util::sprintf("Developers(%d)", h->size()),
-                            h->begin(), h->end());
+
+            results->add(util::sprintf("Developers(%d)", h->size()),
+                         h->begin(), h->end());
 
             if ((q+1) != query.end())
                 results->add_linebreak();
-
-            this->size() += h->size();
-        }
-        catch (const ActionException)
-        {
-            this->error() = true;
-            results->add(util::sprintf("Herd '%s' doesn't seem to exist.",
-                q->second.c_str()));
-
-            if (options.iomethod() == "stream")
-                throw;
         }
     }
-
-    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

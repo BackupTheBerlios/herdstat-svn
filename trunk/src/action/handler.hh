@@ -43,6 +43,9 @@ class ActionHandler
         ActionHandler();
         virtual ~ActionHandler() { }
 
+        /// perform action
+        void operator()(Query& query, QueryResults * const results);
+
         /// this handler allows empty query objects to be passed?
         virtual bool allow_empty_query() const;
         /// action identifier string
@@ -52,11 +55,13 @@ class ActionHandler
         /// action usage string
         virtual const char * const usage() const;
 
-        /// perform action
-        virtual void operator()(Query& query,
-                                QueryResults * const results) = 0;
-
     protected:
+        virtual void do_init(Query& query, QueryResults * const results) { }
+        virtual void do_all(Query& query, QueryResults * const results) = 0;
+        virtual void do_regex(Query& query, QueryResults * const results) = 0;
+        virtual void do_results(Query& query, QueryResults * const results) = 0;
+        virtual void do_cleanup(QueryResults * const results);
+
         /* Called by GuiIOHandler::operator() when
          * filling the TabBar. */
         friend class GuiIOHandler;
@@ -64,7 +69,7 @@ class ActionHandler
 
         /* result size (not necessarily same size as results
          * object passed to operator()). */
-        std::size_t& size() { return _size; }
+        int& size() { return _size; }
         /* did the handler err at least once? */
         bool& error() { return _err; }
 
@@ -74,7 +79,7 @@ class ActionHandler
 
     private:
         bool _err;
-        std::size_t _size;
+        int _size;
 };
 
 class PortageSearchActionHandler : public ActionHandler
@@ -82,8 +87,7 @@ class PortageSearchActionHandler : public ActionHandler
     public:
         virtual ~PortageSearchActionHandler() { }
 
-        virtual void operator()(Query& query,
-                                QueryResults * const results) = 0;
+        virtual void do_cleanup(QueryResults * const results);
 
     protected:
         std::multimap<std::string, std::string> matches;

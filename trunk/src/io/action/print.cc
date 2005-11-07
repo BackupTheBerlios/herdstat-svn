@@ -48,7 +48,7 @@ PrintIOActionHandler::usage() const
 }
 
 void
-PrintIOActionHandler::operator()(Query& query,
+PrintIOActionHandler::do_results(Query& query,
                                  QueryResults * const results)
 {
     for (Query::iterator q = query.begin() ; q != query.end() ; ++q)

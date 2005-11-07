@@ -70,6 +70,29 @@ VersionsActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
+void
+VersionsActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+VersionsActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    regexp.assign(query.front().second);
+    query.clear();
+
+    matches = portage::find_package_regex(regexp, options.overlay(),
+                    &search_timer, GlobalPkgCache());
+
+    if (matches.empty())
+    {
+        results->add("Failed to find any packages matching '" + regexp() + "'.");
+        throw ActionException();
+    }
+}
+
 struct OnlyPVR
 {
     std::string operator()(const portage::version_string& v) const
@@ -79,31 +102,15 @@ struct OnlyPVR
     }
 };
 
-struct OnlyPVREmptyFirst
-{
-    std::pair<std::string, std::string>
-    operator()(const portage::version_string& v)
-    {
-        std::pair<std::string, std::string> p;
-        const std::string& pvr((v.components())["PVR"]);
-        p.second.assign(pvr.substr(0, pvr.rfind("-r0")));
-        return p;
-    }
-};
-
 void
-VersionsActionHandler::operator()(Query& query,
+VersionsActionHandler::do_results(Query& query,
                                   QueryResults * const results)
 {
     OverlayDisplay od(results);
     std::string dir;
     bool pwd = false;
 
-    if (query.all())
-    {
-        results->add("versions action handler doesn't support the 'all' target.");
-        throw ActionException();
-    }
+    this->size() = 0;
 
     if (query.empty())
     {
@@ -134,26 +141,11 @@ VersionsActionHandler::operator()(Query& query,
          * category or category/package */
         pwd = true;
         dir = path;
-        query.push_back(std::make_pair("", leftover));
-    }
-    else if (options.regex())
-    {
-        regexp.assign(query.front().second);
-        query.clear();
-
-        pkgcache& pkgcache(GlobalPkgCache());
-        matches = portage::find_package_regex(regexp, options.overlay(),
-                    &search_timer, pkgcache);
-
-        if (matches.empty())
-        {
-            results->add("Failed to find any packages matching '" + regexp() + "'.");
-            throw ActionException();
-        }
+        query.add(leftover);
     }
 
-    std::transform(query.begin(), query.end(),
-        std::inserter(matches, matches.end()), util::EmptyFirst());
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+        matches.insert(std::make_pair("", q->second));
 
     std::multimap<std::string, std::string>::iterator m;
     std::multimap<std::string, std::string>::size_type n = 1;
@@ -199,8 +191,8 @@ VersionsActionHandler::operator()(Query& query,
             {
                 results->add("Package", (dir == options.portdir() or pwd) ?
                         package : package+od[dir]);
-                transform_to_query(versions.begin(), versions.end(),
-                    *results, OnlyPVREmptyFirst());
+                std::transform(versions.begin(), versions.end(),
+                    std::back_inserter(*results), OnlyPVR());
             }
             else if (not options.count())
                 results->transform(versions.begin(), versions.end(), OnlyPVR());
@@ -227,8 +219,6 @@ VersionsActionHandler::operator()(Query& query,
                 throw ActionException();
         }
     }
-
-    PortageSearchActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

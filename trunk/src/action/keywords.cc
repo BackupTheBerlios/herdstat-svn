@@ -97,18 +97,36 @@ struct GetKeywords
 };
 
 void
-KeywordsActionHandler::operator()(Query& query,
-                                  QueryResults * const results)
+KeywordsActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+KeywordsActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    regexp.assign(query.front().second);
+    query.clear();
+
+    matches = portage::find_package_regex(regexp, options.overlay(),
+                    &search_timer, GlobalPkgCache());
+
+    if (matches.empty())
+    {
+        results->add("Failed to find any packages matching '" + regexp() + "'.");
+        throw ActionException();
+    }
+}
+
+void
+KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 {
     OverlayDisplay od(results);
     std::string dir;
     bool pwd = false;
 
-    if (query.all())
-    {
-        results->add("keywords action handler doesn't support the 'all' target.");
-        throw ActionException();
-    }
+    this->size() = 0;
 
     if (query.empty())
     {
@@ -139,26 +157,11 @@ KeywordsActionHandler::operator()(Query& query,
          * category or category/package */
         pwd = true;
         dir = path;
-        query.push_back(std::make_pair("", leftover));
-    }
-    else if (options.regex())
-    {
-        regexp.assign(query.front().second);
-        query.clear();
-
-        pkgcache& pkgcache(GlobalPkgCache());
-        matches = portage::find_package_regex(regexp, options.overlay(),
-                    &search_timer, pkgcache);
-
-        if (matches.empty())
-        {
-            results->add("Failed to find any packages matching '" + regexp() + "'.");
-            throw ActionException();
-        }
+        query.add(leftover);
     }
 
-    std::transform(query.begin(), query.end(),
-        std::inserter(matches, matches.end()), util::EmptyFirst());
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+        matches.insert(std::make_pair("", q->second));
 
     std::multimap<std::string, std::string>::iterator m;
     std::multimap<std::string, std::string>::size_type n = 1;
@@ -232,8 +235,6 @@ KeywordsActionHandler::operator()(Query& query,
                 throw ActionException();
         }
     }
-
-    PortageSearchActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

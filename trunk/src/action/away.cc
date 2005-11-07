@@ -62,44 +62,55 @@ AwayActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-AwayActionHandler::operator()(Query& query,
-                              QueryResults * const results)
+AwayActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    const portage::Developers& devs(GlobalDevawayXML().devs());
+    std::transform(devs.begin(), devs.end(),
+        std::back_inserter(query), portage::User());
+}
+
+void
+AwayActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    const portage::Developers& devs(GlobalDevawayXML().devs());
+
+    regexp.assign(query.front().second);
+    query.clear();
+
+    util::transform_if(devs.begin(), devs.end(), std::back_inserter(query),
+        std::bind1st(portage::UserRegexMatch<portage::Developer>(),
+        regexp), portage::User());
+
+    if (query.empty())
+    {
+        results->add("Failed to find any developers matching '" + regexp() + "'.");
+        throw ActionException();
+    }
+}
+
+void
+AwayActionHandler::do_results(Query& query, QueryResults * const results)
 {
     const portage::Developers& devs(GlobalDevawayXML().devs());
     portage::Developers::const_iterator d;
 
-    if (query.all())
-        transform_to_query(devs.begin(), devs.end(),
-            query, portage::User());
-    else if (options.regex())
-    {
-        regexp.assign(query.front().second);
-        query.clear();
-
-        transform_to_query_if(devs.begin(), devs.end(), query,
-            std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-                regexp), portage::User());
-
-        if (query.empty())
-        {
-            results->add("Failed to find any developers matching '" +
-                         regexp() + "'.");
-            throw ActionException();
-        }
-    }
-
     for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
-        try
+        if ((d = devs.find(q->second)) == devs.end())
         {
-            if ((d = devs.find(q->second)) == devs.end())
+            this->error() = true;
+            results->add("Developer '" + q->second +
+                "' either doesn't exist or is not currently away.");
+
+            if (query.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();
 
-            this->size()++;
-
-            if (options.count())
-                continue;
-
+            q = query.erase(q);
+        }
+        else if (options.count())
+            continue;
+        else
+        {
             if (options.quiet())
                 results->add(
                     d->user() + " - " + util::tidy_whitespace(d->awaymsg()));
@@ -113,29 +124,17 @@ AwayActionHandler::operator()(Query& query,
                     results->add("Developer", dev.user());
                 else
                     results->add("Developer",
-                         dev.name() + " (" + dev.user() + ")");
+                        dev.name() + " (" + dev.user() + ")");
 
                 results->add("Email", dev.email());
                 results->add("Away Message",
-                     util::tidy_whitespace(dev.awaymsg()));
+                    util::tidy_whitespace(dev.awaymsg()));
+
+                if ((q+1) != query.end())
+                    results->add_linebreak();
             }
         }
-        catch (const ActionException)
-        {
-            this->error() = true;
-            results->add(util::sprintf(
-                "Developer '%s' either doesn't exist or is not currently away.",
-                q->second.c_str()));
-
-            if (query.size() == 1 and options.iomethod() == "stream")
-                throw;
-        }
-
-        if (not options.quiet() and ((q+1) != query.end()))
-            results->add_linebreak();
     }
-
-    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

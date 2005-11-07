@@ -33,14 +33,18 @@ class DevActionHandler : public ActionHandler
 {
     public:
         virtual ~DevActionHandler() { }
+
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
-        virtual void operator()(Query& query, QueryResults * const results);
 
     protected:
-        virtual gui::Tab *
-            createTab(gui::WidgetFactory *factory);
+        virtual void do_init(Query& query, QueryResults * const results);
+        virtual void do_all(Query& query, QueryResults * const results);
+        virtual void do_regex(Query& query, QueryResults * const results);
+        virtual void do_results(Query& query, QueryResults * const results);
+
+        virtual gui::Tab *createTab(gui::WidgetFactory *factory);
 };
 
 #endif /* _HAVE_ACTION_DEV_HH */

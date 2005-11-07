@@ -33,10 +33,13 @@ class HelpIOActionHandler : public IOActionHandler
 {
     public:
         virtual ~HelpIOActionHandler() { }
+        
         virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;
-        virtual void operator()(Query& query, QueryResults * const results);
+        
+    protected:
+        virtual void do_results(Query& query, QueryResults * const results);
 };
 
 #endif /* _HAVE_ACTION_HELP_HH */

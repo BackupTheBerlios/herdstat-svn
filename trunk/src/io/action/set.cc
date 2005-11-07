@@ -50,7 +50,7 @@ SetIOActionHandler::usage() const
 }
 
 void
-SetIOActionHandler::operator()(Query& query,
+SetIOActionHandler::do_results(Query& query,
                                QueryResults * const results)
 {
     for (Query::iterator q = query.begin() ; q != query.end() ; ++q)

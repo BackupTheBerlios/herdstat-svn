@@ -41,6 +41,8 @@ class IOActionHandler : public ActionHandler
         virtual bool allow_empty_query() const;
 
     protected:
+        virtual void do_all(Query& query, QueryResults * const results);
+        virtual void do_regex(Query& query, QueryResults * const results);
         virtual gui::Tab *createTab(gui::WidgetFactory *factory);
 };
 

@@ -66,33 +66,35 @@ FindActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-FindActionHandler::operator()(Query& query,
-                              QueryResults * const results)
+FindActionHandler::do_all(Query& null, QueryResults * const results)
 {
-    if (query.all())
+    results->add("'find' handler does not support the all target.");
+    throw ActionException();
+}
+
+void
+FindActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    regexp.assign(query.front().second);
+
+    matches = portage::find_package_regex(regexp, options.overlay(),
+                    &search_timer, GlobalPkgCache());
+
+    if (matches.empty())
     {
-        results->add("'find' handler does not support the all target.");
+        results->add("Failed to find any packages matching '" + regexp() + "'.");
         throw ActionException();
     }
+}
 
-    pkgcache& pkgcache(GlobalPkgCache());
+void
+FindActionHandler::do_results(Query& query, QueryResults * const results)
+{
+    this->size() = 0;
 
-    if (options.regex())
-    {
-        regexp.assign(query.front().second);
-
-        matches = portage::find_package_regex(regexp, options.overlay(),
-                        &search_timer, pkgcache);
-
-        if (matches.empty())
-        {
-            results->add("Failed to find any packages matching '" + regexp() + "'.");
-            throw ActionException();
-        }
-    }
-    else
-        std::transform(query.begin(), query.end(),
-            std::inserter(matches, matches.end()), util::EmptyFirst());
+    if (not options.regex())
+        for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+            matches.insert(std::make_pair("", q->second));
 
     std::vector<std::string> res;
     std::multimap<std::string, std::string>::iterator m;
@@ -106,7 +108,7 @@ FindActionHandler::operator()(Query& query,
                 p = *m;
             else
                 p = portage::find_package(m->second, options.overlay(),
-                                &search_timer, pkgcache);
+                                &search_timer, GlobalPkgCache());
         }
         catch (const portage::AmbiguousPkg& e)
         {
@@ -124,6 +126,7 @@ FindActionHandler::operator()(Query& query,
             continue;
         }
 
+        this->size()++;
         res.push_back(p.second);
     }
 
@@ -143,7 +146,7 @@ FindActionHandler::operator()(Query& query,
         options.set_eregex(false);
 
         Query q;
-        copy_to_query(res.begin(), res.end(), q);
+        std::copy(res.begin(), res.end(), std::back_inserter(q));
 
         MetaActionHandler mhandler;
         mhandler(q, results);
@@ -152,10 +155,7 @@ FindActionHandler::operator()(Query& query,
         options.set_eregex(ere);
     }
     else if (not options.count())
-        copy_to_query(res.begin(), res.end(), *results);
-
-    this->size() = res.size();
-    PortageSearchActionHandler::operator()(query, results);
+        std::copy(res.begin(), res.end(), std::back_inserter(*results));
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

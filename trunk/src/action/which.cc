@@ -63,45 +63,49 @@ WhichActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-WhichActionHandler::operator()(Query& query,
-                               QueryResults * const results)
+WhichActionHandler::do_all(Query& query, QueryResults * const results)
 {
-    if (query.all())
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+WhichActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    regexp.assign(query.front().second);
+    query.clear();
+
+    matches = portage::find_package_regex(regexp, options.overlay(),
+                        &search_timer, GlobalPkgCache());
+
+    if (matches.empty())
     {
-        results->add("This handler does not support the 'all' target.");
+        results->add("Failed to find any packages matching '" + regexp() + "'.");
         throw ActionException();
     }
 
-    pkgcache& pkgcache(GlobalPkgCache());
+    std::vector<std::string> v;
     std::multimap<std::string, std::string>::iterator m;
-
-    if (options.regex())
+    for (m = matches.begin() ; m != matches.end() ; ++m)
     {
-        regexp.assign(query.front().second);
-        query.clear();
-
-        matches = portage::find_package_regex(regexp, options.overlay(),
-                        &search_timer, pkgcache);
-
-        if (matches.empty())
-        {
-            results->add("Failed to find any packages matching '" + regexp() + "'.");
-            throw ActionException();
-        }
-
-        std::vector<std::string> v;
-        for (m = matches.begin() ; m != matches.end() ; ++m)
-        {
-            if (std::find(v.begin(), v.end(), m->second) == v.end())
-                v.push_back(m->second);
-            else
-                matches.erase(m--);
-        }
+        if (std::find(v.begin(), v.end(), m->second) == v.end())
+            v.push_back(m->second);
+        else
+            matches.erase(m--);
     }
-    else
-        std::transform(query.begin(), query.end(),
-            std::inserter(matches, matches.end()), util::EmptyFirst());
+}
 
+void
+WhichActionHandler::do_results(Query& query,
+                               QueryResults * const results)
+{
+    this->size() = 0;
+
+    if (not options.regex())
+        for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+            matches.insert(std::make_pair("", q->second));
+
+    std::multimap<std::string, std::string>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
         std::string ebuild;
@@ -140,7 +144,7 @@ WhichActionHandler::operator()(Query& query,
         
         if (options.regex())
             ebuild = portage::ebuild_which(p.second, options.overlay(), NULL,
-                pkgcache);
+                GlobalPkgCache());
         else
             ebuild = portage::ebuild_which(p.second, options.overlay(), NULL);
 
@@ -149,7 +153,6 @@ WhichActionHandler::operator()(Query& query,
     }
     
     this->size() = matches.size();
-    PortageSearchActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

@@ -62,78 +62,111 @@ DevActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-DevActionHandler::operator()(Query& query, QueryResults * const results)
+DevActionHandler::do_init(Query& query, QueryResults * const results)
+{
+    if (not options.userinfoxml().empty())
+        GlobalUserinfoXML().parse(options.userinfoxml());
+}
+
+void
+DevActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
+    const portage::Developers& devs(userinfo_xml.devs());
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+    portage::Herds::const_iterator h;
+
+    for (h = herds.begin() ; h != herds.end() ; ++h)
+        std::transform(h->begin(), h->end(),
+            std::back_inserter(query), portage::User());
+
+    if (not userinfo_xml.empty())
+        std::transform(devs.begin(), devs.end(),
+            std::back_inserter(query), portage::User());
+
+    /* nuke dupes */
+    std::sort(query.begin(), query.end(), util::SecondLess());
+    query.erase(std::unique(query.begin(), query.end(), util::SecondEqual()),
+            query.end());
+}
+
+void
+DevActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
+    const portage::Developers& devs(userinfo_xml.devs());
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+    portage::Herds::const_iterator h;
+
+    regexp.assign(query.front().second);
+    query.clear();
+
+    /* insert the user name of each developer
+     * that matches the regex into our query object */
+    for (h = herds.begin() ; h != herds.end() ; ++h)
+        util::transform_if(h->begin(), h->end(), std::back_inserter(query),
+            std::bind1st(portage::UserRegexMatch<portage::Developer>(),
+            regexp), portage::User());
+
+    /* likewise for userinfo.xml, if used.  There may be
+     * developers that match that aren't listed in herds.xml */
+    if (not userinfo_xml.empty())
+        util::transform_if(devs.begin(), devs.end(),
+            std::back_inserter(query),
+            std::bind1st(portage::UserRegexMatch<portage::Developer>(),
+            regexp), portage::User());
+
+    if (query.empty())
+    {
+        results->add("Failed to find any developers matching '" +
+                     regexp() + "'.");
+        throw ActionException();
+    }
+
+    /* remove any dupes */
+    std::sort(query.begin(), query.end(), util::SecondLess());
+    query.erase(std::unique(query.begin(), query.end(), util::SecondEqual()),
+        query.end());
+}
+
+void
+DevActionHandler::do_results(Query& query, QueryResults * const results)
 {
     portage::herds_xml& herds_xml(GlobalHerdsXML());
     portage::devaway_xml& devaway_xml(GlobalDevawayXML());
     portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
     const portage::Developers& devs(userinfo_xml.devs());
-
     const portage::Herds& herds(herds_xml.herds());
-    portage::Herds::const_iterator h;
 
-    if (not options.userinfoxml().empty())
-        userinfo_xml.parse(options.userinfoxml());
-
-    if (query.all())
+    if (query.all() and options.quiet())
     {
-        portage::Herd all_devs;
-        for (h = herds.begin() ; h != herds.end() ; ++h)
-            all_devs.insert(h->begin(), h->end());
-
-        if (not userinfo_xml.empty())
-            all_devs.insert(devs.begin(), devs.end());
-
-        add_herd(all_devs, results);
-        this->size() = all_devs.size();
-        ActionHandler::operator()(query, results);
+        results->transform(query.begin(), query.end(), util::Second());
         return;
-    }
-    else if (options.regex())
-    {
-        regexp.assign(query.front().second);
-        query.clear();
-
-        /* insert the user name of each developer
-         * that matches the regex into our query object */
-        for (h = herds.begin() ; h != herds.end() ; ++h)
-            transform_to_query_if(h->begin(), h->end(), query,
-                std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-                regexp), portage::User());
-
-        /* likewise for userinfo.xml, if used.  There may be
-         * developers that match that aren't listed in herds.xml */
-        if (not userinfo_xml.empty())
-            transform_to_query_if(devs.begin(), devs.end(), query,
-                std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-                regexp), portage::User());
-
-        if (query.empty())
-        {
-            results->add(util::sprintf(
-                "Failed to find any developers matching '%s'.", regexp().c_str()));
-            throw ActionException();
-        }
-
-        /* remove any dupes */
-        std::sort(query.begin(), query.end(), util::SecondLess());
-        query.erase(std::unique(query.begin(), query.end(), util::SecondEqual()),
-            query.end());
     }
 
     for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
     {
-        try
-        {
-            portage::Developer dev(q->second);
-            herds_xml.fill_developer(dev);
-            devaway_xml.fill_developer(dev);
-            userinfo_xml.fill_developer(dev);
+        portage::Developer dev(q->second);
+        herds_xml.fill_developer(dev);
+        devaway_xml.fill_developer(dev);
+        userinfo_xml.fill_developer(dev);
 
-            if (dev.herds().empty() and (userinfo_xml.empty() or
-                (devs.find(q->second) == devs.end())))
+        if (dev.herds().empty() and (userinfo_xml.empty() or
+            (devs.find(q->second) == devs.end())))
+        {
+            this->error() = true;
+            results->add("Developer '" + q->second +
+                         "' doesn't seem to belong to any herds.");
+
+            if (options.iomethod() == "stream")
                 throw ActionException();
 
+            q = query.erase(q);
+        }
+        else if (options.count())
+            continue;
+        else
+        {
             const std::vector<std::string>& hvec(dev.herds());
 
             if (not options.quiet())
@@ -148,10 +181,7 @@ DevActionHandler::operator()(Query& query, QueryResults * const results)
             }
 
             if (hvec.empty())
-            {
-                if (not options.count())
-                    results->add("Herds(0)", "none");
-            }
+                results->add("Herds(0)", "none");
             else
             {
                 if (options.verbose() and not options.quiet())
@@ -176,10 +206,8 @@ DevActionHandler::operator()(Query& query, QueryResults * const results)
                             results->add_linebreak();
                     }
                 }
-                else if (not options.count())
+                else
                     results->add(util::sprintf("Herds(%d)", hvec.size()), hvec);
-
-                this->size() += hvec.size();
             }
 
             /* display userinfo.xml stuff */
@@ -227,18 +255,7 @@ DevActionHandler::operator()(Query& query, QueryResults * const results)
             if ((q+1) != query.end())
                 results->add_linebreak();
         }
-        catch (const ActionException)
-        {
-            this->error() = true;
-            results->add(util::sprintf("Developer '%s' doesn't seem to belong to any herds.",
-                    q->second.c_str()));
-
-            if (options.iomethod() == "stream")
-                throw;
-        }
     }
-
-    ActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

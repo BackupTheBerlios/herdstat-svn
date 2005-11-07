@@ -50,7 +50,7 @@ HelpIOActionHandler::desc() const
 }
 
 void
-HelpIOActionHandler::operator()(Query& query,
+HelpIOActionHandler::do_results(Query& query,
                                 QueryResults * const results)
 {
     HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());

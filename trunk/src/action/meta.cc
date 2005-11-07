@@ -111,8 +111,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
                     devs.front().email());
 
         if (devs.size() > 1)
-            transform_to_query(++devs.begin(), devs.end(),
-                *results, portage::Email());
+            std::transform(++devs.begin(), devs.end(),
+                std::back_inserter(*results), portage::Email());
         else if (not meta.is_category() and devs.empty())
             results->add("Maintainers(0)", "none");
     }
@@ -189,7 +189,8 @@ add_data(const metadata_data& data, QueryResults * const results)
                     results->add("Homepage", parts.front());
 
                 if (parts.size() > 1)
-                    copy_to_query(parts.begin() + 1, parts.end(), *results);
+                    std::copy(parts.begin() + 1, parts.end(),
+                        std::back_inserter(*results));
             }
             else
                 results->add("Homepage", ebuild_vars["HOMEPAGE"]);
@@ -216,8 +217,32 @@ add_data(const metadata_data& data, QueryResults * const results)
 }
 
 void
-MetaActionHandler::operator()(Query& query,
-                              QueryResults * const results)
+MetaActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This action does not support the 'all' target.");
+    throw ActionException();
+}
+
+void
+MetaActionHandler::do_regex(Query& query, QueryResults * const results)
+{
+    regexp.assign(query.front().second);
+    query.clear();
+    std::vector<std::string> rvec;
+
+    matches = portage::find_package_regex(regexp, options.overlay(),
+                    &search_timer);
+
+    if (matches.empty())
+    {
+        results->add("Failed to find any packages matching '" +
+                     regexp() + "'.");
+        throw ActionException();
+    }
+}
+
+void
+MetaActionHandler::do_results(Query& query, QueryResults * const results)
 {
     OverlayDisplay od(results);
     bool pwd = false;
@@ -258,28 +283,11 @@ MetaActionHandler::operator()(Query& query,
 
         pwd = true;
         dir = path;
-        query.push_back(std::make_pair("", leftover));
-    }
-    else if (options.regex())
-    {
-        regexp.assign(query.front().second);
-        query.clear();
-        std::vector<std::string> rvec;
-
-        matches = portage::find_package_regex(regexp, options.overlay(),
-                        &search_timer);
-
-        if (matches.empty())
-        {
-            results->add(util::sprintf("Failed to find any packages matching '%s'.",
-                        regexp().c_str()));
-            throw ActionException();
-        }
+        query.add(leftover);
     }
 
-    Query::iterator i;
-    for (i = query.begin() ; i != query.end() ; ++i)
-        matches.insert(std::make_pair(dir, i->second));
+    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+        matches.insert(std::make_pair(dir, q->second));
 
     std::multimap<std::string, std::string>::size_type n = 1;
     std::multimap<std::string, std::string>::iterator m;
@@ -348,8 +356,6 @@ MetaActionHandler::operator()(Query& query,
 
         add_data(data, results);
     }
-
-    PortageSearchActionHandler::operator()(query, results);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
