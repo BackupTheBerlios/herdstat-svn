@@ -33,11 +33,78 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/container_base.hh>
 
-class QueryBase
-    : public herdstat::util::VectorBase<std::pair<std::string, std::string> >
+class QuerySpec
 {
     public:
+        typedef std::string first_type;
+        typedef std::string second_type;
+
+        QuerySpec(const second_type& val)
+            : first(), second(val) { }
+        QuerySpec(const first_type& field, const second_type& val)
+            : first(field), second(val) { }
+        QuerySpec(const std::pair<first_type, second_type>& p)
+            : first(p.first), second(p.second) { }
+
+        operator std::pair<first_type, second_type>() const
+        { return std::pair<first_type, second_type>(first, second); }
+
+        QuerySpec& operator= (const second_type& val)
+        { second.assign(val); return *this; }
+        QuerySpec& operator= (const std::pair<first_type, second_type>& p)
+        { first.assign(p.first) ; second.assign(p.second) ; return *this; }
+
+        bool operator== (const std::pair<first_type, second_type>& p)
+        { return ((p.first == first) and (p.second == second)); }
+        bool operator!= (const std::pair<first_type, second_type>& p)
+        { return not (*this == p); }
+
+        first_type first;
+        second_type second;
+};
+
+class QueryBase
+{
+    public:
+        typedef std::vector<QuerySpec> container_type;
+        typedef container_type::value_type value_type;
+        typedef container_type::size_type size_type;
+        typedef container_type::iterator iterator;
+        typedef container_type::const_iterator const_iterator;
+        typedef container_type::reference reference;
+        typedef container_type::const_reference const_reference;
+
         virtual ~QueryBase() { }
+
+        inline container_type& operator= (const container_type& c);
+
+        inline size_type size() const;
+        inline bool empty() const;
+        inline void clear();
+
+        inline iterator begin();
+        inline const_iterator begin() const;
+        inline iterator end();
+        inline const_iterator end() const;
+
+        inline reference front();
+        inline const_reference front() const;
+        inline reference back();
+        inline const_reference back() const;
+
+        inline void push_back(const std::string& str);
+        inline void push_back(const value_type& v);
+        inline void push_back(const std::pair<std::string, std::string>& p);
+
+        inline iterator insert(iterator hpos, const value_type& v);
+        template <typename InputIterator>
+        inline iterator insert(InputIterator first, InputIterator last);
+
+        inline iterator erase(iterator pos);
+        inline iterator erase(iterator first, iterator last);
+
+        template <typename InputIterator>
+        inline void assign(InputIterator first, InputIterator last);
 
         ///@{
         /// Add a string.
@@ -51,6 +118,7 @@ class QueryBase
         inline void add(const char * const field, const char * const val);
         inline void add(const char * const field, const std::string& val);
         inline void add(const std::string& field, const char * const val);
+        inline void add(const value_type& p);
         inline void add(const std::pair<std::string, std::string>& p);
         ///@}
 
@@ -101,7 +169,137 @@ class QueryBase
         void transform_if(const std::string& field, InputIterator first,
                           InputIterator last, UnaryPred pred, UnaryOp op);
         ///@}
+    
+    protected:
+        container_type& container() { return _query; }
+        const container_type& container() const { return _query; }
+
+    private:
+        container_type _query;
 };
+
+inline QueryBase::container_type&
+QueryBase::operator=(const container_type& c)
+{
+    return _query = c;
+}
+
+inline QueryBase::size_type
+QueryBase::size() const
+{
+    return _query.size();
+}
+
+inline bool
+QueryBase::empty() const
+{
+    return _query.empty();
+}
+
+inline void
+QueryBase::clear()
+{
+    _query.clear();
+}
+
+inline QueryBase::iterator
+QueryBase::begin()
+{
+    return _query.begin();
+}
+
+inline QueryBase::const_iterator
+QueryBase::begin() const
+{
+    return _query.begin();
+}
+
+inline QueryBase::iterator
+QueryBase::end()
+{
+    return _query.end();
+}
+
+inline QueryBase::const_iterator
+QueryBase::end() const
+{
+    return _query.end();
+}
+
+inline QueryBase::reference
+QueryBase::front()
+{
+    return _query.front();
+}
+
+inline QueryBase::const_reference
+QueryBase::front() const
+{
+    return _query.front();
+}
+
+inline QueryBase::reference
+QueryBase::back()
+{
+    return _query.back();
+}
+
+inline QueryBase::const_reference
+QueryBase::back() const
+{
+    return _query.back();
+}
+
+inline void
+QueryBase::push_back(const std::string& val)
+{
+    this->add(val);
+}
+
+inline void
+QueryBase::push_back(const value_type& v)
+{
+    _query.push_back(v);
+}
+
+inline void
+QueryBase::push_back(const std::pair<std::string, std::string>& p)
+{
+    _query.push_back(p);
+}
+
+inline QueryBase::iterator
+QueryBase::insert(iterator hpos, const value_type& v)
+{
+    return _query.insert(hpos, v);
+}
+
+template <typename InputIterator>
+inline QueryBase::iterator
+QueryBase::insert(InputIterator first, InputIterator last)
+{
+    this->add(first, last);
+    return (this->end() - 1);
+}
+
+inline QueryBase::iterator
+QueryBase::erase(iterator pos)
+{
+    return _query.erase(pos);
+}
+
+inline QueryBase::iterator
+QueryBase::erase(iterator first, iterator last)
+{
+    return _query.erase(first, last);
+}
+
+template <typename InputIterator>
+inline void
+QueryBase::assign(InputIterator first, InputIterator last)
+{
+    _query.assign(first, last);
+}
 
 inline void
 QueryBase::add(const std::string& val)
@@ -112,7 +310,7 @@ QueryBase::add(const std::string& val)
 inline void
 QueryBase::add(const std::string& field, const std::string& val)
 {
-    this->push_back(std::make_pair(field, val));
+    _query.push_back(value_type(field, val));
 }
 
 inline void
@@ -140,9 +338,15 @@ QueryBase::add(const std::string& field, const char * const val)
 }
 
 inline void
+QueryBase::add(const value_type& v)
+{
+    _query.push_back(v);
+}
+
+inline void
 QueryBase::add(const std::pair<std::string, std::string>& p)
 {
-    this->add(p.first, p.second);
+    _query.push_back(p);
 }
 
 template <typename T>
@@ -272,53 +476,6 @@ QueryBase::transform_if(const std::string& field,
     }
 
     this->add(field, val);
-}
-
-template <typename T, typename InputIterator>
-void
-copy_to_query(InputIterator first,
-              InputIterator last,
-              T& v)
-{
-    while (first != last)
-        v.add(*first++);
-}
-
-template <typename T, typename InputIterator, typename UnaryOp>
-void
-transform_to_query(InputIterator first,
-                   InputIterator last,
-                   T& v,
-                   UnaryOp op)
-{
-    while (first != last)
-        v.add(op(*first++));
-}
-
-template <typename T, typename InputIterator, typename UnaryPred>
-void
-copy_to_query_if(InputIterator first,
-                 InputIterator last,
-                 T& v,
-                 UnaryPred pred)
-{
-    for ( ; first != last ; ++first)
-        if (pred(*first))
-            v.add(*first);
-}
-
-template <typename T, typename InputIterator,
-          typename UnaryPred, typename UnaryOp>
-void
-transform_to_query_if(InputIterator first,
-                      InputIterator last,
-                      T& v,
-                      UnaryPred pred,
-                      UnaryOp op)
-{
-    for ( ; first != last ; ++first)
-        if (pred(*first))
-            v.add(op(*first));
 }
 
 #endif /* _HAVE_QUERY_BASE_HH */
