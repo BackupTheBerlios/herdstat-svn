@@ -250,7 +250,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
 
     options.set_count(false);
 
-    if (query.empty())
+    if (query.empty() and matches.empty())
     {
         unsigned short depth = 0;
 
