@@ -44,7 +44,7 @@ Options::Options()
       _locale(std::locale::classic().name()),
       _prompt(PACKAGE"> "),
       _action("unspecified"),
-      _iomethod("unspecified"),
+      _iomethod("stream"),
       _portdir(portage::GlobalConfig().portdir()),
       _overlays(portage::GlobalConfig().overlays())
 {
