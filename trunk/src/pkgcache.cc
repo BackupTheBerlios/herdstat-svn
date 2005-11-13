@@ -43,13 +43,6 @@
 using namespace herdstat;
 using namespace herdstat::portage;
 
-pkgcache&
-GlobalPkgCache()
-{
-    static pkgcache p(GlobalOptions().portdir());
-    return p;
-}
-
 pkgcache::pkgcache(const std::string &portdir)
     : cachable(GlobalOptions().localstatedir()+PKGCACHE),
       _options(GlobalOptions()),
@@ -169,6 +162,26 @@ pkgcache::fill()
  * Load package cache from disk.
  */
 
+struct CacheEntryToPackage
+{
+    portage::Package
+    operator()(const std::string& pkg) const
+    {
+        std::vector<std::string> parts(util::split(pkg, ':'));
+        assert(parts.size() == 2);
+        return portage::Package(parts.front(), parts.back());
+    }
+};
+
+struct PackageToCacheEntry
+{
+    std::string
+    operator()(const Package& pkg) const
+    {
+        return (pkg.category()+"/"+pkg.name()+":"+pkg.portdir());
+    }
+};
+
 void
 pkgcache::load()
 {
@@ -188,9 +201,9 @@ pkgcache::load()
         _reserve = util::destringify<int>(line.substr(++pos));
 
     _pkgs.reserve(_reserve);
-    _pkgs.insert(_pkgs.end(),
-        std::istream_iterator<std::string>(stream),
-        std::istream_iterator<std::string>());
+    std::transform(std::istream_iterator<std::string>(stream),
+        std::istream_iterator<std::string>(), std::back_inserter(_pkgs),
+        CacheEntryToPackage());
 }
 
 /*
@@ -209,8 +222,9 @@ pkgcache::dump()
     stream << "overlays=" << util::join(this->_overlays, ':') << std::endl;
     stream << "size=" << _pkgs.size() << std::endl;
 
-    std::copy(_pkgs.begin(), _pkgs.end(),
-        std::ostream_iterator<std::string>(stream, "\n"));
+    std::transform(_pkgs.begin(), _pkgs.end(),
+        std::ostream_iterator<std::string>(stream, "\n"),
+        PackageToCacheEntry());
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

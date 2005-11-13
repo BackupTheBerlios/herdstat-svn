@@ -497,13 +497,6 @@ PkgActionHandler::do_init(Query& query, QueryResults * const results)
 }
 
 void
-PkgActionHandler::do_all(Query& query, QueryResults * const results)
-{
-    results->add("This action does not support the 'all' target.");
-    throw ActionException();
-}
-
-void
 PkgActionHandler::do_regex(Query& query, QueryResults * const results)
 {
 }

@@ -680,9 +680,6 @@ main(int argc, char **argv)
 	iohandlers.insert(std::make_pair("gtk", new GuiIOHandler(argc, argv)));
 #endif
 
-	if (options.iomethod() == "unspecified")
-	    options.set_iomethod("stream");
-
 	while (true)
 	{
 	    std::auto_ptr<Query> query(new Query());

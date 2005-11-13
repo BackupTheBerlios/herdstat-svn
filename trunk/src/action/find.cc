@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <iterator>
 #include <herdstat/util/functional.hh>
-#include <herdstat/portage/find.hh>
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
@@ -61,30 +60,7 @@ FindActionHandler::createTab(WidgetFactory *widgetFactory)
 {
     Tab *tab = widgetFactory->createTab();
     tab->set_title(this->id());
-
     return tab;
-}
-
-void
-FindActionHandler::do_all(Query& null, QueryResults * const results)
-{
-    results->add("'find' handler does not support the all target.");
-    throw ActionException();
-}
-
-void
-FindActionHandler::do_regex(Query& query, QueryResults * const results)
-{
-    regexp.assign(query.front().second);
-
-    matches = portage::find_package_regex(regexp, options.overlay(),
-                    &search_timer, GlobalPkgCache());
-
-    if (matches.empty())
-    {
-        results->add("Failed to find any packages matching '" + regexp() + "'.");
-        throw ActionException();
-    }
 }
 
 void
@@ -93,48 +69,41 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
     this->size() = 0;
 
     if (not options.regex())
+    {
+        const std::vector<portage::Package>& find_results(find.results());
         for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
-            matches.insert(std::make_pair("", q->second));
-
-    std::vector<std::string> res;
-    std::multimap<std::string, std::string>::iterator m;
-    for (m = matches.begin() ; m != matches.end() ; ++m)
-    {
-        std::pair<std::string, std::string> p;
-
-        try
         {
-            if (options.regex())
-                p = *m;
-            else
-                p = portage::find_package(m->second, options.overlay(),
-                                &search_timer, GlobalPkgCache());
-        }
-        catch (const portage::AmbiguousPkg& e)
-        {
-            /* ambiguous still matches */
-            res.insert(res.end(), e.packages.begin(), e.packages.end());
-            continue;
-        }
-        catch (const portage::NonExistentPkg& e)
-        {
-            results->add(m->second + " doesn't seem to exist.");
+            try
+            {
+                find(q->second, &search_timer);
+            }
+            catch (const portage::NonExistentPkg& e)
+            {
+                results->add(e.what());
 
-            if (matches.size() == 1 and options.iomethod() == "stream")
-                throw ActionException();
+                if (query.size() == 1 and options.iomethod() == "stream")
+                    throw ActionException();
+            }
 
-            continue;
+            matches.insert(matches.end(),
+                find_results.begin(), find_results.end());
+            find.clear_results();
         }
-
-        this->size()++;
-        res.push_back(p.second);
     }
 
-    if (res.size() > 1)
+    /* if not in overlay mode, remove those packages
+     * that were found in an overlay. */
+    if (not options.overlay())
+        remove_overlay_packages();
+
+    if (matches.size() > 1)
     {
-        std::sort(res.begin(), res.end());
-        res.erase(std::unique(res.begin(), res.end()), res.end());
+//        std::sort(matches.begin(), matches.end());
+        matches.erase(std::unique(matches.begin(), matches.end(),
+                portage::FullPkgNameEqual()), matches.end());
     }
+
+    this->size() = matches.size();
 
     if (options.meta())
     {
@@ -146,7 +115,8 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
         options.set_eregex(false);
 
         Query q;
-        std::copy(res.begin(), res.end(), std::back_inserter(q));
+        std::transform(matches.begin(), matches.end(),
+            std::back_inserter(q), portage::FullPkgName());
 
         MetaActionHandler mhandler;
         mhandler(q, results);
@@ -155,7 +125,8 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
         options.set_eregex(ere);
     }
     else if (not options.count())
-        std::copy(res.begin(), res.end(), std::back_inserter(*results));
+        std::transform(matches.begin(), matches.end(),
+            std::back_inserter(*results), portage::FullPkgName());
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

@@ -188,7 +188,7 @@ metacache::fill()
 
             char *path;
             asprintf(&path, "%s/%s/metadata.xml",
-                _portdir.c_str(), i->c_str());
+                _portdir.c_str(), std::string(*i).c_str());
 
             if (util::file_exists(path))
             {

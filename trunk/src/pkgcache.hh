@@ -29,12 +29,12 @@
 
 #include "options.hh"
 #include <herdstat/cachable.hh>
-#include <herdstat/portage/package_list.hh>
+#include <herdstat/portage/package.hh>
 
 class pkgcache : public herdstat::cachable
 {
     public:
-        typedef std::vector<std::string> container_type;
+        typedef herdstat::portage::PackageList container_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
@@ -71,7 +71,12 @@ class pkgcache : public herdstat::cachable
         herdstat::portage::PackageList _pkgs;
 };
 
-pkgcache& GlobalPkgCache();
+inline pkgcache&
+GlobalPkgCache()
+{
+    static pkgcache p(GlobalOptions().portdir());
+    return p;
+}
 
 #endif
 

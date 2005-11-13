@@ -58,13 +58,6 @@ StatsActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-StatsActionHandler::do_all(Query& query, QueryResults * const results)
-{
-    results->add("This action does not support the 'all' target.");
-    throw ActionException();
-}
-
-void
 StatsActionHandler::do_regex(Query& query, QueryResults * const results)
 {
     results->add("This action does not support regular expressions.");

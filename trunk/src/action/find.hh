@@ -39,10 +39,7 @@ class FindActionHandler : public PortageSearchActionHandler
         virtual const char * const usage() const;
 
     protected:
-        virtual void do_all(Query& query, QueryResults * const results);
-        virtual void do_regex(Query& query, QueryResults * const results);
         virtual void do_results(Query& query, QueryResults * const results);
-
         virtual gui::Tab *createTab(gui::WidgetFactory *factory);
 };
 

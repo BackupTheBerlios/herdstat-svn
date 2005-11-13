@@ -27,6 +27,7 @@
 #include <herdstat/util/string.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "action/handler.hh"
 
 using namespace herdstat;
@@ -63,16 +64,24 @@ ActionHandler::operator()(Query &query, QueryResults * const results)
     if (query.all())
         this->do_all(query, results);
     /* handle regex */
-    else if(options.regex())
+    else if (options.regex())
         this->do_regex(query, results);
 
     /* fill results */
     this->do_results(query, results);
 
+    /* if the handler didnt set the size, default to query.size() */
     if (this->_size == -1)
         this->_size = query.size();
 
     this->do_cleanup(results);
+}
+
+void
+ActionHandler::do_all(Query& query, QueryResults * const results)
+{
+    results->add("This handler does not support the all target.");
+    throw ActionException();
 }
 
 void
@@ -83,6 +92,29 @@ ActionHandler::do_cleanup(QueryResults * const results)
         results->add(this->_size);
 
     this->_size = this->_err = 0;
+}
+
+PortageSearchActionHandler::PortageSearchActionHandler()
+    : find(GlobalPkgCache()), matches()
+{
+}
+
+void
+PortageSearchActionHandler::do_regex(Query& query,
+                                     QueryResults * const results)
+{
+    regexp.assign(query.front().second);
+
+    try
+    {
+        matches = find(regexp, &search_timer);
+        find.clear_results();
+    }
+    catch (const portage::NonExistentPkg& e)
+    {
+        results->add(e.what());
+        throw ActionException();
+    }
 }
 
 void

@@ -26,13 +26,14 @@
 
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/exceptions.hh>
-#include <herdstat/portage/find.hh>
+#include <herdstat/portage/package.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/ebuild.hh>
 #include <herdstat/portage/license.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
+#include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "action/meta.hh"
 
@@ -141,15 +142,10 @@ add_data(const metadata_data& data, QueryResults * const results)
 
     if (not data.is_category)
     {
-        std::string ebuild;
-        try
-        {
-            ebuild = portage::ebuild_which(data.portdir, data.pkg);
-        }
-        catch (const portage::NonExistentPkg)
-        {
-            ebuild = portage::ebuild_which(options.portdir(), data.pkg);
-        }
+        portage::PackageWhich which;
+        const std::vector<std::string>& which_results(
+                which(data.pkg, data.portdir));
+        const std::string& ebuild(which_results.front());
 
         assert(not ebuild.empty());
         ebuild_vars.read(ebuild);
@@ -217,31 +213,6 @@ add_data(const metadata_data& data, QueryResults * const results)
 }
 
 void
-MetaActionHandler::do_all(Query& query, QueryResults * const results)
-{
-    results->add("This action does not support the 'all' target.");
-    throw ActionException();
-}
-
-void
-MetaActionHandler::do_regex(Query& query, QueryResults * const results)
-{
-    regexp.assign(query.front().second);
-    query.clear();
-    std::vector<std::string> rvec;
-
-    matches = portage::find_package_regex(regexp, options.overlay(),
-                    &search_timer);
-
-    if (matches.empty())
-    {
-        results->add("Failed to find any packages matching '" +
-                     regexp() + "'.");
-        throw ActionException();
-    }
-}
-
-void
 MetaActionHandler::do_results(Query& query, QueryResults * const results)
 {
     OverlayDisplay od(results);
@@ -250,93 +221,88 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
 
     options.set_count(false);
 
-    if (query.empty() and matches.empty())
+//    if (query.empty() and matches.empty())
+//    {
+//        unsigned short depth = 0;
+
+//        /* are we in a package directory? */
+//        if (portage::in_pkg_dir())
+//            depth = 2;
+//        /* nope but a metadata exists, so assume we're in a category */
+//        else if (util::is_file("metadata.xml"))
+//            depth = 1;
+//        else
+//        {
+//            results->add("You must be in a package directory or category if you want to run the meta action handler with no arguments.");
+//            throw ActionException();
+//        }
+
+//        std::string leftover;
+//        std::string path(util::getcwd());
+//        while (depth > 0)
+//        {
+//            std::string::size_type pos = path.rfind('/');
+//            if (pos != std::string::npos)
+//            {
+//                leftover = (leftover.empty() ?
+//                        path.substr(pos + 1) :
+//                        path.substr(pos + 1) + "/" + leftover);
+//                path.erase(pos);
+//            }
+//            --depth;
+//        }
+
+//        pwd = true;
+//        dir = path;
+//        query.add(leftover);
+//    }
+
+    if (not options.regex())
     {
-        unsigned short depth = 0;
-
-        /* are we in a package directory? */
-        if (portage::in_pkg_dir())
-            depth = 2;
-        /* nope but a metadata exists, so assume we're in a category */
-        else if (util::is_file("metadata.xml"))
-            depth = 1;
-        else
+        for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
         {
-            results->add("You must be in a package directory or category if you want to run the meta action handler with no arguments.");
-            throw ActionException();
-        }
-
-        std::string leftover;
-        std::string path(util::getcwd());
-        while (depth > 0)
-        {
-            std::string::size_type pos = path.rfind('/');
-            if (pos != std::string::npos)
+            try
             {
-                leftover = (leftover.empty() ?
-                        path.substr(pos + 1) :
-                        path.substr(pos + 1) + "/" + leftover);
-                path.erase(pos);
-            }
-            --depth;
-        }
+                const std::vector<portage::Package>& res(find.results());
+                find(q->second, &search_timer);
+                if (is_ambiguous(res))
+                    throw portage::AmbiguousPkg(res.begin(), res.end());
 
-        pwd = true;
-        dir = path;
-        query.add(leftover);
+                matches.insert(matches.end(), res.begin(), res.end());
+                find.clear_results();
+            }
+            catch (const portage::AmbiguousPkg& e)
+            {
+                results->add(e.name() + " is ambiguous.  Possible matches are:");
+                results->add_linebreak();
+
+                std::for_each(e.packages.begin(), e.packages.end(),
+                    std::bind2nd(ColorAmbiguousPkg(), results));
+            
+                if (query.size() == 1 and options.iomethod() == "stream")
+                    throw ActionException();
+            }
+            catch (const portage::NonExistentPkg& e)
+            {
+                results->add(e.what());
+
+                if (query.size() == 1 and options.iomethod() == "stream")
+                    throw ActionException();
+            }
+        }
     }
 
-    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
-        matches.insert(std::make_pair(dir, q->second));
+    if (not options.overlay())
+        remove_overlay_packages();
 
-    std::multimap<std::string, std::string>::size_type n = 1;
-    std::multimap<std::string, std::string>::iterator m;
-    for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
+    this->size() = matches.size();
+
+    std::vector<portage::Package>::iterator m;
+    for (m = matches.begin() ; m != matches.end() ; ++m)
     {
         metadata_data data;
-        data.portdir = dir;
-
-        try
-        {
-            if (pwd)
-                data.pkg = portage::find_package_in(data.portdir,
-                                m->second, &search_timer);
-            else if (options.regex() and not m->first.empty())
-            {
-                data.portdir = m->first;
-                data.pkg = m->second;
-            }
-            else
-            {
-                std::pair<std::string, std::string> p =
-                    portage::find_package(m->second, options.overlay(),
-                        &search_timer);
-                data.portdir = p.first;
-                data.pkg = p.second;
-            }
-        }
-        catch (const portage::AmbiguousPkg& e)
-        {
-            results->add(e.name() + " is ambiguous.  Possible matches are:");
-            results->add_linebreak();
-
-            std::for_each(e.packages.begin(), e.packages.end(),
-                std::bind2nd(ColorAmbiguousPkg(), results));
-
-            if (matches.size() == 1 and options.iomethod() == "stream")
-                throw ActionException();
-                
-            continue;
-        }
-        catch (const portage::NonExistentPkg& e)
-        {
-            results->add(m->second + " doesn't seem to exist.");
-
-            if (matches.size() == 1 and options.iomethod() == "stream")
-                throw ActionException();
-                
-            continue;
-        }
+        data.portdir = m->portdir();
+        data.pkg = m->full();
 
         data.path = data.portdir + "/" + data.pkg + "/metadata.xml";
 
@@ -345,7 +311,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
 
         data.is_category = (data.pkg.rfind('/') == std::string::npos);
 
-        if (n != 1)
+        if (m != matches.begin())
             results->add_linebreak();
 
         if (data.portdir == options.portdir() or pwd)
@@ -356,6 +322,77 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
 
         add_data(data, results);
     }
+
+//    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+//        matches.insert(std::make_pair(dir, q->second));
+
+//    std::multimap<std::string, std::string>::size_type n = 1;
+//    std::multimap<std::string, std::string>::iterator m;
+//    for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
+//    {
+//        metadata_data data;
+//        data.portdir = dir;
+
+//        try
+//        {
+//            if (pwd)
+//                data.pkg = portage::find_package_in(data.portdir,
+//                                m->second, &search_timer);
+//            else if (options.regex() and not m->first.empty())
+//            {
+//                data.portdir = m->first;
+//                data.pkg = m->second;
+//            }
+//            else
+//            {
+//                std::pair<std::string, std::string> p =
+//                    portage::find_package(m->second, options.overlay(),
+//                        &search_timer);
+//                data.portdir = p.first;
+//                data.pkg = p.second;
+//            }
+//        }
+//        catch (const portage::AmbiguousPkg& e)
+//        {
+//            results->add(e.name() + " is ambiguous.  Possible matches are:");
+//            results->add_linebreak();
+
+//            std::for_each(e.packages.begin(), e.packages.end(),
+//                std::bind2nd(ColorAmbiguousPkg(), results));
+
+//            if (matches.size() == 1 and options.iomethod() == "stream")
+//                throw ActionException();
+//                
+//            continue;
+//        }
+//        catch (const portage::NonExistentPkg& e)
+//        {
+//            results->add(m->second + " doesn't seem to exist.");
+
+//            if (matches.size() == 1 and options.iomethod() == "stream")
+//                throw ActionException();
+//                
+//            continue;
+//        }
+
+//        data.path = data.portdir + "/" + data.pkg + "/metadata.xml";
+
+//        if (data.portdir != options.portdir() and not pwd)
+//            od.insert(data.portdir);
+
+//        data.is_category = (data.pkg.rfind('/') == std::string::npos);
+
+//        if (n != 1)
+//            results->add_linebreak();
+
+//        if (data.portdir == options.portdir() or pwd)
+//            results->add(data.is_category ? "Category" : "Package", data.pkg);
+//        else
+//            results->add(data.is_category ? "Category" : "Package",
+//                    data.pkg + od[data.portdir]);
+
+//        add_data(data, results);
+//    }
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

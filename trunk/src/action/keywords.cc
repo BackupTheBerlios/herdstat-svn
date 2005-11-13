@@ -26,7 +26,7 @@
 
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/misc.hh>
-#include <herdstat/portage/find.hh>
+#include <herdstat/portage/package.hh>
 #include <herdstat/portage/version.hh>
 #include <herdstat/portage/keywords.hh>
 
@@ -97,29 +97,6 @@ struct GetKeywords
 };
 
 void
-KeywordsActionHandler::do_all(Query& query, QueryResults * const results)
-{
-    results->add("This action does not support the 'all' target.");
-    throw ActionException();
-}
-
-void
-KeywordsActionHandler::do_regex(Query& query, QueryResults * const results)
-{
-    regexp.assign(query.front().second);
-    query.clear();
-
-    matches = portage::find_package_regex(regexp, options.overlay(),
-                    &search_timer, GlobalPkgCache());
-
-    if (matches.empty())
-    {
-        results->add("Failed to find any packages matching '" + regexp() + "'.");
-        throw ActionException();
-    }
-}
-
-void
 KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 {
     OverlayDisplay od(results);
@@ -160,79 +137,66 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
         query.add(leftover);
     }
 
-    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
-        matches.insert(std::make_pair("", q->second));
-
-    std::multimap<std::string, std::string>::iterator m;
-    std::multimap<std::string, std::string>::size_type n = 1;
-    for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
+    if (not options.regex())
     {
-        std::string package;
-
-        try
+        
+        for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
         {
-            if (pwd)
-                package = portage::find_package_in(dir,
-                            m->second, &search_timer);
-            else if (options.regex() and not m->first.empty())
+            try
             {
-                dir = m->first;
-                package = m->second;
+                const std::vector<portage::Package>& res(find.results());
+                find(q->second, &search_timer);
+                if (is_ambiguous(res))
+                    throw portage::AmbiguousPkg(res.begin(), res.end());
+
+                matches.insert(matches.end(), res.begin(), res.end());
+                find.clear_results();
             }
-            else
+            catch (const portage::AmbiguousPkg& e)
             {
-                std::pair<std::string, std::string> p =
-                    portage::find_package(m->second, options.overlay(),
-                        &search_timer);
-
-                dir = p.first;
-                package = p.second;
-            }
-            if (dir != options.portdir() and not pwd)
-                od.insert(dir);
-
-            portage::versions versions(dir + "/" + package);
-
-            /* versions would be empty if the directory exists, but no
-             * ebuilds are there - in this case, use real PORTDIR. */
-            if (versions.empty())
-                versions.assign(options.portdir() + "/" + package);
-            /* still empty, so bail */
-            if (versions.empty())
-                throw portage::NonExistentPkg(package);
-
-            this->size() += versions.size();
-
-            if (not options.quiet())
-                results->add("Package",
-                        (dir == options.portdir() or pwd) ?
-                            package : package+od[dir]);
-
-            /* insert version/keywords pair for each version into results */
-            if (not options.count())
-                std::transform(versions.begin(), versions.end(),
-                    std::back_inserter(*results), GetKeywords());
-
-            if (not options.count() and (n != matches.size()))
+                results->add(e.name() + " is ambiguous.  Possible matches are:");
                 results->add_linebreak();
-        }
-        catch (const portage::AmbiguousPkg &e)
-        {
-            results->add(e.name() + " is ambiguous.  Possible matches are:");
-            results->add_linebreak();
 
-            std::for_each(e.packages.begin(), e.packages.end(),
-                std::bind2nd(ColorAmbiguousPkg(), results));
+                std::for_each(e.packages.begin(), e.packages.end(),
+                    std::bind2nd(ColorAmbiguousPkg(), results));
             
-            if (matches.size() == 1 and options.iomethod() == "stream")
-                throw ActionException();
-        }
-        catch (const portage::NonExistentPkg &e)
-        {
-            results->add(m->second + " doesn't seem to exist.");
+                if (query.size() == 1 and options.iomethod() == "stream")
+                    throw ActionException();
+            }
+            catch (const portage::NonExistentPkg& e)
+            {
+                results->add(e.what());
 
-            if (matches.size() == 1 and options.iomethod() == "stream")
-                throw ActionException();
+                if (query.size() == 1 and options.iomethod() == "stream")
+                    throw ActionException();
+            }
+        }
+    }
+
+    if (not options.overlay())
+        remove_overlay_packages();
+
+    std::vector<portage::Package>::iterator m;
+    for (m = matches.begin() ; m != matches.end() ; ++m)
+    {
+        const portage::versions& versions(m->versions());
+
+        this->size() += versions.size();
+
+        if (m->portdir() != options.portdir() and not pwd)
+            od.insert(m->portdir());
+
+        if (not options.quiet())
+            results->add("Package", (m->portdir() == options.portdir() or pwd) ?
+                        m->full() : m->full()+od[m->portdir()]);
+
+        if (not options.count())
+        {
+            std::transform(versions.begin(), versions.end(),
+                std::back_inserter(*results), GetKeywords());
+
+            if ((m+1) != matches.end())
+                results->add_linebreak();
         }
     }
 }

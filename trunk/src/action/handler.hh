@@ -31,6 +31,7 @@
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/timer.hh>
 #include <herdstat/util/regex.hh>
+#include <herdstat/portage/package.hh>
 
 #include "options.hh"
 #include "query.hh"
@@ -57,7 +58,7 @@ class ActionHandler
 
     protected:
         virtual void do_init(Query& query, QueryResults * const results) { }
-        virtual void do_all(Query& query, QueryResults * const results) = 0;
+        virtual void do_all(Query& query, QueryResults * const results);
         virtual void do_regex(Query& query, QueryResults * const results) = 0;
         virtual void do_results(Query& query, QueryResults * const results) = 0;
         virtual void do_cleanup(QueryResults * const results);
@@ -85,14 +86,35 @@ class ActionHandler
 class PortageSearchActionHandler : public ActionHandler
 {
     public:
+        PortageSearchActionHandler();
         virtual ~PortageSearchActionHandler() { }
 
+        virtual void do_regex(Query& query, QueryResults * const results);
         virtual void do_cleanup(QueryResults * const results);
 
     protected:
-        std::multimap<std::string, std::string> matches;
+        inline void remove_overlay_packages();
+        inline bool is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs);
+
+        herdstat::portage::PackageFinder find;
+        std::vector<herdstat::portage::Package> matches;
         herdstat::util::Timer search_timer;
 };
+
+inline void
+PortageSearchActionHandler::remove_overlay_packages()
+{
+    matches.erase(std::remove_if(matches.begin(), matches.end(),
+        herdstat::portage::PackageLivesInOverlay()), matches.end());
+}
+
+inline bool
+PortageSearchActionHandler::is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs)
+{
+    return ((pkgs.size() > 1) and not
+        (herdstat::util::all_equal(pkgs.begin(), pkgs.end(),
+            herdstat::portage::FullPkgName())));
+}
 
 #endif /* _HAVE_ACTION_HANDLER_HH */
 

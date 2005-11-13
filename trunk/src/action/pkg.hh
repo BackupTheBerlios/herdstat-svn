@@ -47,7 +47,6 @@ class PkgActionHandler : public ActionHandler
 
     protected:
         virtual void do_init(Query& query, QueryResults * const results);
-        virtual void do_all(Query& query, QueryResults * const results);
         virtual void do_regex(Query& query, QueryResults * const results);
         virtual void do_results(Query& query, QueryResults * const results);
         virtual void do_cleanup(QueryResults * const results);
