@@ -70,19 +70,12 @@ VersionsActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
-struct OnlyPVR
-{
-    std::string operator()(const portage::version_string& v) const
-    {
-        const std::string& pvr((v.components())["PVR"]);
-        return (pvr.substr(0, pvr.rfind("-r0")));
-    }
-};
-
 void
 VersionsActionHandler::do_results(Query& query,
                                   QueryResults * const results)
 {
+    BacktraceContext c("VersionsActionHandler::do_results()");
+
     OverlayDisplay od(results);
     std::string dir;
     bool pwd = false;
@@ -127,13 +120,13 @@ VersionsActionHandler::do_results(Query& query,
         {
             try
             {
-                const std::vector<portage::Package>& res(find.results());
-                find(q->second, &search_timer);
+                const std::vector<portage::Package>& res(find().results());
+                find()(q->second, &search_timer);
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
 
                 matches.insert(matches.end(), res.begin(), res.end());
-                find.clear_results();
+                find().clear_results();
             }
             catch (const portage::AmbiguousPkg& e)
             {
@@ -162,7 +155,7 @@ VersionsActionHandler::do_results(Query& query,
     std::vector<portage::Package>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
-        const portage::versions& versions(m->versions());
+        const portage::KeywordsMap& versions(m->keywords());
 
         this->size() += versions.size();
 
@@ -174,10 +167,16 @@ VersionsActionHandler::do_results(Query& query,
             results->add("Package", (m->portdir() == options.portdir() or pwd) ?
                         m->full() : m->full()+od[m->portdir()]);
             std::transform(versions.begin(), versions.end(),
-                    std::back_inserter(*results), OnlyPVR());
+                    std::back_inserter(*results),
+                    util::compose_f_gx(
+                        std::mem_fun_ref(&portage::VersionString::str),
+                        util::First<portage::KeywordsMap::value_type>()));
         }
         else if (not options.count())
-            results->transform(versions.begin(), versions.end(), OnlyPVR());
+            results->transform(versions.begin(), versions.end(),
+                util::compose_f_gx(
+                    std::mem_fun_ref(&portage::VersionString::str),
+                    util::First<portage::KeywordsMap::value_type>()));
             
         if (not options.count() and ((m+1) != matches.end()))
             results->add_linebreak();

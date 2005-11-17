@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include <herdstat/xml/exceptions.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/file.hh>
 #include <herdstat/util/timer.hh>
@@ -42,13 +43,14 @@
 
 using namespace herdstat;
 using namespace herdstat::portage;
+using namespace herdstat::xml;
 
 pkgcache::pkgcache(const std::string &portdir)
     : cachable(GlobalOptions().localstatedir()+PKGCACHE),
       _options(GlobalOptions()),
       _reserve(PKGLIST_RESERVE),
       _portdir(portdir), _overlays(_options.overlays()),
-      _pkgs(_portdir, _overlays)
+      _pkgs(_portdir, _overlays, false)
 {
     this->logic();
 }
@@ -64,6 +66,8 @@ pkgcache::~pkgcache()
 bool
 pkgcache::valid() const
 {
+    BacktraceContext c("pkgcache::valid()");
+
     const util::Stat pkgcache(this->path());
     bool valid = false;
 
@@ -143,6 +147,8 @@ pkgcache::valid() const
 void
 pkgcache::fill()
 {
+    BacktraceContext c("pkgcache::fill()");
+
     util::Timer timer;
 
     if (_options.timer())
@@ -167,8 +173,10 @@ struct CacheEntryToPackage
     portage::Package
     operator()(const std::string& pkg) const
     {
+        BacktraceContext c("CacheEntryToPackage::operator()("+pkg+")");
         std::vector<std::string> parts(util::split(pkg, ':'));
-        assert(parts.size() == 2);
+        if (parts.size() != 2)
+            throw ParserException(GlobalOptions().localstatedir()+PKGCACHE, "Invalid format");
         return portage::Package(parts.front(), parts.back());
     }
 };
@@ -185,6 +193,8 @@ struct PackageToCacheEntry
 void
 pkgcache::load()
 {
+    BacktraceContext c("pkgcache::load("+this->path()+")");
+
     std::ifstream stream(this->path().c_str());
     if (not stream)
         throw FileException(this->path());
@@ -213,6 +223,8 @@ pkgcache::load()
 void
 pkgcache::dump()
 {
+    BacktraceContext c("pkgcache::dump("+this->path()+")");
+
     std::ofstream stream(this->path().c_str());
     if (not stream)
         throw FileException(this->path());

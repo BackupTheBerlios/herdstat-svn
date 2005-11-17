@@ -34,6 +34,7 @@
 #include <herdstat/portage/package.hh>
 
 #include "options.hh"
+#include "pkgcache.hh"
 #include "query.hh"
 #include "query_results.hh"
 #include "io/gui/widget_factory.hh"
@@ -87,7 +88,7 @@ class PortageSearchActionHandler : public ActionHandler
 {
     public:
         PortageSearchActionHandler();
-        virtual ~PortageSearchActionHandler() { }
+        virtual ~PortageSearchActionHandler();
 
         virtual void do_regex(Query& query, QueryResults * const results);
         virtual void do_cleanup(QueryResults * const results);
@@ -96,9 +97,13 @@ class PortageSearchActionHandler : public ActionHandler
         inline void remove_overlay_packages();
         inline bool is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs);
 
-        herdstat::portage::PackageFinder find;
+        inline herdstat::portage::PackageFinder& find();
+
         std::vector<herdstat::portage::Package> matches;
         herdstat::util::Timer search_timer;
+
+    private:
+        herdstat::portage::PackageFinder *_find;
 };
 
 inline void
@@ -114,6 +119,14 @@ PortageSearchActionHandler::is_ambiguous(const std::vector<herdstat::portage::Pa
     return ((pkgs.size() > 1) and not
         (herdstat::util::all_equal(pkgs.begin(), pkgs.end(),
             herdstat::portage::FullPkgName())));
+}
+
+inline herdstat::portage::PackageFinder&
+PortageSearchActionHandler::find()
+{
+    if (not _find)
+        _find = new herdstat::portage::PackageFinder(GlobalPkgCache());
+    return *_find;
 }
 
 #endif /* _HAVE_ACTION_HANDLER_HH */

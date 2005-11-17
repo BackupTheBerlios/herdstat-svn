@@ -71,34 +71,22 @@ KeywordsActionHandler::createTab(WidgetFactory *widgetFactory)
     return tab;
 }
 
-struct GetKeywords
+struct GetVerKeywordsPair
 {
     std::pair<std::string, std::string>
-    operator()(const portage::version_string& v) const
+    operator()(const std::pair<portage::VersionString, portage::Keywords>& p) const
     {
-        std::pair<std::string, std::string> result;
-        
-        const std::string& pvr((v.components())["PVR"]);
-        result.first.assign(pvr.substr(0, pvr.rfind("-r0")));
-
-        /* get keywords for this version */
-        try
-        {
-            portage::Keywords kw(v.ebuild(), GlobalOptions().color());
-            result.second.assign(kw.str());
-        }
-        catch (const Exception& e)
-        {
-            result.second.assign("no KEYWORDS variable defined");
-        }
-
-        return result;
+        if (not GlobalOptions().color())
+            return std::make_pair(p.first.str(), util::strip_colors(p.second.str()));
+        return std::make_pair(p.first.str(), p.second.str());
     }
 };
 
 void
 KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("KeywordsActionHandler::do_results()");
+
     OverlayDisplay od(results);
     std::string dir;
     bool pwd = false;
@@ -144,13 +132,13 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
         {
             try
             {
-                const std::vector<portage::Package>& res(find.results());
-                find(q->second, &search_timer);
+                const std::vector<portage::Package>& res(find().results());
+                find()(q->second, &search_timer);
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
 
                 matches.insert(matches.end(), res.begin(), res.end());
-                find.clear_results();
+                find().clear_results();
             }
             catch (const portage::AmbiguousPkg& e)
             {
@@ -179,11 +167,11 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
     std::vector<portage::Package>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
-        const portage::versions& versions(m->versions());
+        const portage::KeywordsMap& keywords(m->keywords());
 
-        this->size() += versions.size();
+        this->size() += keywords.size();
 
-        if (m->portdir() != options.portdir() and not pwd)
+        if (m->in_overlay() and not pwd)
             od.insert(m->portdir());
 
         if (not options.quiet())
@@ -192,8 +180,8 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 
         if (not options.count())
         {
-            std::transform(versions.begin(), versions.end(),
-                std::back_inserter(*results), GetKeywords());
+            std::transform(keywords.begin(), keywords.end(),
+                std::back_inserter(*results), GetVerKeywordsPair());
 
             if ((m+1) != matches.end())
                 results->add_linebreak();

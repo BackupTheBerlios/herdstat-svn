@@ -27,6 +27,8 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+
+#include <herdstat/xml/exceptions.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/vars.hh>
 #include <herdstat/util/progress.hh>
@@ -44,6 +46,7 @@
 
 using namespace herdstat;
 using namespace herdstat::portage;
+using namespace herdstat::xml;
 
 metacache::metacache(const std::string &portdir)
     : cachable(GlobalOptions().localstatedir()+METACACHE),
@@ -64,6 +67,8 @@ metacache::~metacache()
 bool
 metacache::valid() const
 {
+    BacktraceContext c("metacache::valid("+this->path()+")");
+
     const util::Stat mcache(this->path());
     bool valid = false;
 
@@ -163,6 +168,8 @@ metacache::valid() const
 void
 metacache::fill()
 {
+    BacktraceContext c("metacache::fill()");
+
     const bool status = not _options.quiet() and not _options.debug();
     {
         util::Progress progress;
@@ -213,72 +220,66 @@ metacache::fill()
 void
 metacache::load()
 {
+    BacktraceContext c("metacache::load("+this->path()+")");
+
     if (not util::is_file(this->path()))
         return;
 
-    try
+    util::vars cache(this->path());
+
+    /* reserve to prevent tons of reallocations */
+    if (cache["size"].empty() or cache["size"] == "0")
+        _metadatas.reserve(METACACHE_RESERVE);
+    else
+        _metadatas.reserve(util::destringify<int>(cache["size"]));
+
+    util::vars::const_iterator i, e = cache.end();
+    for (i = cache.begin() ; i != e ; ++i)
     {
-        util::vars cache(this->path());
+        /* not a category/package, so skip it */
+        if (i->first.find('/') == std::string::npos)
+            continue;
 
-        /* reserve to prevent tons of reallocations */
-        if (cache["size"].empty() or cache["size"] == "0")
-            _metadatas.reserve(METACACHE_RESERVE);
-        else
-            _metadatas.reserve(util::destringify<int>(cache["size"]));
+        std::string str;
+        metadata meta(i->first);
+        Herds& herds(meta.herds());
+        Developers&  devs(meta.devs());
 
-        util::vars::const_iterator i, e = cache.end();
-        for (i = cache.begin() ; i != e ; ++i)
+        std::vector<std::string> parts = util::split(i->second, ':', true);
+        if (parts.empty())
+            throw ParserException(this->path(), "Invalid format");
+
+        /* get herds */
+        str = parts.front();
+        parts.erase(parts.begin());
+        herds = util::split(str, ',');
+
+        /* get devs */
+        if (not parts.empty())
         {
-            /* not a category/package, so skip it */
-            if (i->first.find('/') == std::string::npos)
-                continue;
-
-            std::string str;
-            metadata meta(i->first);
-            Herds& herds(meta.herds());
-            Developers&  devs(meta.devs());
-
-            std::vector<std::string> parts = util::split(i->second, ':', true);
-            if (parts.empty())
-                throw Exception();
-
-            /* get herds */
             str = parts.front();
             parts.erase(parts.begin());
-            herds = util::split(str, ',');
-
-            /* get devs */
-            if (not parts.empty())
-            {
-                str = parts.front();
-                parts.erase(parts.begin());
-                if (not str.empty())
-                    devs = util::split(str, ',');
-            }
-
-            /* get longdesc */
-            if (not parts.empty())
-            {
-                str = parts.front();
-                parts.erase(parts.begin());
-
-                /* longdesc contains a ':', so reconstruct it */
-                while (not parts.empty())
-                {
-                    str += ":" + parts.front();
-                    parts.erase(parts.begin());
-                }
-
-                meta.set_longdesc(str);
-            }
-
-            _metadatas.push_back(meta);
+            if (not str.empty())
+                devs = util::split(str, ',');
         }
-    }
-    catch (const Exception)
-    {
-        std::cerr << "Error parsing " << this->path() << std::endl;
-        throw;
+
+        /* get longdesc */
+        if (not parts.empty())
+        {
+            str = parts.front();
+            parts.erase(parts.begin());
+
+            /* longdesc contains a ':', so reconstruct it */
+            while (not parts.empty())
+            {
+                str += ":" + parts.front();
+                parts.erase(parts.begin());
+            }
+
+            meta.set_longdesc(str);
+        }
+
+        _metadatas.push_back(meta);
     }
 }
 
@@ -289,6 +290,8 @@ metacache::load()
 void
 metacache::dump()
 {
+    BacktraceContext c("metacache::dump("+this->path()+")");
+
     std::ofstream f(this->path().c_str());
     if (not f)
         throw FileException(this->path());

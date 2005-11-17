@@ -262,6 +262,8 @@ querycache::dump(std::ostream &stream)
 void
 querycache::dump()
 {
+    BacktraceContext c("querycache::dump()");
+
     this->sort();
 
     /* trim if needed */

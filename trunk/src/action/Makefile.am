@@ -7,7 +7,6 @@ libaction_la_SOURCES = \
 	handler.hh handler.cc \
 	away.hh away.cc \
 	dev.hh dev.cc \
-	fetch.hh fetch.cc \
 	find.hh find.cc \
 	herd.hh herd.cc \
 	keywords.hh keywords.cc \

@@ -126,7 +126,7 @@ dnl --with-qt
 AC_MSG_CHECKING([whether to build the Qt front-end])
 AC_ARG_WITH(qt,
     AC_HELP_STRING([--with-qt],[Enable the Qt front-end]),
-    [WITH_QT=$withval],[WITH_QT=yes])
+    [WITH_QT=$withval],[WITH_QT=no])
 AC_MSG_RESULT([$WITH_QT])
 
 if test x"$WITH_QT" = "xyes" ; then
@@ -163,7 +163,7 @@ fi
 AC_MSG_CHECKING([whether to build the GTK+ front-end])
 AC_ARG_WITH(gtk,
     AC_HELP_STRING([--with-gtk],[Enable the GTK+ front-end]),
-    [WITH_GTK=$withval],[WITH_GTK=yes])
+    [WITH_GTK=$withval],[WITH_GTK=no])
 AC_MSG_RESULT([$WITH_GTK])
 
 if test x"$WITH_GTK" = "xyes" ; then
@@ -176,7 +176,7 @@ AM_CONDITIONAL(BUILD_QT_FRONTEND, test x"$WITH_QT" = "xyes")
 AM_CONDITIONAL(BUILD_GTK_FRONTEND, test x"$WITH_GTK" = "xyes")
 
 dnl Required libs
-PKG_CHECK_MODULES(libherdstat, libherdstat-0.1)
+PKG_CHECK_MODULES(libherdstat, libherdstat-0.2)
 
 AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile

@@ -40,6 +40,8 @@
 
 #include "common.hh"
 #include "rc.hh"
+#include "handler_map.hh"
+#include "xmlinit.hh"
 #include "formatter.hh"
 #include "io/handler.hh"
 #include "io/stream.hh"
@@ -49,7 +51,6 @@
 #include "action/handler.hh"
 #include "action/away.hh"
 #include "action/dev.hh"
-#include "action/fetch.hh"
 #include "action/find.hh"
 #include "action/herd.hh"
 #include "action/keywords.hh"
@@ -58,7 +59,6 @@
 #include "action/stats.hh"
 #include "action/versions.hh"
 #include "action/which.hh"
-#include "handler_map.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
@@ -129,29 +129,34 @@ version()
 {
     std::cout << PACKAGE << "-" << VERSION
 	<< " (built: " << __DATE__ << " " << __TIME__ << ")" << std::endl;
-    std::cout << "Options:";
-#ifdef HAVE_NCURSES
-    std::cout << " +ncurses";
+    std::cout << "Options:"
+#ifdef DEBUG
+    << " +debug"
 #else
-    std::cout << " -ncurses";
+    << " -debug"
+#endif
+#ifdef HAVE_NCURSES
+    << " +ncurses"
+#else
+    << " -ncurses"
 #endif
 #ifdef READLINE_FRONTEND
-    std::cout << " +readline";
+    << " +readline"
 #else
-    std::cout << " -readline";
+    << " -readline"
 #endif
 #ifdef QT_FRONTEND
-    std::cout << " +qt";
+    << " +qt"
 #else
-    std::cout << " -qt";
+    << " -qt"
 #endif
 #ifdef GTK_FRONTEND
-    std::cout << " +gtk";
+    << " +gtk"
 #else
-    std::cout << " -gtk";
+    << " -gtk"
 #endif
 
-    std::cout << std::endl;
+    << std::endl;
 }
 
 static void
@@ -403,6 +408,7 @@ handle_opts(int argc, char **argv, Query *q)
 		    throw argsOneActionOnly();
 		q->set_action("fetch");
 		options.set_fetch(true);
+                GlobalXMLInit();
 		break;
 	    /* --field */
 	    case 'X':
@@ -530,7 +536,8 @@ handle_opts(int argc, char **argv, Query *q)
     parse_fields(fields, &options);
 
     if (optind < argc)
-        q->add(argv+optind, argv+argc);
+        std::transform(argv+optind, argv+argc,
+            std::back_inserter(*q), util::stringify<char *>);
     else
     {
 	/* actions that are allowed to have 0 non-option args */
@@ -556,6 +563,8 @@ std::string::size_type getcols(); // defined in getcols.cc
 int
 main(int argc, char **argv)
 {
+    BacktraceContext c("main()");
+
     Options& options(GlobalOptions());
     std::ostream *outstream = NULL;
 
@@ -655,7 +664,6 @@ main(int argc, char **argv)
 	HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
 	handlers.insert(std::make_pair("away", new AwayActionHandler()));
 	handlers.insert(std::make_pair("dev",  new DevActionHandler()));
-//        handlers.insert(std::make_pair("fetch", new FetchActionHandler()));
 	handlers.insert(std::make_pair("find", new FindActionHandler()));
 	handlers.insert(std::make_pair("herd", new HerdActionHandler()));
 	handlers.insert(std::make_pair("keywords", new KeywordsActionHandler()));
@@ -680,7 +688,8 @@ main(int argc, char **argv)
 	iohandlers.insert(std::make_pair("gtk", new GuiIOHandler(argc, argv)));
 #endif
 
-	while (true)
+        /* main loop (except if action == fetch) */
+	while (q.action() != "fetch")
 	{
 	    std::auto_ptr<Query> query(new Query());
 	    const std::string& iomethod(options.iomethod());
@@ -723,12 +732,14 @@ main(int argc, char **argv)
     }
     catch (const QAException& e)
     {
-	std::cerr << "QA Violation: " << e.what() << std::endl;
+	std::cerr << e.backtrace(":\n  * ") << "QA Violation: " << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const ParserException& e)
     {
-	std::cerr << "Error parsing " << e.file() << ": " << e.error()
+	std::cerr << "Oops!" << std::endl << "  * "
+            << e.backtrace(":\n  * ") << "Error parsing "
+            << e.file() << ": " << e.error()
 	    << std::endl;
 	return EXIT_FAILURE;
     }
@@ -739,7 +750,7 @@ main(int argc, char **argv)
     }
     catch (const BadDate& e)
     {
-	std::cerr << "Error parsing date '" << e.what() << "'." << std::endl;
+	std::cerr << e.backtrace(":\n  * ") << "Error parsing date '" << e.what() << "'." << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const FormatException &e)
@@ -751,19 +762,9 @@ main(int argc, char **argv)
     {
 	return EXIT_FAILURE;
     }
-    catch (const BadRegex)
+    catch (const BadRegex& e)
     {
-	std::cerr << "Bad regular expression." << std::endl;
-	return EXIT_FAILURE;
-    }
-    catch (const FileException &e)
-    {
-	std::cerr << e.what() << std::endl;
-	return EXIT_FAILURE;
-    }
-    catch (const ErrnoException &e)
-    {
-	std::cerr << e.what() << std::endl;
+	std::cerr << e.backtrace(":\n  * ") << "Bad regular expression." << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const argsInvalidField)
@@ -794,13 +795,20 @@ main(int argc, char **argv)
     }
     catch (const Exception& e)
     {
-	std::cerr << e.what() << std::endl;
+	std::cerr << "Oops!" << std::endl  << "  * " << e.backtrace(":\n  * ")
+            << e.what() << std::endl;
 	return EXIT_FAILURE;
     }
     catch (const BaseException& e)
     {
-	std::cerr << "Unhandled exception: " << e.what() << std::endl;
+	std::cerr << "Unhandled exception: " << e.backtrace(":\n  * ")
+            << e.what() << std::endl;
 	return EXIT_FAILURE;
+    }
+    catch (...)
+    {
+        std::cerr << "Caught unknown exception!" << std::endl;
+        return EXIT_FAILURE;
     }
     // }}}
 

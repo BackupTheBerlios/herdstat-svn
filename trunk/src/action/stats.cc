@@ -68,6 +68,8 @@ void
 StatsActionHandler::do_results(Query& query,
                                QueryResults * const results)
 {
+    BacktraceContext c("StatsActionHandler::do_results()");
+
     const bool quiet_save(options.quiet());
     options.set_quiet(false);
 

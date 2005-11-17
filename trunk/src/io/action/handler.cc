@@ -45,8 +45,6 @@ IOActionHandler::do_all(Query& query, QueryResults * const results)
 void
 IOActionHandler::do_regex(Query& query, QueryResults * const results)
 {
-    results->add("This action does not support regular expressions.");
-    throw ActionException();
 }
 
 Tab *

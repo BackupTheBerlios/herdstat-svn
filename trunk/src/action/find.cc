@@ -66,16 +66,18 @@ FindActionHandler::createTab(WidgetFactory *widgetFactory)
 void
 FindActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("FindActionHandler::do_results()");
+        
     this->size() = 0;
 
     if (not options.regex())
     {
-        const std::vector<portage::Package>& find_results(find.results());
+        const std::vector<portage::Package>& find_results(find().results());
         for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
         {
             try
             {
-                find(q->second, &search_timer);
+                find()(q->second, &search_timer);
             }
             catch (const portage::NonExistentPkg& e)
             {
@@ -87,7 +89,7 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
 
             matches.insert(matches.end(),
                 find_results.begin(), find_results.end());
-            find.clear_results();
+            find().clear_results();
         }
     }
 

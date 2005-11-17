@@ -34,82 +34,82 @@
 using namespace herdstat;
 using namespace gui;
 
-void
-add_herd(const portage::Herd& herd, QueryResults * const results)
-{
-    const Options& options(GlobalOptions());
+//void
+//add_herd(const portage::Herd& herd, QueryResults * const results)
+//{
+//    const Options& options(GlobalOptions());
 
-    if (not options.quiet())
-    {
-        if (not herd.name().empty())
-            results->add("Herd", herd.name());
-        if (not herd.email().empty())
-            results->add("Email", herd.email());
-        if (not herd.desc().empty())
-            results->add("Description", util::tidy_whitespace(herd.desc()));
+//    if (not options.quiet())
+//    {
+//        if (not herd.name().empty())
+//            results->add("Herd", herd.name());
+//        if (not herd.email().empty())
+//            results->add("Email", herd.email());
+//        if (not herd.desc().empty())
+//            results->add("Description", util::tidy_whitespace(herd.desc()));
 
-        if (options.verbose())
-            results->add(util::sprintf("Developers(%d)", herd.size()), "");
-    }
+//        if (options.verbose())
+//            results->add(util::sprintf("Developers(%d)", herd.size()), "");
+//    }
 
-    if (options.verbose() and not options.quiet())
-    {
-        util::ColorMap& color(GlobalColorMap());
-        const std::string user(util::current_user());
+//    if (options.verbose() and not options.quiet())
+//    {
+//        util::ColorMap& color(GlobalColorMap());
+//        const std::string user(util::current_user());
 
-        portage::Herd::const_iterator i;
-        for (i = herd.begin() ; i != herd.end() ; ++i)
-        {
-            if ((i->user() == user) or not options.color())
-                results->add(i->email());
-            else
-                results->add(color[blue] + i->email() + color[none]);
+//        portage::Herd::const_iterator i;
+//        for (i = herd.begin() ; i != herd.end() ; ++i)
+//        {
+//            if ((i->user() == user) or not options.color())
+//                results->add(i->email());
+//            else
+//                results->add(color[blue] + i->email() + color[none]);
 
-            if (not i->name().empty())
-                results->add(i->name());
-            if (not i->role().empty())
-                results->add(i->role());
-            if (not i->name().empty() or not i->role().empty())
-                results->add_linebreak();
-        }
-    }
+//            if (not i->name().empty())
+//                results->add(i->name());
+//            if (not i->role().empty())
+//                results->add(i->role());
+//            if (not i->name().empty() or not i->role().empty())
+//                results->add_linebreak();
+//        }
+//    }
 
-    if ((not options.verbose() and not options.quiet()) or
-        (not options.verbose() and options.quiet() and not options.count()))
-        results->add(util::sprintf("Developers(%d)", herd.size()),
-                        herd.begin(), herd.end());
-}
+//    if ((not options.verbose() and not options.quiet()) or
+//        (not options.verbose() and options.quiet() and not options.count()))
+//        results->add(util::sprintf("Developers(%d)", herd.size()),
+//                        herd.begin(), herd.end());
+//}
 
-static void
-add_herds(const portage::Herds& herds, QueryResults * const results)
-{
-    const Options& options(GlobalOptions());
-    util::ColorMap& color(GlobalColorMap());
+//static void
+//add_herds(const portage::Herds& herds, QueryResults * const results)
+//{
+//    const Options& options(GlobalOptions());
+//    util::ColorMap& color(GlobalColorMap());
 
-    if (options.verbose() and not options.quiet())
-    {
-        results->add(util::sprintf("Herds(%d)", herds.size()), "");
+//    if (options.verbose() and not options.quiet())
+//    {
+//        results->add(util::sprintf("Herds(%d)", herds.size()), "");
 
-        portage::Herds::size_type n = 1;
-        portage::Herds::const_iterator h;
-        for (h = herds.begin() ; h != herds.end() ; ++h)
-        {
-            if (options.color())
-                results->add(color[blue] + h->name() + color[none]);
-            else
-                results->add(h->name());
+//        portage::Herds::size_type n = 1;
+//        portage::Herds::const_iterator h;
+//        for (h = herds.begin() ; h != herds.end() ; ++h)
+//        {
+//            if (options.color())
+//                results->add(color[blue] + h->name() + color[none]);
+//            else
+//                results->add(h->name());
 
-            if (not h->desc().empty())
-                results->add(util::tidy_whitespace(h->desc()));
+//            if (not h->desc().empty())
+//                results->add(util::tidy_whitespace(h->desc()));
 
-            if (not options.count() and n != herds.size())
-                results->add_linebreak();
-        }
-    }
-    else if (not options.count())
-        results->add(util::sprintf("Herds(%d)", herds.size()),
-                herds.begin(), herds.end());
-}
+//            if (not options.count() and n != herds.size())
+//                results->add_linebreak();
+//        }
+//    }
+//    else if (not options.count())
+//        results->add(util::sprintf("Herds(%d)", herds.size()),
+//                herds.begin(), herds.end());
+//}
 
 const char * const
 HerdActionHandler::id() const
@@ -143,33 +143,42 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 void
 HerdActionHandler::do_all(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("HerdActionHandler::do_all()");
     const portage::Herds& herds(GlobalHerdsXML().herds());
     std::transform(herds.begin(), herds.end(),
-        std::back_inserter(query), portage::Name());
+        std::back_inserter(query),
+        std::mem_fun_ref(&portage::Herd::name));
 }
 
 void
 HerdActionHandler::do_regex(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("HerdActionHandler::do_regex("+query.front().second+")");
     const portage::Herds& herds(GlobalHerdsXML().herds());
 
     regexp.assign(query.front().second);
     query.clear();
 
+    /* copy each herd name of each herd that matches the regex */
     util::transform_if(herds.begin(), herds.end(), std::back_inserter(query),
-        std::bind1st(portage::NameRegexMatch<portage::Herd>(), regexp),
-        portage::Name());
+        util::compose_f_gx(
+            std::bind1st(util::regexMatch(), regexp),
+            std::mem_fun_ref(&portage::Herd::name)),
+                std::mem_fun_ref(&portage::Herd::name));
 }
 
 void
 HerdActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("HerdActionHandler::do_results()");
+
     const portage::Herds& herds(GlobalHerdsXML().herds());
     portage::Herds::const_iterator h;
 
     if (query.all() and options.quiet())
     {
-        results->transform(query.begin(), query.end(), util::Second());
+        results->transform(query.begin(), query.end(),
+                util::Second<QuerySpec>());
         return;
     }
 
@@ -183,7 +192,7 @@ HerdActionHandler::do_results(Query& query, QueryResults * const results)
             if (options.iomethod() == "stream")
                 throw ActionException();
 
-            q = query.erase(q);
+            query.erase(q--);
         }
         else if (options.count())
             continue;

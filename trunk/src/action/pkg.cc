@@ -106,6 +106,8 @@ bool
 PkgActionHandler::metadata_matches(const portage::metadata &meta,
                                    const std::string &criteria)
 {
+    BacktraceContext c("PkgActionHandler::metadata_matches()");
+
     const portage::Herds& herds(meta.herds());
     const portage::Developers& devs(meta.devs());
 
@@ -155,6 +157,8 @@ PkgActionHandler::metadata_matches(const portage::metadata &meta,
 void
 PkgActionHandler::search(const Query& query, pkgQuery &q)
 {
+    BacktraceContext c("PkgActionHandler::search(Query, pkgQuery)");
+
     if (options.regex())
         regexp.assign(q.query);
 
@@ -189,6 +193,8 @@ PkgActionHandler::search(const Query& query, pkgQuery &q)
 void
 PkgActionHandler::search(const Query& query)
 {
+    BacktraceContext c("PkgActionHandler::search(Query)");
+
     /* for each metadata.xml */
     for (metacache::const_iterator m = mcache.begin() ; m != mcache.end() ; ++m)
     {
@@ -255,6 +261,8 @@ PkgActionHandler::add_matches(pkgQuery *q, QueryResults * const results)
 {
     assert(q);
 
+    BacktraceContext c("PkgActionHandler::add_matches(pkgQuery, QueryResults)");
+
     const portage::Herds& herds(herds_xml.herds());
     portage::Herds::const_iterator i;
 
@@ -274,7 +282,7 @@ PkgActionHandler::add_matches(pkgQuery *q, QueryResults * const results)
         }
         else if ((i = herds.find(q->query)) != herds.end())
         {
-            results->add("Herd", q->query);
+            results->add("Herd", i->name());
             if (not i->email().empty())
                 results->add("Email", i->email());
             if (not i->desc().empty())
@@ -345,6 +353,8 @@ PkgActionHandler::add_matches(pkgQuery *q, QueryResults * const results)
 void
 PkgActionHandler::add_matches(QueryResults * const results)
 {
+    BacktraceContext c("PkgActionHandler::add_matches()");
+
     std::map<std::string, pkgQuery * >::size_type n = 1;
     std::map<std::string, pkgQuery * >::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
@@ -391,6 +401,8 @@ PkgActionHandler::add_matches(QueryResults * const results)
 void
 PkgActionHandler::do_init(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("PkgActionHandler::do_init()");
+
     this->size() = 0;
 
     /* check PORTDIR */
@@ -504,6 +516,8 @@ PkgActionHandler::do_regex(Query& query, QueryResults * const results)
 void
 PkgActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("PkgActionHandler::do_results()");
+
     if (at_least_one_not_cached)
         search(query);
 

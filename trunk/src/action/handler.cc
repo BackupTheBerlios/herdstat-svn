@@ -58,6 +58,8 @@ ActionHandler::usage() const
 void
 ActionHandler::operator()(Query &query, QueryResults * const results)
 {
+    BacktraceContext c("ActionHandler::operator()");
+
     this->do_init(query, results);
 
     /* handle all target */
@@ -95,20 +97,28 @@ ActionHandler::do_cleanup(QueryResults * const results)
 }
 
 PortageSearchActionHandler::PortageSearchActionHandler()
-    : find(GlobalPkgCache()), matches()
+    : matches(), _find(NULL)
 {
+}
+
+PortageSearchActionHandler::~PortageSearchActionHandler()
+{
+    if (_find)
+        delete _find;
 }
 
 void
 PortageSearchActionHandler::do_regex(Query& query,
                                      QueryResults * const results)
 {
+    BacktraceContext c("PortageSearchActionHandler::do_regex("+query.front().second+")");
+
     regexp.assign(query.front().second);
 
     try
     {
-        matches = find(regexp, &search_timer);
-        find.clear_results();
+        matches = find()(regexp, &search_timer);
+        find().clear_results();
     }
     catch (const portage::NonExistentPkg& e)
     {

@@ -104,7 +104,7 @@ BatchIOHandler::operator()(Query * const query)
         (*h)(*query, &results);
         std::transform(results.begin(), results.end(),
             std::ostream_iterator<std::string>(options.outstream(), "\n"),
-            util::Second());
+            util::Second<QuerySpec>());
     }
     catch (const ActionUnimplemented& e)
     {
@@ -115,7 +115,7 @@ BatchIOHandler::operator()(Query * const query)
     {
         std::transform(results.begin(), results.end(),
             std::ostream_iterator<std::string>(options.outstream(), "\n"),
-            util::Second());
+            util::Second<QuerySpec>());
     }
 
     return true;

@@ -39,7 +39,7 @@ using namespace herdstat;
 void
 IOHandler::init_xml_if_necessary(const std::string& action)
 {
-    static char *actions[] = { "away", "dev", "herd", "stats" };
+    static char *actions[] = { "away", "dev", "herd", "pkg", "stats" };
     if (std::binary_search(actions, actions+NELEMS(actions), action))
         GlobalXMLInit();
 }

@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <functional>
+
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/package.hh>
@@ -85,6 +87,8 @@ static void
 add_metadata(const metadata_data& data, std::string& longdesc,
              QueryResults * const results)
 {
+    BacktraceContext c("add_metadata("+data.pkg+")");
+
     const Options& options(GlobalOptions());
     const portage::metadata_xml m(data.path);
     const portage::metadata& meta(m.data());
@@ -101,7 +105,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
     if (options.quiet())
     {
         if (devs.size() >= 1)
-            results->transform(devs.begin(), devs.end(), portage::Email());
+            results->transform(devs.begin(), devs.end(),
+                std::mem_fun_ref(&portage::Developer::email));
         else if (not meta.is_category())
             results->add("none");
     }
@@ -113,7 +118,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
 
         if (devs.size() > 1)
             std::transform(++devs.begin(), devs.end(),
-                std::back_inserter(*results), portage::Email());
+                std::back_inserter(*results),
+                std::mem_fun_ref(&portage::Developer::email));
         else if (not meta.is_category() and devs.empty())
             results->add("Maintainers(0)", "none");
     }
@@ -125,6 +131,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
 static void
 add_data(const metadata_data& data, QueryResults * const results)
 {
+    BacktraceContext c("add_data("+data.pkg+")");
+
     util::ColorMap& color(GlobalColorMap());
     Options& options(GlobalOptions());
     std::string longdesc;
@@ -215,6 +223,8 @@ add_data(const metadata_data& data, QueryResults * const results)
 void
 MetaActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("MetaActionHandler::do_results()");
+
     OverlayDisplay od(results);
     bool pwd = false;
     std::string dir;
@@ -263,13 +273,42 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
         {
             try
             {
-                const std::vector<portage::Package>& res(find.results());
-                find(q->second, &search_timer);
+                const std::vector<portage::Package>& res(find().results());
+                find()(q->second, &search_timer);
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
+                /* not ambigious but more than one match.  that means we have 1
+                 * in the real portdir, and at least 1 in an overlay.  See if
+                 * we can find the one from the last-specified overlay and if
+                 * not just show the first one from an overlay. */
+                else if (res.size() > 1 and options.overlay() and
+                        not GlobalOptions().overlays().empty())
+                {
+                    const std::string& overlay(GlobalOptions().overlays().back());
 
-                matches.insert(matches.end(), res.begin(), res.end());
-                find.clear_results();
+                    /* find first package whose portdir()
+                     * member equals overlay */
+                    std::vector<portage::Package>::const_iterator i =
+                        std::find_if(res.begin(), res.end(),
+                            util::compose_f_gx(
+                                std::bind2nd(std::equal_to<std::string>(), overlay),
+                                std::mem_fun_ref(&portage::Package::portdir)));
+
+                    if (i == res.end())
+                    {
+                        /* otherwise just settle for the
+                         * first one in an overlay */
+                        i = std::find_if(res.begin(), res.end(),
+                                portage::PackageLivesInOverlay());
+                        assert (i != res.end());
+                    }
+
+                    matches.push_back(*i);
+                }
+                else
+                    matches.insert(matches.end(), res.begin(), res.end());
+
+                find().clear_results();
             }
             catch (const portage::AmbiguousPkg& e)
             {
@@ -322,77 +361,6 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
 
         add_data(data, results);
     }
-
-//    for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
-//        matches.insert(std::make_pair(dir, q->second));
-
-//    std::multimap<std::string, std::string>::size_type n = 1;
-//    std::multimap<std::string, std::string>::iterator m;
-//    for (m = matches.begin() ; m != matches.end() ; ++m, ++n)
-//    {
-//        metadata_data data;
-//        data.portdir = dir;
-
-//        try
-//        {
-//            if (pwd)
-//                data.pkg = portage::find_package_in(data.portdir,
-//                                m->second, &search_timer);
-//            else if (options.regex() and not m->first.empty())
-//            {
-//                data.portdir = m->first;
-//                data.pkg = m->second;
-//            }
-//            else
-//            {
-//                std::pair<std::string, std::string> p =
-//                    portage::find_package(m->second, options.overlay(),
-//                        &search_timer);
-//                data.portdir = p.first;
-//                data.pkg = p.second;
-//            }
-//        }
-//        catch (const portage::AmbiguousPkg& e)
-//        {
-//            results->add(e.name() + " is ambiguous.  Possible matches are:");
-//            results->add_linebreak();
-
-//            std::for_each(e.packages.begin(), e.packages.end(),
-//                std::bind2nd(ColorAmbiguousPkg(), results));
-
-//            if (matches.size() == 1 and options.iomethod() == "stream")
-//                throw ActionException();
-//                
-//            continue;
-//        }
-//        catch (const portage::NonExistentPkg& e)
-//        {
-//            results->add(m->second + " doesn't seem to exist.");
-
-//            if (matches.size() == 1 and options.iomethod() == "stream")
-//                throw ActionException();
-//                
-//            continue;
-//        }
-
-//        data.path = data.portdir + "/" + data.pkg + "/metadata.xml";
-
-//        if (data.portdir != options.portdir() and not pwd)
-//            od.insert(data.portdir);
-
-//        data.is_category = (data.pkg.rfind('/') == std::string::npos);
-
-//        if (n != 1)
-//            results->add_linebreak();
-
-//        if (data.portdir == options.portdir() or pwd)
-//            results->add(data.is_category ? "Category" : "Package", data.pkg);
-//        else
-//            results->add(data.is_category ? "Category" : "Package",
-//                    data.pkg + od[data.portdir]);
-
-//        add_data(data, results);
-//    }
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

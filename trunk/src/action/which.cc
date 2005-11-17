@@ -66,6 +66,8 @@ void
 WhichActionHandler::do_results(Query& query,
                                QueryResults * const results)
 {
+    BacktraceContext c("WhichActionHandler::do_results()");
+
     this->size() = 0;
 
     if (not options.regex())
@@ -74,13 +76,13 @@ WhichActionHandler::do_results(Query& query,
         {
             try
             {
-                const std::vector<portage::Package>& res(find.results());
-                find(q->second, &search_timer);
+                const std::vector<portage::Package>& res(find().results());
+                find()(q->second, &search_timer);
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
 
                 matches.insert(matches.end(), res.begin(), res.end());
-                find.clear_results();
+                find().clear_results();
             }
             catch (const portage::AmbiguousPkg& e)
             {

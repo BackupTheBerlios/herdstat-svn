@@ -48,8 +48,8 @@ class HerdActionHandler : public ActionHandler
 };
 
 /* add info from given herd to query results */
-void add_herd(const herdstat::portage::Herd& herd,
-              QueryResults * const results);
+//void add_herd(const herdstat::portage::Herd& herd,
+//              QueryResults * const results);
 
 #endif /* _HAVE_ACTION_HERD_HH */
 

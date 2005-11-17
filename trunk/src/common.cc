@@ -64,6 +64,8 @@ debug_msg(const char *fmt, ...)
 static void
 do_fetch(const char * const url, const char * const file)
 {
+    BacktraceContext c("do_fetch()");
+
     const Options& options(GlobalOptions());
     util::Stat xml(file);
     const std::time_t now(std::time(NULL));
@@ -116,6 +118,7 @@ do_fetch(const char * const url, const char * const file)
 void
 fetch_devawayxml()
 {
+    BacktraceContext c("fetch_devawayxml()");
     const Options& options(GlobalOptions());
     if (options.devawayxml().empty())
         do_fetch(DEVAWAYXML_REMOTE, DEVAWAYXML_LOCAL);
@@ -124,6 +127,7 @@ fetch_devawayxml()
 void
 fetch_herdsxml()
 {
+    BacktraceContext c("fetch_herdsxml()");
     const Options& options(GlobalOptions());
     if (options.herdsxml().empty())
         do_fetch(HERDSXML_REMOTE, HERDSXML_LOCAL);
@@ -132,6 +136,7 @@ fetch_herdsxml()
 portage::herds_xml&
 GlobalHerdsXML()
 {
+    BacktraceContext c("GlobalHerdsXML()");
     static portage::herds_xml h;
     return h;
 }
@@ -139,6 +144,7 @@ GlobalHerdsXML()
 portage::devaway_xml&
 GlobalDevawayXML()
 {
+    BacktraceContext c("GlobalDevawayXML()");
     static portage::devaway_xml d;
     return d;
 }
@@ -146,6 +152,7 @@ GlobalDevawayXML()
 portage::userinfo_xml&
 GlobalUserinfoXML()
 {
+    BacktraceContext c("GlobalUserinfoXML()");
     static portage::userinfo_xml u;
     return u;
 }
@@ -153,8 +160,9 @@ GlobalUserinfoXML()
 util::ColorMap&
 GlobalColorMap()
 {
-    static util::ColorMap c;
-    return c;
+    BacktraceContext c("GlobalColorMap()");
+    static util::ColorMap cm;
+    return cm;
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

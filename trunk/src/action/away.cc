@@ -66,20 +66,26 @@ AwayActionHandler::do_all(Query& query, QueryResults * const results)
 {
     const portage::Developers& devs(GlobalDevawayXML().devs());
     std::transform(devs.begin(), devs.end(),
-        std::back_inserter(query), portage::User());
+        std::back_inserter(query),
+        std::mem_fun_ref(&portage::Developer::user));
 }
 
 void
 AwayActionHandler::do_regex(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("AwayActionHandler::do_regex("+query.front().second+")");
+
     const portage::Developers& devs(GlobalDevawayXML().devs());
 
     regexp.assign(query.front().second);
     query.clear();
 
+    /* copy the user name of developers whose user name matches the regex */
     util::transform_if(devs.begin(), devs.end(), std::back_inserter(query),
-        std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-        regexp), portage::User());
+        util::compose_f_gx(
+            std::bind1st(util::regexMatch(), regexp),
+            std::mem_fun_ref(&portage::Developer::user)),
+                std::mem_fun_ref(&portage::Developer::user));
 
     if (query.empty())
     {
@@ -91,6 +97,8 @@ AwayActionHandler::do_regex(Query& query, QueryResults * const results)
 void
 AwayActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("AwayActionHandler::do_results()");
+
     const portage::Developers& devs(GlobalDevawayXML().devs());
     portage::Developers::const_iterator d;
 
@@ -105,7 +113,7 @@ AwayActionHandler::do_results(Query& query, QueryResults * const results)
             if (query.size() == 1 and options.iomethod() == "stream")
                 throw ActionException();
 
-            q = query.erase(q);
+            query.erase(q--);
         }
         else if (options.count())
             continue;

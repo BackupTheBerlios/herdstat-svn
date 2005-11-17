@@ -28,7 +28,6 @@
 #include <herdstat/util/functional.hh>
 
 #include "common.hh"
-#include "action/herd.hh" /* for add_herd() */
 #include "action/dev.hh"
 
 using namespace herdstat;
@@ -64,6 +63,7 @@ DevActionHandler::createTab(WidgetFactory *widgetFactory)
 void
 DevActionHandler::do_init(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("DevActionHandler::do_init()");
     if (not options.userinfoxml().empty())
         GlobalUserinfoXML().parse(options.userinfoxml());
 }
@@ -71,6 +71,8 @@ DevActionHandler::do_init(Query& query, QueryResults * const results)
 void
 DevActionHandler::do_all(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("DevActionHandler::do_all()");
+
     portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
     const portage::Developers& devs(userinfo_xml.devs());
     const portage::Herds& herds(GlobalHerdsXML().herds());
@@ -78,11 +80,13 @@ DevActionHandler::do_all(Query& query, QueryResults * const results)
 
     for (h = herds.begin() ; h != herds.end() ; ++h)
         std::transform(h->begin(), h->end(),
-            std::back_inserter(query), portage::User());
+            std::back_inserter(query),
+            std::mem_fun_ref(&portage::Developer::user));
 
     if (not userinfo_xml.empty())
         std::transform(devs.begin(), devs.end(),
-            std::back_inserter(query), portage::User());
+            std::back_inserter(query),
+            std::mem_fun_ref(&portage::Developer::user));
 
     /* nuke dupes */
     std::sort(query.begin(), query.end(), util::SecondLess());
@@ -93,6 +97,7 @@ DevActionHandler::do_all(Query& query, QueryResults * const results)
 void
 DevActionHandler::do_regex(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("DevActionHandler::do_regex("+query.front().second+")");
     portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
     const portage::Developers& devs(userinfo_xml.devs());
     const portage::Herds& herds(GlobalHerdsXML().herds());
@@ -105,16 +110,20 @@ DevActionHandler::do_regex(Query& query, QueryResults * const results)
      * that matches the regex into our query object */
     for (h = herds.begin() ; h != herds.end() ; ++h)
         util::transform_if(h->begin(), h->end(), std::back_inserter(query),
-            std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-            regexp), portage::User());
+            util::compose_f_gx(
+                std::bind1st(util::regexMatch(), regexp),
+                std::mem_fun_ref(&portage::Developer::user)),
+                    std::mem_fun_ref(&portage::Developer::user));
+
 
     /* likewise for userinfo.xml, if used.  There may be
      * developers that match that aren't listed in herds.xml */
     if (not userinfo_xml.empty())
-        util::transform_if(devs.begin(), devs.end(),
-            std::back_inserter(query),
-            std::bind1st(portage::UserRegexMatch<portage::Developer>(),
-            regexp), portage::User());
+        util::transform_if(devs.begin(), devs.end(), std::back_inserter(query),
+            util::compose_f_gx(
+                std::bind1st(util::regexMatch(), regexp),
+                std::mem_fun_ref(&portage::Developer::user)),
+                    std::mem_fun_ref(&portage::Developer::user));
 
     if (query.empty())
     {
@@ -132,6 +141,8 @@ DevActionHandler::do_regex(Query& query, QueryResults * const results)
 void
 DevActionHandler::do_results(Query& query, QueryResults * const results)
 {
+    BacktraceContext c("DevActionHandler::do_results()");
+
     portage::herds_xml& herds_xml(GlobalHerdsXML());
     portage::devaway_xml& devaway_xml(GlobalDevawayXML());
     portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
@@ -140,7 +151,8 @@ DevActionHandler::do_results(Query& query, QueryResults * const results)
 
     if (query.all() and options.quiet())
     {
-        results->transform(query.begin(), query.end(), util::Second());
+        results->transform(query.begin(), query.end(),
+                util::Second<QuerySpec>());
         return;
     }
 
@@ -161,7 +173,7 @@ DevActionHandler::do_results(Query& query, QueryResults * const results)
             if (options.iomethod() == "stream")
                 throw ActionException();
 
-            q = query.erase(q);
+            query.erase(q--);
         }
         else if (options.count())
             continue;

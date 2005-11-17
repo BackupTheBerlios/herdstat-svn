@@ -28,6 +28,7 @@
 #endif
 
 #include "options.hh"
+#include <herdstat/exceptions.hh>
 #include <herdstat/cachable.hh>
 #include <herdstat/portage/package.hh>
 
@@ -74,6 +75,7 @@ class pkgcache : public herdstat::cachable
 inline pkgcache&
 GlobalPkgCache()
 {
+    herdstat::BacktraceContext c("GlobalPkgCache()");
     static pkgcache p(GlobalOptions().portdir());
     return p;
 }
