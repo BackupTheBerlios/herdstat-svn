@@ -37,15 +37,6 @@
 
 #include "query_results.hh"
 
-struct FirstLengthLess
-{
-    bool operator()(const std::pair<std::string, std::string>& p1,
-                    const std::pair<std::string, std::string>& p2) const
-    {
-        return (p1.first.length() < p2.first.length());
-    }
-};
-
 class FormatAttrs
 {
     public:

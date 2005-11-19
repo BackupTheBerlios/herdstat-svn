@@ -270,6 +270,15 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
  * This is the user interface to what does the actual formatting.
  */
 
+struct FirstLengthLess
+{
+    bool operator()(const std::pair<std::string, std::string>& p1,
+                    const std::pair<std::string, std::string>& p2) const
+    {
+        return (p1.first.length() < p2.first.length());
+    }
+};
+
 void
 Formatter::operator()(const QueryResults& results, std::ostream& stream)
 {
@@ -287,16 +296,10 @@ Formatter::operator()(const QueryResults& results, std::ostream& stream)
                     0 : i->first.length() + 3
     );
 
-    /* for each element in our buffer, format it and insert
-     * the result into the real output buffer. */
-    std::vector<std::string> outbuf;
+    /* format/display each element in results */
     std::transform(results.begin(), results.end(),
-        std::back_inserter(outbuf),
+        std::ostream_iterator<std::string>(stream, "\n"),
         std::bind2nd(Format(), &_attrs));
-
-    /* display it finally */
-    std::copy(outbuf.begin(), outbuf.end(),
-        std::ostream_iterator<std::string>(stream, "\n"));
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
