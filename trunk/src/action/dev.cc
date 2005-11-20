@@ -89,8 +89,17 @@ DevActionHandler::do_all(Query& query, QueryResults * const results)
             std::mem_fun_ref(&portage::Developer::user));
 
     /* nuke dupes */
-    std::sort(query.begin(), query.end(), util::SecondLess());
-    query.erase(std::unique(query.begin(), query.end(), util::SecondEqual()),
+    std::sort(query.begin(), query.end(),
+        util::compose_f_gx_hy(
+            std::less<std::string>(),
+            util::Second<Query::value_type>(),
+            util::Second<Query::value_type>()));
+
+    query.erase(std::unique(query.begin(), query.end(),
+                    util::compose_f_gx_hy(
+                        std::equal_to<std::string>(),
+                        util::Second<Query::value_type>(),
+                        util::Second<Query::value_type>())),
             query.end());
 }
 
@@ -132,10 +141,19 @@ DevActionHandler::do_regex(Query& query, QueryResults * const results)
         throw ActionException();
     }
 
-    /* remove any dupes */
-    std::sort(query.begin(), query.end(), util::SecondLess());
-    query.erase(std::unique(query.begin(), query.end(), util::SecondEqual()),
-        query.end());
+    /* nuke dupes */
+    std::sort(query.begin(), query.end(),
+        util::compose_f_gx_hy(
+            std::less<std::string>(),
+            util::Second<Query::value_type>(),
+            util::Second<Query::value_type>()));
+
+    query.erase(std::unique(query.begin(), query.end(),
+                    util::compose_f_gx_hy(
+                        std::equal_to<std::string>(),
+                        util::Second<Query::value_type>(),
+                        util::Second<Query::value_type>())),
+            query.end());
 }
 
 void
