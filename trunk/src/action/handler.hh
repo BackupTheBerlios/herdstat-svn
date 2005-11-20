@@ -31,7 +31,7 @@
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/timer.hh>
 #include <herdstat/util/regex.hh>
-#include <herdstat/portage/package.hh>
+#include <herdstat/portage/package_finder.hh>
 
 #include "options.hh"
 #include "pkgcache.hh"
@@ -110,11 +110,12 @@ inline void
 PortageSearchActionHandler::remove_overlay_packages()
 {
     matches.erase(std::remove_if(matches.begin(), matches.end(),
-        herdstat::portage::PackageLivesInOverlay()), matches.end());
+        std::mem_fun_ref(&herdstat::portage::Package::in_overlay)), matches.end());
 }
 
 inline bool
-PortageSearchActionHandler::is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs)
+PortageSearchActionHandler::is_ambiguous
+    (const std::vector<herdstat::portage::Package>& pkgs)
 {
     return ((pkgs.size() > 1) and not
         (herdstat::util::all_equal(pkgs.begin(), pkgs.end(),
