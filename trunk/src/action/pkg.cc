@@ -572,9 +572,11 @@ PkgActionHandler::do_cleanup(QueryResults * const results)
 {
     ActionHandler::do_cleanup(results);
 
-    std::map<std::string, pkgQuery * >::iterator m;
-    for (m = matches.begin() ; m != matches.end() ; ++m)
-        delete m->second;
+    std::for_each(matches.begin(), matches.end(),
+        util::compose_f_gx(
+            util::DeleteAndNullify<pkgQuery>(),
+            util::Second<std::pair<const std::string, pkgQuery *> >()));
+
     matches.clear();
 }
 
