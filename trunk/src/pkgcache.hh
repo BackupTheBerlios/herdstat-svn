@@ -30,7 +30,7 @@
 #include "options.hh"
 #include <herdstat/exceptions.hh>
 #include <herdstat/cachable.hh>
-#include <herdstat/portage/package.hh>
+#include <herdstat/portage/package_list.hh>
 
 class pkgcache : public herdstat::cachable
 {

@@ -28,7 +28,7 @@
 
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/exceptions.hh>
-#include <herdstat/portage/package.hh>
+#include <herdstat/portage/package_which.hh>
 #include <herdstat/portage/misc.hh>
 #include <herdstat/portage/ebuild.hh>
 #include <herdstat/portage/license.hh>
@@ -299,7 +299,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
                         /* otherwise just settle for the
                          * first one in an overlay */
                         i = std::find_if(res.begin(), res.end(),
-                                portage::PackageLivesInOverlay());
+                                std::mem_fun_ref(&portage::Package::in_overlay));
                         assert (i != res.end());
                     }
 
@@ -309,6 +309,15 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
                     matches.insert(matches.end(), res.begin(), res.end());
 
                 find().clear_results();
+
+                if (not options.overlay())
+                {
+                    remove_overlay_packages();
+
+                    /* might be empty if the pkg only exists in an overlay */
+                    if (matches.empty())
+                        throw portage::NonExistentPkg(q->second);
+                }
             }
             catch (const portage::AmbiguousPkg& e)
             {
@@ -330,9 +339,6 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
             }
         }
     }
-
-    if (not options.overlay())
-        remove_overlay_packages();
 
     this->size() = matches.size();
 

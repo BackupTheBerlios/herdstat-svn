@@ -119,6 +119,15 @@ PortageSearchActionHandler::do_regex(Query& query,
     {
         matches = find()(regexp, &search_timer);
         find().clear_results();
+
+        if (not options.overlay())
+        {
+            remove_overlay_packages();
+
+            /* might be empty if the pkg only exists in an overlay */
+            if (matches.empty())
+                throw portage::NonExistentPkg(regexp);
+        }
     }
     catch (const portage::NonExistentPkg& e)
     {

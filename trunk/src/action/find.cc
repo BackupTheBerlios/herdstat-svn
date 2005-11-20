@@ -78,6 +78,18 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
             try
             {
                 find()(q->second, &search_timer);
+                matches.insert(matches.end(),
+                    find_results.begin(), find_results.end());
+                find().clear_results();
+
+                if (not options.overlay())
+                {
+                    remove_overlay_packages();
+
+                    /* might be empty if the pkg only exists in an overlay */
+                    if (matches.empty())
+                        throw portage::NonExistentPkg(q->second);
+                }
             }
             catch (const portage::NonExistentPkg& e)
             {
@@ -86,23 +98,18 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
                 if (query.size() == 1 and options.iomethod() == "stream")
                     throw ActionException();
             }
-
-            matches.insert(matches.end(),
-                find_results.begin(), find_results.end());
-            find().clear_results();
         }
     }
 
-    /* if not in overlay mode, remove those packages
-     * that were found in an overlay. */
-    if (not options.overlay())
-        remove_overlay_packages();
-
     if (matches.size() > 1)
     {
-//        std::sort(matches.begin(), matches.end());
-        matches.erase(std::unique(matches.begin(), matches.end(),
-                portage::FullPkgNameEqual()), matches.end());
+        matches.erase(
+            std::unique(matches.begin(), matches.end(),
+                util::compose_f_gx_hy(
+                    std::equal_to<std::string>(),
+                    portage::FullPkgName(),
+                    portage::FullPkgName())),
+            matches.end());
     }
 
     this->size() = matches.size();

@@ -139,6 +139,15 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 
                 matches.insert(matches.end(), res.begin(), res.end());
                 find().clear_results();
+
+                if (not options.overlay())
+                {
+                    remove_overlay_packages();
+
+                    /* might be empty if the pkg only exists in an overlay */
+                    if (matches.empty())
+                        throw portage::NonExistentPkg(q->second);
+                }
             }
             catch (const portage::AmbiguousPkg& e)
             {
@@ -160,9 +169,6 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
             }
         }
     }
-
-    if (not options.overlay())
-        remove_overlay_packages();
 
     std::vector<portage::Package>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
