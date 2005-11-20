@@ -27,9 +27,9 @@
 # include "config.h"
 #endif
 
+#include <vector>
 #include <string>
 #include <utility>
-#include <herdstat/util/functional.hh>
 
 #include "options.hh"
 
@@ -43,8 +43,7 @@ class QueryResults;
 class OverlayDisplay
 {
     public:
-        typedef std::set<std::pair<std::string, std::size_t>,
-                         herdstat::util::SecondLess> container_type;
+        typedef std::vector<std::pair<std::string, std::size_t> > container_type;
         typedef container_type::size_type size_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
@@ -58,13 +57,13 @@ class OverlayDisplay
         // insert new overlay
         void insert(const std::string& overlay);
 
-        bool empty() const { return _oset.empty(); }
-        size_type size() const { return _oset.size(); }
+        bool empty() const { return _ovec.empty(); }
+        size_type size() const { return _ovec.size(); }
 
     private:
         Options& _options;
         QueryResults * const _results;
-        container_type _oset;
+        container_type _ovec;
 };
 
 #endif /* HAVE_OVERLAYDISPLAY_HH */

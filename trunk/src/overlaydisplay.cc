@@ -24,8 +24,10 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/functional.hh>
 
 #include "common.hh"
 #include "query_results.hh"
@@ -40,13 +42,13 @@ OverlayDisplay::OverlayDisplay(QueryResults * const results)
 
 OverlayDisplay::~OverlayDisplay()
 {
-    if (_options.quiet() or _oset.empty())
+    if (_options.quiet() or _ovec.empty())
         return;
 
     _results->add_linebreak();
     _results->add("Portage overlays:");
 
-    for (iterator i = _oset.begin() ; i != _oset.end() ; ++i)
+    for (iterator i = _ovec.begin() ; i != _ovec.end() ; ++i)
         _results->add(" " + this->operator[](i->first) + " " + i->first);
 }
 
@@ -56,11 +58,12 @@ OverlayDisplay::operator[] (const std::string& overlay) const
     if (_options.quiet())
         return std::string();
 
-    /* cant use find() as we dont now the second value of the pair */
-    iterator i;
-    for (i = _oset.begin() ; i != _oset.end() ; ++i)
-        if (i->first == overlay) break;
-    assert(i != _oset.end());
+    const_iterator i =
+        std::find_if(_ovec.begin(), _ovec.end(),
+                util::compose_f_gx(
+                    std::bind2nd(std::equal_to<std::string>(), overlay),
+                    util::First<value_type>()));
+    assert(i != _ovec.end());
 
     if (_options.color())
     {
@@ -75,11 +78,13 @@ OverlayDisplay::operator[] (const std::string& overlay) const
 void
 OverlayDisplay::insert(const std::string& overlay)
 {
-    /* cant use find() as we dont now the second value of the pair */
-    for (iterator i = _oset.begin() ; i != _oset.end() ; ++i)
-        if (i->first == overlay) return;
+    if (_ovec.end() != std::find_if(_ovec.begin(), _ovec.end(),
+                        util::compose_f_gx(
+                            std::bind2nd(std::equal_to<std::string>(), overlay),
+                            util::First<value_type>())))
+        return;
 
-    _oset.insert(value_type(overlay, _oset.size() + 1));
+    _ovec.push_back(value_type(overlay, _ovec.size() + 1));
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
