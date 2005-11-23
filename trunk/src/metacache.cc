@@ -49,7 +49,7 @@ using namespace herdstat::portage;
 using namespace herdstat::xml;
 
 metacache::metacache(const std::string &portdir)
-    : cachable(GlobalOptions().localstatedir()+METACACHE),
+    : Cachable(GlobalOptions().localstatedir()+METACACHE),
       _options(GlobalOptions()),
       _portdir(portdir),
       _overlays(_options.overlays())
@@ -200,13 +200,13 @@ metacache::fill()
             if (util::file_exists(path))
             {
                 /* parse it */
-                const metadata_xml meta(path, *i);
+                const MetadataXML meta(path, *i);
                 _metadatas.push_back(meta.data());
             }
         }
 
         /* trim unused space */
-        std::vector<portage::metadata>(_metadatas).swap(_metadatas);
+        std::vector<Metadata>(_metadatas).swap(_metadatas);
     }
 
     if (status)
@@ -225,7 +225,7 @@ metacache::load()
     if (not util::is_file(this->path()))
         return;
 
-    util::vars cache(this->path());
+    util::Vars cache(this->path());
 
     /* reserve to prevent tons of reallocations */
     if (cache["size"].empty() or cache["size"] == "0")
@@ -233,7 +233,7 @@ metacache::load()
     else
         _metadatas.reserve(util::destringify<int>(cache["size"]));
 
-    util::vars::const_iterator i, e = cache.end();
+    util::Vars::const_iterator i, e = cache.end();
     for (i = cache.begin() ; i != e ; ++i)
     {
         /* not a category/package, so skip it */
@@ -241,7 +241,7 @@ metacache::load()
             continue;
 
         std::string str;
-        metadata meta(i->first);
+        Metadata meta(i->first);
         Herds& herds(meta.herds());
         Developers&  devs(meta.devs());
 

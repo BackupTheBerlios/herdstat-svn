@@ -133,27 +133,27 @@ fetch_herdsxml()
         do_fetch(HERDSXML_REMOTE, HERDSXML_LOCAL);
 }
 
-portage::herds_xml&
+portage::HerdsXML&
 GlobalHerdsXML()
 {
     BacktraceContext c("GlobalHerdsXML()");
-    static portage::herds_xml h;
+    static portage::HerdsXML h;
     return h;
 }
 
-portage::devaway_xml&
+portage::DevawayXML&
 GlobalDevawayXML()
 {
     BacktraceContext c("GlobalDevawayXML()");
-    static portage::devaway_xml d;
+    static portage::DevawayXML d;
     return d;
 }
 
-portage::userinfo_xml&
+portage::UserinfoXML&
 GlobalUserinfoXML()
 {
     BacktraceContext c("GlobalUserinfoXML()");
-    static portage::userinfo_xml u;
+    static portage::UserinfoXML u;
     return u;
 }
 

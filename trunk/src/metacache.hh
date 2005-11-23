@@ -35,10 +35,10 @@
  * A cache of all metadata.xml's.
  */
 
-class metacache : public herdstat::cachable
+class metacache : public herdstat::Cachable
 {
     public:
-        typedef std::vector<herdstat::portage::metadata> container_type;
+        typedef std::vector<herdstat::portage::Metadata> container_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;

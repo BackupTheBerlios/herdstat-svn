@@ -30,7 +30,7 @@
 #include <herdstat/noncopyable.hh>
 #include <herdstat/xml/init.hh>
 
-class XMLInit : private herdstat::noncopyable
+class XMLInit : private herdstat::Noncopyable
 {
     private:
         friend void GlobalXMLInit();

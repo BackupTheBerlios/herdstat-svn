@@ -32,7 +32,7 @@
 #include <herdstat/cachable.hh>
 #include <herdstat/portage/package_list.hh>
 
-class pkgcache : public herdstat::cachable
+class pkgcache : public herdstat::Cachable
 {
     public:
         typedef herdstat::portage::PackageList container_type;

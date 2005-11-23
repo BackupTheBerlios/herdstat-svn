@@ -73,7 +73,7 @@ DevActionHandler::do_all(Query& query, QueryResults * const results)
 {
     BacktraceContext c("DevActionHandler::do_all()");
 
-    portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
+    portage::UserinfoXML& userinfo_xml(GlobalUserinfoXML());
     const portage::Developers& devs(userinfo_xml.devs());
     const portage::Herds& herds(GlobalHerdsXML().herds());
     portage::Herds::const_iterator h;
@@ -107,7 +107,7 @@ void
 DevActionHandler::do_regex(Query& query, QueryResults * const results)
 {
     BacktraceContext c("DevActionHandler::do_regex("+query.front().second+")");
-    portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
+    portage::UserinfoXML& userinfo_xml(GlobalUserinfoXML());
     const portage::Developers& devs(userinfo_xml.devs());
     const portage::Herds& herds(GlobalHerdsXML().herds());
     portage::Herds::const_iterator h;
@@ -161,9 +161,9 @@ DevActionHandler::do_results(Query& query, QueryResults * const results)
 {
     BacktraceContext c("DevActionHandler::do_results()");
 
-    portage::herds_xml& herds_xml(GlobalHerdsXML());
-    portage::devaway_xml& devaway_xml(GlobalDevawayXML());
-    portage::userinfo_xml& userinfo_xml(GlobalUserinfoXML());
+    portage::HerdsXML& herds_xml(GlobalHerdsXML());
+    portage::DevawayXML& devaway_xml(GlobalDevawayXML());
+    portage::UserinfoXML& userinfo_xml(GlobalUserinfoXML());
     const portage::Developers& devs(userinfo_xml.devs());
     const portage::Herds& herds(herds_xml.herds());
 

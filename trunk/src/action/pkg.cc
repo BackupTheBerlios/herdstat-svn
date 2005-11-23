@@ -103,7 +103,7 @@ struct Error : std::binary_function<std::string, const util::Regex *, void>
  */
 
 bool
-PkgActionHandler::metadata_matches(const portage::metadata &meta,
+PkgActionHandler::metadata_matches(const portage::Metadata &meta,
                                    const std::string &criteria)
 {
     BacktraceContext c("PkgActionHandler::metadata_matches()");
@@ -169,8 +169,8 @@ PkgActionHandler::search(const Query& query, pkgQuery &q)
 
         /* parse it's metadata.xml */
         const std::string path(options.portdir() + "/" + pkg + "/metadata.xml");
-        const portage::metadata_xml mxml(path, pkg);
-        const portage::metadata& meta(mxml.data());
+        const portage::MetadataXML mxml(path, pkg);
+        const portage::Metadata& meta(mxml.data());
 
         /* does it match the criteria? */
         if (not metadata_matches(meta, q.query))

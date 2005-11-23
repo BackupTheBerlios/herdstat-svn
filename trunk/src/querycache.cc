@@ -43,7 +43,7 @@ using namespace herdstat::xml;
  * Content Handler for our internal querycache.xml
  */
 
-class querycacheXMLHandler : public saxhandler
+class querycacheXMLHandler : public herdstat::xml::SAXHandler
 {
     public:
         querycacheXMLHandler();

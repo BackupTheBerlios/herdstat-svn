@@ -34,7 +34,7 @@
 
 typedef std::vector<std::pair<std::string, std::string> > fields_type;
 
-class Options : private herdstat::noncopyable
+class Options : private herdstat::Noncopyable
 {
     public:
         bool verbose() const { return _verbose; }

@@ -90,8 +90,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
     BacktraceContext c("add_metadata("+data.pkg+")");
 
     const Options& options(GlobalOptions());
-    const portage::metadata_xml m(data.path);
-    const portage::metadata& meta(m.data());
+    const portage::MetadataXML m(data.path);
+    const portage::Metadata& meta(m.data());
     const portage::Herds& herds(meta.herds());
     const portage::Developers& devs(meta.devs());
 
@@ -136,7 +136,7 @@ add_data(const metadata_data& data, QueryResults * const results)
     util::ColorMap& color(GlobalColorMap());
     Options& options(GlobalOptions());
     std::string longdesc;
-    portage::ebuild ebuild_vars;
+    portage::Ebuild ebuild_vars;
 
     if (util::is_file(data.path))
         add_metadata(data, longdesc, results);
@@ -209,7 +209,11 @@ add_data(const metadata_data& data, QueryResults * const results)
                 results->add("Description", ebuild_vars["DESCRIPTION"]);
         }
         else
-            results->add("Description", util::tidy_whitespace(longdesc));
+        {
+            const std::string tidyld(util::tidy_whitespace(longdesc));
+            debug_msg("long description = '%s'", tidyld.c_str());
+            results->add("Description", tidyld);
+        }
     }
     else
     {

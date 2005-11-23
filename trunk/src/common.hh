@@ -51,9 +51,9 @@ void debug_msg(const char *, ...);
 void fetch_devawayxml();
 void fetch_herdsxml();
 
-herdstat::portage::herds_xml& GlobalHerdsXML();
-herdstat::portage::devaway_xml& GlobalDevawayXML();
-herdstat::portage::userinfo_xml& GlobalUserinfoXML();
+herdstat::portage::HerdsXML& GlobalHerdsXML();
+herdstat::portage::DevawayXML& GlobalDevawayXML();
+herdstat::portage::UserinfoXML& GlobalUserinfoXML();
 herdstat::util::ColorMap& GlobalColorMap();
 
 struct ColorAmbiguousPkg

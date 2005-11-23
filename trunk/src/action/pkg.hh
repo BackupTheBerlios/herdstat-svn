@@ -57,7 +57,7 @@ class PkgActionHandler : public ActionHandler
         void search(const Query& q);
         void add_matches(QueryResults * const results);
         void add_matches(pkgQuery *pq, QueryResults * const results);
-        bool metadata_matches(const herdstat::portage::metadata &meta,
+        bool metadata_matches(const herdstat::portage::Metadata &meta,
                               const std::string& pkg);
 
         std::map<std::string, pkgQuery *> matches;
@@ -67,7 +67,7 @@ class PkgActionHandler : public ActionHandler
         const bool status;
         bool cache_is_valid, at_least_one_not_cached;
         herdstat::util::Regex with;
-        herdstat::portage::herds_xml& herds_xml;
+        herdstat::portage::HerdsXML& herds_xml;
 };
 
 #endif /* _HAVE_ACTION_PKG_HH */

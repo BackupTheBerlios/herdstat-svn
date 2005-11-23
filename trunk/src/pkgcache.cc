@@ -46,7 +46,7 @@ using namespace herdstat::portage;
 using namespace herdstat::xml;
 
 pkgcache::pkgcache(const std::string &portdir)
-    : cachable(GlobalOptions().localstatedir()+PKGCACHE),
+    : Cachable(GlobalOptions().localstatedir()+PKGCACHE),
       _options(GlobalOptions()),
       _reserve(PKGLIST_RESERVE),
       _portdir(portdir), _overlays(_options.overlays()),
