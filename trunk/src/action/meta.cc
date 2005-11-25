@@ -328,7 +328,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
                 results->add(e.name() + " is ambiguous.  Possible matches are:");
                 results->add_linebreak();
 
-                std::for_each(e.packages.begin(), e.packages.end(),
+                std::for_each(e.packages().begin(), e.packages().end(),
                     std::bind2nd(ColorAmbiguousPkg(), results));
             
                 if (query.size() == 1 and options.iomethod() == "stream")
