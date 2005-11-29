@@ -27,20 +27,20 @@
 # include "config.h"
 #endif
 
+#include <herdstat/noncopyable.hh>
 #include <herdstat/util/container_base.hh>
 
 template <typename T>
 class HandlerMap
-    : public herdstat::util::MapBase<std::string, T*>
+    : public herdstat::util::MapBase<std::string, T*>,
+      private herdstat::Noncopyable
 {
     public:
         virtual ~HandlerMap() { }
 
-    private:
-        template <typename U>
-        friend HandlerMap<U>& GlobalHandlerMap();
-
-        HandlerMap() { }
+//    private:
+//        template <typename U>
+//        friend HandlerMap<U>& GlobalHandlerMap();
 };
 
 template <typename T>
