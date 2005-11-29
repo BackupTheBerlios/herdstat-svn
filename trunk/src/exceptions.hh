@@ -62,26 +62,6 @@ class BadOption : public herdstat::Exception
         }
 };
 
-class FormatException : public herdstat::Exception
-{
-    public:
-        FormatException() { }
-        FormatException(const char *msg) : herdstat::Exception(msg) { }
-        FormatException(const std::string &msg) : herdstat::Exception(msg) { }
-        virtual ~FormatException() throw() { }
-};
-
-class CleanupException : public herdstat::Exception
-{
-    public:
-        CleanupException(int code) : _code(code) { }
-        virtual ~CleanupException() throw() { }
-        int exit_code() const { return _code; }
-
-    private:
-        int _code;
-};
-
 class IOHandlerUnimplemented : public herdstat::Exception
 {
     public:
@@ -110,10 +90,23 @@ class ActionUnimplemented : public herdstat::Exception
         virtual ~ActionUnimplemented() throw() { }
 };
 
+class BadLocale : public herdstat::Exception
+{
+    public:
+        BadLocale() { }
+        virtual ~BadLocale() throw() { }
+        virtual const char *what() const throw()
+        {
+            std::string error("Invalid locale");
+            char *result = std::getenv("LC_ALL");
+            if (result)
+                error += " '" + std::string(result) + "'.";
+            return error.c_str();
+        }
+};
+
 /* action handler exceptions */
 class ActionException : public herdstat::BaseException { };
-class HerdException   : public ActionException { };
-class DevException    : public ActionException { };
 
 #endif
 
