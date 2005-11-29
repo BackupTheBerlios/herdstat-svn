@@ -34,6 +34,7 @@
 #endif
 
 #include <herdstat/exceptions.hh>
+#include <herdstat/libherdstat_version.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
 #include <herdstat/portage/exceptions.hh>
@@ -128,6 +129,8 @@ static void
 version()
 {
     std::cout << PACKAGE << "-" << VERSION
+        << " w/libherdstat-" << LIBHERDSTAT_VERSION_MAJOR << "."
+        << LIBHERDSTAT_VERSION_MINOR << "." << LIBHERDSTAT_VERSION_MICRO
 	<< " (built: " << __DATE__ << " " << __TIME__ << ")" << std::endl;
     std::cout << "Options:"
 #ifdef DEBUG
@@ -635,26 +638,20 @@ main(int argc, char **argv)
 		throw FileException(options.outfile());
 	    options.set_outstream(outstream);
 	}
-	else
-	{
-	    /* save locale name */
-	    try
-	    {
-		options.set_locale(std::locale("").name());
-	    }
-	    catch (const std::runtime_error)
-	    {
-		std::string error("Invalid locale");
-		char *result = std::getenv("LC_ALL");
-		if (result)
-		    error += " '" + std::string(result) + "'.";
-		std::cerr << error << std::endl;
-		return EXIT_FAILURE;
-	    }
-	}
-
-	/* set locale */
-	options.outstream().imbue(std::locale(options.locale().c_str()));
+        /* setup locale only if outstream is stdout||stderr */
+        else
+        {
+            try
+            {
+                std::locale locale("");
+                options.set_locale(locale.name());
+                options.outstream().imbue(locale);
+            }
+            catch (const std::runtime_error&)
+            {
+                throw BadLocale();
+            }
+        }
 
 	/* set default action */
 	if (q.action() == "unspecified")
@@ -703,7 +700,7 @@ main(int argc, char **argv)
 	    if (iomethod == "stream")
 		std::swap(*query, q);
 
-	    /* start I/O handler */
+	    /* execute I/O handler */
 	    if (not (*handler)(query.get()))
 		break;
 	}
@@ -711,16 +708,19 @@ main(int argc, char **argv)
 	if (outstream)
 	    delete outstream;
 
-	HandlerMap<ActionHandler>::iterator m;
-	for (m = handlers.begin() ; m != handlers.end() ; ++m)
-	    if (m->second) delete m->second;
+        /* clean up handler maps */
+        std::for_each(handlers.begin(), handlers.end(),
+            util::compose_f_gx(
+                util::DeleteAndNullify<ActionHandler>(),
+                util::Second<HandlerMap<ActionHandler>::value_type>()));
 
-	HandlerMap<IOHandler>::iterator i;
-	for (i = iohandlers.begin() ; i != iohandlers.end() ; ++i)
-	    if (i->second) delete i->second;
+        std::for_each(iohandlers.begin(), iohandlers.end(),
+            util::compose_f_gx(
+                util::DeleteAndNullify<IOHandler>(),
+                util::Second<HandlerMap<IOHandler>::value_type>()));
     }
     // {{{ catches
-    catch (const ActionException)
+    catch (const ActionException&)
     {
         return EXIT_FAILURE;
     }
@@ -753,11 +753,6 @@ main(int argc, char **argv)
 	std::cerr << e.backtrace(":\n  * ") << "Error parsing date '" << e.what() << "'." << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const FormatException &e)
-    {
-	std::cerr << e.what() << std::endl;
-	return EXIT_FAILURE;
-    }
     catch (const FetchException)
     {
 	return EXIT_FAILURE;
@@ -767,28 +762,28 @@ main(int argc, char **argv)
 	std::cerr << e.backtrace(":\n  * ") << "Bad regular expression." << std::endl;
 	return EXIT_FAILURE;
     }
-    catch (const argsInvalidField)
+    catch (const argsInvalidField&)
     {
         std::cerr << "Format for --field is \"--field=field,criteria\"." << std::endl
             << "For example: --field=status,active" << std::endl;
         return EXIT_FAILURE;
     }
-    catch (const argsHelp)
+    catch (const argsHelp&)
     {
 	help();
 	return EXIT_SUCCESS;
     }
-    catch (const argsVersion)
+    catch (const argsVersion&)
     {
 	version();
 	return EXIT_SUCCESS;
     }
-    catch (const argsUsage)
+    catch (const argsUsage&)
     {
 	usage();
 	return EXIT_FAILURE;
     }
-    catch (const argsException)
+    catch (const argsException&)
     {
 	usage();
 	return EXIT_FAILURE;
