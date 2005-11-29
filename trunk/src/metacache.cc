@@ -177,18 +177,14 @@ metacache::fill()
         debug_msg("pkgcache.size() == %d", pkgcache.size());
 
         if (status)
-        {
-            _options.outstream()
-                << "Generating metadata.xml cache: ";
-            progress.start(pkgcache.size());
-        }
+            progress.start(pkgcache.size(), "Generating metadata.xml cache");
 
         /* we will contain at most pkgcache.size() elements */
         _metadatas.reserve(pkgcache.size());
 
         /* for each pkg */
-        pkgcache::iterator i, end = pkgcache.end();
-        for (i = pkgcache.begin() ; i != end ; ++i)
+        pkgcache::iterator i, end;
+        for (i = pkgcache.begin(), end = pkgcache.end() ; i != end ; ++i)
         {
             if (status)
                 ++progress;
@@ -210,7 +206,7 @@ metacache::fill()
     }
 
     if (status)
-        _options.outstream() << std::endl;
+        std::cout << std::endl;
 }
 
 /*

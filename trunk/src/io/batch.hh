@@ -32,9 +32,12 @@
 class BatchIOHandler : public IOHandler
 {
     public:
-        virtual ~BatchIOHandler() { }
-        virtual void insert_extra_actions(HandlerMap<ActionHandler>&) const;
+        BatchIOHandler();
+        virtual ~BatchIOHandler();
         virtual bool operator()(Query * const query);
+
+    private:
+        HandlerMap<ActionHandler> local_handlers;
 };
 
 #endif /* _HAVE_BATCH_HH */

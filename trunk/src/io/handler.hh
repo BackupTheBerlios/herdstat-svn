@@ -37,14 +37,46 @@
 class IOHandler
 {
     public:
-        virtual ~IOHandler() { }
-
+        IOHandler();
+        virtual ~IOHandler();
         virtual bool operator()(Query * const query) = 0;
-        virtual void insert_extra_actions(HandlerMap<ActionHandler>&) const { }
 
     protected:
+        /* insert a local handler */
+        template <typename Handler>
+        inline void insert_local_handler(const std::string& name);
+        /* get a local handler */
+        inline ActionHandler *
+        local_handler(const std::string& name);
+        /* is it in our local handler map? */
+        inline bool is_local_handler(const std::string& name) const;
+
         void init_xml_if_necessary(const std::string& action);
+
+    private:
+        HandlerMap<ActionHandler> _local;
 };
+
+template <typename Handler>
+inline void
+IOHandler::insert_local_handler(const std::string& name)
+{
+    ActionHandler *h = new Handler();
+    if (not _local.insert(std::make_pair(name, h)).second)
+        delete h;
+}
+
+inline ActionHandler *
+IOHandler::local_handler(const std::string& name)
+{
+    return _local[name];
+}
+
+inline bool
+IOHandler::is_local_handler(const std::string& name) const
+{
+    return (_local.find(name) != _local.end());
+}
 
 #endif /* _HAVE_IO_HANDLER_HH */
 

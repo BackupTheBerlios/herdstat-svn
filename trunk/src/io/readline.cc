@@ -85,14 +85,14 @@ ReadLineIOHandler::ReadLineIOHandler()
     rl_startup_hook = readline_init;
     /* no completions (for now) */
     rl_bind_key('\t', NULL);
+
+    insert_local_handler<HelpIOActionHandler>("help");
+    insert_local_handler<SetIOActionHandler>("set");
+    insert_local_handler<PrintIOActionHandler>("print");
 }
 
-void
-ReadLineIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap) const
+ReadLineIOHandler::~ReadLineIOHandler()
 {
-    hmap.insert(std::make_pair("help", new HelpIOActionHandler()));
-    hmap.insert(std::make_pair("set", new SetIOActionHandler()));
-    hmap.insert(std::make_pair("print", new PrintIOActionHandler()));
 }
 
 bool
@@ -130,21 +130,20 @@ ReadLineIOHandler::operator()(Query * const query)
             /* should never happen since in isn't empty */
 	    throw Exception("Failed to parse input!");
 
-        /* copy the global action handler map and
-         * add our own readline-specific actions to it */
-        static HandlerMap<ActionHandler>
-            handlers(GlobalHandlerMap<ActionHandler>());
-        insert_extra_actions(handlers);        
-
         if (query->action() == "unspecified")
         {
             query->set_action(parts.front());
             parts.erase(parts.begin());
         }
 
-        ActionHandler *h = handlers[query->action()];
+        ActionHandler *h = local_handler(query->action());
         if (not h)
-            throw ActionUnimplemented(query->action());
+        {
+            HandlerMap<ActionHandler>&
+                global_handlers(GlobalHandlerMap<ActionHandler>());
+            if (not (h = global_handlers[query->action()]))
+                throw ActionUnimplemented(query->action());
+        }
 
         init_xml_if_necessary(query->action());
 
@@ -160,11 +159,9 @@ ReadLineIOHandler::operator()(Query * const query)
             }
             /* action is bound, but we still want to provide access to our
              * handler-specific actions */
-            else if (front == "set" or
-                     front == "print" or
-                     front == "help")
+            else if (is_local_handler(front))
             {
-                h = handlers[front];
+                h = local_handler(front);
                 parts.erase(parts.begin());
             }
             
@@ -177,7 +174,7 @@ ReadLineIOHandler::operator()(Query * const query)
         {
             query->clear();
             query->add(h->id());
-            h = handlers["help"];
+            h = local_handler("help");
         }
         
         (*h)(*query, &results);

@@ -40,10 +40,13 @@
 
 using namespace herdstat;
 
-void
-BatchIOHandler::insert_extra_actions(HandlerMap<ActionHandler>& hmap) const
+BatchIOHandler::BatchIOHandler()
 {
-    hmap.insert(std::make_pair("help", new HelpIOActionHandler()));
+    insert_local_handler<HelpIOActionHandler>("help");
+}
+
+BatchIOHandler::~BatchIOHandler()
+{
 }
 
 bool
@@ -70,14 +73,14 @@ BatchIOHandler::operator()(Query * const query)
         if (parts.empty())
             throw Exception("Failed to parse input!");
 
-        /* copy the global handler map and insert our additional actions */
-        static HandlerMap<ActionHandler>
-            handlers(GlobalHandlerMap<ActionHandler>());
-        insert_extra_actions(handlers);
-
-        ActionHandler *h = handlers[parts.front()];
+        ActionHandler *h = local_handler(parts.front());
         if (not h)
-            throw ActionUnimplemented(parts.front());
+        {
+            HandlerMap<ActionHandler>&
+                global_handlers(GlobalHandlerMap<ActionHandler>());
+            if (not (h = global_handlers[parts.front()]))
+                throw ActionUnimplemented(parts.front());
+        }
 
         query->set_action(parts.front());
         parts.erase(parts.begin());
@@ -98,7 +101,7 @@ BatchIOHandler::operator()(Query * const query)
         {
             query->clear();
             query->add(h->id());
-            h = handlers["help"];
+            h = local_handler("help");
         }
 
         (*h)(*query, &results);

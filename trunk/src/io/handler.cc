@@ -36,6 +36,19 @@
 
 using namespace herdstat;
 
+IOHandler::IOHandler()
+    : _local()
+{
+}
+
+IOHandler::~IOHandler()
+{
+    std::for_each(_local.begin(), _local.end(),
+        util::compose_f_gx(
+            util::DeleteAndNullify<ActionHandler>(),
+            util::Second<HandlerMap<ActionHandler>::value_type>()));
+}
+
 void
 IOHandler::init_xml_if_necessary(const std::string& action)
 {
