@@ -37,10 +37,6 @@ class HandlerMap
 {
     public:
         virtual ~HandlerMap() { }
-
-//    private:
-//        template <typename U>
-//        friend HandlerMap<U>& GlobalHandlerMap();
 };
 
 template <typename T>
