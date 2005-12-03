@@ -100,7 +100,6 @@ class PortageSearchActionHandler : public ActionHandler
         inline herdstat::portage::PackageFinder& find();
 
         std::vector<herdstat::portage::Package> matches;
-        herdstat::util::Timer search_timer;
 
     private:
         herdstat::portage::PackageFinder *_find;

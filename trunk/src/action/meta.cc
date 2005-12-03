@@ -278,7 +278,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
             try
             {
                 const std::vector<portage::Package>& res(find().results());
-                find()(q->second, &search_timer);
+                find()(q->second);
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
                 /* not ambigious but more than one match.  that means we have 1

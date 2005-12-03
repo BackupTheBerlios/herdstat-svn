@@ -117,7 +117,7 @@ PortageSearchActionHandler::do_regex(Query& query,
 
     try
     {
-        matches = find()(regexp, &search_timer);
+        matches = find()(regexp);
         find().clear_results();
 
         if (not options.overlay())
@@ -141,7 +141,10 @@ PortageSearchActionHandler::do_cleanup(QueryResults * const results)
 {
     ActionHandler::do_cleanup(results);
     matches.clear();
-    search_timer.reset();
+
+    if (options.timer())
+        options.outstream() << "Took " << find().elapsed()
+            << "ms to perform search." << std::endl;
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

@@ -17,6 +17,9 @@
             --verbose &lt;herd&gt;
         </note>
     </note>
+    <note priority="medium" time="1133476243">
+        Redo the way we cache stuff.
+    </note>
     <note priority="verylow" time="1126623676">
         Look into adding LDAP support for Gentoo's LDAP.
     </note>
