@@ -30,7 +30,7 @@
 #include <herdstat/util/regex.hh>
 #include <herdstat/portage/metadata.hh>
 
-#include "metacache.hh"
+#include "metadata_cache.hh"
 #include "querycache.hh"
 #include "pkgquery.hh"
 #include "action/handler.hh"
@@ -62,7 +62,7 @@ class PkgActionHandler : public ActionHandler
 
         std::map<std::string, pkgQuery *> matches;
         std::vector<std::string> not_found, packages;
-        metacache mcache;
+        MetadataCache mcache;
         querycache qcache;
         const bool status;
         bool cache_is_valid, at_least_one_not_cached;

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/metacache.cc
+ * herdstat -- src/metadata_cache.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -27,18 +27,20 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <cstdlib>
 
 #include <herdstat/xml/exceptions.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/vars.hh>
 #include <herdstat/util/progress.hh>
 #include <herdstat/util/functional.hh>
+#include <herdstat/io/binary_stream_iterator.hh>
 #include <herdstat/portage/config.hh>
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
-#include "metacache.hh"
+#include "package_cache.hh"
+#include "metadata_cache.hh"
 
 #define METACACHE               /*LOCALSTATEDIR*/"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
@@ -48,15 +50,16 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::xml;
 
-metacache::metacache(const std::string &portdir)
-    : Cachable(GlobalOptions().localstatedir()+METACACHE),
+MetadataCache::MetadataCache(const std::string &portdir)
+    : _path(GlobalOptions().localstatedir()+METACACHE),
       _options(GlobalOptions()),
       _portdir(portdir),
-      _overlays(_options.overlays())
+      _overlays(_options.overlays()),
+      _header(), _stream()
 {
 }
 
-metacache::~metacache()
+MetadataCache::~MetadataCache()
 {
 }
 
@@ -65,11 +68,11 @@ metacache::~metacache()
  */
 
 bool
-metacache::valid() const
+MetadataCache::is_valid() const
 {
-    BacktraceContext c("metacache::valid("+this->path()+")");
+    BacktraceContext c("MetadataCache::is_valid()");
 
-    const util::Stat mcache(this->path());
+    const util::Stat mcache(_path);
     bool valid = false;
 
     const std::string expire(_options.metacache_expire());
@@ -124,36 +127,18 @@ metacache::valid() const
             valid = (mcache.size() > 0);
     }
 
-    /* 
-     * only valid if first line is "version=VERSION".
-     * this prevents weird bugs if for some reason the
-     * metacache format changed between versions.
-     *
-     * also, if second line (which should be portdir=)
-     * does not list the same portdir as our current
-     * setting, it needs to be invalidated.
-     */
-
+    /* finally, it's only valid if the header is valid */
     if (valid)
     {
-        std::ifstream stream(this->path().c_str());
-        if (not stream)
-            throw FileException(this->path());
+        _stream.open(_path);
+        if (not _stream)
+            throw FileException(_path);
 
-        std::string line;
-        valid = (std::getline(stream, line) and
-                (line == (std::string("version=")+VERSION)));
+        valid = _header.is_valid(_stream);
 
-        if (valid)
-            valid = (std::getline(stream, line) and
-                    (line == (std::string("portdir=")+this->_portdir)));
-
-        if (valid)
-        {
-            valid = (std::getline(stream, line) and
-                    (line == (std::string("overlays=") +
-                              util::join(this->_overlays, ':'))));
-        }
+        /* if it's valid, leave the stream open for load() */
+        if (not valid)
+            _stream.close();
     }
 
     debug_msg("metadata cache is valid? %d", valid);
@@ -166,14 +151,14 @@ metacache::valid() const
  */
 
 void
-metacache::fill()
+MetadataCache::fill()
 {
-    BacktraceContext c("metacache::fill()");
+    BacktraceContext c("MetadataCache::fill()");
 
     const bool status = not _options.quiet() and not _options.debug();
     {
         util::Progress progress;
-        pkgcache& pkgcache(GlobalPkgCache());
+        const PackageCache& pkgcache(GlobalPkgCache());
         debug_msg("pkgcache.size() == %d", pkgcache.size());
 
         if (status)
@@ -182,17 +167,16 @@ metacache::fill()
         /* we will contain at most pkgcache.size() elements */
         _metadatas.reserve(pkgcache.size());
 
+        const std::string base(_portdir+"/");
+
         /* for each pkg */
-        pkgcache::iterator i, end;
+        PackageCache::const_iterator i, end;
         for (i = pkgcache.begin(), end = pkgcache.end() ; i != end ; ++i)
         {
             if (status)
                 ++progress;
 
-            char *path;
-            asprintf(&path, "%s/%s/metadata.xml",
-                _portdir.c_str(), std::string(*i).c_str());
-
+            const std::string path(base+i->full()+"/metadata.xml");
             if (util::file_exists(path))
             {
                 /* parse it */
@@ -213,40 +197,29 @@ metacache::fill()
  * Load cache from disk.
  */
 
-void
-metacache::load()
+struct CacheEntryToMetadata
 {
-    BacktraceContext c("metacache::load("+this->path()+")");
-
-    if (not util::is_file(this->path()))
-        return;
-
-    util::Vars cache(this->path());
-
-    /* reserve to prevent tons of reallocations */
-    if (cache["size"].empty() or cache["size"] == "0")
-        _metadatas.reserve(METACACHE_RESERVE);
-    else
-        _metadatas.reserve(util::destringify<int>(cache["size"]));
-
-    util::Vars::const_iterator i, e = cache.end();
-    for (i = cache.begin() ; i != e ; ++i)
+    portage::Metadata
+    operator()(const std::string& entry) const
     {
-        /* not a category/package, so skip it */
-        if (i->first.find('/') == std::string::npos)
-            continue;
+        std::string::size_type pos = entry.find('=');
+        if (pos == std::string::npos)
+            throw ParserException(GlobalOptions().localstatedir()+METACACHE,
+                    "Invalid format");
 
         std::string str;
-        Metadata meta(i->first);
-        Herds& herds(meta.herds());
-        Developers&  devs(meta.devs());
 
-        std::vector<std::string> parts = util::split(i->second, ':', true);
+        portage::Metadata meta(entry.substr(0, pos));
+        Herds& herds(meta.herds());
+        Developers& devs(meta.devs());
+
+        std::vector<std::string> parts = util::split(entry.substr(pos+1), ':', true);
         if (parts.empty())
-            throw ParserException(this->path(), "Invalid format");
+            throw ParserException(GlobalOptions().localstatedir()+METACACHE,
+                    "Invalid format");
 
         /* get herds */
-        str = parts.front();
+        str.assign(parts.front());
         parts.erase(parts.begin());
         herds = util::split(str, ',');
 
@@ -275,48 +248,29 @@ metacache::load()
             meta.set_longdesc(str);
         }
 
-        _metadatas.push_back(meta);
+        return meta;
     }
-}
+};
 
-/*
- * Dump cache to disk.
- */
-
-void
-metacache::dump()
+struct MetadataToCacheEntry
 {
-    BacktraceContext c("metacache::dump("+this->path()+")");
-
-    std::ofstream f(this->path().c_str());
-    if (not f)
-        throw FileException(this->path());
-
-    f << "version=" << VERSION << std::endl;
-    f << "portdir=" << this->_portdir << std::endl;
-    f << "overlays=" << util::join(this->_overlays, ':') << std::endl;
-    f << "size=" << this->size() << std::endl;
-
-    std::string str;
-    std::size_t n, size;
-
-    /* for each metadata object */
-    iterator ci, cend;
-    for (ci = _metadatas.begin(), cend = _metadatas.end() ;
-         ci != cend ; ++ci)
+    std::string
+    operator()(const portage::Metadata& meta) const
     {
         /*
          * format is the form of:
          *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
          */
 
-        f << ci->pkg() << "=";
+        std::size_t n, size;
+        std::string str;
+        std::string result(meta.pkg()+"=");
 
         /* herds */
         {
             Herds::const_iterator i, end;
-            for (i = ci->herds().begin(), end = ci->herds().end(),
-                 n = 1, size = ci->herds().size(), str.clear() ;
+            for (i = meta.herds().begin(), end = meta.herds().end(),
+                 n = 1, size = meta.herds().size(), str.clear() ;
                  i != end ; ++i, ++n)
             {
                 str.append(i->name());
@@ -325,13 +279,13 @@ metacache::dump()
             }
         }
 
-        f << str << ":";
+        result += str + ":";
         
         /* developers */
         {
             Developers::const_iterator i, end;
-            for (i = ci->devs().begin(), end = ci->devs().end(),
-                 n = 1, size = ci->devs().size(), str.clear() ;
+            for (i = meta.devs().begin(), end = meta.devs().end(),
+                 n = 1, size = meta.devs().size(), str.clear() ;
                  i != end ; ++i, ++n)
             {
                 str.append(i->email());
@@ -341,8 +295,59 @@ metacache::dump()
         }
 
         /* longdesc */
-        f << str << ":" << util::tidy_whitespace(ci->longdesc()) << std::endl;
+        result += str + ":" + util::tidy_whitespace(meta.longdesc());
+
+        return result;
     }
+};
+
+void
+MetadataCache::load()
+{
+    BacktraceContext c("MetadataCache::load()");
+
+    assert(_stream.is_open());
+    _metadatas.reserve(_header.size());
+
+    util::Timer timer;
+    if (_options.timer())
+        timer.start();
+
+    std::transform(io::BinaryIStreamIterator<std::string>(_stream),
+                   io::BinaryIStreamIterator<std::string>(),
+                   std::back_inserter(_metadatas),
+                   CacheEntryToMetadata());
+
+    if (_options.timer())
+    {
+        timer.stop();
+        _options.outstream() << "Took " << timer.elapsed()
+            << "ms to load the metadata cache." << std::endl;
+    }
+
+    _stream.close();
+}
+
+/*
+ * Dump cache to disk.
+ */
+
+void
+MetadataCache::dump()
+{
+    BacktraceContext c("MetadataCache::dump()");
+
+    assert(not _stream.is_open());
+
+    io::BinaryOStream stream(_path);
+    if (not stream)
+        throw FileException(_path);
+    
+    _header.dump(stream, _metadatas.size());
+
+    std::transform(_metadatas.begin(), _metadatas.end(),
+        io::BinaryOStreamIterator<std::string>(stream),
+        MetadataToCacheEntry());
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

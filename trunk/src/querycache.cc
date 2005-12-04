@@ -55,7 +55,7 @@ class querycacheXMLHandler : public herdstat::xml::SAXHandler
         /* callbacks */
         virtual bool start_element(const std::string&, const attrs_type&);
         virtual bool end_element(const std::string&);
-        virtual bool text(const std::string&);
+        virtual bool do_text(const std::string&);
 
     private:
         /* internal state variables */
@@ -137,7 +137,7 @@ querycacheXMLHandler::end_element(const std::string &name)
 }
 
 bool
-querycacheXMLHandler::text(const std::string &text)
+querycacheXMLHandler::do_text(const std::string &text)
 {
     if (in_string)
     {

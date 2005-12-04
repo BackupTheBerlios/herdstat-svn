@@ -29,7 +29,6 @@
 #include <herdstat/portage/package_which.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "action/which.hh"
 
 using namespace herdstat;

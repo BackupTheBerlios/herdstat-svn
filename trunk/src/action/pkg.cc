@@ -196,7 +196,8 @@ PkgActionHandler::search(const Query& query)
     BacktraceContext c("PkgActionHandler::search(Query)");
 
     /* for each metadata.xml */
-    for (metacache::const_iterator m = mcache.begin() ; m != mcache.end() ; ++m)
+    for (MetadataCache::const_iterator m = mcache.begin() ;
+            m != mcache.end() ; ++m)
     {
         /* for each specified herd/dev */
         for (Query::const_iterator i = query.begin() ; i != query.end() ; ++i)
@@ -494,7 +495,7 @@ PkgActionHandler::do_init(Query& query, QueryResults * const results)
     }
 
     at_least_one_not_cached = (not query.empty());
-    cache_is_valid = (options.metacache() and mcache.valid());
+    cache_is_valid = (options.metacache() and mcache.is_valid());
 
     if (cache_is_valid and at_least_one_not_cached)
         mcache.load();

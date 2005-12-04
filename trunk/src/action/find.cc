@@ -30,7 +30,6 @@
 #include <herdstat/portage/exceptions.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "action/meta.hh"
 #include "action/find.hh"
 

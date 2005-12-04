@@ -34,7 +34,7 @@
 #include <herdstat/portage/package_finder.hh>
 
 #include "options.hh"
-#include "pkgcache.hh"
+#include "package_cache.hh"
 #include "query.hh"
 #include "query_results.hh"
 #include "io/gui/widget_factory.hh"

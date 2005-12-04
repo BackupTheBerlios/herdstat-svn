@@ -35,7 +35,6 @@
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "action/meta.hh"
 

@@ -30,7 +30,6 @@
 #include <herdstat/portage/version.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "overlaydisplay.hh"
 #include "action/versions.hh"
 

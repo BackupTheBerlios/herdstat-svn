@@ -121,8 +121,8 @@ class Options : private herdstat::Noncopyable
         void set_iomethod(const std::string& v) { _iomethod.assign(v); }
 
         /* read-only */
-        const std::string& portdir() { return _portdir; }
-        const std::vector<std::string>& overlays() { return _overlays; }
+        const std::string& portdir() const { return _portdir; }
+        const std::vector<std::string>& overlays() const { return _overlays; }
 
     private:
         friend Options& GlobalOptions();

@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/pkgcache.hh
+ * herdstat -- src/metadata_cache.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,66 +20,79 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_PKGCACHE_HH
-#define HAVE_PKGCACHE_HH 1
+#ifndef HAVE_METADATA_CACHE_HH
+#define HAVE_METADATA_CACHE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include "options.hh"
-#include <herdstat/exceptions.hh>
-#include <herdstat/cachable.hh>
-#include <herdstat/portage/package_list.hh>
+#include <vector>
+#include <herdstat/io/binary_stream.hh>
+#include <herdstat/portage/metadata.hh>
 
-class pkgcache : public herdstat::Cachable
+#include "cache.hh"
+
+/*
+ * A cache of all metadata.xml's.
+ */
+
+class MetadataCache : public Cache
 {
     public:
-        typedef herdstat::portage::PackageList container_type;
+        typedef std::vector<herdstat::portage::Metadata> container_type;
         typedef container_type::value_type value_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        virtual ~pkgcache();
+        MetadataCache(const std::string& portdir);
+        virtual ~MetadataCache();
 
-        virtual bool valid() const;
+        virtual bool is_valid() const;
         virtual void fill();
         virtual void load();
         virtual void dump();
 
-        /// Implicit conversion to container_type
-        operator const container_type&() const { return _pkgs; }
-
-        iterator begin() { return _pkgs.begin(); }
-        const_iterator begin() const { return _pkgs.begin(); }
-        iterator end() { return _pkgs.end(); }
-        const_iterator end() const { return _pkgs.end(); }
-        size_type size() const { return _pkgs.size(); }
-        bool empty() const { return _pkgs.empty(); }
+        inline const_iterator begin() const;
+        inline const_iterator end() const;
+        inline size_type size() const;
+        inline bool empty() const;
 
     private:
-        friend pkgcache& GlobalPkgCache();
-        pkgcache();
-        pkgcache(const std::string &portdir);
-        pkgcache(const pkgcache&);
-        pkgcache& operator= (const pkgcache&);
-
+        std::string _path;
         Options& _options;
-        int _reserve;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
-        herdstat::portage::PackageList _pkgs;
+        container_type _metadatas;
+        mutable PortageCacheHeader _header;
+        mutable herdstat::io::BinaryIStream _stream;
 };
 
-inline pkgcache&
-GlobalPkgCache()
+inline MetadataCache::const_iterator
+MetadataCache::begin() const
 {
-    herdstat::BacktraceContext c("GlobalPkgCache()");
-    static pkgcache p(GlobalOptions().portdir());
-    return p;
+    return _metadatas.begin();
 }
 
-#endif
+inline MetadataCache::const_iterator
+MetadataCache::end() const
+{
+    return _metadatas.end();
+}
+
+inline MetadataCache::size_type
+MetadataCache::size() const
+{
+    return _metadatas.size();
+}
+
+inline bool
+MetadataCache::empty() const
+{
+    return _metadatas.empty();
+}
+
+#endif /* HAVE_METADATA_CACHE_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

@@ -27,7 +27,6 @@
 #include <herdstat/util/string.hh>
 
 #include "common.hh"
-#include "pkgcache.hh"
 #include "action/handler.hh"
 
 using namespace herdstat;

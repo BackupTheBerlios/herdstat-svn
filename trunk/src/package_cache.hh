@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/metacache.hh
+ * herdstat -- src/package_cache.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -20,74 +20,64 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef HAVE_METACACHE_HH
-#define HAVE_METACACHE_HH 1
+#ifndef _HAVE_SRC_PACKAGE_CACHE_HH
+#define _HAVE_SRC_PACKAGE_CACHE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <vector>
-#include <herdstat/cachable.hh>
-#include <herdstat/portage/metadata.hh>
+#include <herdstat/noncopyable.hh>
+#include <herdstat/io/binary_stream.hh>
+#include <herdstat/portage/package_list.hh>
 
-/*
- * A cache of all metadata.xml's.
- */
+#include "options.hh"
+#include "cache.hh"
 
-class metacache : public herdstat::Cachable
+class PackageCache : public Cache,
+                     private herdstat::Noncopyable
 {
     public:
-        typedef std::vector<herdstat::portage::Metadata> container_type;
-        typedef container_type::value_type value_type;
+        typedef herdstat::portage::PackageList container_type;
         typedef container_type::iterator iterator;
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
+        typedef container_type::value_type value_type;
 
-        metacache(const std::string& portdir);
-        ~metacache();
+        virtual ~PackageCache() throw();
 
-        virtual bool valid() const;
-        virtual void fill();
+        virtual bool is_valid() const;
         virtual void load();
         virtual void dump();
+        virtual void fill();
 
-        inline const_iterator begin() const;
-        inline const_iterator end() const;
-        inline size_type size() const;
-        inline bool empty() const;
+        inline operator const container_type&() const { return _pkgs; }
+
+        inline const_iterator begin() const { return _pkgs.begin(); }
+        inline const_iterator end() const { return _pkgs.end(); }
+        inline size_type size() const { return _pkgs.size(); }
+        inline bool empty() const { return _pkgs.empty(); }
 
     private:
+        friend const PackageCache& GlobalPkgCache();
+        PackageCache();
+
+        std::string _path;
         Options& _options;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
-        container_type _metadatas;
+        container_type _pkgs;
+        mutable PortageCacheHeader _header;
+        mutable herdstat::io::BinaryIStream _stream;
 };
 
-inline metacache::const_iterator
-metacache::begin() const
+inline const PackageCache&
+GlobalPkgCache()
 {
-    return _metadatas.begin();
+    static PackageCache p;
+    return p;
 }
 
-inline metacache::const_iterator
-metacache::end() const
-{
-    return _metadatas.end();
-}
-
-inline metacache::size_type
-metacache::size() const
-{
-    return _metadatas.size();
-}
-
-inline bool
-metacache::empty() const
-{
-    return _metadatas.empty();
-}
-
-#endif
+#endif /* _HAVE_SRC_PACKAGE_CACHE_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
