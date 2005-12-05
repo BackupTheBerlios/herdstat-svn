@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/overlaydisplay.hh
+ * herdstat -- src/overlay_display.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

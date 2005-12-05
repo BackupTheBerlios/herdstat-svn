@@ -35,7 +35,7 @@
 #include <herdstat/portage/metadata_xml.hh>
 
 #include "common.hh"
-#include "overlaydisplay.hh"
+#include "overlay_display.hh"
 #include "action/meta.hh"
 
 using namespace herdstat;

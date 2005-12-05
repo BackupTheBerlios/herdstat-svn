@@ -31,7 +31,7 @@
 #include <herdstat/portage/keywords.hh>
 
 #include "common.hh"
-#include "overlaydisplay.hh"
+#include "overlay_display.hh"
 #include "action/keywords.hh"
 
 using namespace herdstat;

@@ -30,7 +30,7 @@
 #include <herdstat/portage/version.hh>
 
 #include "common.hh"
-#include "overlaydisplay.hh"
+#include "overlay_display.hh"
 #include "action/versions.hh"
 
 using namespace herdstat;

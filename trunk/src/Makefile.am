@@ -19,7 +19,7 @@ herdstat_SOURCES = \
 	package_cache.hh package_cache.cc \
 	metadata_cache.hh metadata_cache.cc \
 	querycache.hh querycache.cc \
-	overlaydisplay.hh overlaydisplay.cc \
+	overlay_display.hh overlay_display.cc \
 	fields.hh \
 	query_base.hh \
 	query.hh query.cc \
