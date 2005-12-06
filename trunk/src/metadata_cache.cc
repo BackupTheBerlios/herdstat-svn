@@ -44,7 +44,7 @@
 
 #define METACACHE               /*LOCALSTATEDIR*/"/metacache"
 #define METACACHE_EXPIRE        259200 /* 3 days */
-#define METACACHE_RESERVE       9600
+#define METACACHE_DELIM         "%%%"
 
 using namespace herdstat;
 using namespace herdstat::portage;
@@ -200,53 +200,25 @@ MetadataCache::fill()
 struct CacheEntryToMetadata
 {
     portage::Metadata
-    operator()(const std::string& entry) const
+    operator()(const std::string& entry)
     {
-        std::string::size_type pos = entry.find('=');
-        if (pos == std::string::npos)
+        std::vector<std::string> parts;
+        util::split(entry, std::back_inserter(parts), METACACHE_DELIM, true);
+        if (parts.size() != 4)
             throw ParserException(GlobalOptions().localstatedir()+METACACHE,
-                    "Invalid format");
+                                  "Invalid format: '"+entry+"'.");
 
-        std::string str;
+        portage::Metadata meta(parts[0]);
+        portage::Herds& herds(meta.herds());
+        portage::Developers& devs(meta.devs());
 
-        portage::Metadata meta(entry.substr(0, pos));
-        Herds& herds(meta.herds());
-        Developers& devs(meta.devs());
+        /* assign herds */
+        util::split(parts[1], std::inserter(herds, herds.end()), ",");
+        /* assign developers */
+        util::split(parts[2], std::inserter(devs, devs.end()), ",");
 
-        std::vector<std::string> parts = util::split(entry.substr(pos+1), ':', true);
-        if (parts.empty())
-            throw ParserException(GlobalOptions().localstatedir()+METACACHE,
-                    "Invalid format");
-
-        /* get herds */
-        str.assign(parts.front());
-        parts.erase(parts.begin());
-        herds = util::split(str, ',');
-
-        /* get devs */
-        if (not parts.empty())
-        {
-            str = parts.front();
-            parts.erase(parts.begin());
-            if (not str.empty())
-                devs = util::split(str, ',');
-        }
-
-        /* get longdesc */
-        if (not parts.empty())
-        {
-            str = parts.front();
-            parts.erase(parts.begin());
-
-            /* longdesc contains a ':', so reconstruct it */
-            while (not parts.empty())
-            {
-                str += ":" + parts.front();
-                parts.erase(parts.begin());
-            }
-
-            meta.set_longdesc(str);
-        }
+        /* assign longdesc */
+        meta.set_longdesc(parts[3]);
 
         return meta;
     }
@@ -259,45 +231,15 @@ struct MetadataToCacheEntry
     {
         /*
          * format is the form of:
-         *   cat/pkg=herd1,herd2:dev1,dev2:longdesc
+         *   cat/pkg:herd1,herd2:dev1,dev2:longdesc
          */
 
-        std::size_t n, size;
-        std::string str;
-        std::string result(meta.pkg()+"=");
-
-        /* herds */
-        {
-            Herds::const_iterator i, end;
-            for (i = meta.herds().begin(), end = meta.herds().end(),
-                 n = 1, size = meta.herds().size(), str.clear() ;
-                 i != end ; ++i, ++n)
-            {
-                str.append(i->name());
-                if (n != size)
-                    str.append(",");
-            }
-        }
-
-        result += str + ":";
-        
-        /* developers */
-        {
-            Developers::const_iterator i, end;
-            for (i = meta.devs().begin(), end = meta.devs().end(),
-                 n = 1, size = meta.devs().size(), str.clear() ;
-                 i != end ; ++i, ++n)
-            {
-                str.append(i->email());
-                if (n != size)
-                    str.append(",");
-            }
-        }
-
-        /* longdesc */
-        result += str + ":" + util::tidy_whitespace(meta.longdesc());
-
-        return result;
+        return (meta.pkg() + METACACHE_DELIM +
+                util::join(meta.herds().begin(),
+                           meta.herds().end(), ",") + METACACHE_DELIM +
+                util::join(meta.devs().begin(),
+                           meta.devs().end(), ",") + METACACHE_DELIM +
+                util::tidy_whitespace(meta.longdesc()));
     }
 };
 
@@ -307,12 +249,12 @@ MetadataCache::load()
     BacktraceContext c("MetadataCache::load()");
 
     assert(_stream.is_open());
-    _metadatas.reserve(_header.size());
 
     util::Timer timer;
     if (_options.timer())
         timer.start();
 
+    _metadatas.reserve(_header.size());
     std::transform(io::BinaryIStreamIterator<std::string>(_stream),
                    io::BinaryIStreamIterator<std::string>(),
                    std::back_inserter(_metadatas),
