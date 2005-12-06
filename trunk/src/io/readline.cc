@@ -125,7 +125,8 @@ ReadLineIOHandler::operator()(Query * const query)
         if (in == "quit" or in == "exit")
             return false;
 
-        std::vector<std::string> parts(util::split(in));
+        std::vector<std::string> parts;
+        util::split(in, std::back_inserter(parts));
         if (parts.empty())
             /* should never happen since in isn't empty */
 	    throw Exception("Failed to parse input!");

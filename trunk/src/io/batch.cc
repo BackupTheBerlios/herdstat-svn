@@ -69,7 +69,8 @@ BatchIOHandler::operator()(Query * const query)
         if (in == "exit" or in == "quit")
             return false;
 
-        std::vector<std::string> parts(util::split(in));
+        std::vector<std::string> parts;
+        util::split(in, std::back_inserter(parts));
         if (parts.empty())
             throw Exception("Failed to parse input!");
 

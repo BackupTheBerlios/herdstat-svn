@@ -53,7 +53,8 @@ FormatAttrs::add_highlights(const std::vector<std::string>& pairs)
     std::vector<std::string>::const_iterator i;
     for (i = pairs.begin() ; i != pairs.end() ; ++i)
     {
-        std::vector<std::string> parts(util::split(*i, ','));
+        std::vector<std::string> parts;
+        util::split(*i, std::back_inserter(parts), ",");
         if (parts.size() == 1)
             _highlights.insert(std::make_pair(
                     util::Regex(parts.front()), _hcolor));
@@ -248,7 +249,8 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
     if (not data.empty())
     {
         /* split into a vector of words */
-        std::vector<std::string> parts(util::split(data));
+        std::vector<std::string> parts;
+        util::split(data, std::back_inserter(parts));
         /* perform any highlights */
         if (attrs->colors())
             std::transform(parts.begin(), parts.end(),

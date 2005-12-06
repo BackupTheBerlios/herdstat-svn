@@ -57,7 +57,8 @@ SetIOActionHandler::do_results(Query& query,
     {
         try
         {
-            std::vector<std::string> parts(util::split(q->second, '='));
+            std::vector<std::string> parts;
+            util::split(q->second, std::back_inserter(parts), "=");
             if (parts.size() != 2)
                 throw Exception("Failed to parse '%s'. Use option=value.",
                                 q->second.c_str());

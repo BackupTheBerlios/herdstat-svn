@@ -35,6 +35,7 @@
 #define PKGCACHE_EXPIRE  259200 /* 3 days */
 
 using namespace herdstat;
+using namespace herdstat::xml;
 
 PackageCache::PackageCache()
     : _path(GlobalOptions().localstatedir()+PKGCACHE),
@@ -152,13 +153,10 @@ struct CacheEntryToPackage
     portage::Package
     operator()(const std::string& entry) const
     {
-        BacktraceContext c("CacheEntryToPackage("+entry+")");
-
         std::string::size_type pos = entry.find(':');
         if (pos == std::string::npos)
-            throw herdstat::xml::ParserException(
-                    GlobalOptions().localstatedir()+PKGCACHE, "Invalid format");
-        
+            throw ParserException(GlobalOptions().localstatedir()+PKGCACHE,
+                                  "Invalid format: '"+entry+"'.");
         return portage::Package(entry.substr(0, pos), entry.substr(pos+1));
     }
 };

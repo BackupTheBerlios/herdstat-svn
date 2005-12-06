@@ -303,7 +303,8 @@ parse_fields(const std::vector<std::string>& fields, Options *options)
     std::vector<std::string>::const_iterator i;
     for (i = fields.begin() ; i != fields.end() ; ++i)
     {
-	std::vector<std::string> parts(util::split(*i, ','));
+	std::vector<std::string> parts;
+        util::split(*i, std::back_inserter(parts), ",");
 	if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
 	    throw argsInvalidField();
 

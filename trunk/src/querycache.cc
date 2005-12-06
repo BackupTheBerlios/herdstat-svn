@@ -152,7 +152,7 @@ querycacheXMLHandler::do_text(const std::string &text)
     else if (in_portdir)
         queries.back().portdir = text;
     else if (in_overlays)
-        queries.back().overlays = util::split(text, ':');
+        util::split(text, std::back_inserter(queries.back().overlays), ":");
     else if (in_pkg)
         cur_query->second += text;
 
@@ -296,7 +296,7 @@ querycache::dump()
             cri_node.push_back(::xml::node("type", i->type == QUERYTYPE_DEV? "dev":"herd"));
             cri_node.push_back(::xml::node("portdir", i->portdir.c_str()));
             cri_node.push_back(::xml::node("overlays",
-                util::join(i->overlays, ':').c_str()));
+                util::join(i->overlays.begin(), i->overlays.end(), ":").c_str()));
             it->push_back(cri_node);
 
             it = root.begin();

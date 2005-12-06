@@ -43,7 +43,8 @@ PortageCacheHeader::is_valid(io::BinaryIStream& stream) const
     if (header.empty())
         return false;
 
-    std::vector<std::string> parts(util::split(header, ':', true));
+    std::vector<std::string> parts;
+    util::split(header, std::back_inserter(parts), ":", true);
     if (parts.size() != 4)
         return false;
 
@@ -61,7 +62,8 @@ PortageCacheHeader::is_valid(io::BinaryIStream& stream) const
         return false;
 
     /* likewise for overlays */
-    std::vector<std::string> ovec(util::split(overlays, ','));
+    std::vector<std::string> ovec;
+    util::split(overlays, std::back_inserter(ovec), ",");
     if (ovec != _options.overlays())
         return false;
 
@@ -76,7 +78,8 @@ PortageCacheHeader::dump(io::BinaryOStream& stream, std::size_t size)
 {
     this->set_size(size);
     stream << (std::string(VERSION)+":"+_options.portdir()+":"+
-        util::join(_options.overlays(), ',')+":"+
+        util::join(_options.overlays().begin(),
+                   _options.overlays().end(), ",")+":"+
         util::stringify(this->size()));
 }
 

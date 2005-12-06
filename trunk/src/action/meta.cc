@@ -185,8 +185,8 @@ add_data(const metadata_data& data, QueryResults * const results)
             /* it's possible to have more than one HOMEPAGE */
             if (ebuild_vars["HOMEPAGE"].find("://") != std::string::npos)
             {
-                std::vector<std::string> parts = 
-                    util::split(ebuild_vars["HOMEPAGE"]);
+                std::vector<std::string> parts;
+                util::split(ebuild_vars["HOMEPAGE"], std::back_inserter(parts));
 
                 if (parts.size() >= 1)
                     results->add("Homepage", parts.front());
