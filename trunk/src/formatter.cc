@@ -252,9 +252,8 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
         std::vector<std::string> parts;
         util::split(data, std::back_inserter(parts));
         /* perform any highlights */
-        if (attrs->colors())
-            std::transform(parts.begin(), parts.end(),
-                parts.begin(), std::bind2nd(Highlight(), attrs));
+        std::transform(parts.begin(), parts.end(),
+            parts.begin(), std::bind2nd(Highlight(), attrs));
         /* perform any line wrapping */
         out.len = util::strip_colors(out.str).length();
         std::for_each(parts.begin(), parts.end(),
