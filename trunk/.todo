@@ -13,12 +13,6 @@
     </note>
     <note priority="medium" time="1133233405">
         Stuff to finish before 1.1.90 release:
-        <note priority="veryhigh" time="1133233423">
-            --verbose &lt;herd&gt;
-        </note>
-    </note>
-    <note priority="medium" time="1133476243">
-        Redo the way we cache stuff.
     </note>
     <note priority="verylow" time="1126623676">
         Look into adding LDAP support for Gentoo's LDAP.

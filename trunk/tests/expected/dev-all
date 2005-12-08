@@ -1,33 +1,995 @@
-Developers(229):   abhishek absinthe* aether agriffis aliz allanonjl anarchy
-                   angusyoung* anti araujo arj astinus augustus avenj axxo*
-                   azarah bass batlogg battousai* bazik* bcowan beejay beu*
-                   blubb brad brix caleb cardoe carlo centic* chainsaw
-                   chriswhite ciaranm citizen428 cjr compnerd config coredumb
-                   coronalvr corsair cryos dams dang dcoutts dertobi123*
-                   dholm* dju dmwaters* dostrow dragonheart eklipse eldad
-                   eradicator esammer fafhrd ferdy flameeyes fmmcor foser*
-                   francesco fserb fuzzyray fvdpol g2boojum ganymede genone
-                   genstef geoman* george gerrynjr gmsoft greg_g* gregf
-                   gregkh* gustavoz halcy0n hanno hansmi hardave hattya herbs
-                   hhg hollow hparker humpback hythloday iluxa jbms jhuebel
-                   jmglov jnc joem* johnm joker josejx* ka0ttic kang karltk
-                   killerfox kingtaco kito klieber kloeri kosmikus kugelfang
-                   kumba kutsuya kzimmerm langthang lanius latexer lcars
-                   leonardop liquidx lizb lordvan lu_zero lucass luckyduck*
-                   lv* malc malverian matsuu mattam* mattm max mcummings*
-                   merlin method mglauche ming mkennedy morfic motaboy
-                   mr_bones_ mrness mutex nakano nerdboy* nigoro nixphoeni obz
-                   omkhar pauldv pbienst pclouds* pebenito peitholm pfeifer
-                   phosphan pkdawson plasmaroo* port001 psi29a pvdabeel pylon*
-                   pyrania pythonhead r3pek rac* radek rajiv* ramereth
-                   redhatter ribosome rizzo rl03 robbat2 rphillips s4t4n satya
-                   scox sebastian sediener seemant* sejo* sekretarz slarti*
-                   smithj* solar* spb spider* spock spyderous* squash
-                   squinky86 st_lim stkn strerror stuart* suka superlag
-                   svyatogor swegener* tantive taviso tchiwam tercel tester
-                   tgall ticho tocharian todd tomk tove trapni tseng tuxus
-                   twp* uberlord urilith usata vanquirius vapier vericgar
-                   voxus warpzero weeve wesolows williamh wolf31o2 wormo
-                   wschlich xmerlin* yoswink zaheerm zul zx* zypher
+Developer:   Abhishek Amit (abhishek)
+Email:       abhishek@gentoo.org
+Herds(1):    pda
+
+Developer:   Dylan Carlson (absinthe)
+Email:       absinthe@gentoo.org*
+Herds(3):    amd64 bsd java
+Devaway:     Almost finished moving (ugh), but currently out of the country on
+             business in Bombay/Mumbai, India. Email is the best option, but
+             the response time won't be awesome until I get back on July 5th.
+
+Developer:   Jason Mobarak (aether)
+Email:       aether@gentoo.org
+Herds(1):    python
+
+Developer:   Aron Griffis (agriffis)
+Email:       agriffis@gentoo.org
+Herds(7):    alpha alpha-kernel base-system ia64 ia64-kernel mozilla toolchain
+
+Developer:   Daniel Ahlberg (aliz)
+Email:       aliz@gentoo.org
+Herds(2):    amd64 kerberos
+
+Developer:   John N. Laliberte (allanonjl)
+Email:       allanonjl@gentoo.org
+Herds(1):    gnome
+
+Developer:   Jory A. Pratt (anarchy)
+Email:       anarchy@gentoo.org
+Herds(4):    mozilla net-mail ppc qmail
+
+Developer:   Otavio Rodolfo Piske (angusyoung)
+Email:       angusyoung@gentoo.org*
+Herds(3):    app-dicts bsd netmon
+Devaway:     Visiting clients. I'll be back Aug/13.
+
+Developer:   Ray Russell Reese III (anti)
+Email:       anti@gentoo.org
+Herds(1):    postgresql
+
+Developer:   Luis F. Araujo (araujo)
+Email:       araujo@gentoo.org
+Herds(1):    haskell
+
+Developer:   Anders Rune Jensen (arj)
+Email:       arj@gentoo.org
+Herds(2):    app-dicts video
+
+Developer:   Alex Howells (astinus)
+Email:       astinus@gentoo.org
+Herds(1):    amd64
+
+Developer:   Kris Kersey (augustus)
+Email:       augustus@gentoo.org
+Herds(1):    amd64
+
+Developer:   Jon Portnoy (avenj)
+Email:       avenj@gentoo.org
+Herds(3):    amd64 base-system toolchain
+
+Developer:   Thomas Matthijs (axxo)
+Email:       axxo@gentoo.org*
+Herds(1):    java
+Devaway:     email me
+
+Developer:   Martin Schlemmer (azarah)
+Email:       azarah@gentoo.org
+Herds(7):    base-system gcc-porting mozilla pam toolchain x11 x11-drivers
+
+Developer:   José Alberto Suárez López (bass)
+Email:       bass@gentoo.org
+Herds(1):    www-servers
+
+Developer:   Jodok Batlogg (batlogg)
+Email:       batlogg@gentoo.org
+Herds(1):    net-zope
+
+Developer:   Bryan D. Stine (battousai)
+Email:       battousai@gentoo.org*
+Herds(3):    hardened x11 x11-drivers
+Devaway:     Still no internet on campus. Don't say I didn't warn you.
+             Currently hoping for a Wed Sep 5 return.
+
+Developer:   Sven Blumenstein (bazik)
+Email:       bazik@gentoo.org*
+Herds(1):    sparc
+Devaway:     Duty in German Army until 2006/05/31, foreign deployment in
+             Afghanistan for International Security Assistance Force from
+             November '05 to March '06.
+
+Developer:   Brad Cowan (bcowan)
+Email:       bcowan@gentoo.org
+Herds(2):    desktop-wm xfce
+
+Developer:   Benjamin Judas (beejay)
+Email:       beejay@gentoo.org
+Herds(1):    livecd
+
+Developer:   Elfyn McBratney (beu)
+Email:       beu@gentoo.org*
+Herds(4):    net-mail perl php web-apps
+Devaway:     Last week(ish) at present job, might be unavailable for long
+             periods - email me@g.o on anything that needs attention.
+
+Developer:   Simon Stelling (blubb)
+Email:       blubb@gentoo.org
+Herds(1):    amd64
+
+Developer:   Brad Laue (brad)
+Email:       brad@gentoo.org
+Herds(1):    mozilla
+
+Developer:   Henrik Brix Andersen (brix)
+Email:       brix@gentoo.org
+Herds(2):    kernel mobile
+
+Developer:   Caleb Tennis (caleb)
+Email:       caleb@gentoo.org
+Herds(3):    kde qt ruby
+
+Developer:   Doug Goldstein (cardoe)
+Email:       cardoe@gentoo.org
+Herds(3):    media-tv mobile tcltk
+
+Developer:   Carsten Lohrke (carlo)
+Email:       carlo@gentoo.org
+Herds(3):    kde python qt
+
+Developer:   Dominik Stadler (centic)
+Email:       centic@gentoo.org*
+Herds(1):    kde
+Devaway:     I have to reduce working on Gentoo-related things as my real life
+             wants some more of my time currently...
+
+Developer:   Tony Vroon (chainsaw)
+Email:       chainsaw@gentoo.org
+Herds(3):    base-system kernel sound
+
+Developer:   Chris White (chriswhite)
+Email:       chriswhite@gentoo.org
+Herds(1):    chriswhite
+
+Developer:   Ciaran McCreesh (ciaranm)
+Email:       ciaranm@gentoo.org
+Herds(7):    base-system commonbox cron mips shell-tools sparc vim
+
+Developer:   Michael Kohl (citizen428)
+Email:       citizen428@gentoo.org
+Herds(4):    bsd cjk games ruby
+
+Developer:   Chris Russell (cjr)
+Email:       cjr@gentoo.org
+Herds(1):    sparc
+
+Developer:   Saleem Abdulrasool (compnerd)
+Email:       compnerd@gentoo.org
+Herds(1):    java
+
+Developer:   Benjamin Schindler (config)
+Email:       config@gentoo.org
+Herds(1):    amd64
+
+Developer:   Tal Peer (coredumb)
+Email:       coredumb@gentoo.org
+Herds(2):    middle-east php
+
+Developer:   Alex Veber (coronalvr)
+Email:       coronalvr@gentoo.org
+Herds(2):    middle-east wine
+
+Developer:   corsair
+Email:       corsair@gentoo.org
+Herds(1):    ppc64
+
+Developer:   Marcus D. Hanwell (cryos)
+Email:       cryos@gentoo.org
+Herds(4):    amd64 kde net-proxy sci
+
+Developer:   Damien Krotkine (dams)
+Email:       dams@gentoo.org
+Herds(1):    ppc
+
+Developer:   Daniel Gryniewicz (dang)
+Email:       dang@gentoo.org
+Herds(2):    amd64 gnome
+
+Developer:   Duncan Coutts (dcoutts)
+Email:       dcoutts@gentoo.org
+Herds(1):    haskell
+
+Developer:   Tobias Scherbaum (dertobi123)
+Email:       dertobi123@gentoo.org*
+Herds(1):    ppc
+Devaway:     Busy with real-life stuff, back in september. Will try to catch
+             up all ppc-security bugs though, otherwise ask Anarchy. For
+             German translations ask grahl.
+
+Developer:   David Holm (dholm)
+Email:       dholm@gentoo.org*
+Herds(3):    ada ppc ppc-kernel
+Devaway:     Moving August 13th. Status of broadband access is uncertain at
+             the moment.
+
+Developer:   Julien Allanos (dju)
+Email:       dju@gentoo.org
+Herds(1):    web-apps
+
+Developer:   Deedra M. Waters (dmwaters)
+Email:       dmwaters@gentoo.org*
+Herds(1):    accessibility
+Devaway:     moving back to florida. Won't get my stuff till Sept 2, might be
+             back before that, depends on when i get my new machine. Jhuebel
+             can handle major devrel issues while i'm gone, and recruiters@g.o
+             can handle any new dev issues.
+
+Developer:   Daniel Ostrow (dostrow)
+Email:       dostrow@gentoo.org
+Herds(4):    ppc ppc64 toolchain xfce
+
+Developer:   Daniel Black (dragonheart)
+Email:       dragonheart@gentoo.org
+Herds(6):    crypto dev-embedded forensics hardened netmon ppc
+
+Developer:   Matt Jarjoura (eklipse)
+Email:       eklipse@gentoo.org
+Herds(1):    ppc
+
+Developer:   Eldad Zack (eldad)
+Email:       eldad@gentoo.org
+Herds(1):    netmon
+
+Developer:   Jeremy Huddleston (eradicator)
+Email:       eradicator@gentoo.org
+Herds(9):    accessibility amd64 kernel sound sparc sparc-kernel toolchain x11
+             x11-drivers
+
+Developer:   esammer
+Email:       esammer@gentoo.org
+Herds(1):    perl
+
+Developer:   Armando Di Cianno (fafhrd)
+Email:       fafhrd@gentoo.org
+Herds(3):    gnustep pda ppc
+
+Developer:   Fernando J. Pereda (ferdy)
+Email:       ferdy@gentoo.org
+Herds(2):    alpha net-mail
+
+Developer:   Diego Pettenò (flameeyes)
+Email:       flameeyes@gentoo.org
+Herds(5):    amd64 bsd pam sound video
+
+Developer:   Ferris McCormick (fmmcor)
+Email:       fmmcor@gentoo.org
+Herds(1):    sparc
+
+Developer:   foser*
+Email:       foser@gentoo.org*
+Herds(3):    dotnet gnome gstreamer
+Devaway:     Break until 27th of Aug, won't be reading any mail.
+
+Developer:   Francesco Riosa (francesco)
+Email:       francesco@pnpitalia.it
+Herds(1):    mysql
+
+Developer:   Fernando Serboncini (fserb)
+Email:       fserb@gentoo.org
+Herds(1):    python
+
+Developer:   Paul Varner (fuzzyray)
+Email:       fuzzyray@gentoo.org
+Herds(1):    tools-portage
+
+Developer:   Frank van de Pol (fvdpol)
+Email:       fvdpol@gentoo.org
+Herds(1):    sound
+
+Developer:   Grant Goodyear (g2boojum)
+Email:       g2boojum@gentoo.org
+Herds(6):    base-system bsd graphics net-mail python toolchain
+
+Developer:   David Guembel (ganymede)
+Email:       ganymede@gentoo.org
+Herds(1):    wine
+
+Developer:   Marius Mauch (genone)
+Email:       genone@gentoo.org
+Herds(1):    tools-portage
+
+Developer:   Stefan Schweizer (genstef)
+Email:       genstef@gentoo.org
+Herds(4):    kernel mobile net-dialup printing
+
+Developer:   Stephen Becker (geoman)
+Email:       geoman@gentoo.org*
+Herds(1):    mips
+Devaway:     New Hampshire until August 6th, Missouri until August 15th
+
+Developer:   George Shapovalov (george)
+Email:       george@gentoo.org
+Herds(6):    ada haskell lang-misc ml prolog sci
+
+Developer:   Gerald J. Normandin Jr. (gerrynjr)
+Email:       gerrynjr@gentoo.org
+Herds(1):    amd64
+
+Developer:   Guy Martin (gmsoft)
+Email:       gmsoft@gentoo.org
+Herds(3):    base-system hppa hppa-kernel
+
+Developer:   Gregorio Guidi (greg_g)
+Email:       greg_g@gentoo.org*
+Herds(2):    kde qt
+Devaway:     Away for three weeks to attend a series of conferences with
+             limited internet access, from 8/28 to 9/18.
+
+Developer:   Greg Fitzgerald (gregf)
+Email:       gregf@gentoo.org
+Herds(2):    net-irc net-mail
+
+Developer:   Greg Kroah-Hartman (gregkh)
+Email:       gregkh@gentoo.org*
+Herds(2):    kernel x86-kernel
+Devaway:     Be back August 31.
+
+Developer:   Gustavo Zacarias (gustavoz)
+Email:       gustavoz@gentoo.org
+Herds(2):    hppa sparc
+
+Developer:   Mark Loeser (halcy0n)
+Email:       halcy0n@gentoo.org
+Herds(2):    gcc-porting toolchain
+
+Developer:   hanno
+Email:       hanno@gentoo.org
+Herds(1):    gstreamer
+
+Developer:   Michael Hanselmann (hansmi)
+Email:       hansmi@gentoo.org
+Herds(4):    hppa net-mail ppc qmail
+
+Developer:   Hardave Riar (hardave)
+Email:       hardave@gentoo.org
+Herds(2):    mips sparc
+
+Developer:   Akinori Hattori (hattya)
+Email:       hattya@gentoo.org
+Herds(2):    cjk net-mail
+
+Developer:   Herbie Hopkins (herbs)
+Email:       herbs@gentoo.org
+Herds(1):    amd64
+
+Developer:   Hallgrimur Gunnarsson (hhg)
+Email:       hhg@gentoo.org
+Herds(3):    net-mail pam x11
+
+Developer:   Benedikt Boehm (hollow)
+Email:       hollow@gentoo.org
+Herds(3):    apache kernel qmail
+
+Developer:   Homer Parker (hparker)
+Email:       hparker@gentoo.org
+Herds(1):    amd64
+
+Developer:   Gustavo Felisberto (humpback)
+Email:       humpback@gentoo.org
+Herds(2):    net-ftp net-im
+
+Developer:   James Harlow (hythloday)
+Email:       hythloday@gentoo.org
+Herds(1):    gcc-porting
+
+Developer:   Ilya Volynets (iluxa)
+Email:       iluxa@gentoo.org
+Herds(2):    mips toolchain
+
+Developer:   Jeremy Maitin-Shepard (jbms)
+Email:       jbms@gentoo.org
+Herds(1):    emacs
+
+Developer:   Jason Huebel (jhuebel)
+Email:       jhuebel@gentoo.org
+Herds(4):    amd64 livecd toolchain vmware
+
+Developer:   Josh Glover (jmglov)
+Email:       jmglov@gentoo.org
+Herds(3):    cjk vmware web-apps
+
+Developer:   Eric Shattow (jnc)
+Email:       jnc@gentoo.org
+Herds(1):    sound
+
+Developer:   Joe McCann (joem)
+Email:       joem@gentoo.org*
+Herds(1):    gnome
+Devaway:     Finished moving and getting dsl installed. Will be back no later
+             than aug 18.
+
+Developer:   John Mylchreest (johnm)
+Email:       johnm@gentoo.org
+Herds(5):    antivirus gcc-porting kernel tools-portage x86-kernel
+
+Developer:   Christian Birchinger (joker)
+Email:       joker@gentoo.org
+Herds(2):    sparc sparc-kernel
+
+Developer:   Joseph Jezak (josejx)
+Email:       josejx@gentoo.org*
+Herds(1):    ppc
+Devaway:     Moved to Pittsburgh, I'll be hard to reach for the next few days
+             until after September 6th.
+
+Developer:   Aaron Walker (ka0ttic)
+Email:       ka0ttic@gentoo.org
+Herds(13):   afterstep benchmarks bsd commonbox cron cvs-utils dev-tools
+             forensics netmon shell-tools vim web-apps www-servers
+
+Developer:   Guillaume Destuynder (kang)
+Email:       kang@gentoo.org
+Herds(2):    hardened net-p2p
+
+Developer:   Karl Trygve Kalleberg (karltk)
+Email:       karltk@gentoo.org
+Herds(3):    dev-tools java tools-portage
+
+Developer:   René Nussbaumer (killerfox)
+Email:       killerfox@gentoo.org
+Herds(1):    hppa
+
+Developer:   Mike Doty (kingtaco)
+Email:       kingtaco@gentoo.org
+Herds(2):    amd64 comm-fax
+
+Developer:   Kito Danya Dietrich (kito)
+Email:       kito@gentoo.org
+Herds(1):    sound
+
+Developer:   Kurt Lieber (klieber)
+Email:       klieber@gentoo.org
+Herds(1):    sysadmin
+
+Developer:   Bryan Østergaard (kloeri)
+Email:       kloeri@gentoo.org
+Herds(7):    afterstep alpha alpha-kernel apache ia64 python shell-tools
+
+Developer:   Andres Loeh (kosmikus)
+Email:       kosmikus@gentoo.org
+Herds(1):    haskell
+
+Developer:   Danny van Dyk (kugelfang)
+Email:       kugelfang@gentoo.org
+Herds(2):    amd64 sci
+
+Developer:   Joshua Kinard (kumba)
+Email:       kumba@gentoo.org
+Herds(7):    base-system embedded gcc-porting mips mips-kernel sparc toolchain
+
+Developer:   Jason Shoemaker (kutsuya)
+Email:       kutsuya@gentoo.org
+Herds(2):    net-zope python
+
+Developer:   Kai Zimmermann (kzimmerm)
+Email:       kzimmerm@gentoo.org
+Herds(2):    sound video
+
+Developer:   Tuan Van (langthang)
+Email:       langthang@gentoo.org
+Herds(1):    net-mail
+
+Developer:   Heinrich Wendel (lanius)
+Email:       lanius@gentoo.org
+Herds(2):    printing utf8
+
+Developer:   Peter Johanson (latexer)
+Email:       latexer@gentoo.org
+Herds(3):    dotnet mobile net-fs
+
+Developer:   Andrea Barisani (lcars)
+Email:       lcars@gentoo.org
+Herds(1):    net-mail
+
+Developer:   Leonardo Boshell (leonardop)
+Email:       leonardop@gentoo.org
+Herds(4):    accessibility gnome gnome-accessibility text-markup
+
+Developer:   Alastair Tse (liquidx)
+Email:       liquidx@gentoo.org
+Herds(7):    app-dicts cjk mobile mobile-phone pda python wxwindows
+
+Developer:   Elizabeth Blackwell (lizb)
+Email:       lizb@gentoo.org
+Herds(1):    ppc
+
+Developer:   Thomas Raschbacher (lordvan)
+Email:       lordvan@gentoo.org
+Herds(3):    antivirus python video
+
+Developer:   Luca Barbato (lu_zero)
+Email:       lu_zero@gentoo.org
+Herds(9):    base-system gcc-porting graphics ppc ppc-kernel toolchain video
+             x11 x11-drivers
+
+Developer:   Lukasz Strzygowski (lucass)
+Email:       lucass@gentoo.org
+Herds(1):    python
+
+Developer:   Jan Brinkmann (luckyduck)
+Email:       luckyduck@gentoo.org*
+Herds(4):    amd64 java sound video
+Devaway:     Away till 2005/07/25 due to connection problems
+
+Developer:   Travis Tilley (lv)
+Email:       lv@gentoo.org*
+Herds(3):    amd64 gcc-porting toolchain
+Devaway:     <jedi mind trick> I'm not really away. </jedi mind trick>
+
+Developer:   malc
+Email:       malc@gentoo.org
+Herds(1):    amd64
+
+Developer:   Philip Walls (malverian)
+Email:       malverian@gentoo.org
+Herds(2):    graphics net-p2p
+
+Developer:   MATSUU Takuto (matsuu)
+Email:       matsuu@gentoo.org
+Herds(3):    cjk postgresql tcltk
+
+Developer:   Matthieu Sozeau (mattam)
+Email:       mattam@gentoo.org*
+Herds(4):    emacs haskell ml text-markup
+Devaway:     Hollidays then summer school from 15 'till 27 augut. Always
+             working on mymaster's thesis, so don't expect much responsivness.
+
+Developer:   Matthew Marlowe (mattm)
+Email:       mattm@gentoo.org
+Herds(2):    apache vmware
+
+Developer:   Max Kalika (max)
+Email:       max@gentoo.org
+Herds(4):    antivirus media-tv net-mail web-apps
+
+Developer:   Michael Cummings (mcummings)
+Email:       mcummings@gentoo.org*
+Herds(2):    perl sparc
+Devaway:     I am currently on sabatical from Gentoo and shall return in a few
+             months time. [ 16/08/05 ]
+
+Developer:   merlin
+Email:       merlin@gentoo.org
+Herds(1):    net-dialup
+
+Developer:   Joshua Brindle (method)
+Email:       method@gentoo.org
+Herds(3):    crypto hardened toolchain
+
+Developer:   Michael Glauche (mglauche)
+Email:       mglauche@gentoo.org
+Herds(1):    samba
+
+Developer:   ming
+Email:       ming@gentoo.org
+Herds(1):    tcltk
+
+Developer:   Matthew Kennedy (mkennedy)
+Email:       mkennedy@gentoo.org
+Herds(4):    common-lisp emacs gcc-porting scheme
+
+Developer:   Daniel Goller (morfic)
+Email:       morfic@gentoo.org
+Herds(3):    benchmarks gcc-porting ppc
+
+Developer:   Simone Gotti (motaboy)
+Email:       motaboy@gentoo.org
+Herds(1):    kde
+
+Developer:   Michael Sterrett (mr_bones_)
+Email:       mr_bones_@gentoo.org
+Herds(1):    games
+
+Developer:   Alin Nastac (mrness)
+Email:       mrness@gentoo.org
+Herds(3):    mobile-phone net-dialup net-proxy
+
+Developer:   David Bryson (mutex)
+Email:       mutex@gentoo.org
+Herds(2):    embedded toolchain
+
+Developer:   Masatomo Nakano (nakano)
+Email:       nakano@gentoo.org
+Herds(4):    cjk mozilla net-mail postgresql
+
+Developer:   Steve Arnold (nerdboy)
+Email:       nerdboy@gentoo.org*
+Herds(3):    comm-fax dev-tools sci
+Devaway:     Really away to Canada and Finland until 24 August. Please poke
+             KingTaco or
+
+Developer:   Yuta SATOH (nigoro)
+Email:       nigoro@gentoo.org
+Herds(2):    cjk ppc64
+
+Developer:   Joe Sapp (nixphoeni)
+Email:       nixphoeni@gentoo.org
+Herds(1):    gdesklets
+
+Developer:   Mike Gardiner (obz)
+Email:       obz@gentoo.org
+Herds(2):    gdesklets gnome
+
+Developer:   omkhar
+Email:       omkhar@gentoo.org
+Herds(1):    ppc64
+
+Developer:   pauldv
+Email:       pauldv@gentoo.org
+Herds(1):    openoffice
+
+Developer:   Peter Bienstman (pbienst)
+Email:       pbienst@gentoo.org
+Herds(1):    sci
+
+Developer:   Nguyen Thai Ngoc Duy (pclouds)
+Email:       pclouds@gentoo.org*
+Herds(2):    cjk text-markup
+Devaway:     Moving to Japan
+
+Developer:   Chris Pebenito (pebenito)
+Email:       pebenito@gentoo.org
+Herds(3):    base-system embedded hardened
+
+Developer:   Colin Morey (peitholm)
+Email:       peitholm@gentoo.org
+Herds(2):    mips sparc
+
+Developer:   Jay Pfeifer (pfeifer)
+Email:       pfeifer@gentoo.org
+Herds(3):    crypto gcc-porting toolchain
+
+Developer:   Patrick Kursawe (phosphan)
+Email:       phosphan@gentoo.org
+Herds(2):    sci video
+
+Developer:   Patrick Dawson (pkdawson)
+Email:       pkdawson@gentoo.org
+Herds(2):    sound video
+
+Developer:   Tim Yamin (plasmaroo)
+Email:       plasmaroo@gentoo.org*
+Herds(5):    dev-tools ia64 ia64-kernel kernel x86-kernel
+Devaway:     Slightly limited availability for a few days.
+
+Developer:   Ian Leitch (port001)
+Email:       port001@gentoo.org
+Herds(1):    tools-portage
+
+Developer:   Bret Curtis (psi29a)
+Email:       psi29a@gentoo.org
+Herds(1):    mips
+
+Developer:   Pieter van den Abeele (pvdabeel)
+Email:       pvdabeel@gentoo.org
+Herds(4):    gcc-porting ppc prolog toolchain
+
+Developer:   Lars Weiler (pylon)
+Email:       pylon@gentoo.org*
+Herds(4):    cvs-utils media-optical ppc text-markup
+Devaway:     09/02-09/04 @ <a
+             href="http://mrmcd.metarheinmain.de/">mrmcd11b</a> (Darmstadt,
+             Hesse, Germany)
+
+Developer:   Markus Nigbur (pyrania)
+Email:       pyrania@gentoo.org
+Herds(3):    commonbox desktop-dock desktop-misc
+
+Developer:   Rob Cakebread (pythonhead)
+Email:       pythonhead@gentoo.org
+Herds(3):    python ruby wxwindows
+
+Developer:   Carlos Silva (r3pek)
+Email:       r3pek@gentoo.org
+Herds(3):    amd64 kernel mobile-phone
+
+Developer:   Robert Coie (rac)
+Email:       rac@gentoo.org*
+Herds(3):    dev-tools mysql perl
+Devaway:     Overwhelmed by company work currently
+
+Developer:   Radoslaw Stachowiak (radek)
+Email:       radek@gentoo.org
+Herds(1):    net-zope
+
+Developer:   Rajiv Aaron Manglani (rajiv)
+Email:       rajiv@gentoo.org*
+Herds(1):    ppc
+Devaway:     visiting los angeles until wed sep 7. any devs want to meet to
+             chat and sign keys? i will be checking email but will not be on
+             irc.
+
+Developer:   Lance Albertson (ramereth)
+Email:       ramereth@gentoo.org
+Herds(1):    netmon
+
+Developer:   Stuart Longland (redhatter)
+Email:       redhatter@gentoo.org
+Herds(1):    mips
+
+Developer:   Olivier Fisette (ribosome)
+Email:       ribosome@gentoo.org
+Herds(1):    sci
+
+Developer:   Don Seiler (rizzo)
+Email:       rizzo@gentoo.org
+Herds(1):    net-im
+
+Developer:   Renat Lumpau (rl03)
+Email:       rl03@gentoo.org
+Herds(2):    apache web-apps
+
+Developer:   Robin H. Johnson (robbat2)
+Email:       robbat2@gentoo.org
+Herds(11):   apache app-backup crypto cvs-utils dev-embedded mysql net-mail
+             pam php qmail web-apps
+
+Developer:   Ryan Phillips (rphillips)
+Email:       rphillips@gentoo.org
+Herds(3):    kerberos net-fs vim
+
+Developer:   Michele Noberasco (s4t4n)
+Email:       s4t4n@gentoo.org
+Herds(1):    desktop-dock
+
+Developer:   Christian Andreetta (satya)
+Email:       satya@gentoo.org
+Herds(1):    samba
+
+Developer:   Andrea Luzzardi (scox)
+Email:       scox@gentoo.org
+Herds(1):    hardened
+
+Developer:   Sebastian Bergmann (sebastian)
+Email:       sebastian@gentoo.org
+Herds(1):    php
+
+Developer:   Stephen Diener (sediener)
+Email:       sediener@gentoo.org
+Herds(2):    mobile sci
+
+Developer:   Seemant Kulleen (seemant)
+Email:       seemant@gentoo.org*
+Herds(5):    app-dicts base-system kerberos shell-tools x11
+Devaway:     In Boston, without dev box. Dev Box arrives in the middle of
+             September, that's when I will return. I don't check mailing lists
+             or aliases -- I'm on IRC, but better to contact alternate people.
+
+Developer:   Jochen Maes (sejo)
+Email:       sejo@gentoo.org*
+Herds(3):    java ppc ppc-kernel
+Devaway:     no internet due to moving, normally 12/09 back internet :(
+
+Developer:   Karol Wojtaszek (sekretarz)
+Email:       sekretarz@gentoo.org
+Herds(7):    amd64 gcc-porting graphics mobile net-im net-p2p x11
+
+Developer:   Tom Martin (slarti)
+Email:       slarti@gentoo.org*
+Herds(4):    amd64 net-mail shell-tools vim
+Devaway:     Gone till 1 Aug, then gone again on the 4 Aug till 22 Aug
+             (roughly). No mail, irc or net at all. Recruiters ->
+             #gentoo-devrel, net-mail -> #gentoo-netmail. spb has my phone if
+             it's life threatening, but it won't be.
+
+Developer:   Jonathan Smith (smithj)
+Email:       smithj@gentoo.org*
+Herds(2):    desktop-misc netmon
+Devaway:     my laptop's motherboard fried... NEVER BUY A DELL!!! in any case,
+             any dev can fix anything normally maintained by me. i hope to be
+             back within a week or two, but who knows?
+
+Developer:   Ned Ludd (solar)
+Email:       solar@gentoo.org*
+Herds(3):    embedded hardened toolchain
+Devaway:     away moving.. as long as it takes to get done. 9-5 EST I will be
+             reachable
+
+Developer:   Stephen Bennett (spb)
+Email:       spb@gentoo.org
+Herds(2):    bsd mips
+
+Developer:   D.M.D. Ljungmark (spider)
+Email:       spider@gentoo.org*
+Herds(1):    gnome
+Devaway:     Moving // Germany from 12th to 17th ( Wave Gotik Treffen ) // 3-5
+             weeks before I get an ISP in my new place.
+
+Developer:   Michael Januszewski (spock)
+Email:       spock@gentoo.org
+Herds(3):    gcc-porting kernel x86-kernel
+
+Developer:   Donnie Berkholz (spyderous)
+Email:       spyderous@gentoo.org*
+Herds(3):    cluster sci x11
+Devaway:     Wedding+honeymoon, back Sept. 5. Bug joshuabaergen/battousai
+             about X.
+
+Developer:   Josh Grebe (squash)
+Email:       squash@gentoo.org
+Herds(1):    sparc
+
+Developer:   Jon Hood (squinky86)
+Email:       squinky86@gentoo.org
+Herds(3):    accessibility forensics net-p2p
+
+Developer:   Lim Swee Tat (st_lim)
+Email:       st_lim@gentoo.org
+Herds(5):    java net-dialup net-mail qmail web-apps
+
+Developer:   Stefan Knoblich (stkn)
+Email:       stkn@gentoo.org
+Herds(1):    voip
+
+Developer:   Benjamin Smee (strerror)
+Email:       strerror@gentoo.org
+Herds(2):    net-mail netmon
+
+Developer:   Stuart Herbert (stuart)
+Email:       stuart@gentoo.org*
+Herds(6):    apache nx php vmware web-apps www-servers
+Devaway:     On vacation - back 1st October.
+
+Developer:   suka
+Email:       suka@gentoo.org
+Herds(1):    openoffice
+
+Developer:   Aaron Kulbe (superlag)
+Email:       superlag@gentoo.org
+Herds(3):    amd64 commonbox net-mail
+
+Developer:   Sergey Kuleshov (svyatogor)
+Email:       svyatogor@gentoo.org
+Herds(1):    wine
+
+Developer:   Sven Wegener (swegener)
+Email:       swegener@gentoo.org*
+Herds(3):    net-irc net-news shell-tools
+Devaway:     Looking for a new job, don't expect much Gentoo work during this
+             time. Available via IRC and mail.
+
+Developer:   tantive
+Email:       tantive@gentoo.org
+Herds(1):    cluster
+
+Developer:   Tavis Ormandy (taviso)
+Email:       taviso@gentoo.org
+Herds(2):    forensics shell-tools
+
+Developer:   Philippe Trottier (tchiwam)
+Email:       tchiwam@gentoo.org
+Herds(1):    sci
+
+Developer:   Colin Kingsley (tercel)
+Email:       tercel@gentoo.org
+Herds(1):    tools-portage
+
+Developer:   Olivier Crête (tester)
+Email:       tester@gentoo.org
+Herds(2):    amd64 net-im
+
+Developer:   Tom Gall (tgall)
+Email:       tgall@gentoo.org
+Herds(2):    ppc64 toolchain
+
+Developer:   Andrej Kacian (ticho)
+Email:       ticho@gentoo.org
+Herds(3):    amd64 antivirus net-mail
+
+Developer:   Adam Mondl (tocharian)
+Email:       tocharian@gentoo.org
+Herds(1):    hardened
+
+Developer:   Todd Sunderlin (todd)
+Email:       todd@gentoo.org
+Herds(1):    sparc
+
+Developer:   tomk
+Email:       tomk@gentoo.org
+Herds(2):    net-mail php
+
+Developer:   Torsten Veller (tove)
+Email:       tove@gentoo.org
+Herds(2):    net-dialup net-mail
+
+Developer:   Christian Parpart (trapni)
+Email:       trapni@gentoo.org
+Herds(6):    amd64 apache crypto sound video web-apps
+
+Developer:   Brandon Hale (tseng)
+Email:       tseng@gentoo.org
+Herds(4):    desktop-dock desktop-wm hardened kernel
+
+Developer:   Jan Seidel (tuxus)
+Email:       tuxus@gentoo.org
+Herds(1):    mips
+
+Developer:   Tom Payne (twp)
+Email:       twp@gentoo.org*
+Herds(1):    ruby
+Devaway:     Around, but generally slow reaction times at the moment: busy at
+             work and the
+
+Developer:   Roy Marples (uberlord)
+Email:       uberlord@gentoo.org
+Herds(1):    net-ftp
+
+Developer:   Michael Tindal (urilith)
+Email:       urilith@gentoo.org
+Herds(2):    apache dotnet
+
+Developer:   Mamoru KOMACHI (usata)
+Email:       usata@gentoo.org
+Herds(5):    cjk desktop-wm emacs ruby text-markup
+
+Developer:   Marcelo Goes (vanquirius)
+Email:       vanquirius@gentoo.org
+Herds(2):    crypto netmon
+
+Developer:   Mike Frysinger (vapier)
+Email:       vapier@gentoo.org
+Herds(12):   arm base-system cron games gcc-porting hppa ia64 net-fs netmon
+             qmail toolchain vmware
+
+Developer:   Michael Stewart (vericgar)
+Email:       vericgar@gentoo.org
+Herds(1):    apache
+
+Developer:   Konstantin V. Arkhipov (voxus)
+Email:       voxus@gentoo.org
+Herds(3):    amd64 bind cluster
+
+Developer:   Joshua Charles Campbell (warpzero)
+Email:       warpzero@gentoo.org
+Herds(2):    mobile secure-tunneling
+
+Developer:   Jason Wever (weeve)
+Email:       weeve@gentoo.org
+Herds(2):    base-system sparc
+
+Developer:   Keith Wesolowski (wesolows)
+Email:       wesolows@gentoo.org
+Herds(1):    sparc
+
+Developer:   William Hubbs (williamh)
+Email:       williamh@gentoo.org
+Herds(1):    accessibility
+
+Developer:   Chris Gianelloni (wolf31o2)
+Email:       wolf31o2@gentoo.org
+Herds(3):    games livecd vmware
+
+Developer:   Stephanie Lockwood-Childs (wormo)
+Email:       wormo@gentoo.org
+Herds(2):    dev-tools ppc
+
+Developer:   Wolfram Schlich (wschlich)
+Email:       wschlich@gentoo.org
+Herds(1):    antivirus
+
+Developer:   Christian Zoffoli (xmerlin)
+Email:       xmerlin@gentoo.org*
+Herds(2):    cluster qmail
+Devaway:     On holidays from Monday, August 15th for about a week.
+
+Developer:   yoswink
+Email:       yoswink@gentoo.org
+Herds(1):    alpha
+
+Developer:   Zaheer Merali (zaheerm)
+Email:       zaheerm@gentoo.org
+Herds(1):    gstreamer
+
+Developer:   Chuck Short (zul)
+Email:       zul@gentoo.org
+Herds(2):    apache sparc
+
+Developer:   Chris Aniszczyk (zx)
+Email:       zx@gentoo.org*
+Herds(2):    accessibility java
+Devaway:     Half-time now. Working on a book.
+
+Developer:   Marc Hildebrand (zypher)
+Email:       zypher@gentoo.org
+Herds(1):    video
 
 *[00m Currently away

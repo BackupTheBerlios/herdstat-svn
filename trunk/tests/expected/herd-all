@@ -1,16 +1,625 @@
-Herds(116):   accessibility ada afterstep alpha alpha-kernel amd64 antivirus
-              apache app-backup app-dicts arm base-system benchmarks bind bsd
-              chriswhite cjk cluster comm-fax common-lisp commonbox cron
-              crypto cvs-utils desktop-dock desktop-misc desktop-wm
-              dev-embedded dev-tools dotnet emacs embedded forensics games
-              gcc-porting gdesklets gnome gnome-accessibility gnustep graphics
-              gstreamer hardened haskell hppa hppa-kernel ia64 ia64-kernel
-              java kde kerberos kernel lang-misc livecd media-optical media-tv
-              middle-east mips mips-kernel ml mobile mobile-phone mozilla
-              mysql net-dialup net-fs net-ftp net-im net-irc net-mail net-news
-              net-p2p net-proxy net-zope netmon nx openoffice pam pda perl php
-              postgresql ppc ppc-kernel ppc64 printing prolog python qmail qt
-              ruby samba scheme sci secure-tunneling shell-tools sound sparc
-              sparc-kernel sysadmin tcltk text-markup toolchain tools-portage
-              utf8 video vim vmware voip web-apps wine www-servers wxwindows
-              x11 x11-drivers x86-kernel xfce
+Herd:             accessibility
+Email:            accessibility@gentoo.org
+Description:      accessibility related packages
+Developers(6):    dmwaters* eradicator leonardop squinky86 williamh zx*
+
+Herd:             ada
+Email:            ada@gentoo.org
+Description:      compilers libs and other packages related to ada. Covers
+                  dev-ada category (+ some extra stuff).
+Developers(2):    dholm* george
+
+Herd:             afterstep
+Email:            afterstep@gentoo.org
+Description:      Afterstep and related packages
+Developers(2):    ka0ttic kloeri
+
+Herd:             alpha
+Email:            alpha@gentoo.org
+Description:      Alpha specific packages
+Developers(4):    agriffis ferdy kloeri yoswink
+
+Herd:             alpha-kernel
+Email:            alpha-kernel@gentoo.org
+Description:      Kernel packages for Gentoo/Alpha
+Developers(2):    agriffis kloeri
+
+Herd:             amd64
+Email:            amd64@gentoo.org
+Description:      x86_64-specific packages
+Developers(28):   absinthe* aliz astinus augustus avenj blubb config cryos
+                  dang eradicator flameeyes gerrynjr herbs hparker jhuebel
+                  kingtaco kugelfang luckyduck* lv* malc r3pek sekretarz
+                  slarti* superlag tester ticho trapni voxus
+
+Herd:             antivirus
+Email:            antivirus@gentoo.org
+Description:      Antivirus related stuff like e-mail-scanning, on-access
+                  scanning or generic/daemon av-scanners
+Developers(5):    johnm lordvan max ticho wschlich
+
+Herd:             apache
+Email:            apache-devs@gentoo.org
+Description:      The Apache web server and supporting packages
+Developers(10):   hollow kloeri mattm rl03 robbat2 stuart* trapni urilith
+                  vericgar zul
+
+Herd:             app-backup
+Email:            app-backup@gentoo.org
+Description:      Any applications that handle system backup and restore.
+Developers(1):    robbat2
+
+Herd:             app-dicts
+Email:            app-dicts@gentoo.org
+Description:      Spell checking programs and dictionaries
+Developers(4):    angusyoung* arj liquidx seemant*
+
+Herd:             arm
+Email:            arm@gentoo.org
+Developers(1):    vapier
+
+Herd:             base-system
+Email:            base-system@gentoo.org
+Description:      Core system utilities and libraries.
+Developers(13):   agriffis avenj azarah chainsaw ciaranm g2boojum gmsoft kumba
+                  lu_zero pebenito seemant* vapier weeve
+
+Herd:             benchmarks
+Email:            benchmarks@gentoo.org
+Description:      Herd for app-benchmarks
+Developers(2):    ka0ttic morfic
+
+Herd:             bind
+Email:            bind@gentoo.org
+Description:      Herd for net-dns/bind and net-dns/bind-utils
+Developers(1):    voxus
+
+Herd:             bsd
+Email:            bsd@gentoo.org
+Description:      Supporting *BSD systems in Gentoo
+Developers(7):    absinthe* angusyoung* citizen428 flameeyes g2boojum ka0ttic
+                  spb
+
+Herd:             chriswhite
+Email:            chriswhite@gentoo.org
+Description:      I'm not really in a specific herd so.. this is for new
+                  ebuilds because I hate no-herd
+Developers(1):    chriswhite
+
+Herd:             cjk
+Email:            cjk@gentoo.org
+Description:      Chinese/Japanese/Korean support packages
+Developers(9):    citizen428 hattya jmglov liquidx matsuu nakano nigoro
+                  pclouds* usata
+
+Herd:             cluster
+Email:            cluster@gentoo.org
+Description:      Gentoo Cluster project. Everything related to clusters.
+Developers(4):    spyderous* tantive voxus xmerlin*
+
+Herd:             comm-fax
+Email:            comm-fax@gentoo.org
+Description:      Comm, fax, and related packages
+Developers(2):    kingtaco nerdboy*
+
+Herd:             common-lisp
+Email:            common-lisp@gentoo.org
+Description:      Common Lisp compilers, libraries and applications and
+                  controller
+Developers(1):    mkennedy
+
+Herd:             commonbox
+Email:            commonbox@gentoo.org
+Description:      Blackbox and derivative works
+Developers(4):    ciaranm ka0ttic pyrania superlag
+
+Herd:             cron
+Email:            cron-bugs@gentoo.org
+Description:      Cron and similar packages
+Developers(3):    ciaranm ka0ttic vapier
+
+Herd:             crypto
+Email:            crypto@gentoo.org
+Description:      Cryptography related packages
+Developers(6):    dragonheart method pfeifer robbat2 trapni vanquirius
+
+Herd:             cvs-utils
+Email:            cvs-utils@gentoo.org
+Description:      cvs and utilities
+Developers(3):    ka0ttic pylon* robbat2
+
+Herd:             desktop-dock
+Email:            desktop-dock@gentoo.org
+Description:      WindowMaker/Blackbox Dockapps
+Developers(3):    pyrania s4t4n tseng
+
+Herd:             desktop-misc
+Email:            desktop-misc@gentoo.org
+Description:      Various small utilities for X11 that do not fit any other
+                  category
+Developers(2):    pyrania smithj*
+
+Herd:             desktop-wm
+Email:            desktop-wm@gentoo.org
+Description:      Window Managers for X11 that do not fit any other category.
+Developers(3):    bcowan tseng usata
+
+Herd:             dev-embedded
+Email:            dev-embedded@gentoo.org
+Description:      Development tools for embedded systems and micro-controllers
+Developers(2):    dragonheart robbat2
+
+Herd:             dev-tools
+Email:            dev-tools@gentoo.org
+Description:      Language-agnostic software development and code analysis
+                  tools
+Developers(6):    ka0ttic karltk nerdboy* plasmaroo* rac* wormo
+
+Herd:             dotnet
+Email:            dotnet@gentoo.org
+Description:      DotNet-related packages
+Developers(3):    foser* latexer urilith
+
+Herd:             emacs
+Email:            emacs@gentoo.org
+Description:      GNU Emacs applications and Emacs Lisp add-ons
+Developers(4):    jbms mattam* mkennedy usata
+
+Herd:             embedded
+Email:            embedded@gentoo.org
+Description:      Embedded systems packages
+Developers(4):    kumba mutex pebenito solar*
+
+Herd:             forensics
+Email:            forensics@gentoo.org
+Description:      This will contain all applications that aid the
+                  investigation of intrusions and general stuff that would be
+                  used by system adminstrators and law enforcement agencies.
+                  By the dual purpose nature of the applications some disaster
+                  recover mechanism tools may also fall under our maintence
+Developers(4):    dragonheart ka0ttic squinky86 taviso
+
+Herd:             games
+Email:            games@gentoo.org
+Description:      Gentoo Games Team
+Developers(4):    citizen428 mr_bones_ vapier wolf31o2
+
+Herd:             gcc-porting
+Email:            gcc-porting@gentoo.org
+Description:      Handles porting of packages to newer toolchain versions
+Developers(14):   azarah halcy0n hythloday johnm kumba lu_zero lv* mkennedy
+                  morfic pfeifer pvdabeel sekretarz spock vapier
+
+Herd:             gdesklets
+Email:            gdesklets@gentoo.org
+Description:      GDesklets packages
+Developers(2):    nixphoeni obz
+
+Herd:             gnome
+Email:            gnome@gentoo.org
+Description:      GNOME Desktop and related packages
+Developers(7):    allanonjl dang foser* joem* leonardop obz spider*
+
+Herd:             gnome-accessibility
+Email:            gnome-accessibility@gentoo.org
+Description:      GNOME accessibility packages
+Developers(1):    leonardop
+
+Herd:             gnustep
+Email:            gnustep@gentoo.org
+Description:      GNUstep enviroment and related
+Developers(1):    fafhrd
+
+Herd:             graphics
+Email:            graphics@gentoo.org
+Description:      media-gfx and related packages
+Developers(4):    g2boojum lu_zero malverian sekretarz
+
+Herd:             gstreamer
+Email:            gstreamer@gentoo.org
+Description:      Handles all gstreamer related packages
+Developers(3):    foser* hanno zaheerm
+
+Herd:             hardened
+Email:            hardened@gentoo.org
+Description:      Hardened Gentoo project packages and policy
+Developers(9):    battousai* dragonheart kang method pebenito scox solar*
+                  tocharian tseng
+
+Herd:             haskell
+Email:            haskell@gentoo.org
+Description:      compilers, libraries and apps related to Haskell programming
+                  language
+Developers(5):    araujo dcoutts george kosmikus mattam*
+
+Herd:             hppa
+Email:            hppa@gentoo.org
+Description:      HPPA specific packages
+Developers(5):    gmsoft gustavoz hansmi killerfox vapier
+
+Herd:             hppa-kernel
+Email:            hppa-kernel@gentoo.org
+Description:      Kernel packages for Gentoo/HP-PA
+Developers(1):    gmsoft
+
+Herd:             ia64
+Email:            ia64@gentoo.org
+Description:      IA-64 specific packages
+Developers(4):    agriffis kloeri plasmaroo* vapier
+
+Herd:             ia64-kernel
+Email:            ia64-kernel@gentoo.org
+Description:      Kernel packages for Gentoo/IA-64
+Developers(2):    agriffis plasmaroo*
+
+Herd:             java
+Email:            java@gentoo.org
+Description:      Java-related packages
+Developers(8):    absinthe* axxo* compnerd karltk luckyduck* sejo* st_lim zx*
+
+Herd:             kde
+Email:            kde@gentoo.org
+Description:      KDE and related packages
+Developers(6):    caleb carlo centic* cryos greg_g* motaboy
+
+Herd:             kerberos
+Email:            kerberos@gentoo.org
+Description:      Kerberos implementations
+Developers(3):    aliz rphillips seemant*
+
+Herd:             kernel
+Email:            kernel@gentoo.org
+Description:      Kernels and kernel related packages
+Developers(11):   brix chainsaw eradicator genstef gregkh* hollow johnm
+                  plasmaroo* r3pek spock tseng
+
+Herd:             lang-misc
+Email:            lang-misc@gentoo.org
+Description:      programming language related packages (mostly under
+                  dev-lang) that do not easilly fall under individual category
+Developers(1):    george
+
+Herd:             livecd
+Email:            livecd@gentoo.org
+Description:      Gentoo LiveCD Team
+Developers(3):    beejay jhuebel wolf31o2
+
+Herd:             media-optical
+Email:            media-optical@gentoo.org
+Description:      Tools for handling optical media, especially CD and DVD
+                  burning software
+Developers(1):    pylon*
+
+Herd:             media-tv
+Email:            media-tv@gentoo.org
+Description:      TV related applications and modules
+Developers(2):    cardoe max
+
+Herd:             middle-east
+Email:            middle-east@gentoo.org
+Description:      Applications and libraries that handle middle-eastern
+                  languages
+Developers(2):    coredumb coronalvr
+
+Herd:             mips
+Email:            mips@gentoo.org
+Description:      Gentoo/MIPS Team
+Developers(10):   ciaranm geoman* hardave iluxa kumba peitholm psi29a
+                  redhatter spb tuxus
+
+Herd:             mips-kernel
+Email:            mips-kernel@gentoo.org
+Description:      Kernel Packages for Gentoo/MIPS
+Developers(1):    kumba
+
+Herd:             ml
+Email:            lang-ml@gentoo.org
+Description:      compilers, libraries and apps related to Caml
+Developers(2):    george mattam*
+
+Herd:             mobile
+Email:            mobile@gentoo.org
+Description:      Mobile computing, including wireless networking (IEEE
+                  802.11, bluetooth, infrared, etc), power management and
+                  laptop specific packages
+Developers(8):    brix cardoe genstef latexer liquidx sediener sekretarz
+                  warpzero
+
+Herd:             mobile-phone
+Email:            mobile-phone@gentoo.org
+Description:      Mobile phone related applications
+Developers(3):    liquidx mrness r3pek
+
+Herd:             mozilla
+Email:            mozilla@gentoo.org
+Description:      Mozilla and related applications
+Developers(5):    agriffis anarchy azarah brad nakano
+
+Herd:             mysql
+Email:            mysql-bugs@gentoo.org
+Description:      MySQL and associated packages
+Developers(3):    francesco rac* robbat2
+
+Herd:             net-dialup
+Email:            net-dialup@gentoo.org
+Description:      Dialup connection tools
+Developers(5):    genstef merlin mrness st_lim tove
+
+Herd:             net-fs
+Email:            net-fs@gentoo.org
+Description:      network based filesystems and support
+Developers(3):    latexer rphillips vapier
+
+Herd:             net-ftp
+Email:            net-ftp@gentoo.org
+Description:      FTP (File Transfer Protocol) related applications
+Developers(2):    humpback uberlord
+
+Herd:             net-im
+Email:            net-im@gentoo.org
+Description:      Instant messaging clients and servers
+Developers(4):    humpback rizzo sekretarz tester
+
+Herd:             net-irc
+Email:            net-irc@gentoo.org
+Description:      IRC and related ebuilds
+Developers(2):    gregf swegener*
+
+Herd:             net-mail
+Email:            net-mail@gentoo.org
+Description:      Email servers, clients, and related packages
+Developers(20):   anarchy beu* ferdy g2boojum gregf hansmi hattya hhg
+                  langthang lcars max nakano robbat2 slarti* st_lim strerror
+                  superlag ticho tomk tove
+
+Herd:             net-news
+Email:            net-news@gentoo.org
+Description:      Herd for NNTP related packages in net-news
+Developers(1):    swegener*
+
+Herd:             net-p2p
+Email:            net-p2p@gentoo.org
+Description:      Peer to Peer network related packages
+Developers(4):    kang malverian sekretarz squinky86
+
+Herd:             net-proxy
+Email:            net-proxy@gentoo.org
+Description:      Network proxies
+Developers(2):    cryos mrness
+
+Herd:             net-zope
+Email:            net-zope@gentoo.org
+Description:      Zope and ZProduct packages
+Developers(3):    batlogg kutsuya radek
+
+Herd:             netmon
+Email:            netmon@gentoo.org
+Description:      Network monitoring software and tools
+Developers(9):    angusyoung* dragonheart eldad ka0ttic ramereth smithj*
+                  strerror vanquirius vapier
+
+Herd:             nx
+Email:            nx@gentoo.org
+Description:      NoMachine's NX Server and GPL'd clones
+Developers(1):    stuart*
+
+Herd:             openoffice
+Email:            openoffice@gentoo.org
+Description:      Openoffice related packages
+Developers(2):    pauldv suka
+
+Herd:             pam
+Email:            pam-bugs@gentoo.org
+Description:      PAM related packages
+Developers(4):    azarah flameeyes hhg robbat2
+
+Herd:             pda
+Email:            pda@gentoo.org
+Description:      PDA Related Applications and Libraries
+Developers(3):    abhishek fafhrd liquidx
+
+Herd:             perl
+Email:            perl@gentoo.org
+Description:      Perl-related packages
+Developers(4):    beu* esammer mcummings* rac*
+
+Herd:             php
+Email:            php-bugs@gentoo.org
+Description:      PHP and related packages
+Developers(6):    beu* coredumb robbat2 sebastian stuart* tomk
+
+Herd:             postgresql
+Email:            pgsql-bugs@gentoo.org
+Description:      PostgreSQL related packages
+Developers(3):    anti matsuu nakano
+
+Herd:             ppc
+Email:            ppc@gentoo.org
+Description:      PowerPC porters
+Developers(18):   anarchy dams dertobi123* dholm* dostrow dragonheart eklipse
+                  fafhrd hansmi josejx* lizb lu_zero morfic pvdabeel pylon*
+                  rajiv* sejo* wormo
+
+Herd:             ppc-kernel
+Email:            ppc-kernel@gentoo.org
+Description:      Kernel packages for Gentoo/PPC
+Developers(3):    dholm* lu_zero sejo*
+
+Herd:             ppc64
+Email:            ppc64@gentoo.org
+Description:      Gentoo/PPC64 Team
+Developers(5):    corsair dostrow nigoro omkhar tgall
+
+Herd:             printing
+Email:            printing@gentoo.org
+Description:      Printing related stuff, net-print category (+ some extra
+                  stuff).
+Developers(2):    genstef lanius
+
+Herd:             prolog
+Email:            prolog@gentoo.org
+Description:      Prolog related stuff. Compilers/interpreters, etc
+Developers(2):    george pvdabeel
+
+Herd:             python
+Email:            python@gentoo.org
+Description:      Python-related packages
+Developers(10):   aether carlo fserb g2boojum kloeri kutsuya liquidx lordvan
+                  lucass pythonhead
+
+Herd:             qmail
+Email:            qmail-bugs@gentoo.org
+Description:      Everything to do with Qmail, and related packages.
+Developers(7):    anarchy hansmi hollow robbat2 st_lim vapier xmerlin*
+
+Herd:             qt
+Email:            qt@gentoo.org
+Description:      Qt and related packages
+Developers(3):    caleb carlo greg_g*
+
+Herd:             ruby
+Email:            ruby@gentoo.org
+Description:      the Ruby programming language
+Developers(5):    caleb citizen428 pythonhead twp* usata
+
+Herd:             samba
+Email:            samba@gentoo.org
+Description:      Handles all issues related to Samba in Gentoo
+Developers(2):    mglauche satya
+
+Herd:             scheme
+Email:            scheme@gentoo.org
+Description:      Scheme compilers, interpreters and libraries.
+Developers(1):    mkennedy
+
+Herd:             sci
+Email:            sci@gentoo.org
+Description:      scientific applications and libraries
+Developers(10):   cryos george kugelfang nerdboy* pbienst phosphan ribosome
+                  sediener spyderous* tchiwam
+
+Herd:             secure-tunneling
+Email:            secure-tunneling@gentoo.org
+Description:      IPSec and VPN and other secure tunneling related packages
+Developers(1):    warpzero
+
+Herd:             shell-tools
+Email:            shell-tools@gentoo.org
+Description:      Tools used from within a shell environment
+Developers(7):    ciaranm ka0ttic kloeri seemant* slarti* swegener* taviso
+
+Herd:             sound
+Email:            sound@gentoo.org
+Description:      media-sound and related packages
+Developers(10):   chainsaw eradicator flameeyes fvdpol jnc kito kzimmerm
+                  luckyduck* pkdawson trapni
+
+Herd:             sparc
+Email:            sparc@gentoo.org
+Description:      Gentoo/Sparc Team
+Developers(16):   bazik* ciaranm cjr eradicator fmmcor gustavoz hardave joker
+                  kumba mcummings* peitholm squash todd weeve wesolows zul
+
+Herd:             sparc-kernel
+Email:            sparc-kernel@gentoo.org
+Description:      Kernel packages for Gentoo/SPARC
+Developers(2):    eradicator joker
+
+Herd:             sysadmin
+Email:            sysadmin@gentoo.org
+Description:      System Administration packages
+Developers(1):    klieber
+
+Herd:             tcltk
+Email:            tcltk@gentoo.org
+Description:      TCL / TK Packages
+Developers(3):    cardoe matsuu ming
+
+Herd:             text-markup
+Email:            text-markup@gentoo.org
+Description:      Docbook-xml, Docbook-sgml, TeX and text utilities
+Developers(5):    leonardop mattam* pclouds* pylon* usata
+
+Herd:             toolchain
+Email:            toolchain@gentoo.org
+Description:      Manages gcc/binutils/glibc and other toolchain-related
+                  packages
+Developers(19):   agriffis avenj azarah dostrow eradicator g2boojum halcy0n
+                  iluxa jhuebel kumba lu_zero lv* method mutex pfeifer
+                  pvdabeel solar* tgall vapier
+
+Herd:             tools-portage
+Email:            tools-portage@gentoo.org
+Description:      Portage-related utilities
+Developers(6):    fuzzyray genone johnm karltk port001 tercel
+
+Herd:             utf8
+Email:            utf8@gentoo.org
+Description:      Improve support for UTF-8 in Gentoo
+Developers(1):    lanius
+
+Herd:             video
+Email:            media-video@gentoo.org
+Description:      Video related programs that don't fit into media-tv
+Developers(10):   arj flameeyes kzimmerm lordvan lu_zero luckyduck* phosphan
+                  pkdawson trapni zypher
+
+Herd:             vim
+Email:            vim@gentoo.org
+Description:      vim-core, vim, gvim and app-vim plugins
+Developers(4):    ciaranm ka0ttic rphillips slarti*
+
+Herd:             vmware
+Email:            vmware@gentoo.org
+Description:      Handles all issues with VMWare and VMWare-releated ebuilds
+                  in Gentoo
+Developers(6):    jhuebel jmglov mattm stuart* vapier wolf31o2
+
+Herd:             voip
+Email:            voip@gentoo.org
+Description:      Voice-over-IP related packages
+Developers(1):    stkn
+
+Herd:             web-apps
+Email:            web-apps@gentoo.org
+Description:      Web based applications and their configuration
+Developers(10):   beu* dju jmglov ka0ttic max rl03 robbat2 st_lim stuart*
+                  trapni
+
+Herd:             wine
+Email:            wine@gentoo.org
+Description:      Wine - System for running windows apps under Linux.
+Developers(3):    coronalvr ganymede svyatogor
+
+Herd:             www-servers
+Email:            www-servers@gentoo.org
+Description:      Web servers other than Apache
+Developers(3):    bass ka0ttic stuart*
+
+Herd:             wxwindows
+Email:            wxwindows@gentoo.org
+Description:      wxGTK and wxPython related packages and applications
+Developers(2):    liquidx pythonhead
+
+Herd:             x11
+Email:            x11@gentoo.org
+Description:      X.Org, XFree86, and related packages
+Developers(8):    azarah battousai* eradicator hhg lu_zero seemant* sekretarz
+                  spyderous*
+
+Herd:             x11-drivers
+Email:            x11-drivers@gentoo.org
+Description:      X11 external drivers packages
+Developers(4):    azarah battousai* eradicator lu_zero
+
+Herd:             x86-kernel
+Email:            x86-kernel@gentoo.org
+Description:      Kernel Packages for Gentoo/x86
+Developers(4):    gregkh* johnm plasmaroo* spock
+
+Herd:             xfce
+Email:            xfce@gentoo.org
+Description:      The XFCE Desktop Environment
+Developers(2):    bcowan dostrow
+
+*[00m Currently away

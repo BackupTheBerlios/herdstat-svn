@@ -1,13 +1,2 @@
-afterstep
-benchmarks
-bsd
-commonbox
-cron
-cvs-utils
-dev-tools
-forensics
-netmon
-shell-tools
-vim
-web-apps
-www-servers
+afterstep benchmarks bsd commonbox cron cvs-utils dev-tools forensics netmon
+ shell-tools vim web-apps www-servers

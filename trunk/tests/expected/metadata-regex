@@ -1,8 +1,16 @@
+app-lala
+No metadata.xml.
+none
+
 app-lala/foomatic
 bar fu
 slarti@gentoo.org
 none
 none
+none
+
+app-misc
+No metadata.xml.
 none
 
 app-misc/foo
@@ -12,10 +20,18 @@ none
 http://www.foo.org
 none
 
+media-libs
+No metadata.xml.
+none
+
 media-libs/libfoo
 No metadata.xml.
 none
 none
+none
+
+sys-ignore
+No metadata.xml.
 none
 
 sys-ignore/fefifofum
@@ -25,12 +41,8 @@ none
 none
 SHORT USELESS LONG DESCRIPTION
 
-sys-libs/pfft
-none
-ka0ttic@gentoo.org
-none
-none
-
+sys-libs
+The sys-libs category contains various system-level libraries.
 
 sys-libs/libfoo
 fu
@@ -38,3 +50,10 @@ none
 GPL-2 BSD
 http://www.gentoo.org/proj/en/libfoo
 libfoo for writing foomatic apps
+
+sys-libs/pfft
+none
+ka0ttic@gentoo.org
+none
+none
+none
