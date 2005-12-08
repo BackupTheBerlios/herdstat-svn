@@ -34,83 +34,6 @@
 using namespace herdstat;
 using namespace gui;
 
-//void
-//add_herd(const portage::Herd& herd, QueryResults * const results)
-//{
-//    const Options& options(GlobalOptions());
-
-//    if (not options.quiet())
-//    {
-//        if (not herd.name().empty())
-//            results->add("Herd", herd.name());
-//        if (not herd.email().empty())
-//            results->add("Email", herd.email());
-//        if (not herd.desc().empty())
-//            results->add("Description", util::tidy_whitespace(herd.desc()));
-
-//        if (options.verbose())
-//            results->add(util::sprintf("Developers(%d)", herd.size()), "");
-//    }
-
-//    if (options.verbose() and not options.quiet())
-//    {
-//        util::ColorMap& color(GlobalColorMap());
-//        const std::string user(util::current_user());
-
-//        portage::Herd::const_iterator i;
-//        for (i = herd.begin() ; i != herd.end() ; ++i)
-//        {
-//            if ((i->user() == user) or not options.color())
-//                results->add(i->email());
-//            else
-//                results->add(color[blue] + i->email() + color[none]);
-
-//            if (not i->name().empty())
-//                results->add(i->name());
-//            if (not i->role().empty())
-//                results->add(i->role());
-//            if (not i->name().empty() or not i->role().empty())
-//                results->add_linebreak();
-//        }
-//    }
-
-//    if ((not options.verbose() and not options.quiet()) or
-//        (not options.verbose() and options.quiet() and not options.count()))
-//        results->add(util::sprintf("Developers(%d)", herd.size()),
-//                        herd.begin(), herd.end());
-//}
-
-//static void
-//add_herds(const portage::Herds& herds, QueryResults * const results)
-//{
-//    const Options& options(GlobalOptions());
-//    util::ColorMap& color(GlobalColorMap());
-
-//    if (options.verbose() and not options.quiet())
-//    {
-//        results->add(util::sprintf("Herds(%d)", herds.size()), "");
-
-//        portage::Herds::size_type n = 1;
-//        portage::Herds::const_iterator h;
-//        for (h = herds.begin() ; h != herds.end() ; ++h)
-//        {
-//            if (options.color())
-//                results->add(color[blue] + h->name() + color[none]);
-//            else
-//                results->add(h->name());
-
-//            if (not h->desc().empty())
-//                results->add(util::tidy_whitespace(h->desc()));
-
-//            if (not options.count() and n != herds.size())
-//                results->add_linebreak();
-//        }
-//    }
-//    else if (not options.count())
-//        results->add(util::sprintf("Herds(%d)", herds.size()),
-//                herds.begin(), herds.end());
-//}
-
 const char * const
 HerdActionHandler::id() const
 {
@@ -120,7 +43,7 @@ HerdActionHandler::id() const
 const char * const
 HerdActionHandler::desc() const
 {
-    return "Get information for the given herd(s).";
+    return "Get information about the given herd(s).";
 }
 
 const char * const
@@ -134,9 +57,6 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 {
     Tab *tab = widgetFactory->createTab();
     tab->set_title(this->id());
-
-    /* ... */
-
     return tab;
 }
 
@@ -200,11 +120,41 @@ HerdActionHandler::do_results(Query& query, QueryResults * const results)
         {
             if (not options.quiet())
             {
-                results->add("Name", h->name());
+                results->add("Herd", h->name());
                 results->add("Email", h->email());
+
+                if (not h->desc().empty())
+                    results->add("Description",
+                            util::tidy_whitespace(h->desc()));
+
+                if (options.verbose())
+                    results->add(util::sprintf("Developers(%d)", h->size()), "");
             }
 
-            results->add(util::sprintf("Developers(%d)", h->size()),
+            if (options.verbose() and not options.quiet())
+            {
+                const std::string user(util::current_user());
+
+                for (portage::Herd::const_iterator i = h->begin() ;
+                        i != h->end() ; ++i)
+                {
+                    if ((i->user() == user) or not options.color())
+                        results->add(i->email());
+                    else
+                        results->add(color[blue] + i->email() + color[none]);
+
+                    if (not i->name().empty())
+                        results->add(i->name());
+                    if (not i->role().empty())
+                        results->add(i->role());
+                    if (not i->name().empty() or not i->role().empty())
+                        results->add_linebreak();
+                }
+            }
+
+            if ((not options.verbose() and not options.quiet()) or
+                (not options.verbose() and options.quiet() and not options.count()))
+                results->add(util::sprintf("Developers(%d)", h->size()),
                          h->begin(), h->end());
 
             if ((q+1) != query.end())
