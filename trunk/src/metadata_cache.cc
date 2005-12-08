@@ -50,17 +50,27 @@ using namespace herdstat;
 using namespace herdstat::portage;
 using namespace herdstat::xml;
 
-MetadataCache::MetadataCache(const std::string &portdir)
-    : _path(GlobalOptions().localstatedir()+METACACHE),
-      _options(GlobalOptions()),
-      _portdir(portdir),
-      _overlays(_options.overlays()),
-      _header(), _stream()
+MetadataCache::MetadataCache()
+    : Cache(GlobalOptions().localstatedir()+METACACHE),
+      _portdir(_options.portdir()),
+      _overlays(_options.overlays())
 {
 }
 
-MetadataCache::~MetadataCache()
+MetadataCache::~MetadataCache() throw()
 {
+}
+
+std::size_t
+MetadataCache::cache_size() const
+{
+    return _metadatas.size();
+}
+
+const char * const
+MetadataCache::name() const
+{
+    return "metadata";
 }
 
 /*
@@ -68,11 +78,11 @@ MetadataCache::~MetadataCache()
  */
 
 bool
-MetadataCache::is_valid() const
+MetadataCache::do_is_valid()
 {
     BacktraceContext c("MetadataCache::is_valid()");
 
-    const util::Stat mcache(_path);
+    const util::Stat mcache(this->path());
     bool valid = false;
 
     const std::string expire(_options.metacache_expire());
@@ -127,21 +137,6 @@ MetadataCache::is_valid() const
             valid = (mcache.size() > 0);
     }
 
-    /* finally, it's only valid if the header is valid */
-    if (valid)
-    {
-        _stream.open(_path);
-        if (not _stream)
-            throw FileException(_path);
-
-        valid = _header.is_valid(_stream);
-
-        /* if it's valid, leave the stream open for load() */
-        if (not valid)
-            _stream.close();
-    }
-
-    debug_msg("metadata cache is valid? %d", valid);
     return valid;
 }
 
@@ -151,7 +146,7 @@ MetadataCache::is_valid() const
  */
 
 void
-MetadataCache::fill()
+MetadataCache::do_fill()
 {
     BacktraceContext c("MetadataCache::fill()");
 
@@ -162,7 +157,7 @@ MetadataCache::fill()
         debug_msg("pkgcache.size() == %d", pkgcache.size());
 
         if (status)
-            progress.start(pkgcache.size(), "Generating metadata.xml cache");
+            progress.start(pkgcache.size(), "Generating metadata.xml cache:");
 
         /* we will contain at most pkgcache.size() elements */
         _metadatas.reserve(pkgcache.size());
@@ -244,30 +239,15 @@ struct MetadataToCacheEntry
 };
 
 void
-MetadataCache::load()
+MetadataCache::do_load(io::BinaryIStream& stream)
 {
     BacktraceContext c("MetadataCache::load()");
 
-    assert(_stream.is_open());
-
-    util::Timer timer;
-    if (_options.timer())
-        timer.start();
-
-    _metadatas.reserve(_header.size());
-    std::transform(io::BinaryIStreamIterator<std::string>(_stream),
+    _metadatas.reserve(this->header_size());
+    std::transform(io::BinaryIStreamIterator<std::string>(stream),
                    io::BinaryIStreamIterator<std::string>(),
                    std::back_inserter(_metadatas),
                    CacheEntryToMetadata());
-
-    if (_options.timer())
-    {
-        timer.stop();
-        _options.outstream() << "Took " << timer.elapsed()
-            << "ms to load the metadata cache." << std::endl;
-    }
-
-    _stream.close();
 }
 
 /*
@@ -275,17 +255,9 @@ MetadataCache::load()
  */
 
 void
-MetadataCache::dump()
+MetadataCache::do_dump(io::BinaryOStream& stream)
 {
     BacktraceContext c("MetadataCache::dump()");
-
-    assert(not _stream.is_open());
-
-    io::BinaryOStream stream(_path);
-    if (not stream)
-        throw FileException(_path);
-    
-    _header.dump(stream, _metadatas.size());
 
     std::transform(_metadatas.begin(), _metadatas.end(),
         io::BinaryOStreamIterator<std::string>(stream),

@@ -27,51 +27,56 @@
 # include "config.h"
 #endif
 
-#include "options.hh"
+#include <herdstat/noncopyable.hh>
+#include <herdstat/io/binary_stream.hh>
+#include "common.hh"
 
-class Cache
+class Cache : private herdstat::Noncopyable
 {
     public:
-        virtual bool is_valid() const = 0;
-        virtual void fill() = 0;
-        virtual void load() = 0;
-        virtual void dump() = 0;
+        virtual ~Cache() throw() { }
+
+        bool is_valid();
+        void fill();
+        void load();
+        void dump();
+
+        inline const std::string& path() const { return _path; }
 
     protected:
-        Cache() { }
-        virtual ~Cache() { }
-};
+        Cache(const std::string& path)
+            : _options(GlobalOptions()), _path(path), _header(), _stream() { }
 
-class herdstat::io::BinaryIStream;
-class herdstat::io::BinaryOStream;
+        virtual std::size_t cache_size() const = 0;
+        virtual const char * const name() const = 0;
+        virtual bool do_is_valid() = 0;
+        virtual void do_fill() = 0;
+        virtual void do_load(herdstat::io::BinaryIStream& stream) = 0;
+        virtual void do_dump(herdstat::io::BinaryOStream& stream) = 0;
 
-class CacheHeader
-{
-    public:
-        virtual ~CacheHeader() { }
-        virtual bool is_valid(herdstat::io::BinaryIStream& stream) const = 0;
-        virtual void dump(herdstat::io::BinaryOStream& stream, std::size_t size) = 0;
+        inline const std::size_t& header_size() const { return _header.size(); }
 
-        const std::size_t& size() const { return _size; }
-
-    protected:
-        void set_size(const std::size_t& size) const { _size = size; }
-
-    private:
-        mutable std::size_t _size;
-};
-
-class PortageCacheHeader : public CacheHeader
-{
-    public:
-        PortageCacheHeader() : _options(GlobalOptions()) { }
-        virtual ~PortageCacheHeader() { }
-
-        virtual bool is_valid(herdstat::io::BinaryIStream& stream) const;
-        virtual void dump(herdstat::io::BinaryOStream& stream, std::size_t size);
-
-    private:
         const Options& _options;
+
+    private:
+        class Header
+        {
+            public:
+                Header() : _options(GlobalOptions()), _size(0) { }
+
+                bool is_valid(herdstat::io::BinaryIStream& stream);
+                void dump(herdstat::io::BinaryOStream& stream,
+                          std::size_t size);
+                const std::size_t& size() const { return _size; }
+
+            private:
+                const Options& _options;
+                std::size_t _size;
+        };
+
+        std::string _path;
+        Header _header;
+        herdstat::io::BinaryIStream _stream;
 };
 
 #endif /* _HAVE_SRC_CACHE_HH */

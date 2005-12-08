@@ -25,15 +25,17 @@
 #endif
 
 #include <herdstat/util/string.hh>
-#include <herdstat/io/binary_stream.hh>
+#include <herdstat/util/timer.hh>
+
+#include "common.hh"
 #include "cache.hh"
 
 using namespace herdstat;
 
 bool
-PortageCacheHeader::is_valid(io::BinaryIStream& stream) const
+Cache::Header::is_valid(io::BinaryIStream& stream)
 {
-    /* package cache header is in the form of:
+    /* cache header is in the form of:
      *  <version>:<portdir>:<overlays (comma separated)>:<size>
      */
 
@@ -51,7 +53,7 @@ PortageCacheHeader::is_valid(io::BinaryIStream& stream) const
     const std::string& version(parts[0]);
     const std::string& portdir(parts[1]);
     const std::string& overlays(parts[2]);
-    const std::string& npkgs(parts[3]);
+    const std::string& size(parts[3]);
 
     /* only valid if cached version is equal to our version */
     if (version != VERSION)
@@ -68,19 +70,103 @@ PortageCacheHeader::is_valid(io::BinaryIStream& stream) const
         return false;
 
     /* number of packages cached */
-    this->set_size(util::destringify<std::size_t>(npkgs));
+    _size = util::destringify<std::size_t>(size);
 
     return true;
 }
 
 void
-PortageCacheHeader::dump(io::BinaryOStream& stream, std::size_t size)
+Cache::Header::dump(io::BinaryOStream& stream, std::size_t size)
 {
-    this->set_size(size);
+    _size = size;
     stream << (std::string(VERSION)+":"+_options.portdir()+":"+
         util::join(_options.overlays().begin(),
                    _options.overlays().end(), ",")+":"+
-        util::stringify(this->size()));
+        util::stringify(_size));
+}
+
+bool
+Cache::is_valid()
+{
+    BacktraceContext c("Cache::is_valid("+_path+")");
+
+    bool valid = false;
+
+    if (this->do_is_valid())
+    {
+        _stream.open(_path);
+        if (not _stream)
+            throw FileException(_path);
+
+        valid = _header.is_valid(_stream);
+
+        /* if valid, keep stream open for load() to use */
+        if (not valid)
+            _stream.close();
+    }
+
+    debug_msg("%s cache is valid? %d",
+        this->name(), valid);
+
+    return valid;
+}
+
+void
+Cache::fill()
+{
+    BacktraceContext c("Cache::fill("+_path+")");
+
+    util::Timer timer;
+    if (_options.timer())
+        timer.start();
+
+    this->do_fill();
+
+    if (_options.timer())
+    {
+        timer.stop();
+        _options.outstream() << "Took " << timer.elapsed()
+            << "ms to fill the " << this->name() << " cache." << std::endl;
+    }
+}
+
+void
+Cache::load()
+{
+    BacktraceContext c("Cache::load("+_path+")");
+
+    assert(_stream.is_open());
+
+    util::Timer timer;
+    if (_options.timer())
+        timer.start();
+
+    this->do_load(_stream);
+
+    if (_options.timer())
+    {
+        timer.stop();
+        _options.outstream() << "Took " << timer.elapsed()
+            << "ms to load the " << this->name() << " cache." << std::endl;
+    }
+
+    _stream.close();
+}
+
+void
+Cache::dump()
+{
+    BacktraceContext c("Cache::dump("+_path+")");
+
+    assert(not _stream.is_open());
+
+    io::BinaryOStream stream(_path);
+    if (not stream)
+        throw FileException(_path);
+
+    _header.dump(stream, this->cache_size());
+
+    this->do_dump(stream);
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

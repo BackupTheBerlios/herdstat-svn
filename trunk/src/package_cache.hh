@@ -27,15 +27,12 @@
 # include "config.h"
 #endif
 
-#include <herdstat/noncopyable.hh>
-#include <herdstat/io/binary_stream.hh>
 #include <herdstat/portage/package_list.hh>
 
 #include "options.hh"
 #include "cache.hh"
 
-class PackageCache : public Cache,
-                     private herdstat::Noncopyable
+class PackageCache : public Cache
 {
     public:
         typedef herdstat::portage::PackageList container_type;
@@ -46,11 +43,6 @@ class PackageCache : public Cache,
 
         virtual ~PackageCache() throw();
 
-        virtual bool is_valid() const;
-        virtual void load();
-        virtual void dump();
-        virtual void fill();
-
         inline operator const container_type&() const { return _pkgs; }
 
         inline const_iterator begin() const { return _pkgs.begin(); }
@@ -58,17 +50,21 @@ class PackageCache : public Cache,
         inline size_type size() const { return _pkgs.size(); }
         inline bool empty() const { return _pkgs.empty(); }
 
+    protected:
+        virtual std::size_t cache_size() const;
+        virtual const char * const name() const;
+        virtual bool do_is_valid();
+        virtual void do_load(herdstat::io::BinaryIStream& stream);
+        virtual void do_dump(herdstat::io::BinaryOStream& stream);
+        virtual void do_fill();
+
     private:
         friend const PackageCache& GlobalPkgCache();
         PackageCache();
 
-        std::string _path;
-        Options& _options;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
         container_type _pkgs;
-        mutable PortageCacheHeader _header;
-        mutable herdstat::io::BinaryIStream _stream;
 };
 
 inline const PackageCache&

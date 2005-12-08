@@ -38,11 +38,9 @@ using namespace herdstat;
 using namespace herdstat::xml;
 
 PackageCache::PackageCache()
-    : _path(GlobalOptions().localstatedir()+PKGCACHE),
-      _options(GlobalOptions()),
+    : Cache(GlobalOptions().localstatedir()+PKGCACHE),
       _portdir(_options.portdir()), _overlays(_options.overlays()),
-      _pkgs(_portdir, _overlays, false),
-      _header(), _stream()
+      _pkgs(_portdir, _overlays, false)
 {
     if (this->is_valid())
         this->load();
@@ -57,12 +55,24 @@ PackageCache::~PackageCache() throw()
 {
 }
 
+const char * const
+PackageCache::name() const
+{
+    return "package";
+}
+
+std::size_t
+PackageCache::cache_size() const
+{
+    return _pkgs.size();
+}
+
 bool
-PackageCache::is_valid() const
+PackageCache::do_is_valid()
 {
     BacktraceContext c("PackageCache::is_valid()");
 
-    const util::Stat pkgcache(_path);
+    const util::Stat pkgcache(this->path());
     bool valid = false;
 
     const std::string& expire(_options.metacache_expire());
@@ -109,43 +119,14 @@ PackageCache::is_valid() const
             valid = (pkgcache.size() > 0);
     }
 
-    /* and finally, it's only valid if the header is valid */
-    if (valid)
-    {
-        _stream.open(_path);
-        if (not _stream)
-            throw FileException(_path);
-
-        valid = _header.is_valid(_stream);
-
-        /* if it's not valid close stream, otherwise keep it open for the call
-         * to load(). */
-        if (not valid)
-            _stream.close();
-    }
-
-    debug_msg("package cache is valid? %d", valid);
-
     return valid;
 }
 
 void
-PackageCache::fill()
+PackageCache::do_fill()
 {
     BacktraceContext c("PackageCache::fill()");
-
-    util::Timer timer;
-    if (_options.timer())
-        timer.start();
-
     _pkgs.fill();
-    
-    if (_options.timer())
-    {
-        timer.stop();
-        _options.outstream() << "Took " << timer.elapsed()
-            << "ms to fill the package cache." << std::endl;
-    }
 }
 
 struct CacheEntryToPackage
@@ -162,30 +143,13 @@ struct CacheEntryToPackage
 };
 
 void
-PackageCache::load()
+PackageCache::do_load(herdstat::io::BinaryIStream& stream)
 {
-    BacktraceContext c("PackageCache::load()");
-
-    assert(_stream.is_open());
-
-    util::Timer timer;
-    if (_options.timer())
-        timer.start();
-
-    _pkgs.reserve(_header.size());
-    std::transform(io::BinaryIStreamIterator<std::string>(_stream),
+    _pkgs.reserve(this->header_size());
+    std::transform(io::BinaryIStreamIterator<std::string>(stream),
                    io::BinaryIStreamIterator<std::string>(),
                    std::back_inserter(_pkgs),
                    CacheEntryToPackage());
-
-    if (_options.timer())
-    {
-        timer.stop();
-        _options.outstream() << "Took " << timer.elapsed()
-            << "ms to load the package cache." << std::endl;
-    }
-
-    _stream.close();
 }
 
 struct PackageToCacheEntry
@@ -198,17 +162,9 @@ struct PackageToCacheEntry
 };
 
 void
-PackageCache::dump()
+PackageCache::do_dump(io::BinaryOStream& stream)
 {
      BacktraceContext c("PackageCache::dump()");
-
-     assert(not _stream.is_open());
-
-     io::BinaryOStream stream(_path);
-     if (not stream)
-         throw FileException(_path);
-
-     _header.dump(stream, _pkgs.size());
 
      std::transform(_pkgs.begin(), _pkgs.end(),
         io::BinaryOStreamIterator<std::string>(stream),

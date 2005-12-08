@@ -28,7 +28,6 @@
 #endif
 
 #include <vector>
-#include <herdstat/io/binary_stream.hh>
 #include <herdstat/portage/metadata.hh>
 
 #include "cache.hh"
@@ -46,27 +45,26 @@ class MetadataCache : public Cache
         typedef container_type::const_iterator const_iterator;
         typedef container_type::size_type size_type;
 
-        MetadataCache(const std::string& portdir);
-        virtual ~MetadataCache();
-
-        virtual bool is_valid() const;
-        virtual void fill();
-        virtual void load();
-        virtual void dump();
+        MetadataCache();
+        virtual ~MetadataCache() throw();
 
         inline const_iterator begin() const;
         inline const_iterator end() const;
         inline size_type size() const;
         inline bool empty() const;
 
+    protected:
+        virtual std::size_t cache_size() const;
+        virtual const char * const name() const;
+        virtual bool do_is_valid();
+        virtual void do_fill();
+        virtual void do_load(herdstat::io::BinaryIStream& stream);
+        virtual void do_dump(herdstat::io::BinaryOStream& stream);
+
     private:
-        std::string _path;
-        Options& _options;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
         container_type _metadatas;
-        mutable PortageCacheHeader _header;
-        mutable herdstat::io::BinaryIStream _stream;
 };
 
 inline MetadataCache::const_iterator
