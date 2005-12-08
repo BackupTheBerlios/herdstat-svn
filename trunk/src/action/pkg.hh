@@ -20,19 +20,16 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_ACTION_PKG_HH
-#define _HAVE_ACTION_PKG_HH 1
+#ifndef _HAVE__PKG_HH
+#define _HAVE__PKG_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/util/regex.hh>
-#include <herdstat/portage/metadata.hh>
-
+#include <set>
+#include <map>
 #include "metadata_cache.hh"
-#include "querycache.hh"
-#include "pkgquery.hh"
 #include "action/handler.hh"
 
 class PkgActionHandler : public ActionHandler
@@ -53,23 +50,19 @@ class PkgActionHandler : public ActionHandler
         virtual gui::Tab *createTab(gui::WidgetFactory *factory);
 
     private:
-        void search(const Query& q, pkgQuery &pq);
-        void search(const Query& q);
-        void add_matches(QueryResults * const results);
-        void add_matches(pkgQuery *pq, QueryResults * const results);
-        bool metadata_matches(const herdstat::portage::Metadata &meta,
-                              const std::string& pkg);
+        typedef std::map<std::string,
+                std::set<herdstat::portage::Metadata> * > matches_type;
 
-        std::map<std::string, pkgQuery *> matches;
-        std::vector<std::string> not_found, packages;
-        MetadataCache mcache;
-        querycache qcache;
-        const bool status;
-        bool cache_is_valid, at_least_one_not_cached;
+        void add_matches(QueryResults * const results);
+        bool metadata_matches(const herdstat::portage::Metadata& meta,
+                              const std::string& criteria);
+
+        matches_type matches;
+        MetadataCache metacache;
         herdstat::util::Regex with;
         herdstat::portage::HerdsXML& herds_xml;
 };
 
-#endif /* _HAVE_ACTION_PKG_HH */
+#endif /* _HAVE__PKG_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

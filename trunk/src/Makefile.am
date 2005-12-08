@@ -14,11 +14,9 @@ herdstat_SOURCES = \
 	rc.hh rc.cc \
 	xmlinit.hh xmlinit.cc \
 	formatter.hh formatter.cc \
-	pkgquery.hh pkgquery.cc \
 	cache.hh cache.cc \
 	package_cache.hh package_cache.cc \
 	metadata_cache.hh metadata_cache.cc \
-	querycache.hh querycache.cc \
 	overlay_display.hh overlay_display.cc \
 	fields.hh \
 	query_base.hh \
