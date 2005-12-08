@@ -118,7 +118,7 @@ PortageSearchActionHandler::is_ambiguous
 {
     return ((pkgs.size() > 1) and not
         (herdstat::util::all_equal(pkgs.begin(), pkgs.end(),
-            herdstat::portage::FullPkgName())));
+            std::mem_fun_ref(&herdstat::portage::Package::full))));
 }
 
 inline herdstat::portage::PackageFinder&

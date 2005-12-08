@@ -106,8 +106,8 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
             std::unique(matches.begin(), matches.end(),
                 util::compose_f_gx_hy(
                     std::equal_to<std::string>(),
-                    portage::FullPkgName(),
-                    portage::FullPkgName())),
+                    std::mem_fun_ref(&portage::Package::full),
+                    std::mem_fun_ref(&portage::Package::full))),
             matches.end());
     }
 
@@ -124,7 +124,8 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
 
         Query q;
         std::transform(matches.begin(), matches.end(),
-            std::back_inserter(q), portage::FullPkgName());
+            std::back_inserter(q),
+            std::mem_fun_ref(&portage::Package::full));
 
         MetaActionHandler mhandler;
         mhandler(q, results);
@@ -134,7 +135,8 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
     }
     else if (not options.count())
         std::transform(matches.begin(), matches.end(),
-            std::back_inserter(*results), portage::FullPkgName());
+            std::back_inserter(*results),
+            std::mem_fun_ref(&portage::Package::full));
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
