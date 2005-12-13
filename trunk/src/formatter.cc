@@ -256,8 +256,11 @@ Format::operator()(const std::pair<std::string, std::string>& pair,
             parts.begin(), std::bind2nd(Highlight(), attrs));
         /* perform any line wrapping */
         out.len = util::strip_colors(out.str).length();
-        std::for_each(parts.begin(), parts.end(),
-            std::bind2nd(Wrap(), &out));
+        if (parts.size() == 1)
+            out.str += parts.front();
+        else
+            std::for_each(parts.begin(), parts.end(),
+                std::bind2nd(Wrap(), &out));
     }
 
     if (out.str[out.str.length() - 1] == ' ')
