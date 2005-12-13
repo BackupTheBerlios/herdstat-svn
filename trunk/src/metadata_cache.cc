@@ -32,7 +32,7 @@
 #include <herdstat/xml/exceptions.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/util/vars.hh>
-#include <herdstat/util/progress.hh>
+#include <herdstat/util/progress/percent.hh>
 #include <herdstat/util/functional.hh>
 #include <herdstat/io/binary_stream_iterator.hh>
 #include <herdstat/portage/config.hh>
@@ -52,6 +52,7 @@ using namespace herdstat::xml;
 
 MetadataCache::MetadataCache()
     : Cache(GlobalOptions().localstatedir()+METACACHE),
+      _spinner(NULL),
       _portdir(_options.portdir()),
       _overlays(_options.overlays())
 {
@@ -151,41 +152,40 @@ MetadataCache::do_fill()
     BacktraceContext c("MetadataCache::fill()");
 
     const bool status = not _options.quiet() and not _options.debug();
+        
+    const PackageCache& pkgcache(GlobalPkgCache(_spinner));
+    debug_msg("pkgcache.size() == %d", pkgcache.size());
+
+    if (_spinner)
+        _spinner->stop();
+
+    util::PercentMeter progress;
+    if (status)
+        progress.start(pkgcache.size(), "Generating metadata.xml cache:");
+
+    /* we will contain at most pkgcache.size() elements */
+    _metadatas.reserve(pkgcache.size());
+
+    const std::string base(_portdir+"/");
+
+    /* for each pkg */
+    PackageCache::const_iterator i, end;
+    for (i = pkgcache.begin(), end = pkgcache.end() ; i != end ; ++i)
     {
-        util::Progress progress;
-        const PackageCache& pkgcache(GlobalPkgCache());
-        debug_msg("pkgcache.size() == %d", pkgcache.size());
-
         if (status)
-            progress.start(pkgcache.size(), "Generating metadata.xml cache:");
+            ++progress;
 
-        /* we will contain at most pkgcache.size() elements */
-        _metadatas.reserve(pkgcache.size());
-
-        const std::string base(_portdir+"/");
-
-        /* for each pkg */
-        PackageCache::const_iterator i, end;
-        for (i = pkgcache.begin(), end = pkgcache.end() ; i != end ; ++i)
+        const std::string path(base+i->full()+"/metadata.xml");
+        if (util::file_exists(path))
         {
-            if (status)
-                ++progress;
-
-            const std::string path(base+i->full()+"/metadata.xml");
-            if (util::file_exists(path))
-            {
-                /* parse it */
-                const MetadataXML meta(path, *i);
-                _metadatas.push_back(meta.data());
-            }
+            /* parse it */
+            const MetadataXML meta(path, *i);
+            _metadatas.push_back(meta.data());
         }
-
-        /* trim unused space */
-        std::vector<Metadata>(_metadatas).swap(_metadatas);
     }
 
-    if (status)
-        std::cout << std::endl;
+    /* trim unused space */
+    std::vector<Metadata>(_metadatas).swap(_metadatas);
 }
 
 /*

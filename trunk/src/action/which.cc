@@ -76,7 +76,7 @@ WhichActionHandler::do_results(Query& query,
             try
             {
                 const std::vector<portage::Package>& res(find().results());
-                find()(q->second);
+                find()(q->second, spinner);
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
 

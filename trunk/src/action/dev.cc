@@ -64,6 +64,9 @@ void
 DevActionHandler::do_init(Query& query, QueryResults * const results)
 {
     BacktraceContext c("DevActionHandler::do_init()");
+
+    ActionHandler::do_init(query, results);
+
     if (not options.userinfoxml().empty())
         GlobalUserinfoXML().parse(options.userinfoxml());
 }

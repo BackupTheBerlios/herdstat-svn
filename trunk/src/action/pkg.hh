@@ -57,6 +57,7 @@ class PkgActionHandler : public ActionHandler
         bool metadata_matches(const herdstat::portage::Metadata& meta,
                               const std::string& criteria);
 
+        herdstat::util::ProgressMeter *_spinner;
         matches_type matches;
         MetadataCache metacache;
         herdstat::util::Regex with;

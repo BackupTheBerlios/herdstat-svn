@@ -76,7 +76,7 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
         {
             try
             {
-                find()(q->second);
+                find()(q->second, spinner);
                 matches.insert(matches.end(),
                     find_results.begin(), find_results.end());
                 find().clear_results();

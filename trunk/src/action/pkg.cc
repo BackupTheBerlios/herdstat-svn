@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/progress/spinner.hh>
+
 #include "common.hh"
 #include "action/meta.hh"
 #include "action/pkg.hh"
@@ -211,6 +213,16 @@ PkgActionHandler::add_matches(QueryResults * const results)
 void
 PkgActionHandler::do_init(Query& query, QueryResults * const results)
 {
+    ActionHandler::do_init(query, results);
+
+    if (not options.quiet() and not options.timer())
+    {
+        assert(spinner == NULL);
+        spinner = new util::Spinner();
+        spinner->start(1000, "Performing query");
+        metacache.set_spinner(spinner);
+    }
+
     this->size() = 0;
 
     /* setup with regex */

@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/progress/spinner.hh>
 #include <herdstat/util/string.hh>
 
 #include "common.hh"
@@ -33,11 +34,16 @@ using namespace herdstat;
 
 ActionHandler::ActionHandler()
     : options(GlobalOptions()),
-      color(GlobalColorMap()), _err(false), _size(-1)
+      color(GlobalColorMap()),
+      spinner(NULL), _err(false), _size(-1)
 {
     regexp.set_cflags(options.eregex() ?
                 util::Regex::icase|util::Regex::extended :
                 util::Regex::icase);
+}
+
+ActionHandler::~ActionHandler()
+{
 }
 
 bool
@@ -79,6 +85,11 @@ ActionHandler::operator()(Query &query, QueryResults * const results)
 }
 
 void
+ActionHandler::do_init(Query& query, QueryResults * const results)
+{
+}
+
+void
 ActionHandler::do_all(Query& query, QueryResults * const results)
 {
     results->add("This handler does not support the all target.");
@@ -93,6 +104,12 @@ ActionHandler::do_cleanup(QueryResults * const results)
         results->add(this->_size);
 
     this->_size = this->_err = 0;
+
+    if (spinner)
+    {
+        delete spinner;
+        spinner = NULL;
+    }
 }
 
 PortageSearchActionHandler::PortageSearchActionHandler()
@@ -107,6 +124,18 @@ PortageSearchActionHandler::~PortageSearchActionHandler()
 }
 
 void
+PortageSearchActionHandler::do_init(Query& query,
+                                    QueryResults * const results)
+{
+    if (not options.quiet() and not options.meta() and not options.timer())
+    {
+        assert(spinner == NULL);
+        spinner = new util::Spinner();
+        spinner->start(1000, "Performing query");
+    }
+}
+
+void
 PortageSearchActionHandler::do_regex(Query& query,
                                      QueryResults * const results)
 {
@@ -116,7 +145,7 @@ PortageSearchActionHandler::do_regex(Query& query,
 
     try
     {
-        matches = find()(regexp);
+        matches = find()(regexp, spinner);
         find().clear_results();
 
         if (not options.overlay())

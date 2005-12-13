@@ -43,7 +43,7 @@ class ActionHandler
 {
     public:
         ActionHandler();
-        virtual ~ActionHandler() { }
+        virtual ~ActionHandler();
 
         /// perform action
         void operator()(Query& query, QueryResults * const results);
@@ -58,7 +58,7 @@ class ActionHandler
         virtual const char * const usage() const;
 
     protected:
-        virtual void do_init(Query& query, QueryResults * const results) { }
+        virtual void do_init(Query& query, QueryResults * const results);
         virtual void do_all(Query& query, QueryResults * const results);
         virtual void do_regex(Query& query, QueryResults * const results) = 0;
         virtual void do_results(Query& query, QueryResults * const results) = 0;
@@ -78,6 +78,7 @@ class ActionHandler
         Options& options;
         herdstat::util::ColorMap& color;
         herdstat::util::Regex regexp;
+        herdstat::util::ProgressMeter *spinner;
 
     private:
         bool _err;
@@ -87,13 +88,15 @@ class ActionHandler
 class PortageSearchActionHandler : public ActionHandler
 {
     public:
-        PortageSearchActionHandler();
         virtual ~PortageSearchActionHandler();
 
+    protected:
+        PortageSearchActionHandler();
+
+        virtual void do_init(Query& query, QueryResults * const results);
         virtual void do_regex(Query& query, QueryResults * const results);
         virtual void do_cleanup(QueryResults * const results);
 
-    protected:
         inline void remove_overlay_packages();
         inline bool is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs);
 
@@ -125,7 +128,7 @@ inline herdstat::portage::PackageFinder&
 PortageSearchActionHandler::find()
 {
     if (not _find)
-        _find = new herdstat::portage::PackageFinder(GlobalPkgCache());
+        _find = new herdstat::portage::PackageFinder(GlobalPkgCache(spinner));
     return *_find;
 }
 

@@ -28,6 +28,7 @@
 #endif
 
 #include <vector>
+#include <herdstat/util/progress/meter.hh>
 #include <herdstat/portage/metadata.hh>
 
 #include "cache.hh"
@@ -53,6 +54,9 @@ class MetadataCache : public Cache
         inline size_type size() const;
         inline bool empty() const;
 
+        inline void set_spinner(herdstat::util::ProgressMeter *spinner)
+        { _spinner = spinner; }
+
     protected:
         virtual std::size_t cache_size() const;
         virtual const char * const name() const;
@@ -62,6 +66,7 @@ class MetadataCache : public Cache
         virtual void do_dump(herdstat::io::BinaryOStream& stream);
 
     private:
+        herdstat::util::ProgressMeter *_spinner;
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
         container_type _metadatas;

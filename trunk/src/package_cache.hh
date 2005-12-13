@@ -59,18 +59,19 @@ class PackageCache : public Cache
         virtual void do_fill();
 
     private:
-        friend const PackageCache& GlobalPkgCache();
-        PackageCache();
+        friend const PackageCache& GlobalPkgCache(herdstat::util::ProgressMeter *);
+        PackageCache(herdstat::util::ProgressMeter *progress);
 
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
         container_type _pkgs;
+        herdstat::util::ProgressMeter *_spinner;
 };
 
 inline const PackageCache&
-GlobalPkgCache()
+GlobalPkgCache(herdstat::util::ProgressMeter *spinner)
 {
-    static PackageCache p;
+    static PackageCache p(spinner);
     return p;
 }
 

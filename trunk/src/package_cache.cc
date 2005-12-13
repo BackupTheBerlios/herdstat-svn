@@ -25,6 +25,8 @@
 #endif
 
 #include <herdstat/util/string.hh>
+#include <herdstat/util/progress/meter.hh>
+#include <herdstat/util/progress/spinner.hh>
 #include <herdstat/xml/exceptions.hh>
 #include <herdstat/io/binary_stream_iterator.hh>
 
@@ -37,10 +39,11 @@
 using namespace herdstat;
 using namespace herdstat::xml;
 
-PackageCache::PackageCache()
+PackageCache::PackageCache(herdstat::util::ProgressMeter *progress)
     : Cache(GlobalOptions().localstatedir()+PKGCACHE),
       _portdir(_options.portdir()), _overlays(_options.overlays()),
-      _pkgs(_portdir, _overlays, false)
+      _pkgs(_portdir, _overlays, false),
+      _spinner(progress)
 {
     if (this->is_valid())
         this->load();
@@ -126,18 +129,24 @@ void
 PackageCache::do_fill()
 {
     BacktraceContext c("PackageCache::fill()");
-    _pkgs.fill();
+
+    _pkgs.fill(_spinner);
 }
 
 struct CacheEntryToPackage
+    : std::binary_function<std::string, util::ProgressMeter *, portage::Package>
 {
     portage::Package
-    operator()(const std::string& entry) const
+    operator()(const std::string& entry, util::ProgressMeter *progress) const
     {
+        if (progress)
+            ++*progress;
+
         std::string::size_type pos = entry.find(':');
         if (pos == std::string::npos)
             throw ParserException(GlobalOptions().localstatedir()+PKGCACHE,
                                   "Invalid format: '"+entry+"'.");
+
         return portage::Package(entry.substr(0, pos), entry.substr(pos+1));
     }
 };
@@ -149,7 +158,7 @@ PackageCache::do_load(herdstat::io::BinaryIStream& stream)
     std::transform(io::BinaryIStreamIterator<std::string>(stream),
                    io::BinaryIStreamIterator<std::string>(),
                    std::back_inserter(_pkgs),
-                   CacheEntryToPackage());
+                   std::bind2nd(CacheEntryToPackage(), _spinner));
 }
 
 struct PackageToCacheEntry
