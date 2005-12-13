@@ -136,7 +136,6 @@ fetch_herdsxml()
 portage::HerdsXML&
 GlobalHerdsXML()
 {
-    BacktraceContext c("GlobalHerdsXML()");
     static portage::HerdsXML h;
     return h;
 }
@@ -144,7 +143,6 @@ GlobalHerdsXML()
 portage::DevawayXML&
 GlobalDevawayXML()
 {
-    BacktraceContext c("GlobalDevawayXML()");
     static portage::DevawayXML d;
     return d;
 }
@@ -152,7 +150,6 @@ GlobalDevawayXML()
 portage::UserinfoXML&
 GlobalUserinfoXML()
 {
-    BacktraceContext c("GlobalUserinfoXML()");
     static portage::UserinfoXML u;
     return u;
 }
@@ -160,7 +157,6 @@ GlobalUserinfoXML()
 util::ColorMap&
 GlobalColorMap()
 {
-    BacktraceContext c("GlobalColorMap()");
     static util::ColorMap cm;
     return cm;
 }
