@@ -74,17 +74,22 @@ BatchIOHandler::operator()(Query * const query)
         if (parts.empty())
             throw Exception("Failed to parse input!");
 
-        ActionHandler *h = local_handler(parts.front());
+        query->set_action(parts.front());
+        parts.erase(parts.begin());
+
+        ActionHandler *h = local_handler(query->action());
         if (not h)
         {
             HandlerMap<ActionHandler>&
                 global_handlers(GlobalHandlerMap<ActionHandler>());
-            if (not (h = global_handlers[parts.front()]))
-                throw ActionUnimplemented(parts.front());
+            HandlerMap<ActionHandler>::iterator i =
+                global_handlers.find(query->action());
+            if (i == global_handlers.end() or not i->second)
+                throw ActionUnimplemented(query->action());
+            else
+                h = i->second;
         }
 
-        query->set_action(parts.front());
-        parts.erase(parts.begin());
         init_xml_if_necessary(query->action());
 
         /* transform arguments into the query object */

@@ -142,8 +142,12 @@ ReadLineIOHandler::operator()(Query * const query)
         {
             HandlerMap<ActionHandler>&
                 global_handlers(GlobalHandlerMap<ActionHandler>());
-            if (not (h = global_handlers[query->action()]))
+            HandlerMap<ActionHandler>::iterator i =
+                global_handlers.find(query->action());
+            if (i == global_handlers.end() or not i->second)
                 throw ActionUnimplemented(query->action());
+            else
+                h = i->second;
         }
 
         init_xml_if_necessary(query->action());

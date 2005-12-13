@@ -69,7 +69,8 @@ IOHandler::insert_local_handler(const std::string& name)
 inline ActionHandler *
 IOHandler::local_handler(const std::string& name)
 {
-    return _local[name];
+    HandlerMap<ActionHandler>::iterator i = _local.find(name);
+    return (i == _local.end() ? NULL : i->second);
 }
 
 inline bool
