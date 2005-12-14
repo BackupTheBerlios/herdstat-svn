@@ -63,6 +63,13 @@ Display results matching the specified regular expression.
 .B "\-E, \-\-extended"
 Use extended regular expressions.  Implies --regex.
 .TP
+.B "\-i, \-\-iomethod \fI<frontend>\fR"
+Choose which front-end to use.  The default front-end is "stream" which is the
+normal CLI front-end.  Possible front-ends include: batch, readline, gtk, qt.
+These front-ends are also available via installed symbolic links.  For example,
+running 'herdstat-rl' is equivelent to using 'herdstat \-i readline'.  The only
+exception to this is the batch front-end, which is available via 'herdstat \-'.
+.TP
 .B "\-p, \-\-package"
 Display package information for the specified herd(s) or developer(s).  If --metadata
 is specified, show the metadata for each package in the list instead of the list itself.
@@ -82,6 +89,9 @@ Display full path to ebuild for the specified package(s).
 .TP
 .B "\-\-versions"
 Display versions of the specified package(s).
+.TP
+.B "\-k, \-\-keywords"
+Display keywords for the specified packages.
 .TP
 .B "\-f, \-\-find"
 Display full package name (in category/package form) for the specified packages.
@@ -118,11 +128,8 @@ Complain loudly if a QA-related problem occurs (rather than just ignoring it).
 For example, if --qa is specified and a category is listed in ${PORTDIR}/profiles/categories
 that does not exist, @PACKAGE@ will fail with an error message.
 .TP
-.B "\-X, \-\-field \fI<field,criteria>\fR"
-Search by the given field rather than the default.  For example, with --dev the default
-field is the developer's user name.  Using --field, it is possible to search by other means.
-\-\-field=status,retired shows retired developers.  The second arg, \fIcriteria\fR is interpreted
-as a regular expression (or an extended regular expression if \-E is specified).
+.B "\-S, \-\-no\-spinner"
+Don't display the spinner when performing a query.
 .SH "NON-OPTION ARGUMENTS"
 Unless you specify --version or --help, at least one non-option argument is
 required.  The non-option arguments depend on the action:

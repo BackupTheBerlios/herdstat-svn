@@ -1,6 +1,13 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
+1.1.90:
+    - Complete redesign; input/output has been completely separated from
+      action handlers allowing us to write front-ends.  Currently provided
+      front-ends: batch (read from stdin, write to stdout), stream (the previous
+      default CLI interface), and readline (nice prompt with command-line
+      history).  Planned front-ends: gtk, qt.
+
 1.1.2_rc2:
     - Added a few more tests.
 

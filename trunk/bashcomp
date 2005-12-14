@@ -31,7 +31,7 @@ _complete_dev()
 }
 
 _herdstat() {
-    local cur prev opts
+    local cur prev opts iomethods
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -41,7 +41,9 @@ _herdstat() {
         --with-herd -w --which --versions --no-overlay -r --regex
         -E --extended -f --find --qa --with-maintainer --no-maintainer
         -a --away --nometacache -A --devaway -L --localstatedir
-        -C --gentoo-cvs -U --userinfo --field"
+        -C --gentoo-cvs -U --userinfo -k --keywords -i --iomethod
+        -S --no-spinner"
+    iomethods="batch readline gtk qt"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -54,6 +56,9 @@ _herdstat() {
     case "${prev}" in
         --field|-X)
             COMPREPLY=()
+            ;;
+        -i|--iomethod)
+            COMPREPLY=( $(compgen -W "${iomethods}" -- ${cur}) )
             ;;
 	-H|--herdsxml|-o|--outfile|-A|--devaway|-U|--userinfo)
 	    COMPREPLY=( $(compgen -f -- ${cur}) )
@@ -70,7 +75,7 @@ _herdstat() {
         --with-maintainer)
             COMPREPLY=( $(compgen -W "$(_complete_dev) none" -- ${cur}) )
             ;;
-        -m|--metadata|-w|--which|--versions|-f|--find)
+        -m|--metadata|-w|--which|--versions|-f|--find|-k|--keywords)
             local words p=$(_portdir)
             
             [[ -d ${p} ]] || return 0
