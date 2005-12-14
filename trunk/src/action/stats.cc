@@ -58,14 +58,15 @@ StatsActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-StatsActionHandler::do_regex(Query& query, QueryResults * const results)
+StatsActionHandler::do_regex(Query& query LIBHERDSTAT_UNUSED,
+                             QueryResults * const results)
 {
     results->add("This action does not support regular expressions.");
     throw ActionException();
 }
 
 void
-StatsActionHandler::do_results(Query& query,
+StatsActionHandler::do_results(Query& query LIBHERDSTAT_UNUSED,
                                QueryResults * const results)
 {
     BacktraceContext c("StatsActionHandler::do_results()");

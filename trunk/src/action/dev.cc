@@ -72,7 +72,8 @@ DevActionHandler::do_init(Query& query, QueryResults * const results)
 }
 
 void
-DevActionHandler::do_all(Query& query, QueryResults * const results)
+DevActionHandler::do_all(Query& query,
+                         QueryResults * const results LIBHERDSTAT_UNUSED)
 {
     BacktraceContext c("DevActionHandler::do_all()");
 

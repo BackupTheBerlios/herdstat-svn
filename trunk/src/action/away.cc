@@ -62,7 +62,8 @@ AwayActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-AwayActionHandler::do_all(Query& query, QueryResults * const results)
+AwayActionHandler::do_all(Query& query,
+                          QueryResults * const results LIBHERDSTAT_UNUSED)
 {
     const portage::Developers& devs(GlobalDevawayXML().devs());
     std::transform(devs.begin(), devs.end(),

@@ -26,6 +26,7 @@
 
 #include "exceptions.hh"
 #include "io/action/handler.hh"
+#include <herdstat/defs.hh>
 
 using namespace gui;
 
@@ -36,19 +37,21 @@ IOActionHandler::allow_empty_query() const
 }
 
 void
-IOActionHandler::do_all(Query& query, QueryResults * const results)
+IOActionHandler::do_all(Query& query LIBHERDSTAT_UNUSED,
+                        QueryResults * const results)
 {
     results->add("This action does not support the 'all' target.");
     throw ActionException();
 }
 
 void
-IOActionHandler::do_regex(Query& query, QueryResults * const results)
+IOActionHandler::do_regex(Query& query LIBHERDSTAT_UNUSED,
+                          QueryResults * const results LIBHERDSTAT_UNUSED)
 {
 }
 
 Tab *
-IOActionHandler::createTab(WidgetFactory* widgetFactory)
+IOActionHandler::createTab(WidgetFactory* widgetFactory LIBHERDSTAT_UNUSED)
 {
     /* by default, these action handlers dont have tabs as the majority
      * of these actions are non-gui actions. */
