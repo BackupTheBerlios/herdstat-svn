@@ -69,7 +69,7 @@ using namespace herdstat::portage;
 using namespace herdstat::xml;
 
 // {{{ getopt stuff
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:ki:";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:ki:S";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -120,11 +120,13 @@ static struct option long_opts[] =
     {"field",	    required_argument,	0,  'X'},
     {"keywords",    no_argument,	0,  'k'},
     {"iomethod",    required_argument,  0,  'i'},
+    {"no-spinner",  no_argument,        0,  'S'},
     { 0, 0, 0, 0 }
 };
 #endif /* HAVE_GETOPT_LONG */
 // }}}
 
+// {{{ version()
 static void
 version()
 {
@@ -161,6 +163,7 @@ version()
 
     << std::endl;
 }
+// }}}
 
 static void
 usage()
@@ -229,6 +232,7 @@ help()
 	<< "                         items themself." << std::endl
 	<< " -n, --nocolor           Don't display colored output." << std::endl
 	<< "     --qa                Complain loudly if a QA-related problem occurs." << std::endl
+        << " -S, --no-spinner        Don't show a spinner when performing a query." << std::endl
 	<< std::endl
 	<< "Where [args] depends on the specified action:" << std::endl
 	<< " default action          1 or more herds." << std::endl
@@ -395,6 +399,7 @@ handle_opts(int argc, char **argv, Query *q)
 		    throw argsOneActionOnly();
 		q->set_action("versions");
 		break;
+            /* --keywords */
 	    case 'k':
 		if (q->action() != "unspecified")
 		    throw argsOneActionOnly();
@@ -522,6 +527,10 @@ handle_opts(int argc, char **argv, Query *q)
 	    case 'V':
 		throw argsVersion();
 		break;
+            /* --no-spinner */
+            case 'S':
+                options.set_spinner(false);
+                break;
 	    /* --help */
 	    case 'h':
 		throw argsHelp();
@@ -554,7 +563,7 @@ handle_opts(int argc, char **argv, Query *q)
 	    action != "dev" and
 	    action != "versions" and
 	    action != "fetch" and
-	    action != "kw" and
+	    action != "keywords" and
 	    (options.iomethod() == "stream"))
 	    throw argsUsage();
     }

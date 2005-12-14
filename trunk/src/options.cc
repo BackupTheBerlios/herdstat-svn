@@ -37,6 +37,7 @@ Options::Options()
       _dev(false), _count(false), _color(true), _overlay(true),
       _eregex(false), _regex(false), _qa(false), _meta(false),
       _metacache(true), _querycache(true), _devaway(true), _fetch(false),
+      _spinner(true),
       _querycache_max(100), _querycache_expire(84600), _devaway_expire(84600),
       _maxcol(79), _outstream(&std::cout), _outfile("stdout"),
       _localstatedir(LOCALSTATEDIR), _labelcolor("green"),

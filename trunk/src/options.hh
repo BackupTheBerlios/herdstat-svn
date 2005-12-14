@@ -71,6 +71,9 @@ class Options : private herdstat::Noncopyable
         void set_devaway(bool v)  { _devaway = v; }
         bool fetch() const { return _fetch; }
         void set_fetch(bool v) { _fetch = v; }
+        bool spinner() const
+        { return (_spinner and not _quiet and not _debug and not _timer); }
+        void set_spinner(bool v) { _spinner = v; }
         
         const int& querycache_max() const { return _querycache_max; }
         void set_querycache_max(int v) { _querycache_max = v; }
@@ -145,6 +148,7 @@ class Options : private herdstat::Noncopyable
         bool _querycache;
         bool _devaway;
         bool _fetch;
+        bool _spinner;
 
         int _querycache_max;
         long _querycache_expire;
