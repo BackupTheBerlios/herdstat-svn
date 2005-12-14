@@ -48,6 +48,13 @@ class ActionHandler
         /// perform action
         void operator()(Query& query, QueryResults * const results);
 
+        /** this handler allows using data found in ${PWD} to be used as the
+          * query?
+          */
+        virtual bool allow_pwd_query() const;
+        /// Generate query based on data in ${PWD}.
+        virtual void handle_pwd_query(Query * const query,
+                                      QueryResults * const results);
         /// this handler allows empty query objects to be passed?
         virtual bool allow_empty_query() const;
         /// action identifier string
@@ -90,6 +97,9 @@ class PortageSearchActionHandler : public ActionHandler
     public:
         virtual ~PortageSearchActionHandler();
 
+        virtual void handle_pwd_query(Query * const query,
+                                      QueryResults * const results);
+
     protected:
         PortageSearchActionHandler();
 
@@ -101,11 +111,14 @@ class PortageSearchActionHandler : public ActionHandler
         inline bool is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs);
 
         inline herdstat::portage::PackageFinder& find();
+        inline bool pwd_mode() const { return _pwd; }
+        inline void set_pwd_mode(bool v) { _pwd = v; }
 
         std::vector<herdstat::portage::Package> matches;
 
     private:
         herdstat::portage::PackageFinder *_find;
+        bool _pwd;
 };
 
 inline void

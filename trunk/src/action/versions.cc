@@ -37,7 +37,7 @@ using namespace herdstat;
 using namespace gui;
 
 bool
-VersionsActionHandler::allow_empty_query() const
+VersionsActionHandler::allow_pwd_query() const
 {
     return true;
 }
@@ -76,44 +76,10 @@ VersionsActionHandler::do_results(Query& query,
     BacktraceContext c("VersionsActionHandler::do_results()");
 
     OverlayDisplay od(results);
-    std::string dir;
-    bool pwd = false;
 
     this->size() = 0;
 
-    if (query.empty())
-    {
-        /* are we in a package's directory? */
-        if (not portage::in_pkg_dir())
-        {
-            results->add("You must be in a package directory if you want to run this handler without arguments.");
-            throw ActionException();
-        }
-
-        unsigned short depth = 2;
-        std::string leftover;
-        std::string path(util::getcwd());
-
-        while (depth > 0)
-        {
-            std::string::size_type pos = path.rfind('/');
-            if (pos != std::string::npos)
-            {
-                leftover = (leftover.empty() ? path.substr(pos + 1) :
-                                               path.substr(pos + 1)+"/"+leftover);
-                path.erase(pos);
-            }
-            --depth;
-        }
-        
-        /* now assign portdir to our path, treating the leftovers as the
-         * category or category/package */
-        pwd = true;
-        dir = path;
-        query.add(leftover);
-    }
-
-    if (not options.regex())
+    if (not options.regex() and not pwd_mode())
     {
         for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
         {
@@ -164,12 +130,13 @@ VersionsActionHandler::do_results(Query& query,
 
         this->size() += versions.size();
 
-        if (m->portdir() != options.portdir() and not pwd)
+        if (m->portdir() != options.portdir() and not pwd_mode())
             od.insert(m->portdir());
 
         if (not options.quiet())
         {
-            results->add("Package", (m->portdir() == options.portdir() or pwd) ?
+            results->add("Package",
+                    (m->portdir() == options.portdir() or pwd_mode()) ?
                         m->full() : m->full()+od[m->portdir()]);
             std::transform(versions.begin(), versions.end(),
                     std::back_inserter(*results),

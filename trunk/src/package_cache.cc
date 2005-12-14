@@ -129,7 +129,6 @@ void
 PackageCache::do_fill()
 {
     BacktraceContext c("PackageCache::fill()");
-
     _pkgs.fill(_spinner);
 }
 

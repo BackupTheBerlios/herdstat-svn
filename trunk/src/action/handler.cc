@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/defs.hh>
 #include <herdstat/util/progress/spinner.hh>
 #include <herdstat/util/string.hh>
 
@@ -43,6 +44,22 @@ ActionHandler::ActionHandler()
 }
 
 ActionHandler::~ActionHandler()
+{
+    if (spinner)
+        delete spinner;
+}
+
+bool
+ActionHandler::allow_pwd_query() const
+{
+    /* by default, action handlers don't support
+     * getting query data from ${PWD} */
+    return false;
+}
+
+void
+ActionHandler::handle_pwd_query(Query * const query LIBHERDSTAT_UNUSED,
+                                QueryResults * const results LIBHERDSTAT_UNUSED)
 {
 }
 
@@ -65,32 +82,42 @@ ActionHandler::operator()(Query &query, QueryResults * const results)
 {
     BacktraceContext c("ActionHandler::operator()");
 
-    this->do_init(query, results);
+    try
+    {
+        this->do_init(query, results);
 
-    /* handle all target */
-    if (query.all())
-        this->do_all(query, results);
-    /* handle regex */
-    else if (options.regex())
-        this->do_regex(query, results);
+        /* handle all target */
+        if (query.all())
+            this->do_all(query, results);
+        /* handle regex */
+        else if (options.regex())
+            this->do_regex(query, results);
 
-    /* fill results */
-    this->do_results(query, results);
+        /* fill results */
+        this->do_results(query, results);
 
-    /* if the handler didnt set the size, default to query.size() */
-    if (this->_size == -1)
-        this->_size = query.size();
+        /* if the handler didnt set the size, default to query.size() */
+        if (this->_size == -1)
+            this->_size = query.size();
 
-    this->do_cleanup(results);
+        this->do_cleanup(results);
+    }
+    catch (const ActionException&)
+    {
+        this->do_cleanup(results);
+        throw;
+    }
 }
 
 void
-ActionHandler::do_init(Query& query, QueryResults * const results)
+ActionHandler::do_init(Query& query LIBHERDSTAT_UNUSED,
+                       QueryResults * const results LIBHERDSTAT_UNUSED)
 {
 }
 
 void
-ActionHandler::do_all(Query& query, QueryResults * const results)
+ActionHandler::do_all(Query& query LIBHERDSTAT_UNUSED,
+                      QueryResults * const results)
 {
     results->add("This handler does not support the all target.");
     throw ActionException();
@@ -105,15 +132,17 @@ ActionHandler::do_cleanup(QueryResults * const results)
 
     this->_size = this->_err = 0;
 
-    if (spinner)
-    {
-        delete spinner;
-        spinner = NULL;
-    }
+    if (spinner and spinner->started())
+        spinner->stop();
+//    if (spinner)
+//    {
+//        delete spinner;
+//        spinner = NULL;
+//    }
 }
 
 PortageSearchActionHandler::PortageSearchActionHandler()
-    : matches(), _find(NULL)
+    : matches(), _find(NULL), _pwd(false)
 {
 }
 
@@ -124,14 +153,38 @@ PortageSearchActionHandler::~PortageSearchActionHandler()
 }
 
 void
-PortageSearchActionHandler::do_init(Query& query,
-                                    QueryResults * const results)
+PortageSearchActionHandler::handle_pwd_query
+    (Query * const query LIBHERDSTAT_UNUSED,
+     QueryResults * const results)
 {
-    if (not options.quiet() and not options.meta() and not options.timer())
+    const std::string pwd(util::getcwd());
+
+    if (portage::is_pkg_dir(pwd))
     {
-        assert(spinner == NULL);
-        spinner = new util::Spinner();
-        spinner->start(1000, "Performing query");
+        matches.push_back(portage::Package(
+                            portage::get_pkg_from_path(pwd),
+                            util::dirname(util::dirname(pwd))));
+    }
+    else
+    {
+        results->add("You must be in a package directory if you want to run this handler without arguments.");
+        throw ActionException();
+    }
+
+    set_pwd_mode(true);
+}
+
+void
+PortageSearchActionHandler::do_init(Query& query LIBHERDSTAT_UNUSED,
+                                    QueryResults * const results LIBHERDSTAT_UNUSED)
+{
+    if (options.spinner() and not options.meta())
+    {
+//        assert(spinner == NULL);
+        if (not spinner)
+            spinner = new util::Spinner();
+        if (not spinner->started())
+            spinner->start(1000, "Performing query");
     }
 }
 
@@ -169,6 +222,7 @@ PortageSearchActionHandler::do_cleanup(QueryResults * const results)
 {
     ActionHandler::do_cleanup(results);
     matches.clear();
+    _pwd = false;
 
     if (options.timer())
         options.outstream() << "Took " << find().elapsed()

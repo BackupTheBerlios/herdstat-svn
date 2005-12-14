@@ -6,7 +6,7 @@ else
     function eend() { : ; }
 fi
 
-[[ -z "${srcdir}" ]] && srcdir=.
+srcdir=$(pwd)
 
 get_caller() {
     local x=${1##*/}

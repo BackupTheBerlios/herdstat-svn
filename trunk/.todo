@@ -5,9 +5,6 @@
     <note priority="veryhigh" time="1130062506">
         Allow keywords action handler to only show keywords for a specific version.
     </note>
-    <note priority="veryhigh" time="1131532452">
-        Write something generic for those action handlers that accept empty queries for working in ${PWD}
-    </note>
     <note priority="high" time="1129831232">
         Add some kind of --extract option for only displaying a certain piece of info about something. Fex, 'herdstat -d ka0ttic --extract birthday'
     </note>
@@ -21,9 +18,6 @@
         </note>
         <note priority="veryhigh" time="1134468115">
             Update examples
-        </note>
-        <note priority="high" time="1134468153">
-            See #2
         </note>
     </note>
     <note priority="verylow" time="1126623676">

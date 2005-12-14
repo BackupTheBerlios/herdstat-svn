@@ -38,7 +38,7 @@ using namespace herdstat;
 using namespace gui;
 
 bool
-KeywordsActionHandler::allow_empty_query() const
+KeywordsActionHandler::allow_pwd_query() const
 {
     return true;
 }
@@ -87,44 +87,10 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
     BacktraceContext c("KeywordsActionHandler::do_results()");
 
     OverlayDisplay od(results);
-    std::string dir;
-    bool pwd = false;
 
     this->size() = 0;
 
-    if (query.empty())
-    {
-        /* are we in a package's directory? */
-        if (not portage::in_pkg_dir())
-        {
-            results->add("You must be in a package directory if you want to run this handler without arguments.");
-            throw ActionException();
-        }
-
-        unsigned short depth = 2;
-        std::string leftover;
-        std::string path(util::getcwd());
-
-        while (depth > 0)
-        {
-            std::string::size_type pos = path.rfind('/');
-            if (pos != std::string::npos)
-            {
-                leftover = (leftover.empty() ? path.substr(pos + 1) :
-                                               path.substr(pos + 1)+"/"+leftover);
-                path.erase(pos);
-            }
-            --depth;
-        }
-        
-        /* now assign portdir to our path, treating the leftovers as the
-         * category or category/package */
-        pwd = true;
-        dir = path;
-        query.add(leftover);
-    }
-
-    if (not options.regex())
+    if (not options.regex() and not pwd_mode())
     {
         
         for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
@@ -176,11 +142,12 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 
         this->size() += keywords.size();
 
-        if (m->in_overlay() and not pwd)
+        if (m->in_overlay() and not pwd_mode())
             od.insert(m->portdir());
 
         if (not options.quiet())
-            results->add("Package", (m->portdir() == options.portdir() or pwd) ?
+            results->add("Package",
+                    (m->portdir() == options.portdir() or pwd_mode()) ?
                         m->full() : m->full()+od[m->portdir()]);
 
         if (not options.count())

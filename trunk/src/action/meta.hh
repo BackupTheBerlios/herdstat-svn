@@ -34,12 +34,16 @@ class MetaActionHandler : public PortageSearchActionHandler
     public:
         virtual ~MetaActionHandler() { }
 
-        virtual bool allow_empty_query() const;
+        virtual bool allow_pwd_query() const;
+        virtual void handle_pwd_query(Query * const query,
+                                      QueryResults * const results);
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
         
     protected:
+        friend class PkgActionHandler;
+
         virtual void do_results(Query& query, QueryResults * const results);
         virtual gui::Tab *createTab(gui::WidgetFactory *factory);
 };

@@ -26,6 +26,7 @@
 
 #include <functional>
 
+#include <herdstat/util/misc.hh>
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/package_which.hh>
@@ -42,9 +43,35 @@ using namespace herdstat;
 using namespace gui;
 
 bool
-MetaActionHandler::allow_empty_query() const
+MetaActionHandler::allow_pwd_query() const
 {
     return true;
+}
+
+void
+MetaActionHandler::handle_pwd_query(Query * const query,
+                                    QueryResults * const results)
+{
+    const std::string pwd(util::getcwd());
+
+    if (portage::is_pkg_dir(pwd))
+    {
+        matches.push_back(portage::Package(
+                            portage::get_pkg_from_path(pwd),
+                            util::dirname(util::dirname(pwd))));
+    }
+    else if (portage::is_category(util::basename(pwd)))
+    {
+        matches.push_back(portage::Package(util::basename(pwd),
+                                           util::dirname(pwd)));
+    }
+    else
+    {
+        results->add("You must be in a package directory or category if you want to run the meta action handler with no arguments.");
+        throw ActionException();
+    }
+
+    set_pwd_mode(true);
 }
 
 const char * const
@@ -229,51 +256,15 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
     BacktraceContext c("MetaActionHandler::do_results()");
 
     OverlayDisplay od(results);
-    bool pwd = false;
-    std::string dir;
-
     options.set_count(false);
 
-//    if (query.empty() and matches.empty())
-//    {
-//        unsigned short depth = 0;
-
-//        /* are we in a package directory? */
-//        if (portage::in_pkg_dir())
-//            depth = 2;
-//        /* nope but a metadata exists, so assume we're in a category */
-//        else if (util::is_file("metadata.xml"))
-//            depth = 1;
-//        else
-//        {
-//            results->add("You must be in a package directory or category if you want to run the meta action handler with no arguments.");
-//            throw ActionException();
-//        }
-
-//        std::string leftover;
-//        std::string path(util::getcwd());
-//        while (depth > 0)
-//        {
-//            std::string::size_type pos = path.rfind('/');
-//            if (pos != std::string::npos)
-//            {
-//                leftover = (leftover.empty() ?
-//                        path.substr(pos + 1) :
-//                        path.substr(pos + 1) + "/" + leftover);
-//                path.erase(pos);
-//            }
-//            --depth;
-//        }
-
-//        pwd = true;
-//        dir = path;
-//        query.add(leftover);
-//    }
-
-    if (not options.regex())
+    if (not options.regex() and not pwd_mode())
     {
         for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
         {
+            if (spinner)
+                ++*spinner;
+
             try
             {
                 const std::vector<portage::Package>& res(find().results());
@@ -348,13 +339,16 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
     std::vector<portage::Package>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
+        if (spinner)
+            ++*spinner;
+
         metadata_data data;
         data.portdir = m->portdir();
         data.pkg = m->full();
 
         data.path = data.portdir + "/" + data.pkg + "/metadata.xml";
 
-        if (data.portdir != options.portdir() and not pwd)
+        if (data.portdir != options.portdir() and not pwd_mode())
             od.insert(data.portdir);
 
         data.is_category = (data.pkg.rfind('/') == std::string::npos);
@@ -362,7 +356,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
         if (m != matches.begin())
             results->add_linebreak();
 
-        if (data.portdir == options.portdir() or pwd)
+        if (data.portdir == options.portdir() or pwd_mode())
             results->add(data.is_category ? "Category" : "Package", data.pkg);
         else
             results->add(data.is_category ? "Category" : "Package",

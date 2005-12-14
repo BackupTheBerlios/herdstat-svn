@@ -215,11 +215,13 @@ PkgActionHandler::do_init(Query& query, QueryResults * const results)
 {
     ActionHandler::do_init(query, results);
 
-    if (not options.quiet() and not options.timer())
+    if (options.spinner())
     {
-        assert(spinner == NULL);
-        spinner = new util::Spinner();
-        spinner->start(1000, "Performing query");
+//        assert(spinner == NULL);
+        if (not spinner)
+            spinner = new util::Spinner();
+        if (not spinner->started())
+            spinner->start(1000, "Performing query");
         metacache.set_spinner(spinner);
     }
 
@@ -251,6 +253,9 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
     MetadataCache::const_iterator m;
     for (m = metacache.begin() ; m != metacache.end() ; ++m)
     {
+        if (spinner)
+            ++*spinner;
+
         for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
         {
             const std::string& criteria(q->second);
@@ -296,7 +301,11 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
         }
 
         if (matches.empty())
+        {
+            if (spinner and spinner->started())
+                spinner->stop();
             throw ActionException();
+        }
         else
             results->add_linebreak();
     }
@@ -324,7 +333,7 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
         }
 
         MetaActionHandler mh;
-        mh(q, results);
+        mh.do_results(q, results);
 
         options.set_regex(re);
         options.set_eregex(ere);

@@ -61,7 +61,8 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
-HerdActionHandler::do_all(Query& query, QueryResults * const results)
+HerdActionHandler::do_all(Query& query,
+                          QueryResults * const results LIBHERDSTAT_UNUSED)
 {
     BacktraceContext c("HerdActionHandler::do_all()");
     const portage::Herds& herds(GlobalHerdsXML().herds());
@@ -71,7 +72,8 @@ HerdActionHandler::do_all(Query& query, QueryResults * const results)
 }
 
 void
-HerdActionHandler::do_regex(Query& query, QueryResults * const results)
+HerdActionHandler::do_regex(Query& query,
+                            QueryResults * const results LIBHERDSTAT_UNUSED)
 {
     BacktraceContext c("HerdActionHandler::do_regex("+query.front().second+")");
     const portage::Herds& herds(GlobalHerdsXML().herds());

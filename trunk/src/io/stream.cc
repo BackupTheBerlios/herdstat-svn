@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/misc.hh>
 #include "exceptions.hh"
 #include "handler_map.hh"
 #include "action/handler.hh"
@@ -43,6 +44,9 @@ StreamIOHandler::operator()(Query * const query)
             throw ActionUnimplemented(query->action());
 
         init_xml_if_necessary(query->action());
+
+        if (query->empty() and h->allow_pwd_query())
+            h->handle_pwd_query(query, &results);
 
         (*h)(*query, &results);
         display(results);

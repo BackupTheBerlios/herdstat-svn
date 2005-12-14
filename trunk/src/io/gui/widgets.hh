@@ -33,6 +33,7 @@
  */
 
 #include <string>
+#include <herdstat/defs.hh>
 
 namespace gui {
 
@@ -72,7 +73,8 @@ namespace gui {
             virtual ~TabBar() { }
             virtual void add_tab(Tab *tab) = 0;
             virtual void show() { }
-            virtual void resize(std::size_t x, std::size_t y) { }
+            virtual void resize(std::size_t x LIBHERDSTAT_UNUSED,
+                                std::size_t y LIBHERDSTAT_UNUSED) { }
     };
 
 } // namespace gui
