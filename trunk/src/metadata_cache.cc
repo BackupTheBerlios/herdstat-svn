@@ -151,7 +151,7 @@ MetadataCache::do_fill()
 {
     BacktraceContext c("MetadataCache::fill()");
 
-    const bool status = not _options.quiet() and not _options.debug();
+    const bool status = (not _options.quiet() and not _options.debug());
         
     const PackageCache& pkgcache(GlobalPkgCache(_spinner));
     debug_msg("pkgcache.size() == %d", pkgcache.size());
@@ -159,9 +159,9 @@ MetadataCache::do_fill()
     if (_spinner)
         _spinner->stop();
 
-    util::PercentMeter progress;
+    util::PercentMeter percentage;
     if (status)
-        progress.start(pkgcache.size(), "Generating metadata.xml cache:");
+        percentage.start(pkgcache.size(), "Generating metadata.xml cache:");
 
     /* we will contain at most pkgcache.size() elements */
     _metadatas.reserve(pkgcache.size());
@@ -173,7 +173,7 @@ MetadataCache::do_fill()
     for (i = pkgcache.begin(), end = pkgcache.end() ; i != end ; ++i)
     {
         if (status)
-            ++progress;
+            ++percentage;
 
         const std::string path(base+i->full()+"/metadata.xml");
         if (util::file_exists(path))
@@ -185,7 +185,8 @@ MetadataCache::do_fill()
     }
 
     /* trim unused space */
-    std::vector<Metadata>(_metadatas).swap(_metadatas);
+    if (_metadatas.capacity() > (_metadatas.size() + 10))
+        std::vector<Metadata>(_metadatas).swap(_metadatas);
 }
 
 /*
@@ -193,10 +194,14 @@ MetadataCache::do_fill()
  */
 
 struct CacheEntryToMetadata
+    : std::binary_function<std::string, util::ProgressMeter *, portage::Metadata>
 {
     portage::Metadata
-    operator()(const std::string& entry)
+    operator()(const std::string& entry, util::ProgressMeter *progress) const
     {
+        if (progress)
+            ++*progress;
+
         std::vector<std::string> parts;
         util::split(entry, std::back_inserter(parts), METACACHE_DELIM, true);
         if (parts.size() != 4)
@@ -247,7 +252,7 @@ MetadataCache::do_load(io::BinaryIStream& stream)
     std::transform(io::BinaryIStreamIterator<std::string>(stream),
                    io::BinaryIStreamIterator<std::string>(),
                    std::back_inserter(_metadatas),
-                   CacheEntryToMetadata());
+                   std::bind2nd(CacheEntryToMetadata(), _spinner));
 }
 
 /*
