@@ -114,7 +114,7 @@ WhichActionHandler::do_results(Query& query,
     }
 
     portage::PackageWhich which;
-    const std::vector<std::string>& which_results(which(matches));
+    const std::vector<std::string>& which_results(which(matches, spinner));
     std::copy(which_results.begin(), which_results.end(),
             std::back_inserter(*results));
 

@@ -155,7 +155,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
 }
 
 static void
-add_data(const metadata_data& data, QueryResults * const results)
+add_data(const metadata_data& data, QueryResults * const results,
+         util::ProgressMeter *spinner)
 {
     BacktraceContext c("add_data("+data.pkg+")");
 
@@ -178,7 +179,7 @@ add_data(const metadata_data& data, QueryResults * const results)
     {
         portage::PackageWhich which;
         const std::vector<std::string>& which_results(
-                which(data.pkg, data.portdir));
+                which(data.pkg, data.portdir, spinner));
         const std::string& ebuild(which_results.front());
 
         assert(not ebuild.empty());
@@ -362,7 +363,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
             results->add(data.is_category ? "Category" : "Package",
                     data.pkg + od[data.portdir]);
 
-        add_data(data, results);
+        add_data(data, results, spinner);
     }
 }
 

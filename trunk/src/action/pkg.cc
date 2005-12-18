@@ -258,6 +258,9 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
 
         for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
         {
+            if (spinner)
+                ++*spinner;
+
             const std::string& criteria(q->second);
     
             if (options.regex())
@@ -282,6 +285,9 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
     {
         for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
         {
+            if (spinner)
+                ++*spinner;
+
             if (matches.find(q->second) == matches.end())
             {
                 std::ostringstream error;
@@ -327,13 +333,18 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
         for (matches_type::iterator i = matches.begin() ;
                 i != matches.end() ; ++i)
         {
+            if (spinner)
+                ++*spinner;
+
             std::transform(i->second->begin(), i->second->end(),
                 std::back_inserter(q),
                 std::mem_fun_ref(&portage::Metadata::pkg));
         }
 
         MetaActionHandler mh;
+        mh.spinner = spinner;
         mh.do_results(q, results);
+        mh.spinner = NULL;
 
         options.set_regex(re);
         options.set_eregex(ere);
