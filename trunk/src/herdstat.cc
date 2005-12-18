@@ -36,6 +36,7 @@
 #include <herdstat/exceptions.hh>
 #include <herdstat/libherdstat_version.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/util/getcols.hh>
 #include <herdstat/util/functional.hh>
 #include <herdstat/portage/exceptions.hh>
 
@@ -571,8 +572,6 @@ handle_opts(int argc, char **argv, Query *q)
     return true;
 }
 
-std::string::size_type getcols(); // defined in getcols.cc
-
 int
 main(int argc, char **argv)
 {
@@ -603,7 +602,7 @@ main(int argc, char **argv)
     }
 
     /* save column width */
-    options.set_maxcol((test ? 79 : getcols()-1));
+    options.set_maxcol((test ? 79 : util::getcols()-1));
 
     try
     { 

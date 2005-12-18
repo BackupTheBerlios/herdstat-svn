@@ -22,7 +22,6 @@ herdstat_SOURCES = \
 	query_base.hh \
 	query.hh query.cc \
 	query_results.hh \
-	getcols.cc \
 	herdstat.cc
 
 herdstat_LDADD = \
