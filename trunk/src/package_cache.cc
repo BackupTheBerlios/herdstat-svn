@@ -136,10 +136,10 @@ struct CacheEntryToPackage
     : std::binary_function<std::string, util::ProgressMeter *, portage::Package>
 {
     portage::Package
-    operator()(const std::string& entry, util::ProgressMeter *progress) const
+    operator()(const std::string& entry, util::ProgressMeter *spinner) const
     {
-        if (progress)
-            ++*progress;
+        if (spinner)
+            ++*spinner;
 
         std::string::size_type pos = entry.find(':');
         if (pos == std::string::npos)
@@ -161,10 +161,14 @@ PackageCache::do_load(herdstat::io::BinaryIStream& stream)
 }
 
 struct PackageToCacheEntry
+    : std::binary_function<portage::Package, util::ProgressMeter *, std::string>
 {
     std::string
-    operator()(const portage::Package& pkg) const
+    operator()(const portage::Package& pkg, util::ProgressMeter *spinner) const
     {
+        if (spinner)
+            ++*spinner;
+
         return (pkg.full()+":"+pkg.portdir());
     }
 };
@@ -176,7 +180,7 @@ PackageCache::do_dump(io::BinaryOStream& stream)
 
      std::transform(_pkgs.begin(), _pkgs.end(),
         io::BinaryOStreamIterator<std::string>(stream),
-        PackageToCacheEntry());
+        std::bind2nd(PackageToCacheEntry(), _spinner));
 }
 
 /* vim: set tw=80 sw=4 fdm=marker et : */
