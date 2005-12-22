@@ -601,8 +601,10 @@ main(int argc, char **argv)
             test = true;
     }
 
-    /* save column width */
-    options.set_maxcol((test ? 79 : util::getcols()-1));
+    /* save column width; need to use a constant value if
+     * we're in "test mode" so results don't vary based on
+     * terminal width */
+    options.set_maxcol(test ? 79 : (util::getcols() - 1));
 
     try
     { 
