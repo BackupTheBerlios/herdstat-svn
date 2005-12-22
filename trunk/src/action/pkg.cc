@@ -217,12 +217,8 @@ PkgActionHandler::do_init(Query& query, QueryResults * const results)
 
     if (options.spinner())
     {
-//        assert(spinner == NULL);
-        if (not spinner)
-            spinner = new util::Spinner();
-        if (not spinner->started())
-            spinner->start(1000, "Performing query");
-        metacache.set_spinner(spinner);
+        start_spinner(1000, "Performing query");
+        metacache.set_spinner(spinner());
     }
 
     this->size() = 0;
@@ -251,16 +247,11 @@ void
 PkgActionHandler::do_results(Query& query, QueryResults * const results)
 {
     MetadataCache::const_iterator m;
-    for (m = metacache.begin() ; m != metacache.end() ; ++m)
+    for (m = metacache.begin() ; m != metacache.end() ; ++m, increment_spinner())
     {
-        if (spinner)
-            ++*spinner;
-
-        for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+        for (Query::const_iterator q = query.begin() ;
+                q != query.end() ; ++q, increment_spinner())
         {
-            if (spinner)
-                ++*spinner;
-
             const std::string& criteria(q->second);
     
             if (options.regex())
@@ -283,11 +274,9 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
     /* add error messages for the queries not found */
     if (not options.quiet() and (query.size() != matches.size()))
     {
-        for (Query::const_iterator q = query.begin() ; q != query.end() ; ++q)
+        for (Query::const_iterator q = query.begin() ;
+                q != query.end() ; ++q, increment_spinner())
         {
-            if (spinner)
-                ++*spinner;
-
             if (matches.find(q->second) == matches.end())
             {
                 std::ostringstream error;
@@ -308,8 +297,7 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
 
         if (matches.empty())
         {
-            if (spinner and spinner->started())
-                spinner->stop();
+            stop_spinner();
             throw ActionException();
         }
         else
@@ -331,20 +319,17 @@ PkgActionHandler::do_results(Query& query, QueryResults * const results)
 
         Query q;
         for (matches_type::iterator i = matches.begin() ;
-                i != matches.end() ; ++i)
+                i != matches.end() ; ++i, increment_spinner())
         {
-            if (spinner)
-                ++*spinner;
-
             std::transform(i->second->begin(), i->second->end(),
                 std::back_inserter(q),
                 std::mem_fun_ref(&portage::Metadata::pkg));
         }
 
         MetaActionHandler mh;
-        mh.spinner = spinner;
+        mh.set_spinner(spinner());
         mh.do_results(q, results);
-        mh.spinner = NULL;
+        mh.set_spinner(NULL);
 
         options.set_regex(re);
         options.set_eregex(ere);

@@ -31,6 +31,7 @@
 #include <herdstat/util/misc.hh>
 #include <herdstat/util/timer.hh>
 #include <herdstat/util/regex.hh>
+#include <herdstat/util/progress/spinner.hh>
 #include <herdstat/portage/package_finder.hh>
 
 #include "options.hh"
@@ -82,15 +83,51 @@ class ActionHandler
         /* did the handler err at least once? */
         bool& error() { return _err; }
 
+        inline void increment_spinner();
+        inline void stop_spinner();
+        inline void start_spinner(unsigned total,
+                                  const std::string& title = "");
+        inline herdstat::util::ProgressMeter *spinner() const
+        { return _spinner; } 
+        inline void set_spinner(herdstat::util::ProgressMeter *p)
+        { _spinner = p; }
+
         Options& options;
         herdstat::util::ColorMap& color;
         herdstat::util::Regex regexp;
-        herdstat::util::ProgressMeter *spinner;
 
     private:
         bool _err;
         int _size;
+        herdstat::util::ProgressMeter *_spinner;
 };
+
+inline void
+ActionHandler::increment_spinner()
+{
+    if (_spinner)
+        ++*_spinner;
+}
+
+inline void
+ActionHandler::stop_spinner()
+{
+    if (_spinner)
+    {
+        delete _spinner;
+        _spinner = NULL;
+    }
+//        _spinner->stop();
+}
+
+inline void
+ActionHandler::start_spinner(unsigned total, const std::string& title)
+{
+    if (not _spinner)
+        _spinner = new herdstat::util::Spinner();
+    if (not _spinner->started())
+        _spinner->start(total, title);
+}
 
 class PortageSearchActionHandler : public ActionHandler
 {
@@ -141,7 +178,7 @@ inline herdstat::portage::PackageFinder&
 PortageSearchActionHandler::find()
 {
     if (not _find)
-        _find = new herdstat::portage::PackageFinder(GlobalPkgCache(spinner));
+        _find = new herdstat::portage::PackageFinder(GlobalPkgCache(spinner()));
     return *_find;
 }
 

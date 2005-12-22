@@ -43,6 +43,7 @@ class MetaActionHandler : public PortageSearchActionHandler
         
     protected:
         friend class PkgActionHandler;
+        friend class FindActionHandler;
 
         virtual void do_results(Query& query, QueryResults * const results);
         virtual gui::Tab *createTab(gui::WidgetFactory *factory);

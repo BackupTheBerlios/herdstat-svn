@@ -36,7 +36,7 @@ using namespace herdstat;
 ActionHandler::ActionHandler()
     : options(GlobalOptions()),
       color(GlobalColorMap()),
-      spinner(NULL), _err(false), _size(-1)
+      _err(false), _size(-1), _spinner(NULL)
 {
     regexp.set_cflags(options.eregex() ?
                 util::Regex::icase|util::Regex::extended :
@@ -45,8 +45,8 @@ ActionHandler::ActionHandler()
 
 ActionHandler::~ActionHandler()
 {
-    if (spinner)
-        delete spinner;
+    if (_spinner)
+        delete _spinner;
 }
 
 bool
@@ -132,13 +132,7 @@ ActionHandler::do_cleanup(QueryResults * const results)
 
     this->_size = this->_err = 0;
 
-    if (spinner and spinner->started())
-        spinner->stop();
-//    if (spinner)
-//    {
-//        delete spinner;
-//        spinner = NULL;
-//    }
+    stop_spinner();
 }
 
 PortageSearchActionHandler::PortageSearchActionHandler()
@@ -179,13 +173,7 @@ PortageSearchActionHandler::do_init(Query& query LIBHERDSTAT_UNUSED,
                                     QueryResults * const results LIBHERDSTAT_UNUSED)
 {
     if (options.spinner() and not options.meta())
-    {
-//        assert(spinner == NULL);
-        if (not spinner)
-            spinner = new util::Spinner();
-        if (not spinner->started())
-            spinner->start(1000, "Performing query");
-    }
+        start_spinner(1000, "Performing query");
 }
 
 void
@@ -198,7 +186,7 @@ PortageSearchActionHandler::do_regex(Query& query,
 
     try
     {
-        matches = find()(regexp, spinner);
+        matches = find()(regexp, spinner());
         find().clear_results();
 
         if (not options.overlay())

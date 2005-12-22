@@ -76,7 +76,7 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
         {
             try
             {
-                find()(q->second, spinner);
+                find()(q->second, spinner());
                 matches.insert(matches.end(),
                     find_results.begin(), find_results.end());
                 find().clear_results();
@@ -127,8 +127,10 @@ FindActionHandler::do_results(Query& query, QueryResults * const results)
             std::back_inserter(q),
             std::mem_fun_ref(&portage::Package::full));
 
-        MetaActionHandler mhandler;
-        mhandler(q, results);
+        MetaActionHandler mh;
+        mh.set_spinner(spinner());
+        mh.do_results(q, results);
+        mh.set_spinner(NULL);
 
         options.set_regex(re);
         options.set_eregex(ere);

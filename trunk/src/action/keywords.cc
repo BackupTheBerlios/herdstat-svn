@@ -25,7 +25,7 @@
 #endif
 
 #include <herdstat/portage/exceptions.hh>
-#include <herdstat/portage/misc.hh>
+#include <herdstat/portage/util.hh>
 #include <herdstat/portage/package.hh>
 #include <herdstat/portage/version.hh>
 #include <herdstat/portage/keywords.hh>
@@ -98,7 +98,7 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
             try
             {
                 const std::vector<portage::Package>& res(find().results());
-                find()(q->second, spinner);
+                find()(q->second, spinner());
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
 
