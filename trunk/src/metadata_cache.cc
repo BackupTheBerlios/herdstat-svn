@@ -166,8 +166,6 @@ MetadataCache::do_fill()
     /* we will contain at most pkgcache.size() elements */
     _metadatas.reserve(pkgcache.size());
 
-    const std::string base(_portdir+"/");
-
     /* for each pkg */
     PackageCache::const_iterator i, end;
     for (i = pkgcache.begin(), end = pkgcache.end() ; i != end ; ++i)
@@ -175,7 +173,7 @@ MetadataCache::do_fill()
         if (status)
             ++percentage;
 
-        const std::string path(base+i->full()+"/metadata.xml");
+        const std::string path(i->path()+"/metadata.xml");
         if (util::file_exists(path))
         {
             /* parse it */
