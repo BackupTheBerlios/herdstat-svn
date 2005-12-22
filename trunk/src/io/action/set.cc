@@ -96,11 +96,14 @@ SetIOActionHandler::do_results(Query& query,
                 options.set_color(not v);
                 attrs.set_quiet(v);
             }
-            else if (key == "colors")
+            else if (key == "color" or key == "colors")
             {
                 const bool v(util::destringify<bool>(val));
                 options.set_color(v);
                 attrs.set_colors(v);
+                util::ColorMap& color(GlobalColorMap());
+                attrs.set_label_color(color[options.labelcolor()]);
+                attrs.set_highlight_color(color[options.hlcolor()]);
             }
             else SET_INT_IF_EQUAL(bool, verbose)
             else SET_INT_IF_EQUAL(bool, overlay)
