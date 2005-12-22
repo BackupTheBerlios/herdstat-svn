@@ -30,7 +30,7 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/portage/exceptions.hh>
 #include <herdstat/portage/package_which.hh>
-#include <herdstat/portage/misc.hh>
+#include <herdstat/portage/util.hh>
 #include <herdstat/portage/ebuild.hh>
 #include <herdstat/portage/license.hh>
 #include <herdstat/portage/metadata_xml.hh>
@@ -60,7 +60,7 @@ MetaActionHandler::handle_pwd_query(Query * const query,
                             portage::get_pkg_from_path(pwd),
                             util::dirname(util::dirname(pwd))));
     }
-    else if (portage::is_category(util::basename(pwd)))
+    else if (portage::is_category(pwd))
     {
         matches.push_back(portage::Package(util::basename(pwd),
                                            util::dirname(pwd)));
@@ -125,8 +125,8 @@ add_metadata(const metadata_data& data, std::string& longdesc,
         (herds.empty() or (herds.front() == "no-herd")))
         results->add("Herds(0)", "none");
     else if (not herds.empty())
-        results->add(util::sprintf("Herds(%d)", herds.size()),
-                herds.begin(), herds.end());
+        results->transform(util::sprintf("Herds(%d)", herds.size()),
+                herds.begin(), herds.end(), util::tidy_whitespace);
 
     if (options.quiet())
     {
@@ -261,15 +261,13 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
 
     if (not options.regex() and not pwd_mode())
     {
-        for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
+        for (Query::iterator q = query.begin() ; q != query.end() ;
+                ++q, increment_spinner())
         {
-            if (spinner)
-                ++*spinner;
-
             try
             {
                 const std::vector<portage::Package>& res(find().results());
-                find()(q->second, spinner);
+                find()(q->second, spinner());
                 if (is_ambiguous(res))
                     throw portage::AmbiguousPkg(res.begin(), res.end());
                 /* not ambigious but more than one match.  that means we have 1
@@ -338,11 +336,8 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
     this->size() = matches.size();
 
     std::vector<portage::Package>::iterator m;
-    for (m = matches.begin() ; m != matches.end() ; ++m)
+    for (m = matches.begin() ; m != matches.end() ; ++m, increment_spinner())
     {
-        if (spinner)
-            ++*spinner;
-
         metadata_data data;
         data.portdir = m->portdir();
         data.pkg = m->full();
@@ -363,7 +358,7 @@ MetaActionHandler::do_results(Query& query, QueryResults * const results)
             results->add(data.is_category ? "Category" : "Package",
                     data.pkg + od[data.portdir]);
 
-        add_data(data, results, spinner);
+        add_data(data, results, spinner());
     }
 }
 
