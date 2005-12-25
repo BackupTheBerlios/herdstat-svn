@@ -73,7 +73,7 @@ PackageCache::cache_size() const
 bool
 PackageCache::do_is_valid()
 {
-    BacktraceContext c("PackageCache::is_valid()");
+    BacktraceContext c("PackageCache::do_is_valid()");
 
     const util::Stat pkgcache(this->path());
     bool valid = false;
@@ -128,7 +128,7 @@ PackageCache::do_is_valid()
 void
 PackageCache::do_fill()
 {
-    BacktraceContext c("PackageCache::fill()");
+    BacktraceContext c("PackageCache::do_fill()");
     _pkgs.fill(_spinner);
 }
 
@@ -176,10 +176,20 @@ struct PackageToCacheEntry
 void
 PackageCache::do_dump(io::BinaryOStream& stream)
 {
-     BacktraceContext c("PackageCache::dump()");
+     BacktraceContext c("PackageCache::do_dump()");
 
      std::transform(_pkgs.begin(), _pkgs.end(),
         io::BinaryOStreamIterator<std::string>(stream),
+        std::bind2nd(PackageToCacheEntry(), _spinner));
+}
+
+void
+PackageCache::dump_text(std::ostream& stream)
+{
+    BacktraceContext c("PackageCache::dump_text()");
+
+     std::transform(_pkgs.begin(), _pkgs.end(),
+        std::ostream_iterator<std::string>(stream, "\n"),
         std::bind2nd(PackageToCacheEntry(), _spinner));
 }
 

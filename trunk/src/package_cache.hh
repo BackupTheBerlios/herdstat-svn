@@ -50,6 +50,8 @@ class PackageCache : public Cache
         inline size_type size() const { return _pkgs.size(); }
         inline bool empty() const { return _pkgs.empty(); }
 
+        virtual void dump_text(std::ostream& stream);
+
     protected:
         virtual std::size_t cache_size() const;
         virtual const char * const name() const;

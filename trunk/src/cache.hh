@@ -41,6 +41,8 @@ class Cache : private herdstat::Noncopyable
         void load();
         void dump();
 
+        virtual void dump_text(std::ostream& stream) = 0;
+
         inline const std::string& path() const { return _path; }
 
     protected:

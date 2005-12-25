@@ -81,7 +81,7 @@ MetadataCache::name() const
 bool
 MetadataCache::do_is_valid()
 {
-    BacktraceContext c("MetadataCache::is_valid()");
+    BacktraceContext c("MetadataCache::do_is_valid()");
 
     const util::Stat mcache(this->path());
     bool valid = false;
@@ -149,7 +149,7 @@ MetadataCache::do_is_valid()
 void
 MetadataCache::do_fill()
 {
-    BacktraceContext c("MetadataCache::fill()");
+    BacktraceContext c("MetadataCache::do_fill()");
 
     const bool status = (not _options.quiet() and not _options.debug());
         
@@ -260,10 +260,19 @@ MetadataCache::do_load(io::BinaryIStream& stream)
 void
 MetadataCache::do_dump(io::BinaryOStream& stream)
 {
-    BacktraceContext c("MetadataCache::dump()");
+    BacktraceContext c("MetadataCache::do_dump()");
 
     std::transform(_metadatas.begin(), _metadatas.end(),
         io::BinaryOStreamIterator<std::string>(stream),
+        MetadataToCacheEntry());
+}
+
+void
+MetadataCache::dump_text(std::ostream& stream)
+{
+    BacktraceContext c("MetadataCache::dump_text()");
+    std::transform(_metadatas.begin(), _metadatas.end(),
+        std::ostream_iterator<std::string>(stream, "\n"),
         MetadataToCacheEntry());
 }
 

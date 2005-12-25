@@ -57,6 +57,8 @@ class MetadataCache : public Cache
         inline void set_spinner(herdstat::util::ProgressMeter *spinner)
         { _spinner = spinner; }
 
+        virtual void dump_text(std::ostream& stream);
+
     protected:
         virtual std::size_t cache_size() const;
         virtual const char * const name() const;
