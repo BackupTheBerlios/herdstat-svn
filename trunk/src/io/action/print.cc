@@ -48,6 +48,43 @@ PrintIOActionHandler::usage() const
 }
 
 void
+PrintIOActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+    static const char *comps[] =
+    {
+        "verbose",
+        "count",
+        "regex",
+        "eregex",
+        "overlay",
+        "qa",
+        "metacache",
+        "devaway",
+        "meta",
+        "dev",
+        "querycache_max",
+        "querycache_expire",
+        "devaway_expire",
+        "maxcol",
+        "action",
+        "cvsdir",
+        "herdsxml",
+        "devawayxml",
+        "userinfoxml",
+        "localstatedir",
+        "metacache_expire",
+        "locale",
+        "iomethod",
+        "portdir",
+        "with_dev",
+        "with_herd",
+        "version"
+    };
+
+    v->assign(comps, comps+NELEMS(comps));
+}
+
+void
 PrintIOActionHandler::do_results(Query& query,
                                  QueryResults * const results)
 {

@@ -41,6 +41,7 @@ class PkgActionHandler : public ActionHandler
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
+        virtual void generate_completions(std::vector<std::string> *) const;
 
     protected:
         virtual void do_init(Query& query, QueryResults * const results);

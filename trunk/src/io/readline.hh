@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <herdstat/util/readline.hh>
 #include "io/pretty.hh"
 
 class ReadLineIOHandler : public PrettyIOHandler
@@ -35,6 +36,9 @@ class ReadLineIOHandler : public PrettyIOHandler
         ReadLineIOHandler();
         virtual ~ReadLineIOHandler();
         virtual bool operator()(Query * const query);
+
+    private:
+        herdstat::util::ReadLine _readline;
 };
 
 #endif /* _HAVE_READLINE_HH */

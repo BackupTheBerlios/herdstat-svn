@@ -50,6 +50,40 @@ SetIOActionHandler::usage() const
 }
 
 void
+SetIOActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+    static const char *comps[] =
+    {
+        "action",
+        "quiet",
+        "color",
+        "verbose",
+        "overlay",
+        "regex",
+        "eregex",
+        "qa",
+        "metacache",
+        "devaway",
+        "meta",
+        "dev",
+        "maxcol",
+        "cvsdir",
+        "herdsxml",
+        "devawayxml",
+        "userinfoxml",
+        "localstatedir",
+        "locale",
+        "labelcolor",
+        "hlcolor",
+        "with_dev",
+        "with_herd",
+        "metacache_expire"
+    };
+
+    v->assign(comps, comps+NELEMS(comps));
+}
+
+void
 SetIOActionHandler::do_results(Query& query,
                                QueryResults * const results)
 {
@@ -110,8 +144,9 @@ SetIOActionHandler::do_results(Query& query,
             else SET_INT_IF_EQUAL(bool, regex)
             else if (key == "eregex")
             {
-                options.set_regex(true);
-                options.set_eregex(true);
+                const bool v(util::destringify<bool>(val));
+                options.set_regex(v);
+                options.set_eregex(v);
             }
             else SET_INT_IF_EQUAL(bool, qa)
             else SET_INT_IF_EQUAL(bool, metacache)

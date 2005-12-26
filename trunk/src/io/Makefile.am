@@ -20,7 +20,9 @@ libio_la_LIBADD = \
 	gui/libio_gui.la
 
 if BUILD_RL_FRONTEND
-libio_la_SOURCES += readline.hh readline.cc
+libio_la_SOURCES += readline.hh readline.cc readline_completion_hooks.cc
+else
+EXTRA_DIST = readline.hh readline.cc readline_completion_hooks.cc
 endif
 
 srchtml: $(foreach f, $(libio_la_SOURCES), $(f).html)

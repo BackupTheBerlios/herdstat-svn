@@ -146,6 +146,26 @@ PortageSearchActionHandler::~PortageSearchActionHandler()
         delete _find;
 }
 
+/* default generate_completions() for PortageSearchActionHandler derivates;
+ * simply inserts a list of all packages. */
+void
+PortageSearchActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+    const PackageCache& pkgcache(GlobalPkgCache(spinner()));
+
+    v->reserve(pkgcache.size() * 2);
+
+    /* copy all cat/pkg strings */
+    std::transform(pkgcache.begin(), pkgcache.end(),
+        std::back_inserter(*v),
+        std::mem_fun_ref(&portage::Package::full));
+
+    /* copy all pkg strings so we can complete on just pkg names as well */
+    std::transform(pkgcache.begin(), pkgcache.end(),
+        std::back_inserter(*v),
+        std::mem_fun_ref(&portage::Package::name));
+}
+
 void
 PortageSearchActionHandler::handle_pwd_query
     (Query * const query LIBHERDSTAT_UNUSED,

@@ -61,6 +61,15 @@ HerdActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
+HerdActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+    std::transform(herds.begin(), herds.end(),
+        std::back_inserter(*v),
+        std::mem_fun_ref(&portage::Herd::name));
+}
+
+void
 HerdActionHandler::do_all(Query& query,
                           QueryResults * const results LIBHERDSTAT_UNUSED)
 {

@@ -58,6 +58,11 @@ StatsActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
+StatsActionHandler::generate_completions(std::vector<std::string> *) const
+{
+}
+
+void
 StatsActionHandler::do_regex(Query& query LIBHERDSTAT_UNUSED,
                              QueryResults * const results)
 {

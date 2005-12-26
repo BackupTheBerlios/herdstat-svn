@@ -97,6 +97,7 @@ dnl Required functions
 
 dnl Optional functions
 AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_FUNCS(strdup)
 
 dnl Optional libs
 
@@ -108,9 +109,6 @@ AC_ARG_WITH(readline,
 AC_MSG_RESULT([$WITH_READLINE])
 
 if test x"$WITH_READLINE" = "xyes" ; then
-    AC_CHECK_HEADERS(readline/readline.h,,
-	[AC_MSG_ERROR([readline support was enabled but no readline/readline.h was found])])
-    AC_CHECK_LIB(readline, readline)
     AC_DEFINE(READLINE_FRONTEND, 1, [Enable Readline front-end])
 fi
 

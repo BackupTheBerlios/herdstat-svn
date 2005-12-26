@@ -37,7 +37,8 @@ class HerdActionHandler : public ActionHandler
         virtual const char * const id() const;
         virtual const char * const desc() const;
         virtual const char * const usage() const;
-        
+        virtual void generate_completions(std::vector<std::string> *) const;
+
     protected:
         virtual void do_all(Query& query, QueryResults * const results);
         virtual void do_regex(Query& query, QueryResults * const results);
@@ -46,10 +47,6 @@ class HerdActionHandler : public ActionHandler
         virtual gui::Tab *
             createTab(gui::WidgetFactory *factory);
 };
-
-/* add info from given herd to query results */
-//void add_herd(const herdstat::portage::Herd& herd,
-//              QueryResults * const results);
 
 #endif /* _HAVE_ACTION_HERD_HH */
 

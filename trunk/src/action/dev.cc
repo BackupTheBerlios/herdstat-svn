@@ -61,6 +61,30 @@ DevActionHandler::createTab(WidgetFactory *widgetFactory)
 }
 
 void
+DevActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+    portage::UserinfoXML& userinfo_xml(GlobalUserinfoXML());
+
+    if (userinfo_xml.empty())
+    {
+        const portage::Herds& herds(GlobalHerdsXML().herds());
+        portage::Herds::const_iterator h;
+
+        for (h = herds.begin() ; h != herds.end() ; ++h)
+            std::transform(h->begin(), h->end(),
+                std::back_inserter(*v),
+                std::mem_fun_ref(&portage::Developer::user));
+    }
+    else
+    {
+        const portage::Developers& devs(userinfo_xml.devs());
+        std::transform(devs.begin(), devs.end(),
+            std::back_inserter(*v),
+            std::mem_fun_ref(&portage::Developer::user));
+    }
+}
+
+void
 DevActionHandler::do_init(Query& query, QueryResults * const results)
 {
     BacktraceContext c("DevActionHandler::do_init()");

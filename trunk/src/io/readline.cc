@@ -1,5 +1,5 @@
 /*
- * herdstat -- src/readline.cc
+ * herdstat -- src/io/readline.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -26,17 +26,14 @@
 
 #include <cstdio>
 #include <cstdlib>
-
-#ifdef HAVE_READLINE_READLINE_H
-# include <readline/readline.h>
-# include <readline/history.h>
-#endif
+#include <cstring>
 
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
 
 #include "exceptions.hh"
 #include "handler_map.hh"
+#include "xmlinit.hh"
 #include "action/handler.hh"
 #include "io/action/set.hh"
 #include "io/action/print.hh"
@@ -45,46 +42,13 @@
 
 using namespace herdstat;
 
-class ReadlineEOF : public Exception { };
-
-static const std::string *rl_buffer = NULL;
-
-static int
-readline_init()
-{
-    rl_insert_text(rl_buffer->c_str());
-    return 0;
-}
-
-/* readline() wrapper */
-static void get_input(const std::string&, std::string *,
-                      const std::string& = "");
-
-void
-get_input(const std::string& prompt, std::string *result,
-          const std::string& text)
-{
-    /* for readline_init startup hook */
-    rl_buffer = &text;
-    
-    char *input = readline(prompt.c_str());
-    if (not input)
-        throw ReadlineEOF();
-
-    if (*input)
-    {
-        add_history(input);
-        result->assign(input);
-    }
-    
-    std::free(input);
-}
+/* forwards (defined in readline_completion_hooks.cc) */
+char **herdstat_completion(const char *, int, int);
 
 ReadLineIOHandler::ReadLineIOHandler()
+    : _readline(PACKAGE)
 {
-    rl_startup_hook = readline_init;
-    /* no completions (for now) */
-    rl_bind_key('\t', NULL);
+    _readline.set_attempted_comp_hook(herdstat_completion);
 
     insert_local_handler<HelpIOActionHandler>("help");
     insert_local_handler<SetIOActionHandler>("set");
@@ -101,10 +65,10 @@ ReadLineIOHandler::operator()(Query * const query)
     Options& options(GlobalOptions());
     QueryResults results;
 
+    GlobalXMLInit();
+
     try
     {
-        std::string in;
-
         /* if action is already set, adjust prompt to reflect it */
         if (options.action() == "unspecified")
         {
@@ -117,11 +81,18 @@ ReadLineIOHandler::operator()(Query * const query)
             query->set_action(options.action());
         }
 
-        get_input(options.prompt(), &in);
+        _readline.set_prompt(options.prompt());
+        std::string in(_readline());
 
         /* empty, so just call ourselves again and display another prompt */
         if (in.empty())
             return true;
+
+        /* strip trailing whitespace */
+        std::string::size_type pos = in.find_last_not_of(" \t");
+        if (pos != std::string::npos)
+            in.erase(++pos);
+
         if (in == "quit" or in == "exit")
             return false;
 
@@ -149,8 +120,6 @@ ReadLineIOHandler::operator()(Query * const query)
             else
                 h = i->second;
         }
-
-        init_xml_if_necessary(query->action());
 
         /* transform arguments into the query object */
         if (not parts.empty())
@@ -185,7 +154,7 @@ ReadLineIOHandler::operator()(Query * const query)
         (*h)(*query, &results);
         display(results);
     }
-    catch (const ReadlineEOF)
+    catch (const util::ReadLineEOF)
     {
         options.outstream() << std::endl;
         return false;

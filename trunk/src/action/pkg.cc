@@ -211,6 +211,40 @@ PkgActionHandler::add_matches(QueryResults * const results)
 }
 
 void
+PkgActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+    const portage::Herds& herds(GlobalHerdsXML().herds());
+
+    if (options.dev())
+    {
+        portage::UserinfoXML& userinfo_xml(GlobalUserinfoXML());
+ 
+        if (userinfo_xml.empty())
+        {
+            portage::Herds::const_iterator h;
+ 
+            for (h = herds.begin() ; h != herds.end() ; ++h)
+                std::transform(h->begin(), h->end(),
+                    std::back_inserter(*v),
+                    std::mem_fun_ref(&portage::Developer::user));
+        }
+        else
+        {
+            const portage::Developers& devs(userinfo_xml.devs());
+            std::transform(devs.begin(), devs.end(),
+                std::back_inserter(*v),
+                std::mem_fun_ref(&portage::Developer::user));
+        }
+    }
+    else
+    {
+        std::transform(herds.begin(), herds.end(),
+            std::back_inserter(*v),
+            std::mem_fun_ref(&portage::Herd::name));
+    }
+}
+
+void
 PkgActionHandler::do_init(Query& query, QueryResults * const results)
 {
     ActionHandler::do_init(query, results);

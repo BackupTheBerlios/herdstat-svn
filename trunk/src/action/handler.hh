@@ -65,6 +65,9 @@ class ActionHandler
         /// action usage string
         virtual const char * const usage() const;
 
+        /// Fill vector of strings with possible arguments to operator().
+        virtual void generate_completions(std::vector<std::string> *) const = 0;
+
     protected:
         virtual void do_init(Query& query, QueryResults * const results);
         virtual void do_all(Query& query, QueryResults * const results);
@@ -117,7 +120,6 @@ ActionHandler::stop_spinner()
         delete _spinner;
         _spinner = NULL;
     }
-//        _spinner->stop();
 }
 
 inline void
@@ -136,6 +138,7 @@ class PortageSearchActionHandler : public ActionHandler
 
         virtual void handle_pwd_query(Query * const query,
                                       QueryResults * const results);
+        virtual void generate_completions(std::vector<std::string> *) const;
 
     protected:
         PortageSearchActionHandler();

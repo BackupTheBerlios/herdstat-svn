@@ -50,6 +50,11 @@ HelpIOActionHandler::desc() const
 }
 
 void
+HelpIOActionHandler::generate_completions(std::vector<std::string> *v) const
+{
+}
+
+void
 HelpIOActionHandler::do_results(Query& query,
                                 QueryResults * const results)
 {
@@ -71,7 +76,11 @@ HelpIOActionHandler::do_results(Query& query,
     /* show action handler help */
     else
     {
-        ActionHandler *h = handlers[query.front().second];
+        ActionHandler *h = NULL;
+        HandlerMap<ActionHandler>::iterator i = handlers.find(query.front().second);
+        if (i != handlers.end())
+            h = i->second;
+
         if (h)
         {
             results->add(util::sprintf("Help for '%s' action handler.", h->id()));

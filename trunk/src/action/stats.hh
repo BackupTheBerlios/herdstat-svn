@@ -37,6 +37,7 @@ class StatsActionHandler : public ActionHandler
         virtual bool allow_empty_query() const;
         virtual const char * const id() const;
         virtual const char * const desc() const;
+        virtual void generate_completions(std::vector<std::string> *) const;
         
     protected:
         virtual void do_regex(Query& query, QueryResults * const results);
