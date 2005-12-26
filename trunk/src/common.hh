@@ -27,7 +27,9 @@
 #include <vector>
 #include <functional>
 
+#include <herdstat/defs.hh>
 #include <herdstat/util/misc.hh>
+#include <herdstat/util/string.hh>
 #include <herdstat/portage/herds_xml.hh>
 #include <herdstat/portage/devaway_xml.hh>
 #include <herdstat/portage/userinfo_xml.hh>
@@ -43,7 +45,9 @@
 #define USE_XMLWRAPP
 #define LASTSYNC        /*LOCALSTATEDIR*/"/lastsync"
 
-#define NELEMS(x) (sizeof(x) / sizeof(x[0]))
+#ifndef HAVE_STRDUP
+# define strdup(x) herdstat::util::strdup(x)
+#endif /* HAVE_STRDUP */
 
 typedef std::vector<std::string> opts_type;
 
@@ -61,7 +65,7 @@ struct ColorAmbiguousPkg
 {
     void operator()(const std::string& str, QueryResults * const results) const
     {
-        Options& options(GlobalOptions());
+        const Options& options(GlobalOptions());
         if (options.quiet() or not options.color())
             results->add(str);
         else
