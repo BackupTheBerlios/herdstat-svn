@@ -92,7 +92,6 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
 
     if (not options.regex() and not pwd_mode())
     {
-        
         for (Query::iterator q = query.begin() ; q != query.end() ; ++q)
         {
             try
@@ -138,6 +137,15 @@ KeywordsActionHandler::do_results(Query& query, QueryResults * const results)
     std::vector<portage::Package>::iterator m;
     for (m = matches.begin() ; m != matches.end() ; ++m)
     {
+        if (portage::is_category(m->path()))
+        {
+            if (options.regex())
+                continue;
+
+            results->add("Requesting keywords for a category doesn't make much sense.");
+            continue;
+        }
+
         const portage::KeywordsMap& keywords(m->keywords());
 
         this->size() += keywords.size();

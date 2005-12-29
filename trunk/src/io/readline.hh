@@ -20,14 +20,15 @@
  * Place, Suite 325, Boston, MA  02111-1257  USA
  */
 
-#ifndef _HAVE_READLINE_HH
-#define _HAVE_READLINE_HH 1
+#ifndef _HAVE_IO_READLINE_HH
+#define _HAVE_IO_READLINE_HH 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <herdstat/util/readline.hh>
+#include <herdstat/readline/readline.hh>
+#include <herdstat/readline/history.hh>
 #include "io/pretty.hh"
 
 class ReadLineIOHandler : public PrettyIOHandler
@@ -38,9 +39,11 @@ class ReadLineIOHandler : public PrettyIOHandler
         virtual bool operator()(Query * const query);
 
     private:
-        herdstat::util::ReadLine _readline;
+        herdstat::readline::ReadLine _readline;
+        herdstat::readline::History _history;
+        bool _read_hist;
 };
 
-#endif /* _HAVE_READLINE_HH */
+#endif /* _HAVE_IO_READLINE_HH */
 
 /* vim: set tw=80 sw=4 fdm=marker et : */

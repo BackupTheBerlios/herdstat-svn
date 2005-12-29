@@ -40,14 +40,21 @@
 #include "io/action/help.hh"
 #include "io/readline.hh"
 
-using namespace herdstat;
+/// max number of history entries to keep
+#define HERDSTAT_HISTORY_MAX 100
 
-/* forwards (defined in readline_completion_hooks.cc) */
-char **herdstat_completion(const char *, int, int);
+using namespace herdstat;
+using namespace herdstat::readline;
+
+extern char **herdstat_completion(const char *, int, int);
 
 ReadLineIOHandler::ReadLineIOHandler()
-    : _readline(PACKAGE)
+    : _readline(PACKAGE), _history(), _read_hist(false)
 {
+    const char * const result = std::getenv("HOME");
+    if (result)
+        _history.set_path(std::string(result) + "/.herdstat_history");
+
     _readline.set_attempted_comp_hook(herdstat_completion);
 
     insert_local_handler<HelpIOActionHandler>("help");
@@ -57,6 +64,16 @@ ReadLineIOHandler::ReadLineIOHandler()
 
 ReadLineIOHandler::~ReadLineIOHandler()
 {
+    _history.stifle(HERDSTAT_HISTORY_MAX);
+
+    try
+    {
+        _history.write();
+    }
+    catch (const FileException& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
 
 bool
@@ -66,6 +83,12 @@ ReadLineIOHandler::operator()(Query * const query)
     QueryResults results;
 
     GlobalXMLInit();
+
+    if (not _read_hist)
+    {
+        _history.read();
+        _read_hist = true;
+    }
 
     try
     {
@@ -95,6 +118,8 @@ ReadLineIOHandler::operator()(Query * const query)
 
         if (in == "quit" or in == "exit")
             return false;
+
+        _history.add(in);
 
         std::vector<std::string> parts;
         util::split(in, std::back_inserter(parts));
@@ -154,7 +179,7 @@ ReadLineIOHandler::operator()(Query * const query)
         (*h)(*query, &results);
         display(results);
     }
-    catch (const util::ReadLineEOF)
+    catch (const ReadLineEOF&)
     {
         options.outstream() << std::endl;
         return false;

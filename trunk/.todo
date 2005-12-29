@@ -8,18 +8,6 @@
     <note priority="high" time="1129831232">
         Add some kind of --extract option for only displaying a certain piece of info about something. Fex, 'herdstat -d ka0ttic --extract birthday'
     </note>
-    <note priority="medium" time="1133233405">
-        Stuff to finish before 1.1.90 release:
-        <note priority="veryhigh" time="1134468103">
-            Update bash completion
-        </note>
-        <note priority="veryhigh" time="1134468111">
-            Update manual page
-        </note>
-        <note priority="veryhigh" time="1134468115">
-            Update examples
-        </note>
-    </note>
     <note priority="verylow" time="1126623676">
         Look into adding LDAP support for Gentoo's LDAP.
     </note>

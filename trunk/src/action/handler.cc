@@ -27,6 +27,7 @@
 #include <herdstat/defs.hh>
 #include <herdstat/util/progress/spinner.hh>
 #include <herdstat/util/string.hh>
+#include <herdstat/portage/functional.hh>
 
 #include "common.hh"
 #include "action/handler.hh"
@@ -153,17 +154,18 @@ PortageSearchActionHandler::generate_completions(std::vector<std::string> *v) co
 {
     const PackageCache& pkgcache(GlobalPkgCache(spinner()));
 
-    v->reserve(pkgcache.size() * 2);
+    v->reserve((pkgcache.size() * 2) - portage::GlobalConfig().categories().size());
 
-    /* copy all cat/pkg strings */
+    /* insert all categories and cat/pkg's */
     std::transform(pkgcache.begin(), pkgcache.end(),
-        std::back_inserter(*v),
-        std::mem_fun_ref(&portage::Package::full));
+        std::back_inserter(*v), std::mem_fun_ref(&portage::Package::full));
 
-    /* copy all pkg strings so we can complete on just pkg names as well */
-    std::transform(pkgcache.begin(), pkgcache.end(),
-        std::back_inserter(*v),
+    /* also insert package names without the category */
+    util::transform_if(pkgcache.begin(), pkgcache.end(),
+        std::back_inserter(*v), portage::PackageIsValid(),
         std::mem_fun_ref(&portage::Package::name));
+
+    std::vector<std::string>(*v).swap(*v);
 }
 
 void

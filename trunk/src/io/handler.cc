@@ -36,9 +36,12 @@
 
 using namespace herdstat;
 
+extern HandlerMap<ActionHandler> *lhp;
+
 IOHandler::IOHandler()
     : _local()
 {
+    lhp = &_local;
 }
 
 IOHandler::~IOHandler()

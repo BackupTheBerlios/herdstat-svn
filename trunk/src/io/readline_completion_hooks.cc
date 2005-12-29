@@ -26,13 +26,16 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <herdstat/util/readline.hh>
+
+#include <herdstat/defs.hh>
+#include <herdstat/readline/readline.hh>
 
 #include "common.hh"
 #include "action/handler.hh"
 #include "handler_map.hh"
 
 static std::string cur_action;
+HandlerMap<ActionHandler> *lhp = NULL;
 
 // Complete on action names
 static char *
@@ -90,16 +93,20 @@ action_param_completion(const char *text, int state)
         comps.clear();
 
         HandlerMap<ActionHandler>& handlers(GlobalHandlerMap<ActionHandler>());
-        HandlerMap<ActionHandler>::iterator i = handlers.find(cur_action);
+        HandlerMap<ActionHandler>::const_iterator i = handlers.find(cur_action);
         if ((i == handlers.end()) or (i->second == NULL))
-            return NULL;
+        {
+            assert(lhp != NULL);
+            i = lhp->find(cur_action);
+            if ((i == lhp->end()) or (i->second == NULL))
+                return NULL;
+        }
 
         i->second->generate_completions(&comps);
     }
 
-    std::vector<std::string>::const_iterator c = comps.begin() + offset;
-
-    for ( ; c != comps.end() ; ++c)
+    std::vector<std::string>::const_iterator c;
+    for (c = comps.begin() + offset ; c != comps.end() ; ++c)
     {
         ++offset;
         if (c->substr(0, len) == text)
@@ -121,16 +128,16 @@ herdstat_completion(const char *text, int start, int end)
     rl_attempted_completion_over = 1;
 
     /* if at first word and action is not bound, complete on actions */
-    if (start == 0 and options.action() == "unspecified")
+    if ((start == 0) and (options.action() == "unspecified"))
         matches = rl_completion_matches(text, action_completion);
     /* otherwise determine action and complete on it's parameters */
     else
     {
         /* action is bound */
-        if (start == 0)
+        if (options.action() != "unspecified")
             cur_action.assign(options.action());
         /* action is not bound, so get it from rl_line_buffer */
-        else
+        else if (start != 0)
         {
             /* get first word in rl_line_buffer */
             const char * const space = std::strchr(rl_line_buffer, ' ');
