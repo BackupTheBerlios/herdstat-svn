@@ -8,9 +8,13 @@ MAINTAINERCLEANFILES = Makefile.in *~ *.loT
 noinst_LTLIBRARIES = libio_action.la
 libio_action_la_SOURCES = \
 	handler.hh handler.cc \
-	help.hh help.cc \
-	set.hh set.cc \
-	print.hh print.cc
+	help.hh help.cc
+
+if BUILD_RL_FRONTEND
+libio_action_la_SOURCES += set.hh set.cc print.hh print.cc
+else
+EXTRA_DIST = set.hh set.cc print.hh print.cc
+endif
 
 srchtml: $(foreach f, $(libio_action_la_SOURCES), $(f).html)
 %.cc.html: %.cc
