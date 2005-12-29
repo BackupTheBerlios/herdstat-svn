@@ -54,6 +54,7 @@ PrintIOActionHandler::generate_completions(std::vector<std::string> *v) const
     {
         "verbose",
         "count",
+        "color",
         "regex",
         "eregex",
         "overlay",
@@ -123,6 +124,9 @@ PrintIOActionHandler::do_results(Query& query,
         else ADD_IF_EQUAL(with_herd)
         else if (q->second == "version")
             results->add(PACKAGE"-"VERSION);
+        else if (q->second == "color" or q->second == "colors"
+                 or q->second == "colour" or q->second == "colours")
+            results->add(options.color());
         else results->add("Unknown option '" + q->second + "'.");
 #undef ADD_IF_EQUAL
     }

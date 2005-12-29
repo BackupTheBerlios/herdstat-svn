@@ -130,7 +130,8 @@ SetIOActionHandler::do_results(Query& query,
                 options.set_color(not v);
                 attrs.set_quiet(v);
             }
-            else if (key == "color" or key == "colors")
+            else if (key == "color" or key == "colors"
+                     or key == "colour" or key == "colours")
             {
                 const bool v(util::destringify<bool>(val));
                 options.set_color(v);
