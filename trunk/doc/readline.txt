@@ -1,0 +1,128 @@
+======================
+The Readline Front-End
+======================
+
+Introduction
+============
+
+The readline front-end provides a shell-like interface to herdstat.  For users
+who need to invoke herdstat often (bug-wranglers using herdstat to look up
+package maintainer information, for example), the readline front-end can be
+quite convenient.
+
+Invoking the Readline Front-End
+===============================
+
+There are two ways to invoke the readline front-end.  You can use the provided
+convenience symbolic link: ::
+
+    $ herdstat-rl
+
+or pass ``readline`` to herdstat's -i (or --iomethod) flag: ::
+
+    $ herdstat -i readline
+
+Using the Readline Front-End
+============================
+
+When first invoking the readline front-end, you will be greeted with a simple
+prompt: ::
+
+    herdstat>
+
+The basic usage syntax is as follows: ::
+
+    herdstat> <action> <param1> <param2> ...
+
+where <action> is one of the supported action handlers.  You can get a list of
+possible actions by executing the ``help`` action: ::
+
+    herdstat> help
+    Valid actions: away dev find herd keywords meta pkg stats versions which 
+    Use 'help <action>' to get usage information for the specified action.
+
+As the output says, passing an action name as a parameter to the ``help``
+action handler, will display usage information for the specified action
+handler: ::
+
+    herdstat> help find 
+    Help for 'find' action handler.
+
+    Description: Find packages matching the given criteria.
+    Usage: find <package(s)>
+
+You can also use the provided command-line completion to get a list: ::
+
+    herdstat> <TAB><TAB>
+    away      find      keywords  print     stats     
+    dev       help      meta      quit      versions  
+    exit      herd      pkg       set       which 
+
+Note that command-line completions are offered for the action handler parameters
+as well.
+
+Displaying Options
+------------------
+
+The readline front-end offers the ``print`` action handler for displaying the
+value of the specified option.  For example, to see what local state directory
+herdstat is currently using: ::
+
+    herdstat> print localstatedir
+    /var/lib/herdstat
+
+Use the provided command-line completion to get a list of options you can
+display.
+
+Setting Options
+---------------
+
+The readline front-end offers the ``set`` action handler for setting options.
+The ``set`` action handler recognizes the syntax: ::
+
+    herdstat> set <option1=value1> <option2=value2> ...
+
+For example, to disable colored output you'd type: ::
+
+    herdstat> set color=0
+
+or: ::
+
+    herdstat> set color=false
+
+Some options alter the way that action parameters will be treated.  For example,
+if you'd like the parameters to be treated as regular expressions, you'd just
+enable the ``regex`` option: ::
+
+    herdstat> set regex=true
+    herdstat> find ^gcc
+
+Action Binding
+--------------
+
+Because of the ``set`` action, it is possible to "bind" an action: ::
+
+    herdstat> set action=<action>
+
+Action binding can be very useful if you need to invoke the same action handler
+over and over again.  You'll know when an action is bound because the prompt
+will change: ::
+
+    herdstat:<action>>
+
+where <action> is the name of the bound action.  Because the action handler to
+be executed is now constant, you only need to specify the parameters: ::
+
+    herdstat:dev> <param1> <param2>
+
+To unbind the action, just set the action option to "unspecified": ::
+
+    herdstat:dev> set action=unspecified
+
+Leaving the Readline Front-End
+==============================
+
+You can exit the readline front-end by either sending the process a SIGINT or
+SIGTERM signal or by using the ``quit`` or ``exit`` commands.
+
+.. vim: set ft=glep tw=80 sw=4 et spell spelllang=en : ..

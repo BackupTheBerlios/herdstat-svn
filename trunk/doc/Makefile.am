@@ -1,11 +1,11 @@
-doc_files = examples
+doc_files = examples readline
 noinst_DATA = $(foreach f, $(doc_files), $(f).txt)
 man_MANS = herdstat.1
 
 CLEANFILES = \
 	$(man_MANS) \
 	$(VERSION)/html/* \
-	examples.html \
+	$(foreach f, $(doc_files), $(f).html) \
 	Doxyfile
 
 MAINTAINERCLEANFILES = Makefile.in *~
