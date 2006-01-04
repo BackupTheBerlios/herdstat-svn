@@ -66,13 +66,6 @@ AC_SUBST(LIBTOOL)
 dnl SED is defined by the LT_AC_PROG_SED ran by AC_PROG_LIBTOOL
 AC_SUBST(SED)
 
-AC_MSG_CHECKING([g++ version])
-gxxver=`$CXX -dumpversion | cut -f1 -d.`
-AC_MSG_RESULT([$gxxver])
-if test x$gxxver = "x4" ; then
-    AC_DEFINE_UNQUOTED(HAVE_GCC4, 1, [GCC Version 4])
-fi
-
 LHS_CHECK_CXXFLAG([-pedantic])
 LHS_CHECK_CXXFLAG([-ansi])
 LHS_CHECK_CXXFLAG([-W])
@@ -101,6 +94,8 @@ AC_CHECK_FUNCS(strdup)
 
 dnl Optional libs
 
+PKG_PROG_PKG_CONFIG
+
 dnl --with-readline
 AC_MSG_CHECKING([whether to build the readline front-end])
 AC_ARG_WITH(readline,
@@ -110,9 +105,10 @@ AC_MSG_RESULT([$WITH_READLINE])
 
 if test x"$WITH_READLINE" = "xyes" ; then
     AC_DEFINE(READLINE_FRONTEND, 1, [Enable Readline front-end])
+    PKG_CHECK_MODULES(libreadlinepp, libreadline++ >= 0.1,
+	[READLINE_LIBS="-lreadline++"])
 fi
-
-PKG_PROG_PKG_CONFIG
+AC_SUBST(READLINE_LIBS)
 
 dnl --with-qt
 AC_MSG_CHECKING([whether to build the Qt front-end])

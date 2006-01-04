@@ -44,7 +44,6 @@
 #define HERDSTAT_HISTORY_MAX 100
 
 using namespace herdstat;
-using namespace herdstat::readline;
 
 extern char **herdstat_completion(const char *, int, int);
 
@@ -70,7 +69,7 @@ ReadLineIOHandler::~ReadLineIOHandler()
     {
         _history.write();
     }
-    catch (const FileException& e)
+    catch (const rl::FileException& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -105,7 +104,7 @@ ReadLineIOHandler::operator()(Query * const query)
         }
 
         _readline.set_prompt(options.prompt());
-        std::string in(_readline());
+        std::string& in(_readline());
 
         /* empty, so just call ourselves again and display another prompt */
         if (in.empty())
@@ -179,7 +178,7 @@ ReadLineIOHandler::operator()(Query * const query)
         (*h)(*query, &results);
         display(results);
     }
-    catch (const ReadLineEOF&)
+    catch (const rl::ReadLineEOF&)
     {
         options.outstream() << std::endl;
         return false;

@@ -17,7 +17,8 @@ libio_la_SOURCES = \
 
 libio_la_LIBADD = \
 	action/libio_action.la \
-	gui/libio_gui.la
+	gui/libio_gui.la \
+	@READLINE_LIBS@
 
 if BUILD_RL_FRONTEND
 libio_la_SOURCES += readline.hh readline.cc readline_completion_hooks.cc

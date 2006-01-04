@@ -24,15 +24,55 @@
 # include "config.h"
 #endif
 
+#include <iostream>
 #include <string>
+#include <algorithm>
+#include <iterator>
+
 #include <herdstat/util/string.hh>
 #include "common.hh"
 #include "rc.hh"
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/"PACKAGE"rc"
-#define HERDSTATRC_LOCAL    "/."PACKAGE"rc"
+#define HERDSTATRC_LOCAL    /*HOME*/"/."PACKAGE"rc"
 
 using namespace herdstat;
+
+static bool
+option_is_deprecated(const std::string& option)
+{
+    static const char *deprecated[] = {
+        "querycache.expire",
+        "querycache.max",
+        "wget.options",
+        "use.querycache"
+    };
+
+    return std::binary_search(deprecated,
+            deprecated + NELEMS(deprecated), option);
+}
+
+struct ShowDeprecatedOptionWarning
+{
+    void operator()(const util::Vars::value_type& v) const
+    {
+        if (option_is_deprecated(v.first))
+        {
+            std::cerr << "Warning: option '" << v.first
+                << "' is deprecated and will be ignored." << std::endl;
+        }
+        else if (v.first.find('.') != std::string::npos)
+        {
+            std::cerr << "Warning: option '" << v.first
+                << "' is deprecated.  Use '";
+
+            std::replace_copy(v.first.begin(), v.first.end(),
+                std::ostream_iterator<char>(std::cerr, ""), '.', '_');
+            
+            std::cerr << "' instead." << std::endl;
+        }
+    }
+};
 
 rc::rc()
 {
@@ -45,10 +85,10 @@ rc::rc()
         vars.close();
     }
 
-    char *result = std::getenv("HOME");
-    if (result)
+    const char * const homedir = std::getenv("HOME");
+    if (homedir)
     {
-        std::string path(std::string(result) + HERDSTATRC_LOCAL);
+        const std::string path(std::string(homedir) + HERDSTATRC_LOCAL);
         if (not util::is_file(path))
             return;
 
@@ -58,6 +98,9 @@ rc::rc()
         set_options();
         vars.close();
     }
+
+    // show warnings for deprecated options
+    std::for_each(vars.begin(), vars.end(), ShowDeprecatedOptionWarning());
 }
 
 void
@@ -67,34 +110,28 @@ rc::set_options()
 
     if (not vars["colors"].empty())
         options.set_color(util::destringify<bool>(vars["colors"]));
-    if (not vars["label.color"].empty())
-	options.set_labelcolor(vars["label.color"]);
-    if (not vars["highlight.color"].empty())
-	options.set_hlcolor(vars["highlight.color"]);
+    if (not vars["label_color"].empty())
+	options.set_labelcolor(vars["label_color"]);
+    if (not vars["highlight_color"].empty())
+	options.set_hlcolor(vars["highlight_color"]);
     if (not vars["qa"].empty())
         options.set_qa(util::destringify<bool>(vars["qa"]));
     if (not vars["herdsxml"].empty())
 	options.set_herdsxml(vars["herdsxml"]);
-    if (not vars["gentoo.cvs"].empty())
-        options.set_cvsdir(vars["gentoo.cvs"]);
+    if (not vars["gentoo_cvs"].empty())
+        options.set_cvsdir(vars["gentoo_cvs"]);
     if (not vars["userinfo"].empty())
         options.set_userinfoxml(vars["userinfo"]);
-    if (not vars["use.devaway"].empty())
-        options.set_devaway(util::destringify<bool>(vars["use.devaway"]));
-    if (not vars["devaway.expire"].empty())
-        options.set_devaway_expire(util::destringify<long>(vars["devaway.expire"]));
-    if (not vars["devaway.location"].empty())
-        options.set_devawayxml(vars["devaway.location"]);
-    if (not vars["use.metacache"].empty())
-        options.set_metacache(util::destringify<bool>(vars["use.metacache"]));
-    if (not vars["metacache.expire"].empty())
-	options.set_metacache_expire(vars["metacache.expire"]);
-    if (not vars["use.querycache"].empty())
-        options.set_querycache(util::destringify<bool>(vars["use.querycache"]));
-    if (not vars["querycache.max"].empty())
-        options.set_querycache_max(util::destringify<int>(vars["querycache.max"]));
-    if (not vars["querycache.expire"].empty())
-        options.set_querycache_expire(util::destringify<long>(vars["querycache.expire"]));
+    if (not vars["use_devaway"].empty())
+        options.set_devaway(util::destringify<bool>(vars["use_devaway"]));
+    if (not vars["devaway_expire"].empty())
+        options.set_devaway_expire(util::destringify<long>(vars["devaway_expire"]));
+    if (not vars["devaway_location"].empty())
+        options.set_devawayxml(vars["devaway_location"]);
+    if (not vars["use_metacache"].empty())
+        options.set_metacache(util::destringify<bool>(vars["use_metacache"]));
+    if (not vars["metacache_expire"].empty())
+	options.set_metacache_expire(vars["metacache_expire"]);
     if (not vars["highlights"].empty())
         options.set_highlights(vars["highlights"]);
     if (not vars["frontend"].empty())

@@ -28,7 +28,7 @@
 #include <cstring>
 
 #include <herdstat/defs.hh>
-#include <herdstat/readline/readline.hh>
+#include <libreadline++/readline.hh>
 
 #include "common.hh"
 #include "action/handler.hh"

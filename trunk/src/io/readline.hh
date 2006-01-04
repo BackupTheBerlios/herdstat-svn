@@ -27,8 +27,8 @@
 # include "config.h"
 #endif
 
-#include <herdstat/readline/readline.hh>
-#include <herdstat/readline/history.hh>
+#include <libreadline++/readline.hh>
+#include <libreadline++/history.hh>
 #include "io/pretty.hh"
 
 class ReadLineIOHandler : public PrettyIOHandler
@@ -39,8 +39,8 @@ class ReadLineIOHandler : public PrettyIOHandler
         virtual bool operator()(Query * const query);
 
     private:
-        herdstat::readline::ReadLine _readline;
-        herdstat::readline::History _history;
+        rl::ReadLine _readline;
+        rl::History _history;
         bool _read_hist;
 };
 
