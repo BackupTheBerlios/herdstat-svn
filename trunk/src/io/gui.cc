@@ -30,10 +30,10 @@
 #include "handler_map.hh"
 #include "action/handler.hh"
 #ifdef QT_FRONTEND
-# include <io/gui/qt_widget_factory.hh>
+# include "io/gui/qt_widget_factory.hh"
 #endif
 #ifdef GTK_FRONTEND
-# include <io/gui/gtk_widget_factory.hh>
+# include "io/gui/gtk_widget_factory.hh"
 #endif
 #include "io/gui/widget_factory.hh"
 #include "io/gui.hh"
