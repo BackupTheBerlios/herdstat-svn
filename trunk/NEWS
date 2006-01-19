@@ -1,7 +1,7 @@
 This file contains a summary of changes in released versions.  Please read the
 ChangeLog file for a more detailed listing of changes/bug fixes.
 
-1.1.90:
+1.1.91:
     - Complete redesign; input/output has been completely separated from
       action handlers allowing us to write front-ends.  Currently provided
       front-ends: batch (read from stdin, write to stdout), stream (the previous

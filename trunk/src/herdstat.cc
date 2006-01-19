@@ -42,7 +42,6 @@
 
 // {{{ local includes
 #include "common.hh"
-#include "rc.hh"
 #include "handler_map.hh"
 #include "xmlinit.hh"
 #include "formatter.hh"
