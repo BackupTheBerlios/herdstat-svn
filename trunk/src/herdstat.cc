@@ -40,6 +40,7 @@
 #include <herdstat/util/functional.hh>
 #include <herdstat/portage/exceptions.hh>
 
+// {{{ local includes
 #include "common.hh"
 #include "rc.hh"
 #include "handler_map.hh"
@@ -61,6 +62,7 @@
 #include "action/stats.hh"
 #include "action/versions.hh"
 #include "action/which.hh"
+// }}}
 
 #define HERDSTATRC_GLOBAL   SYSCONFDIR"/herdstatrc"
 #define HERDSTATRC_LOCAL    /*HOME*/"/.herdstatrc"
@@ -70,7 +72,7 @@ using namespace herdstat::portage;
 using namespace herdstat::xml;
 
 // {{{ getopt stuff
-static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:TX:ki:S";
+static const char *short_opts = "H:o:hVvDdtpqFcnmwNErfaA:L:C:U:Tki:S";
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -118,7 +120,7 @@ static struct option long_opts[] =
     {"qa",	    no_argument,	0,  '\a'},
     {"nometacache",  no_argument,	0,  '\f'},
     {"TEST",	    no_argument,	0,  'T'},
-    {"field",	    required_argument,	0,  'X'},
+//    {"field",	    required_argument,	0,  'X'},
     {"keywords",    no_argument,	0,  'k'},
     {"iomethod",    required_argument,  0,  'i'},
     {"no-spinner",  no_argument,        0,  'S'},
@@ -140,11 +142,6 @@ version()
     << " +debug"
 #else
     << " -debug"
-#endif
-#ifdef HAVE_NCURSES
-    << " +ncurses"
-#else
-    << " -ncurses"
 #endif
 #ifdef READLINE_FRONTEND
     << " +readline"
@@ -301,27 +298,26 @@ help()
 }
 // }}}
 
-static void
-parse_fields(const std::vector<std::string>& fields, Options *options)
-{
-    /* --field */
-    std::vector<std::string>::const_iterator i;
-    for (i = fields.begin() ; i != fields.end() ; ++i)
-    {
-	std::vector<std::string> parts;
-        util::split(*i, std::back_inserter(parts), ",");
-	if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
-	    throw argsInvalidField();
+//static void
+//parse_fields(const std::vector<std::string>& fields, Options *options)
+//{
+//    /* --field */
+//    std::vector<std::string>::const_iterator i;
+//    for (i = fields.begin() ; i != fields.end() ; ++i)
+//    {
+//        std::vector<std::string> parts;
+//        util::split(*i, std::back_inserter(parts), ",");
+//        if (parts.size() != 2 or (parts[0].empty() or parts[1].empty()))
+//            throw argsInvalidField();
 
-        options->add_field(std::make_pair(parts[0], parts[1]));
-    }
-}
+//        options->add_field(std::make_pair(parts[0], parts[1]));
+//    }
+//}
 
 static bool
 handle_opts(int argc, char **argv, Query *q)
 {
     Options& options(GlobalOptions());
-    std::vector<std::string> fields;
     int key, opt_index = 0;
 
     while (true)
@@ -421,9 +417,9 @@ handle_opts(int argc, char **argv, Query *q)
                 GlobalXMLInit();
 		break;
 	    /* --field */
-	    case 'X':
-		fields.push_back(optarg);
-		break;
+//            case 'X':
+//                fields.push_back(optarg);
+//                break;
 	    /* --no-overlay */
 	    case 'N':
 		options.set_overlay(false);
@@ -547,7 +543,7 @@ handle_opts(int argc, char **argv, Query *q)
     // }}}
 
     /* --field */
-    parse_fields(fields, &options);
+//    parse_fields(fields, &options);
 
     if (optind < argc)
         std::transform(argv+optind, argv+argc,
@@ -556,8 +552,8 @@ handle_opts(int argc, char **argv, Query *q)
     {
 	/* actions that are allowed to have 0 non-option args */
 	const std::string& action = q->action();
-	if (action == "dev" and fields.empty())
-	    throw argsUsage();
+//        if (action == "dev" and fields.empty())
+//            throw argsUsage();
 
 	if (action != "unspecified" and
 	    action != "meta" and
@@ -609,13 +605,14 @@ main(int argc, char **argv)
     try
     { 
 	Query q;
-	char *getenv_result = NULL;
-	
-	if ((getenv_result = std::getenv("HERDSTAT_FRONTEND")))
-	    options.set_iomethod(getenv_result);
 	
 	/* handle rc file(s) */
-	if (not test) { rc rc; }
+	if (not test)
+            options.read_configs();
+
+	char *getenv_result = NULL;
+	if ((getenv_result = std::getenv("HERDSTAT_FRONTEND")))
+	    options.set_iomethod(getenv_result);
 
 	/* handle command line options */
 	if (not handle_opts(argc, argv, &q))
