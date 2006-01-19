@@ -31,12 +31,15 @@
 #include <vector>
 #include <utility>
 #include <herdstat/noncopyable.hh>
+#include <herdstat/util/vars.hh>
 
 typedef std::vector<std::pair<std::string, std::string> > fields_type;
 
 class Options : private herdstat::Noncopyable
 {
     public:
+        void read_configs();
+
         bool verbose() const { return _verbose; }
         void set_verbose(bool v) { _verbose = v; }
         bool quiet() const { return _quiet; }
@@ -65,8 +68,6 @@ class Options : private herdstat::Noncopyable
         void set_meta(bool v) { _meta = v; }
         bool metacache() const { return _metacache; }
         void set_metacache(bool v) { _metacache = v; }
-        bool querycache() const { return _querycache; }
-        void set_querycache(bool v) { _querycache = v; }
         bool devaway() const { return _devaway; }
         void set_devaway(bool v)  { _devaway = v; }
         bool fetch() const { return _fetch; }
@@ -75,10 +76,6 @@ class Options : private herdstat::Noncopyable
         { return (_spinner and not _quiet and not _debug and not _timer); }
         void set_spinner(bool v) { _spinner = v; }
         
-        const int& querycache_max() const { return _querycache_max; }
-        void set_querycache_max(int v) { _querycache_max = v; }
-        const long& querycache_expire() const { return _querycache_expire; }
-        void set_querycache_expire(long v) { _querycache_expire = v; }
         const long& devaway_expire() const { return _devaway_expire; }
         void set_devaway_expire(long v) { _devaway_expire = v; }
         const size_t& maxcol() const { return _maxcol; }
@@ -117,8 +114,8 @@ class Options : private herdstat::Noncopyable
         const std::string& action() const { return _action; }
         void set_action(const std::string& v) { _action.assign(v); }
 
-        const fields_type& fields() const { return _fields; }
-        void add_field(const fields_type::value_type v) { _fields.push_back(v); }
+//        const fields_type& fields() const { return _fields; }
+//        void add_field(const fields_type::value_type v) { _fields.push_back(v); }
 
         const std::string& iomethod() const { return _iomethod; }
         void set_iomethod(const std::string& v) { _iomethod.assign(v); }
@@ -130,6 +127,8 @@ class Options : private herdstat::Noncopyable
     private:
         friend Options& GlobalOptions();
         Options();
+
+        void set_options_from_config(herdstat::util::Vars& v);
 
         bool _verbose;
         bool _quiet;
@@ -145,13 +144,10 @@ class Options : private herdstat::Noncopyable
         bool _qa;
         bool _meta;
         bool _metacache;
-        bool _querycache;
         bool _devaway;
         bool _fetch;
         bool _spinner;
 
-        int _querycache_max;
-        long _querycache_expire;
         long _devaway_expire;
         size_t _maxcol;
 
@@ -174,7 +170,7 @@ class Options : private herdstat::Noncopyable
         std::string _action;
         std::string _iomethod;
 
-        fields_type _fields;
+//        fields_type _fields;
 
         const std::string& _portdir;
         const std::vector<std::string>& _overlays;
