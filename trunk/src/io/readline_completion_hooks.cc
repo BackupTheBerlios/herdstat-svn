@@ -28,11 +28,12 @@
 #include <cstring>
 
 #include <herdstat/defs.hh>
-#include <libreadline++/readline.hh>
 
 #include "common.hh"
 #include "action/handler.hh"
 #include "handler_map.hh"
+
+#include <readline/readline.h>
 
 static std::string cur_action;
 HandlerMap<ActionHandler> *lhp = NULL;

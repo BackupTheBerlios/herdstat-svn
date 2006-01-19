@@ -104,9 +104,16 @@ AC_ARG_WITH(readline,
 AC_MSG_RESULT([$WITH_READLINE])
 
 if test x"$WITH_READLINE" = "xyes" ; then
+    AC_CHECK_LIB(readline, readline, [READLINE_LIBS="-lreadline"],
+	[AC_MSG_ERROR([failed to find libreadline])])
+    AC_CHECK_HEADERS([readline/readline.h],,
+	[AC_MSG_ERROR([failed to find readline/readline.h])])
+    AC_CHECK_LIB(history, add_history,
+	[READLINE_LIBS="$READLINE_LIBS -lhistory"],
+	[AC_MSG_ERROR([failed to find libhistory])])
+    AC_CHECK_HEADERS([readline/history.h],,
+	[AC_MSG_ERROR([failed to find readline/history.h])])
     AC_DEFINE(READLINE_FRONTEND, 1, [Enable Readline front-end])
-    PKG_CHECK_MODULES(libreadlinepp, libreadline++ >= 0.1,
-	[READLINE_LIBS="-lreadline++"])
 fi
 AC_SUBST(READLINE_LIBS)
 

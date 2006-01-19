@@ -31,6 +31,9 @@
 #include <herdstat/util/string.hh>
 #include <herdstat/util/functional.hh>
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #include "exceptions.hh"
 #include "handler_map.hh"
 #include "xmlinit.hh"
@@ -40,21 +43,37 @@
 #include "io/action/help.hh"
 #include "io/readline.hh"
 
-/// max number of history entries to keep
+#define HERDSTAT_HISTORY_PATH (_hist_path.empty() ? NULL : _hist_path.c_str())
 #define HERDSTAT_HISTORY_MAX 100
 
 using namespace herdstat;
 
 extern char **herdstat_completion(const char *, int, int);
 
-ReadLineIOHandler::ReadLineIOHandler()
-    : _readline(PACKAGE), _history(), _read_hist(false)
+/// Exception for readline EOF.
+class ReadLineEOF : public BaseException { };
+
+static inline void
+get_user_input(const std::string& prompt, std::string *result)
 {
+    char *input = readline(prompt.c_str());
+    if (not input)
+        throw ReadLineEOF();
+
+    result->assign(*input ? input : "");
+    std::free(input);
+}
+
+ReadLineIOHandler::ReadLineIOHandler()
+    : _read_hist(false)
+{
+    using_history();
+
     const char * const result = std::getenv("HOME");
     if (result)
-        _history.set_path(std::string(result) + "/.herdstat_history");
+        _hist_path.assign(std::string(result) + "/.herdstat_history");
 
-    _readline.set_attempted_comp_hook(herdstat_completion);
+    rl_attempted_completion_function = herdstat_completion;
 
     insert_local_handler<HelpIOActionHandler>("help");
     insert_local_handler<SetIOActionHandler>("set");
@@ -63,13 +82,14 @@ ReadLineIOHandler::ReadLineIOHandler()
 
 ReadLineIOHandler::~ReadLineIOHandler()
 {
-    _history.stifle(HERDSTAT_HISTORY_MAX);
+    stifle_history(HERDSTAT_HISTORY_MAX);
 
     try
     {
-        _history.write();
+        if (write_history(HERDSTAT_HISTORY_PATH) != 0)
+            throw FileException(_hist_path);
     }
-    catch (const rl::FileException& e)
+    catch (const FileException& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -80,12 +100,20 @@ ReadLineIOHandler::operator()(Query * const query)
 {
     Options& options(GlobalOptions());
     QueryResults results;
+    static std::string in;
+    static std::string::size_type pos;
+    static std::vector<std::string> parts;
 
     GlobalXMLInit();
+    in.clear();
+    parts.clear();
 
     if (not _read_hist)
     {
-        _history.read();
+        if (util::is_file(_hist_path) and
+            (read_history(HERDSTAT_HISTORY_PATH) != 0))
+            throw FileException(_hist_path);
+
         _read_hist = true;
     }
 
@@ -103,24 +131,22 @@ ReadLineIOHandler::operator()(Query * const query)
             query->set_action(options.action());
         }
 
-        _readline.set_prompt(options.prompt());
-        std::string& in(_readline());
+        /* read user input */
+        get_user_input(options.prompt(), &in);
 
         /* empty, so just call ourselves again and display another prompt */
         if (in.empty())
             return true;
 
         /* strip trailing whitespace */
-        std::string::size_type pos = in.find_last_not_of(" \t");
-        if (pos != std::string::npos)
+        if ((pos = in.find_last_not_of(" \t")) != std::string::npos)
             in.erase(++pos);
 
         if (in == "quit" or in == "exit")
             return false;
 
-        _history.add(in);
+        add_history(in.c_str());
 
-        std::vector<std::string> parts;
         util::split(in, std::back_inserter(parts));
         if (parts.empty())
             /* should never happen since in isn't empty */
@@ -178,7 +204,7 @@ ReadLineIOHandler::operator()(Query * const query)
         (*h)(*query, &results);
         display(results);
     }
-    catch (const rl::ReadLineEOF&)
+    catch (const ReadLineEOF&)
     {
         options.outstream() << std::endl;
         return false;

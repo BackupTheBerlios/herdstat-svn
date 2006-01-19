@@ -27,21 +27,28 @@
 # include "config.h"
 #endif
 
-#include <libreadline++/readline.hh>
-#include <libreadline++/history.hh>
 #include "io/pretty.hh"
+
+/**
+ * @class ReadLineIOHandler
+ * @brief I/O handler for the readline front-end.
+ */
 
 class ReadLineIOHandler : public PrettyIOHandler
 {
     public:
+        /// Default constructor.
         ReadLineIOHandler();
+
+        /// Destructor.
         virtual ~ReadLineIOHandler();
+
+        /// handle input/display output
         virtual bool operator()(Query * const query);
 
     private:
-        rl::ReadLine _readline;
-        rl::History _history;
         bool _read_hist;
+        std::string _hist_path;
 };
 
 #endif /* _HAVE_IO_READLINE_HH */
