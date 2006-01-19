@@ -29,6 +29,11 @@
 
 #include "io/handler.hh"
 
+/**
+ * @class PrettyIOHandler
+ * @brief Base I/O handler for "pretty" output via the Formatter class.
+ */
+
 class PrettyIOHandler : public IOHandler
 {
     public:
@@ -36,6 +41,7 @@ class PrettyIOHandler : public IOHandler
         virtual ~PrettyIOHandler() { }
 
     protected:
+        /// Display output using the Formatter class.
         void display(const QueryResults& results);
 
     private:

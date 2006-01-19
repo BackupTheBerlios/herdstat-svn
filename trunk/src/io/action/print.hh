@@ -29,6 +29,11 @@
 
 #include "io/action/handler.hh"
 
+/**
+ * @class PrintIOActionHandler
+ * @brief IOActionHandler for printing the value of an option.
+ */
+
 class PrintIOActionHandler : public IOActionHandler
 {
     public:

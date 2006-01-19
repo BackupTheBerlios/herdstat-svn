@@ -1,5 +1,5 @@
 /*
- * herdstat -- io/stream.hh
+ * herdstat -- src/io/stream.hh
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *
@@ -28,6 +28,11 @@
 #endif
 
 #include "io/pretty.hh"
+
+/**
+ * @class StreamIOHandler
+ * @brief I/O handler for default CLI front-end.
+ */
 
 class StreamIOHandler : public PrettyIOHandler
 {

@@ -34,26 +34,44 @@
 #include "handler_map.hh"
 #include "action/handler.hh"
 
+/**
+ * @class IOHandler
+ * @brief Input/Output handler base class.  All front-ends ultimately derive
+ * from this class.
+ */
+
 class IOHandler
 {
     public:
+        /// Default constructor.
         IOHandler();
+        
+        /// Destructor.
         virtual ~IOHandler();
+
+        /** Perform input/output.
+         * @param query query object to use.
+         * @returns false when ready to quit.
+         */
         virtual bool operator()(Query * const query) = 0;
 
     protected:
-        /* insert a local handler */
+        /// insert a local handler
         template <typename Handler>
         inline void insert_local_handler(const std::string& name);
-        /* get a local handler */
+
+        /// get a local handler
         inline ActionHandler *
         local_handler(const std::string& name);
-        /* is it in our local handler map? */
+        
+        /// is a handler with the specified name in our local handler map?
         inline bool is_local_handler(const std::string& name) const;
 
+        /// initialize XML stuff if necessary
         void init_xml_if_necessary(const std::string& action);
 
     private:
+        /// action handler map for actions specific to this handler.
         HandlerMap<ActionHandler> _local;
 };
 

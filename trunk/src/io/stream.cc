@@ -1,5 +1,5 @@
 /*
- * herdstat -- io/stream.cc
+ * herdstat -- src/io/stream.cc
  * $Id$
  * Copyright (c) 2005 Aaron Walker <ka0ttic@gentoo.org>
  *

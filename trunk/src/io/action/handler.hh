@@ -31,7 +31,12 @@
 
 /**
  * @file io/action/handler.hh
- * @brief Defines an abstract interface to IOHandler-specific action handlers.
+ * @brief Provides the IOActionHandler class definition.
+ */
+
+/**
+ * @class IOActionHandler
+ * @brief Defines the interface for IOHandler-specific ActionHandlers.
  */
 
 class IOActionHandler : public ActionHandler

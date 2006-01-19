@@ -29,6 +29,11 @@
 
 #include "io/action/handler.hh"
 
+/**
+ * @class HelpIOActionHandler
+ * @brief IOActionHandler for displaying help.
+ */
+
 class HelpIOActionHandler : public IOActionHandler
 {
     public:

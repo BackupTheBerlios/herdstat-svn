@@ -40,10 +40,15 @@
 #include "query_results.hh"
 #include "io/gui/widget_factory.hh"
 
+/**
+ * @class ActionHandler
+ * @brief Base class for representing actions.
+ */
+
 class ActionHandler
 {
     public:
-        ActionHandler();
+        /// Destructor.
         virtual ~ActionHandler();
 
         /// perform action
@@ -69,13 +74,21 @@ class ActionHandler
         virtual void generate_completions(std::vector<std::string> *) const = 0;
 
     protected:
+        /// Default constructor.
+        ActionHandler();
+
+        /// do any initializations
         virtual void do_init(Query& query, QueryResults * const results);
+        /// do 'all' target expansion
         virtual void do_all(Query& query, QueryResults * const results);
+        /// do regular expression expansion
         virtual void do_regex(Query& query, QueryResults * const results) = 0;
+        /// fill results
         virtual void do_results(Query& query, QueryResults * const results) = 0;
+        /// do any cleaning up
         virtual void do_cleanup(QueryResults * const results);
 
-        /* Called by GuiIOHandler::operator() when
+        /** Called by GuiIOHandler::operator() when
          * filling the TabBar. */
         friend class GuiIOHandler;
         virtual gui::Tab *createTab(gui::WidgetFactory *factory) = 0;
@@ -83,15 +96,21 @@ class ActionHandler
         /* result size (not necessarily same size as results
          * object passed to operator()). */
         int& size() { return _size; }
-        /* did the handler err at least once? */
+        /// did the handler err at least once?
         bool& error() { return _err; }
 
+        /// increment progress spinner.
         inline void increment_spinner();
+        /// stop progress spinner.
         inline void stop_spinner();
+        /// start progress spinner.
         inline void start_spinner(unsigned total,
                                   const std::string& title = "");
+
+        /// Get progress spinner pointer.
         inline herdstat::util::ProgressMeter *spinner() const
         { return _spinner; } 
+        /// Set progress spinner pointer.
         inline void set_spinner(herdstat::util::ProgressMeter *p)
         { _spinner = p; }
 
@@ -131,29 +150,43 @@ ActionHandler::start_spinner(unsigned total, const std::string& title)
         _spinner->start(total, title);
 }
 
+/**
+ * @class PortageSearchActionHandler
+ * @brief Base class for ActionHandler's that do any kind of portage searching.
+ */
+
 class PortageSearchActionHandler : public ActionHandler
 {
     public:
+        /// Destructor.
         virtual ~PortageSearchActionHandler();
 
         virtual void handle_pwd_query(Query * const query,
                                       QueryResults * const results);
+
         virtual void generate_completions(std::vector<std::string> *) const;
 
     protected:
+        /// Default constructor.
         PortageSearchActionHandler();
 
         virtual void do_init(Query& query, QueryResults * const results);
         virtual void do_regex(Query& query, QueryResults * const results);
         virtual void do_cleanup(QueryResults * const results);
 
+        /// remove packages whose portdir is an overlay from the matches member.
         inline void remove_overlay_packages();
+        /// determine if any of the specified packages are ambigious.
         inline bool is_ambiguous(const std::vector<herdstat::portage::Package>& pkgs);
 
+        /// return reference to _find member.
         inline herdstat::portage::PackageFinder& find();
+        /// are we in pwd mode?
         inline bool pwd_mode() const { return _pwd; }
+        /// set pwd mode.
         inline void set_pwd_mode(bool v) { _pwd = v; }
 
+        /// matches
         std::vector<herdstat::portage::Package> matches;
 
     private:

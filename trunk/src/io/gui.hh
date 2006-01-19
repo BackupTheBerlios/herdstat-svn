@@ -31,6 +31,11 @@
 #include "io/handler.hh"
 #include "io/gui/widget_factory.hh"
 
+/**
+ * @class GuiIOHandler
+ * @brief Base I/O handler for the GUI front-end.
+ */
+
 class GuiIOHandler : public IOHandler
 {
     public:

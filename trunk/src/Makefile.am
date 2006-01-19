@@ -11,7 +11,6 @@ herdstat_SOURCES = \
 	handler_map.hh \
 	options.hh options.cc \
 	common.hh common.cc \
-	rc.hh rc.cc \
 	xmlinit.hh xmlinit.cc \
 	formatter.hh formatter.cc \
 	cache.hh cache.cc \
@@ -28,19 +27,6 @@ herdstat_LDADD = \
 	io/libio.la \
 	action/libaction.la \
 	$(libherdstat_LIBS)
-
-# if DEBUG
-# bin_PROGRAMS += querycachectl
-# querycachectl_SOURCES = common.hh common.cc \
-#                         exceptions.hh \
-#                         options.hh options.cc \
-#                         rc.hh rc.cc \
-#                         formatter.hh formatter.cc \
-#                         pkgquery.hh pkgquery.cc \
-#                         querycache.hh querycache.cc \
-#                         querycachectl.cc
-# querycachectl_LDADD = $(libherdstat_LIBS)
-# endif
 
 INCLUDES = $(libherdstat_CFLAGS)
 MAINTAINERCLEANFILES = Makefile.in *~

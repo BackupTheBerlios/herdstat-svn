@@ -29,6 +29,11 @@
 
 #include "io/action/handler.hh"
 
+/**
+ * @class SetIOActionHandler
+ * @brief IOActionHandler for setting the value of an option.
+ */
+
 class SetIOActionHandler : public IOActionHandler
 {
     public:
