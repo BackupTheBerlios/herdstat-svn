@@ -29,15 +29,17 @@
 
 #include "io/handler.hh"
 
+/**
+ * @class BatchIOHandler
+ * @brief I/O handler for the batch front-end.
+ */
+
 class BatchIOHandler : public IOHandler
 {
     public:
         BatchIOHandler();
         virtual ~BatchIOHandler();
         virtual bool operator()(Query * const query);
-
-    private:
-        HandlerMap<ActionHandler> local_handlers;
 };
 
 #endif /* _HAVE_BATCH_HH */
