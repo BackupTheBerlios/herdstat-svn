@@ -151,12 +151,9 @@ SetIOActionHandler::do_results(Query& query,
             }
             else SET_INT_IF_EQUAL(bool, qa)
             else SET_INT_IF_EQUAL(bool, metacache)
-            else SET_INT_IF_EQUAL(bool, querycache)
             else SET_INT_IF_EQUAL(bool, devaway)
             else SET_INT_IF_EQUAL(bool, meta)
             else SET_INT_IF_EQUAL(bool, dev)
-            else SET_INT_IF_EQUAL(int, querycache_max)
-            else SET_INT_IF_EQUAL(long, querycache_expire)
             else SET_INT_IF_EQUAL(size_t, maxcol)
             else SET_STR_IF_EQUAL(cvsdir)
             else SET_STR_IF_EQUAL(herdsxml)

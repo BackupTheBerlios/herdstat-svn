@@ -63,8 +63,6 @@ PrintIOActionHandler::generate_completions(std::vector<std::string> *v) const
         "devaway",
         "meta",
         "dev",
-        "querycache_max",
-        "querycache_expire",
         "devaway_expire",
         "maxcol",
         "action",
@@ -106,8 +104,6 @@ PrintIOActionHandler::do_results(Query& query,
         else ADD_IF_EQUAL(devaway)
         else ADD_IF_EQUAL(meta)
         else ADD_IF_EQUAL(dev)
-        else ADD_IF_EQUAL(querycache_max)
-        else ADD_IF_EQUAL(querycache_expire)
         else ADD_IF_EQUAL(devaway_expire)
         else ADD_IF_EQUAL(maxcol)
         else ADD_IF_EQUAL(action)
