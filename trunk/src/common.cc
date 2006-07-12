@@ -30,7 +30,7 @@
 #include "options.hh"
 #include "common.hh"
 
-#define HERDSXML_REMOTE "http://www.gentoo.org/cgi-bin/viewcvs.cgi/misc/herds.xml?rev=HEAD;cvsroot=gentoo;content-type=text/plain"
+#define HERDSXML_REMOTE "http://sources.gentoo.org/viewcvs.py/*checkout*/gentoo/misc/herds.xml?content-type=text/plain"
 #define HERDSXML_LOCAL  LOCALSTATEDIR"/herds.xml"
 #define DEVAWAYXML_REMOTE "http://dev.gentoo.org/devaway/xml/index.php"
 #define DEVAWAYXML_LOCAL  LOCALSTATEDIR"/devaway.xml"
